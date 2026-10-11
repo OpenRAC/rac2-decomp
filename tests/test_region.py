@@ -36,6 +36,14 @@ class RegistryTests(unittest.TestCase):
         self.assertEqual(usa.expected_levels, len(usa.overlay_pins()))
         self.assertEqual(region.matching().name, "ntsc-u")
 
+    def test_v2_target_is_pinned_but_has_no_proofs(self):
+        v2 = region.load("v2")
+        self.assertEqual((v2.name, v2.serial, v2.matching, v2.pinned, v2.expected_levels),
+                         ("ntsc-u-v2", "SCUS_972.68", False, True, 27))
+        self.assertEqual(len(v2.overlay_pins()), 27)
+        self.assertNotEqual(v2.target["boot"]["sha256"], region.load("ntsc-u").target["boot"]["sha256"])
+        self.assertEqual(region.by_serial("SCUS_972.68").name, "ntsc-u")
+
     def test_aliases_and_environment_select_a_region(self):
         self.assertEqual(region.load("NTSC").name, "ntsc-u")
         self.assertEqual(region.load("europe").name, "pal")
