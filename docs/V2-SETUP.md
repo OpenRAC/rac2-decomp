@@ -84,3 +84,12 @@ Claim a small lot in [`CONTRIBUTOR-RESERVATIONS.md`](CONTRIBUTOR-RESERVATIONS.md
 as described in [`CONTRIBUTOR-QUICKSTART.md`](CONTRIBUTOR-QUICKSTART.md), and keep matching claims honest:
 a function counts only after the campaign byte gates pass.
 `python scripts/measure_unique.py --reference <runtime>/runs/<run>/reference` estimates unique v2.00 code (about 5.25 MB, heuristic; see section 6).
+
+## 9. Deduplicated v1.01 estimate (accepted target)
+
+The accepted v1.01 target counts 48.8 MB of loaded code because the engine is repeated in each of the 27 overlays.
+`python scripts/unique_estimate.py catalog --reference <v1.01 reference> --elf <reference>/boot.elf` (private input, then commit
+`config/estimates/ntsc-u.json`) and `python scripts/unique_estimate.py report --output build/decomp/unique-estimate-report.json`
+build a separate decomp.dev report in which each distinct body counts once (relocation fields masked by a register-tracking heuristic).
+Credit comes only from accepted proofs of identical digest and extent, so it adds nothing to the official figures. CI uploads it as
+`SCUS_972.68_unique_estimate`; the maintainer's `SCUS_972.68_report` is unchanged.

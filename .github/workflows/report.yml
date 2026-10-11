@@ -1,6 +1,7 @@
 name: Report
 
-# Publishes the USA v2.00 progress report that decomp.dev reads. Runs beside the maintainer's
+# Publishes two supplementary decomp.dev reports: the experimental USA v2.00 candidates and the heuristic
+# deduplicated estimate for the accepted USA v1.01 target (no new credit). Runs beside the maintainer's
 # validation workflows and never replaces them.
 on:
   push:
@@ -14,7 +15,7 @@ permissions:
 
 jobs:
   report:
-    name: SCUS_972.68 v2.00 report
+    name: SCUS_972.68 supplementary reports
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +26,9 @@ jobs:
         run: python scripts/legal_check.py
       - name: Build the USA v2.00 report from the committed catalogue and proofs
         run: python scripts/v2_report.py report --output build/decomp/report-v2.json
-      - name: Validate the report with objdiff
+      - name: Build the deduplicated USA v1.01 estimate from the committed catalogue
+        run: python scripts/unique_estimate.py report --output build/decomp/unique-estimate-report.json
+      - name: Validate the reports with objdiff
         # decomp.dev parses this artifact with objdiff; the release binary is pinned by version and SHA-256.
         run: |
           curl --fail --location --retry 3 -o "$RUNNER_TEMP/objdiff-cli" \
@@ -34,17 +37,27 @@ jobs:
           chmod +x "$RUNNER_TEMP/objdiff-cli"
           "$RUNNER_TEMP/objdiff-cli" report changes build/decomp/report-v2.json build/decomp/report-v2.json \
             -o "$RUNNER_TEMP/objdiff-validation.json"
+          "$RUNNER_TEMP/objdiff-cli" report changes build/decomp/unique-estimate-report.json build/decomp/unique-estimate-report.json \
+            -o "$RUNNER_TEMP/objdiff-validation-estimate.json"
       - uses: actions/upload-artifact@v4
         with:
           name: SCUS_972.68_v2_report
           path: build/decomp/report-v2.json
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SCUS_972.68_unique_estimate
+          path: build/decomp/unique-estimate-report.json
           if-no-files-found: error
       - name: Job summary
         run: |
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           m = json.load(open("build/decomp/report-v2.json"))["measures"]
-          print("### USA v2.00 progress (SCUS_972.68)")
+          print("### USA v2.00 exploratory report (SCUS_972.68, no credit)")
           print(f"Matched code: {int(m['matchedCode']):,} / {int(m['totalCode']):,} bytes ({m['matchedCodePercent']:.4f}%)")
           print(f"Matched units: {m['completeUnits']} / {m['totalUnits']}")
+          e = json.load(open("build/decomp/unique-estimate-report.json"))["measures"]
+          print("### USA v1.01 deduplicated estimate (heuristic, no new credit)")
+          print(f"Credited distinct code: {int(e['matchedCode']):,} / {int(e['totalCode']):,} bytes ({e['matchedCodePercent']:.4f}%)")
           PY
