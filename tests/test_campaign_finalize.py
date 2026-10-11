@@ -243,6 +243,21 @@ class FinalizeTests(unittest.TestCase):
             self.finish(maintainer_jobs=2)
         self.assertFalse(self.output.exists())
 
+    def test_structural_names_and_trial_test_inputs_are_snapshotted_and_guarded(self):
+        fixtures = {
+            "config/segments/fixture.tsv": b"0x1000\tfixture\n",
+            "symbol_addrs/usa/symbol_addrs.txt": b"Fixture = 0x1000;\n",
+            "trials/usa-v2/Fixture.c": b"int Fixture(void) { return 1; }\n",
+        }
+        for name, data in fixtures.items():
+            write(self.repo / name, data)
+        result = self.finish()
+        for name, data in fixtures.items():
+            self.assertEqual((self.output / "snapshot" / name).read_bytes(), data)
+        write(self.repo / "config/segments/fixture.tsv", b"changed metadata\n")
+        with self.assertRaisesRegex(ValueError, "Concurrent"):
+            self.finish(apply=True)
+
     def test_delegated_owner_local_authenticates_role_before_preparation(self):
         for name in ("test_campaign_finalize", "test_decomp_report", "test_maintainer_tests", "test_maintainer_test_policy"):
             write(self.repo / "tests" / (name + ".py"), b"# targeted fixture\n")

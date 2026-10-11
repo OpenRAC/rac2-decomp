@@ -168,7 +168,8 @@ def _inventory(repo):
     """Copy only source/documentation/structural metadata; never runtime trees."""
     result = {}
     patterns = {"scripts": {".py"}, "tests": {".py"}, "src": {".c", ".h", ".cfrag"},
-                "candidates": {".c"}, "config": {".json", ".gz"},
+                "candidates": {".c"}, "config": {".json", ".gz", ".tsv"},
+                "symbol_addrs": {".txt"}, "trials": {".c", ".md"},
                 "progress": {".json", ".gz", ".md", ".svg"}, "docs": {".md"},
                 ".github": {".md", ".yml", ".yaml"}}
     for directory, suffixes in patterns.items():
