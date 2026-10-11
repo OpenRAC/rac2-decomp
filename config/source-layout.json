@@ -844,11 +844,16 @@
       "boundary_evidence": "authoritative contiguous source fragment; not an original object boundary",
       "fragment": "src/shared/node-record-helper-pipeline.cfrag",
       "name": "node-record-helper-pipeline"
+    },
+    {
+      "boundary_evidence": "authoritative contiguous source fragment; not an original object boundary",
+      "fragment": "src/boot/19-second-argument-forwarder.cfrag",
+      "name": "19-second-argument-forwarder"
     }
   ],
   "generator_sha256": "9f4dd373e387ce8d272c02b7ca337ea46b1fa9301065f932a26d7c230adbf43d",
   "input_sha256": {
-    "candidates/boot.c": "b0aa18b9eac5fba68c87cd4a6908149b3a88cda9b43f7654f9fdfde0dd645a68",
+    "candidates/boot.c": "ef361bdb901d9e7b24bc337b4ce843b69f22726622b8a1e450d1b32aa3eb9b0b",
     "candidates/levels/0_aranos_tutorial-g8.c": "eac0f2bc08962cddbc14feac4abfd10d89620487207cf8256375fa6bc7892518",
     "candidates/levels/0_aranos_tutorial.c": "b9e575d0da39811c34cec348ddd948d5ed76eaa2d40e0277fc790f555288352a",
     "candidates/levels/10_hrugis_cloud-g8.c": "6f680198b5dc27620e8a20487c551273e84c2fbf5abbe435cd504786c8f36abb",
@@ -909,7 +914,7 @@
     "config/boot-units/sdk-cpr8.json": "d3b35d02f2ab660e84aeedf65aabde12b89286d97ba012bc27fa8fd5291175c5",
     "config/boot-units/sdk-ipu-restart-dma.json": "186e6faca67f024ca46baf69e37b0625cbaae33cc143df3204d9d01332175c31",
     "config/boot-units/sdk-sysbit-flush.json": "8997e4370cf6c1a4aaf13d44c4234d78b0226618a7895319ecc1618d93e1d031",
-    "config/candidate-catalog.json": "ab37710e574e2facd9dbeada484857d5d69130e1fc12a886e8849d51332d3660",
+    "config/candidate-catalog.json": "3e4991906258d5fa5087e0f002adbf733d1d1e74b7bcba215af171768f1b4198",
     "config/compiler-profiles/owned-sdk-b9-single-text-controls-v1.json": "b6274a824c321458200375da3012c3cd35163f1994402caf6f9c78bfb71023b6",
     "config/level-g8/0_aranos_tutorial.json": "347f8c8d1aac943ccd6e56697b98c7d3475c144ccf3d69c21c90b0a16c45c7b3",
     "config/level-g8/10_hrugis_cloud.json": "1f8fc8b7a088a8fd483fe8332bf67766174fd9182f59f57a02a712c1a692f19c",
@@ -973,8 +978,8 @@
   },
   "machine_proof_status": "unverified after authoring; regenerate all affected reviews and loaded-byte gates",
   "metrics": {
-    "boot_authored_functions": 391,
-    "boot_catalogued_machine_bytes": 33464,
+    "boot_authored_functions": 394,
+    "boot_catalogued_machine_bytes": 33492,
     "identity_basis": "catalogued definitions compared as exact source bytes after recorded symbol-only substitutions; not a new machine proof",
     "native_authored_variant_catalogued_bytes_upper_bound": 978308,
     "native_base_family_placements": 1969,
@@ -993,7 +998,7 @@
     "sdk_authored_functions": 3,
     "sdk_catalogued_machine_bytes": 1144,
     "shared_native_prelude_variants": 29,
-    "total_unique_authored_source_variants_in_scope": 7567,
+    "total_unique_authored_source_variants_in_scope": 7570,
     "warning": "Representative catalogued bytes are an organization metric, not loaded-byte progress or a new accepted match. Do not add this numerator to the public report."
   },
   "native_source_families": [
@@ -145379,8 +145384,8 @@
         },
         {
           "fragment": "src/boot/04-leaf-field-accessors.cfrag",
-          "sha256": "85ca5d8d0f31d7e1b0297a7a558b87166cccc8546214c4114ab1ce68a9b6ccf8",
-          "source_text_bytes": 4669
+          "sha256": "674f9b036178682aa460a5434a0d821be465dad8a27f35a283d2857c658bf51c",
+          "source_text_bytes": 4900
         },
         {
           "fragment": "src/boot/05-small-field-transforms.cfrag",
@@ -147623,10 +147628,15 @@
           },
           "sha256": "0aa2909899e55b13bc25b8efc2798eb959202206d25f50eb364efd46007bb145",
           "source_text_bytes": 1848
+        },
+        {
+          "fragment": "src/boot/19-second-argument-forwarder.cfrag",
+          "sha256": "089cc5f4a2891ba3ef0a4231619cf8ba8b28acf15383c9fb060d0da1f7a58d2c",
+          "source_text_bytes": 79
         }
       ],
-      "sha256": "b0aa18b9eac5fba68c87cd4a6908149b3a88cda9b43f7654f9fdfde0dd645a68",
-      "source_text_bytes": 178755
+      "sha256": "ef361bdb901d9e7b24bc337b4ce843b69f22726622b8a1e450d1b32aa3eb9b0b",
+      "source_text_bytes": 179065
     },
     "candidates/levels/0_aranos_tutorial-g8.c": {
       "pieces": [

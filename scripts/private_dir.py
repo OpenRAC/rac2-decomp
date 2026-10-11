@@ -22,7 +22,7 @@ def allowed(path: Path) -> bool:
     resolved = path.resolve()
     if not inside_repository(resolved):
         return True
-    if EXTRACTED not in resolved.parents:
+    if resolved != EXTRACTED and EXTRACTED not in resolved.parents:
         return False
     probe = resolved / ".private-probe"
     ignored = subprocess.run(["git", "-C", str(ROOT), "check-ignore", "-q", str(probe)], check=False).returncode == 0

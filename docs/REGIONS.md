@@ -1,9 +1,9 @@
 # Game regions
 
-New work targets **USA v2.00** (`ntsc-u-v2`, same serial `SCUS_972.68`). The existing C catalogues,
-reviews and progress proofs were measured on USA v1.01 (`ntsc-u`) and stay attached to it until
-the v2.00 overlays are measured and the proofs regenerated. `by_serial` resolves a shared serial
-to the matching region.
+The accepted campaign and default region remain **USA v1.01** (`ntsc-u`).
+USA v2.00 (`ntsc-u-v2`, the same serial `SCUS_972.68`) is an isolated experimental
+route with no accepted C credit. `by_serial` resolves a shared serial to the
+matching region; a preparation manifest records its explicit region.
 
 The matching target is still USA v1.01 for those proofs. The European PAL release,
 `SCES_516.07`, is registered as a second region so the preparation and

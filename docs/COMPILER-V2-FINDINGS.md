@@ -3,7 +3,7 @@
 Source of the claims below: Going Native (`Promises/RC2-Going-Decompiled`, `tools/ee/objdiff_build.sh` and `build.sh`) unless
 marked **measured here**. Its text is GPL-2.0-or-later; only facts and ideas are used, nothing is copied.
 
-## Retail is a mixed-compiler build
+## Upstream mixed-compiler hypothesis
 
 | Arm | Compiler | Where it comes from | Used for |
 | --- | --- | --- | --- |
@@ -23,8 +23,8 @@ Going Native also builds each unit with `-O2 -G0` or `-G8`, sometimes `-fno-gcse
   `chmod +x`; clones lose the exec bit). A test function gets `sd $16,0($sp); sd $17,8($sp); sd $31,16($sp)`. ProDG 3.01's `2.95.3`
   `cc1.exe` (via wibo) gives `sq $16,32($sp); sq $17,16($sp)`, a different profile again.
 - **Our chain matches the 8-byte model.** The rebuilt GNU EE chain (`docs/V2-SETUP.md`) removes the quad-save widening
-  (`0001-r5900-quad-saves` reversed), so it reproduces the `sd` layout; it is the right model for about 98% of saving functions.
-  The 32 `sq` functions need the same source with `0001` kept.
+  (`0001-r5900-quad-saves` reversed), so it reproduces the `sd` layout; the observed save width agrees with about 98% of saving functions. This does not establish the original compiler or full matching behaviour.
+  The 32 `sq` functions motivate a separately qualified wider-save experiment.
 - **Stock 2.96 is not a drop-in.** It rejects the `sda` attribute our sources use (`candidates/boot.c`), so comparing it against the
   v1.01 proofs would not be like for like.
 
@@ -32,5 +32,5 @@ Going Native also builds each unit with `-O2 -G0` or `-G8`, sometimes `-fno-gcse
 
 1. Keep the patched 2.9 chain for engine code; add a second chain (with `0001`) only for the 32 `sq` functions at `0x115228-0x119BF8`.
 2. If a leaf function will not match, try `-G8` and `-fno-gcse` per function before rewriting the C.
-3. Functions that never match under 2.9 may belong to `engine96` or `s136os`; the real `cc1` from the mirrors can be tried. `FloatToInt` was: the 2.96 and 2.95.3 `cc1` also give `$f0`, so it is handwritten (see `trials/usa-v2/README.md`).
+3. Functions that never match under 2.9 may belong to `engine96` or `s136os`; the real `cc1` from the mirrors can be tried. `FloatToInt` was: the 2.96 and 2.95.3 `cc1` also give `$f0`, so the tested spellings remain unmatched; handwritten code is an unproved hypothesis (see `trials/usa-v2/README.md`).
 4. Everything here is a candidate result. v2.00 has no campaign task, reservation or qualified proof yet.

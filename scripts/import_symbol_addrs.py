@@ -1,91 +1,89 @@
 #!/usr/bin/env python3
-"""
-Import symbol addresses from progress/candidates.json into symbol_addrs/ files.
+"""Export USA v1.01 candidate symbol metadata to an explicit private review file.
 
-This script extracts symbol addresses from the candidates JSON and generates
-symbol_addrs/usa/symbol_addrs.txt and symbol_addrs/eu/symbol_addrs.txt files.
+Never updates the maintained symbol maps and never infers another release's
+addresses. Review and merge individual names separately; this adds no credit.
 """
+from __future__ import annotations
 
+import argparse
+import hashlib
 import json
-import os
+import re
+import subprocess
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+NAME = re.compile(r"[A-Za-z_]\w*\Z", re.ASCII)
 
 
-def extract_symbol_addresses():
-    """
-    Extract symbol addresses from progress/candidates.json
-    and generate symbol_addrs/ files.
-    """
-    # Paths
-    candidates_path = "progress/candidates.json"
-    symbol_addrs_usa = "symbol_addrs/usa/symbol_addrs.txt"
-    symbol_addrs_eu = "symbol_addrs/eu/symbol_addrs.txt"
-
-    # Load candidates data
-    with open(candidates_path, 'r') as f:
-        data = json.load(f)
-
-    # Get the functions array
-    functions = data.get('functions', [])
-
-    print(f"Processing {len(functions)} functions from progress/candidates.json")
-
-    # Collect symbols by region
-    symbols_usa = {}
-    symbols_eu = {}
-
-    for func in functions:
-        symbol = func.get('symbol', '')
-        if not symbol:
-            continue
-
-        address = func.get('address', '')
-        if not address:
-            continue
-
-        # Convert address to hex format
-        if isinstance(address, int):
-            hex_addr = f"0x{address:x}"
-        else:
-            hex_addr = f"0x{int(address):x}"
-
-        # Determine region based on address range
-        addr_int = int(hex_addr, 16)
-
-        # USA and EU have different address ranges
-        # Boot functions are typically in lower ranges
-        # Level functions have different ranges per region
-
-        # Default to USA for boot/low memory functions
-        if addr_int < 0x80000000:
-            # This is a kernel address
-            symbols_usa[symbol] = hex_addr
-        else:
-            # User space - default to USA
-            symbols_usa[symbol] = hex_addr
-
-    # Write USA symbol_addrs.txt
-    os.makedirs(os.path.dirname(symbol_addrs_usa), exist_ok=True)
-    with open(symbol_addrs_usa, 'w') as f:
-        f.write("# symbol_addrs.txt - USA region (SCUS_972.68)\n\n")
-        f.write("# Symbol addresses imported from progress/candidates.json\n")
-        f.write("# Add new symbols here when identified during decompilation.\n\n")
-
-        for name, addr in sorted(symbols_usa.items()):
-            f.write(f"{name} = {addr};\n")
-
-    # Write EU symbol_addrs.txt
-    os.makedirs(os.path.dirname(symbol_addrs_eu), exist_ok=True)
-    with open(symbol_addrs_eu, 'w') as f:
-        f.write("# symbol_addrs.txt - EU region (SCES-51607)\n\n")
-        f.write("# Symbol addresses imported from progress/candidates.json\n")
-        f.write("# Add new symbols here when identified during decompilation.\n\n")
-
-        for name, addr in sorted(symbols_eu.items()):
-            f.write(f"{name} = {addr};\n")
-
-    print(f"Imported {len(symbols_usa)} USA symbols to {symbol_addrs_usa}")
-    print(f"Imported {len(symbols_eu)} EU symbols to {symbol_addrs_eu}")
+def review_output(path: Path) -> Path:
+    """Require an unused outside-repository or Git-ignored review destination."""
+    path = path.resolve()
+    if path.exists():
+        raise ValueError(f"Refusing to overwrite {path}")
+    if path == ROOT or ROOT in path.parents:
+        # Canonical maps remain protected even if a local ignore rule covers them.
+        if ROOT / "symbol_addrs" in path.parents:
+            raise ValueError("Do not write imports into maintained symbol_addrs/")
+        ignored = subprocess.run(["git", "-C", str(ROOT), "check-ignore", "-q", str(path)],
+                                 check=False).returncode == 0
+        if not ignored:
+            raise ValueError("Output inside the repository must be Git-ignored for private review")
+    return path
 
 
-if __name__ == '__main__':
-    extract_symbol_addresses()
+def add_symbol(symbols: dict[str, int], name: str, address: object) -> None:
+    if not NAME.fullmatch(name) or isinstance(address, bool):
+        raise ValueError(f"Invalid symbol {name!r}")
+    number = int(address, 0) if isinstance(address, str) else address
+    if not isinstance(number, int) or not 0 <= number <= 0xFFFFFFFF:
+        raise ValueError(f"Invalid address for {name!r}")
+    if name in symbols and symbols[name] != number:
+        raise ValueError(f"Conflicting addresses for {name!r}")
+    symbols[name] = number
+
+
+def candidate_symbols(data: dict, target: dict) -> dict[str, int]:
+    if (data.get("target") != target["serial"] or
+            data.get("reference_sha256") != target["boot"]["sha256"]):
+        raise ValueError("Candidate metadata must identify the pinned USA v1.01 boot")
+    symbols: dict[str, int] = {}
+    for entry in data.get("functions", []):
+        add_symbol(symbols, entry["symbol"], entry["address"])
+    if not symbols:
+        raise ValueError("No candidate symbols found")
+    return symbols
+
+
+def write_review(path: Path, symbols: dict[str, int], provenance: str) -> None:
+    path = review_output(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write(f"# PRIVATE REVIEW ONLY; no matching credit or maintained-map update\n# {provenance}\n\n")
+        for name, address in sorted(symbols.items()):
+            stream.write(f"{name} = 0x{address:08x};\n")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, default=ROOT / "progress/candidates.json")
+    parser.add_argument("--region", required=True, choices=("ntsc-u",),
+                        help="Candidate metadata is USA v1.01 only; no PAL/v2 address inference")
+    parser.add_argument("--output", type=Path, required=True, help="Unused private review file")
+    args = parser.parse_args()
+    output = review_output(args.output)
+    raw = args.input.read_bytes()
+    target = json.loads((ROOT / "config/target.json").read_bytes())
+    symbols = candidate_symbols(json.loads(raw), target)
+    write_review(output, symbols, f"region=ntsc-u; input_sha256={hashlib.sha256(raw).hexdigest()}; "
+                 f"boot_sha256={target['boot']['sha256']}")
+    print(f"Wrote {len(symbols)} symbols for private review to {output}")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        raise SystemExit(f"Symbol export failed: {error}")

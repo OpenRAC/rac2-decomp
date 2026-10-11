@@ -27,6 +27,16 @@ MARKER = "# --- names carried from USA v2.00 and SDK libraries by scripts/transf
 SYM = re.compile(r"^\s*([A-Za-z_]\w*)\s*=\s*(0x[0-9A-Fa-f]+)\s*;(.*)$")
 
 
+def without_generated_block(lines, marker):
+    """Remove this tool's block while retaining other generated sections."""
+    if marker not in lines:
+        return list(lines)
+    start = lines.index(marker)
+    end = next((i for i in range(start + 1, len(lines))
+                if lines[i].startswith("# --- ")), len(lines))
+    return lines[:start] + lines[end:]
+
+
 def digests(path: Path, pinned: str) -> dict[int, tuple[int, str]]:
     data = path.read_bytes()
     if hashlib.sha256(data).hexdigest() != pinned:
@@ -50,8 +60,7 @@ def main() -> int:
     by_digest = {d: a for a, (_, d) in f1.items() if count1[d] == 1}
     target = ROOT / "symbol_addrs/usa/symbol_addrs.txt"
     lines = target.read_text(encoding="utf-8").splitlines()
-    if MARKER in lines:
-        lines = lines[:lines.index(MARKER)]
+    lines = without_generated_block(lines, MARKER)
     placeholders = {}
     for i, line in enumerate(lines):
         m = SYM.match(line)
@@ -75,10 +84,20 @@ def main() -> int:
         for address, names in found.items():
             if len(names) == 1 and address not in named and address in f1:
                 named[address] = next(iter(names))
-    dropped = {a for a in named if a in placeholders and not placeholders[a][1].startswith(("func_", "FUN_"))}
-    keep = [l for i, l in enumerate(lines) if not any(placeholders[a][0] == i for a in named if a in placeholders)]
-    taken = {m.group(1) for l in keep if (m := SYM.match(l))}
-    rows = [(a, n) for a, n in sorted(named.items()) if a not in dropped and n not in taken]
+    existing_names = {m.group(1) for line in lines if (m := SYM.match(line))}
+    rows = []
+    replaced = set()
+    for address, name in sorted(named.items()):
+        prior = placeholders.get(address)
+        if prior and not prior[1].startswith(("func_", "FUN_")):
+            continue
+        if name in existing_names:
+            continue
+        rows.append((address, name))
+        existing_names.add(name)
+        if prior:
+            replaced.add(prior[0])
+    keep = [line for index, line in enumerate(lines) if index not in replaced]
     out = keep + ["", MARKER] + [f"{n} = 0x{a:08X}; // type:func size:0x{f1[a][0]:X} - name (v2.00 Promises or SDK library match), digest match"
                                  for a, n in rows]
     target.write_text("\n".join(out) + "\n", encoding="utf-8")

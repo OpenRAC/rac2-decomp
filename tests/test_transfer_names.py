@@ -61,3 +61,12 @@ class DataNameTests(unittest.TestCase):
         self.assertTrue(rows and all(rows))
         self.assertEqual(len({m.group(1) for m in rows}), len(rows))
         self.assertEqual(len({m.group(2).lower() for m in rows}), len(rows))
+
+
+class BlockPreservationTests(unittest.TestCase):
+    def test_other_generator_block_is_preserved(self):
+        lines = ["KnownFn = 0x1000;", transfer_names.MARKER,
+                 "Generated = 0x2000;", "# --- another generator ---",
+                 "DataName = 0x3000;"]
+        self.assertEqual(transfer_names.without_generated_block(lines, transfer_names.MARKER),
+                         [lines[0], lines[3], lines[4]])

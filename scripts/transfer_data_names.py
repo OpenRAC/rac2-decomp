@@ -72,8 +72,7 @@ def main() -> int:
     code = [(b, b + len(w) * 4) for b, w in r1.items()]
     target = ROOT / "symbol_addrs/usa/symbol_addrs.txt"
     lines = target.read_text(encoding="utf-8").splitlines()
-    if MARKER in lines:
-        lines = lines[:lines.index(MARKER)]
+    lines = tn.without_generated_block(lines, MARKER)
     taken_names = {m.group(1) for l in lines if (m := tn.SYM.match(l))}
     taken_addr = {int(m.group(2), 16) for l in lines if (m := tn.SYM.match(l))}
     rows = []

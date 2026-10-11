@@ -35,7 +35,7 @@ FNR != NR {
   fn = a[2]
   operands = a[3]
   words = a[4]
-  
+
   key = region SUBSEP fn SUBSEP operands
   sites[key] = words
 }
@@ -48,7 +48,7 @@ FNR != NR {
     line = $0
     sub(/^[[:space:]]*dli[[:space:]]+/, "", line)
     sub(/[[:space:]]*$/, "", line)
-    
+
     # Get current function
     for (i = 1; i <= NR; i++) {
       if (lines[i] ~ /^[[:space:]]*\.ent[[:space:]]/) {
@@ -57,7 +57,7 @@ FNR != NR {
         break
       }
     }
-    
+
     key = current_region SUBSEP curfn SUBSEP line
     if (key in sites) {
       # Replace with expansion
@@ -73,7 +73,7 @@ FNR != NR {
       next
     }
   }
-  
+
   # Track region and function
   if (/^[[:space:]]*\.text/) {
     current_region = (REGION == "") ? "usa" : REGION
@@ -82,7 +82,7 @@ FNR != NR {
     match($0, /\.ent[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)/, arr)
     curfn = arr[1]
   }
-  
+
   print
 }
 

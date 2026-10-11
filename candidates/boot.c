@@ -409,6 +409,10 @@ void FUN_00351888(u8 *a0) { *(s32 *)(a0 + 0xa8) = 0; }
 /* Measured target: byte-identical across all 27 levels. */
 s32 FUN_003518D8(u8 *a0) { return *(s32 *)(a0 + 0xa8); }
 
+
+/* Complete boot bodies from liolu PRs #72 and #75; refreshed in one combined batch. */
+void FUN_00336B90(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x40) = a1; }
+void *FUN_002B5D28(u8 *a0) { return *(void **)(*(u8 **)(a0 + 0x68) + 0x18); }
 /* SECOND LOT -- 16 to 32 bytes. */
 /* integer-to-float conversion; byte-identical across all 27 levels. */
 f32 FUN_00283CE0(s32 a0) { return (f32)a0; }
@@ -6844,3 +6848,4 @@ void FUN_002A9850(void *a0, Vec16_F5621621c *src, int *p, int n,
         F5621621c_FUN_002A8E20(*q, &rec);
     }
 }
+void *FUN_00336DA8(void *first, void *second) { (void) first; return second; }

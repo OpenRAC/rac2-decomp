@@ -52,7 +52,7 @@ def main():
     print("Function Size Ranking Test - Ratchet & Clank 2")
     print("=" * 70)
     print()
-    
+
     # Test categorization
     print("Testing function categorization:")
     test_cases = [
@@ -65,7 +65,7 @@ def main():
         (501, "big"),
         (1000, "big"),
     ]
-    
+
     all_passed = True
     for size, expected in test_cases:
         result = categorize_function(size)
@@ -73,9 +73,9 @@ def main():
         if result != expected:
             all_passed = False
         print(f"  {status} Size {size:4} -> {result:8} (expected: {expected})")
-    
+
     print()
-    
+
     # Test ranking
     print("Testing function ranking (largest first):")
     ranked = rank_functions(MOCK_FUNCTIONS)
@@ -84,34 +84,34 @@ def main():
     for func in ranked:
         name, addr, size, cat = func
         print(f"  {hex(addr):<10} {size:>4}  {cat:<8}  {name}")
-    
+
     print()
-    
+
     # Test filtering
     print("Testing function filtering:")
-    
+
     print("\n  Small functions (0-100 bytes):")
     small = filter_functions(ranked, category="small")
     for func in small:
         print(f"    {func[0]}: {func[2]} bytes")
-    
+
     print("\n  Medium functions (101-500 bytes):")
     medium = filter_functions(ranked, category="medium")
     for func in medium:
         print(f"    {func[0]}: {func[2]} bytes")
-    
+
     print("\n  Big functions (501+ bytes):")
     big = filter_functions(ranked, category="big")
     for func in big:
         print(f"    {func[0]}: {func[2]} bytes")
-    
+
     print("\n  Functions with size 100-500 bytes:")
     range_filtered = filter_functions(ranked, min_size=100, max_size=500)
     for func in range_filtered:
         print(f"    {func[0]}: {func[2]} bytes")
-    
+
     print()
-    
+
     # Summary
     print("=" * 70)
     print("Summary:")
@@ -120,12 +120,12 @@ def main():
     print(f"  Medium (101-500): {len(medium)}")
     print(f"  Big (501+):      {len(big)}")
     print("=" * 70)
-    
+
     if all_passed:
         print("\n✓ All tests passed!")
     else:
         print("\n✗ Some tests failed!")
-    
+
     return 0 if all_passed else 1
 
 

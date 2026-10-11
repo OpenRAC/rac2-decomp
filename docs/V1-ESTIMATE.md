@@ -5,9 +5,16 @@ Heuristic decomp.dev report for the accepted USA v1.01 target. It adds no matchi
 The accepted v1.01 target counts 48.8 MB of loaded code because the engine is repeated in each of the 27 overlays.
 `scripts/unique_estimate.py` builds a separate decomp.dev report laid out like rac1-decomp's: categories *Executable*
 (`core/<addr>` objects cut at the linker's `0xCDCDCDCD` fill, `game/<addr>`), *Level code* (*Shared level code* = a body present in two
-or more overlays, *Level-specific code*) and one category per level ("Level 01: Oozla"). Each distinct body counts once, and relocation fields
-are masked by a register-tracking heuristic. Credit comes only from accepted proofs of identical digest and extent, so it adds nothing
-to the official figures. CI uploads it as `SCUS_972.68_unique_estimate`; the maintainer's `SCUS_972.68_report` is unchanged.
+or more overlays, *Level-specific code*) and one category per level ("Level 01: Oozla"). Each structural digest counts once.
+The register-tracking mask is destructive: it erases all jump targets and `lui` immediates, as well as address-like immediates and member offsets.
+For example, floating constants 1.0 and 2.0 loaded through `lui` can collapse to the same digest. Equal digests are naming/repetition hints,
+not proof of identical behavior or relocation equivalence. This is neither the official physical total nor the official unique-code denominator.
+
+The estimate provides **no matching credit**. It reads no candidate or integration proofs; neither kind can certify all bodies merged by this mask.
+All objdiff matched/complete measures are zero to represent unavailable credit, including when reading an older catalogue with stale credit flags.
+Zero here must not be interpreted as official progress or a loss of accepted C coverage. The committed catalogue retains only structural size estimates;
+it has no current-progress claim. Regeneration checks the pinned boot and every overlay hash before recording their identities.
+CI uploads it as `SCUS_972.68_unique_estimate`; the maintainer's `SCUS_972.68_report` is unchanged.
 
 Keep your private runtime inside the repository in the git-ignored `extracted/` folder if you prefer
 (`python scripts/setup.py --iso <iso> --runtime extracted/v101 --wrench <wrenchbuild>`); nothing under it is ever tracked.

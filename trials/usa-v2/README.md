@@ -23,8 +23,8 @@ no reservation and no register entry, so these add no credit.
 `FloatToInt` was also tried with the real `2.96-ee-001003-1` `cc1` (`-O2`, `-G0` and `-G8`, three source spellings) and with
 SN `2.95.3`: all allocate `$f0` for the result. Going Native reaches the same conclusion (no C spelling reproduces the in-place
 `cvt.w.s $f12,$f12` under cc1 2.9 or the 2.96 arm) and lists six functions with that pattern: `FloatToInt 0x2846A0`,
-`0x283240`, `0x283278`, `0x2832B0`, `0x2A1628/0x2A1630` and `0x2BAB68`. Treat them as handwritten assembly (an assembly unit),
-not as C targets.
+`0x283240`, `0x283278`, `0x2832B0`, `0x2A1628/0x2A1630` and `0x2BAB68`. Keep these attempts parked; handwritten assembly remains a hypothesis.
+Reopen only with new source, caller ABI or compiler-lowering evidence.
 
 ## Real 2.96 `cc1` on the call-bearing functions
 

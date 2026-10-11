@@ -12,7 +12,7 @@ git clone https://github.com/OpenRAC/rac2-gc-decomp && cd rac2-gc-decomp
 python3 -m venv ~/rac2-private/venv && ~/rac2-private/venv/bin/pip install -r requirements.txt
 mkdir -p baserom && 7z x -obaserom "<your v2.00 iso>" SCUS_972.68      # or copy it from your disc
 python scripts/doctor.py --region v2 --iso "<your v2.00 iso>"          # disc and boot must match the pins
-python scripts/function_size_rank.py --category small --status todo --ascending --limit 20
+python scripts/function_size_rank.py --region v2 --category small --status todo --ascending --limit 20
 ```
 
 ## 2. Prepare the reference (Wrench)
@@ -49,12 +49,13 @@ Expected: the boot and all 27 overlays report `All PT_LOAD bytes and metadata ma
 tools/linux/build-compiler.sh ~/rac2-private/compiler       # ~2 minutes, needs podman or docker
 ```
 
-All inputs are public and SHA-256 checked. The script applies only published transformers (`tools/linux/rac2_recipe.py`)
+Source repositories are pinned to immutable commits. Archives and final source checkpoints
+are SHA-256 checked; each patch is checked against its Git blob identity. The script applies only published transformers (`tools/linux/rac2_recipe.py`)
 and prints the five source hashes; all must equal the checkpoint table in [`COMPILER-NOTES.md`](COMPILER-NOTES.md)
 (`mips.c 4a6a1ae1…`, `mips.h 87d59c06…`, `mips.md 9720897d…`, `toplev.c 38d52727…`, `tc-mips.c b22dfff8…`).
 They do on Ubuntu 24.04 and 26.04 (`UBUNTU=26.04 tools/linux/build-compiler.sh …`). The `cc1`/`cpp`/`as` **binary** hashes
 depend on the build host and do not equal the documented ones, so record your own in any proof.
-Behavioural check: compiling `candidates/boot.c` gives bytes identical to the recorded v1.01 proofs for all 210
+Contributor-reported historical behavioural check (not independently reproduced by the maintainer): compiling `candidates/boot.c` gives bytes identical to the recorded v1.01 proofs for all 210
 relocation-free functions (the other 99 need a link to compare).
 
 ## 5. Try a function
@@ -64,7 +65,7 @@ podman run -d --init --name rac2-gnu --userns=keep-id --security-opt label=disab
   --tmpfs /rac2tmp:exec,mode=1777 rac2-linux:24.04 sleep infinity
 export PYTHONPATH=$PWD/tools/linux RAC2_LINUX_RUNNER="podman exec rac2-gnu bash -c" \
   RAC2_WSL_TOOLS=$HOME/rac2-private/compiler/tools RAC2_WSL_TMP=/rac2tmp
-python scripts/try_function.py trials/usa-v2/IntToFloat.c --address 0x284690 --size 16     # prints MATCH
+python scripts/try_function.py trials/usa-v2/IntToFloat.c --address 0x284690 --size 16     # prints RAW_EQUAL_CANDIDATE
 ```
 
 Write your function in `trials/usa-v2/`, compare, then iterate on the C shape (see the notes in
@@ -73,7 +74,7 @@ Write your function in `trials/usa-v2/`, compare, then iterate on the C shape (s
 ## 6. decomp.dev report
 
 `python scripts/function_size_rank.py` and `python scripts/v2_report.py catalog --reference <reference dir>` refresh the committed
-structure-only catalogue (`config/regions/ntsc-u-v2/catalog.json`). After a function matches, add `--record` to
+structure-only catalogue (`config/regions/ntsc-u-v2/catalog.json`). After a function has diagnostic equality, add `--record` to
 `scripts/try_function.py` to store its proof in `progress/v2/matches.json`, then
 `python scripts/v2_report.py report --output build/decomp/report.json` builds the objdiff report CI uploads to decomp.dev.
 Totals are a heuristic estimate (about 5.27 MB): boot extents are inferred and level code is normalised chunks with relocation fields and immediates erased, so different constants can collapse into one body. They are not comparable to the official loaded-byte or conservative unique-code figures and are never a denominator. Matches recorded here are exploratory candidates and earn no credit in the report.

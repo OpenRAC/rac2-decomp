@@ -45,5 +45,5 @@ jobs:
           import json
           e = json.load(open("build/decomp/unique-estimate-report.json"))["measures"]
           print("### USA v1.01 deduplicated estimate (heuristic, no new credit)")
-          print(f"Credited distinct code: {int(e['matchedCode']):,} / {int(e['totalCode']):,} bytes ({e['matchedCodePercent']:.4f}%)")
+          print(f"Exploratory credited code (always zero): {int(e['matchedCode']):,} / {int(e['totalCode']):,} bytes ({e['matchedCodePercent']:.4f}%)")
           PY

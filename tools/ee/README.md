@@ -12,5 +12,6 @@ Known limitations:
   (modern GNU binutils, a different container) and is untested against this repository's targets.
 - Nothing here is qualified against the campaign compiler profile.
 
-Do not present these helpers as a build route until they are fixed and qualified. Going Native is
-GPL-2.0: use it for names and ideas, never copy its code into the MIT tree.
+Do not present these helpers as a build route until they are fixed and qualified.
+These imported files retain their upstream GPL-2.0 licence in [LICENSE](LICENSE);
+they are not relicensed under the repository root MIT notice. See [CREDITS.md](../../CREDITS.md).

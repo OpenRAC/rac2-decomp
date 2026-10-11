@@ -2,15 +2,16 @@
 """Heuristic deduplicated size estimate for the accepted USA v1.01 target, as a decomp.dev report.
 
 The loaded-byte total (boot plus 27 overlays, about 48.8 MB) counts engine code once per overlay. This
-tool estimates how much of that is distinct. It is an ESTIMATE, not a progress denominator: functions
+tool estimates structural repetition. It is an ESTIMATE, not a progress denominator: functions
 are grouped by a digest of their words with relocatable fields masked by a register-tracking heuristic
 (``jal``/``j`` targets, ``lui`` immediates, ``addiu``/``ori`` immediates and load/store offsets fed by a
-``lui`` or ``$gp``). Functions that differ only in non-address constants stay distinct; address-like
-fields never do. Boundaries are the heuristic discovery of ``function_size_rank.py``.
+``lui`` or ``$gp``). This destructive mask also erases non-address constants built with ``lui``,
+member offsets and call identities; equal digests do not establish equivalent functions.
+Boundaries are the heuristic discovery of ``function_size_rank.py``.
 
-Credit is conservative and comes only from already accepted proofs: a distinct body counts as matched
-only when a function recorded as matched in ``progress/candidates.json`` or ``progress/levels/`` has the
-same digest over exactly the same extent. Nothing here adds or changes matching credit.
+No matching credit is reported. Neither candidate matches nor accepted integration proofs can prove
+that every body collapsed by this mask is equivalent. All matched/complete measures are zero solely
+to represent unavailable credit in the objdiff schema; they are not official progress measurements.
 
 ``catalog`` (private input: the reference ``setup.py`` prepared) writes digests of structure only to
 ``config/estimates/ntsc-u.json``; ``report`` (CI-safe) turns it into an objdiff report v2.
@@ -43,7 +44,7 @@ GP = 28
 
 
 def normalise(words: list[int]) -> list[int]:
-    """Mask relocatable fields; keep every other word exact."""
+    """Destructively mask address-like fields, including some constants and member offsets."""
     tracked: set[int] = set()
     out = []
     for w in words:
@@ -102,15 +103,6 @@ def extents(ranges: dict[int, list[int]]) -> list[tuple[int, int]]:
     return rows
 
 
-def accepted(level: str | None) -> list[tuple[int, int]]:
-    """(address, size) of functions an accepted proof records as matched for the boot or one level."""
-    if level is None:
-        data = json.loads((ROOT / "progress/candidates.json").read_text(encoding="utf-8"))
-        return [(f["address"], f["size"]) for f in data["functions"] if f.get("matched")]
-    data = json.loads((ROOT / f"progress/levels/{level}.json").read_text(encoding="utf-8"))
-    return [(f["address"], f["size"]) for f in data["functions"] if f.get("matched") and f.get("integrated")]
-
-
 def object_cuts(ranges: dict[int, list[int]]) -> list[int]:
     """Start of every object after a run of 0xCDCDCDCD, the linker's fill between retail objects."""
     cuts = []
@@ -135,26 +127,22 @@ def build_catalog(reference: Path, elf: Path) -> dict:
     if hashlib.sha256(boot_bytes).hexdigest() != region.target["boot"]["sha256"]:
         raise SystemExit("ELF is not the pinned USA v1.01 boot executable")
     boot_ranges = code_words(boot_bytes)
-    images = [("boot", boot_ranges, accepted(None))]
+    images = [("boot", boot_ranges)]
     for row in region.overlays["levels"]:
         path = reference / "levels" / row["level"] / "overlay.elf"
-        images.append((row["level"], code_words(path.read_bytes()), accepted(row["level"])))
-    credited: set[str] = set()
-    for _, ranges, proofs in images:
-        for address, size in proofs:
-            words = slice_words(ranges, address, size)
-            if words is not None:
-                credited.add(digest(words))
+        overlay = path.read_bytes()
+        if hashlib.sha256(overlay).hexdigest() != row["sha256"]:
+            raise SystemExit(f"Overlay {row['level']} is not the pinned USA v1.01 reference")
+        images.append((row["level"], code_words(overlay)))
     per_image = {}
     holders: dict[str, set[str]] = {}
-    for name, ranges, _ in images:
+    for name, ranges in images:
         rows = []
         for address, size in extents(ranges):
             d = digest(slice_words(ranges, address, size))
             rows.append((address, size, d))
             holders.setdefault(d, set()).add(name)
         per_image[name] = rows
-    boot_digests = {d for _, _, d in per_image["boot"]}
     physical = {n: sum(r[1] for r in rows) for n, rows in per_image.items()}
     functions = {"boot": [], "shared": {}, "specific": {}}
     seen: set[str] = set()
@@ -162,7 +150,7 @@ def build_catalog(reference: Path, elf: Path) -> dict:
         if d in seen:
             continue
         seen.add(d)
-        functions["boot"].append([address, size, int(d in credited)])
+        functions["boot"].append([address, size, 0])
     for name, rows in per_image.items():
         if name == "boot":
             continue
@@ -171,16 +159,17 @@ def build_catalog(reference: Path, elf: Path) -> dict:
                 continue
             seen.add(d)
             kind = "shared" if len(holders[d] - {"boot"}) > 1 else "specific"
-            functions[kind].setdefault(name, []).append([address, size, int(d in credited)])
+            functions[kind].setdefault(name, []).append([address, size, 0])
     return {"schema": 2, "target": region.serial, "version": "1.01", "heuristic": True,
+            "matching_credit": "none",
             "boot_sha256": region.target["boot"]["sha256"],
             "overlay_sha256": {r["level"]: r["sha256"] for r in region.overlays["levels"]},
             "physical_code_bytes": physical, "boot_object_starts": sorted(object_cuts(boot_ranges)),
             "boot_code_sections": [[b, len(w) * 4] for b, w in boot_ranges.items()],
             "functions": functions,
-            "note": "Estimate only. Distinct bodies are counted once by a relocation-masking heuristic; shared = a body "
-                    "present in two or more overlays, specific = in one; credited = an accepted proof with the same "
-                    "digest and extent. No bytes are stored."}
+            "note": "Structural estimate only. A destructive mask merges some different constants, member offsets "
+                    "and call targets. Shared = a digest present in two or more overlays, specific = in one. "
+                    "Matching credit is unavailable; all credit flags are zero. No bytes are stored."}
 
 
 def level_title(level: str) -> str:
@@ -218,13 +207,15 @@ def overlay_names() -> dict[str, dict[int, str]]:
 
 
 def unit(name: str, rows: list[list[int]], categories: list[str], named: bool = False, local: dict[int, str] | None = None) -> dict:
-    done = sum(r[1] for r in rows if r[2])
+    # Legacy catalogues stored unpinned credit flags. Never consume them, even if nonzero.
+    done = 0
     total = sum(r[1] for r in rows)
-    return {"name": name, "measures": measures(total, done, len(rows), sum(r[2] for r in rows), 1, int(bool(rows) and done == total)),
+    return {"name": name, "measures": measures(total, done, len(rows), 0, 1, 0),
             "sections": [{"name": ".text", "size": str(total), "fuzzyMatchPercent": done / total * 100 if total else 0}],
-            "functions": [{"name": (NAMES.get(r[0]) if named else (local or {}).get(r[0])) or f"func_{r[0]:08X}", "size": str(r[1]), "fuzzyMatchPercent": 100.0 if r[2] else 0.0,
+            "functions": [{"name": (NAMES.get(r[0]) if named else (local or {}).get(r[0])) or f"func_{r[0]:08X}", "size": str(r[1]), "fuzzyMatchPercent": 0.0,
                            "metadata": {"virtualAddress": str(r[0])}} for r in rows],
-            "metadata": {"complete": bool(rows) and done == total, "autoGenerated": True, "progressCategories": categories}}
+            "metadata": {"complete": False, "autoGenerated": True, "progressCategories": categories,
+                         "heuristic": True, "matchingCredit": "none"}}
 
 
 def boot_units(catalog: dict, overrides: list[tuple[int, str]]) -> list[dict]:
@@ -272,7 +263,9 @@ def build_report(catalog: dict, overrides: list[tuple[int, str]] | None = None, 
     return {"version": 2, "measures": measures(total, done, sum(u["measures"]["totalFunctions"] for u in units),
                                                sum(u["measures"]["matchedFunctions"] for u in units), len(units),
                                                sum(u["measures"]["completeUnits"] for u in units)),
-            "units": units, "categories": cats}
+            "units": units, "categories": cats,
+            "metadata": {"heuristic": True, "matchingCredit": "none",
+                         "note": "Structural size estimate; zero matched measures mean unavailable credit, not official progress."}}
 
 
 def read_overrides() -> list[tuple[int, str]]:
@@ -308,15 +301,15 @@ def main() -> int:
     args = ap.parse_args()
     if args.cmd == "catalog":
         ESTIMATE.parent.mkdir(parents=True, exist_ok=True)
-        ESTIMATE.write_text(json.dumps(build_catalog(args.reference, args.elf), separators=(",", ":")) + "\n", encoding="utf-8")
+        ESTIMATE.write_bytes((json.dumps(build_catalog(args.reference, args.elf), separators=(",", ":")) + "\n").encode("utf-8"))
         print(f"wrote {ESTIMATE.relative_to(ROOT)}")
         return 0
     report = build_report(json.loads(ESTIMATE.read_text(encoding="utf-8")), read_overrides(), known_names())
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report) + "\n", encoding="utf-8")
     m = report["measures"]
-    print(f"{m['matchedCode']} / {m['totalCode']} distinct code bytes ({m['matchedCodePercent']:.4f}%), "
-          f"{m['matchedFunctions']} / {m['totalFunctions']} functions, {m['totalUnits']} units [heuristic estimate]")
+    print(f"{m['totalCode']} estimated structural code bytes, {m['totalFunctions']} groups, "
+          f"{m['totalUnits']} units [destructive heuristic; matching credit unavailable]")
     return 0
 
 

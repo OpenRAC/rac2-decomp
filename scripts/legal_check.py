@@ -52,7 +52,8 @@ def check(rel: str) -> list[str]:
         if b"\0" in raw[:4096] or raw[:4] in MAGIC:
             return problems + ["compressed binary payload"]
         return problems + text_problems(rel, raw.decode("utf-8", errors="ignore"))
-    head = p.read_bytes()[:4096]
+    with p.open("rb") as stream:
+        head = stream.read(0x8006)
     if any(head.startswith(m) or (m == b"CD001" and head[0x8001:0x8006] == m) for m in MAGIC):
         problems.append("binary container magic")
     if b"\0" in head:
