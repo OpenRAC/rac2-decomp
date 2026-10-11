@@ -19,7 +19,7 @@ python scripts/unique_estimate.py report --output build/decomp/unique-estimate-r
 ```
 
 Source files are not identified yet: units are named by start address (or `lib_<member>` for SDK library objects) until a real file name is known.
-`scripts/map_segments.py --yaml <SCUS_972.68.yaml> --v1 <reference>/boot.elf` carries the 44 unambiguous boundaries of Promises' v2.00 split over to v1.01 by function digest (20 of 64 have no unique match and are left out). Add `<address> <name>` rows to
+`scripts/map_segments.py --yaml <SCUS_972.68.yaml> --v1 <reference>/boot.elf` carries 53 of the 64 code boundaries of Promises' v2.00 split over to v1.01 by function digest (padding-aligned starts are snapped to the next function; 11 have no unique match or are data and are left out). Add `<address> <name>` rows to
 `config/segments/ntsc-u-boot.tsv` to split or rename a boot unit once a boundary is proven. Existing splits to cross-check
 (addresses and names only; Going Native is GPL-2.0, never copy its code): `going-decompiled/config/usa/SCUS_972.68.yaml` in
 `Promises/RC2-Going-Decompiled` (USA v2.00 segments) and the engine file names in `OpenRAC/rac1-decomp` (`src/game/`) and `OpenRAC/rac3-uya-decomp`.

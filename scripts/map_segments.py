@@ -4,7 +4,7 @@
 Promises/RC2-Going-Decompiled keeps a splat config for the v2.00 boot with the object/file boundaries it
 established (``going-decompiled/config/usa/SCUS_972.68.yaml``). That project is GPL-2.0: only the
 boundary addresses are read here, never its code. Each boundary is a function start in v2.00; the same
-function (or the same run of up to four consecutive functions, when one body is not unique) is looked up
+function (or the same run of up to eight consecutive functions, when one body is not unique) is looked up
 in the v1.01 boot by a relocation-masked digest (``unique_estimate.digest``). Only unambiguous matches are
 written, as ``<v1.01 address> <name>`` rows for ``config/segments/ntsc-u-boot.tsv``.
 
@@ -26,6 +26,7 @@ import unique_estimate as ue  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 ROW = re.compile(r"^\s*-\s*\[\s*0x([0-9A-Fa-f]+)\s*,\s*(\w+)\s*,\s*([^\],]+?)\s*(?:,\s*([^\]]+?))?\s*\]")
 CODE_KINDS = {"c", "cpp", "asm", "hasm", "lib"}
+MAX_RUN = 8
 DELTA = 0x100080  # file offset -> virtual address in the v2.00 boot
 
 
@@ -62,16 +63,19 @@ def main() -> int:
     f1, _ = functions(args.v1, regions.load("ntsc-u").target["boot"]["sha256"])
     index2 = {a: i for i, (a, _, _) in enumerate(f2)}
     runs: dict[tuple[str, ...], list[int]] = {}
-    for n in range(1, 5):
+    for n in range(1, MAX_RUN + 1):
         for i in range(len(f1) - n + 1):
             runs.setdefault(tuple(d for _, _, d in f1[i:i + n]), []).append(f1[i][0])
     out, skipped = [], []
     for vaddr, kind, name in boundaries(args.yaml):
         i = index2.get(vaddr)
-        if i is None:
-            skipped.append((vaddr, "not a function start in v2.00"))
-            continue
-        for n in range(1, 5):
+        if i is None:  # an object often starts on padding: snap to the first function within 0x20 bytes after it
+            nxt = next((k for k, (a, _, _) in enumerate(f2) if vaddr < a <= vaddr + 0x20), None)
+            if nxt is None:
+                skipped.append((vaddr, "not a function start in v2.00"))
+                continue
+            i = nxt
+        for n in range(1, MAX_RUN + 1):
             key = tuple(d for _, _, d in f2[i:i + n])
             if len(key) < n:
                 break
