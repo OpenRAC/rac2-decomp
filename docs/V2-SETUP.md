@@ -130,3 +130,7 @@ GHIDRA_MCP_AUTH_TOKEN=rac2-local python scripts/ghidra_anchors.py --url http://1
 **Datamining the boot.** `scripts/datamine.py --elf <reference>/boot.elf` writes identifier-only tables to `config/datamine/` (source-file strings with referencing functions,
 message-spelled function names, identifier tables, SDK tags, section map); full strings stay in `extracted/datamine/`. `scripts/match_sdk_libs.py` matches boot
 functions to your SDK mirror's library objects (196 matches, mostly `libkernl`, `libmpeg`, libc); `transfer_names.py` adds those names to the symbol file.
+
+`match_sdk_libs.py` also writes `config/datamine/ntsc-u-sdk-objects.tsv` (17 SDK library objects located in the boot; they become `lib_<object>` units).
+`name_overlay_functions.py --reference <reference>` finds no SDK or named function that exists only in an overlay; 66,248 overlay functions are copies of boot functions.
+No newer Sony SDK mirror is public (ps2dev/ps2sdk is a different implementation), so remaining libraries need your own SDK 2.5-era libraries.

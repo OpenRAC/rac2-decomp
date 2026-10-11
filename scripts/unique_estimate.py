@@ -269,6 +269,17 @@ def read_overrides() -> list[tuple[int, str]]:
             if line.strip() and not line.startswith("#"):
                 address, name = line.split()[:2]
                 rows.append((int(address, 0), name))
+    objects = ROOT / "config/datamine/ntsc-u-sdk-objects.tsv"
+    if objects.exists():  # SDK library objects located by match_sdk_libs.py; explicit rows above win
+        named = {a for a, _ in rows}
+        for line in objects.read_text(encoding="utf-8").splitlines():
+            if line and not line.startswith("#"):
+                start, end, _, member, _ = line.split("\t")
+                stem = member.rsplit(".", 1)[0]
+                for address, name in ((int(start, 16), f"lib_{stem}"), (int(end, 16), f"{int(end, 16):08X}")):
+                    if address not in named:
+                        rows.append((address, name))
+                        named.add(address)
     return rows
 
 

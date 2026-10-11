@@ -82,7 +82,7 @@ def object_functions(blob: bytes):
         for i, (value, sz, _, name) in enumerate(ordered):
             end = value + sz if sz else (ordered[i + 1][0] if i + 1 < len(ordered) else sec[5])
             if end > value and (end - value) % 4 == 0:
-                yield name, words[value // 4:end // 4]
+                yield name, words[value // 4:end // 4], value, sec[5]
 
 
 def main() -> int:
@@ -99,17 +99,20 @@ def main() -> int:
     count = Counter(d for _, _, d in boot)
     by_digest = {d: (a, s) for a, s, d in boot if count[d] == 1}
     found: dict[str, set[tuple[str, str, str]]] = {}
+    where: dict[tuple[str, str], list[tuple[int, int, int]]] = {}  # (lib, member) -> (boot address, offset, text size)
+    index: dict[str, tuple[int, int]] = {}
     scanned = 0
     for root in args.libs:
         for path in sorted(root.rglob("*.a")):
             if "/ee/lib/" not in path.as_posix():
                 continue
             for member, blob in members(path.read_bytes()):
-                for name, words in object_functions(blob):
+                for name, words, offset, text_size in object_functions(blob):
                     scanned += 1
                     d = ue.digest(words)
                     if d in by_digest:
                         found.setdefault(d, set()).add((path.name, member, name))
+                        where.setdefault((path.name, member), []).append((by_digest[d][0], offset, text_size))
     lines = ["# Boot functions that equal a PS2 SDK library function (relocation-masked digest, unique in the boot).",
              "# Columns: boot function start, size, library, object member, symbol; several rows per address = identical bodies."]
     rows = []
@@ -119,6 +122,28 @@ def main() -> int:
             rows.append((a, s, lib, member, name))
     lines += [f"0x{a:08X}\t{s}\t{lib}\t{member}\t{name}" for a, s, lib, member, name in sorted(rows)]
     args.output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    objects = ["# SDK library objects located in the USA v1.01 boot: all matched functions of an object agree on its start,",
+               "# it has two or more matches (or one covering the whole object), and it overlaps no better-supported object.",
+               "# Columns: boot start, boot end, library, object member, matched functions."]
+    cand = []
+    for (lib, member), hits in sorted(where.items()):
+        starts = {a - off for a, off, _ in hits}
+        sizes = {size for _, _, size in hits}
+        if len(starts) == 1 and len(sizes) == 1 and (start := next(iter(starts))) >= 0:
+            if len(hits) >= 2 or hits[0][2] <= 0x1F0:
+                cand.append((len(hits), start, start + hits[0][2], lib, member))
+    chosen = []
+    for n, start, end, lib, member in sorted(cand, key=lambda c: (-c[0], c[1])):
+        if all(end <= c[0] or start >= c[1] or (c[0], c[1]) == (start, end) for c in chosen):
+            chosen.append((start, end, lib, member, n))
+    chosen = [c for c in sorted(chosen) if c[2] not in ("libg.a", "libm.a")]
+    seen_ranges = set()
+    for start, end, lib, member, n in chosen:
+        if (start, end) not in seen_ranges:
+            seen_ranges.add((start, end))
+            objects.append(f"0x{start:08X}\t0x{end:08X}\t{lib}\t{member}\t{n}")
+    args.output.with_name("ntsc-u-sdk-objects.tsv").write_text("\n".join(objects) + "\n", encoding="utf-8")
+    print(f"{len(objects) - 2} located objects")
     print(f"scanned {scanned} library functions; {len(found)} boot functions matched ({len(rows)} rows)")
     return 0
 
