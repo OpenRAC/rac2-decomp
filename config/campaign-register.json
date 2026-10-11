@@ -549,6 +549,19 @@
       "returncode": 0,
       "state": "passed"
     },
+    "46c3920fca8045d3a493426cbe4763ef": {
+      "action_manifest_sha256": "4ad7d6a4b565882852a95711de09f32127d06e6241cba67cbd0ebcafd39dad1b",
+      "action_outcome_sha256": "e3eab60fca6e9031d02b396ad8cdb0d5af510c75756e90813981e7bebdf264bc",
+      "artifact": "prepared-run:builds/campaign-46c3920fca8045d3a493426cbe4763ef/report.json",
+      "artifact_sha256": "030a17c188a589bbef234244b567efe9f391357b9a39ca7514668ff2123a640d",
+      "directory": "runtime:actions/46c3920fca8045d3a493426cbe4763ef",
+      "finished": "2026-10-11T18:01:25.297782+00:00",
+      "id": "46c3920fca8045d3a493426cbe4763ef",
+      "integration_credit": 0,
+      "kind": "integrate",
+      "returncode": 0,
+      "state": "passed"
+    },
     "479f5abd31be41c190f1d468b1d3ddbc": {
       "artifact": "prepared-run:builds/campaign-479f5abd31be41c190f1d468b1d3ddbc/report.json",
       "artifact_sha256": "09ad14f2d1077bba7e4cd8fa306bf701e539d9f5299c11f2af08a2fd9b3d8299",
@@ -5363,7 +5376,7 @@
       "validity": "historical_unverified"
     }
   },
-  "revision": 13673,
+  "revision": 13676,
   "schema": 1,
   "tasks": {
     "24_ship_shack-fun_002a3e18": {

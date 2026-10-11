@@ -6,6 +6,7 @@ import importlib.metadata
 import json
 import re
 import shutil
+import os
 import subprocess
 import sys
 import uuid
@@ -14,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from elf_tools import assert_fresh, compare_loads, read_elf
+import private_dir
 import region as regions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,6 +69,9 @@ def shared_link_object_proof(directory: Path, catalog: dict, c_object, boot_revi
 
 
 def checked(arguments: list[str], directory: Path, log: Path) -> None:
+    runner = os.environ.get("RAC2_EXE_RUNNER")  # e.g. wibo, to run the Windows SN tools on Linux
+    if runner and arguments[0].lower().endswith(".exe"):
+        arguments = [runner, *arguments]
     with log.open("wb") as stream:
         try:
             result = subprocess.run(arguments, cwd=directory, stdout=stream,
@@ -390,11 +395,14 @@ def main() -> int:
         if importlib.metadata.version(package) != version:
             raise ValueError(f"Use pinned {package} {version}")
     manifest_path = args.manifest.resolve()
-    if ROOT == manifest_path.parent or ROOT in manifest_path.parents:
-        raise ValueError("Private manifest and builds must remain outside source repository")
+    if not private_dir.allowed(manifest_path.parent):
+        raise ValueError("Private manifest and builds must remain outside the repository or under its git-ignored extracted/ folder")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     try:
-        region = regions.by_serial(manifest["target"])
+        # Several releases share one serial; the manifest names its own region.
+        region = regions.load(manifest["region"]) if manifest.get("region") else regions.by_serial(manifest["target"])
+        if region.serial != manifest["target"]:
+            raise ValueError("Manifest region and target disagree")
     except ValueError as error:
         raise ValueError("Wrong manifest target") from error
     if args.region and regions.canonical(args.region) != region.name:

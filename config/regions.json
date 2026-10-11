@@ -1,14 +1,22 @@
 {
   "schema": 1,
   "default": "ntsc-u",
-  "aliases": {"ntsc": "ntsc-u", "usa": "ntsc-u", "europe": "pal"},
+  "aliases": {
+    "ntsc": "ntsc-u",
+    "usa": "ntsc-u",
+    "europe": "pal",
+    "v2": "ntsc-u-v2",
+    "usa-v2": "ntsc-u-v2",
+    "v1.01": "ntsc-u"
+  },
   "regions": {
     "ntsc-u": {
       "label": "USA v1.01",
       "serial": "SCUS_972.68",
       "target": "config/target.json",
       "overlays": "config/overlays.json",
-      "matching": true
+      "matching": true,
+      "symbols": "symbol_addrs/usa/symbol_addrs.txt"
     },
     "pal": {
       "label": "Europe PAL",
@@ -16,7 +24,16 @@
       "target": "config/regions/pal/target.json",
       "overlays": null,
       "matching": false,
-      "functional_port": "ports/pal-functional"
+      "functional_port": "ports/pal-functional",
+      "symbols": "symbol_addrs/eu/symbol_addrs.txt"
+    },
+    "ntsc-u-v2": {
+      "label": "USA v2.00",
+      "serial": "SCUS_972.68",
+      "target": "config/regions/ntsc-u-v2/target.json",
+      "overlays": "config/regions/ntsc-u-v2/overlays.json",
+      "matching": false,
+      "symbols": "symbol_addrs/usa-v2/symbol_addrs.txt"
     }
   }
 }

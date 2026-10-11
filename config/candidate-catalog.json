@@ -1290,6 +1290,14 @@
       "symbol": "FUN_002B5278"
     },
     {
+      "address": 2841896,
+      "meaning": "read a word through the pointer at 0x68, field 0x18",
+      "ranges": 1,
+      "size": 12,
+      "symbol": "FUN_002B5D28",
+      "xrefs": 6
+    },
+    {
       "address": 2844528,
       "meaning": "Ported from RAC1 (src/audio/sound/fun_0022dd78.c), byte-identical in both games",
       "ranges": 1,
@@ -2141,6 +2149,14 @@
       "symbol": "FUN_00336A38"
     },
     {
+      "address": 3369872,
+      "meaning": "write a word at 0x40",
+      "ranges": 1,
+      "size": 8,
+      "symbol": "FUN_00336B90",
+      "xrefs": 17
+    },
+    {
       "address": 3370176,
       "meaning": "write a word at 0x38; byte-identical body in all 27 levels",
       "ranges": 1,
@@ -2168,6 +2184,12 @@
       "address": 3370400,
       "size": 8,
       "symbol": "FUN_00336DA0"
+    },
+    {
+      "address": 3370408,
+      "meaning": "Return the supplied second pointer argument unchanged.",
+      "size": 8,
+      "symbol": "FUN_00336DA8"
     },
     {
       "address": 3370704,

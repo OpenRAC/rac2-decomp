@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "unique_code": {
-    "matched_bytes": 592308,
+    "matched_bytes": 592336,
     "total_bytes": 44400168,
-    "matched_percent": 1.3340219793762942,
+    "matched_percent": 1.3340850422007413,
     "scope": "conservative_global_ee"
   },
   "loaded_code": {
-    "matched_bytes": 1529572,
+    "matched_bytes": 1529816,
     "total_bytes": 48788176,
-    "matched_percent": 3.1351284786707336
+    "matched_percent": 3.1356285998476356
   },
   "catalogue_complete": false,
   "coverage": {
@@ -24,10 +24,10 @@
     "certified": false
   },
   "validated_subset": {
-    "any_c_unique_bytes": 606392,
+    "any_c_unique_bytes": 606400,
     "groups": 67988,
-    "matched_c_groups": 3549,
-    "matched_c_unique_bytes": 592308,
+    "matched_c_groups": 3552,
+    "matched_c_unique_bytes": 592336,
     "total_unique_bytes": 35773608
   },
   "quality": {
