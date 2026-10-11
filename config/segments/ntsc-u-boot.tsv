@@ -28,7 +28,6 @@
 0x0026EA00 0026EA00 c 0x0026EA00 1
 0x00274118 00274118 asm 0x00274128 2
 0x00278EB0 00278EB0 cpp 0x00278EC0 1
-0x002808F8 002808F8 asm 0x002812A8 1
 0x00281A08 00281A08 cpp 0x002823B8 1
 0x00282848 00282848 c 0x002831F8 1
 0x00282A18 00282A18 asm 0x002833C8 1
@@ -49,3 +48,10 @@
 0x00335270 00335270 c 0x00336068 1
 0x00347EA0 00347EA0 cpp 0x00348BD0 1
 0x0034F3B8 0034F3B8 cpp 0x00350100 1
+# named: rows below come from scripts/name_units_from_rac1.py (rac1-decomp source file whose first function and at least
+# two more match in order; columns: v1.01 start, file name, rac1, matched functions, functions in the rac1 file).
+0x002808F8 drawquad rac1 6 10
+0x0029CF58 miscproc rac1 5 7
+0x002C9C90 pause rac1 7 155
+0x002EF480 tfragproc rac1 2 4
+0x00350590 movie_readbuf rac1 5 6

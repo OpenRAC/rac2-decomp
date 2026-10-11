@@ -108,3 +108,8 @@ Source files are not identified yet: units are named by start address (or `lib_<
 `config/segments/ntsc-u-boot.tsv` to split or rename a boot unit once a boundary is proven. Existing splits to cross-check
 (addresses and names only; Going Native is GPL-2.0, never copy its code): `going-decompiled/config/usa/SCUS_972.68.yaml` in
 `Promises/RC2-Going-Decompiled` (USA v2.00 segments) and the engine file names in `OpenRAC/rac1-decomp` (`src/game/`) and `OpenRAC/rac3-uya-decomp`.
+
+`scripts/name_units_from_rac1.py` (needs your own rac1 PAL boot `SCES_509.16` and rac1-decomp's `progress/report.json`) digests each rac1 source file's
+functions and finds them in the v1.01 boot. Five units are named after a rac1 file (`drawquad`, `miscproc`, `pause`, `tfragproc`, `movie_readbuf`);
+the 146 function-level matches of 35 rac1 files (for example 56 of 78 `fastfunc` functions) are kept in `config/segments/ntsc-u-rac1-matches.tsv`
+as reference data for renaming further units. Most files match only partly, so a unit is named only when its first function and at least one more match in order.
