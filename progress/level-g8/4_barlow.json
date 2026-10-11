@@ -6,10 +6,10 @@
   "reference_sha256": "fdb2c733e5c52e9e30f72cef2656d6c6c5cc5fc3d9198600e224b94b7d786eb8",
   "reference_entry": 2929800,
   "candidate_source": "candidates/levels/4_barlow-g8.c",
-  "source_sha256": "4eac3ef60459175fc27fc8f32c8994d9a7bcefcf978a493dd3ed9841103bc6fc",
-  "catalog_sha256": "cf1a198ce56d75c886d9e6b46d01201de8a7003abd1096861636a4d58e07a8de",
-  "object_sha256": "cb19c3c6e9d8510a3e7b4d638f7961fdd1d0d1a6ff106b7293de3f7f418dab1c",
-  "candidate_elf_sha256": "57671cf84bfb0f5323b00463335f79c4533d6afbdceefa0f704120fa61d5ddb9",
+  "source_sha256": "eac7056c1fbd7f690ced3ce6bf416a68e827fcbe9275e0080a180cebcba7dfe0",
+  "catalog_sha256": "69ce6204cf4679a7b3e0f63b71253aed4edaea34bab74374e1543a13de3cdc65",
+  "object_sha256": "9bee81295f633ec98826f1a3932b3bdc817c383bb33d3d2c01b842264c6bd2d1",
+  "candidate_elf_sha256": "31a0daa558f85b08d1d4d856f6278e09f18a4891f2506aa7baf54c1df2f1d0e1",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -34,6 +34,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_4_BARLOW_FUN_002F6CA8",
+      "address": 3108008,
+      "size": 208,
+      "matched": true,
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 208
     },
     {
       "symbol": "LVL_4_BARLOW_FUN_002F77C8",
@@ -520,6 +531,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_4_BARLOW_FUN_0038A9E8",
+      "address": 3713512,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "2ff1c37d98f5fd4038cb8bdc505f70ca3f274d08e50d7891b307d93a0fa37c09",
+      "candidate_sha256": "2ff1c37d98f5fd4038cb8bdc505f70ca3f274d08e50d7891b307d93a0fa37c09",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
+    },
+    {
       "symbol": "LVL_4_BARLOW_FUN_0039EE00",
       "address": 3796480,
       "size": 76,
@@ -631,5 +653,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3548
+  "matched_code_bytes": 3844
 }

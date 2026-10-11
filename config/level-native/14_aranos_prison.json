@@ -52,6 +52,13 @@
     "LVL_14_ARANOS_PRISON_F01bd4546_FUN_0045D250": 4575824,
     "LVL_14_ARANOS_PRISON_F01bd4546_FUN_0045D298": 4575896,
     "LVL_14_ARANOS_PRISON_F03c444112283bc5f_AT00396100_ROLE00": 2340400,
+    "LVL_14_ARANOS_PRISON_F043c77a5_FUN_002EE0A0": 3072160,
+    "LVL_14_ARANOS_PRISON_F043c77a5_FUN_002F2530": 3089712,
+    "LVL_14_ARANOS_PRISON_F043c77a5_FUN_002F5CC0": 3103936,
+    "LVL_14_ARANOS_PRISON_F043c77a5_FUN_002F5DB0": 3104176,
+    "LVL_14_ARANOS_PRISON_F043c77a5_FUN_002F62F0": 3105520,
+    "LVL_14_ARANOS_PRISON_F043c77a5_FUN_002F64B8": 3105976,
+    "LVL_14_ARANOS_PRISON_F043c77a5_FUN_004393E0": 4428768,
     "LVL_14_ARANOS_PRISON_F081de6c9_FUN_00449BE0": 4496352,
     "LVL_14_ARANOS_PRISON_F081de6c9_FUN_0044A9C0": 4499904,
     "LVL_14_ARANOS_PRISON_F081de6c9_FUN_0044AA58": 4500056,
@@ -107,6 +114,9 @@
     "LVL_14_ARANOS_PRISON_F250fbfa4_FUN_002F58A8": 3102888,
     "LVL_14_ARANOS_PRISON_F250fbfa4_FUN_002F5C38": 3103800,
     "LVL_14_ARANOS_PRISON_F250fbfa4_FUN_00339F18": 3383064,
+    "LVL_14_ARANOS_PRISON_F27f9be8e_FUN_002F5B78": 3103608,
+    "LVL_14_ARANOS_PRISON_F27f9be8e_FUN_002F6C80": 3107968,
+    "LVL_14_ARANOS_PRISON_F27f9be8e_FUN_002F6CC8": 3108040,
     "LVL_14_ARANOS_PRISON_F280d7406_FUN_002F5C38": 3103800,
     "LVL_14_ARANOS_PRISON_F280d7406_FUN_002F6DD8": 3108312,
     "LVL_14_ARANOS_PRISON_F280d7406_FUN_00339F18": 3383064,
@@ -131,6 +141,9 @@
     "LVL_14_ARANOS_PRISON_F391de845_D_001B9500": 1807616,
     "LVL_14_ARANOS_PRISON_F391de845_FUN_002F5DF8": 3104248,
     "LVL_14_ARANOS_PRISON_F391de845_FUN_00368520": 3573024,
+    "LVL_14_ARANOS_PRISON_F3c007b59_FUN_002F58A8": 3102888,
+    "LVL_14_ARANOS_PRISON_F3c007b59_FUN_002F6DD8": 3108312,
+    "LVL_14_ARANOS_PRISON_F3c007b59_FUN_00339F18": 3383064,
     "LVL_14_ARANOS_PRISON_F40487154_FUN_002F5CC0": 3103936,
     "LVL_14_ARANOS_PRISON_F40487154_FUN_002F6240": 3105344,
     "LVL_14_ARANOS_PRISON_F40487154_FUN_002F6498": 3105944,
@@ -191,6 +204,10 @@
     "LVL_14_ARANOS_PRISON_F55a1acb8_D_001A63AC": 1729452,
     "LVL_14_ARANOS_PRISON_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_14_ARANOS_PRISON_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_14_ARANOS_PRISON_F5621621c_FUN_002F6228": 3105320,
+    "LVL_14_ARANOS_PRISON_F5621621c_FUN_002F6240": 3105344,
+    "LVL_14_ARANOS_PRISON_F5621621c_FUN_002F62F0": 3105520,
+    "LVL_14_ARANOS_PRISON_F5621621c_FUN_00323A00": 3291648,
     "LVL_14_ARANOS_PRISON_F5a19df7a_FUN_00322068": 3285096,
     "LVL_14_ARANOS_PRISON_F5a19df7a_FUN_00322188": 3285384,
     "LVL_14_ARANOS_PRISON_F5a19df7a_FUN_00385CB8": 3693752,
@@ -258,6 +275,10 @@
     "LVL_14_ARANOS_PRISON_F7b2f1854_FUN_00449A80": 4496000,
     "LVL_14_ARANOS_PRISON_F7b2f1854_FUN_0044A9C0": 4499904,
     "LVL_14_ARANOS_PRISON_F7b2f1854_FUN_0044AA58": 4500056,
+    "LVL_14_ARANOS_PRISON_F7cacd225_FUN_002F58A8": 3102888,
+    "LVL_14_ARANOS_PRISON_F7cacd225_FUN_002F6DC8": 3108296,
+    "LVL_14_ARANOS_PRISON_F7cacd225_FUN_002F6E20": 3108384,
+    "LVL_14_ARANOS_PRISON_F7cacd225_FUN_00339F18": 3383064,
     "LVL_14_ARANOS_PRISON_F7cb419c1_D_001FF380": 2093952,
     "LVL_14_ARANOS_PRISON_F7cb419c1_FUN_003621A0": 3547552,
     "LVL_14_ARANOS_PRISON_F8411efa9_FUN_002EE0A0": 3072160,
@@ -295,6 +316,11 @@
     "LVL_14_ARANOS_PRISON_F904cc63b_FUN_00328768": 3311464,
     "LVL_14_ARANOS_PRISON_F93479d13_D_00189E20": 1613344,
     "LVL_14_ARANOS_PRISON_F93479d13_FUN_00317D90": 3243408,
+    "LVL_14_ARANOS_PRISON_F966dbf73_FUN_00322028": 3285032,
+    "LVL_14_ARANOS_PRISON_F966dbf73_FUN_00322068": 3285096,
+    "LVL_14_ARANOS_PRISON_F966dbf73_FUN_003220C0": 3285184,
+    "LVL_14_ARANOS_PRISON_F966dbf73_FUN_00322248": 3285576,
+    "LVL_14_ARANOS_PRISON_F966dbf73_FUN_0033EB90": 3402640,
     "LVL_14_ARANOS_PRISON_F97fc4e13_FUN_002F59E0": 3103200,
     "LVL_14_ARANOS_PRISON_F97fc4e13_FUN_00363478": 3552376,
     "LVL_14_ARANOS_PRISON_F9a90bcc4_FUN_00322028": 3285032,
@@ -374,6 +400,11 @@
     "LVL_14_ARANOS_PRISON_Fb342d477_FUN_004643C8": 4604872,
     "LVL_14_ARANOS_PRISON_Fb342d477_FUN_00464438": 4604984,
     "LVL_14_ARANOS_PRISON_Fb4cfb7e0_FUN_00322028": 3285032,
+    "LVL_14_ARANOS_PRISON_Fb5729173_FUN_002F5DF8": 3104248,
+    "LVL_14_ARANOS_PRISON_Fb5729173_FUN_002F5E30": 3104304,
+    "LVL_14_ARANOS_PRISON_Fb5729173_FUN_002F62F0": 3105520,
+    "LVL_14_ARANOS_PRISON_Fb5729173_FUN_002F6D68": 3108200,
+    "LVL_14_ARANOS_PRISON_Fb5729173_FUN_00326C28": 3304488,
     "LVL_14_ARANOS_PRISON_Fb77d67f1_FUN_002F5878": 3102840,
     "LVL_14_ARANOS_PRISON_Fb77d67f1_FUN_00339F18": 3383064,
     "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2": 1735602,
@@ -411,6 +442,12 @@
     "LVL_14_ARANOS_PRISON_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_14_ARANOS_PRISON_Fc936841d_FUN_002F5C38": 3103800,
     "LVL_14_ARANOS_PRISON_Fc936841d_FUN_002F5C68": 3103848,
+    "LVL_14_ARANOS_PRISON_Fc94396f4_D_00189E20": 1613344,
+    "LVL_14_ARANOS_PRISON_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_14_ARANOS_PRISON_Fc94396f4_FUN_002DB458": 2995288,
+    "LVL_14_ARANOS_PRISON_Fc94396f4_FUN_002DB4D8": 2995416,
+    "LVL_14_ARANOS_PRISON_Fc94396f4_FUN_002F5C38": 3103800,
+    "LVL_14_ARANOS_PRISON_Fc94396f4_FUN_002F5F18": 3104536,
     "LVL_14_ARANOS_PRISON_Fccb147a4_FUN_00339F18": 3383064,
     "LVL_14_ARANOS_PRISON_Fccb147a4_FUN_0038A150": 3711312,
     "LVL_14_ARANOS_PRISON_Fcdb4d905_FUN_002EBBE0": 3062752,
@@ -445,6 +482,14 @@
     "LVL_14_ARANOS_PRISON_Fdb046c5d_FUN_0032CD70": 3329392,
     "LVL_14_ARANOS_PRISON_Fdb046c5d_FUN_00369AD0": 3578576,
     "LVL_14_ARANOS_PRISON_Fdb046c5d_FUN_00369EB0": 3579568,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_FUN_002F58A8": 3102888,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_FUN_002F5C38": 3103800,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_FUN_002F5CC0": 3103936,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_FUN_002F6DC8": 3108296,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_FUN_002F6DD8": 3108312,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_FUN_00339F18": 3383064,
+    "LVL_14_ARANOS_PRISON_Fdd54ca5d_FUN_0038A150": 3711312,
     "LVL_14_ARANOS_PRISON_Fe524d931_D_001A6480": 1729664,
     "LVL_14_ARANOS_PRISON_Fe524d931_FUN_002F7FE0": 3112928,
     "LVL_14_ARANOS_PRISON_Fe524d931_FUN_00369C30": 3578928,
@@ -489,6 +534,7 @@
     "LVL_14_ARANOS_PRISON_Ff2d8e5ad_FUN_002F6120": 3105056,
     "LVL_14_ARANOS_PRISON_Ff2d8e5ad_FUN_002F6190": 3105168,
     "LVL_14_ARANOS_PRISON_Ff2d8e5ad_FUN_0031CE98": 3264152,
+    "LVL_14_ARANOS_PRISON_Ff454dd77_FUN_002F5B78": 3103608,
     "LVL_14_ARANOS_PRISON_Ff4dd22f3_FUN_002F58A8": 3102888,
     "LVL_14_ARANOS_PRISON_Ff4dd22f3_FUN_002F5C38": 3103800,
     "LVL_14_ARANOS_PRISON_Ff4dd22f3_FUN_00339F18": 3383064,
@@ -717,6 +763,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_14_ARANOS_PRISON_FUN_002DAD00"
+    },
+    {
+      "address": 2993600,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_002DADC0"
     },
     {
       "address": 2994296,
@@ -1095,6 +1147,24 @@
       "symbol": "LVL_14_ARANOS_PRISON_FUN_00321FC8"
     },
     {
+      "address": 3286784,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00322700"
+    },
+    {
+      "address": 3294616,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00324598"
+    },
+    {
+      "address": 3297384,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00325068"
+    },
+    {
       "address": 3301272,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1140,6 +1210,12 @@
       "meaning": "Write a payload pointer in the first selector/key record before the list terminator",
       "size": 64,
       "symbol": "LVL_14_ARANOS_PRISON_FUN_0032B8D8"
+    },
+    {
+      "address": 3325216,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_0032BD20"
     },
     {
       "address": 3330376,
@@ -1231,6 +1307,12 @@
       "symbol": "LVL_14_ARANOS_PRISON_FUN_0033D680"
     },
     {
+      "address": 3399984,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_0033E130"
+    },
+    {
       "address": 3400624,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1241,6 +1323,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_14_ARANOS_PRISON_FUN_0033FB18"
+    },
+    {
+      "address": 3418840,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00342AD8"
     },
     {
       "address": 3421440,
@@ -1271,6 +1359,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_14_ARANOS_PRISON_FUN_003454E8"
+    },
+    {
+      "address": 3436312,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00346F18"
     },
     {
       "address": 3445736,
@@ -1684,6 +1778,12 @@
       "symbol": "LVL_14_ARANOS_PRISON_FUN_003D2D00"
     },
     {
+      "address": 4010560,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_003D3240"
+    },
+    {
       "address": 4019256,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1987,6 +2087,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_14_ARANOS_PRISON_FUN_00439448"
+    },
+    {
+      "address": 4433480,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_0043A648"
     },
     {
       "address": 4450296,

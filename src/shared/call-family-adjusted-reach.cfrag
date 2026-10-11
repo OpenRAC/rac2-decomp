@@ -1,0 +1,46 @@
+extern float @@ROLE_0_00@@(char *a, char *b);
+extern float @@ROLE_1_00@@(float x, float y);
+extern float @@ROLE_2_00@@(float x, float y);
+extern float @@ROLE_3_00@@(char *a, char *b);
+extern int @@ROLE_6_00@@(char *a);
+
+float @@FUNCTION@@(char *a0, char *a1, int *a2,
+                                       float p1, float p2, float p3, float p4)
+{
+    float best = p4;
+    float hi = p3;
+    float radius;
+    float reach = p2;
+    float far;
+    float near;
+    float tmp;
+
+    *a2 = 0;
+    far = @@ROLE_0_01@@(a0, a1 + 16);
+    if (reach < far) {
+        *a2 = 1;
+    }
+
+    reach = 0.0f;
+    radius = @@ROLE_2_01@@(@@ROLE_1_01@@(((float *)(a1 + 16))[0] - ((float *)a0)[0],
+                             ((float *)(a1 + 16))[1] - ((float *)a0)[1]), p1);
+    near = @@ROLE_3_01@@(a0, a1 + 16);
+    tmp = @@ROLE_2_02@@(@@ROLE_1_02@@(near, ((float *)(a1 + 16))[2] - ((float *)a0)[2]), 0.0f);
+
+    if (reach < hi) {
+        if (hi < radius) {
+            *a2 = 1;
+        }
+    }
+    if (0.0f < best) {
+        if (best < tmp) {
+            *a2 = 1;
+        }
+    }
+
+    reach = far + radius * far;
+    if (@@ROLE_6_01@@(a1) != 0) {
+        reach = reach + 8.0f;
+    }
+    return reach;
+}

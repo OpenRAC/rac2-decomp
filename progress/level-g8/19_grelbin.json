@@ -6,10 +6,10 @@
   "reference_sha256": "eeab491a667c311b024745af7173ac08371e279ade0b4ab5d48b6f81fa751aaf",
   "reference_entry": 2782728,
   "candidate_source": "candidates/levels/19_grelbin-g8.c",
-  "source_sha256": "e726c872f54f4a8af887f6d236be4236d468e1efc6b03ec72b13ece471382cde",
-  "catalog_sha256": "f2be2df03dacd38203b1da937385859ba0b2f9e505aae793f7a7f476a76a6589",
-  "object_sha256": "87ce986c669f5d752083ab5efcc1706c3153bbe7c0041442070a6b2e7aa1b4d8",
-  "candidate_elf_sha256": "efabc970d27c5190c0385fb52609f1d59883abcc40e4ef287feebb9dabde0938",
+  "source_sha256": "41809f004ae336b3efae7a64e7ead36c20b0f1d53a742f80ffb0ba780d6478c4",
+  "catalog_sha256": "7147c3fd99b69be9fdba0b809fc93aaa4bb5dbb608f0796435ee8761b901960c",
+  "object_sha256": "19c995060b7a5ec8ce730f3d615ab92d0b6fb4c9ca317fa9ee64f12d0640d40e",
+  "candidate_elf_sha256": "e1d4ebba42e3a53eae4982abfb6db48f389252c52ae01297064bd428093e41cb",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -34,6 +34,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_002D3F38",
+      "address": 2965304,
+      "size": 208,
+      "matched": true,
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 208
     },
     {
       "symbol": "LVL_19_GRELBIN_FUN_002D53E0",
@@ -509,6 +520,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_19_GRELBIN_FUN_00365098",
+      "address": 3559576,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "7079bd6f1b42430f8d59a1926e1d7cca7db2e96e3fac08abc358f8ebb0e1ef8e",
+      "candidate_sha256": "7079bd6f1b42430f8d59a1926e1d7cca7db2e96e3fac08abc358f8ebb0e1ef8e",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
+    },
+    {
       "symbol": "LVL_19_GRELBIN_FUN_003793B8",
       "address": 3642296,
       "size": 76,
@@ -631,5 +653,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3424
+  "matched_code_bytes": 3720
 }

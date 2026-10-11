@@ -1,6 +1,7 @@
 {
   "entry": 2767752,
   "externals": {
+    "D_001AA430": 1745968,
     "LVL_0_ARANOS_TUTORIAL_F1716667661d8e672_AT00309738_ROLE00": 1283040,
     "LVL_0_ARANOS_TUTORIAL_F1716667661d8e672_AT00309738_ROLE01": 1733668,
     "LVL_0_ARANOS_TUTORIAL_F1716667661d8e672_AT00309738_ROLE02": 1733664,
@@ -70,6 +71,9 @@
     "LVL_0_ARANOS_TUTORIAL_F998ff33d7f808dbf_AT00309900_ROLE03": 1733664,
     "LVL_0_ARANOS_TUTORIAL_F99b76d48da369e8d_AT00309828_ROLE00": 1283040,
     "LVL_0_ARANOS_TUTORIAL_F99b76d48da369e8d_AT00309828_ROLE01": 1733664,
+    "LVL_0_ARANOS_TUTORIAL_F9c1eb693_D_00189E20": 1613344,
+    "LVL_0_ARANOS_TUTORIAL_F9c1eb693_D_001A7F9C": 1736604,
+    "LVL_0_ARANOS_TUTORIAL_F9c1eb693_D_001A7FA4": 1736612,
     "LVL_0_ARANOS_TUTORIAL_F9da4b6b15b3cf4a0_AT0037B508_ROLE00": 1779208,
     "LVL_0_ARANOS_TUTORIAL_Fa077d83e809ad7db_AT00312060_ROLE00": 1684200,
     "LVL_0_ARANOS_TUTORIAL_Fa077d83e809ad7db_AT00312060_ROLE01": 1735152,
@@ -109,8 +113,7 @@
     "LVL_0_ARANOS_TUTORIAL_QWEN_538934d89776_AT002D6FD8_ROLE000": 1738972,
     "LVL_0_ARANOS_TUTORIAL_QWEN_538934d89776_AT002D6FD8_ROLE001": 1735600,
     "LVL_0_ARANOS_TUTORIAL_QWEN_538934d89776_AT002D6FD8_ROLE002": 2976680,
-    "LVL_0_ARANOS_TUTORIAL_QWEN_538934d89776_AT002D6FD8_ROLE003": 1278336,
-    "D_001AA430": 1745968
+    "LVL_0_ARANOS_TUTORIAL_QWEN_538934d89776_AT002D6FD8_ROLE003": 1278336
   },
   "flags": [
     "-O2",
@@ -119,94 +122,22 @@
   ],
   "functions": [
     {
-      "address": 3184072,
-      "meaning": "Always clear flag 0x20. In mode 2 at offset 0x08, select state 9 for selector 0 or -1 at offset 0x10, clearing selector -1 to zero, or state 5 for selector -2.",
-      "size": 112,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_003095C8"
-    },
-    {
-      "address": 3184184,
-      "meaning": "Write state 3 when the signed root selector differs from -2; otherwise write state 6 if the marker word or flag mask 0x2 is nonzero. Original game role and full data-object boundaries remain unknown.",
-      "size": 76,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309638"
-    },
-    {
-      "address": 3184264,
-      "meaning": "Write state 3 when the signed gate differs from -2. Otherwise clear flag 0x20 and select state 23 or 5 by a nonzero or zero marker; when 0x20 is clear, clear flag 0x08 and write state 7 if that flag is set.",
-      "size": 124,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309688"
-    },
-    {
-      "address": 3184392,
-      "meaning": "Clear the signed root selector, replace a negative selection with 3 and clear its associated word, then always write state 8.",
-      "size": 44,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309708"
-    },
-    {
-      "address": 3184440,
-      "meaning": "When mode at 0x15C is 2 and selection at 0x164 is negative, nonzero extra at 0x16C selects state 17 and flag 0x40; zero extra selects state 14.",
-      "size": 96,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309738"
-    },
-    {
-      "address": 3184536,
-      "meaning": "Write state 3 for a nonzero gate; otherwise write state 10 when flag mask 6 is nonzero, or state 25 when flag 0x200 is set.",
-      "size": 76,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309798"
-    },
-    {
-      "address": 3184680,
-      "meaning": "Under mode 2 and a negative selection, choose states 12, 3, 19 or 16 from the extra/selector words, signed phase short and the signed sum threshold 475; preserve state when the measured guards reject an update.",
-      "size": 156,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309828"
-    },
-    {
-      "address": 3184840,
-      "meaning": "Write state 3 for a nonzero signed root selector; otherwise write state 13 when flag mask 0x2 is nonzero. Original game role and full data-object boundaries remain unknown.",
-      "size": 56,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_003098C8"
-    },
-    {
-      "address": 3184896,
-      "meaning": "Write state 3 when the signed gate is nonzero. Otherwise clear flag 0x20 and select state 24 or 12 by a nonzero or zero marker; when 0x20 is clear, clear flag 0x10 and write state 14 if that flag is set.",
-      "size": 120,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309900"
-    },
-    {
-      "address": 3185200,
-      "meaning": "Conditionally clear flag bits 4 and 2; handle flag 0x80 with state 21 or flag 0x100 with state 20 while setting 0x40, otherwise select state 3 or 1 from the measured selector and word 0x17C.",
-      "size": 184,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309A30"
-    },
-    {
-      "address": 3185576,
-      "meaning": "When mode at offset 0x15C is 2 and selection at 0x164 is negative, nonzero extra at 0x16C or word at 0x24 clears word 0x17C, sets state 21 and flags 0x440; otherwise write word 0x17C to 1 and state 1.",
-      "size": 112,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309BA8"
-    },
-    {
-      "address": 3185952,
-      "meaning": "Write state 3 when the signed root selector differs from -2; otherwise, only when flag mask 0x20 is set, clear it and write state 5. Original game role and full data-object boundaries remain unknown.",
-      "size": 72,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309D20"
-    },
-    {
-      "address": 3186024,
-      "meaning": "Write state 3 when the signed root selector is nonzero; otherwise, only when flag mask 0x20 is set, clear it and write state 12. Original game role and full data-object boundaries remain unknown.",
-      "size": 68,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309D68"
-    },
-    {
-      "address": 3307608,
-      "meaning": "Optionally prepare the context payload when enabled is one and count is nonzero. For kinds zero through two, call the helper selected by the bound mode, clear enabled when returned flag bit 1 is set, and return those flags; other kinds return zero. Original game role and retail source ownership remain unknown.",
-      "size": 164,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00327858"
-    },
-    {
       "address": 2767744,
       "meaning": "Return the measured signed four-byte GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002A3B80"
+    },
+    {
+      "address": 2974904,
+      "meaning": "Selects one of two measured states, writes up to three optional float outputs, and reports whether a supported state was found.",
+      "size": 208,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002D64B8"
+    },
+    {
+      "address": 2977752,
+      "meaning": "Collect two output words, conditionally update the accumulator and wrap byte, and store the second word low byte.",
+      "size": 132,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002D6FD8"
     },
     {
       "address": 2980152,
@@ -347,6 +278,84 @@
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002FC048"
     },
     {
+      "address": 3184072,
+      "meaning": "Always clear flag 0x20. In mode 2 at offset 0x08, select state 9 for selector 0 or -1 at offset 0x10, clearing selector -1 to zero, or state 5 for selector -2.",
+      "size": 112,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_003095C8"
+    },
+    {
+      "address": 3184184,
+      "meaning": "Write state 3 when the signed root selector differs from -2; otherwise write state 6 if the marker word or flag mask 0x2 is nonzero. Original game role and full data-object boundaries remain unknown.",
+      "size": 76,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309638"
+    },
+    {
+      "address": 3184264,
+      "meaning": "Write state 3 when the signed gate differs from -2. Otherwise clear flag 0x20 and select state 23 or 5 by a nonzero or zero marker; when 0x20 is clear, clear flag 0x08 and write state 7 if that flag is set.",
+      "size": 124,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309688"
+    },
+    {
+      "address": 3184392,
+      "meaning": "Clear the signed root selector, replace a negative selection with 3 and clear its associated word, then always write state 8.",
+      "size": 44,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309708"
+    },
+    {
+      "address": 3184440,
+      "meaning": "When mode at 0x15C is 2 and selection at 0x164 is negative, nonzero extra at 0x16C selects state 17 and flag 0x40; zero extra selects state 14.",
+      "size": 96,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309738"
+    },
+    {
+      "address": 3184536,
+      "meaning": "Write state 3 for a nonzero gate; otherwise write state 10 when flag mask 6 is nonzero, or state 25 when flag 0x200 is set.",
+      "size": 76,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309798"
+    },
+    {
+      "address": 3184680,
+      "meaning": "Under mode 2 and a negative selection, choose states 12, 3, 19 or 16 from the extra/selector words, signed phase short and the signed sum threshold 475; preserve state when the measured guards reject an update.",
+      "size": 156,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309828"
+    },
+    {
+      "address": 3184840,
+      "meaning": "Write state 3 for a nonzero signed root selector; otherwise write state 13 when flag mask 0x2 is nonzero. Original game role and full data-object boundaries remain unknown.",
+      "size": 56,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_003098C8"
+    },
+    {
+      "address": 3184896,
+      "meaning": "Write state 3 when the signed gate is nonzero. Otherwise clear flag 0x20 and select state 24 or 12 by a nonzero or zero marker; when 0x20 is clear, clear flag 0x10 and write state 14 if that flag is set.",
+      "size": 120,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309900"
+    },
+    {
+      "address": 3185200,
+      "meaning": "Conditionally clear flag bits 4 and 2; handle flag 0x80 with state 21 or flag 0x100 with state 20 while setting 0x40, otherwise select state 3 or 1 from the measured selector and word 0x17C.",
+      "size": 184,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309A30"
+    },
+    {
+      "address": 3185576,
+      "meaning": "When mode at offset 0x15C is 2 and selection at 0x164 is negative, nonzero extra at 0x16C or word at 0x24 clears word 0x17C, sets state 21 and flags 0x440; otherwise write word 0x17C to 1 and state 1.",
+      "size": 112,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309BA8"
+    },
+    {
+      "address": 3185952,
+      "meaning": "Write state 3 when the signed root selector differs from -2; otherwise, only when flag mask 0x20 is set, clear it and write state 5. Original game role and full data-object boundaries remain unknown.",
+      "size": 72,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309D20"
+    },
+    {
+      "address": 3186024,
+      "meaning": "Write state 3 when the signed root selector is nonzero; otherwise, only when flag mask 0x20 is set, clear it and write state 12. Original game role and full data-object boundaries remain unknown.",
+      "size": 68,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00309D68"
+    },
+    {
       "address": 3198368,
       "meaning": "Store the constant -1 in the measured four-byte GP cell. The original game role is unknown.",
       "size": 12,
@@ -357,6 +366,24 @@
       "meaning": "Set bit 0x80 in the measured byte array at index plus 16 times the GP word, unless index is 255. The original game role is unknown.",
       "size": 56,
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00312060"
+    },
+    {
+      "address": 3307608,
+      "meaning": "Optionally prepare the context payload when enabled is one and count is nonzero. For kinds zero through two, call the helper selected by the bound mode, clear enabled when returned flag bit 1 is set, and return those flags; other kinds return zero. Original game role and retail source ownership remain unknown.",
+      "size": 164,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00327858"
+    },
+    {
+      "address": 3322496,
+      "meaning": "Store the input's raw 32-bit value in the GP-relative cell; original owner and semantic meaning are unknown.",
+      "size": 8,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_0032B280"
+    },
+    {
+      "address": 3650408,
+      "meaning": "Call the measured delay helper while the backed signed flag word intersects the supplied 64-bit mask.",
+      "size": 76,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_0037B368"
     },
     {
       "address": 3650488,
@@ -399,24 +426,6 @@
       "meaning": "Write four observed 32-bit command words through a numeric address cursor, then advance the same cursor by 16. The command protocol and original types are unknown.",
       "size": 92,
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_0037B818"
-    },
-    {
-      "address": 2977752,
-      "meaning": "Collect two output words, conditionally update the accumulator and wrap byte, and store the second word low byte.",
-      "size": 132,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002D6FD8"
-    },
-    {
-      "address": 3650408,
-      "meaning": "Call the measured delay helper while the backed signed flag word intersects the supplied 64-bit mask.",
-      "size": 76,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_0037B368"
-    },
-    {
-      "address": 3322496,
-      "meaning": "Store the input's raw 32-bit value in the GP-relative cell; original owner and semantic meaning are unknown.",
-      "size": 8,
-      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_0032B280"
     }
   ],
   "gp": 1765360,

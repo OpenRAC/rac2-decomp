@@ -89,6 +89,9 @@
     "LVL_6_NOTAK_F998ff33d7f808dbf_AT00348E00_ROLE03": 1733664,
     "LVL_6_NOTAK_F99b76d48da369e8d_AT00348D28_ROLE00": 1283040,
     "LVL_6_NOTAK_F99b76d48da369e8d_AT00348D28_ROLE01": 1733664,
+    "LVL_6_NOTAK_F9c1eb693_D_00189E20": 1613344,
+    "LVL_6_NOTAK_F9c1eb693_D_001A7F9C": 1736604,
+    "LVL_6_NOTAK_F9c1eb693_D_001A7FA4": 1736612,
     "LVL_6_NOTAK_Fa077d83e809ad7db_AT00351FA8_ROLE00": 1684200,
     "LVL_6_NOTAK_Fa077d83e809ad7db_AT00351FA8_ROLE01": 1735152,
     "LVL_6_NOTAK_Fa0e246aa2dc0b8e7_AT00348DC8_ROLE00": 1733668,
@@ -115,6 +118,10 @@
     "LVL_6_NOTAK_Fde7724c328f7c2d0_AT00332960_ROLE00": 1740212,
     "LVL_6_NOTAK_Fe44fc83bd69b4f14_AT0036BAC8_ROLE00": 1745776,
     "LVL_6_NOTAK_Fe6fa55215bad26dd_AT0036BB00_ROLE00": 1745780,
+    "LVL_6_NOTAK_Fe8672ea5_D_001AC18C": 1753484,
+    "LVL_6_NOTAK_Fe8672ea5_D_001AC190": 1753488,
+    "LVL_6_NOTAK_Fe8672ea5_D_001B2E30": 1781296,
+    "LVL_6_NOTAK_Fe8672ea5_FUN_0032D590": 3331472,
     "LVL_6_NOTAK_Fef45f15dfb57feb2_AT0033B4E0_ROLE00": 1741676,
     "LVL_6_NOTAK_Ff0259c87ab6a3193_AT00332978_ROLE00": 1740212,
     "LVL_6_NOTAK_QWEN_339fe89f21bc_AT003BC7C0_ROLE000": 3330856,
@@ -135,6 +142,12 @@
       "meaning": "Return the measured signed four-byte GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_6_NOTAK_FUN_002E3180"
+    },
+    {
+      "address": 3234872,
+      "meaning": "Selects one of two measured states, writes up to three optional float outputs, and reports whether a supported state was found.",
+      "size": 208,
+      "symbol": "LVL_6_NOTAK_FUN_00315C38"
     },
     {
       "address": 3237720,
@@ -393,6 +406,12 @@
       "meaning": "Store the incoming signed word in the measured GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_6_NOTAK_FUN_0036BB00"
+    },
+    {
+      "address": 3835160,
+      "meaning": "Clears 512 fixed-stride words, publishes the span base and scalar state, then invokes one bound initializer.",
+      "size": 88,
+      "symbol": "LVL_6_NOTAK_FUN_003A8518"
     },
     {
       "address": 3917760,

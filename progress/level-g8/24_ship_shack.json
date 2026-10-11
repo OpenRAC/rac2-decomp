@@ -6,10 +6,10 @@
   "reference_sha256": "4afbc22add84109c84ef8ca49099fdf9863905e5f497369c207ac5cb47814740",
   "reference_entry": 2763912,
   "candidate_source": "candidates/levels/24_ship_shack-g8.c",
-  "source_sha256": "9cc33e4de06079206a760db1f6fdab60ed9ff9467379ef21a9e2873c53194a63",
-  "catalog_sha256": "55e6e9f670fe7dee6876a2466540750f98f0647868eedb92bc4a044167d30cc3",
-  "object_sha256": "94cc679015eda096c3845c348bfc9643ecae0486a0ed783f3a9d12d82dcb5399",
-  "candidate_elf_sha256": "6bbbfc79a37b5552a63ff57417eae2f3472ee831f8c5f02bb528b1ccfd80ab2b",
+  "source_sha256": "11d35ab31e6b68f553150d6bb1e7a879b94d3d03cc3f6859886f779a0cbdcd36",
+  "catalog_sha256": "d3403eb58ef7b8008c485d4e54caf64309c8d3af08228e2f5fa7975b29a60bc2",
+  "object_sha256": "d5a024078de40b2b6acd7eb9aa3592bad482c2838a7d8fa63d14fbfd793f20e6",
+  "candidate_elf_sha256": "62a776f8a13c712281f5a1b3f4d7997d26d56441d27951fb7a1ea06051ce630d",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -34,6 +34,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_24_SHIP_SHACK_FUN_002D5570",
+      "address": 2970992,
+      "size": 208,
+      "matched": true,
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 208
     },
     {
       "symbol": "LVL_24_SHIP_SHACK_FUN_002D6090",
@@ -498,6 +509,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_24_SHIP_SHACK_FUN_0035E550",
+      "address": 3532112,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "dc32a74ba0f239ede3667d4df86433a784db084b330e6929389520ab67e6c17e",
+      "candidate_sha256": "dc32a74ba0f239ede3667d4df86433a784db084b330e6929389520ab67e6c17e",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
+    },
+    {
       "symbol": "LVL_24_SHIP_SHACK_FUN_003725F0",
       "address": 3614192,
       "size": 76,
@@ -609,5 +631,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3328
+  "matched_code_bytes": 3624
 }

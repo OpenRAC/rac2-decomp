@@ -1,0 +1,55 @@
+extern int @@ROLE_0_00@@(char *p);
+extern void @@ROLE_1_00@@(char *self);
+extern float @@ROLE_2_00@@(int v);
+extern float @@ROLE_3_00@@(int v);
+extern int @@ROLE_4_00@@(float f);
+extern void @@ROLE_5_00@@(char *dst, char *src, char *vec);
+extern void @@ROLE_6_00@@(char *dst, char *src);
+extern void @@ROLE_7_00@@(char *dst, char *table, float scale);
+extern void @@ROLE_8_00@@(char *dst, char *src, char *vec);
+extern void @@ROLE_9_00@@(char *dst, char *table, float scale);
+extern char @@BIND_DATA0_00@@[];
+
+void @@FUNCTION@@(char *self)
+{
+    float vec[4];
+    float tmp[4];
+    char *s1;
+    char *p;
+    float f20;
+    float t;
+    unsigned int v;
+
+    if (@@ROLE_0_01@@(self + 10)) {
+        @@ROLE_1_01@@(self);
+        return;
+    }
+    s1 = self + 32;
+    f20 = @@ROLE_2_01@@(*(short *)(s1 + 30));
+    t = @@ROLE_3_01@@(*(short *)(s1 + 28));
+    v = @@ROLE_4_01@@(f20 * ((float)*(short *)(self + 10) / t));
+    v = v << 24;
+    v = v | (*(unsigned char *)(s1 + 19) << 16);
+    v = v | (*(unsigned char *)(s1 + 18) << 8);
+    v = v | *(unsigned char *)(s1 + 17);
+    *(unsigned int *)(self + 4) = v;
+    vec[3] = 0.0f;
+    vec[0] = *(float *)(self + 32);
+    vec[1] = *(float *)(s1 + 4);
+    vec[2] = *(float *)(s1 + 8);
+    @@ROLE_5_01@@((char *)self + 16, (char *)self + 16, (char *)vec);
+    if (*(float *)(self + 28) != 0.0f) {
+        if (*(float *)(self + 28) == 2.0f)
+            @@ROLE_6_01@@((char *)self + 16, (char *)self + 16);
+        *(float *)(self + 28) = 2.0f;
+    }
+    p = (char *)tmp;
+    @@ROLE_7_01@@(p, @@BIND_DATA0_01@@, *(float *)(s1 + 12));
+    @@ROLE_8_01@@((char *)vec, (char *)vec, p);
+    @@ROLE_9_01@@((char *)vec, (char *)vec, *(float *)(s1 + 24));
+    *(float *)s1 = vec[0];
+    *(float *)(s1 + 4) = vec[1];
+    *(float *)(s1 + 8) = vec[2];
+    *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(s1 + 16);
+    *(float *)(self + 12) = *(float *)(self + 12) + *(float *)(s1 + 20);
+}

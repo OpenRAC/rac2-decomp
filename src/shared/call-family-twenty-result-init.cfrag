@@ -1,0 +1,41 @@
+extern void @@ROLE_0_00@@(int a);
+extern void @@ROLE_1_00@@(int a);
+extern float @@ROLE_2_00@@(float a, float b);
+extern unsigned int @@ROLE_3_00@@(int a, int b);
+extern void @@ROLE_4_00@@(char *p, float a, float b);
+extern char *@@ROLE_5_00@@(float fa, float fb, float fc, float fd, char *p, int z,
+                     char *local, unsigned int v, int one);
+
+void @@FUNCTION@@(char *unused, char *arg)
+{
+    char local[16];
+    float f;
+    int i;
+    unsigned int v;
+    unsigned int w;
+    unsigned int x;
+    char *r;
+
+    i = 19;
+    do {
+        @@ROLE_0_01@@(2);
+        i = i - 1;
+        @@ROLE_1_01@@(2);
+        f = @@ROLE_2_01@@(70000.0f, 150000.0f);
+        v = @@ROLE_3_01@@(10, 127);
+        w = (v << 8) | 0x7f000000U;
+        x = (v << 16) | w;
+        v = x | v;
+        @@ROLE_4_01@@(local, 1.6666668670950457453728e-05f,
+                6.6666672937572002410889e-03f);
+        r = @@ROLE_5_01@@(0.3f, 1.0f, 1.01f, f, arg, 0, local, v, 1);
+        if (r != 0) {
+            char *q = r + 32;
+
+            *(short *)(r + 10) = 120;
+            *(int *)(q + 4) = 2;
+            *(char *)(q + 10) = 127;
+            *(char *)(q + 11) = *(unsigned char *)(r + 10);
+        }
+    } while (i >= 0);
+}

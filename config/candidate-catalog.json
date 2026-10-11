@@ -65,6 +65,9 @@
     "F250fbfa4_FUN_00282978": 2632056,
     "F250fbfa4_FUN_00282CC0": 2632896,
     "F250fbfa4_FUN_002B9180": 2855296,
+    "F27f9be8e_FUN_00282C48": 2632776,
+    "F27f9be8e_FUN_00283B98": 2636696,
+    "F27f9be8e_FUN_00283BE0": 2636768,
     "F29eece9b_D_00188660": 1607264,
     "F29eece9b_FUN_002E5AD0": 3037904,
     "F2c74c194_FUN_00282D30": 2633008,
@@ -77,6 +80,9 @@
     "F391de845_D_001B5340": 1790784,
     "F391de845_FUN_00282E48": 2633288,
     "F391de845_FUN_002E45C8": 3032520,
+    "F3c007b59_FUN_00282978": 2632056,
+    "F3c007b59_FUN_00283CF0": 2637040,
+    "F3c007b59_FUN_002B9180": 2855296,
     "F449e2f67_FUN_003361A8": 3367336,
     "F449e2f67_FUN_003366D0": 3368656,
     "F449e2f67_FUN_00336968": 3369320,
@@ -99,6 +105,10 @@
     "F500f9762_FUN_00283CE0": 2637024,
     "F500f9762_FUN_00283CF0": 2637040,
     "F500f9762_FUN_002A04B8": 2753720,
+    "F5621621c_FUN_00283180": 2634112,
+    "F5621621c_FUN_00283198": 2634136,
+    "F5621621c_FUN_00283248": 2634312,
+    "F5621621c_FUN_002A8E20": 2788896,
     "F5a19df7a_FUN_002A7820": 2783264,
     "F5a19df7a_FUN_002A7940": 2783552,
     "F5a19df7a_FUN_002FC560": 3130720,
@@ -151,6 +161,10 @@
     "F7b2f1854_FUN_00335E68": 3366504,
     "F7b2f1854_FUN_00336DA8": 3370408,
     "F7b2f1854_FUN_00336E40": 3370560,
+    "F7cacd225_FUN_00282978": 2632056,
+    "F7cacd225_FUN_00283CE0": 2637024,
+    "F7cacd225_FUN_00283D38": 2637112,
+    "F7cacd225_FUN_002B9180": 2855296,
     "F7cb419c1_D_001F2840": 2041920,
     "F7cb419c1_FUN_002DE618": 3008024,
     "F8411efa9_FUN_0027C878": 2607224,
@@ -253,6 +267,11 @@
     "Fb1bbe20c_FUN_002E5E58": 3038808,
     "Fb1bbe20c_FUN_0033AE28": 3386920,
     "Fb1bbe20c_FUN_0033B018": 3387416,
+    "Fb5729173_FUN_00282E48": 2633288,
+    "Fb5729173_FUN_00282E80": 2633344,
+    "Fb5729173_FUN_00283248": 2634312,
+    "Fb5729173_FUN_00283C80": 2636928,
+    "Fb5729173_FUN_002ABB78": 2800504,
     "Fb77d67f1_FUN_00282948": 2632008,
     "Fb77d67f1_FUN_002B9180": 2855296,
     "Fb7feb893_D_001A7BB2": 1735602,
@@ -326,6 +345,7 @@
     "Ff2d8e5ad_FUN_002830C0": 2633920,
     "Ff2d8e5ad_FUN_00283130": 2634032,
     "Ff2d8e5ad_FUN_002A3110": 2765072,
+    "Ff454dd77_FUN_00282C48": 2632776,
     "Ff4dd22f3_FUN_00282978": 2632056,
     "Ff4dd22f3_FUN_00282CC0": 2632896,
     "Ff4dd22f3_FUN_002B9180": 2855296,
@@ -1084,6 +1104,14 @@
       "xrefs": 0
     },
     {
+      "address": 2784416,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "ranges": 1,
+      "size": 360,
+      "symbol": "FUN_002A7CA0",
+      "xrefs": 1
+    },
+    {
       "address": 2787424,
       "meaning": "Ported from RAC1 (src\\overlays\\shared\\math_interpolation_00257ef0.c), byte-identical in both games",
       "ranges": 1,
@@ -1116,12 +1144,28 @@
       "xrefs": 0
     },
     {
+      "address": 2791504,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "ranges": 1,
+      "size": 332,
+      "symbol": "FUN_002A9850",
+      "xrefs": 1
+    },
+    {
       "address": 2793792,
       "meaning": "Ported from RAC1 (src\\overlays\\shared\\gameplay_entities_00259710.c), byte-identical in both games",
       "ranges": 1,
       "size": 16,
       "symbol": "FUN_002AA140",
       "xrefs": 0
+    },
+    {
+      "address": 2793880,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "ranges": 1,
+      "size": 336,
+      "symbol": "FUN_002AA198",
+      "xrefs": 1
     },
     {
       "address": 2797376,
@@ -1193,6 +1237,14 @@
       "ranges": 1,
       "size": 244,
       "symbol": "FUN_002AD5F8",
+      "xrefs": 1
+    },
+    {
+      "address": 2814696,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "ranges": 1,
+      "size": 376,
+      "symbol": "FUN_002AF2E8",
       "xrefs": 1
     },
     {
@@ -1344,6 +1396,14 @@
       "xrefs": 1
     },
     {
+      "address": 2872216,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "ranges": 1,
+      "size": 356,
+      "symbol": "FUN_002BD398",
+      "xrefs": 1
+    },
+    {
       "address": 2877880,
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "ranges": 1,
@@ -1381,6 +1441,14 @@
       "ranges": 1,
       "size": 160,
       "symbol": "FUN_002C3EE8",
+      "xrefs": 1
+    },
+    {
+      "address": 2905424,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "ranges": 1,
+      "size": 348,
+      "symbol": "FUN_002C5550",
       "xrefs": 1
     },
     {

@@ -52,6 +52,13 @@
     "LVL_5_FELTZIN_SYSTEM_F01bd4546_FUN_0045A658": 4564568,
     "LVL_5_FELTZIN_SYSTEM_F01bd4546_FUN_0045A6A0": 4564640,
     "LVL_5_FELTZIN_SYSTEM_F03c444112283bc5f_AT003A0EF8_ROLE00": 2337136,
+    "LVL_5_FELTZIN_SYSTEM_F043c77a5_FUN_002FEF40": 3141440,
+    "LVL_5_FELTZIN_SYSTEM_F043c77a5_FUN_00303910": 3160336,
+    "LVL_5_FELTZIN_SYSTEM_F043c77a5_FUN_003066A0": 3172000,
+    "LVL_5_FELTZIN_SYSTEM_F043c77a5_FUN_00306790": 3172240,
+    "LVL_5_FELTZIN_SYSTEM_F043c77a5_FUN_00306CD0": 3173584,
+    "LVL_5_FELTZIN_SYSTEM_F043c77a5_FUN_00306E98": 3174040,
+    "LVL_5_FELTZIN_SYSTEM_F043c77a5_FUN_00433400": 4404224,
     "LVL_5_FELTZIN_SYSTEM_F0451f37d_D_001A7240": 1733184,
     "LVL_5_FELTZIN_SYSTEM_F0451f37d_D_00225FD0": 2252752,
     "LVL_5_FELTZIN_SYSTEM_F0451f37d_FUN_0011AFE0": 1159136,
@@ -116,6 +123,9 @@
     "LVL_5_FELTZIN_SYSTEM_F250fbfa4_FUN_003062D0": 3171024,
     "LVL_5_FELTZIN_SYSTEM_F250fbfa4_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_F250fbfa4_FUN_003423C8": 3417032,
+    "LVL_5_FELTZIN_SYSTEM_F27f9be8e_FUN_003065A0": 3171744,
+    "LVL_5_FELTZIN_SYSTEM_F27f9be8e_FUN_00307620": 3175968,
+    "LVL_5_FELTZIN_SYSTEM_F27f9be8e_FUN_00307668": 3176040,
     "LVL_5_FELTZIN_SYSTEM_F280d7406_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_F280d7406_FUN_00307778": 3176312,
     "LVL_5_FELTZIN_SYSTEM_F280d7406_FUN_003423C8": 3417032,
@@ -140,6 +150,9 @@
     "LVL_5_FELTZIN_SYSTEM_F391de845_D_001B96C0": 1808064,
     "LVL_5_FELTZIN_SYSTEM_F391de845_FUN_003067D8": 3172312,
     "LVL_5_FELTZIN_SYSTEM_F391de845_FUN_00370350": 3605328,
+    "LVL_5_FELTZIN_SYSTEM_F3c007b59_FUN_003062D0": 3171024,
+    "LVL_5_FELTZIN_SYSTEM_F3c007b59_FUN_00307778": 3176312,
+    "LVL_5_FELTZIN_SYSTEM_F3c007b59_FUN_003423C8": 3417032,
     "LVL_5_FELTZIN_SYSTEM_F40487154_FUN_003066A0": 3172000,
     "LVL_5_FELTZIN_SYSTEM_F40487154_FUN_00306C20": 3173408,
     "LVL_5_FELTZIN_SYSTEM_F40487154_FUN_00306E78": 3174008,
@@ -200,6 +213,10 @@
     "LVL_5_FELTZIN_SYSTEM_F55a1acb8_D_001A63AC": 1729452,
     "LVL_5_FELTZIN_SYSTEM_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_5_FELTZIN_SYSTEM_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_5_FELTZIN_SYSTEM_F5621621c_FUN_00306C08": 3173384,
+    "LVL_5_FELTZIN_SYSTEM_F5621621c_FUN_00306C20": 3173408,
+    "LVL_5_FELTZIN_SYSTEM_F5621621c_FUN_00306CD0": 3173584,
+    "LVL_5_FELTZIN_SYSTEM_F5621621c_FUN_00334368": 3359592,
     "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_00332AF8": 3353336,
     "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_00332C18": 3353624,
     "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_003906F8": 3737336,
@@ -268,6 +285,10 @@
     "LVL_5_FELTZIN_SYSTEM_F7b2f1854_FUN_00446E88": 4484744,
     "LVL_5_FELTZIN_SYSTEM_F7b2f1854_FUN_00447DC8": 4488648,
     "LVL_5_FELTZIN_SYSTEM_F7b2f1854_FUN_00447E60": 4488800,
+    "LVL_5_FELTZIN_SYSTEM_F7cacd225_FUN_003062D0": 3171024,
+    "LVL_5_FELTZIN_SYSTEM_F7cacd225_FUN_00307768": 3176296,
+    "LVL_5_FELTZIN_SYSTEM_F7cacd225_FUN_003077C0": 3176384,
+    "LVL_5_FELTZIN_SYSTEM_F7cacd225_FUN_003423C8": 3417032,
     "LVL_5_FELTZIN_SYSTEM_F7cb419c1_D_001FF540": 2094400,
     "LVL_5_FELTZIN_SYSTEM_F7cb419c1_FUN_00369FD0": 3579856,
     "LVL_5_FELTZIN_SYSTEM_F8411efa9_FUN_002FEF40": 3141440,
@@ -311,6 +332,11 @@
     "LVL_5_FELTZIN_SYSTEM_F93479d13_D_00189E20": 1613344,
     "LVL_5_FELTZIN_SYSTEM_F93479d13_FUN_00328870": 3311728,
     "LVL_5_FELTZIN_SYSTEM_F954231c4_D_00231E40": 2301504,
+    "LVL_5_FELTZIN_SYSTEM_F966dbf73_FUN_00332AB8": 3353272,
+    "LVL_5_FELTZIN_SYSTEM_F966dbf73_FUN_00332AF8": 3353336,
+    "LVL_5_FELTZIN_SYSTEM_F966dbf73_FUN_00332B50": 3353424,
+    "LVL_5_FELTZIN_SYSTEM_F966dbf73_FUN_00332CD8": 3353816,
+    "LVL_5_FELTZIN_SYSTEM_F966dbf73_FUN_00347040": 3436608,
     "LVL_5_FELTZIN_SYSTEM_F97fc4e13_FUN_00306408": 3171336,
     "LVL_5_FELTZIN_SYSTEM_F97fc4e13_FUN_0036B2A8": 3584680,
     "LVL_5_FELTZIN_SYSTEM_F9a90bcc4_FUN_00332AB8": 3353272,
@@ -404,6 +430,11 @@
     "LVL_5_FELTZIN_SYSTEM_Fb342d477_FUN_004617D0": 4593616,
     "LVL_5_FELTZIN_SYSTEM_Fb342d477_FUN_00461840": 4593728,
     "LVL_5_FELTZIN_SYSTEM_Fb4cfb7e0_FUN_00332AB8": 3353272,
+    "LVL_5_FELTZIN_SYSTEM_Fb5729173_FUN_003067D8": 3172312,
+    "LVL_5_FELTZIN_SYSTEM_Fb5729173_FUN_00306810": 3172368,
+    "LVL_5_FELTZIN_SYSTEM_Fb5729173_FUN_00306CD0": 3173584,
+    "LVL_5_FELTZIN_SYSTEM_Fb5729173_FUN_00307708": 3176200,
+    "LVL_5_FELTZIN_SYSTEM_Fb5729173_FUN_00336F78": 3370872,
     "LVL_5_FELTZIN_SYSTEM_Fb77d67f1_FUN_003062A0": 3170976,
     "LVL_5_FELTZIN_SYSTEM_Fb77d67f1_FUN_003423C8": 3417032,
     "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB2": 1735602,
@@ -441,6 +472,12 @@
     "LVL_5_FELTZIN_SYSTEM_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_5_FELTZIN_SYSTEM_Fc936841d_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_Fc936841d_FUN_00306660": 3171936,
+    "LVL_5_FELTZIN_SYSTEM_Fc94396f4_D_00189E20": 1613344,
+    "LVL_5_FELTZIN_SYSTEM_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_5_FELTZIN_SYSTEM_Fc94396f4_FUN_002EC3D8": 3064792,
+    "LVL_5_FELTZIN_SYSTEM_Fc94396f4_FUN_002EC458": 3064920,
+    "LVL_5_FELTZIN_SYSTEM_Fc94396f4_FUN_00306630": 3171888,
+    "LVL_5_FELTZIN_SYSTEM_Fc94396f4_FUN_003068F8": 3172600,
     "LVL_5_FELTZIN_SYSTEM_Fccb147a4_FUN_003423C8": 3417032,
     "LVL_5_FELTZIN_SYSTEM_Fccb147a4_FUN_00394B90": 3754896,
     "LVL_5_FELTZIN_SYSTEM_Fcdb4d905_FUN_002FCA80": 3132032,
@@ -475,6 +512,14 @@
     "LVL_5_FELTZIN_SYSTEM_Fdb046c5d_FUN_0033C3F8": 3392504,
     "LVL_5_FELTZIN_SYSTEM_Fdb046c5d_FUN_00371900": 3610880,
     "LVL_5_FELTZIN_SYSTEM_Fdb046c5d_FUN_00371C50": 3611728,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_FUN_003062D0": 3171024,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_FUN_00306630": 3171888,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_FUN_003066A0": 3172000,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_FUN_00307768": 3176296,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_FUN_00307778": 3176312,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_FUN_003423C8": 3417032,
+    "LVL_5_FELTZIN_SYSTEM_Fdd54ca5d_FUN_00394B90": 3754896,
     "LVL_5_FELTZIN_SYSTEM_Fe524d931_D_001A6480": 1729664,
     "LVL_5_FELTZIN_SYSTEM_Fe524d931_FUN_00308980": 3180928,
     "LVL_5_FELTZIN_SYSTEM_Fe524d931_FUN_00371A60": 3611232,
@@ -521,6 +566,7 @@
     "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_00306B00": 3173120,
     "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_00306B70": 3173232,
     "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_0032D928": 3332392,
+    "LVL_5_FELTZIN_SYSTEM_Ff454dd77_FUN_003065A0": 3171744,
     "LVL_5_FELTZIN_SYSTEM_Ff4dd22f3_FUN_003062D0": 3171024,
     "LVL_5_FELTZIN_SYSTEM_Ff4dd22f3_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_Ff4dd22f3_FUN_003423C8": 3417032,
@@ -747,6 +793,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_002EBC80"
+    },
+    {
+      "address": 3063104,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_002EBD40"
     },
     {
       "address": 3063800,
@@ -1161,6 +1213,24 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00332A58"
     },
     {
+      "address": 3355024,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00333190"
+    },
+    {
+      "address": 3362080,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00334D20"
+    },
+    {
+      "address": 3364848,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_003357F0"
+    },
+    {
       "address": 3367944,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1206,6 +1276,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0033A3B0"
+    },
+    {
+      "address": 3388744,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0033B548"
     },
     {
       "address": 3393016,
@@ -1285,6 +1361,12 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00345B30"
     },
     {
+      "address": 3433952,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_003465E0"
+    },
+    {
       "address": 3434592,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1295,6 +1377,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00347FC8"
+    },
+    {
+      "address": 3452496,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0034AE50"
     },
     {
       "address": 3455096,
@@ -1325,6 +1413,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0034D860"
+    },
+    {
+      "address": 3469968,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0034F290"
     },
     {
       "address": 3479392,
@@ -1760,6 +1854,12 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_003D66F0"
     },
     {
+      "address": 4025392,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_003D6C30"
+    },
+    {
       "address": 4034088,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -2044,6 +2144,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00433468"
+    },
+    {
+      "address": 4408936,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00434668"
     },
     {
       "address": 4425752,

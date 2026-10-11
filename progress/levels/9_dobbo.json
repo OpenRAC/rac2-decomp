@@ -1,51 +1,51 @@
 {
-  "boot_review_sha256": "f3eb4110327e6f109e65f4fbb651c195f8047bb6ce1dea0e1faf1d3606c07276",
+  "boot_review_sha256": "6abf51bb2b205164f2bd6cc7b94f046706c6995ea1e51b0c429f6b1a48ba0ecc",
   "c_link_object_adapter": {
     "compiled_code_unchanged": true,
-    "compiled_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
+    "compiled_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
     "integration_credit": 0,
     "kind": "reviewed-shared-import-relocation-adapter",
-    "link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
+    "link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
     "new_physical_bytes": 0,
     "relocation_changes": [
       {
         "caller": "FUN_0034F898",
         "caller_address": 4538056,
-        "new_r_info": 130820,
-        "new_symbol_index": 511,
+        "new_r_info": 132356,
+        "new_symbol_index": 517,
         "old_r_info": 68868,
         "old_symbol_index": 269,
         "provider": "FUN_001338C8",
         "provider_address": 1259720,
         "provider_reference_sha256": "df665c024f2c2f2122ca91cb5b61048030b7f98a3df2606d8c91441295d69d2f",
         "provider_size": 36,
-        "r_info_offset": 163592
+        "r_info_offset": 169032
       },
       {
         "caller": "FUN_0034FB20",
         "caller_address": 4538828,
-        "new_r_info": 147716,
-        "new_symbol_index": 577,
+        "new_r_info": 149252,
+        "new_symbol_index": 583,
         "old_r_info": 69124,
         "old_symbol_index": 270,
         "provider": "FUN_00133930",
         "provider_address": 1259824,
         "provider_reference_sha256": "d1b7a40a24b4537c4f9b704b87cafb6001ecaf64ef96c01c869fd05532732474",
         "provider_size": 44,
-        "r_info_offset": 164040
+        "r_info_offset": 169480
       },
       {
         "caller": "FUN_002B7170",
         "caller_address": 3318820,
-        "new_r_info": 162052,
-        "new_symbol_index": 633,
+        "new_r_info": 163588,
+        "new_symbol_index": 639,
         "old_r_info": 68612,
         "old_symbol_index": 268,
         "provider": "FUN_00133490",
         "provider_address": 1258640,
         "provider_reference_sha256": "1c102a1be303b46fbc85f02f327e97d8ecdbbf6635d3458a6454c0c7de75c75a",
         "provider_size": 40,
-        "r_info_offset": 164352
+        "r_info_offset": 169792
       }
     ],
     "schema": 1,
@@ -64,12 +64,12 @@
       {
         "index": 4,
         "name": ".reginfo",
-        "sha256": "c36cadbb29f41b19d0d4fe00f68fafaf85bd7ab22979c1148b6fdc58176e7beb"
+        "sha256": "f478230c6a7dcc05f6dc5ae33a236cb7235246e60d2b2d9ccb607041dca7a0e1"
       },
       {
         "index": 5,
         "name": ".mdebug",
-        "sha256": "f5495a939e13128a5f5a56396ad13d33e7b0135b33456df8bab0df63dccaf099"
+        "sha256": "c525026b298384f7adbadeb06f51d0f49bf68b627989a5069672690657c7bfae"
       },
       {
         "index": 6,
@@ -2068,29 +2068,59 @@
       },
       {
         "index": 591,
-        "name": ".shstrtab",
-        "sha256": "aeaee12eff2daff004d2989ad8f0a0769ee4effa80e46bff050b1ac1104bbacf"
-      },
-      {
-        "index": 592,
-        "name": ".symtab",
-        "sha256": "80481cf8ef119cf939148a2407ac4264fc9e7abedf9c20efbc69265f5eacc88b"
+        "name": ".text.FUN_002AF2E8",
+        "sha256": "480eaee31e8bdded10fbb7a71d979e17bea60cc955be8307321be6834350e5e9"
       },
       {
         "index": 593,
+        "name": ".text.FUN_002A7CA0",
+        "sha256": "6f60d420f9f1f6f6b88f24b8e3fb55db9d14eb1d27a58a528f46d3d1192bb5d5"
+      },
+      {
+        "index": 595,
+        "name": ".text.FUN_002BD398",
+        "sha256": "ecd324661c010c77b529aff255cc8d783447578f7457f4a7efed6b8e7bcef504"
+      },
+      {
+        "index": 597,
+        "name": ".text.FUN_002C5550",
+        "sha256": "b4b00ca23692c47831ba20bd91cba6683ac943a8cbcaa7729ddb1e702279dbb7"
+      },
+      {
+        "index": 599,
+        "name": ".text.FUN_002AA198",
+        "sha256": "7f656387f12db635de5054b140edc8c4f8031be9b6a1a6643a8655fcead24295"
+      },
+      {
+        "index": 601,
+        "name": ".text.FUN_002A9850",
+        "sha256": "a0280298301d3833fc1588a98c78f41f0cec2460f8d656298a07f42a32552890"
+      },
+      {
+        "index": 603,
+        "name": ".shstrtab",
+        "sha256": "e5dc83e9b147f4405ac7f5cca3bf49b9a56406b0f5eb61396856955c6eec5f5e"
+      },
+      {
+        "index": 604,
+        "name": ".symtab",
+        "sha256": "febc07a8aa82fc1ec1bded56748c1a1d0d6b77d83d74650e178a4e98a12e3ec1"
+      },
+      {
+        "index": 605,
         "name": ".strtab",
-        "sha256": "027e3c3f98dfd162580b0529b60d1d61ded151fd3a0b1573617067151295adb4"
+        "sha256": "a3dff66f953fd2c4aa9950aa4b969a22698c122d5f70f0f913496052106d88a7"
       }
     ]
   },
-  "c_link_object_adapter_sha256": "4f9d508fd542ecfe9101b918986f50ead368655209acefe9a7df504cd76f6b9e",
-  "c_link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
-  "c_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
-  "candidate_elf_sha256": "caad0a3358111dffe30efbc71a37aacf28f0317be437f113a9c87670ebae2bcb",
+  "c_link_object_adapter_sha256": "65f8afb29c1a0aaae0674c19dcc2f5605b24ba74f72f8f5c497cb5f878a7c72b",
+  "c_link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
+  "c_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
+  "candidate_elf_sha256": "588402c8a4db42c480fd711f8d285124f5f1ae76f56739eb69dd3fa6991986e8",
   "candidate_entry": 2782472,
   "candidate_source": "candidates/boot.c",
   "catalog_sha256": "fc792ac26dd3bbec8f54565bc6a44fe3ed2c05756e5f66981ceb3d9c294fb7b0",
-  "dependency_sha256": "e567584356c55a3070d94cc995b9b8e145a5f07b0ae034156a85af56bda85d4f",
+  "dependency_sha256": "a48268c4cdbffa66670ac7637624a7bf00975a288f8e549a6059219dad294806",
   "full_level_gate": {
     "bytes_compared": 2812264,
     "matched": true,
@@ -4744,6 +4774,20 @@
       "symbol": "LVL_9_DOBBO_FUN_002CF458"
     },
     {
+      "address": 2946328,
+      "candidate_sha256": "9ae314f209eac016f426eed964725c949321c84fb7f3c647154c9b1f9c475b4e",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "9ae314f209eac016f426eed964725c949321c84fb7f3c647154c9b1f9c475b4e",
+      "size": 372,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_002CF518"
+    },
+    {
       "address": 2947024,
       "candidate_sha256": "ecafbc47e98aa8c4b53f0f926c5d1f73f7f7e71d0b08505e1f3e56956bb8f76c",
       "candidate_source": "candidates/levels/9_dobbo.c",
@@ -5640,6 +5684,48 @@
       "symbol": "LVL_9_DOBBO_FUN_003169C8"
     },
     {
+      "address": 3240192,
+      "candidate_sha256": "487a0ba8b5c30da4a08c9e9421d0867b59c352f1f118a3c772a71ed36b1ccdf0",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "487a0ba8b5c30da4a08c9e9421d0867b59c352f1f118a3c772a71ed36b1ccdf0",
+      "size": 360,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00317100"
+    },
+    {
+      "address": 3248584,
+      "candidate_sha256": "ef6da10af37db66aaa0ef7db1389b6af8676009bf4776aaed9e2413cba4ebd8d",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "ef6da10af37db66aaa0ef7db1389b6af8676009bf4776aaed9e2413cba4ebd8d",
+      "size": 332,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_003191C8"
+    },
+    {
+      "address": 3251352,
+      "candidate_sha256": "08892bcbbd9026a279d4b9b8c68562439d3e360a49c88ba0f33fd5a341d74c56",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "08892bcbbd9026a279d4b9b8c68562439d3e360a49c88ba0f33fd5a341d74c56",
+      "size": 336,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00319C98"
+    },
+    {
       "address": 3255080,
       "candidate_sha256": "5aa80b19e1c3d7a8229b8806441df826dd01b8198cd99af6a1e898946f7a5785",
       "candidate_source": "candidates/levels/9_dobbo.c",
@@ -5736,6 +5822,20 @@
       "size": 128,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_0031F3F0"
+    },
+    {
+      "address": 3278560,
+      "candidate_sha256": "79b827f7aab80893f66373d8108efead23fd31fe52afe7e8fe5914fd3a9e5850",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "79b827f7aab80893f66373d8108efead23fd31fe52afe7e8fe5914fd3a9e5850",
+      "size": 376,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_003206E0"
     },
     {
       "address": 3283528,
@@ -5948,6 +6048,20 @@
       "symbol": "LVL_9_DOBBO_FUN_0032FFF8"
     },
     {
+      "address": 3345064,
+      "candidate_sha256": "1441f02cb1dc5f8026ba465748548e9e4a8e18c402736f336243f071ee108e40",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "1441f02cb1dc5f8026ba465748548e9e4a8e18c402736f336243f071ee108e40",
+      "size": 356,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00330AA8"
+    },
+    {
       "address": 3345704,
       "candidate_sha256": "4241f632ab38c09e4faca0adb27152d6c916b57497fc6fb580735e382ec50042",
       "candidate_source": "candidates/levels/9_dobbo.c",
@@ -5974,6 +6088,20 @@
       "size": 516,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_00332490"
+    },
+    {
+      "address": 3363920,
+      "candidate_sha256": "3229770d187cab096c75aa3222aabdffe856837d5373c89e0ea5dc9d4dc42d7c",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "3229770d187cab096c75aa3222aabdffe856837d5373c89e0ea5dc9d4dc42d7c",
+      "size": 404,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00335450"
     },
     {
       "address": 3366320,
@@ -6044,6 +6172,20 @@
       "size": 160,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_00337EB0"
+    },
+    {
+      "address": 3381768,
+      "candidate_sha256": "e289194ba5b18d46c6a72085bad3f42973b9b2f99a654c8c33b7803b554a806a",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "e289194ba5b18d46c6a72085bad3f42973b9b2f99a654c8c33b7803b554a806a",
+      "size": 348,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00339A08"
     },
     {
       "address": 3391192,
@@ -6956,6 +7098,20 @@
       "symbol": "LVL_9_DOBBO_FUN_003C9370"
     },
     {
+      "address": 3971248,
+      "candidate_sha256": "8b059e8c9b5cd5268155c8822b7294ab3b3758e714913e562e974f166c906502",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "8b059e8c9b5cd5268155c8822b7294ab3b3758e714913e562e974f166c906502",
+      "size": 332,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_003C98B0"
+    },
+    {
       "address": 3979944,
       "candidate_sha256": "acf12518406bfeebfbde1518dcc771b87ee50d7dc3527d6a33049b281fb7837f",
       "candidate_source": "candidates/levels/9_dobbo.c",
@@ -7640,6 +7796,20 @@
       "size": 112,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_00429D90"
+    },
+    {
+      "address": 4370320,
+      "candidate_sha256": "9ad806f121428a6fbcd81e867f018767979f41e994b47e430535f1985e884e6c",
+      "candidate_source": "candidates/levels/9_dobbo.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "9_dobbo",
+      "reference_sha256": "9ad806f121428a6fbcd81e867f018767979f41e994b47e430535f1985e884e6c",
+      "size": 364,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_0042AF90"
     },
     {
       "address": 4387136,
@@ -8846,202 +9016,6 @@
       "symbol": "LVL_9_DOBBO_FUN_00456510"
     },
     {
-      "address": 3168536,
-      "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-      "size": 112,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305918"
-    },
-    {
-      "address": 3168648,
-      "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-      "size": 76,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305988"
-    },
-    {
-      "address": 3168728,
-      "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-      "size": 124,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_003059D8"
-    },
-    {
-      "address": 3168856,
-      "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-      "size": 44,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305A58"
-    },
-    {
-      "address": 3168904,
-      "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-      "size": 96,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305A88"
-    },
-    {
-      "address": 3169000,
-      "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-      "size": 76,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305AE8"
-    },
-    {
-      "address": 3169144,
-      "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-      "size": 156,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305B78"
-    },
-    {
-      "address": 3169304,
-      "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-      "size": 56,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305C18"
-    },
-    {
-      "address": 3169360,
-      "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-      "size": 120,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305C50"
-    },
-    {
-      "address": 3169664,
-      "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-      "size": 184,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305D80"
-    },
-    {
-      "address": 3170040,
-      "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-      "size": 112,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00305EF8"
-    },
-    {
-      "address": 3170416,
-      "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-      "size": 72,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00306070"
-    },
-    {
-      "address": 3170488,
-      "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-      "size": 68,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_003060B8"
-    },
-    {
-      "address": 3293320,
-      "candidate_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
-      "size": 164,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00324088"
-    },
-    {
       "address": 2782464,
       "candidate_sha256": "4912eb9f14b02c39b9cf96da40470b670c4d872a071252fbf2a13fa3cda688ef",
       "candidate_source": "candidates/levels/9_dobbo-g8.c",
@@ -9054,6 +9028,34 @@
       "size": 8,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_002A7500"
+    },
+    {
+      "address": 2958688,
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "size": 208,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_002D2560"
+    },
+    {
+      "address": 2961536,
+      "candidate_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
+      "size": 132,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_002D3080"
     },
     {
       "address": 2963936,
@@ -9378,6 +9380,188 @@
       "symbol": "LVL_9_DOBBO_FUN_002F83C8"
     },
     {
+      "address": 3168536,
+      "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+      "size": 112,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305918"
+    },
+    {
+      "address": 3168648,
+      "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+      "size": 76,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305988"
+    },
+    {
+      "address": 3168728,
+      "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+      "size": 124,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_003059D8"
+    },
+    {
+      "address": 3168856,
+      "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+      "size": 44,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305A58"
+    },
+    {
+      "address": 3168904,
+      "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+      "size": 96,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305A88"
+    },
+    {
+      "address": 3169000,
+      "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+      "size": 76,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305AE8"
+    },
+    {
+      "address": 3169144,
+      "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+      "size": 156,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305B78"
+    },
+    {
+      "address": 3169304,
+      "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+      "size": 56,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305C18"
+    },
+    {
+      "address": 3169360,
+      "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+      "size": 120,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305C50"
+    },
+    {
+      "address": 3169664,
+      "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+      "size": 184,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305D80"
+    },
+    {
+      "address": 3170040,
+      "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+      "size": 112,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00305EF8"
+    },
+    {
+      "address": 3170416,
+      "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+      "size": 72,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00306070"
+    },
+    {
+      "address": 3170488,
+      "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+      "size": 68,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_003060B8"
+    },
+    {
       "address": 3182832,
       "candidate_sha256": "b28d21ced7ab0245a039c390b93f090cc3c6fb544b7cec4261a9484b2f2a7531",
       "candidate_source": "candidates/levels/9_dobbo-g8.c",
@@ -9404,6 +9588,20 @@
       "size": 56,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_0030E3B0"
+    },
+    {
+      "address": 3293320,
+      "candidate_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
+      "size": 164,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00324088"
     },
     {
       "address": 3307264,
@@ -9446,6 +9644,20 @@
       "size": 8,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_00327738"
+    },
+    {
+      "address": 3639176,
+      "candidate_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
+      "candidate_source": "candidates/levels/9_dobbo-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "9_dobbo",
+      "reference_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
+      "size": 76,
+      "state": "integrated",
+      "symbol": "LVL_9_DOBBO_FUN_00378788"
     },
     {
       "address": 3639256,
@@ -9558,44 +9770,16 @@
       "size": 8,
       "state": "integrated",
       "symbol": "LVL_9_DOBBO_FUN_0043B500"
-    },
-    {
-      "address": 2961536,
-      "candidate_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
-      "size": 132,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_002D3080"
-    },
-    {
-      "address": 3639176,
-      "candidate_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
-      "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "9_dobbo",
-      "reference_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
-      "size": 76,
-      "state": "integrated",
-      "symbol": "LVL_9_DOBBO_FUN_00378788"
     }
   ],
   "kind": "level-c-integration",
-  "matched_code_bytes": 51924,
+  "matched_code_bytes": 55712,
   "native": {
     "catalog_path": "config/level-native/9_dobbo.json",
     "object_qualification": {
-      "candidate_elf_sha256": "484642f2b1bd9692aaab709a6436351ebe90572cb9f167beb7015d8bef69d6ea",
+      "candidate_elf_sha256": "5343197ef3f4950ef5b82eb18f916befc7b463997005773990a7e047bf86afe3",
       "candidate_source": "candidates/levels/9_dobbo.c",
-      "catalog_sha256": "f180c0121b4efa3e03e58d386d2541ffb7a80efd52e40731c20896dc94cc6dcc",
+      "catalog_sha256": "102ef931cedd709c6516d8032faaeb575cf7afe56fdacd40104bd29d8dbebde9",
       "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
       "flags": [
         "-O2",
@@ -9888,6 +10072,17 @@
           "size": 188,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_002CF458"
+        },
+        {
+          "address": 2946328,
+          "candidate_sha256": "9ae314f209eac016f426eed964725c949321c84fb7f3c647154c9b1f9c475b4e",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 372,
+          "reference_sha256": "9ae314f209eac016f426eed964725c949321c84fb7f3c647154c9b1f9c475b4e",
+          "size": 372,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_002CF518"
         },
         {
           "address": 2947024,
@@ -10594,6 +10789,39 @@
           "symbol": "LVL_9_DOBBO_FUN_003169C8"
         },
         {
+          "address": 3240192,
+          "candidate_sha256": "487a0ba8b5c30da4a08c9e9421d0867b59c352f1f118a3c772a71ed36b1ccdf0",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 360,
+          "reference_sha256": "487a0ba8b5c30da4a08c9e9421d0867b59c352f1f118a3c772a71ed36b1ccdf0",
+          "size": 360,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00317100"
+        },
+        {
+          "address": 3248584,
+          "candidate_sha256": "ef6da10af37db66aaa0ef7db1389b6af8676009bf4776aaed9e2413cba4ebd8d",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 332,
+          "reference_sha256": "ef6da10af37db66aaa0ef7db1389b6af8676009bf4776aaed9e2413cba4ebd8d",
+          "size": 332,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_003191C8"
+        },
+        {
+          "address": 3251352,
+          "candidate_sha256": "08892bcbbd9026a279d4b9b8c68562439d3e360a49c88ba0f33fd5a341d74c56",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 336,
+          "reference_sha256": "08892bcbbd9026a279d4b9b8c68562439d3e360a49c88ba0f33fd5a341d74c56",
+          "size": 336,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00319C98"
+        },
+        {
           "address": 3255080,
           "candidate_sha256": "5aa80b19e1c3d7a8229b8806441df826dd01b8198cd99af6a1e898946f7a5785",
           "different_bytes": 0,
@@ -10669,6 +10897,17 @@
           "size": 128,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_0031F3F0"
+        },
+        {
+          "address": 3278560,
+          "candidate_sha256": "79b827f7aab80893f66373d8108efead23fd31fe52afe7e8fe5914fd3a9e5850",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 376,
+          "reference_sha256": "79b827f7aab80893f66373d8108efead23fd31fe52afe7e8fe5914fd3a9e5850",
+          "size": 376,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_003206E0"
         },
         {
           "address": 3283528,
@@ -10836,6 +11075,17 @@
           "symbol": "LVL_9_DOBBO_FUN_0032FFF8"
         },
         {
+          "address": 3345064,
+          "candidate_sha256": "1441f02cb1dc5f8026ba465748548e9e4a8e18c402736f336243f071ee108e40",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 356,
+          "reference_sha256": "1441f02cb1dc5f8026ba465748548e9e4a8e18c402736f336243f071ee108e40",
+          "size": 356,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00330AA8"
+        },
+        {
           "address": 3345704,
           "candidate_sha256": "4241f632ab38c09e4faca0adb27152d6c916b57497fc6fb580735e382ec50042",
           "different_bytes": 0,
@@ -10856,6 +11106,17 @@
           "size": 516,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_00332490"
+        },
+        {
+          "address": 3363920,
+          "candidate_sha256": "3229770d187cab096c75aa3222aabdffe856837d5373c89e0ea5dc9d4dc42d7c",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 404,
+          "reference_sha256": "3229770d187cab096c75aa3222aabdffe856837d5373c89e0ea5dc9d4dc42d7c",
+          "size": 404,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00335450"
         },
         {
           "address": 3366320,
@@ -10911,6 +11172,17 @@
           "size": 160,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_00337EB0"
+        },
+        {
+          "address": 3381768,
+          "candidate_sha256": "e289194ba5b18d46c6a72085bad3f42973b9b2f99a654c8c33b7803b554a806a",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 348,
+          "reference_sha256": "e289194ba5b18d46c6a72085bad3f42973b9b2f99a654c8c33b7803b554a806a",
+          "size": 348,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00339A08"
         },
         {
           "address": 3391192,
@@ -11628,6 +11900,17 @@
           "symbol": "LVL_9_DOBBO_FUN_003C9370"
         },
         {
+          "address": 3971248,
+          "candidate_sha256": "8b059e8c9b5cd5268155c8822b7294ab3b3758e714913e562e974f166c906502",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 332,
+          "reference_sha256": "8b059e8c9b5cd5268155c8822b7294ab3b3758e714913e562e974f166c906502",
+          "size": 332,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_003C98B0"
+        },
+        {
           "address": 3979944,
           "candidate_sha256": "acf12518406bfeebfbde1518dcc771b87ee50d7dc3527d6a33049b281fb7837f",
           "different_bytes": 0,
@@ -12165,6 +12448,17 @@
           "size": 112,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_00429D90"
+        },
+        {
+          "address": 4370320,
+          "candidate_sha256": "9ad806f121428a6fbcd81e867f018767979f41e994b47e430535f1985e884e6c",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 364,
+          "reference_sha256": "9ad806f121428a6fbcd81e867f018767979f41e994b47e430535f1985e884e6c",
+          "size": 364,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_0042AF90"
         },
         {
           "address": 4387136,
@@ -13114,14 +13408,14 @@
         }
       ],
       "kind": "level-native-candidate",
-      "matched_code_bytes": 39920,
-      "object_sha256": "651994d8acd4dddece62dbb9bb478b181d6f5266b2de67be7c95bf14312f9028",
+      "matched_code_bytes": 43500,
+      "object_sha256": "10159e050f6a3d614dbcb4f430db0a6a7fbd9ea4d075b4439fba313a31755ffb",
       "program": "levels/9_dobbo",
       "read_only_sections": [],
       "reference_entry": 2782472,
       "reference_sha256": "a47999f3aa251431498e068932ac542399b5e402ab8dcddcbfe246dc220b7810",
       "schema": 1,
-      "source_sha256": "3efe125f1bb333e4fc3600bbb7e056c6241d102478f2fd8657d6389e74e745dc",
+      "source_sha256": "ca0c1c34ce9c722abe5737f3e98f2ff5e807b28efa579bde62411489c225d5fd",
       "state": "matched_unintegrated",
       "target": "SCUS_972.68",
       "tools": {
@@ -13131,9 +13425,9 @@
         "ld.exe": "80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48"
       }
     },
-    "object_sha256": "651994d8acd4dddece62dbb9bb478b181d6f5266b2de67be7c95bf14312f9028",
+    "object_sha256": "10159e050f6a3d614dbcb4f430db0a6a7fbd9ea4d075b4439fba313a31755ffb",
     "review_path": "progress/level-candidates/9_dobbo.json",
-    "review_sha256": "9f1943425a63fc4de870a20045daf0bec8f38aa08df3d62b347d99c14b551e4e",
+    "review_sha256": "be072b6266bf5e3682081a38b05932be144671b2eb2958e45a6ccf516d5502e4",
     "source": "candidates/levels/9_dobbo.c"
   },
   "program": "9_dobbo",
@@ -13334,6 +13628,7 @@
       "LVL_9_DOBBO_FUN_002CE508",
       "LVL_9_DOBBO_FUN_002CF100",
       "LVL_9_DOBBO_FUN_002CF458",
+      "LVL_9_DOBBO_FUN_002CF518",
       "LVL_9_DOBBO_FUN_002CF7D0",
       "LVL_9_DOBBO_FUN_002CF9B8",
       "LVL_9_DOBBO_FUN_002CFAB0",
@@ -13398,6 +13693,9 @@
       "LVL_9_DOBBO_FUN_0030D698",
       "LVL_9_DOBBO_FUN_0030DEA8",
       "LVL_9_DOBBO_FUN_003169C8",
+      "LVL_9_DOBBO_FUN_00317100",
+      "LVL_9_DOBBO_FUN_003191C8",
+      "LVL_9_DOBBO_FUN_00319C98",
       "LVL_9_DOBBO_FUN_0031AB28",
       "LVL_9_DOBBO_FUN_0031B3F8",
       "LVL_9_DOBBO_FUN_0031B7F8",
@@ -13405,6 +13703,7 @@
       "LVL_9_DOBBO_FUN_0031D840",
       "LVL_9_DOBBO_FUN_0031EFC0",
       "LVL_9_DOBBO_FUN_0031F3F0",
+      "LVL_9_DOBBO_FUN_003206E0",
       "LVL_9_DOBBO_FUN_00321A48",
       "LVL_9_DOBBO_FUN_00322708",
       "LVL_9_DOBBO_FUN_00323220",
@@ -13420,13 +13719,16 @@
       "LVL_9_DOBBO_FUN_0032E678",
       "LVL_9_DOBBO_FUN_0032EEA8",
       "LVL_9_DOBBO_FUN_0032FFF8",
+      "LVL_9_DOBBO_FUN_00330AA8",
       "LVL_9_DOBBO_FUN_00330D28",
       "LVL_9_DOBBO_FUN_00332490",
+      "LVL_9_DOBBO_FUN_00335450",
       "LVL_9_DOBBO_FUN_00335DB0",
       "LVL_9_DOBBO_FUN_00336740",
       "LVL_9_DOBBO_FUN_003370C8",
       "LVL_9_DOBBO_FUN_00337628",
       "LVL_9_DOBBO_FUN_00337EB0",
+      "LVL_9_DOBBO_FUN_00339A08",
       "LVL_9_DOBBO_FUN_0033BED8",
       "LVL_9_DOBBO_FUN_0033C488",
       "LVL_9_DOBBO_FUN_0033C6F8",
@@ -13492,6 +13794,7 @@
       "LVL_9_DOBBO_FUN_003C3E48",
       "LVL_9_DOBBO_FUN_003C41C8",
       "LVL_9_DOBBO_FUN_003C9370",
+      "LVL_9_DOBBO_FUN_003C98B0",
       "LVL_9_DOBBO_FUN_003CBAA8",
       "LVL_9_DOBBO_FUN_003CE9E8",
       "LVL_9_DOBBO_FUN_003D1C10",
@@ -13541,6 +13844,7 @@
       "LVL_9_DOBBO_FUN_00427768",
       "LVL_9_DOBBO_FUN_00429D28",
       "LVL_9_DOBBO_FUN_00429D90",
+      "LVL_9_DOBBO_FUN_0042AF90",
       "LVL_9_DOBBO_FUN_0042F140",
       "LVL_9_DOBBO_FUN_0042F9C8",
       "LVL_9_DOBBO_FUN_00432EA0",
@@ -13627,21 +13931,9 @@
       "LVL_9_DOBBO_FUN_004553F0",
       "LVL_9_DOBBO_FUN_00456468",
       "LVL_9_DOBBO_FUN_00456510",
-      "LVL_9_DOBBO_FUN_00305918",
-      "LVL_9_DOBBO_FUN_00305988",
-      "LVL_9_DOBBO_FUN_003059D8",
-      "LVL_9_DOBBO_FUN_00305A58",
-      "LVL_9_DOBBO_FUN_00305A88",
-      "LVL_9_DOBBO_FUN_00305AE8",
-      "LVL_9_DOBBO_FUN_00305B78",
-      "LVL_9_DOBBO_FUN_00305C18",
-      "LVL_9_DOBBO_FUN_00305C50",
-      "LVL_9_DOBBO_FUN_00305D80",
-      "LVL_9_DOBBO_FUN_00305EF8",
-      "LVL_9_DOBBO_FUN_00306070",
-      "LVL_9_DOBBO_FUN_003060B8",
-      "LVL_9_DOBBO_FUN_00324088",
       "LVL_9_DOBBO_FUN_002A7500",
+      "LVL_9_DOBBO_FUN_002D2560",
+      "LVL_9_DOBBO_FUN_002D3080",
       "LVL_9_DOBBO_FUN_002D39E0",
       "LVL_9_DOBBO_FUN_002E1738",
       "LVL_9_DOBBO_FUN_002EC938",
@@ -13665,11 +13957,26 @@
       "LVL_9_DOBBO_FUN_002F83A8",
       "LVL_9_DOBBO_FUN_002F83B0",
       "LVL_9_DOBBO_FUN_002F83C8",
+      "LVL_9_DOBBO_FUN_00305918",
+      "LVL_9_DOBBO_FUN_00305988",
+      "LVL_9_DOBBO_FUN_003059D8",
+      "LVL_9_DOBBO_FUN_00305A58",
+      "LVL_9_DOBBO_FUN_00305A88",
+      "LVL_9_DOBBO_FUN_00305AE8",
+      "LVL_9_DOBBO_FUN_00305B78",
+      "LVL_9_DOBBO_FUN_00305C18",
+      "LVL_9_DOBBO_FUN_00305C50",
+      "LVL_9_DOBBO_FUN_00305D80",
+      "LVL_9_DOBBO_FUN_00305EF8",
+      "LVL_9_DOBBO_FUN_00306070",
+      "LVL_9_DOBBO_FUN_003060B8",
       "LVL_9_DOBBO_FUN_003090F0",
       "LVL_9_DOBBO_FUN_0030E3B0",
+      "LVL_9_DOBBO_FUN_00324088",
       "LVL_9_DOBBO_FUN_00327700",
       "LVL_9_DOBBO_FUN_00327710",
       "LVL_9_DOBBO_FUN_00327738",
+      "LVL_9_DOBBO_FUN_00378788",
       "LVL_9_DOBBO_FUN_003787D8",
       "LVL_9_DOBBO_FUN_003788E0",
       "LVL_9_DOBBO_FUN_00378928",
@@ -13677,59 +13984,57 @@
       "LVL_9_DOBBO_FUN_00378C78",
       "LVL_9_DOBBO_FUN_00378CD8",
       "LVL_9_DOBBO_FUN_00378D40",
-      "LVL_9_DOBBO_FUN_0043B500",
-      "LVL_9_DOBBO_FUN_002D3080",
-      "LVL_9_DOBBO_FUN_00378788"
+      "LVL_9_DOBBO_FUN_0043B500"
     ]
   },
   "schema": 2,
   "shared": {
     "c_link_object_adapter": {
       "compiled_code_unchanged": true,
-      "compiled_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
+      "compiled_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
       "integration_credit": 0,
       "kind": "reviewed-shared-import-relocation-adapter",
-      "link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
+      "link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
       "new_physical_bytes": 0,
       "relocation_changes": [
         {
           "caller": "FUN_0034F898",
           "caller_address": 4538056,
-          "new_r_info": 130820,
-          "new_symbol_index": 511,
+          "new_r_info": 132356,
+          "new_symbol_index": 517,
           "old_r_info": 68868,
           "old_symbol_index": 269,
           "provider": "FUN_001338C8",
           "provider_address": 1259720,
           "provider_reference_sha256": "df665c024f2c2f2122ca91cb5b61048030b7f98a3df2606d8c91441295d69d2f",
           "provider_size": 36,
-          "r_info_offset": 163592
+          "r_info_offset": 169032
         },
         {
           "caller": "FUN_0034FB20",
           "caller_address": 4538828,
-          "new_r_info": 147716,
-          "new_symbol_index": 577,
+          "new_r_info": 149252,
+          "new_symbol_index": 583,
           "old_r_info": 69124,
           "old_symbol_index": 270,
           "provider": "FUN_00133930",
           "provider_address": 1259824,
           "provider_reference_sha256": "d1b7a40a24b4537c4f9b704b87cafb6001ecaf64ef96c01c869fd05532732474",
           "provider_size": 44,
-          "r_info_offset": 164040
+          "r_info_offset": 169480
         },
         {
           "caller": "FUN_002B7170",
           "caller_address": 3318820,
-          "new_r_info": 162052,
-          "new_symbol_index": 633,
+          "new_r_info": 163588,
+          "new_symbol_index": 639,
           "old_r_info": 68612,
           "old_symbol_index": 268,
           "provider": "FUN_00133490",
           "provider_address": 1258640,
           "provider_reference_sha256": "1c102a1be303b46fbc85f02f327e97d8ecdbbf6635d3458a6454c0c7de75c75a",
           "provider_size": 40,
-          "r_info_offset": 164352
+          "r_info_offset": 169792
         }
       ],
       "schema": 1,
@@ -13748,12 +14053,12 @@
         {
           "index": 4,
           "name": ".reginfo",
-          "sha256": "c36cadbb29f41b19d0d4fe00f68fafaf85bd7ab22979c1148b6fdc58176e7beb"
+          "sha256": "f478230c6a7dcc05f6dc5ae33a236cb7235246e60d2b2d9ccb607041dca7a0e1"
         },
         {
           "index": 5,
           "name": ".mdebug",
-          "sha256": "f5495a939e13128a5f5a56396ad13d33e7b0135b33456df8bab0df63dccaf099"
+          "sha256": "c525026b298384f7adbadeb06f51d0f49bf68b627989a5069672690657c7bfae"
         },
         {
           "index": 6,
@@ -15752,25 +16057,55 @@
         },
         {
           "index": 591,
-          "name": ".shstrtab",
-          "sha256": "aeaee12eff2daff004d2989ad8f0a0769ee4effa80e46bff050b1ac1104bbacf"
-        },
-        {
-          "index": 592,
-          "name": ".symtab",
-          "sha256": "80481cf8ef119cf939148a2407ac4264fc9e7abedf9c20efbc69265f5eacc88b"
+          "name": ".text.FUN_002AF2E8",
+          "sha256": "480eaee31e8bdded10fbb7a71d979e17bea60cc955be8307321be6834350e5e9"
         },
         {
           "index": 593,
+          "name": ".text.FUN_002A7CA0",
+          "sha256": "6f60d420f9f1f6f6b88f24b8e3fb55db9d14eb1d27a58a528f46d3d1192bb5d5"
+        },
+        {
+          "index": 595,
+          "name": ".text.FUN_002BD398",
+          "sha256": "ecd324661c010c77b529aff255cc8d783447578f7457f4a7efed6b8e7bcef504"
+        },
+        {
+          "index": 597,
+          "name": ".text.FUN_002C5550",
+          "sha256": "b4b00ca23692c47831ba20bd91cba6683ac943a8cbcaa7729ddb1e702279dbb7"
+        },
+        {
+          "index": 599,
+          "name": ".text.FUN_002AA198",
+          "sha256": "7f656387f12db635de5054b140edc8c4f8031be9b6a1a6643a8655fcead24295"
+        },
+        {
+          "index": 601,
+          "name": ".text.FUN_002A9850",
+          "sha256": "a0280298301d3833fc1588a98c78f41f0cec2460f8d656298a07f42a32552890"
+        },
+        {
+          "index": 603,
+          "name": ".shstrtab",
+          "sha256": "e5dc83e9b147f4405ac7f5cca3bf49b9a56406b0f5eb61396856955c6eec5f5e"
+        },
+        {
+          "index": 604,
+          "name": ".symtab",
+          "sha256": "febc07a8aa82fc1ec1bded56748c1a1d0d6b77d83d74650e178a4e98a12e3ec1"
+        },
+        {
+          "index": 605,
           "name": ".strtab",
-          "sha256": "027e3c3f98dfd162580b0529b60d1d61ded151fd3a0b1573617067151295adb4"
+          "sha256": "a3dff66f953fd2c4aa9950aa4b969a22698c122d5f70f0f913496052106d88a7"
         }
       ]
     },
-    "c_link_object_adapter_sha256": "4f9d508fd542ecfe9101b918986f50ead368655209acefe9a7df504cd76f6b9e",
-    "c_link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
-    "c_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
-    "candidate_elf_sha256": "caad0a3358111dffe30efbc71a37aacf28f0317be437f113a9c87670ebae2bcb",
+    "c_link_object_adapter_sha256": "65f8afb29c1a0aaae0674c19dcc2f5605b24ba74f72f8f5c497cb5f878a7c72b",
+    "c_link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
+    "c_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
+    "candidate_elf_sha256": "588402c8a4db42c480fd711f8d285124f5f1ae76f56739eb69dd3fa6991986e8",
     "candidate_source": "candidates/boot.c",
     "catalog_sha256": "fc792ac26dd3bbec8f54565bc6a44fe3ed2c05756e5f66981ceb3d9c294fb7b0",
     "full_level_gate": {
@@ -15972,6 +16307,7 @@
         "LVL_9_DOBBO_FUN_002CE508",
         "LVL_9_DOBBO_FUN_002CF100",
         "LVL_9_DOBBO_FUN_002CF458",
+        "LVL_9_DOBBO_FUN_002CF518",
         "LVL_9_DOBBO_FUN_002CF7D0",
         "LVL_9_DOBBO_FUN_002CF9B8",
         "LVL_9_DOBBO_FUN_002CFAB0",
@@ -16036,6 +16372,9 @@
         "LVL_9_DOBBO_FUN_0030D698",
         "LVL_9_DOBBO_FUN_0030DEA8",
         "LVL_9_DOBBO_FUN_003169C8",
+        "LVL_9_DOBBO_FUN_00317100",
+        "LVL_9_DOBBO_FUN_003191C8",
+        "LVL_9_DOBBO_FUN_00319C98",
         "LVL_9_DOBBO_FUN_0031AB28",
         "LVL_9_DOBBO_FUN_0031B3F8",
         "LVL_9_DOBBO_FUN_0031B7F8",
@@ -16043,6 +16382,7 @@
         "LVL_9_DOBBO_FUN_0031D840",
         "LVL_9_DOBBO_FUN_0031EFC0",
         "LVL_9_DOBBO_FUN_0031F3F0",
+        "LVL_9_DOBBO_FUN_003206E0",
         "LVL_9_DOBBO_FUN_00321A48",
         "LVL_9_DOBBO_FUN_00322708",
         "LVL_9_DOBBO_FUN_00323220",
@@ -16058,13 +16398,16 @@
         "LVL_9_DOBBO_FUN_0032E678",
         "LVL_9_DOBBO_FUN_0032EEA8",
         "LVL_9_DOBBO_FUN_0032FFF8",
+        "LVL_9_DOBBO_FUN_00330AA8",
         "LVL_9_DOBBO_FUN_00330D28",
         "LVL_9_DOBBO_FUN_00332490",
+        "LVL_9_DOBBO_FUN_00335450",
         "LVL_9_DOBBO_FUN_00335DB0",
         "LVL_9_DOBBO_FUN_00336740",
         "LVL_9_DOBBO_FUN_003370C8",
         "LVL_9_DOBBO_FUN_00337628",
         "LVL_9_DOBBO_FUN_00337EB0",
+        "LVL_9_DOBBO_FUN_00339A08",
         "LVL_9_DOBBO_FUN_0033BED8",
         "LVL_9_DOBBO_FUN_0033C488",
         "LVL_9_DOBBO_FUN_0033C6F8",
@@ -16130,6 +16473,7 @@
         "LVL_9_DOBBO_FUN_003C3E48",
         "LVL_9_DOBBO_FUN_003C41C8",
         "LVL_9_DOBBO_FUN_003C9370",
+        "LVL_9_DOBBO_FUN_003C98B0",
         "LVL_9_DOBBO_FUN_003CBAA8",
         "LVL_9_DOBBO_FUN_003CE9E8",
         "LVL_9_DOBBO_FUN_003D1C10",
@@ -16179,6 +16523,7 @@
         "LVL_9_DOBBO_FUN_00427768",
         "LVL_9_DOBBO_FUN_00429D28",
         "LVL_9_DOBBO_FUN_00429D90",
+        "LVL_9_DOBBO_FUN_0042AF90",
         "LVL_9_DOBBO_FUN_0042F140",
         "LVL_9_DOBBO_FUN_0042F9C8",
         "LVL_9_DOBBO_FUN_00432EA0",
@@ -16265,21 +16610,9 @@
         "LVL_9_DOBBO_FUN_004553F0",
         "LVL_9_DOBBO_FUN_00456468",
         "LVL_9_DOBBO_FUN_00456510",
-        "LVL_9_DOBBO_FUN_00305918",
-        "LVL_9_DOBBO_FUN_00305988",
-        "LVL_9_DOBBO_FUN_003059D8",
-        "LVL_9_DOBBO_FUN_00305A58",
-        "LVL_9_DOBBO_FUN_00305A88",
-        "LVL_9_DOBBO_FUN_00305AE8",
-        "LVL_9_DOBBO_FUN_00305B78",
-        "LVL_9_DOBBO_FUN_00305C18",
-        "LVL_9_DOBBO_FUN_00305C50",
-        "LVL_9_DOBBO_FUN_00305D80",
-        "LVL_9_DOBBO_FUN_00305EF8",
-        "LVL_9_DOBBO_FUN_00306070",
-        "LVL_9_DOBBO_FUN_003060B8",
-        "LVL_9_DOBBO_FUN_00324088",
         "LVL_9_DOBBO_FUN_002A7500",
+        "LVL_9_DOBBO_FUN_002D2560",
+        "LVL_9_DOBBO_FUN_002D3080",
         "LVL_9_DOBBO_FUN_002D39E0",
         "LVL_9_DOBBO_FUN_002E1738",
         "LVL_9_DOBBO_FUN_002EC938",
@@ -16303,11 +16636,26 @@
         "LVL_9_DOBBO_FUN_002F83A8",
         "LVL_9_DOBBO_FUN_002F83B0",
         "LVL_9_DOBBO_FUN_002F83C8",
+        "LVL_9_DOBBO_FUN_00305918",
+        "LVL_9_DOBBO_FUN_00305988",
+        "LVL_9_DOBBO_FUN_003059D8",
+        "LVL_9_DOBBO_FUN_00305A58",
+        "LVL_9_DOBBO_FUN_00305A88",
+        "LVL_9_DOBBO_FUN_00305AE8",
+        "LVL_9_DOBBO_FUN_00305B78",
+        "LVL_9_DOBBO_FUN_00305C18",
+        "LVL_9_DOBBO_FUN_00305C50",
+        "LVL_9_DOBBO_FUN_00305D80",
+        "LVL_9_DOBBO_FUN_00305EF8",
+        "LVL_9_DOBBO_FUN_00306070",
+        "LVL_9_DOBBO_FUN_003060B8",
         "LVL_9_DOBBO_FUN_003090F0",
         "LVL_9_DOBBO_FUN_0030E3B0",
+        "LVL_9_DOBBO_FUN_00324088",
         "LVL_9_DOBBO_FUN_00327700",
         "LVL_9_DOBBO_FUN_00327710",
         "LVL_9_DOBBO_FUN_00327738",
+        "LVL_9_DOBBO_FUN_00378788",
         "LVL_9_DOBBO_FUN_003787D8",
         "LVL_9_DOBBO_FUN_003788E0",
         "LVL_9_DOBBO_FUN_00378928",
@@ -16315,12 +16663,10 @@
         "LVL_9_DOBBO_FUN_00378C78",
         "LVL_9_DOBBO_FUN_00378CD8",
         "LVL_9_DOBBO_FUN_00378D40",
-        "LVL_9_DOBBO_FUN_0043B500",
-        "LVL_9_DOBBO_FUN_002D3080",
-        "LVL_9_DOBBO_FUN_00378788"
+        "LVL_9_DOBBO_FUN_0043B500"
       ]
     },
-    "source_sha256": "58b30b328ace3d537bdfdd2330f0ba0d74b6ca2e10be1013397e985472813231",
+    "source_sha256": "b0aa18b9eac5fba68c87cd4a6908149b3a88cda9b43f7654f9fdfde0dd645a68",
     "state": "integrated",
     "target": "SCUS_972.68",
     "tools": {
@@ -16334,9 +16680,9 @@
     "catalog_path": "config/level-g8/9_dobbo.json",
     "gp": 1765360,
     "object_qualification": {
-      "candidate_elf_sha256": "da6616cd9919f47a747e77470fe22f97e598fa459c8b5f45ce9b16968f5813a5",
+      "candidate_elf_sha256": "c3ce5b79ac7481f887d7b5252b292d22866176708467ab52aa20d2e8e29e5023",
       "candidate_source": "candidates/levels/9_dobbo-g8.c",
-      "catalog_sha256": "15bbb205808b483df0985ad88929c31cc98b53b944d7af21c5f704dc3e28f3b9",
+      "catalog_sha256": "c02306efbfc4e3c75ea61f03459a36e1fcdeea0b52b8c74252c8e24d457c7cc6",
       "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
       "flags": [
         "-O2",
@@ -16344,160 +16690,6 @@
         "-ffunction-sections"
       ],
       "functions": [
-        {
-          "address": 3168536,
-          "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 112,
-          "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-          "size": 112,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305918"
-        },
-        {
-          "address": 3168648,
-          "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 76,
-          "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-          "size": 76,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305988"
-        },
-        {
-          "address": 3168728,
-          "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 124,
-          "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-          "size": 124,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_003059D8"
-        },
-        {
-          "address": 3168856,
-          "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 44,
-          "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-          "size": 44,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305A58"
-        },
-        {
-          "address": 3168904,
-          "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 96,
-          "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-          "size": 96,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305A88"
-        },
-        {
-          "address": 3169000,
-          "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 76,
-          "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-          "size": 76,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305AE8"
-        },
-        {
-          "address": 3169144,
-          "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 156,
-          "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-          "size": 156,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305B78"
-        },
-        {
-          "address": 3169304,
-          "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 56,
-          "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-          "size": 56,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305C18"
-        },
-        {
-          "address": 3169360,
-          "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 120,
-          "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-          "size": 120,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305C50"
-        },
-        {
-          "address": 3169664,
-          "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 184,
-          "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-          "size": 184,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305D80"
-        },
-        {
-          "address": 3170040,
-          "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 112,
-          "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-          "size": 112,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00305EF8"
-        },
-        {
-          "address": 3170416,
-          "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 72,
-          "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-          "size": 72,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00306070"
-        },
-        {
-          "address": 3170488,
-          "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 68,
-          "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-          "size": 68,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_003060B8"
-        },
-        {
-          "address": 3293320,
-          "candidate_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 164,
-          "reference_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
-          "size": 164,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00324088"
-        },
         {
           "address": 2782464,
           "candidate_sha256": "4912eb9f14b02c39b9cf96da40470b670c4d872a071252fbf2a13fa3cda688ef",
@@ -16508,6 +16700,28 @@
           "size": 8,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_002A7500"
+        },
+        {
+          "address": 2958688,
+          "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 208,
+          "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+          "size": 208,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_002D2560"
+        },
+        {
+          "address": 2961536,
+          "candidate_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 132,
+          "reference_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
+          "size": 132,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_002D3080"
         },
         {
           "address": 2963936,
@@ -16763,6 +16977,149 @@
           "symbol": "LVL_9_DOBBO_FUN_002F83C8"
         },
         {
+          "address": 3168536,
+          "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 112,
+          "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+          "size": 112,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305918"
+        },
+        {
+          "address": 3168648,
+          "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 76,
+          "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+          "size": 76,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305988"
+        },
+        {
+          "address": 3168728,
+          "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 124,
+          "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+          "size": 124,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_003059D8"
+        },
+        {
+          "address": 3168856,
+          "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 44,
+          "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+          "size": 44,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305A58"
+        },
+        {
+          "address": 3168904,
+          "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 96,
+          "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+          "size": 96,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305A88"
+        },
+        {
+          "address": 3169000,
+          "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 76,
+          "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+          "size": 76,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305AE8"
+        },
+        {
+          "address": 3169144,
+          "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 156,
+          "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+          "size": 156,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305B78"
+        },
+        {
+          "address": 3169304,
+          "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 56,
+          "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+          "size": 56,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305C18"
+        },
+        {
+          "address": 3169360,
+          "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 120,
+          "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+          "size": 120,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305C50"
+        },
+        {
+          "address": 3169664,
+          "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 184,
+          "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+          "size": 184,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305D80"
+        },
+        {
+          "address": 3170040,
+          "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 112,
+          "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+          "size": 112,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00305EF8"
+        },
+        {
+          "address": 3170416,
+          "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 72,
+          "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+          "size": 72,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00306070"
+        },
+        {
+          "address": 3170488,
+          "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 68,
+          "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+          "size": 68,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_003060B8"
+        },
+        {
           "address": 3182832,
           "candidate_sha256": "b28d21ced7ab0245a039c390b93f090cc3c6fb544b7cec4261a9484b2f2a7531",
           "different_bytes": 0,
@@ -16783,6 +17140,17 @@
           "size": 56,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_0030E3B0"
+        },
+        {
+          "address": 3293320,
+          "candidate_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 164,
+          "reference_sha256": "94d6dcc7873a474b173aad360fd21ff643790e99f9fbf1969e7fa0a32d11e826",
+          "size": 164,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00324088"
         },
         {
           "address": 3307264,
@@ -16816,6 +17184,17 @@
           "size": 8,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_00327738"
+        },
+        {
+          "address": 3639176,
+          "candidate_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 76,
+          "reference_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
+          "size": 76,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_9_DOBBO_FUN_00378788"
         },
         {
           "address": 3639256,
@@ -16904,39 +17283,17 @@
           "size": 8,
           "state": "matched_unintegrated",
           "symbol": "LVL_9_DOBBO_FUN_0043B500"
-        },
-        {
-          "address": 2961536,
-          "candidate_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 132,
-          "reference_sha256": "eb0c65f94eeda1598c84a25b156b25a887b87a24e34034cd2a80f6c4008cf829",
-          "size": 132,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_002D3080"
-        },
-        {
-          "address": 3639176,
-          "candidate_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 76,
-          "reference_sha256": "fc3a5431e93010f7df468c63477a077eac654f3575547b68b28a8d5702bfc615",
-          "size": 76,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_9_DOBBO_FUN_00378788"
         }
       ],
       "kind": "level-smalldata-candidate",
-      "matched_code_bytes": 3112,
-      "object_sha256": "540d2201bb531d46472e568c4ef7f8b2c62f5a566dec8f30749481cad1b2b332",
+      "matched_code_bytes": 3320,
+      "object_sha256": "88fa95fc1fa2c9e5b763cac17c72f088dd0c39bbdda9801673ea279fb6f761b5",
       "program": "levels/9_dobbo",
       "read_only_sections": [],
       "reference_entry": 2782472,
       "reference_sha256": "a47999f3aa251431498e068932ac542399b5e402ab8dcddcbfe246dc220b7810",
       "schema": 1,
-      "source_sha256": "5e7dc0b49a795f37f959b1974ecda0b11976bdc69114365e98e0d15fb88b18b4",
+      "source_sha256": "c9deb7721afd820990929c9028c1d592f84b222da1a922ce66be6ef1da3b53a3",
       "state": "matched_unintegrated",
       "target": "SCUS_972.68",
       "tools": {
@@ -16946,12 +17303,12 @@
         "ld.exe": "80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48"
       }
     },
-    "object_sha256": "540d2201bb531d46472e568c4ef7f8b2c62f5a566dec8f30749481cad1b2b332",
+    "object_sha256": "88fa95fc1fa2c9e5b763cac17c72f088dd0c39bbdda9801673ea279fb6f761b5",
     "review_path": "progress/level-g8/9_dobbo.json",
-    "review_sha256": "7033bc2ebf84e230a18c6b670072a3cccbe7ca7c2f5022ceabd8f46ecc83a164",
+    "review_sha256": "c19b4070e2f89fb1841a4bd25521bf359a7e5b43fe4cd68625f70d4cfbaaff7f",
     "source": "candidates/levels/9_dobbo-g8.c"
   },
-  "source_sha256": "58b30b328ace3d537bdfdd2330f0ba0d74b6ca2e10be1013397e985472813231",
+  "source_sha256": "b0aa18b9eac5fba68c87cd4a6908149b3a88cda9b43f7654f9fdfde0dd645a68",
   "state": "integrated",
   "target": "SCUS_972.68",
   "tools": {

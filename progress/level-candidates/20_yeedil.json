@@ -6,10 +6,10 @@
   "reference_sha256": "af33c5378811e9d57c612c10002ca5c92eb676add3db0552ab2d6231034cafc8",
   "reference_entry": 2844552,
   "candidate_source": "candidates/levels/20_yeedil.c",
-  "source_sha256": "e6c1e8fb60896fbc84c679eb9283a0730ea66a1b93ea7e137dcf0f166451e9f4",
-  "catalog_sha256": "ede453367e78aabb5c154a8e818c46185f5dff6ecd2085b159adaea41a5bd4d2",
-  "object_sha256": "c69c37823ad8db452b359a3b68e3c02afa32afb49f466f1bd87237fa2aa126b9",
-  "candidate_elf_sha256": "0a4907213739f370534fca58ac4f5f725be6f302226754a986570f282e68976a",
+  "source_sha256": "c3d9ca6dbd63d1f11beb3ec0f0dab7ece41c0568bbae2a18d8ffeaaaa646b749",
+  "catalog_sha256": "088a5f2062de082aa0a4a7e52449d081fbf863289d825a62ca82e68552b7786e",
+  "object_sha256": "8d1f38925d8ec3c5553d5055f0ad8d7a20589777b5255742e075104ac5bd9727",
+  "candidate_elf_sha256": "fd73f18317f7cac2e83293eec46017c5bbd77b3af8784fc1f86be526c19474f0",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -309,6 +309,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 188
+    },
+    {
+      "symbol": "LVL_20_YEEDIL_FUN_002E73E8",
+      "address": 3044328,
+      "size": 372,
+      "matched": true,
+      "reference_sha256": "189f097d01ed9c64beba68ec7ec5bb8248ad58d29efd398a639273d6a616d36f",
+      "candidate_sha256": "189f097d01ed9c64beba68ec7ec5bb8248ad58d29efd398a639273d6a616d36f",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 372
     },
     {
       "symbol": "LVL_20_YEEDIL_FUN_002E76A0",
@@ -1015,6 +1026,39 @@
       "produced_size": 68
     },
     {
+      "symbol": "LVL_20_YEEDIL_FUN_0032FD58",
+      "address": 3341656,
+      "size": 360,
+      "matched": true,
+      "reference_sha256": "6ebef6102b04f3e5e624fffd1ae7f6a3d96bc23bda715fd2229f54c4c45e493f",
+      "candidate_sha256": "6ebef6102b04f3e5e624fffd1ae7f6a3d96bc23bda715fd2229f54c4c45e493f",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 360
+    },
+    {
+      "symbol": "LVL_20_YEEDIL_FUN_00331DC8",
+      "address": 3349960,
+      "size": 332,
+      "matched": true,
+      "reference_sha256": "d27a75fd250f30798b07740c849d7062b30aac9c3d30fe414ad8a2077a2613a4",
+      "candidate_sha256": "d27a75fd250f30798b07740c849d7062b30aac9c3d30fe414ad8a2077a2613a4",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 332
+    },
+    {
+      "symbol": "LVL_20_YEEDIL_FUN_00332898",
+      "address": 3352728,
+      "size": 336,
+      "matched": true,
+      "reference_sha256": "24d55f20974d5100c4805150ee8058d89909ae6434b0c7ed70aaa1f0cee3bc60",
+      "candidate_sha256": "24d55f20974d5100c4805150ee8058d89909ae6434b0c7ed70aaa1f0cee3bc60",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 336
+    },
+    {
       "symbol": "LVL_20_YEEDIL_FUN_00333728",
       "address": 3356456,
       "size": 188,
@@ -1090,6 +1134,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 128
+    },
+    {
+      "symbol": "LVL_20_YEEDIL_FUN_00338948",
+      "address": 3377480,
+      "size": 376,
+      "matched": true,
+      "reference_sha256": "6cb1a88c15bb0eae8126edcc8afe2cff83642b722fbdfdfb7b984568b4202ba1",
+      "candidate_sha256": "6cb1a88c15bb0eae8126edcc8afe2cff83642b722fbdfdfb7b984568b4202ba1",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 376
     },
     {
       "symbol": "LVL_20_YEEDIL_FUN_00339CB0",
@@ -1246,6 +1301,17 @@
       "produced_size": 284
     },
     {
+      "symbol": "LVL_20_YEEDIL_FUN_00349378",
+      "address": 3445624,
+      "size": 356,
+      "matched": true,
+      "reference_sha256": "f2f3cb097cb8e3f78c5141f33d09881352edf638db0f1fa081bc9d74cd9a85ad",
+      "candidate_sha256": "f2f3cb097cb8e3f78c5141f33d09881352edf638db0f1fa081bc9d74cd9a85ad",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 356
+    },
+    {
       "symbol": "LVL_20_YEEDIL_FUN_003495F8",
       "address": 3446264,
       "size": 164,
@@ -1266,6 +1332,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 516
+    },
+    {
+      "symbol": "LVL_20_YEEDIL_FUN_0034DBE8",
+      "address": 3464168,
+      "size": 404,
+      "matched": true,
+      "reference_sha256": "6cbad809dcb19ea56cb3e5f2c38fa891eb4ff129408a2d1be294c6f959ab6d46",
+      "candidate_sha256": "6cbad809dcb19ea56cb3e5f2c38fa891eb4ff129408a2d1be294c6f959ab6d46",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 404
     },
     {
       "symbol": "LVL_20_YEEDIL_FUN_0034E610",
@@ -1321,6 +1398,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 160
+    },
+    {
+      "symbol": "LVL_20_YEEDIL_FUN_00352140",
+      "address": 3481920,
+      "size": 348,
+      "matched": true,
+      "reference_sha256": "8243b6826355f90b029e7332a6b27411f7c1b258959740ae962229bd7d685e31",
+      "candidate_sha256": "8243b6826355f90b029e7332a6b27411f7c1b258959740ae962229bd7d685e31",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 348
     },
     {
       "symbol": "LVL_20_YEEDIL_FUN_003547C8",
@@ -2060,6 +2148,17 @@
       "produced_size": 52
     },
     {
+      "symbol": "LVL_20_YEEDIL_FUN_003E4D38",
+      "address": 4083000,
+      "size": 332,
+      "matched": true,
+      "reference_sha256": "3540cb756cb92b1d76eb28e1831560a730a21496c77080367db1310ba01d25d7",
+      "candidate_sha256": "3540cb756cb92b1d76eb28e1831560a730a21496c77080367db1310ba01d25d7",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 332
+    },
+    {
       "symbol": "LVL_20_YEEDIL_FUN_003E6F30",
       "address": 4091696,
       "size": 108,
@@ -2674,6 +2773,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 112
+    },
+    {
+      "symbol": "LVL_20_YEEDIL_FUN_004532D0",
+      "address": 4534992,
+      "size": 364,
+      "matched": true,
+      "reference_sha256": "7ac3d25c21c63a551c3b0a6c4bf9e93d4c0d4339e9c2269500c0d2c864008296",
+      "candidate_sha256": "7ac3d25c21c63a551c3b0a6c4bf9e93d4c0d4339e9c2269500c0d2c864008296",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 364
     },
     {
       "symbol": "LVL_20_YEEDIL_FUN_00457480",
@@ -3623,5 +3733,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 40176
+  "matched_code_bytes": 43756
 }

@@ -1,0 +1,52 @@
+struct family_27f9_object {
+    unsigned char reserved[248];
+    float heading;
+};
+
+extern float @@ROLE_0_00@@(float p, float x);
+extern float @@ROLE_1_00@@(float t);
+extern float @@ROLE_2_00@@(float t);
+extern float @@ROLE_3_00@@(float t);
+extern float @@ROLE_4_00@@(float t);
+extern float @@ROLE_5_00@@(float x, float y);
+
+float @@FUNCTION@@(struct family_27f9_object *a0,
+                                         float *a1,
+                                         float p1, float p2, float p3, float p4)
+{
+    float t;
+    float v;
+    float f3;
+    float out;
+
+    t = @@ROLE_0_01@@(p1, a0->heading);
+    v = t * 6.3661971092224121093750e+00f;
+    if (v > 1.0f) {
+        v = 1.0f;
+    } else {
+        if (v < -1.0f) {
+            v = -1.0f;
+        }
+    }
+    f3 = a1[0];
+    a1[0] = f3 + (p2 * v - p3 * f3);
+    if (p4 != 0.0f) {
+        if (a1[0] > p4) {
+            a1[0] = p4;
+        } else {
+            if (a1[0] < -p4) {
+                a1[0] = -p4;
+            }
+        }
+    }
+    if (@@ROLE_1_01@@(t) < a1[0]) {
+        a1[0] = @@ROLE_2_01@@(t);
+    } else {
+        if (a1[0] < -@@ROLE_3_01@@(t)) {
+            a1[0] = -@@ROLE_4_01@@(t);
+        }
+    }
+    out = @@ROLE_5_01@@(a0->heading, a1[0]);
+    a0->heading = out;
+    return out;
+}

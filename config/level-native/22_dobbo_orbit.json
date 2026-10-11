@@ -52,6 +52,13 @@
     "LVL_22_DOBBO_ORBIT_F01bd4546_FUN_0043F960": 4454752,
     "LVL_22_DOBBO_ORBIT_F01bd4546_FUN_0043F9A8": 4454824,
     "LVL_22_DOBBO_ORBIT_F03c444112283bc5f_AT0038CDF8_ROLE00": 2333872,
+    "LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002EC970": 3066224,
+    "LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F0D60": 3083616,
+    "LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3AF0": 3095280,
+    "LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3BF8": 3095544,
+    "LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F4138": 3096888,
+    "LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F4300": 3097344,
+    "LVL_22_DOBBO_ORBIT_F043c77a5_FUN_0041C2F8": 4309752,
     "LVL_22_DOBBO_ORBIT_F081de6c9_FUN_0042C2F0": 4375280,
     "LVL_22_DOBBO_ORBIT_F081de6c9_FUN_0042D0D0": 4378832,
     "LVL_22_DOBBO_ORBIT_F081de6c9_FUN_0042D168": 4378984,
@@ -107,6 +114,9 @@
     "LVL_22_DOBBO_ORBIT_F250fbfa4_FUN_002F3720": 3094304,
     "LVL_22_DOBBO_ORBIT_F250fbfa4_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_F250fbfa4_FUN_003330A8": 3354792,
+    "LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0": 3095024,
+    "LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F4A88": 3099272,
+    "LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F4AD0": 3099344,
     "LVL_22_DOBBO_ORBIT_F280d7406_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_F280d7406_FUN_002F4BE0": 3099616,
     "LVL_22_DOBBO_ORBIT_F280d7406_FUN_003330A8": 3354792,
@@ -131,6 +141,9 @@
     "LVL_22_DOBBO_ORBIT_F391de845_D_001B9C80": 1809536,
     "LVL_22_DOBBO_ORBIT_F391de845_FUN_002F3C40": 3095616,
     "LVL_22_DOBBO_ORBIT_F391de845_FUN_00361788": 3544968,
+    "LVL_22_DOBBO_ORBIT_F3c007b59_FUN_002F3720": 3094304,
+    "LVL_22_DOBBO_ORBIT_F3c007b59_FUN_002F4BE0": 3099616,
+    "LVL_22_DOBBO_ORBIT_F3c007b59_FUN_003330A8": 3354792,
     "LVL_22_DOBBO_ORBIT_F40487154_FUN_002F3AF0": 3095280,
     "LVL_22_DOBBO_ORBIT_F40487154_FUN_002F4088": 3096712,
     "LVL_22_DOBBO_ORBIT_F40487154_FUN_002F42E0": 3097312,
@@ -191,6 +204,10 @@
     "LVL_22_DOBBO_ORBIT_F55a1acb8_D_001A63AC": 1729452,
     "LVL_22_DOBBO_ORBIT_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_22_DOBBO_ORBIT_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4070": 3096688,
+    "LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4088": 3096712,
+    "LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4138": 3096888,
+    "LVL_22_DOBBO_ORBIT_F5621621c_FUN_003215D8": 3282392,
     "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_0031FCC8": 3275976,
     "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_0031FDE8": 3276264,
     "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_0037EC88": 3665032,
@@ -253,6 +270,10 @@
     "LVL_22_DOBBO_ORBIT_F7b2f1854_FUN_0042C190": 4374928,
     "LVL_22_DOBBO_ORBIT_F7b2f1854_FUN_0042D0D0": 4378832,
     "LVL_22_DOBBO_ORBIT_F7b2f1854_FUN_0042D168": 4378984,
+    "LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F3720": 3094304,
+    "LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4BD0": 3099600,
+    "LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4C28": 3099688,
+    "LVL_22_DOBBO_ORBIT_F7cacd225_FUN_003330A8": 3354792,
     "LVL_22_DOBBO_ORBIT_F7cb419c1_D_001FFB00": 2095872,
     "LVL_22_DOBBO_ORBIT_F7cb419c1_FUN_0035B408": 3519496,
     "LVL_22_DOBBO_ORBIT_F8411efa9_FUN_002EC970": 3066224,
@@ -290,6 +311,11 @@
     "LVL_22_DOBBO_ORBIT_F904cc63b_FUN_00325F78": 3301240,
     "LVL_22_DOBBO_ORBIT_F93479d13_D_00189E20": 1613344,
     "LVL_22_DOBBO_ORBIT_F93479d13_FUN_003159F0": 3234288,
+    "LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FC88": 3275912,
+    "LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FCC8": 3275976,
+    "LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FD20": 3276064,
+    "LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FEA8": 3276456,
+    "LVL_22_DOBBO_ORBIT_F966dbf73_FUN_00337E18": 3374616,
     "LVL_22_DOBBO_ORBIT_F97fc4e13_FUN_002F3858": 3094616,
     "LVL_22_DOBBO_ORBIT_F97fc4e13_FUN_0035C6E0": 3524320,
     "LVL_22_DOBBO_ORBIT_F9a90bcc4_FUN_0031FC88": 3275912,
@@ -369,6 +395,11 @@
     "LVL_22_DOBBO_ORBIT_Fb342d477_FUN_00446AD8": 4483800,
     "LVL_22_DOBBO_ORBIT_Fb342d477_FUN_00446B48": 4483912,
     "LVL_22_DOBBO_ORBIT_Fb4cfb7e0_FUN_0031FC88": 3275912,
+    "LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F3C40": 3095616,
+    "LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F3C78": 3095672,
+    "LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4138": 3096888,
+    "LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4B70": 3099504,
+    "LVL_22_DOBBO_ORBIT_Fb5729173_FUN_00324748": 3295048,
     "LVL_22_DOBBO_ORBIT_Fb77d67f1_FUN_002F36F0": 3094256,
     "LVL_22_DOBBO_ORBIT_Fb77d67f1_FUN_003330A8": 3354792,
     "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB2": 1735602,
@@ -406,6 +437,12 @@
     "LVL_22_DOBBO_ORBIT_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_22_DOBBO_ORBIT_Fc936841d_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_Fc936841d_FUN_002F3AB0": 3095216,
+    "LVL_22_DOBBO_ORBIT_Fc94396f4_D_00189E20": 1613344,
+    "LVL_22_DOBBO_ORBIT_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9E90": 2989712,
+    "LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9F10": 2989840,
+    "LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80": 3095168,
+    "LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3D60": 3095904,
     "LVL_22_DOBBO_ORBIT_Fcbc1388e_D_001A63A8": 1729448,
     "LVL_22_DOBBO_ORBIT_Fccb147a4_FUN_003330A8": 3354792,
     "LVL_22_DOBBO_ORBIT_Fccb147a4_FUN_00383120": 3682592,
@@ -441,6 +478,14 @@
     "LVL_22_DOBBO_ORBIT_Fdb046c5d_FUN_0032A1C8": 3318216,
     "LVL_22_DOBBO_ORBIT_Fdb046c5d_FUN_00362D38": 3550520,
     "LVL_22_DOBBO_ORBIT_Fdb046c5d_FUN_00363088": 3551368,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3720": 3094304,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3A80": 3095168,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3AF0": 3095280,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BD0": 3099600,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BE0": 3099616,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_003330A8": 3354792,
+    "LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_00383120": 3682592,
     "LVL_22_DOBBO_ORBIT_Fe524d931_D_001A6480": 1729664,
     "LVL_22_DOBBO_ORBIT_Fe524d931_FUN_002F5DE8": 3104232,
     "LVL_22_DOBBO_ORBIT_Fe524d931_FUN_00362E98": 3550872,
@@ -480,6 +525,7 @@
     "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3F68": 3096424,
     "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3FD8": 3096536,
     "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_0031AAF8": 3255032,
+    "LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0": 3095024,
     "LVL_22_DOBBO_ORBIT_Ff4dd22f3_FUN_002F3720": 3094304,
     "LVL_22_DOBBO_ORBIT_Ff4dd22f3_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_Ff4dd22f3_FUN_003330A8": 3354792,
@@ -706,6 +752,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_002D9738"
+    },
+    {
+      "address": 2988024,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_002D97F8"
     },
     {
       "address": 2988720,
@@ -1089,6 +1141,24 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_0031FC28"
     },
     {
+      "address": 3277664,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00320360"
+    },
+    {
+      "address": 3285336,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00322158"
+    },
+    {
+      "address": 3288104,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00322C28"
+    },
+    {
       "address": 3291832,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1128,6 +1198,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00327E78"
+    },
+    {
+      "address": 3314136,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_003291D8"
     },
     {
       "address": 3319200,
@@ -1213,6 +1289,12 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00336908"
     },
     {
+      "address": 3371960,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_003373B8"
+    },
+    {
       "address": 3372600,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1223,6 +1305,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00338EE0"
+    },
+    {
+      "address": 3391080,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_0033BE68"
     },
     {
       "address": 3393680,
@@ -1253,6 +1341,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_0033E878"
+    },
+    {
+      "address": 3408848,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_003403D0"
     },
     {
       "address": 3418712,
@@ -1640,6 +1734,12 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_003CA2A8"
     },
     {
+      "address": 3975144,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_003CA7E8"
+    },
+    {
       "address": 3983840,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1906,6 +2006,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_0041C360"
+    },
+    {
+      "address": 4314464,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_0041D560"
     },
     {
       "address": 4331280,
