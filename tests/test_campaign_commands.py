@@ -47,7 +47,8 @@ class CampaignCommandTests(unittest.TestCase):
         self.assertEqual(finalize.call_args.args[2], "b" * 32)
         self.assertEqual(finalize.call_args.kwargs, {"manifest": manifest, "output": destination,
                                                     "references": refs, "tasks": ("one", "two"), "apply": True,
-                                                    "maintainer_tests": ()})
+                                                    "maintainer_tests": (), "owner_local": False,
+                                                    "maintainer_jobs": 0})
 
     def test_finalize_dispatch_forwards_explicit_maintainer_modules(self):
         manifest, destination = self.runtime / "manifest.json", self.runtime / "final"
@@ -60,6 +61,17 @@ class CampaignCommandTests(unittest.TestCase):
         self.assertEqual(finalize.call_args.kwargs["maintainer_tests"],
                          ("test_campaign_finalize", "test_maintainer_test_policy"))
         self.assertFalse(finalize.call_args.kwargs["apply"])
+
+    def test_finalize_dispatch_owner_local_defaults_and_parallel_jobs(self):
+        manifest, destination = self.runtime / "manifest.json", self.runtime / "final"
+        with mock.patch("campaign_finalize.finalize", return_value={"state": "prepared"}) as finalize, \
+                contextlib.redirect_stdout(io.StringIO()):
+            code = campaign.main([*self.prefix, "finalize", "b" * 32, "--manifest", str(manifest),
+                                  "--output", str(destination), "--owner-local", "--maintainer-jobs", "3"])
+        self.assertEqual(code, 0)
+        self.assertTrue(finalize.call_args.kwargs["owner_local"])
+        self.assertEqual(finalize.call_args.kwargs["maintainer_jobs"], 3)
+        self.assertEqual(finalize.call_args.kwargs["maintainer_tests"], ())
 
     def test_browser_open_requires_readonly_server(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:

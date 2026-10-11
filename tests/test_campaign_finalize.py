@@ -208,6 +208,9 @@ class FinalizeTests(unittest.TestCase):
             result = self.finish(maintainer_tests=("test_fixture",))
         plan = json.loads((self.output / "plan.json").read_bytes())
         self.assertEqual(plan["local_test_policy"]["mode"], "targeted")
+        self.assertEqual(plan["local_test_policy"]["jobs"], 4)
+        self.assertFalse(plan["local_test_policy"]["owner_local"])
+        self.assertFalse(plan["local_test_policy"]["owner_local_full_suite_waived"])
         self.assertEqual(result["local_test_policy"]["actor"], actor)
         self.assertTrue(result["local_test_policy"]["full_merge_queue_suite_required"])
         self.assertIn("test_campaign_finalize", plan["local_test_policy"]["modules"])
@@ -216,6 +219,29 @@ class FinalizeTests(unittest.TestCase):
         self.assertIn("18-physical-display-check", [row["step"] for row in plan["checks"]])
         with self.assertRaisesRegex(ValueError, "does not match"):
             self.finish()
+
+    def test_owner_local_defaults_to_parallel_report_and_guard_modules(self):
+        for name in ("test_campaign_finalize", "test_decomp_report", "test_maintainer_tests",
+                     "test_maintainer_test_policy"):
+            write(self.repo / "tests" / (name + ".py"), b"# targeted fixture\n")
+        actor = {"id": 191315338, "login": "llesieur99"}
+        with patch("maintainer_tests.authenticate", return_value=actor):
+            result = self.finish(owner_local=True, maintainer_jobs=3)
+        policy = result["local_test_policy"]
+        self.assertTrue(policy["owner_local"])
+        self.assertEqual(policy["jobs"], 3)
+        self.assertFalse(policy["full_merge_queue_suite_required"])
+        self.assertTrue(policy["owner_local_full_suite_waived"])
+        self.assertEqual(policy["modules"], ["test_campaign_finalize", "test_decomp_report",
+                                               "test_maintainer_test_policy", "test_maintainer_tests"])
+        command = self.calls[-1]
+        self.assertIn("run_modules_parallel", command[2])
+        self.assertEqual(command[3], "3")
+
+    def test_maintainer_jobs_without_targeted_route_are_refused(self):
+        with self.assertRaisesRegex(ValueError, "require --owner-local"):
+            self.finish(maintainer_jobs=2)
+        self.assertFalse(self.output.exists())
 
     def test_targeted_finalizer_auth_failure_does_not_create_output(self):
         for name in ("test_campaign_finalize", "test_maintainer_tests", "test_maintainer_test_policy"):

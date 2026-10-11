@@ -5,7 +5,9 @@ protected merge queue still runs unittest discovery over every test module.
 """
 import argparse
 import ast
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -84,6 +86,83 @@ def run_modules(repo, modules):
         return 1
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     return 0 if result.wasSuccessful() else 1
+
+
+def _flatten_tests(suite):
+    for item in suite:
+        if isinstance(item, unittest.TestSuite):
+            yield from _flatten_tests(item)
+        else:
+            yield item
+
+
+def test_ids(repo, modules):
+    repo = Path(repo).resolve()
+    for path in (repo / "scripts", repo / "tests"):
+        value = str(path)
+        if value not in sys.path:
+            sys.path.insert(0, value)
+    suite = unittest.defaultTestLoader.loadTestsFromNames(modules)
+    return [test.id() for test in _flatten_tests(suite)]
+
+
+def run_test_ids(repo, identifiers):
+    repo = Path(repo).resolve()
+    for path in (repo / "scripts", repo / "tests"):
+        value = str(path)
+        if value not in sys.path:
+            sys.path.insert(0, value)
+    suite = unittest.defaultTestLoader.loadTestsFromNames(identifiers)
+    if not suite.countTestCases():
+        print("No tests were selected; refusing a successful test receipt.", flush=True)
+        return 1
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    return 0 if result.wasSuccessful() else 1
+
+
+def run_modules_parallel(repo, modules, jobs=0):
+    """Shard maintained test cases across isolated worker processes."""
+    repo = Path(repo).resolve()
+    modules = validate_modules(repo, modules)
+    requested = jobs or min(4, os.cpu_count() or 1)
+    if type(requested) is not int or requested < 1:
+        raise ValueError("Maintainer test jobs must be a positive integer or zero for automatic selection")
+    identifiers = test_ids(repo, modules)
+    if not identifiers:
+        print("No tests were selected; refusing a successful test receipt.", flush=True)
+        return 1
+    workers = min(requested, len(identifiers))
+    if workers == 1:
+        return run_test_ids(repo, identifiers)
+    code = ("import sys;from pathlib import Path;sys.path[:0]=['scripts','tests'];"
+            "from maintainer_tests import run_test_ids;"
+            "sys.exit(run_test_ids(Path.cwd(),sys.argv[1:]))")
+    shards = [identifiers[index::workers] for index in range(workers)]
+
+    def execute(index):
+        return subprocess.run([sys.executable, "-c", code, *shards[index]], cwd=repo,
+                              capture_output=True, text=True)
+
+    print(f"Parallel targeted tests: {len(identifiers)} cases from {len(modules)} modules, "
+          f"{workers} workers", flush=True)
+    failed = []
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(execute, index): index for index in range(workers)}
+        for future in as_completed(futures):
+            index = futures[future]
+            result = future.result()
+            print(f"\n===== worker {index + 1}/{workers}: {len(shards[index])} cases "
+                  f"(exit {result.returncode}) =====", flush=True)
+            if result.stdout:
+                print(result.stdout, end="" if result.stdout.endswith("\n") else "\n", flush=True)
+            if result.stderr:
+                print(result.stderr, end="" if result.stderr.endswith("\n") else "\n", file=sys.stderr, flush=True)
+            if result.returncode:
+                failed.append(index + 1)
+    if failed:
+        print("Failed targeted workers: " + ", ".join(map(str, sorted(failed))), file=sys.stderr, flush=True)
+        return 1
+    return 0
 
 
 def main(argv=None):
