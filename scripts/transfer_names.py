@@ -23,7 +23,7 @@ import region as regions  # noqa: E402
 import unique_estimate as ue  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-MARKER = "# --- names carried from USA v2.00 by scripts/transfer_names.py (generated; digest-matched, unique on both sides) ---"
+MARKER = "# --- names carried from USA v2.00 and SDK libraries by scripts/transfer_names.py (generated; digest-matched, unique on both sides) ---"
 SYM = re.compile(r"^\s*([A-Za-z_]\w*)\s*=\s*(0x[0-9A-Fa-f]+)\s*;(.*)$")
 
 
@@ -65,11 +65,21 @@ def main() -> int:
         address = int(m.group(2), 16)
         if address in f2 and count2[f2[address][1]] == 1 and f2[address][1] in by_digest:
             named[by_digest[f2[address][1]]] = m.group(1)
+    sdk = ROOT / "config/datamine/ntsc-u-sdk-matches.tsv"
+    if sdk.exists():  # SDK library functions found by scripts/match_sdk_libs.py; v2.00 names win on conflict
+        found: dict[int, set[str]] = {}
+        for line in sdk.read_text(encoding="utf-8").splitlines():
+            if line and not line.startswith("#"):
+                cols = line.split("\t")
+                found.setdefault(int(cols[0], 16), set()).add(cols[4])
+        for address, names in found.items():
+            if len(names) == 1 and address not in named and address in f1:
+                named[address] = next(iter(names))
     dropped = {a for a in named if a in placeholders and not placeholders[a][1].startswith(("func_", "FUN_"))}
     keep = [l for i, l in enumerate(lines) if not any(placeholders[a][0] == i for a in named if a in placeholders)]
     taken = {m.group(1) for l in keep if (m := SYM.match(l))}
     rows = [(a, n) for a, n in sorted(named.items()) if a not in dropped and n not in taken]
-    out = keep + ["", MARKER] + [f"{n} = 0x{a:08X}; // type:func size:0x{f1[a][0]:X} - v2.00 name (Promises/RC2-Going-Decompiled), digest match"
+    out = keep + ["", MARKER] + [f"{n} = 0x{a:08X}; // type:func size:0x{f1[a][0]:X} - name (v2.00 Promises or SDK library match), digest match"
                                  for a, n in rows]
     target.write_text("\n".join(out) + "\n", encoding="utf-8")
     print(f"carried {len(rows)} names to v1.01 ({len(named) - len(rows)} skipped as clashes)")

@@ -126,3 +126,7 @@ podman run -d --name ghidra-rac2-v101 --security-opt label=disable -p 127.0.0.1:
   -e GHIDRA_MCP_AUTH_TOKEN=rac2-local ghcr.io/lynder063/rac1-ghidra-ps2-mcp:latest      # image from rac1-decomp's container workflow
 GHIDRA_MCP_AUTH_TOKEN=rac2-local python scripts/ghidra_anchors.py --url http://127.0.0.1:18089
 ```
+
+**Datamining the boot.** `scripts/datamine.py --elf <reference>/boot.elf` writes identifier-only tables to `config/datamine/` (source-file strings with referencing functions,
+message-spelled function names, identifier tables, SDK tags, section map); full strings stay in `extracted/datamine/`. `scripts/match_sdk_libs.py` matches boot
+functions to your SDK mirror's library objects (196 matches, mostly `libkernl`, `libmpeg`, libc); `transfer_names.py` adds those names to the symbol file.
