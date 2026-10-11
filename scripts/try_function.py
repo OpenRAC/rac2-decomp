@@ -53,6 +53,8 @@ def main() -> int:
     ap.add_argument("--address", type=lambda x: int(x, 0), required=True)
     ap.add_argument("--size", type=int, required=True)
     ap.add_argument("--symbol")
+    ap.add_argument("--region", default="ntsc-u-v2", choices=("ntsc-u", "ntsc-u-v2"),
+                    help="ntsc-u: accepted v1.01 (pass --elf <reference>/boot.elf, extents are heuristic); ntsc-u-v2: experimental v2.00")
     ap.add_argument("--elf", type=Path, default=rank.DEFAULT_ELF)
     ap.add_argument("--mask-relocs", action="store_true", help="ignore relocated fields (calls, globals) when comparing")
     ap.add_argument("--record", action="store_true", help="on MATCH, add the proof to progress/v2/matches.json")
@@ -60,12 +62,15 @@ def main() -> int:
     args = ap.parse_args()
     symbol = args.symbol or args.source.stem
     data = args.elf.read_bytes()
-    pinned = regions.load("ntsc-u-v2").target["boot"]["sha256"]
+    pinned = regions.load(args.region).target["boot"]["sha256"]
     if hashlib.sha256(data).hexdigest() != pinned:
-        raise SystemExit(f"{args.elf} is not the pinned USA v2.00 boot executable ({pinned[:12]}...)")
+        raise SystemExit(f"{args.elf} is not the pinned {args.region} boot executable ({pinned[:12]}...)")
     if args.size <= 0 or args.size % 4:
         raise SystemExit("--size must be a positive multiple of 4")
-    extents = {f[0]: f[1] for f in json.loads(CATALOG.read_text(encoding="utf-8"))["functions"]}
+    if args.region == "ntsc-u-v2":
+        extents = {f[0]: f[1] for f in json.loads(CATALOG.read_text(encoding="utf-8"))["functions"]}
+    else:  # v1.01: the extent is the Ghidra function body; accept any size multiple of 4 inside code
+        extents = {args.address: args.size}
     if extents.get(args.address) != args.size:
         raise SystemExit(f"0x{args.address:X} is not a catalogued function of exactly {args.size} bytes"
                          f" (catalogue extent: {extents.get(args.address)}); check function_size_rank.py")
@@ -97,6 +102,8 @@ def main() -> int:
         c = ours[i] if i < len(ours) else None
         print(f"{'  ' if a == c else '!!'} +{i * 4:02X} ref {a if a is None else f'{a:08X}'} ours {c if c is None else f'{c:08X}'}")
     print("MATCH" if ok else "DIFFERENT")
+    if ok and args.record and args.region != "ntsc-u-v2":
+        raise SystemExit("--record is only for the experimental v2.00 route")
     if ok and args.record:
         record_match(args, symbol, reference, raw_reference)
     return 0 if ok else 1
