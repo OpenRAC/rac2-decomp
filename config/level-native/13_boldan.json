@@ -52,6 +52,13 @@
     "LVL_13_BOLDAN_F01bd4546_FUN_00453058": 4534360,
     "LVL_13_BOLDAN_F01bd4546_FUN_004530A0": 4534432,
     "LVL_13_BOLDAN_F03c444112283bc5f_AT00393940_ROLE00": 2332912,
+    "LVL_13_BOLDAN_F043c77a5_FUN_002F1208": 3084808,
+    "LVL_13_BOLDAN_F043c77a5_FUN_002F55F8": 3102200,
+    "LVL_13_BOLDAN_F043c77a5_FUN_002F87C8": 3114952,
+    "LVL_13_BOLDAN_F043c77a5_FUN_002F88B8": 3115192,
+    "LVL_13_BOLDAN_F043c77a5_FUN_002F8DF8": 3116536,
+    "LVL_13_BOLDAN_F043c77a5_FUN_002F8FC0": 3116992,
+    "LVL_13_BOLDAN_F043c77a5_FUN_0042D320": 4379424,
     "LVL_13_BOLDAN_F0451f37d_D_001A7240": 1733184,
     "LVL_13_BOLDAN_F0451f37d_D_00225FD0": 2252752,
     "LVL_13_BOLDAN_F0451f37d_FUN_0011AFE0": 1159136,
@@ -110,6 +117,9 @@
     "LVL_13_BOLDAN_F250fbfa4_FUN_002F83E0": 3113952,
     "LVL_13_BOLDAN_F250fbfa4_FUN_002F8740": 3114816,
     "LVL_13_BOLDAN_F250fbfa4_FUN_003395F0": 3380720,
+    "LVL_13_BOLDAN_F27f9be8e_FUN_002F86B0": 3114672,
+    "LVL_13_BOLDAN_F27f9be8e_FUN_002F9748": 3118920,
+    "LVL_13_BOLDAN_F27f9be8e_FUN_002F9790": 3118992,
     "LVL_13_BOLDAN_F280d7406_FUN_002F8740": 3114816,
     "LVL_13_BOLDAN_F280d7406_FUN_002F98A0": 3119264,
     "LVL_13_BOLDAN_F280d7406_FUN_003395F0": 3380720,
@@ -134,6 +144,9 @@
     "LVL_13_BOLDAN_F391de845_D_001B98C0": 1808576,
     "LVL_13_BOLDAN_F391de845_FUN_002F8900": 3115264,
     "LVL_13_BOLDAN_F391de845_FUN_003678A0": 3569824,
+    "LVL_13_BOLDAN_F3c007b59_FUN_002F83E0": 3113952,
+    "LVL_13_BOLDAN_F3c007b59_FUN_002F98A0": 3119264,
+    "LVL_13_BOLDAN_F3c007b59_FUN_003395F0": 3380720,
     "LVL_13_BOLDAN_F40487154_FUN_002F87C8": 3114952,
     "LVL_13_BOLDAN_F40487154_FUN_002F8D48": 3116360,
     "LVL_13_BOLDAN_F40487154_FUN_002F8FA0": 3116960,
@@ -194,6 +207,10 @@
     "LVL_13_BOLDAN_F55a1acb8_D_001A63AC": 1729452,
     "LVL_13_BOLDAN_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_13_BOLDAN_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_13_BOLDAN_F5621621c_FUN_002F8D30": 3116336,
+    "LVL_13_BOLDAN_F5621621c_FUN_002F8D48": 3116360,
+    "LVL_13_BOLDAN_F5621621c_FUN_002F8DF8": 3116536,
+    "LVL_13_BOLDAN_F5621621c_FUN_00326300": 3302144,
     "LVL_13_BOLDAN_F5a19df7a_FUN_003249F0": 3295728,
     "LVL_13_BOLDAN_F5a19df7a_FUN_00324B10": 3296016,
     "LVL_13_BOLDAN_F5a19df7a_FUN_00384E68": 3690088,
@@ -261,6 +278,10 @@
     "LVL_13_BOLDAN_F7b2f1854_FUN_0043F888": 4454536,
     "LVL_13_BOLDAN_F7b2f1854_FUN_004407C8": 4458440,
     "LVL_13_BOLDAN_F7b2f1854_FUN_00440860": 4458592,
+    "LVL_13_BOLDAN_F7cacd225_FUN_002F83E0": 3113952,
+    "LVL_13_BOLDAN_F7cacd225_FUN_002F9890": 3119248,
+    "LVL_13_BOLDAN_F7cacd225_FUN_002F98E8": 3119336,
+    "LVL_13_BOLDAN_F7cacd225_FUN_003395F0": 3380720,
     "LVL_13_BOLDAN_F7cb419c1_D_001FF740": 2094912,
     "LVL_13_BOLDAN_F7cb419c1_FUN_00361520": 3544352,
     "LVL_13_BOLDAN_F8411efa9_FUN_002F1208": 3084808,
@@ -301,6 +322,11 @@
     "LVL_13_BOLDAN_F93479d13_D_00189E20": 1613344,
     "LVL_13_BOLDAN_F93479d13_FUN_0031A718": 3254040,
     "LVL_13_BOLDAN_F954231c4_D_00231E40": 2301504,
+    "LVL_13_BOLDAN_F966dbf73_FUN_003249B0": 3295664,
+    "LVL_13_BOLDAN_F966dbf73_FUN_003249F0": 3295728,
+    "LVL_13_BOLDAN_F966dbf73_FUN_00324A48": 3295816,
+    "LVL_13_BOLDAN_F966dbf73_FUN_00324BD0": 3296208,
+    "LVL_13_BOLDAN_F966dbf73_FUN_0033E268": 3400296,
     "LVL_13_BOLDAN_F97fc4e13_FUN_002F8518": 3114264,
     "LVL_13_BOLDAN_F97fc4e13_FUN_003627F8": 3549176,
     "LVL_13_BOLDAN_F9a90bcc4_FUN_003249B0": 3295664,
@@ -382,6 +408,11 @@
     "LVL_13_BOLDAN_Fb342d477_FUN_0045A1D0": 4563408,
     "LVL_13_BOLDAN_Fb342d477_FUN_0045A240": 4563520,
     "LVL_13_BOLDAN_Fb4cfb7e0_FUN_003249B0": 3295664,
+    "LVL_13_BOLDAN_Fb5729173_FUN_002F8900": 3115264,
+    "LVL_13_BOLDAN_Fb5729173_FUN_002F8938": 3115320,
+    "LVL_13_BOLDAN_Fb5729173_FUN_002F8DF8": 3116536,
+    "LVL_13_BOLDAN_Fb5729173_FUN_002F9830": 3119152,
+    "LVL_13_BOLDAN_Fb5729173_FUN_00329470": 3314800,
     "LVL_13_BOLDAN_Fb77d67f1_FUN_002F83B0": 3113904,
     "LVL_13_BOLDAN_Fb77d67f1_FUN_003395F0": 3380720,
     "LVL_13_BOLDAN_Fb7feb893_D_001A7BB2": 1735602,
@@ -419,6 +450,12 @@
     "LVL_13_BOLDAN_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_13_BOLDAN_Fc936841d_FUN_002F8740": 3114816,
     "LVL_13_BOLDAN_Fc936841d_FUN_002F8770": 3114864,
+    "LVL_13_BOLDAN_Fc94396f4_D_00189E20": 1613344,
+    "LVL_13_BOLDAN_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_13_BOLDAN_Fc94396f4_FUN_002DE5E0": 3007968,
+    "LVL_13_BOLDAN_Fc94396f4_FUN_002DE660": 3008096,
+    "LVL_13_BOLDAN_Fc94396f4_FUN_002F8740": 3114816,
+    "LVL_13_BOLDAN_Fc94396f4_FUN_002F8A20": 3115552,
     "LVL_13_BOLDAN_Fccb147a4_FUN_003395F0": 3380720,
     "LVL_13_BOLDAN_Fccb147a4_FUN_00389300": 3707648,
     "LVL_13_BOLDAN_Fcdb4d905_FUN_002EEDD0": 3075536,
@@ -453,6 +490,14 @@
     "LVL_13_BOLDAN_Fdb046c5d_FUN_0032E318": 3334936,
     "LVL_13_BOLDAN_Fdb046c5d_FUN_00368E50": 3575376,
     "LVL_13_BOLDAN_Fdb046c5d_FUN_00369230": 3576368,
+    "LVL_13_BOLDAN_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_13_BOLDAN_Fdd54ca5d_FUN_002F83E0": 3113952,
+    "LVL_13_BOLDAN_Fdd54ca5d_FUN_002F8740": 3114816,
+    "LVL_13_BOLDAN_Fdd54ca5d_FUN_002F87C8": 3114952,
+    "LVL_13_BOLDAN_Fdd54ca5d_FUN_002F9890": 3119248,
+    "LVL_13_BOLDAN_Fdd54ca5d_FUN_002F98A0": 3119264,
+    "LVL_13_BOLDAN_Fdd54ca5d_FUN_003395F0": 3380720,
+    "LVL_13_BOLDAN_Fdd54ca5d_FUN_00389300": 3707648,
     "LVL_13_BOLDAN_Fe524d931_D_001A6480": 1729664,
     "LVL_13_BOLDAN_Fe524d931_FUN_002FAAA8": 3123880,
     "LVL_13_BOLDAN_Fe524d931_FUN_00368FB0": 3575728,
@@ -492,6 +537,7 @@
     "LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C28": 3116072,
     "LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C98": 3116184,
     "LVL_13_BOLDAN_Ff2d8e5ad_FUN_0031F820": 3274784,
+    "LVL_13_BOLDAN_Ff454dd77_FUN_002F86B0": 3114672,
     "LVL_13_BOLDAN_Ff4dd22f3_FUN_002F83E0": 3113952,
     "LVL_13_BOLDAN_Ff4dd22f3_FUN_002F8740": 3114816,
     "LVL_13_BOLDAN_Ff4dd22f3_FUN_003395F0": 3380720,
@@ -712,6 +758,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_13_BOLDAN_FUN_002DDE88"
+    },
+    {
+      "address": 3006280,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_13_BOLDAN_FUN_002DDF48"
     },
     {
       "address": 3006976,
@@ -1090,6 +1142,24 @@
       "symbol": "LVL_13_BOLDAN_FUN_00324950"
     },
     {
+      "address": 3297416,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_13_BOLDAN_FUN_00325088"
+    },
+    {
+      "address": 3305088,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_13_BOLDAN_FUN_00326E80"
+    },
+    {
+      "address": 3307856,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_13_BOLDAN_FUN_00327950"
+    },
+    {
       "address": 3311584,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1129,6 +1199,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_13_BOLDAN_FUN_0032CBA0"
+    },
+    {
+      "address": 3330776,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_13_BOLDAN_FUN_0032D2D8"
     },
     {
       "address": 3335920,
@@ -1214,6 +1290,12 @@
       "symbol": "LVL_13_BOLDAN_FUN_0033CD58"
     },
     {
+      "address": 3397640,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_13_BOLDAN_FUN_0033D808"
+    },
+    {
       "address": 3398280,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1224,6 +1306,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_13_BOLDAN_FUN_0033F1F0"
+    },
+    {
+      "address": 3416496,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_13_BOLDAN_FUN_003421B0"
     },
     {
       "address": 3419096,
@@ -1254,6 +1342,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_13_BOLDAN_FUN_00344BC0"
+    },
+    {
+      "address": 3433968,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_13_BOLDAN_FUN_003465F0"
     },
     {
       "address": 3443392,
@@ -1653,6 +1747,12 @@
       "symbol": "LVL_13_BOLDAN_FUN_003CEFD0"
     },
     {
+      "address": 3994896,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_13_BOLDAN_FUN_003CF510"
+    },
+    {
       "address": 4003592,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1955,6 +2055,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_13_BOLDAN_FUN_0042D388"
+    },
+    {
+      "address": 4384136,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_13_BOLDAN_FUN_0042E588"
     },
     {
       "address": 4400952,

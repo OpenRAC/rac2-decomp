@@ -1,51 +1,51 @@
 {
-  "boot_review_sha256": "f3eb4110327e6f109e65f4fbb651c195f8047bb6ce1dea0e1faf1d3606c07276",
+  "boot_review_sha256": "6abf51bb2b205164f2bd6cc7b94f046706c6995ea1e51b0c429f6b1a48ba0ecc",
   "c_link_object_adapter": {
     "compiled_code_unchanged": true,
-    "compiled_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
+    "compiled_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
     "integration_credit": 0,
     "kind": "reviewed-shared-import-relocation-adapter",
-    "link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
+    "link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
     "new_physical_bytes": 0,
     "relocation_changes": [
       {
         "caller": "FUN_0034F898",
         "caller_address": 4642136,
-        "new_r_info": 130820,
-        "new_symbol_index": 511,
+        "new_r_info": 132356,
+        "new_symbol_index": 517,
         "old_r_info": 68868,
         "old_symbol_index": 269,
         "provider": "FUN_001338C8",
         "provider_address": 1259720,
         "provider_reference_sha256": "df665c024f2c2f2122ca91cb5b61048030b7f98a3df2606d8c91441295d69d2f",
         "provider_size": 36,
-        "r_info_offset": 163592
+        "r_info_offset": 169032
       },
       {
         "caller": "FUN_0034FB20",
         "caller_address": 4642908,
-        "new_r_info": 147716,
-        "new_symbol_index": 577,
+        "new_r_info": 149252,
+        "new_symbol_index": 583,
         "old_r_info": 69124,
         "old_symbol_index": 270,
         "provider": "FUN_00133930",
         "provider_address": 1259824,
         "provider_reference_sha256": "d1b7a40a24b4537c4f9b704b87cafb6001ecaf64ef96c01c869fd05532732474",
         "provider_size": 44,
-        "r_info_offset": 164040
+        "r_info_offset": 169480
       },
       {
         "caller": "FUN_002B7170",
         "caller_address": 3433316,
-        "new_r_info": 162052,
-        "new_symbol_index": 633,
+        "new_r_info": 163588,
+        "new_symbol_index": 639,
         "old_r_info": 68612,
         "old_symbol_index": 268,
         "provider": "FUN_00133490",
         "provider_address": 1258640,
         "provider_reference_sha256": "1c102a1be303b46fbc85f02f327e97d8ecdbbf6635d3458a6454c0c7de75c75a",
         "provider_size": 40,
-        "r_info_offset": 164352
+        "r_info_offset": 169792
       }
     ],
     "schema": 1,
@@ -64,12 +64,12 @@
       {
         "index": 4,
         "name": ".reginfo",
-        "sha256": "c36cadbb29f41b19d0d4fe00f68fafaf85bd7ab22979c1148b6fdc58176e7beb"
+        "sha256": "f478230c6a7dcc05f6dc5ae33a236cb7235246e60d2b2d9ccb607041dca7a0e1"
       },
       {
         "index": 5,
         "name": ".mdebug",
-        "sha256": "f5495a939e13128a5f5a56396ad13d33e7b0135b33456df8bab0df63dccaf099"
+        "sha256": "c525026b298384f7adbadeb06f51d0f49bf68b627989a5069672690657c7bfae"
       },
       {
         "index": 6,
@@ -2068,29 +2068,59 @@
       },
       {
         "index": 591,
-        "name": ".shstrtab",
-        "sha256": "aeaee12eff2daff004d2989ad8f0a0769ee4effa80e46bff050b1ac1104bbacf"
-      },
-      {
-        "index": 592,
-        "name": ".symtab",
-        "sha256": "80481cf8ef119cf939148a2407ac4264fc9e7abedf9c20efbc69265f5eacc88b"
+        "name": ".text.FUN_002AF2E8",
+        "sha256": "480eaee31e8bdded10fbb7a71d979e17bea60cc955be8307321be6834350e5e9"
       },
       {
         "index": 593,
+        "name": ".text.FUN_002A7CA0",
+        "sha256": "6f60d420f9f1f6f6b88f24b8e3fb55db9d14eb1d27a58a528f46d3d1192bb5d5"
+      },
+      {
+        "index": 595,
+        "name": ".text.FUN_002BD398",
+        "sha256": "ecd324661c010c77b529aff255cc8d783447578f7457f4a7efed6b8e7bcef504"
+      },
+      {
+        "index": 597,
+        "name": ".text.FUN_002C5550",
+        "sha256": "b4b00ca23692c47831ba20bd91cba6683ac943a8cbcaa7729ddb1e702279dbb7"
+      },
+      {
+        "index": 599,
+        "name": ".text.FUN_002AA198",
+        "sha256": "7f656387f12db635de5054b140edc8c4f8031be9b6a1a6643a8655fcead24295"
+      },
+      {
+        "index": 601,
+        "name": ".text.FUN_002A9850",
+        "sha256": "a0280298301d3833fc1588a98c78f41f0cec2460f8d656298a07f42a32552890"
+      },
+      {
+        "index": 603,
+        "name": ".shstrtab",
+        "sha256": "e5dc83e9b147f4405ac7f5cca3bf49b9a56406b0f5eb61396856955c6eec5f5e"
+      },
+      {
+        "index": 604,
+        "name": ".symtab",
+        "sha256": "febc07a8aa82fc1ec1bded56748c1a1d0d6b77d83d74650e178a4e98a12e3ec1"
+      },
+      {
+        "index": 605,
         "name": ".strtab",
-        "sha256": "027e3c3f98dfd162580b0529b60d1d61ded151fd3a0b1573617067151295adb4"
+        "sha256": "a3dff66f953fd2c4aa9950aa4b969a22698c122d5f70f0f913496052106d88a7"
       }
     ]
   },
-  "c_link_object_adapter_sha256": "f1b99cf0713d75f711d49b310746aa794150062bfef5e3cb69c1db57176edceb",
-  "c_link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
-  "c_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
-  "candidate_elf_sha256": "a6b0d1ee7c5593a241218d43fa43b631c5a96f4af51b949de982a43f7eab3027",
+  "c_link_object_adapter_sha256": "39f7ca95b42acedb1a1be51f5f9c63e47ed286077c52078d3a4b197e2673ee85",
+  "c_link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
+  "c_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
+  "candidate_elf_sha256": "3ea3eb257634a8add6016784da0d4bac14338e5d70ce01c314635a8e2f9c0be4",
   "candidate_entry": 2869768,
   "candidate_source": "candidates/boot.c",
   "catalog_sha256": "fc792ac26dd3bbec8f54565bc6a44fe3ed2c05756e5f66981ceb3d9c294fb7b0",
-  "dependency_sha256": "f77ee0e6768efa073af2e7a6ae5031178dccae165213e87b1971bf603c63a929",
+  "dependency_sha256": "0847b2102e0db0020d7aafa4813bc74158d64c8f188bf63adebe2d8c58666937",
   "full_level_gate": {
     "bytes_compared": 2916344,
     "matched": true,
@@ -4758,6 +4788,20 @@
       "symbol": "LVL_15_GORN_FUN_002EC280"
     },
     {
+      "address": 3064640,
+      "candidate_sha256": "e5c93ae2c07f1e063fa702a1f75544b36a78eb3b2784f781b017ced84c33c478",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "e5c93ae2c07f1e063fa702a1f75544b36a78eb3b2784f781b017ced84c33c478",
+      "size": 372,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_002EC340"
+    },
+    {
       "address": 3065336,
       "candidate_sha256": "16662c35cecc045c6126a60e67ed7f0eaf29d507a100462c1245fe74f7bcf3fb",
       "candidate_source": "candidates/levels/15_gorn.c",
@@ -5724,6 +5768,48 @@
       "symbol": "LVL_15_GORN_FUN_00333280"
     },
     {
+      "address": 3357112,
+      "candidate_sha256": "15dfef7f1bd7f37502d512826e69f91164511164b1c9f2678daba6dace31b154",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "15dfef7f1bd7f37502d512826e69f91164511164b1c9f2678daba6dace31b154",
+      "size": 360,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003339B8"
+    },
+    {
+      "address": 3364784,
+      "candidate_sha256": "aef3eeaf4866753c87f06729e09040487809a22dfe220c666f78b22204dbcf91",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "aef3eeaf4866753c87f06729e09040487809a22dfe220c666f78b22204dbcf91",
+      "size": 332,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003357B0"
+    },
+    {
+      "address": 3367552,
+      "candidate_sha256": "eed1139bc7216758343198ecf3a21891a5445ca0ecec08f1e3be1a2cbc23fa0d",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "eed1139bc7216758343198ecf3a21891a5445ca0ecec08f1e3be1a2cbc23fa0d",
+      "size": 336,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00336280"
+    },
+    {
       "address": 3371280,
       "candidate_sha256": "c205afcd88789b7892725233ad2722298196ddfcb054d1b079144b0374e767f8",
       "candidate_source": "candidates/levels/15_gorn.c",
@@ -5834,6 +5920,20 @@
       "size": 64,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_0033C450"
+    },
+    {
+      "address": 3393192,
+      "candidate_sha256": "c9edf2776fe8977ac87179c68c6300d5383542a8703d7306ec9ae001dceecd1b",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "c9edf2776fe8977ac87179c68c6300d5383542a8703d7306ec9ae001dceecd1b",
+      "size": 376,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_0033C6A8"
     },
     {
       "address": 3398336,
@@ -6032,6 +6132,20 @@
       "symbol": "LVL_15_GORN_FUN_0034BC80"
     },
     {
+      "address": 3458864,
+      "candidate_sha256": "602f2ebd675cd1d390907ac77af529fdc6f9b2e517e6aacfcb074fd375dafcc9",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "602f2ebd675cd1d390907ac77af529fdc6f9b2e517e6aacfcb074fd375dafcc9",
+      "size": 356,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_0034C730"
+    },
+    {
       "address": 3459504,
       "candidate_sha256": "d8741724ed5dffae025a4fce7a1ba402bf2a274b5377e4ac9b7efde2dd27f71d",
       "candidate_source": "candidates/levels/15_gorn.c",
@@ -6058,6 +6172,20 @@
       "size": 516,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_0034E118"
+    },
+    {
+      "address": 3477720,
+      "candidate_sha256": "38294ab63097ebbc2e289306a2d218b7d28c82615a353b66be9dd846087579e7",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "38294ab63097ebbc2e289306a2d218b7d28c82615a353b66be9dd846087579e7",
+      "size": 404,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003510D8"
     },
     {
       "address": 3480320,
@@ -6128,6 +6256,20 @@
       "size": 160,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_00353AE8"
+    },
+    {
+      "address": 3495544,
+      "candidate_sha256": "68cdbfe723c1faed4c349f935813a7ce6649179521954fad175a32510c107fc8",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "68cdbfe723c1faed4c349f935813a7ce6649179521954fad175a32510c107fc8",
+      "size": 348,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00355678"
     },
     {
       "address": 3504968,
@@ -7110,6 +7252,20 @@
       "symbol": "LVL_15_GORN_FUN_003DFFE0"
     },
     {
+      "address": 4064544,
+      "candidate_sha256": "bbb98460735db89841764491c112604175f2c1bfffcf0a2b081a3ceee8854065",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "bbb98460735db89841764491c112604175f2c1bfffcf0a2b081a3ceee8854065",
+      "size": 332,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003E0520"
+    },
+    {
       "address": 4073240,
       "candidate_sha256": "acf12518406bfeebfbde1518dcc771b87ee50d7dc3527d6a33049b281fb7837f",
       "candidate_source": "candidates/levels/15_gorn.c",
@@ -7738,6 +7894,20 @@
       "size": 112,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_0043FE00"
+    },
+    {
+      "address": 4460544,
+      "candidate_sha256": "c90bdf8f0f0e9337a2993920d56cf40e78ef4c03a49bdb95ffaa960c3199d599",
+      "candidate_source": "candidates/levels/15_gorn.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "15_gorn",
+      "reference_sha256": "c90bdf8f0f0e9337a2993920d56cf40e78ef4c03a49bdb95ffaa960c3199d599",
+      "size": 364,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00441000"
     },
     {
       "address": 4477360,
@@ -8944,202 +9114,6 @@
       "symbol": "LVL_15_GORN_FUN_0046FBA0"
     },
     {
-      "address": 3285360,
-      "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-      "size": 112,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_00322170"
-    },
-    {
-      "address": 3285472,
-      "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-      "size": 76,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_003221E0"
-    },
-    {
-      "address": 3285552,
-      "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-      "size": 124,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_00322230"
-    },
-    {
-      "address": 3285680,
-      "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-      "size": 44,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_003222B0"
-    },
-    {
-      "address": 3285728,
-      "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-      "size": 96,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_003222E0"
-    },
-    {
-      "address": 3285824,
-      "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-      "size": 76,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_00322340"
-    },
-    {
-      "address": 3285968,
-      "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-      "size": 156,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_003223D0"
-    },
-    {
-      "address": 3286128,
-      "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-      "size": 56,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_00322470"
-    },
-    {
-      "address": 3286184,
-      "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-      "size": 120,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_003224A8"
-    },
-    {
-      "address": 3286488,
-      "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-      "size": 184,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_003225D8"
-    },
-    {
-      "address": 3286864,
-      "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-      "size": 112,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_00322750"
-    },
-    {
-      "address": 3287240,
-      "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-      "size": 72,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_003228C8"
-    },
-    {
-      "address": 3287312,
-      "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-      "size": 68,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_00322910"
-    },
-    {
-      "address": 3405800,
-      "candidate_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
-      "size": 164,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_0033F7E8"
-    },
-    {
       "address": 2869760,
       "candidate_sha256": "4912eb9f14b02c39b9cf96da40470b670c4d872a071252fbf2a13fa3cda688ef",
       "candidate_source": "candidates/levels/15_gorn-g8.c",
@@ -9152,6 +9126,34 @@
       "size": 8,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_002BCA00"
+    },
+    {
+      "address": 3076848,
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "size": 208,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_002EF2F0"
+    },
+    {
+      "address": 3079696,
+      "candidate_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
+      "size": 132,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_002EFE10"
     },
     {
       "address": 3081944,
@@ -9476,6 +9478,188 @@
       "symbol": "LVL_15_GORN_FUN_00314B88"
     },
     {
+      "address": 3285360,
+      "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+      "size": 112,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00322170"
+    },
+    {
+      "address": 3285472,
+      "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+      "size": 76,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003221E0"
+    },
+    {
+      "address": 3285552,
+      "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+      "size": 124,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00322230"
+    },
+    {
+      "address": 3285680,
+      "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+      "size": 44,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003222B0"
+    },
+    {
+      "address": 3285728,
+      "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+      "size": 96,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003222E0"
+    },
+    {
+      "address": 3285824,
+      "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+      "size": 76,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00322340"
+    },
+    {
+      "address": 3285968,
+      "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+      "size": 156,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003223D0"
+    },
+    {
+      "address": 3286128,
+      "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+      "size": 56,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00322470"
+    },
+    {
+      "address": 3286184,
+      "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+      "size": 120,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003224A8"
+    },
+    {
+      "address": 3286488,
+      "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+      "size": 184,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003225D8"
+    },
+    {
+      "address": 3286864,
+      "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+      "size": 112,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00322750"
+    },
+    {
+      "address": 3287240,
+      "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+      "size": 72,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_003228C8"
+    },
+    {
+      "address": 3287312,
+      "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+      "size": 68,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00322910"
+    },
+    {
       "address": 3299744,
       "candidate_sha256": "b28d21ced7ab0245a039c390b93f090cc3c6fb544b7cec4261a9484b2f2a7531",
       "candidate_source": "candidates/levels/15_gorn-g8.c",
@@ -9502,6 +9686,20 @@
       "size": 56,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_0032AC68"
+    },
+    {
+      "address": 3405800,
+      "candidate_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
+      "size": 164,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_0033F7E8"
     },
     {
       "address": 3418920,
@@ -9544,6 +9742,20 @@
       "size": 8,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_00342B60"
+    },
+    {
+      "address": 3763904,
+      "candidate_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
+      "candidate_source": "candidates/levels/15_gorn-g8.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-smalldata",
+      "program": "15_gorn",
+      "reference_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
+      "size": 76,
+      "state": "integrated",
+      "symbol": "LVL_15_GORN_FUN_00396EC0"
     },
     {
       "address": 3763984,
@@ -9656,44 +9868,16 @@
       "size": 8,
       "state": "integrated",
       "symbol": "LVL_15_GORN_FUN_00454B90"
-    },
-    {
-      "address": 3079696,
-      "candidate_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
-      "size": 132,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_002EFE10"
-    },
-    {
-      "address": 3763904,
-      "candidate_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
-      "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "different_bytes": 0,
-      "integrated": true,
-      "matched": true,
-      "origin": "level-smalldata",
-      "program": "15_gorn",
-      "reference_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
-      "size": 76,
-      "state": "integrated",
-      "symbol": "LVL_15_GORN_FUN_00396EC0"
     }
   ],
   "kind": "level-c-integration",
-  "matched_code_bytes": 52912,
+  "matched_code_bytes": 56700,
   "native": {
     "catalog_path": "config/level-native/15_gorn.json",
     "object_qualification": {
-      "candidate_elf_sha256": "55ed4e1256fd097788e9e26a82575f10527bef6b5ba25cc70d113c2b5482a294",
+      "candidate_elf_sha256": "ae2649b435e54ae51858c2aca11e5b6591a55f20574103909e16496e742d20b0",
       "candidate_source": "candidates/levels/15_gorn.c",
-      "catalog_sha256": "d92fb40611d85b4ae2c0c199a6a9c778a9a08b46b8191b7ee08504bc8dfacccf",
+      "catalog_sha256": "3caba761f2ba7a9372bed7f3e35243bfeba923ae158050bff22dedc592fb5ed1",
       "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
       "flags": [
         "-O2",
@@ -9997,6 +10181,17 @@
           "size": 188,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_002EC280"
+        },
+        {
+          "address": 3064640,
+          "candidate_sha256": "e5c93ae2c07f1e063fa702a1f75544b36a78eb3b2784f781b017ced84c33c478",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 372,
+          "reference_sha256": "e5c93ae2c07f1e063fa702a1f75544b36a78eb3b2784f781b017ced84c33c478",
+          "size": 372,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_002EC340"
         },
         {
           "address": 3065336,
@@ -10758,6 +10953,39 @@
           "symbol": "LVL_15_GORN_FUN_00333280"
         },
         {
+          "address": 3357112,
+          "candidate_sha256": "15dfef7f1bd7f37502d512826e69f91164511164b1c9f2678daba6dace31b154",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 360,
+          "reference_sha256": "15dfef7f1bd7f37502d512826e69f91164511164b1c9f2678daba6dace31b154",
+          "size": 360,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003339B8"
+        },
+        {
+          "address": 3364784,
+          "candidate_sha256": "aef3eeaf4866753c87f06729e09040487809a22dfe220c666f78b22204dbcf91",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 332,
+          "reference_sha256": "aef3eeaf4866753c87f06729e09040487809a22dfe220c666f78b22204dbcf91",
+          "size": 332,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003357B0"
+        },
+        {
+          "address": 3367552,
+          "candidate_sha256": "eed1139bc7216758343198ecf3a21891a5445ca0ecec08f1e3be1a2cbc23fa0d",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 336,
+          "reference_sha256": "eed1139bc7216758343198ecf3a21891a5445ca0ecec08f1e3be1a2cbc23fa0d",
+          "size": 336,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00336280"
+        },
+        {
           "address": 3371280,
           "candidate_sha256": "c205afcd88789b7892725233ad2722298196ddfcb054d1b079144b0374e767f8",
           "different_bytes": 0,
@@ -10844,6 +11072,17 @@
           "size": 64,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_0033C450"
+        },
+        {
+          "address": 3393192,
+          "candidate_sha256": "c9edf2776fe8977ac87179c68c6300d5383542a8703d7306ec9ae001dceecd1b",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 376,
+          "reference_sha256": "c9edf2776fe8977ac87179c68c6300d5383542a8703d7306ec9ae001dceecd1b",
+          "size": 376,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_0033C6A8"
         },
         {
           "address": 3398336,
@@ -11000,6 +11239,17 @@
           "symbol": "LVL_15_GORN_FUN_0034BC80"
         },
         {
+          "address": 3458864,
+          "candidate_sha256": "602f2ebd675cd1d390907ac77af529fdc6f9b2e517e6aacfcb074fd375dafcc9",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 356,
+          "reference_sha256": "602f2ebd675cd1d390907ac77af529fdc6f9b2e517e6aacfcb074fd375dafcc9",
+          "size": 356,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_0034C730"
+        },
+        {
           "address": 3459504,
           "candidate_sha256": "d8741724ed5dffae025a4fce7a1ba402bf2a274b5377e4ac9b7efde2dd27f71d",
           "different_bytes": 0,
@@ -11020,6 +11270,17 @@
           "size": 516,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_0034E118"
+        },
+        {
+          "address": 3477720,
+          "candidate_sha256": "38294ab63097ebbc2e289306a2d218b7d28c82615a353b66be9dd846087579e7",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 404,
+          "reference_sha256": "38294ab63097ebbc2e289306a2d218b7d28c82615a353b66be9dd846087579e7",
+          "size": 404,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003510D8"
         },
         {
           "address": 3480320,
@@ -11075,6 +11336,17 @@
           "size": 160,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_00353AE8"
+        },
+        {
+          "address": 3495544,
+          "candidate_sha256": "68cdbfe723c1faed4c349f935813a7ce6649179521954fad175a32510c107fc8",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 348,
+          "reference_sha256": "68cdbfe723c1faed4c349f935813a7ce6649179521954fad175a32510c107fc8",
+          "size": 348,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00355678"
         },
         {
           "address": 3504968,
@@ -11847,6 +12119,17 @@
           "symbol": "LVL_15_GORN_FUN_003DFFE0"
         },
         {
+          "address": 4064544,
+          "candidate_sha256": "bbb98460735db89841764491c112604175f2c1bfffcf0a2b081a3ceee8854065",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 332,
+          "reference_sha256": "bbb98460735db89841764491c112604175f2c1bfffcf0a2b081a3ceee8854065",
+          "size": 332,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003E0520"
+        },
+        {
           "address": 4073240,
           "candidate_sha256": "acf12518406bfeebfbde1518dcc771b87ee50d7dc3527d6a33049b281fb7837f",
           "different_bytes": 0,
@@ -12340,6 +12623,17 @@
           "size": 112,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_0043FE00"
+        },
+        {
+          "address": 4460544,
+          "candidate_sha256": "c90bdf8f0f0e9337a2993920d56cf40e78ef4c03a49bdb95ffaa960c3199d599",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 364,
+          "reference_sha256": "c90bdf8f0f0e9337a2993920d56cf40e78ef4c03a49bdb95ffaa960c3199d599",
+          "size": 364,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00441000"
         },
         {
           "address": 4477360,
@@ -13289,14 +13583,14 @@
         }
       ],
       "kind": "level-native-candidate",
-      "matched_code_bytes": 40908,
-      "object_sha256": "6595fea1833869b95429bdf1b1a72b5a4ccad34cf96f5dc48b6bf8d176f3230f",
+      "matched_code_bytes": 44488,
+      "object_sha256": "9934ac91de525a0b8848071a2a0794c8d416f3337848c955a9b2fe68e05e68b3",
       "program": "levels/15_gorn",
       "read_only_sections": [],
       "reference_entry": 2869768,
       "reference_sha256": "838098ef94f05d78f79be2f65291447db6c9468e7c44e2cab36396f720cce109",
       "schema": 1,
-      "source_sha256": "b53c505b153ff32938b6e3dfe90e22e684b2ad2b6d2cada3736e60e740722bb7",
+      "source_sha256": "d458a2fe125336476b900bdd46f1cc0ccbed6c1065167e7dcb2f86fd8df48f58",
       "state": "matched_unintegrated",
       "target": "SCUS_972.68",
       "tools": {
@@ -13306,9 +13600,9 @@
         "ld.exe": "80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48"
       }
     },
-    "object_sha256": "6595fea1833869b95429bdf1b1a72b5a4ccad34cf96f5dc48b6bf8d176f3230f",
+    "object_sha256": "9934ac91de525a0b8848071a2a0794c8d416f3337848c955a9b2fe68e05e68b3",
     "review_path": "progress/level-candidates/15_gorn.json",
-    "review_sha256": "8bff10e340182b9d8bec763084c35887b60eb27ccbfd57b05bf8d93f81b65d27",
+    "review_sha256": "3526798326e2f0ae1281855e814d038b7480accbe9691fc177e1a8e9e9a7b25d",
     "source": "candidates/levels/15_gorn.c"
   },
   "program": "15_gorn",
@@ -13510,6 +13804,7 @@
       "LVL_15_GORN_FUN_002EC050",
       "LVL_15_GORN_FUN_002EC088",
       "LVL_15_GORN_FUN_002EC280",
+      "LVL_15_GORN_FUN_002EC340",
       "LVL_15_GORN_FUN_002EC5F8",
       "LVL_15_GORN_FUN_002EC7E0",
       "LVL_15_GORN_FUN_002EC8D8",
@@ -13579,6 +13874,9 @@
       "LVL_15_GORN_FUN_00329F50",
       "LVL_15_GORN_FUN_0032A760",
       "LVL_15_GORN_FUN_00333280",
+      "LVL_15_GORN_FUN_003339B8",
+      "LVL_15_GORN_FUN_003357B0",
+      "LVL_15_GORN_FUN_00336280",
       "LVL_15_GORN_FUN_00337110",
       "LVL_15_GORN_FUN_003379E0",
       "LVL_15_GORN_FUN_00337DE0",
@@ -13587,6 +13885,7 @@
       "LVL_15_GORN_FUN_0033B0A0",
       "LVL_15_GORN_FUN_0033B4D0",
       "LVL_15_GORN_FUN_0033C450",
+      "LVL_15_GORN_FUN_0033C6A8",
       "LVL_15_GORN_FUN_0033DAC0",
       "LVL_15_GORN_FUN_0033E4B0",
       "LVL_15_GORN_FUN_0033E980",
@@ -13601,13 +13900,16 @@
       "LVL_15_GORN_FUN_0034A300",
       "LVL_15_GORN_FUN_0034AB30",
       "LVL_15_GORN_FUN_0034BC80",
+      "LVL_15_GORN_FUN_0034C730",
       "LVL_15_GORN_FUN_0034C9B0",
       "LVL_15_GORN_FUN_0034E118",
+      "LVL_15_GORN_FUN_003510D8",
       "LVL_15_GORN_FUN_00351B00",
       "LVL_15_GORN_FUN_00352378",
       "LVL_15_GORN_FUN_00352D00",
       "LVL_15_GORN_FUN_00353260",
       "LVL_15_GORN_FUN_00353AE8",
+      "LVL_15_GORN_FUN_00355678",
       "LVL_15_GORN_FUN_00357B48",
       "LVL_15_GORN_FUN_003580F8",
       "LVL_15_GORN_FUN_00358368",
@@ -13678,6 +13980,7 @@
       "LVL_15_GORN_FUN_003D9C78",
       "LVL_15_GORN_FUN_003D9FF8",
       "LVL_15_GORN_FUN_003DFFE0",
+      "LVL_15_GORN_FUN_003E0520",
       "LVL_15_GORN_FUN_003E2718",
       "LVL_15_GORN_FUN_003E5658",
       "LVL_15_GORN_FUN_003E8880",
@@ -13723,6 +14026,7 @@
       "LVL_15_GORN_FUN_0043DE70",
       "LVL_15_GORN_FUN_0043FD98",
       "LVL_15_GORN_FUN_0043FE00",
+      "LVL_15_GORN_FUN_00441000",
       "LVL_15_GORN_FUN_004451B0",
       "LVL_15_GORN_FUN_00445A38",
       "LVL_15_GORN_FUN_00448F10",
@@ -13809,21 +14113,9 @@
       "LVL_15_GORN_FUN_0046EA80",
       "LVL_15_GORN_FUN_0046FAF8",
       "LVL_15_GORN_FUN_0046FBA0",
-      "LVL_15_GORN_FUN_00322170",
-      "LVL_15_GORN_FUN_003221E0",
-      "LVL_15_GORN_FUN_00322230",
-      "LVL_15_GORN_FUN_003222B0",
-      "LVL_15_GORN_FUN_003222E0",
-      "LVL_15_GORN_FUN_00322340",
-      "LVL_15_GORN_FUN_003223D0",
-      "LVL_15_GORN_FUN_00322470",
-      "LVL_15_GORN_FUN_003224A8",
-      "LVL_15_GORN_FUN_003225D8",
-      "LVL_15_GORN_FUN_00322750",
-      "LVL_15_GORN_FUN_003228C8",
-      "LVL_15_GORN_FUN_00322910",
-      "LVL_15_GORN_FUN_0033F7E8",
       "LVL_15_GORN_FUN_002BCA00",
+      "LVL_15_GORN_FUN_002EF2F0",
+      "LVL_15_GORN_FUN_002EFE10",
       "LVL_15_GORN_FUN_002F06D8",
       "LVL_15_GORN_FUN_002FE450",
       "LVL_15_GORN_FUN_003090E0",
@@ -13847,11 +14139,26 @@
       "LVL_15_GORN_FUN_00314B68",
       "LVL_15_GORN_FUN_00314B70",
       "LVL_15_GORN_FUN_00314B88",
+      "LVL_15_GORN_FUN_00322170",
+      "LVL_15_GORN_FUN_003221E0",
+      "LVL_15_GORN_FUN_00322230",
+      "LVL_15_GORN_FUN_003222B0",
+      "LVL_15_GORN_FUN_003222E0",
+      "LVL_15_GORN_FUN_00322340",
+      "LVL_15_GORN_FUN_003223D0",
+      "LVL_15_GORN_FUN_00322470",
+      "LVL_15_GORN_FUN_003224A8",
+      "LVL_15_GORN_FUN_003225D8",
+      "LVL_15_GORN_FUN_00322750",
+      "LVL_15_GORN_FUN_003228C8",
+      "LVL_15_GORN_FUN_00322910",
       "LVL_15_GORN_FUN_003259A0",
       "LVL_15_GORN_FUN_0032AC68",
+      "LVL_15_GORN_FUN_0033F7E8",
       "LVL_15_GORN_FUN_00342B28",
       "LVL_15_GORN_FUN_00342B38",
       "LVL_15_GORN_FUN_00342B60",
+      "LVL_15_GORN_FUN_00396EC0",
       "LVL_15_GORN_FUN_00396F10",
       "LVL_15_GORN_FUN_00397018",
       "LVL_15_GORN_FUN_00397060",
@@ -13859,59 +14166,57 @@
       "LVL_15_GORN_FUN_003972A8",
       "LVL_15_GORN_FUN_00397308",
       "LVL_15_GORN_FUN_00397370",
-      "LVL_15_GORN_FUN_00454B90",
-      "LVL_15_GORN_FUN_002EFE10",
-      "LVL_15_GORN_FUN_00396EC0"
+      "LVL_15_GORN_FUN_00454B90"
     ]
   },
   "schema": 2,
   "shared": {
     "c_link_object_adapter": {
       "compiled_code_unchanged": true,
-      "compiled_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
+      "compiled_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
       "integration_credit": 0,
       "kind": "reviewed-shared-import-relocation-adapter",
-      "link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
+      "link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
       "new_physical_bytes": 0,
       "relocation_changes": [
         {
           "caller": "FUN_0034F898",
           "caller_address": 4642136,
-          "new_r_info": 130820,
-          "new_symbol_index": 511,
+          "new_r_info": 132356,
+          "new_symbol_index": 517,
           "old_r_info": 68868,
           "old_symbol_index": 269,
           "provider": "FUN_001338C8",
           "provider_address": 1259720,
           "provider_reference_sha256": "df665c024f2c2f2122ca91cb5b61048030b7f98a3df2606d8c91441295d69d2f",
           "provider_size": 36,
-          "r_info_offset": 163592
+          "r_info_offset": 169032
         },
         {
           "caller": "FUN_0034FB20",
           "caller_address": 4642908,
-          "new_r_info": 147716,
-          "new_symbol_index": 577,
+          "new_r_info": 149252,
+          "new_symbol_index": 583,
           "old_r_info": 69124,
           "old_symbol_index": 270,
           "provider": "FUN_00133930",
           "provider_address": 1259824,
           "provider_reference_sha256": "d1b7a40a24b4537c4f9b704b87cafb6001ecaf64ef96c01c869fd05532732474",
           "provider_size": 44,
-          "r_info_offset": 164040
+          "r_info_offset": 169480
         },
         {
           "caller": "FUN_002B7170",
           "caller_address": 3433316,
-          "new_r_info": 162052,
-          "new_symbol_index": 633,
+          "new_r_info": 163588,
+          "new_symbol_index": 639,
           "old_r_info": 68612,
           "old_symbol_index": 268,
           "provider": "FUN_00133490",
           "provider_address": 1258640,
           "provider_reference_sha256": "1c102a1be303b46fbc85f02f327e97d8ecdbbf6635d3458a6454c0c7de75c75a",
           "provider_size": 40,
-          "r_info_offset": 164352
+          "r_info_offset": 169792
         }
       ],
       "schema": 1,
@@ -13930,12 +14235,12 @@
         {
           "index": 4,
           "name": ".reginfo",
-          "sha256": "c36cadbb29f41b19d0d4fe00f68fafaf85bd7ab22979c1148b6fdc58176e7beb"
+          "sha256": "f478230c6a7dcc05f6dc5ae33a236cb7235246e60d2b2d9ccb607041dca7a0e1"
         },
         {
           "index": 5,
           "name": ".mdebug",
-          "sha256": "f5495a939e13128a5f5a56396ad13d33e7b0135b33456df8bab0df63dccaf099"
+          "sha256": "c525026b298384f7adbadeb06f51d0f49bf68b627989a5069672690657c7bfae"
         },
         {
           "index": 6,
@@ -15934,25 +16239,55 @@
         },
         {
           "index": 591,
-          "name": ".shstrtab",
-          "sha256": "aeaee12eff2daff004d2989ad8f0a0769ee4effa80e46bff050b1ac1104bbacf"
-        },
-        {
-          "index": 592,
-          "name": ".symtab",
-          "sha256": "80481cf8ef119cf939148a2407ac4264fc9e7abedf9c20efbc69265f5eacc88b"
+          "name": ".text.FUN_002AF2E8",
+          "sha256": "480eaee31e8bdded10fbb7a71d979e17bea60cc955be8307321be6834350e5e9"
         },
         {
           "index": 593,
+          "name": ".text.FUN_002A7CA0",
+          "sha256": "6f60d420f9f1f6f6b88f24b8e3fb55db9d14eb1d27a58a528f46d3d1192bb5d5"
+        },
+        {
+          "index": 595,
+          "name": ".text.FUN_002BD398",
+          "sha256": "ecd324661c010c77b529aff255cc8d783447578f7457f4a7efed6b8e7bcef504"
+        },
+        {
+          "index": 597,
+          "name": ".text.FUN_002C5550",
+          "sha256": "b4b00ca23692c47831ba20bd91cba6683ac943a8cbcaa7729ddb1e702279dbb7"
+        },
+        {
+          "index": 599,
+          "name": ".text.FUN_002AA198",
+          "sha256": "7f656387f12db635de5054b140edc8c4f8031be9b6a1a6643a8655fcead24295"
+        },
+        {
+          "index": 601,
+          "name": ".text.FUN_002A9850",
+          "sha256": "a0280298301d3833fc1588a98c78f41f0cec2460f8d656298a07f42a32552890"
+        },
+        {
+          "index": 603,
+          "name": ".shstrtab",
+          "sha256": "e5dc83e9b147f4405ac7f5cca3bf49b9a56406b0f5eb61396856955c6eec5f5e"
+        },
+        {
+          "index": 604,
+          "name": ".symtab",
+          "sha256": "febc07a8aa82fc1ec1bded56748c1a1d0d6b77d83d74650e178a4e98a12e3ec1"
+        },
+        {
+          "index": 605,
           "name": ".strtab",
-          "sha256": "027e3c3f98dfd162580b0529b60d1d61ded151fd3a0b1573617067151295adb4"
+          "sha256": "a3dff66f953fd2c4aa9950aa4b969a22698c122d5f70f0f913496052106d88a7"
         }
       ]
     },
-    "c_link_object_adapter_sha256": "f1b99cf0713d75f711d49b310746aa794150062bfef5e3cb69c1db57176edceb",
-    "c_link_object_sha256": "cbfdd9138a7bda7a061d000c5ce75864d5ce95c3d16198a811ae102b77d21e24",
-    "c_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
-    "candidate_elf_sha256": "a6b0d1ee7c5593a241218d43fa43b631c5a96f4af51b949de982a43f7eab3027",
+    "c_link_object_adapter_sha256": "39f7ca95b42acedb1a1be51f5f9c63e47ed286077c52078d3a4b197e2673ee85",
+    "c_link_object_sha256": "a9d5a680f9eb870f152df0c14c026efd5b36233eb18a18f171ff969b43694f02",
+    "c_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
+    "candidate_elf_sha256": "3ea3eb257634a8add6016784da0d4bac14338e5d70ce01c314635a8e2f9c0be4",
     "candidate_source": "candidates/boot.c",
     "catalog_sha256": "fc792ac26dd3bbec8f54565bc6a44fe3ed2c05756e5f66981ceb3d9c294fb7b0",
     "full_level_gate": {
@@ -16155,6 +16490,7 @@
         "LVL_15_GORN_FUN_002EC050",
         "LVL_15_GORN_FUN_002EC088",
         "LVL_15_GORN_FUN_002EC280",
+        "LVL_15_GORN_FUN_002EC340",
         "LVL_15_GORN_FUN_002EC5F8",
         "LVL_15_GORN_FUN_002EC7E0",
         "LVL_15_GORN_FUN_002EC8D8",
@@ -16224,6 +16560,9 @@
         "LVL_15_GORN_FUN_00329F50",
         "LVL_15_GORN_FUN_0032A760",
         "LVL_15_GORN_FUN_00333280",
+        "LVL_15_GORN_FUN_003339B8",
+        "LVL_15_GORN_FUN_003357B0",
+        "LVL_15_GORN_FUN_00336280",
         "LVL_15_GORN_FUN_00337110",
         "LVL_15_GORN_FUN_003379E0",
         "LVL_15_GORN_FUN_00337DE0",
@@ -16232,6 +16571,7 @@
         "LVL_15_GORN_FUN_0033B0A0",
         "LVL_15_GORN_FUN_0033B4D0",
         "LVL_15_GORN_FUN_0033C450",
+        "LVL_15_GORN_FUN_0033C6A8",
         "LVL_15_GORN_FUN_0033DAC0",
         "LVL_15_GORN_FUN_0033E4B0",
         "LVL_15_GORN_FUN_0033E980",
@@ -16246,13 +16586,16 @@
         "LVL_15_GORN_FUN_0034A300",
         "LVL_15_GORN_FUN_0034AB30",
         "LVL_15_GORN_FUN_0034BC80",
+        "LVL_15_GORN_FUN_0034C730",
         "LVL_15_GORN_FUN_0034C9B0",
         "LVL_15_GORN_FUN_0034E118",
+        "LVL_15_GORN_FUN_003510D8",
         "LVL_15_GORN_FUN_00351B00",
         "LVL_15_GORN_FUN_00352378",
         "LVL_15_GORN_FUN_00352D00",
         "LVL_15_GORN_FUN_00353260",
         "LVL_15_GORN_FUN_00353AE8",
+        "LVL_15_GORN_FUN_00355678",
         "LVL_15_GORN_FUN_00357B48",
         "LVL_15_GORN_FUN_003580F8",
         "LVL_15_GORN_FUN_00358368",
@@ -16323,6 +16666,7 @@
         "LVL_15_GORN_FUN_003D9C78",
         "LVL_15_GORN_FUN_003D9FF8",
         "LVL_15_GORN_FUN_003DFFE0",
+        "LVL_15_GORN_FUN_003E0520",
         "LVL_15_GORN_FUN_003E2718",
         "LVL_15_GORN_FUN_003E5658",
         "LVL_15_GORN_FUN_003E8880",
@@ -16368,6 +16712,7 @@
         "LVL_15_GORN_FUN_0043DE70",
         "LVL_15_GORN_FUN_0043FD98",
         "LVL_15_GORN_FUN_0043FE00",
+        "LVL_15_GORN_FUN_00441000",
         "LVL_15_GORN_FUN_004451B0",
         "LVL_15_GORN_FUN_00445A38",
         "LVL_15_GORN_FUN_00448F10",
@@ -16454,21 +16799,9 @@
         "LVL_15_GORN_FUN_0046EA80",
         "LVL_15_GORN_FUN_0046FAF8",
         "LVL_15_GORN_FUN_0046FBA0",
-        "LVL_15_GORN_FUN_00322170",
-        "LVL_15_GORN_FUN_003221E0",
-        "LVL_15_GORN_FUN_00322230",
-        "LVL_15_GORN_FUN_003222B0",
-        "LVL_15_GORN_FUN_003222E0",
-        "LVL_15_GORN_FUN_00322340",
-        "LVL_15_GORN_FUN_003223D0",
-        "LVL_15_GORN_FUN_00322470",
-        "LVL_15_GORN_FUN_003224A8",
-        "LVL_15_GORN_FUN_003225D8",
-        "LVL_15_GORN_FUN_00322750",
-        "LVL_15_GORN_FUN_003228C8",
-        "LVL_15_GORN_FUN_00322910",
-        "LVL_15_GORN_FUN_0033F7E8",
         "LVL_15_GORN_FUN_002BCA00",
+        "LVL_15_GORN_FUN_002EF2F0",
+        "LVL_15_GORN_FUN_002EFE10",
         "LVL_15_GORN_FUN_002F06D8",
         "LVL_15_GORN_FUN_002FE450",
         "LVL_15_GORN_FUN_003090E0",
@@ -16492,11 +16825,26 @@
         "LVL_15_GORN_FUN_00314B68",
         "LVL_15_GORN_FUN_00314B70",
         "LVL_15_GORN_FUN_00314B88",
+        "LVL_15_GORN_FUN_00322170",
+        "LVL_15_GORN_FUN_003221E0",
+        "LVL_15_GORN_FUN_00322230",
+        "LVL_15_GORN_FUN_003222B0",
+        "LVL_15_GORN_FUN_003222E0",
+        "LVL_15_GORN_FUN_00322340",
+        "LVL_15_GORN_FUN_003223D0",
+        "LVL_15_GORN_FUN_00322470",
+        "LVL_15_GORN_FUN_003224A8",
+        "LVL_15_GORN_FUN_003225D8",
+        "LVL_15_GORN_FUN_00322750",
+        "LVL_15_GORN_FUN_003228C8",
+        "LVL_15_GORN_FUN_00322910",
         "LVL_15_GORN_FUN_003259A0",
         "LVL_15_GORN_FUN_0032AC68",
+        "LVL_15_GORN_FUN_0033F7E8",
         "LVL_15_GORN_FUN_00342B28",
         "LVL_15_GORN_FUN_00342B38",
         "LVL_15_GORN_FUN_00342B60",
+        "LVL_15_GORN_FUN_00396EC0",
         "LVL_15_GORN_FUN_00396F10",
         "LVL_15_GORN_FUN_00397018",
         "LVL_15_GORN_FUN_00397060",
@@ -16504,12 +16852,10 @@
         "LVL_15_GORN_FUN_003972A8",
         "LVL_15_GORN_FUN_00397308",
         "LVL_15_GORN_FUN_00397370",
-        "LVL_15_GORN_FUN_00454B90",
-        "LVL_15_GORN_FUN_002EFE10",
-        "LVL_15_GORN_FUN_00396EC0"
+        "LVL_15_GORN_FUN_00454B90"
       ]
     },
-    "source_sha256": "58b30b328ace3d537bdfdd2330f0ba0d74b6ca2e10be1013397e985472813231",
+    "source_sha256": "b0aa18b9eac5fba68c87cd4a6908149b3a88cda9b43f7654f9fdfde0dd645a68",
     "state": "integrated",
     "target": "SCUS_972.68",
     "tools": {
@@ -16523,9 +16869,9 @@
     "catalog_path": "config/level-g8/15_gorn.json",
     "gp": 1765360,
     "object_qualification": {
-      "candidate_elf_sha256": "30ec181b01ad05c3c2d766055ca2e15f605b90dfb3200e32b1f777e0b911510d",
+      "candidate_elf_sha256": "1c430a3d8a2a46ef931d3119286abc28f4325c97fd70ed02b7a74dec8fa84e73",
       "candidate_source": "candidates/levels/15_gorn-g8.c",
-      "catalog_sha256": "89a36f95b798ae4e1a34ea0b2c6c0c2b7c4fb318955c9f4bd36ec6f9c0723074",
+      "catalog_sha256": "a170dc51151ec221a34394b53e6c14dbb884b7f2d678f1865f08ca95041bf713",
       "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
       "flags": [
         "-O2",
@@ -16533,160 +16879,6 @@
         "-ffunction-sections"
       ],
       "functions": [
-        {
-          "address": 3285360,
-          "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 112,
-          "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
-          "size": 112,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_00322170"
-        },
-        {
-          "address": 3285472,
-          "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 76,
-          "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
-          "size": 76,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_003221E0"
-        },
-        {
-          "address": 3285552,
-          "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 124,
-          "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
-          "size": 124,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_00322230"
-        },
-        {
-          "address": 3285680,
-          "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 44,
-          "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
-          "size": 44,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_003222B0"
-        },
-        {
-          "address": 3285728,
-          "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 96,
-          "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
-          "size": 96,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_003222E0"
-        },
-        {
-          "address": 3285824,
-          "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 76,
-          "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
-          "size": 76,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_00322340"
-        },
-        {
-          "address": 3285968,
-          "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 156,
-          "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
-          "size": 156,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_003223D0"
-        },
-        {
-          "address": 3286128,
-          "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 56,
-          "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
-          "size": 56,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_00322470"
-        },
-        {
-          "address": 3286184,
-          "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 120,
-          "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
-          "size": 120,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_003224A8"
-        },
-        {
-          "address": 3286488,
-          "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 184,
-          "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
-          "size": 184,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_003225D8"
-        },
-        {
-          "address": 3286864,
-          "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 112,
-          "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
-          "size": 112,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_00322750"
-        },
-        {
-          "address": 3287240,
-          "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 72,
-          "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
-          "size": 72,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_003228C8"
-        },
-        {
-          "address": 3287312,
-          "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 68,
-          "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
-          "size": 68,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_00322910"
-        },
-        {
-          "address": 3405800,
-          "candidate_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 164,
-          "reference_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
-          "size": 164,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_0033F7E8"
-        },
         {
           "address": 2869760,
           "candidate_sha256": "4912eb9f14b02c39b9cf96da40470b670c4d872a071252fbf2a13fa3cda688ef",
@@ -16697,6 +16889,28 @@
           "size": 8,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_002BCA00"
+        },
+        {
+          "address": 3076848,
+          "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 208,
+          "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+          "size": 208,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_002EF2F0"
+        },
+        {
+          "address": 3079696,
+          "candidate_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 132,
+          "reference_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
+          "size": 132,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_002EFE10"
         },
         {
           "address": 3081944,
@@ -16952,6 +17166,149 @@
           "symbol": "LVL_15_GORN_FUN_00314B88"
         },
         {
+          "address": 3285360,
+          "candidate_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 112,
+          "reference_sha256": "3c69804b0feb240ebdfc00cf11095dfb50adfef1c517206f5ca11c1137a274dc",
+          "size": 112,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00322170"
+        },
+        {
+          "address": 3285472,
+          "candidate_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 76,
+          "reference_sha256": "90a6a154ed5756f6ef1c18d54baaff1fe3eec50c91076db6d3e65e2cf68c4d13",
+          "size": 76,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003221E0"
+        },
+        {
+          "address": 3285552,
+          "candidate_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 124,
+          "reference_sha256": "2d62ebbd96217fb5654d9b05c6eb6e470830bc159c90ba1ffdea38f88dbeccfc",
+          "size": 124,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00322230"
+        },
+        {
+          "address": 3285680,
+          "candidate_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 44,
+          "reference_sha256": "9ce06c6f4f870e75d0f0744de3b5b16f94916d71fdd53798349570020af5600f",
+          "size": 44,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003222B0"
+        },
+        {
+          "address": 3285728,
+          "candidate_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 96,
+          "reference_sha256": "67f3b7715e318846b8196bfe207fa8e3c3ee030d1c6422f70bd29ca0b8bb3758",
+          "size": 96,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003222E0"
+        },
+        {
+          "address": 3285824,
+          "candidate_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 76,
+          "reference_sha256": "655b8ff5f2e97c6081b4c7a3bdc00cc2284baea98b76be88c9399a8535593415",
+          "size": 76,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00322340"
+        },
+        {
+          "address": 3285968,
+          "candidate_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 156,
+          "reference_sha256": "93529c1342acf5f6e020a73806c493f0167df2b20ebe4bb2703bdb4e69b85454",
+          "size": 156,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003223D0"
+        },
+        {
+          "address": 3286128,
+          "candidate_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 56,
+          "reference_sha256": "59287f4430f1314107d899ba25164cf89aad8024335468ff14523619a3a8aa12",
+          "size": 56,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00322470"
+        },
+        {
+          "address": 3286184,
+          "candidate_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 120,
+          "reference_sha256": "67d0874fcd46b83a1abba2ec9895fba394cbad9a28af327c8f23aacf6e598601",
+          "size": 120,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003224A8"
+        },
+        {
+          "address": 3286488,
+          "candidate_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 184,
+          "reference_sha256": "ca36ba4d413cc910bc8674fb969095cf60754a434f881111a84612edc00584ca",
+          "size": 184,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003225D8"
+        },
+        {
+          "address": 3286864,
+          "candidate_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 112,
+          "reference_sha256": "9d56c6426f2cd722d971cdfd426d91f7d09be0230b498fc15b5955a7c91bedc7",
+          "size": 112,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00322750"
+        },
+        {
+          "address": 3287240,
+          "candidate_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 72,
+          "reference_sha256": "e743249713f810f8535dd88f3668585da3b5823fd69bd0d1e0f5854eb7e00693",
+          "size": 72,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_003228C8"
+        },
+        {
+          "address": 3287312,
+          "candidate_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 68,
+          "reference_sha256": "498203249face9ae5f7eba57f01c1b7aba03d30d1e8021c393a91d31bbc6d2c5",
+          "size": 68,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00322910"
+        },
+        {
           "address": 3299744,
           "candidate_sha256": "b28d21ced7ab0245a039c390b93f090cc3c6fb544b7cec4261a9484b2f2a7531",
           "different_bytes": 0,
@@ -16972,6 +17329,17 @@
           "size": 56,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_0032AC68"
+        },
+        {
+          "address": 3405800,
+          "candidate_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 164,
+          "reference_sha256": "15aad32211fc94056137b9c1c9bf6380272df635f05ac1b5dc4d92719f96d70e",
+          "size": 164,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_0033F7E8"
         },
         {
           "address": 3418920,
@@ -17005,6 +17373,17 @@
           "size": 8,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_00342B60"
+        },
+        {
+          "address": 3763904,
+          "candidate_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 76,
+          "reference_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
+          "size": 76,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_15_GORN_FUN_00396EC0"
         },
         {
           "address": 3763984,
@@ -17093,39 +17472,17 @@
           "size": 8,
           "state": "matched_unintegrated",
           "symbol": "LVL_15_GORN_FUN_00454B90"
-        },
-        {
-          "address": 3079696,
-          "candidate_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 132,
-          "reference_sha256": "19562a66375ca657e6d3669a39e027ce7c759ca67de1341cfb475bc5cee8d174",
-          "size": 132,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_002EFE10"
-        },
-        {
-          "address": 3763904,
-          "candidate_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
-          "different_bytes": 0,
-          "matched": true,
-          "produced_size": 76,
-          "reference_sha256": "96543941331a0f5e41bd8861aa194c8b4458eee4bc4b8dd8d0a2de2f430b3f63",
-          "size": 76,
-          "state": "matched_unintegrated",
-          "symbol": "LVL_15_GORN_FUN_00396EC0"
         }
       ],
       "kind": "level-smalldata-candidate",
-      "matched_code_bytes": 3112,
-      "object_sha256": "05d75281d20fdca3c54c64ee9fbc984494e306a915678e9d719ce1ca4fe68078",
+      "matched_code_bytes": 3320,
+      "object_sha256": "477780150c084753b6b240c601bdb70b3b6d0732d0b7edfb5a96a43520dcec25",
       "program": "levels/15_gorn",
       "read_only_sections": [],
       "reference_entry": 2869768,
       "reference_sha256": "838098ef94f05d78f79be2f65291447db6c9468e7c44e2cab36396f720cce109",
       "schema": 1,
-      "source_sha256": "008eb01e65ea57eebf0713dbbf4c474a984ae5f4b74fc98319bb427a72657424",
+      "source_sha256": "b6430d69f24e75b7169934f97e7f6063d12563e97c87e7dab2ac062cb25d5f4a",
       "state": "matched_unintegrated",
       "target": "SCUS_972.68",
       "tools": {
@@ -17135,12 +17492,12 @@
         "ld.exe": "80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48"
       }
     },
-    "object_sha256": "05d75281d20fdca3c54c64ee9fbc984494e306a915678e9d719ce1ca4fe68078",
+    "object_sha256": "477780150c084753b6b240c601bdb70b3b6d0732d0b7edfb5a96a43520dcec25",
     "review_path": "progress/level-g8/15_gorn.json",
-    "review_sha256": "c2701128b2e0af5e002a21935f3148fc5d12ac7e641e2784b62dbfae56252233",
+    "review_sha256": "4647e643e680a0436f03b6ea2c73ba18ef9919282936a261d2194066c9dff2ca",
     "source": "candidates/levels/15_gorn-g8.c"
   },
-  "source_sha256": "58b30b328ace3d537bdfdd2330f0ba0d74b6ca2e10be1013397e985472813231",
+  "source_sha256": "b0aa18b9eac5fba68c87cd4a6908149b3a88cda9b43f7654f9fdfde0dd645a68",
   "state": "integrated",
   "target": "SCUS_972.68",
   "tools": {

@@ -88,6 +88,9 @@
     "LVL_30_INSOMNIAC_MUSEUM_F998ff33d7f808dbf_AT00310278_ROLE03": 1733664,
     "LVL_30_INSOMNIAC_MUSEUM_F99b76d48da369e8d_AT003101A0_ROLE00": 1283040,
     "LVL_30_INSOMNIAC_MUSEUM_F99b76d48da369e8d_AT003101A0_ROLE01": 1733664,
+    "LVL_30_INSOMNIAC_MUSEUM_F9c1eb693_D_00189E20": 1613344,
+    "LVL_30_INSOMNIAC_MUSEUM_F9c1eb693_D_001A7F9C": 1736604,
+    "LVL_30_INSOMNIAC_MUSEUM_F9c1eb693_D_001A7FA4": 1736612,
     "LVL_30_INSOMNIAC_MUSEUM_F9da4b6b15b3cf4a0_AT0037BB30_ROLE00": 1782920,
     "LVL_30_INSOMNIAC_MUSEUM_Fa077d83e809ad7db_AT003189D8_ROLE00": 1684200,
     "LVL_30_INSOMNIAC_MUSEUM_Fa077d83e809ad7db_AT003189D8_ROLE01": 1735152,
@@ -113,6 +116,10 @@
     "LVL_30_INSOMNIAC_MUSEUM_Fde7724c328f7c2d0_AT002FA1E8_ROLE00": 1740212,
     "LVL_30_INSOMNIAC_MUSEUM_Fe44fc83bd69b4f14_AT0032D1A0_ROLE00": 1745776,
     "LVL_30_INSOMNIAC_MUSEUM_Fe6fa55215bad26dd_AT0032D1D8_ROLE00": 1745780,
+    "LVL_30_INSOMNIAC_MUSEUM_Fe8672ea5_D_001AC18C": 1753484,
+    "LVL_30_INSOMNIAC_MUSEUM_Fe8672ea5_D_001AC190": 1753488,
+    "LVL_30_INSOMNIAC_MUSEUM_Fe8672ea5_D_001B3330": 1782576,
+    "LVL_30_INSOMNIAC_MUSEUM_Fe8672ea5_FUN_002F4E30": 3100208,
     "LVL_30_INSOMNIAC_MUSEUM_Fef45f15dfb57feb2_AT00302D68_ROLE00": 1741676,
     "LVL_30_INSOMNIAC_MUSEUM_Ff0259c87ab6a3193_AT002FA200_ROLE00": 1740212,
     "LVL_30_INSOMNIAC_MUSEUM_QWEN_339fe89f21bc_AT0037B990_ROLE000": 3099592,
@@ -133,6 +140,12 @@
       "meaning": "Return the measured signed four-byte GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_002AA980"
+    },
+    {
+      "address": 3003144,
+      "meaning": "Selects one of two measured states, writes up to three optional float outputs, and reports whether a supported state was found.",
+      "size": 208,
+      "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_002DD308"
     },
     {
       "address": 3005992,
@@ -391,6 +404,12 @@
       "meaning": "Store the incoming signed word in the measured GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_0032D1D8"
+    },
+    {
+      "address": 3569904,
+      "meaning": "Clears 512 fixed-stride words, publishes the span base and scalar state, then invokes one bound initializer.",
+      "size": 88,
+      "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_003678F0"
     },
     {
       "address": 3651984,

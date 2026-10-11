@@ -6,10 +6,10 @@
   "reference_sha256": "bd41a03a57871a6f33106d5277c6b4918f379ceaa5f780a84c82360b421204fb",
   "reference_entry": 2868232,
   "candidate_source": "candidates/levels/5_feltzin_system-g8.c",
-  "source_sha256": "c0250a0a39e40d4dcea843bd224432c5a8bc1535d1718e9dbaa2fd5aa5b83a3c",
-  "catalog_sha256": "371ddb612960de237691532ff41a1aa2e137f1ad7f4849553d43e6f178cdee5b",
-  "object_sha256": "a4e33230a17d09e5a5ddbdaff83191801e67b187fa69a62dabb63e240cccd603",
-  "candidate_elf_sha256": "5bace540ecfc51e0e10f8ceef42afdf8acf101b23d66047208083e4fffa63881",
+  "source_sha256": "00c7f37483cd7752827d7d5cbf8ba1f47dfe386d783e39ef3f47ffedb3a99f73",
+  "catalog_sha256": "695ab6c60a7659045c4925775e5e27f2695b981f164ef647e97a49cb5b024b8b",
+  "object_sha256": "edc239154b4420958279883157ec872f863438fbbf5a1f9e70c04c80d76fae2d",
+  "candidate_elf_sha256": "f16a2ca73d57a0e317f25be701f49cfbe6f798bc83aa73b92ad4864916d2ff71",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -34,6 +34,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_002EECF0",
+      "address": 3075312,
+      "size": 208,
+      "matched": true,
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 208
     },
     {
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_002EF810",
@@ -509,6 +520,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00379440",
+      "address": 3642432,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "651287be35844a9342c9d47604fd5595bb2af4bb4905fe1ed20997dc6f3d0f18",
+      "candidate_sha256": "651287be35844a9342c9d47604fd5595bb2af4bb4905fe1ed20997dc6f3d0f18",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
+    },
+    {
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00390558",
       "address": 3736920,
       "size": 76,
@@ -631,5 +653,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3392
+  "matched_code_bytes": 3688
 }

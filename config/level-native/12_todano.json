@@ -52,6 +52,13 @@
     "LVL_12_TODANO_F01bd4546_FUN_00455700": 4544256,
     "LVL_12_TODANO_F01bd4546_FUN_00455748": 4544328,
     "LVL_12_TODANO_F03c444112283bc5f_AT0038F798_ROLE00": 2334256,
+    "LVL_12_TODANO_F043c77a5_FUN_002E9E30": 3055152,
+    "LVL_12_TODANO_F043c77a5_FUN_002EE220": 3072544,
+    "LVL_12_TODANO_F043c77a5_FUN_002F19B0": 3086768,
+    "LVL_12_TODANO_F043c77a5_FUN_002F1AA0": 3087008,
+    "LVL_12_TODANO_F043c77a5_FUN_002F2000": 3088384,
+    "LVL_12_TODANO_F043c77a5_FUN_002F21C8": 3088840,
+    "LVL_12_TODANO_F043c77a5_FUN_00431018": 4395032,
     "LVL_12_TODANO_F081de6c9_FUN_00442090": 4464784,
     "LVL_12_TODANO_F081de6c9_FUN_00442E70": 4468336,
     "LVL_12_TODANO_F081de6c9_FUN_00442F08": 4468488,
@@ -108,6 +115,9 @@
     "LVL_12_TODANO_F250fbfa4_FUN_002F15C8": 3085768,
     "LVL_12_TODANO_F250fbfa4_FUN_002F1928": 3086632,
     "LVL_12_TODANO_F250fbfa4_FUN_00334F58": 3362648,
+    "LVL_12_TODANO_F27f9be8e_FUN_002F1898": 3086488,
+    "LVL_12_TODANO_F27f9be8e_FUN_002F2950": 3090768,
+    "LVL_12_TODANO_F27f9be8e_FUN_002F2998": 3090840,
     "LVL_12_TODANO_F280d7406_FUN_002F1928": 3086632,
     "LVL_12_TODANO_F280d7406_FUN_002F2AA8": 3091112,
     "LVL_12_TODANO_F280d7406_FUN_00334F58": 3362648,
@@ -132,6 +142,9 @@
     "LVL_12_TODANO_F391de845_D_001B9E00": 1809920,
     "LVL_12_TODANO_F391de845_FUN_002F1AE8": 3087080,
     "LVL_12_TODANO_F391de845_FUN_00363848": 3553352,
+    "LVL_12_TODANO_F3c007b59_FUN_002F15C8": 3085768,
+    "LVL_12_TODANO_F3c007b59_FUN_002F2AA8": 3091112,
+    "LVL_12_TODANO_F3c007b59_FUN_00334F58": 3362648,
     "LVL_12_TODANO_F40487154_FUN_002F19B0": 3086768,
     "LVL_12_TODANO_F40487154_FUN_002F1F50": 3088208,
     "LVL_12_TODANO_F40487154_FUN_002F21A8": 3088808,
@@ -194,6 +207,10 @@
     "LVL_12_TODANO_F55a1acb8_D_001A63AC": 1729452,
     "LVL_12_TODANO_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_12_TODANO_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_12_TODANO_F5621621c_FUN_002F1F38": 3088184,
+    "LVL_12_TODANO_F5621621c_FUN_002F1F50": 3088208,
+    "LVL_12_TODANO_F5621621c_FUN_002F2000": 3088384,
+    "LVL_12_TODANO_F5621621c_FUN_0031FC70": 3275888,
     "LVL_12_TODANO_F5a19df7a_FUN_0031E2E0": 3269344,
     "LVL_12_TODANO_F5a19df7a_FUN_0031E400": 3269632,
     "LVL_12_TODANO_F5a19df7a_FUN_00380D80": 3673472,
@@ -256,6 +273,10 @@
     "LVL_12_TODANO_F7b2f1854_FUN_00441F30": 4464432,
     "LVL_12_TODANO_F7b2f1854_FUN_00442E70": 4468336,
     "LVL_12_TODANO_F7b2f1854_FUN_00442F08": 4468488,
+    "LVL_12_TODANO_F7cacd225_FUN_002F15C8": 3085768,
+    "LVL_12_TODANO_F7cacd225_FUN_002F2A98": 3091096,
+    "LVL_12_TODANO_F7cacd225_FUN_002F2AF0": 3091184,
+    "LVL_12_TODANO_F7cacd225_FUN_00334F58": 3362648,
     "LVL_12_TODANO_F7cb419c1_D_001FFC80": 2096256,
     "LVL_12_TODANO_F7cb419c1_FUN_0035D4C8": 3527880,
     "LVL_12_TODANO_F8411efa9_FUN_002E9E30": 3055152,
@@ -293,6 +314,11 @@
     "LVL_12_TODANO_F904cc63b_FUN_00324938": 3295544,
     "LVL_12_TODANO_F93479d13_D_00189E20": 1613344,
     "LVL_12_TODANO_F93479d13_FUN_00314008": 3227656,
+    "LVL_12_TODANO_F966dbf73_FUN_0031E2A0": 3269280,
+    "LVL_12_TODANO_F966dbf73_FUN_0031E2E0": 3269344,
+    "LVL_12_TODANO_F966dbf73_FUN_0031E338": 3269432,
+    "LVL_12_TODANO_F966dbf73_FUN_0031E588": 3270024,
+    "LVL_12_TODANO_F966dbf73_FUN_00339BD0": 3382224,
     "LVL_12_TODANO_F97fc4e13_FUN_002F1700": 3086080,
     "LVL_12_TODANO_F97fc4e13_FUN_0035E7A0": 3532704,
     "LVL_12_TODANO_F9a90bcc4_FUN_0031E2A0": 3269280,
@@ -370,6 +396,11 @@
     "LVL_12_TODANO_Fb342d477_FUN_0045C878": 4573304,
     "LVL_12_TODANO_Fb342d477_FUN_0045C8E8": 4573416,
     "LVL_12_TODANO_Fb4cfb7e0_FUN_0031E2A0": 3269280,
+    "LVL_12_TODANO_Fb5729173_FUN_002F1AE8": 3087080,
+    "LVL_12_TODANO_Fb5729173_FUN_002F1B20": 3087136,
+    "LVL_12_TODANO_Fb5729173_FUN_002F2000": 3088384,
+    "LVL_12_TODANO_Fb5729173_FUN_002F2A38": 3091000,
+    "LVL_12_TODANO_Fb5729173_FUN_00322DF8": 3288568,
     "LVL_12_TODANO_Fb77d67f1_FUN_002F1598": 3085720,
     "LVL_12_TODANO_Fb77d67f1_FUN_00334F58": 3362648,
     "LVL_12_TODANO_Fb7feb893_D_001A7BB2": 1735602,
@@ -410,6 +441,12 @@
     "LVL_12_TODANO_Fc84472d1_FUN_00115E38": 1138232,
     "LVL_12_TODANO_Fc936841d_FUN_002F1928": 3086632,
     "LVL_12_TODANO_Fc936841d_FUN_002F1958": 3086680,
+    "LVL_12_TODANO_Fc94396f4_D_00189E20": 1613344,
+    "LVL_12_TODANO_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_12_TODANO_Fc94396f4_FUN_002D72B8": 2978488,
+    "LVL_12_TODANO_Fc94396f4_FUN_002D7338": 2978616,
+    "LVL_12_TODANO_Fc94396f4_FUN_002F1928": 3086632,
+    "LVL_12_TODANO_Fc94396f4_FUN_002F1C28": 3087400,
     "LVL_12_TODANO_Fccb147a4_FUN_00334F58": 3362648,
     "LVL_12_TODANO_Fccb147a4_FUN_00385218": 3691032,
     "LVL_12_TODANO_Fcdb4d905_FUN_002E79F8": 3045880,
@@ -449,6 +486,14 @@
     "LVL_12_TODANO_Fdb046c5d_FUN_003280C8": 3309768,
     "LVL_12_TODANO_Fdb046c5d_FUN_00364DF8": 3558904,
     "LVL_12_TODANO_Fdb046c5d_FUN_00365148": 3559752,
+    "LVL_12_TODANO_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_12_TODANO_Fdd54ca5d_FUN_002F15C8": 3085768,
+    "LVL_12_TODANO_Fdd54ca5d_FUN_002F1928": 3086632,
+    "LVL_12_TODANO_Fdd54ca5d_FUN_002F19B0": 3086768,
+    "LVL_12_TODANO_Fdd54ca5d_FUN_002F2A98": 3091096,
+    "LVL_12_TODANO_Fdd54ca5d_FUN_002F2AA8": 3091112,
+    "LVL_12_TODANO_Fdd54ca5d_FUN_00334F58": 3362648,
+    "LVL_12_TODANO_Fdd54ca5d_FUN_00385218": 3691032,
     "LVL_12_TODANO_Fe524d931_D_001A6480": 1729664,
     "LVL_12_TODANO_Fe524d931_FUN_002F3CB0": 3095728,
     "LVL_12_TODANO_Fe524d931_FUN_00364F58": 3559256,
@@ -488,6 +533,7 @@
     "LVL_12_TODANO_Ff2d8e5ad_FUN_002F1E30": 3087920,
     "LVL_12_TODANO_Ff2d8e5ad_FUN_002F1EA0": 3088032,
     "LVL_12_TODANO_Ff2d8e5ad_FUN_00319110": 3248400,
+    "LVL_12_TODANO_Ff454dd77_FUN_002F1898": 3086488,
     "LVL_12_TODANO_Ff4dd22f3_FUN_002F15C8": 3085768,
     "LVL_12_TODANO_Ff4dd22f3_FUN_002F1928": 3086632,
     "LVL_12_TODANO_Ff4dd22f3_FUN_00334F58": 3362648,
@@ -714,6 +760,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_12_TODANO_FUN_002D6B60"
+    },
+    {
+      "address": 2976800,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_12_TODANO_FUN_002D6C20"
     },
     {
       "address": 2977496,
@@ -1093,6 +1145,24 @@
       "symbol": "LVL_12_TODANO_FUN_0031E240"
     },
     {
+      "address": 3271232,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_12_TODANO_FUN_0031EA40"
+    },
+    {
+      "address": 3278856,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_12_TODANO_FUN_00320808"
+    },
+    {
+      "address": 3281624,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_12_TODANO_FUN_003212D8"
+    },
+    {
       "address": 3285352,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1132,6 +1202,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_12_TODANO_FUN_00326838"
+    },
+    {
+      "address": 3305512,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_12_TODANO_FUN_00327028"
     },
     {
       "address": 3310752,
@@ -1223,6 +1299,12 @@
       "symbol": "LVL_12_TODANO_FUN_003386C0"
     },
     {
+      "address": 3379568,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_12_TODANO_FUN_00339170"
+    },
+    {
       "address": 3380208,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1233,6 +1315,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_12_TODANO_FUN_0033AB58"
+    },
+    {
+      "address": 3398112,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_12_TODANO_FUN_0033D9E0"
     },
     {
       "address": 3400712,
@@ -1263,6 +1351,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_12_TODANO_FUN_00340508"
+    },
+    {
+      "address": 3415864,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_12_TODANO_FUN_00341F38"
     },
     {
       "address": 3425288,
@@ -1649,6 +1743,12 @@
       "symbol": "LVL_12_TODANO_FUN_003C9998"
     },
     {
+      "address": 3972824,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_12_TODANO_FUN_003C9ED8"
+    },
+    {
       "address": 3981520,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1949,6 +2049,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_12_TODANO_FUN_00431080"
+    },
+    {
+      "address": 4399744,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_12_TODANO_FUN_00432280"
     },
     {
       "address": 4416560,

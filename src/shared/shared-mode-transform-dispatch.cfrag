@@ -1,0 +1,86 @@
+
+#ifndef RAC2_T_S16_FC94396F4
+#define RAC2_T_S16_FC94396F4
+typedef signed short s16_Fc94396f4;
+#endif
+
+
+
+
+#ifndef RAC2_T_FAMILYC94396F4VECTOR_FC94396F4
+#define RAC2_T_FAMILYC94396F4VECTOR_FC94396F4
+typedef struct {
+    f32 x;
+    f32 y;
+    f32 z;
+} FamilyC94396F4Vector_Fc94396f4;
+#endif
+
+
+#ifndef RAC2_T_FAMILYC94396F4STATE_FC94396F4
+#define RAC2_T_FAMILYC94396F4STATE_FC94396F4
+typedef struct {
+    u8 reserved0[846];
+    s16_Fc94396f4 gate;
+    u8 reserved1[8004];
+    s32 state;
+    u8 reserved2[43];
+    u8 mode;
+} FamilyC94396F4State_Fc94396f4;
+#endif
+
+
+extern FamilyC94396F4State_Fc94396f4 @@BIND_DATA0_00@@;
+extern u8 @@BIND_DATA1_00@@[];
+
+extern void @@ROLE_0_00@@(u8 *buffer, u8 *table, f32 parameter);
+extern void @@ROLE_1_00@@(u8 *buffer, FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void @@ROLE_2_00@@(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void @@ROLE_3_00@@(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+extern void @@ROLE_4_00@@(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+extern void @@ROLE_5_00@@(u8 *buffer, u8 *table, f32 parameter);
+extern void @@ROLE_6_00@@(u8 *buffer, u8 *table, f32 parameter);
+extern void @@ROLE_7_00@@(u8 *buffer, FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void @@ROLE_8_00@@(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void @@ROLE_9_00@@(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+extern void @@ROLE_10_00@@(FamilyC94396F4Vector_Fc94396f4 *destination,
+                     FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+
+void @@FUNCTION@@(FamilyC94396F4Vector_Fc94396f4 *destination,
+                                      FamilyC94396F4Vector_Fc94396f4 *source,
+                                      f32 parameter)
+{
+    u8 first[16];
+    u8 second[16];
+
+    switch (@@BIND_DATA0_01@@.mode) {
+    case 0:
+        destination->z = source->z - parameter;
+        return;
+    case 1:
+        @@ROLE_0_01@@(first, (u8 *)&@@BIND_DATA0_02@@ + 672, -parameter);
+        @@ROLE_1_01@@(second, source, 0.0f);
+        @@ROLE_2_01@@(destination, destination, 0.0f);
+        @@ROLE_3_01@@(destination, destination, second);
+        @@ROLE_4_01@@(destination, destination, first);
+        return;
+    case 2:
+        if (@@BIND_DATA0_03@@.state == 58 && @@BIND_DATA0_04@@.gate == 0) {
+            @@ROLE_5_01@@(first, (u8 *)&@@BIND_DATA0_05@@ + 672, -parameter);
+        } else {
+            @@ROLE_6_01@@(first, @@BIND_DATA1_01@@, parameter);
+        }
+        @@ROLE_7_01@@(second, source, 0.0f);
+        @@ROLE_8_01@@(destination, destination, 0.0f);
+        @@ROLE_9_01@@(destination, destination, second);
+        @@ROLE_10_01@@(destination, destination, first);
+        return;
+    default:
+        return;
+    }
+}

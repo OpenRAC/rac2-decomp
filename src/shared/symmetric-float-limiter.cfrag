@@ -1,0 +1,37 @@
+extern float @@ROLE_0_00@@(float a);
+extern float @@ROLE_1_00@@(float a);
+extern float @@ROLE_2_00@@(float a);
+extern float @@ROLE_3_00@@(float a);
+extern float @@ROLE_4_00@@(float a);
+extern float @@ROLE_5_00@@(float a);
+extern float @@ROLE_6_00@@(float a);
+extern float @@ROLE_7_00@@(float a);
+
+#ifndef RAC2_T_OBJ_FF454DD77
+#define RAC2_T_OBJ_FF454DD77
+typedef struct {
+    float f0;
+} Obj_Ff454dd77;
+#endif
+
+
+void @@FUNCTION@@(Obj_Ff454dd77 *o, float a, float b, float c, float d)
+{
+    if (@@ROLE_0_01@@(a) < o->f0)
+        o->f0 = @@ROLE_1_01@@(a);
+    else if (o->f0 < -@@ROLE_2_01@@(a))
+        o->f0 = -@@ROLE_3_01@@(a);
+
+    o->f0 = o->f0 + (b * a - c * o->f0);
+    if (0.0f < d) {
+        if (d < o->f0)
+            o->f0 = d;
+        else if (o->f0 < -d)
+            o->f0 = -d;
+    }
+
+    if (@@ROLE_4_01@@(a) < o->f0)
+        o->f0 = @@ROLE_5_01@@(a);
+    else if (o->f0 < -@@ROLE_6_01@@(a))
+        o->f0 = -@@ROLE_7_01@@(a);
+}

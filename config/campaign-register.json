@@ -1677,6 +1677,19 @@
       "returncode": 0,
       "state": "passed"
     },
+    "dc7968ababf24ab4a4fafca7d6580023": {
+      "action_manifest_sha256": "1b37fbaebe38fad919026b14e335c0c2c9d29b21cd11af0d8a60dafd3f1f7b80",
+      "action_outcome_sha256": "3ec292c697b3fd0757eea5bab867738af4e9b3c817fbdc719184fa705e103358",
+      "artifact": "prepared-run:builds/campaign-dc7968ababf24ab4a4fafca7d6580023/report.json",
+      "artifact_sha256": "4cc18bb654422cb7059c8c17f1f3acff6bc44a35f486807a97b6d766351a1a28",
+      "directory": "runtime:actions/dc7968ababf24ab4a4fafca7d6580023",
+      "finished": "2026-10-11T15:29:51.681269+00:00",
+      "id": "dc7968ababf24ab4a4fafca7d6580023",
+      "integration_credit": 0,
+      "kind": "integrate",
+      "returncode": 0,
+      "state": "passed"
+    },
     "dd613a0bbb6f4283ab0f7db21923ce98": {
       "artifact": "runtime:actions/dd613a0bbb6f4283ab0f7db21923ce98/report.json",
       "artifact_sha256": "cf0dea13cb19b31b89e6a194c3915f59ac849eee120f2338680dd59a4b336144",
@@ -5350,7 +5363,7 @@
       "validity": "historical_unverified"
     }
   },
-  "revision": 13670,
+  "revision": 13673,
   "schema": 1,
   "tasks": {
     "24_ship_shack-fun_002a3e18": {

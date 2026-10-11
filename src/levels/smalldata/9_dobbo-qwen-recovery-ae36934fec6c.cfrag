@@ -930,3 +930,26 @@ void LVL_9_DOBBO_FUN_00378788(QwenRecovery_339fe89f21bc_WrapperWaitMaskU64 mask)
         LVL_9_DOBBO_QWEN_339fe89f21bc_AT00378788_ROLE000(0x400);
 }
 
+extern char LVL_9_DOBBO_F9c1eb693_D_00189E20[];
+extern float LVL_9_DOBBO_F9c1eb693_D_001A7FA4 __attribute__((sda));
+extern float LVL_9_DOBBO_F9c1eb693_D_001A7F9C __attribute__((sda));
+
+int LVL_9_DOBBO_FUN_002D2560(float *a0, float *a1, float *a2)
+{
+    char *p = LVL_9_DOBBO_F9c1eb693_D_00189E20;
+    int v = *(int *)(p + 8852);
+
+    if (v >= 98 && v <= 100) {
+        if (a0) *a0 = *(float *)(p + 6316);
+        if (a1) *a1 = LVL_9_DOBBO_F9c1eb693_D_001A7FA4 * 4.8481374506081920117140e-06f;
+        if (a2) *a2 = LVL_9_DOBBO_F9c1eb693_D_001A7F9C * 2.9088824521750211715698e-04f;
+        return 1;
+    }
+    if (v == 17) {
+        if (a0) *a0 = *(float *)(p + 152);
+        if (a1) *a1 = LVL_9_DOBBO_F9c1eb693_D_001A7FA4 * 1.4544411897077225148678e-05f;
+        if (a2) *a2 = LVL_9_DOBBO_F9c1eb693_D_001A7F9C * 8.7266473565250635147095e-04f;
+        return 1;
+    }
+    return 0;
+}

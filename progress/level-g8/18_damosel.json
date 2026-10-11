@@ -6,10 +6,10 @@
   "reference_sha256": "61c1050b11c8bbb1674bc35107ccf83f2634ee6c8248c9983ba552343d911113",
   "reference_entry": 2890376,
   "candidate_source": "candidates/levels/18_damosel-g8.c",
-  "source_sha256": "4b36fc9effea1228676be7bc592ea1f71f96aca29da7025f5c8ae1b0e9d3dc95",
-  "catalog_sha256": "ba769ddb159a0e13f99b9c5bbec0500137ee0c375227c338b4334d6e6c94bd68",
-  "object_sha256": "5de7a6ad662099d99cb4ba0ef38f89d54f88ba3e7730534d11965d0897050b58",
-  "candidate_elf_sha256": "8565c34349c6caffb7da7df08524ea75fb3bf74d1c287dac6f55e5dfa2bdd412",
+  "source_sha256": "d6c7a3c2d08dab728600c730226b37a2689bfab355b25e89a1bc667b91a04beb",
+  "catalog_sha256": "0290fbaa6215ac20403fd50c97a83abcdad53588559848e51b86f8515a4eb3c3",
+  "object_sha256": "a9fcead4e454c354ed8367cacba28f3980be0d8e0f3a56bc8ec7d63c8a807aeb",
+  "candidate_elf_sha256": "08a4474961a4b40a18903f59f8fcec5a54ac54c0705e29d93a8916da49159726",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -34,6 +34,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_18_DAMOSEL_FUN_002F0CD8",
+      "address": 3083480,
+      "size": 208,
+      "matched": true,
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 208
     },
     {
       "symbol": "LVL_18_DAMOSEL_FUN_002F1820",
@@ -509,6 +520,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_18_DAMOSEL_FUN_003831F0",
+      "address": 3682800,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "91c24cb72d6659cb2b7b5eb80f39072a6e6fa249c8cea0163547b6165706e4b7",
+      "candidate_sha256": "91c24cb72d6659cb2b7b5eb80f39072a6e6fa249c8cea0163547b6165706e4b7",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
+    },
+    {
       "symbol": "LVL_18_DAMOSEL_FUN_00397510",
       "address": 3765520,
       "size": 76,
@@ -620,5 +642,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3268
+  "matched_code_bytes": 3564
 }

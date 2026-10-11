@@ -88,6 +88,9 @@
     "LVL_4_BARLOW_F998ff33d7f808dbf_AT0032A260_ROLE03": 1733664,
     "LVL_4_BARLOW_F99b76d48da369e8d_AT0032A188_ROLE00": 1283040,
     "LVL_4_BARLOW_F99b76d48da369e8d_AT0032A188_ROLE01": 1733664,
+    "LVL_4_BARLOW_F9c1eb693_D_00189E20": 1613344,
+    "LVL_4_BARLOW_F9c1eb693_D_001A7F9C": 1736604,
+    "LVL_4_BARLOW_F9c1eb693_D_001A7FA4": 1736612,
     "LVL_4_BARLOW_F9da4b6b15b3cf4a0_AT0039EFA0_ROLE00": 1780808,
     "LVL_4_BARLOW_Fa077d83e809ad7db_AT00333408_ROLE00": 1684200,
     "LVL_4_BARLOW_Fa077d83e809ad7db_AT00333408_ROLE01": 1735152,
@@ -117,6 +120,10 @@
     "LVL_4_BARLOW_Fde7724c328f7c2d0_AT003141D0_ROLE00": 1740212,
     "LVL_4_BARLOW_Fe44fc83bd69b4f14_AT0034E118_ROLE00": 1745776,
     "LVL_4_BARLOW_Fe6fa55215bad26dd_AT0034E150_ROLE00": 1745780,
+    "LVL_4_BARLOW_Fe8672ea5_D_001AC18C": 1753484,
+    "LVL_4_BARLOW_Fe8672ea5_D_001AC190": 1753488,
+    "LVL_4_BARLOW_Fe8672ea5_D_001B2AF0": 1780464,
+    "LVL_4_BARLOW_Fe8672ea5_FUN_0030ED60": 3206496,
     "LVL_4_BARLOW_Fef45f15dfb57feb2_AT0031CD50_ROLE00": 1741676,
     "LVL_4_BARLOW_Ff0259c87ab6a3193_AT003141E8_ROLE00": 1740212,
     "LVL_4_BARLOW_QWEN_339fe89f21bc_AT0039EE00_ROLE000": 3205832,
@@ -137,6 +144,12 @@
       "meaning": "Return the measured signed four-byte GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_4_BARLOW_FUN_002CB480"
+    },
+    {
+      "address": 3108008,
+      "meaning": "Selects one of two measured states, writes up to three optional float outputs, and reports whether a supported state was found.",
+      "size": 208,
+      "symbol": "LVL_4_BARLOW_FUN_002F6CA8"
     },
     {
       "address": 3110856,
@@ -401,6 +414,12 @@
       "meaning": "Store the incoming signed word in the measured GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_4_BARLOW_FUN_0034E150"
+    },
+    {
+      "address": 3713512,
+      "meaning": "Clears 512 fixed-stride words, publishes the span base and scalar state, then invokes one bound initializer.",
+      "size": 88,
+      "symbol": "LVL_4_BARLOW_FUN_0038A9E8"
     },
     {
       "address": 3796480,

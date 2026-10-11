@@ -6,10 +6,10 @@
   "reference_sha256": "ad5840ad4ebfef75199ad6196e36ba010d99970e75d0de681a050ab4c59f944b",
   "reference_entry": 2774024,
   "candidate_source": "candidates/levels/16_snivelak-g8.c",
-  "source_sha256": "d8938c3cc1e36536593565b9a9125944db6f5fa842117f1bd70ac4f703fa1d21",
-  "catalog_sha256": "40f4f98d2ec1d56289a878346d901c38c2433d42cf35c861425fd790e1543b03",
-  "object_sha256": "f683fedb5e2f883e4acbad4aa9bfb8d96d5b23a994f942764885632694477042",
-  "candidate_elf_sha256": "48bb8fe659d8ac15fa05cfeb4272ca88d8603f0ac1e97ce2880472c58ca49aba",
+  "source_sha256": "6c292c222e27d2e6f77b5e856674c619f3c35c0d077d44dce687aec6ca584f91",
+  "catalog_sha256": "42ca6e211c4a7afefc353e359923f91b4b927fe5d25f68b1375aba8ff7b667fb",
+  "object_sha256": "3f166158f532b86a8b3cb6c41453bb4241ff06677b6a8cc30334733ff3a580e6",
+  "candidate_elf_sha256": "c5bf18faf253cf1368768841e3cc94eeeae1a5bace300030e53fa4dba28eceae",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -34,6 +34,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_16_SNIVELAK_FUN_002CF6D8",
+      "address": 2946776,
+      "size": 208,
+      "matched": true,
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 208
     },
     {
       "symbol": "LVL_16_SNIVELAK_FUN_002D01F8",
@@ -520,6 +531,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_16_SNIVELAK_FUN_0035EDC8",
+      "address": 3534280,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "459adaf49708bee37b06721365ef56c1e7a7a93823e4bf15fe2a2c95358fc695",
+      "candidate_sha256": "459adaf49708bee37b06721365ef56c1e7a7a93823e4bf15fe2a2c95358fc695",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
+    },
+    {
       "symbol": "LVL_16_SNIVELAK_FUN_00373030",
       "address": 3616816,
       "size": 76,
@@ -631,5 +653,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3548
+  "matched_code_bytes": 3844
 }

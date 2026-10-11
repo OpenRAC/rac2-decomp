@@ -52,6 +52,13 @@
     "LVL_23_DAMOSEL_ORBIT_F01bd4546_FUN_00454F98": 4542360,
     "LVL_23_DAMOSEL_ORBIT_F01bd4546_FUN_00454FE0": 4542432,
     "LVL_23_DAMOSEL_ORBIT_F03c444112283bc5f_AT00391430_ROLE00": 2336368,
+    "LVL_23_DAMOSEL_ORBIT_F043c77a5_FUN_002F1050": 3084368,
+    "LVL_23_DAMOSEL_ORBIT_F043c77a5_FUN_002F5440": 3101760,
+    "LVL_23_DAMOSEL_ORBIT_F043c77a5_FUN_002F81D0": 3113424,
+    "LVL_23_DAMOSEL_ORBIT_F043c77a5_FUN_002F82D8": 3113688,
+    "LVL_23_DAMOSEL_ORBIT_F043c77a5_FUN_002F8818": 3115032,
+    "LVL_23_DAMOSEL_ORBIT_F043c77a5_FUN_002F89E0": 3115488,
+    "LVL_23_DAMOSEL_ORBIT_F043c77a5_FUN_00431930": 4397360,
     "LVL_23_DAMOSEL_ORBIT_F081de6c9_FUN_00441928": 4462888,
     "LVL_23_DAMOSEL_ORBIT_F081de6c9_FUN_00442708": 4466440,
     "LVL_23_DAMOSEL_ORBIT_F081de6c9_FUN_004427A0": 4466592,
@@ -107,6 +114,9 @@
     "LVL_23_DAMOSEL_ORBIT_F250fbfa4_FUN_002F7E00": 3112448,
     "LVL_23_DAMOSEL_ORBIT_F250fbfa4_FUN_002F8160": 3113312,
     "LVL_23_DAMOSEL_ORBIT_F250fbfa4_FUN_003377C0": 3372992,
+    "LVL_23_DAMOSEL_ORBIT_F27f9be8e_FUN_002F80D0": 3113168,
+    "LVL_23_DAMOSEL_ORBIT_F27f9be8e_FUN_002F91A8": 3117480,
+    "LVL_23_DAMOSEL_ORBIT_F27f9be8e_FUN_002F91F0": 3117552,
     "LVL_23_DAMOSEL_ORBIT_F280d7406_FUN_002F8160": 3113312,
     "LVL_23_DAMOSEL_ORBIT_F280d7406_FUN_002F9300": 3117824,
     "LVL_23_DAMOSEL_ORBIT_F280d7406_FUN_003377C0": 3372992,
@@ -131,6 +141,9 @@
     "LVL_23_DAMOSEL_ORBIT_F391de845_D_001BA640": 1812032,
     "LVL_23_DAMOSEL_ORBIT_F391de845_FUN_002F8320": 3113760,
     "LVL_23_DAMOSEL_ORBIT_F391de845_FUN_00365EA0": 3563168,
+    "LVL_23_DAMOSEL_ORBIT_F3c007b59_FUN_002F7E00": 3112448,
+    "LVL_23_DAMOSEL_ORBIT_F3c007b59_FUN_002F9300": 3117824,
+    "LVL_23_DAMOSEL_ORBIT_F3c007b59_FUN_003377C0": 3372992,
     "LVL_23_DAMOSEL_ORBIT_F40487154_FUN_002F81D0": 3113424,
     "LVL_23_DAMOSEL_ORBIT_F40487154_FUN_002F8768": 3114856,
     "LVL_23_DAMOSEL_ORBIT_F40487154_FUN_002F89C0": 3115456,
@@ -191,6 +204,10 @@
     "LVL_23_DAMOSEL_ORBIT_F55a1acb8_D_001A63AC": 1729452,
     "LVL_23_DAMOSEL_ORBIT_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_23_DAMOSEL_ORBIT_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_23_DAMOSEL_ORBIT_F5621621c_FUN_002F8750": 3114832,
+    "LVL_23_DAMOSEL_ORBIT_F5621621c_FUN_002F8768": 3114856,
+    "LVL_23_DAMOSEL_ORBIT_F5621621c_FUN_002F8818": 3115032,
+    "LVL_23_DAMOSEL_ORBIT_F5621621c_FUN_00325CF0": 3300592,
     "LVL_23_DAMOSEL_ORBIT_F5a19df7a_FUN_003243E0": 3294176,
     "LVL_23_DAMOSEL_ORBIT_F5a19df7a_FUN_00324500": 3294464,
     "LVL_23_DAMOSEL_ORBIT_F5a19df7a_FUN_003833A0": 3683232,
@@ -253,6 +270,10 @@
     "LVL_23_DAMOSEL_ORBIT_F7b2f1854_FUN_004417C8": 4462536,
     "LVL_23_DAMOSEL_ORBIT_F7b2f1854_FUN_00442708": 4466440,
     "LVL_23_DAMOSEL_ORBIT_F7b2f1854_FUN_004427A0": 4466592,
+    "LVL_23_DAMOSEL_ORBIT_F7cacd225_FUN_002F7E00": 3112448,
+    "LVL_23_DAMOSEL_ORBIT_F7cacd225_FUN_002F92F0": 3117808,
+    "LVL_23_DAMOSEL_ORBIT_F7cacd225_FUN_002F9348": 3117896,
+    "LVL_23_DAMOSEL_ORBIT_F7cacd225_FUN_003377C0": 3372992,
     "LVL_23_DAMOSEL_ORBIT_F7cb419c1_D_002004C0": 2098368,
     "LVL_23_DAMOSEL_ORBIT_F7cb419c1_FUN_0035FB20": 3537696,
     "LVL_23_DAMOSEL_ORBIT_F8411efa9_FUN_002F1050": 3084368,
@@ -290,6 +311,11 @@
     "LVL_23_DAMOSEL_ORBIT_F904cc63b_FUN_0032A690": 3319440,
     "LVL_23_DAMOSEL_ORBIT_F93479d13_D_00189E20": 1613344,
     "LVL_23_DAMOSEL_ORBIT_F93479d13_FUN_0031A108": 3252488,
+    "LVL_23_DAMOSEL_ORBIT_F966dbf73_FUN_003243A0": 3294112,
+    "LVL_23_DAMOSEL_ORBIT_F966dbf73_FUN_003243E0": 3294176,
+    "LVL_23_DAMOSEL_ORBIT_F966dbf73_FUN_00324438": 3294264,
+    "LVL_23_DAMOSEL_ORBIT_F966dbf73_FUN_003245C0": 3294656,
+    "LVL_23_DAMOSEL_ORBIT_F966dbf73_FUN_0033C530": 3392816,
     "LVL_23_DAMOSEL_ORBIT_F97fc4e13_FUN_002F7F38": 3112760,
     "LVL_23_DAMOSEL_ORBIT_F97fc4e13_FUN_00360DF8": 3542520,
     "LVL_23_DAMOSEL_ORBIT_F9a90bcc4_FUN_003243A0": 3294112,
@@ -369,6 +395,11 @@
     "LVL_23_DAMOSEL_ORBIT_Fb342d477_FUN_0045C110": 4571408,
     "LVL_23_DAMOSEL_ORBIT_Fb342d477_FUN_0045C180": 4571520,
     "LVL_23_DAMOSEL_ORBIT_Fb4cfb7e0_FUN_003243A0": 3294112,
+    "LVL_23_DAMOSEL_ORBIT_Fb5729173_FUN_002F8320": 3113760,
+    "LVL_23_DAMOSEL_ORBIT_Fb5729173_FUN_002F8358": 3113816,
+    "LVL_23_DAMOSEL_ORBIT_Fb5729173_FUN_002F8818": 3115032,
+    "LVL_23_DAMOSEL_ORBIT_Fb5729173_FUN_002F9290": 3117712,
+    "LVL_23_DAMOSEL_ORBIT_Fb5729173_FUN_00328E60": 3313248,
     "LVL_23_DAMOSEL_ORBIT_Fb77d67f1_FUN_002F7DD0": 3112400,
     "LVL_23_DAMOSEL_ORBIT_Fb77d67f1_FUN_003377C0": 3372992,
     "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB2": 1735602,
@@ -406,6 +437,12 @@
     "LVL_23_DAMOSEL_ORBIT_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_23_DAMOSEL_ORBIT_Fc936841d_FUN_002F8160": 3113312,
     "LVL_23_DAMOSEL_ORBIT_Fc936841d_FUN_002F8190": 3113360,
+    "LVL_23_DAMOSEL_ORBIT_Fc94396f4_D_00189E20": 1613344,
+    "LVL_23_DAMOSEL_ORBIT_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_23_DAMOSEL_ORBIT_Fc94396f4_FUN_002DE570": 3007856,
+    "LVL_23_DAMOSEL_ORBIT_Fc94396f4_FUN_002DE5F0": 3007984,
+    "LVL_23_DAMOSEL_ORBIT_Fc94396f4_FUN_002F8160": 3113312,
+    "LVL_23_DAMOSEL_ORBIT_Fc94396f4_FUN_002F8440": 3114048,
     "LVL_23_DAMOSEL_ORBIT_Fcbc1388e_D_001A63A8": 1729448,
     "LVL_23_DAMOSEL_ORBIT_Fccb147a4_FUN_003377C0": 3372992,
     "LVL_23_DAMOSEL_ORBIT_Fccb147a4_FUN_00387838": 3700792,
@@ -441,6 +478,14 @@
     "LVL_23_DAMOSEL_ORBIT_Fdb046c5d_FUN_0032E8E0": 3336416,
     "LVL_23_DAMOSEL_ORBIT_Fdb046c5d_FUN_00367450": 3568720,
     "LVL_23_DAMOSEL_ORBIT_Fdb046c5d_FUN_003677A0": 3569568,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_FUN_002F7E00": 3112448,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_FUN_002F8160": 3113312,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_FUN_002F81D0": 3113424,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_FUN_002F92F0": 3117808,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_FUN_002F9300": 3117824,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_FUN_003377C0": 3372992,
+    "LVL_23_DAMOSEL_ORBIT_Fdd54ca5d_FUN_00387838": 3700792,
     "LVL_23_DAMOSEL_ORBIT_Fe524d931_D_001A6480": 1729664,
     "LVL_23_DAMOSEL_ORBIT_Fe524d931_FUN_002FA508": 3122440,
     "LVL_23_DAMOSEL_ORBIT_Fe524d931_FUN_003675B0": 3569072,
@@ -480,6 +525,7 @@
     "LVL_23_DAMOSEL_ORBIT_Ff2d8e5ad_FUN_002F8648": 3114568,
     "LVL_23_DAMOSEL_ORBIT_Ff2d8e5ad_FUN_002F86B8": 3114680,
     "LVL_23_DAMOSEL_ORBIT_Ff2d8e5ad_FUN_0031F210": 3273232,
+    "LVL_23_DAMOSEL_ORBIT_Ff454dd77_FUN_002F80D0": 3113168,
     "LVL_23_DAMOSEL_ORBIT_Ff4dd22f3_FUN_002F7E00": 3112448,
     "LVL_23_DAMOSEL_ORBIT_Ff4dd22f3_FUN_002F8160": 3113312,
     "LVL_23_DAMOSEL_ORBIT_Ff4dd22f3_FUN_003377C0": 3372992,
@@ -706,6 +752,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_002DDE18"
+    },
+    {
+      "address": 3006168,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_002DDED8"
     },
     {
       "address": 3006864,
@@ -1084,6 +1136,24 @@
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00324340"
     },
     {
+      "address": 3295864,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00324A78"
+    },
+    {
+      "address": 3303536,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00326870"
+    },
+    {
+      "address": 3306304,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00327340"
+    },
+    {
       "address": 3310032,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1123,6 +1193,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_0032C590"
+    },
+    {
+      "address": 3332336,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_0032D8F0"
     },
     {
       "address": 3337400,
@@ -1208,6 +1284,12 @@
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_0033B020"
     },
     {
+      "address": 3390160,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_0033BAD0"
+    },
+    {
       "address": 3390800,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1218,6 +1300,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_0033D5F8"
+    },
+    {
+      "address": 3409280,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00340580"
     },
     {
       "address": 3411880,
@@ -1248,6 +1336,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00342F90"
+    },
+    {
+      "address": 3427048,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00344AE8"
     },
     {
       "address": 3436912,
@@ -1635,6 +1729,12 @@
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_003D1998"
     },
     {
+      "address": 4005592,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_003D1ED8"
+    },
+    {
       "address": 4014288,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1913,6 +2013,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00431998"
+    },
+    {
+      "address": 4402072,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00432B98"
     },
     {
       "address": 4418888,

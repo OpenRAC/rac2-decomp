@@ -62,6 +62,13 @@
     "LVL_24_SHIP_SHACK_F01bd4546_FUN_0041DE48": 4316744,
     "LVL_24_SHIP_SHACK_F01bd4546_FUN_0041DE90": 4316816,
     "LVL_24_SHIP_SHACK_F03c444112283bc5f_AT00380A30_ROLE00": 2328304,
+    "LVL_24_SHIP_SHACK_F043c77a5_FUN_002E5738": 3036984,
+    "LVL_24_SHIP_SHACK_F043c77a5_FUN_002E9B28": 3054376,
+    "LVL_24_SHIP_SHACK_F043c77a5_FUN_002EC8B8": 3066040,
+    "LVL_24_SHIP_SHACK_F043c77a5_FUN_002EC9A8": 3066280,
+    "LVL_24_SHIP_SHACK_F043c77a5_FUN_002ECEE8": 3067624,
+    "LVL_24_SHIP_SHACK_F043c77a5_FUN_002ED0B0": 3068080,
+    "LVL_24_SHIP_SHACK_F043c77a5_FUN_003FB048": 4173896,
     "LVL_24_SHIP_SHACK_F081de6c9_FUN_0040A7D8": 4237272,
     "LVL_24_SHIP_SHACK_F081de6c9_FUN_0040B5B8": 4240824,
     "LVL_24_SHIP_SHACK_F081de6c9_FUN_0040B650": 4240976,
@@ -117,6 +124,9 @@
     "LVL_24_SHIP_SHACK_F250fbfa4_FUN_002EC4E8": 3065064,
     "LVL_24_SHIP_SHACK_F250fbfa4_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_F250fbfa4_FUN_00327640": 3307072,
+    "LVL_24_SHIP_SHACK_F27f9be8e_FUN_002EC7B8": 3065784,
+    "LVL_24_SHIP_SHACK_F27f9be8e_FUN_002ED838": 3070008,
+    "LVL_24_SHIP_SHACK_F27f9be8e_FUN_002ED880": 3070080,
     "LVL_24_SHIP_SHACK_F280d7406_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_F280d7406_FUN_002ED990": 3070352,
     "LVL_24_SHIP_SHACK_F280d7406_FUN_00327640": 3307072,
@@ -140,6 +150,9 @@
     "LVL_24_SHIP_SHACK_F391de845_D_001B86C0": 1803968,
     "LVL_24_SHIP_SHACK_F391de845_FUN_002EC9F0": 3066352,
     "LVL_24_SHIP_SHACK_F391de845_FUN_00355460": 3495008,
+    "LVL_24_SHIP_SHACK_F3c007b59_FUN_002EC4E8": 3065064,
+    "LVL_24_SHIP_SHACK_F3c007b59_FUN_002ED990": 3070352,
+    "LVL_24_SHIP_SHACK_F3c007b59_FUN_00327640": 3307072,
     "LVL_24_SHIP_SHACK_F40487154_FUN_002EC8B8": 3066040,
     "LVL_24_SHIP_SHACK_F40487154_FUN_002ECE38": 3067448,
     "LVL_24_SHIP_SHACK_F40487154_FUN_002ED090": 3068048,
@@ -200,6 +213,10 @@
     "LVL_24_SHIP_SHACK_F55a1acb8_D_001A63AC": 1729452,
     "LVL_24_SHIP_SHACK_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_24_SHIP_SHACK_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_24_SHIP_SHACK_F5621621c_FUN_002ECE20": 3067424,
+    "LVL_24_SHIP_SHACK_F5621621c_FUN_002ECE38": 3067448,
+    "LVL_24_SHIP_SHACK_F5621621c_FUN_002ECEE8": 3067624,
+    "LVL_24_SHIP_SHACK_F5621621c_FUN_0031A258": 3252824,
     "LVL_24_SHIP_SHACK_F5a19df7a_FUN_003189E8": 3246568,
     "LVL_24_SHIP_SHACK_F5a19df7a_FUN_00318B08": 3246856,
     "LVL_24_SHIP_SHACK_F5a19df7a_FUN_00372790": 3614608,
@@ -258,6 +275,10 @@
     "LVL_24_SHIP_SHACK_F7b2f1854_FUN_0040A678": 4236920,
     "LVL_24_SHIP_SHACK_F7b2f1854_FUN_0040B5B8": 4240824,
     "LVL_24_SHIP_SHACK_F7b2f1854_FUN_0040B650": 4240976,
+    "LVL_24_SHIP_SHACK_F7cacd225_FUN_002EC4E8": 3065064,
+    "LVL_24_SHIP_SHACK_F7cacd225_FUN_002ED980": 3070336,
+    "LVL_24_SHIP_SHACK_F7cacd225_FUN_002ED9D8": 3070424,
+    "LVL_24_SHIP_SHACK_F7cacd225_FUN_00327640": 3307072,
     "LVL_24_SHIP_SHACK_F7cb419c1_D_001FE540": 2090304,
     "LVL_24_SHIP_SHACK_F7cb419c1_FUN_0034F0E0": 3469536,
     "LVL_24_SHIP_SHACK_F8411efa9_FUN_002E5738": 3036984,
@@ -295,6 +316,11 @@
     "LVL_24_SHIP_SHACK_F904cc63b_FUN_0031E698": 3270296,
     "LVL_24_SHIP_SHACK_F93479d13_D_00189E20": 1613344,
     "LVL_24_SHIP_SHACK_F93479d13_FUN_0030E798": 3205016,
+    "LVL_24_SHIP_SHACK_F966dbf73_FUN_003189A8": 3246504,
+    "LVL_24_SHIP_SHACK_F966dbf73_FUN_003189E8": 3246568,
+    "LVL_24_SHIP_SHACK_F966dbf73_FUN_00318A40": 3246656,
+    "LVL_24_SHIP_SHACK_F966dbf73_FUN_00318BC8": 3247048,
+    "LVL_24_SHIP_SHACK_F966dbf73_FUN_0032C2B8": 3326648,
     "LVL_24_SHIP_SHACK_F97fc4e13_FUN_002EC620": 3065376,
     "LVL_24_SHIP_SHACK_F97fc4e13_FUN_003503B8": 3474360,
     "LVL_24_SHIP_SHACK_F9a90bcc4_FUN_003189A8": 3246504,
@@ -384,6 +410,11 @@
     "LVL_24_SHIP_SHACK_Fb342d477_FUN_00424FC0": 4345792,
     "LVL_24_SHIP_SHACK_Fb342d477_FUN_00425030": 4345904,
     "LVL_24_SHIP_SHACK_Fb4cfb7e0_FUN_003189A8": 3246504,
+    "LVL_24_SHIP_SHACK_Fb5729173_FUN_002EC9F0": 3066352,
+    "LVL_24_SHIP_SHACK_Fb5729173_FUN_002ECA28": 3066408,
+    "LVL_24_SHIP_SHACK_Fb5729173_FUN_002ECEE8": 3067624,
+    "LVL_24_SHIP_SHACK_Fb5729173_FUN_002ED920": 3070240,
+    "LVL_24_SHIP_SHACK_Fb5729173_FUN_0031CE68": 3264104,
     "LVL_24_SHIP_SHACK_Fb77d67f1_FUN_002EC4B8": 3065016,
     "LVL_24_SHIP_SHACK_Fb77d67f1_FUN_00327640": 3307072,
     "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB2": 1735602,
@@ -455,6 +486,14 @@
     "LVL_24_SHIP_SHACK_Fdb046c5d_FUN_00321670": 3282544,
     "LVL_24_SHIP_SHACK_Fdb046c5d_FUN_00356A10": 3500560,
     "LVL_24_SHIP_SHACK_Fdb046c5d_FUN_00356D60": 3501408,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_FUN_002EC4E8": 3065064,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_FUN_002EC848": 3065928,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_FUN_002EC8B8": 3066040,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_FUN_002ED980": 3070336,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_FUN_002ED990": 3070352,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_FUN_00327640": 3307072,
+    "LVL_24_SHIP_SHACK_Fdd54ca5d_FUN_00376C28": 3632168,
     "LVL_24_SHIP_SHACK_Fe524d931_D_001A6480": 1729664,
     "LVL_24_SHIP_SHACK_Fe524d931_FUN_002EEB98": 3074968,
     "LVL_24_SHIP_SHACK_Fe524d931_FUN_00356B70": 3500912,
@@ -494,6 +533,7 @@
     "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002ECD18": 3067160,
     "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002ECD88": 3067272,
     "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_00313818": 3225624,
+    "LVL_24_SHIP_SHACK_Ff454dd77_FUN_002EC7B8": 3065784,
     "LVL_24_SHIP_SHACK_Ff4dd22f3_FUN_002EC4E8": 3065064,
     "LVL_24_SHIP_SHACK_Ff4dd22f3_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_Ff4dd22f3_FUN_00327640": 3307072,
@@ -1176,6 +1216,24 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_00318948"
     },
     {
+      "address": 3248256,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00319080"
+    },
+    {
+      "address": 3255312,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_0031AC10"
+    },
+    {
+      "address": 3258080,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_0031B6E0"
+    },
+    {
       "address": 3261176,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1215,6 +1273,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_24_SHIP_SHACK_FUN_003202A0"
+    },
+    {
+      "address": 3278864,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00320810"
     },
     {
       "address": 3283056,
@@ -1294,6 +1358,12 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_0032ADA8"
     },
     {
+      "address": 3323992,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_0032B858"
+    },
+    {
       "address": 3324632,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1304,6 +1374,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_24_SHIP_SHACK_FUN_0032D240"
+    },
+    {
+      "address": 3342536,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_003300C8"
     },
     {
       "address": 3345136,
@@ -1334,6 +1410,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_24_SHIP_SHACK_FUN_00332AD8"
+    },
+    {
+      "address": 3360008,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00334508"
     },
     {
       "address": 3369432,
@@ -1727,6 +1809,12 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_003B1490"
     },
     {
+      "address": 3873232,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_003B19D0"
+    },
+    {
       "address": 3881928,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1993,6 +2081,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_24_SHIP_SHACK_FUN_003FB0B0"
+    },
+    {
+      "address": 4178608,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_003FC2B0"
     },
     {
       "address": 4195424,

@@ -52,6 +52,13 @@
     "LVL_9_DOBBO_F01bd4546_FUN_0044DC48": 4512840,
     "LVL_9_DOBBO_F01bd4546_FUN_0044DC90": 4512912,
     "LVL_9_DOBBO_F03c444112283bc5f_AT00387A40_ROLE00": 2336304,
+    "LVL_9_DOBBO_F043c77a5_FUN_002E2828": 3024936,
+    "LVL_9_DOBBO_F043c77a5_FUN_002E6C68": 3042408,
+    "LVL_9_DOBBO_F043c77a5_FUN_002EA4F8": 3056888,
+    "LVL_9_DOBBO_F043c77a5_FUN_002EA5E8": 3057128,
+    "LVL_9_DOBBO_F043c77a5_FUN_002EAB28": 3058472,
+    "LVL_9_DOBBO_F043c77a5_FUN_002EACF0": 3058928,
+    "LVL_9_DOBBO_F043c77a5_FUN_00429D28": 4365608,
     "LVL_9_DOBBO_F081de6c9_FUN_0043A5D8": 4433368,
     "LVL_9_DOBBO_F081de6c9_FUN_0043B3B8": 4436920,
     "LVL_9_DOBBO_F081de6c9_FUN_0043B450": 4437072,
@@ -108,6 +115,9 @@
     "LVL_9_DOBBO_F250fbfa4_FUN_002EA110": 3055888,
     "LVL_9_DOBBO_F250fbfa4_FUN_002EA470": 3056752,
     "LVL_9_DOBBO_F250fbfa4_FUN_0032C890": 3328144,
+    "LVL_9_DOBBO_F27f9be8e_FUN_002EA3E0": 3056608,
+    "LVL_9_DOBBO_F27f9be8e_FUN_002EB478": 3060856,
+    "LVL_9_DOBBO_F27f9be8e_FUN_002EB4C0": 3060928,
     "LVL_9_DOBBO_F280d7406_FUN_002EA470": 3056752,
     "LVL_9_DOBBO_F280d7406_FUN_002EB5D0": 3061200,
     "LVL_9_DOBBO_F280d7406_FUN_0032C890": 3328144,
@@ -132,6 +142,9 @@
     "LVL_9_DOBBO_F391de845_D_001B9A00": 1808896,
     "LVL_9_DOBBO_F391de845_FUN_002EA630": 3057200,
     "LVL_9_DOBBO_F391de845_FUN_0035B280": 3519104,
+    "LVL_9_DOBBO_F3c007b59_FUN_002EA110": 3055888,
+    "LVL_9_DOBBO_F3c007b59_FUN_002EB5D0": 3061200,
+    "LVL_9_DOBBO_F3c007b59_FUN_0032C890": 3328144,
     "LVL_9_DOBBO_F40487154_FUN_002EA4F8": 3056888,
     "LVL_9_DOBBO_F40487154_FUN_002EAA78": 3058296,
     "LVL_9_DOBBO_F40487154_FUN_002EACD0": 3058896,
@@ -194,6 +207,10 @@
     "LVL_9_DOBBO_F55a1acb8_D_001A63AC": 1729452,
     "LVL_9_DOBBO_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_9_DOBBO_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_9_DOBBO_F5621621c_FUN_002EAA60": 3058272,
+    "LVL_9_DOBBO_F5621621c_FUN_002EAA78": 3058296,
+    "LVL_9_DOBBO_F5621621c_FUN_002EAB28": 3058472,
+    "LVL_9_DOBBO_F5621621c_FUN_00318630": 3245616,
     "LVL_9_DOBBO_F5a19df7a_FUN_00316A68": 3238504,
     "LVL_9_DOBBO_F5a19df7a_FUN_00316B88": 3238792,
     "LVL_9_DOBBO_F5a19df7a_FUN_00378928": 3639592,
@@ -256,6 +273,10 @@
     "LVL_9_DOBBO_F7b2f1854_FUN_0043A478": 4433016,
     "LVL_9_DOBBO_F7b2f1854_FUN_0043B3B8": 4436920,
     "LVL_9_DOBBO_F7b2f1854_FUN_0043B450": 4437072,
+    "LVL_9_DOBBO_F7cacd225_FUN_002EA110": 3055888,
+    "LVL_9_DOBBO_F7cacd225_FUN_002EB5C0": 3061184,
+    "LVL_9_DOBBO_F7cacd225_FUN_002EB618": 3061272,
+    "LVL_9_DOBBO_F7cacd225_FUN_0032C890": 3328144,
     "LVL_9_DOBBO_F7cb419c1_D_001FF880": 2095232,
     "LVL_9_DOBBO_F7cb419c1_FUN_00354DE0": 3493344,
     "LVL_9_DOBBO_F8411efa9_FUN_002E2828": 3024936,
@@ -293,6 +314,11 @@
     "LVL_9_DOBBO_F904cc63b_FUN_0031D2F8": 3265272,
     "LVL_9_DOBBO_F93479d13_D_00189E20": 1613344,
     "LVL_9_DOBBO_F93479d13_FUN_0030C790": 3196816,
+    "LVL_9_DOBBO_F966dbf73_FUN_00316A28": 3238440,
+    "LVL_9_DOBBO_F966dbf73_FUN_00316A68": 3238504,
+    "LVL_9_DOBBO_F966dbf73_FUN_00316AC0": 3238592,
+    "LVL_9_DOBBO_F966dbf73_FUN_00316C48": 3238984,
+    "LVL_9_DOBBO_F966dbf73_FUN_00331508": 3347720,
     "LVL_9_DOBBO_F97fc4e13_FUN_002EA248": 3056200,
     "LVL_9_DOBBO_F97fc4e13_FUN_003560B8": 3498168,
     "LVL_9_DOBBO_F9a90bcc4_FUN_00316A28": 3238440,
@@ -371,6 +397,11 @@
     "LVL_9_DOBBO_Fb342d477_FUN_00454DC0": 4541888,
     "LVL_9_DOBBO_Fb342d477_FUN_00454E30": 4542000,
     "LVL_9_DOBBO_Fb4cfb7e0_FUN_00316A28": 3238440,
+    "LVL_9_DOBBO_Fb5729173_FUN_002EA630": 3057200,
+    "LVL_9_DOBBO_Fb5729173_FUN_002EA668": 3057256,
+    "LVL_9_DOBBO_Fb5729173_FUN_002EAB28": 3058472,
+    "LVL_9_DOBBO_Fb5729173_FUN_002EB560": 3061088,
+    "LVL_9_DOBBO_Fb5729173_FUN_0031B7B8": 3258296,
     "LVL_9_DOBBO_Fb77d67f1_FUN_002EA0E0": 3055840,
     "LVL_9_DOBBO_Fb77d67f1_FUN_0032C890": 3328144,
     "LVL_9_DOBBO_Fb7feb893_D_001A7BB2": 1735602,
@@ -411,6 +442,12 @@
     "LVL_9_DOBBO_Fc84472d1_FUN_00115E38": 1138232,
     "LVL_9_DOBBO_Fc936841d_FUN_002EA470": 3056752,
     "LVL_9_DOBBO_Fc936841d_FUN_002EA4A0": 3056800,
+    "LVL_9_DOBBO_Fc94396f4_D_00189E20": 1613344,
+    "LVL_9_DOBBO_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_9_DOBBO_Fc94396f4_FUN_002CFBB0": 2948016,
+    "LVL_9_DOBBO_Fc94396f4_FUN_002CFC30": 2948144,
+    "LVL_9_DOBBO_Fc94396f4_FUN_002EA470": 3056752,
+    "LVL_9_DOBBO_Fc94396f4_FUN_002EA750": 3057488,
     "LVL_9_DOBBO_Fccb147a4_FUN_0032C890": 3328144,
     "LVL_9_DOBBO_Fccb147a4_FUN_0037CEC8": 3657416,
     "LVL_9_DOBBO_Fcdb4d905_FUN_002E03F0": 3015664,
@@ -450,6 +487,14 @@
     "LVL_9_DOBBO_Fdb046c5d_FUN_00321670": 3282544,
     "LVL_9_DOBBO_Fdb046c5d_FUN_0035C830": 3524656,
     "LVL_9_DOBBO_Fdb046c5d_FUN_0035CB80": 3525504,
+    "LVL_9_DOBBO_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_9_DOBBO_Fdd54ca5d_FUN_002EA110": 3055888,
+    "LVL_9_DOBBO_Fdd54ca5d_FUN_002EA470": 3056752,
+    "LVL_9_DOBBO_Fdd54ca5d_FUN_002EA4F8": 3056888,
+    "LVL_9_DOBBO_Fdd54ca5d_FUN_002EB5C0": 3061184,
+    "LVL_9_DOBBO_Fdd54ca5d_FUN_002EB5D0": 3061200,
+    "LVL_9_DOBBO_Fdd54ca5d_FUN_0032C890": 3328144,
+    "LVL_9_DOBBO_Fdd54ca5d_FUN_0037CEC8": 3657416,
     "LVL_9_DOBBO_Fe524d931_D_001A6480": 1729664,
     "LVL_9_DOBBO_Fe524d931_FUN_002EC7D8": 3065816,
     "LVL_9_DOBBO_Fe524d931_FUN_0035C990": 3525008,
@@ -489,6 +534,7 @@
     "LVL_9_DOBBO_Ff2d8e5ad_FUN_002EA958": 3058008,
     "LVL_9_DOBBO_Ff2d8e5ad_FUN_002EA9C8": 3058120,
     "LVL_9_DOBBO_Ff2d8e5ad_FUN_00311898": 3217560,
+    "LVL_9_DOBBO_Ff454dd77_FUN_002EA3E0": 3056608,
     "LVL_9_DOBBO_Ff4dd22f3_FUN_002EA110": 3055888,
     "LVL_9_DOBBO_Ff4dd22f3_FUN_002EA470": 3056752,
     "LVL_9_DOBBO_Ff4dd22f3_FUN_0032C890": 3328144,
@@ -707,6 +753,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_9_DOBBO_FUN_002CF458"
+    },
+    {
+      "address": 2946328,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_9_DOBBO_FUN_002CF518"
     },
     {
       "address": 2947024,
@@ -1086,6 +1138,24 @@
       "symbol": "LVL_9_DOBBO_FUN_003169C8"
     },
     {
+      "address": 3240192,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_9_DOBBO_FUN_00317100"
+    },
+    {
+      "address": 3248584,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_9_DOBBO_FUN_003191C8"
+    },
+    {
+      "address": 3251352,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_9_DOBBO_FUN_00319C98"
+    },
+    {
       "address": 3255080,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1125,6 +1195,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_9_DOBBO_FUN_0031F3F0"
+    },
+    {
+      "address": 3278560,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_9_DOBBO_FUN_003206E0"
     },
     {
       "address": 3283528,
@@ -1216,6 +1292,12 @@
       "symbol": "LVL_9_DOBBO_FUN_0032FFF8"
     },
     {
+      "address": 3345064,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_9_DOBBO_FUN_00330AA8"
+    },
+    {
       "address": 3345704,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1226,6 +1308,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_9_DOBBO_FUN_00332490"
+    },
+    {
+      "address": 3363920,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_9_DOBBO_FUN_00335450"
     },
     {
       "address": 3366320,
@@ -1256,6 +1344,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_9_DOBBO_FUN_00337EB0"
+    },
+    {
+      "address": 3381768,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_9_DOBBO_FUN_00339A08"
     },
     {
       "address": 3391192,
@@ -1643,6 +1737,12 @@
       "symbol": "LVL_9_DOBBO_FUN_003C9370"
     },
     {
+      "address": 3971248,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_9_DOBBO_FUN_003C98B0"
+    },
+    {
       "address": 3979944,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1933,6 +2033,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_9_DOBBO_FUN_00429D90"
+    },
+    {
+      "address": 4370320,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_9_DOBBO_FUN_0042AF90"
     },
     {
       "address": 4387136,

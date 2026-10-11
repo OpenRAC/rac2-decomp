@@ -52,6 +52,13 @@
     "LVL_26_JAMMING_ARRAY_F01bd4546_FUN_004314F8": 4396280,
     "LVL_26_JAMMING_ARRAY_F01bd4546_FUN_00431540": 4396352,
     "LVL_26_JAMMING_ARRAY_F03c444112283bc5f_AT00388D40_ROLE00": 2329520,
+    "LVL_26_JAMMING_ARRAY_F043c77a5_FUN_002E6DB8": 3042744,
+    "LVL_26_JAMMING_ARRAY_F043c77a5_FUN_002EB1A8": 3060136,
+    "LVL_26_JAMMING_ARRAY_F043c77a5_FUN_002EE398": 3072920,
+    "LVL_26_JAMMING_ARRAY_F043c77a5_FUN_002EE488": 3073160,
+    "LVL_26_JAMMING_ARRAY_F043c77a5_FUN_002EE9C8": 3074504,
+    "LVL_26_JAMMING_ARRAY_F043c77a5_FUN_002EEB90": 3074960,
+    "LVL_26_JAMMING_ARRAY_F043c77a5_FUN_0040DBF0": 4250608,
     "LVL_26_JAMMING_ARRAY_F081de6c9_FUN_0041DE88": 4316808,
     "LVL_26_JAMMING_ARRAY_F081de6c9_FUN_0041EC68": 4320360,
     "LVL_26_JAMMING_ARRAY_F081de6c9_FUN_0041ED00": 4320512,
@@ -108,6 +115,9 @@
     "LVL_26_JAMMING_ARRAY_F250fbfa4_FUN_002EDFC8": 3071944,
     "LVL_26_JAMMING_ARRAY_F250fbfa4_FUN_002EE328": 3072808,
     "LVL_26_JAMMING_ARRAY_F250fbfa4_FUN_0032F720": 3340064,
+    "LVL_26_JAMMING_ARRAY_F27f9be8e_FUN_002EE298": 3072664,
+    "LVL_26_JAMMING_ARRAY_F27f9be8e_FUN_002EF358": 3076952,
+    "LVL_26_JAMMING_ARRAY_F27f9be8e_FUN_002EF3A0": 3077024,
     "LVL_26_JAMMING_ARRAY_F280d7406_FUN_002EE328": 3072808,
     "LVL_26_JAMMING_ARRAY_F280d7406_FUN_002EF4B0": 3077296,
     "LVL_26_JAMMING_ARRAY_F280d7406_FUN_0032F720": 3340064,
@@ -133,6 +143,9 @@
     "LVL_26_JAMMING_ARRAY_F391de845_D_001B8B80": 1805184,
     "LVL_26_JAMMING_ARRAY_F391de845_FUN_002EE4D0": 3073232,
     "LVL_26_JAMMING_ARRAY_F391de845_FUN_0035D7E8": 3528680,
+    "LVL_26_JAMMING_ARRAY_F3c007b59_FUN_002EDFC8": 3071944,
+    "LVL_26_JAMMING_ARRAY_F3c007b59_FUN_002EF4B0": 3077296,
+    "LVL_26_JAMMING_ARRAY_F3c007b59_FUN_0032F720": 3340064,
     "LVL_26_JAMMING_ARRAY_F40487154_FUN_002EE398": 3072920,
     "LVL_26_JAMMING_ARRAY_F40487154_FUN_002EE918": 3074328,
     "LVL_26_JAMMING_ARRAY_F40487154_FUN_002EEB70": 3074928,
@@ -195,6 +208,10 @@
     "LVL_26_JAMMING_ARRAY_F55a1acb8_D_001A63AC": 1729452,
     "LVL_26_JAMMING_ARRAY_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_26_JAMMING_ARRAY_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_26_JAMMING_ARRAY_F5621621c_FUN_002EE900": 3074304,
+    "LVL_26_JAMMING_ARRAY_F5621621c_FUN_002EE918": 3074328,
+    "LVL_26_JAMMING_ARRAY_F5621621c_FUN_002EE9C8": 3074504,
+    "LVL_26_JAMMING_ARRAY_F5621621c_FUN_0031C238": 3260984,
     "LVL_26_JAMMING_ARRAY_F5a19df7a_FUN_0031A8A0": 3254432,
     "LVL_26_JAMMING_ARRAY_F5a19df7a_FUN_0031A9C0": 3254720,
     "LVL_26_JAMMING_ARRAY_F5a19df7a_FUN_0037ACB0": 3648688,
@@ -257,6 +274,10 @@
     "LVL_26_JAMMING_ARRAY_F7b2f1854_FUN_0041DD28": 4316456,
     "LVL_26_JAMMING_ARRAY_F7b2f1854_FUN_0041EC68": 4320360,
     "LVL_26_JAMMING_ARRAY_F7b2f1854_FUN_0041ED00": 4320512,
+    "LVL_26_JAMMING_ARRAY_F7cacd225_FUN_002EDFC8": 3071944,
+    "LVL_26_JAMMING_ARRAY_F7cacd225_FUN_002EF4A0": 3077280,
+    "LVL_26_JAMMING_ARRAY_F7cacd225_FUN_002EF4F8": 3077368,
+    "LVL_26_JAMMING_ARRAY_F7cacd225_FUN_0032F720": 3340064,
     "LVL_26_JAMMING_ARRAY_F7cb419c1_D_001FEA00": 2091520,
     "LVL_26_JAMMING_ARRAY_F7cb419c1_FUN_00357468": 3503208,
     "LVL_26_JAMMING_ARRAY_F8411efa9_FUN_002E6DB8": 3042744,
@@ -294,6 +315,11 @@
     "LVL_26_JAMMING_ARRAY_F904cc63b_FUN_00320EE8": 3280616,
     "LVL_26_JAMMING_ARRAY_F93479d13_D_00189E20": 1613344,
     "LVL_26_JAMMING_ARRAY_F93479d13_FUN_003105C8": 3212744,
+    "LVL_26_JAMMING_ARRAY_F966dbf73_FUN_0031A860": 3254368,
+    "LVL_26_JAMMING_ARRAY_F966dbf73_FUN_0031A8A0": 3254432,
+    "LVL_26_JAMMING_ARRAY_F966dbf73_FUN_0031A8F8": 3254520,
+    "LVL_26_JAMMING_ARRAY_F966dbf73_FUN_0031AA80": 3254912,
+    "LVL_26_JAMMING_ARRAY_F966dbf73_FUN_00334398": 3359640,
     "LVL_26_JAMMING_ARRAY_F97fc4e13_FUN_002EE100": 3072256,
     "LVL_26_JAMMING_ARRAY_F97fc4e13_FUN_00358740": 3508032,
     "LVL_26_JAMMING_ARRAY_F9a90bcc4_FUN_0031A860": 3254368,
@@ -368,6 +394,11 @@
     "LVL_26_JAMMING_ARRAY_Fb342d477_FUN_00438670": 4425328,
     "LVL_26_JAMMING_ARRAY_Fb342d477_FUN_004386E0": 4425440,
     "LVL_26_JAMMING_ARRAY_Fb4cfb7e0_FUN_0031A860": 3254368,
+    "LVL_26_JAMMING_ARRAY_Fb5729173_FUN_002EE4D0": 3073232,
+    "LVL_26_JAMMING_ARRAY_Fb5729173_FUN_002EE508": 3073288,
+    "LVL_26_JAMMING_ARRAY_Fb5729173_FUN_002EE9C8": 3074504,
+    "LVL_26_JAMMING_ARRAY_Fb5729173_FUN_002EF440": 3077184,
+    "LVL_26_JAMMING_ARRAY_Fb5729173_FUN_0031F3A8": 3273640,
     "LVL_26_JAMMING_ARRAY_Fb77d67f1_FUN_002EDF98": 3071896,
     "LVL_26_JAMMING_ARRAY_Fb77d67f1_FUN_0032F720": 3340064,
     "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB2": 1735602,
@@ -408,6 +439,12 @@
     "LVL_26_JAMMING_ARRAY_Fc84472d1_FUN_00115E38": 1138232,
     "LVL_26_JAMMING_ARRAY_Fc936841d_FUN_002EE328": 3072808,
     "LVL_26_JAMMING_ARRAY_Fc936841d_FUN_002EE358": 3072856,
+    "LVL_26_JAMMING_ARRAY_Fc94396f4_D_00189E20": 1613344,
+    "LVL_26_JAMMING_ARRAY_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_26_JAMMING_ARRAY_Fc94396f4_FUN_002D42D8": 2966232,
+    "LVL_26_JAMMING_ARRAY_Fc94396f4_FUN_002D4358": 2966360,
+    "LVL_26_JAMMING_ARRAY_Fc94396f4_FUN_002EE328": 3072808,
+    "LVL_26_JAMMING_ARRAY_Fc94396f4_FUN_002EE5F0": 3073520,
     "LVL_26_JAMMING_ARRAY_Fccb147a4_FUN_0032F720": 3340064,
     "LVL_26_JAMMING_ARRAY_Fccb147a4_FUN_0037F148": 3666248,
     "LVL_26_JAMMING_ARRAY_Fcdb4d905_FUN_002E4980": 3033472,
@@ -442,6 +479,14 @@
     "LVL_26_JAMMING_ARRAY_Fdb046c5d_FUN_00324898": 3295384,
     "LVL_26_JAMMING_ARRAY_Fdb046c5d_FUN_0035ED98": 3534232,
     "LVL_26_JAMMING_ARRAY_Fdb046c5d_FUN_0035F178": 3535224,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_FUN_002EDFC8": 3071944,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_FUN_002EE328": 3072808,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_FUN_002EE398": 3072920,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_FUN_002EF4A0": 3077280,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_FUN_002EF4B0": 3077296,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_FUN_0032F720": 3340064,
+    "LVL_26_JAMMING_ARRAY_Fdd54ca5d_FUN_0037F148": 3666248,
     "LVL_26_JAMMING_ARRAY_Fe524d931_D_001A6480": 1729664,
     "LVL_26_JAMMING_ARRAY_Fe524d931_FUN_002F06B8": 3081912,
     "LVL_26_JAMMING_ARRAY_Fe524d931_FUN_0035EEF8": 3534584,
@@ -481,6 +526,7 @@
     "LVL_26_JAMMING_ARRAY_Ff2d8e5ad_FUN_002EE7F8": 3074040,
     "LVL_26_JAMMING_ARRAY_Ff2d8e5ad_FUN_002EE868": 3074152,
     "LVL_26_JAMMING_ARRAY_Ff2d8e5ad_FUN_003156D0": 3233488,
+    "LVL_26_JAMMING_ARRAY_Ff454dd77_FUN_002EE298": 3072664,
     "LVL_26_JAMMING_ARRAY_Ff4dd22f3_FUN_002EDFC8": 3071944,
     "LVL_26_JAMMING_ARRAY_Ff4dd22f3_FUN_002EE328": 3072808,
     "LVL_26_JAMMING_ARRAY_Ff4dd22f3_FUN_0032F720": 3340064,
@@ -707,6 +753,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_002D3B80"
+    },
+    {
+      "address": 2964544,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_002D3C40"
     },
     {
       "address": 2965240,
@@ -1086,6 +1138,24 @@
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_0031A800"
     },
     {
+      "address": 3256120,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_0031AF38"
+    },
+    {
+      "address": 3263928,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_0031CDB8"
+    },
+    {
+      "address": 3266696,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_0031D888"
+    },
+    {
       "address": 3270424,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1125,6 +1195,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_00323000"
+    },
+    {
+      "address": 3291216,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_00323850"
     },
     {
       "address": 3296368,
@@ -1210,6 +1286,12 @@
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_00332E88"
     },
     {
+      "address": 3356984,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_00333938"
+    },
+    {
       "address": 3357624,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1220,6 +1302,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_00335320"
+    },
+    {
+      "address": 3375528,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_003381A8"
     },
     {
       "address": 3378128,
@@ -1250,6 +1338,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_0033ABB8"
+    },
+    {
+      "address": 3393000,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_0033C5E8"
     },
     {
       "address": 3402424,
@@ -1643,6 +1737,12 @@
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_003BD7B0"
     },
     {
+      "address": 3923184,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_003BDCF0"
+    },
+    {
       "address": 3931880,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -1915,6 +2015,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_0040DC58"
+    },
+    {
+      "address": 4255320,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_0040EE58"
     },
     {
       "address": 4272136,

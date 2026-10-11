@@ -57,6 +57,13 @@
     "LVL_18_DAMOSEL_F023cd14a_D_001B22E8": 1778408,
     "LVL_18_DAMOSEL_F023cd14a_D_001B22F8": 1778424,
     "LVL_18_DAMOSEL_F03c444112283bc5f_AT003A7C08_ROLE00": 2332656,
+    "LVL_18_DAMOSEL_F043c77a5_FUN_00300FC8": 3149768,
+    "LVL_18_DAMOSEL_F043c77a5_FUN_00305498": 3167384,
+    "LVL_18_DAMOSEL_F043c77a5_FUN_00308960": 3180896,
+    "LVL_18_DAMOSEL_F043c77a5_FUN_00308A50": 3181136,
+    "LVL_18_DAMOSEL_F043c77a5_FUN_00308FB0": 3182512,
+    "LVL_18_DAMOSEL_F043c77a5_FUN_00309178": 3182968,
+    "LVL_18_DAMOSEL_F043c77a5_FUN_00448398": 4490136,
     "LVL_18_DAMOSEL_F07a718bf_D_001BCF88": 1822600,
     "LVL_18_DAMOSEL_F07d03334_D_001A742C": 1733676,
     "LVL_18_DAMOSEL_F07d03334_D_001B2F88": 1781640,
@@ -130,6 +137,9 @@
     "LVL_18_DAMOSEL_F25780968_D_001A7350": 1733456,
     "LVL_18_DAMOSEL_F25780968_D_001A7354": 1733460,
     "LVL_18_DAMOSEL_F25780968_D_001B2F88": 1781640,
+    "LVL_18_DAMOSEL_F27f9be8e_FUN_00308860": 3180640,
+    "LVL_18_DAMOSEL_F27f9be8e_FUN_00309900": 3184896,
+    "LVL_18_DAMOSEL_F27f9be8e_FUN_00309948": 3184968,
     "LVL_18_DAMOSEL_F280d7406_FUN_003088F0": 3180784,
     "LVL_18_DAMOSEL_F280d7406_FUN_00309A58": 3185240,
     "LVL_18_DAMOSEL_F280d7406_FUN_0034B1D0": 3453392,
@@ -159,6 +169,9 @@
     "LVL_18_DAMOSEL_F391de845_D_001B97C0": 1808320,
     "LVL_18_DAMOSEL_F391de845_FUN_00308A98": 3181208,
     "LVL_18_DAMOSEL_F391de845_FUN_0037A100": 3645696,
+    "LVL_18_DAMOSEL_F3c007b59_FUN_00308590": 3179920,
+    "LVL_18_DAMOSEL_F3c007b59_FUN_00309A58": 3185240,
+    "LVL_18_DAMOSEL_F3c007b59_FUN_0034B1D0": 3453392,
     "LVL_18_DAMOSEL_F40487154_FUN_00308960": 3180896,
     "LVL_18_DAMOSEL_F40487154_FUN_00308F00": 3182336,
     "LVL_18_DAMOSEL_F40487154_FUN_00309158": 3182936,
@@ -225,6 +238,10 @@
     "LVL_18_DAMOSEL_F55a1acb8_D_001A63AC": 1729452,
     "LVL_18_DAMOSEL_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_18_DAMOSEL_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_18_DAMOSEL_F5621621c_FUN_00308EE8": 3182312,
+    "LVL_18_DAMOSEL_F5621621c_FUN_00308F00": 3182336,
+    "LVL_18_DAMOSEL_F5621621c_FUN_00308FB0": 3182512,
+    "LVL_18_DAMOSEL_F5621621c_FUN_00337228": 3371560,
     "LVL_18_DAMOSEL_F5a19df7a_FUN_00335778": 3364728,
     "LVL_18_DAMOSEL_F5a19df7a_FUN_00335898": 3365016,
     "LVL_18_DAMOSEL_F5a19df7a_FUN_003976B0": 3765936,
@@ -294,6 +311,10 @@
     "LVL_18_DAMOSEL_F7b2f1854_FUN_00458F58": 4558680,
     "LVL_18_DAMOSEL_F7b2f1854_FUN_00459E98": 4562584,
     "LVL_18_DAMOSEL_F7b2f1854_FUN_00459F30": 4562736,
+    "LVL_18_DAMOSEL_F7cacd225_FUN_00308590": 3179920,
+    "LVL_18_DAMOSEL_F7cacd225_FUN_00309A48": 3185224,
+    "LVL_18_DAMOSEL_F7cacd225_FUN_00309AA0": 3185312,
+    "LVL_18_DAMOSEL_F7cacd225_FUN_0034B1D0": 3453392,
     "LVL_18_DAMOSEL_F7cb419c1_D_001FF640": 2094656,
     "LVL_18_DAMOSEL_F7cb419c1_FUN_00373D80": 3620224,
     "LVL_18_DAMOSEL_F8411efa9_FUN_00300FC8": 3149768,
@@ -331,6 +352,11 @@
     "LVL_18_DAMOSEL_F904cc63b_FUN_0033BC38": 3390520,
     "LVL_18_DAMOSEL_F93479d13_D_00189E20": 1613344,
     "LVL_18_DAMOSEL_F93479d13_FUN_0032B460": 3322976,
+    "LVL_18_DAMOSEL_F966dbf73_FUN_00335738": 3364664,
+    "LVL_18_DAMOSEL_F966dbf73_FUN_00335778": 3364728,
+    "LVL_18_DAMOSEL_F966dbf73_FUN_003357D0": 3364816,
+    "LVL_18_DAMOSEL_F966dbf73_FUN_00335958": 3365208,
+    "LVL_18_DAMOSEL_F966dbf73_FUN_0034FE48": 3472968,
     "LVL_18_DAMOSEL_F97fc4e13_FUN_003086C8": 3180232,
     "LVL_18_DAMOSEL_F97fc4e13_FUN_00375058": 3625048,
     "LVL_18_DAMOSEL_F9a90bcc4_FUN_00335738": 3364664,
@@ -412,6 +438,11 @@
     "LVL_18_DAMOSEL_Fb342d477_FUN_004738A0": 4667552,
     "LVL_18_DAMOSEL_Fb342d477_FUN_00473910": 4667664,
     "LVL_18_DAMOSEL_Fb4cfb7e0_FUN_00335738": 3364664,
+    "LVL_18_DAMOSEL_Fb5729173_FUN_00308A98": 3181208,
+    "LVL_18_DAMOSEL_Fb5729173_FUN_00308AD0": 3181264,
+    "LVL_18_DAMOSEL_Fb5729173_FUN_00308FB0": 3182512,
+    "LVL_18_DAMOSEL_Fb5729173_FUN_003099E8": 3185128,
+    "LVL_18_DAMOSEL_Fb5729173_FUN_0033A3B0": 3384240,
     "LVL_18_DAMOSEL_Fb77d67f1_FUN_00308560": 3179872,
     "LVL_18_DAMOSEL_Fb77d67f1_FUN_0034B1D0": 3453392,
     "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB2": 1735602,
@@ -449,6 +480,12 @@
     "LVL_18_DAMOSEL_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_18_DAMOSEL_Fc936841d_FUN_003088F0": 3180784,
     "LVL_18_DAMOSEL_Fc936841d_FUN_00308920": 3180832,
+    "LVL_18_DAMOSEL_Fc94396f4_D_00189E20": 1613344,
+    "LVL_18_DAMOSEL_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_18_DAMOSEL_Fc94396f4_FUN_002EE378": 3072888,
+    "LVL_18_DAMOSEL_Fc94396f4_FUN_002EE3F8": 3073016,
+    "LVL_18_DAMOSEL_Fc94396f4_FUN_003088F0": 3180784,
+    "LVL_18_DAMOSEL_Fc94396f4_FUN_00308BD8": 3181528,
     "LVL_18_DAMOSEL_Fccb147a4_FUN_0034B1D0": 3453392,
     "LVL_18_DAMOSEL_Fccb147a4_FUN_0039DDD0": 3792336,
     "LVL_18_DAMOSEL_Fcdb4d905_FUN_002FEB90": 3140496,
@@ -483,6 +520,14 @@
     "LVL_18_DAMOSEL_Fdb046c5d_FUN_0033FF10": 3407632,
     "LVL_18_DAMOSEL_Fdb046c5d_FUN_0037B6B0": 3651248,
     "LVL_18_DAMOSEL_Fdb046c5d_FUN_0037BA00": 3652096,
+    "LVL_18_DAMOSEL_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_18_DAMOSEL_Fdd54ca5d_FUN_00308590": 3179920,
+    "LVL_18_DAMOSEL_Fdd54ca5d_FUN_003088F0": 3180784,
+    "LVL_18_DAMOSEL_Fdd54ca5d_FUN_00308960": 3180896,
+    "LVL_18_DAMOSEL_Fdd54ca5d_FUN_00309A48": 3185224,
+    "LVL_18_DAMOSEL_Fdd54ca5d_FUN_00309A58": 3185240,
+    "LVL_18_DAMOSEL_Fdd54ca5d_FUN_0034B1D0": 3453392,
+    "LVL_18_DAMOSEL_Fdd54ca5d_FUN_0039DDD0": 3792336,
     "LVL_18_DAMOSEL_Fe524d931_D_001A6480": 1729664,
     "LVL_18_DAMOSEL_Fe524d931_FUN_0030AC60": 3189856,
     "LVL_18_DAMOSEL_Fe524d931_FUN_0037B810": 3651600,
@@ -529,6 +574,7 @@
     "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_00308DE0": 3182048,
     "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_00308E50": 3182160,
     "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_003305A8": 3343784,
+    "LVL_18_DAMOSEL_Ff454dd77_FUN_00308860": 3180640,
     "LVL_18_DAMOSEL_Ff4dd22f3_FUN_00308590": 3179920,
     "LVL_18_DAMOSEL_Ff4dd22f3_FUN_003088F0": 3180784,
     "LVL_18_DAMOSEL_Ff4dd22f3_FUN_0034B1D0": 3453392,
@@ -740,6 +786,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_18_DAMOSEL_FUN_002EDC20"
+    },
+    {
+      "address": 3071200,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_18_DAMOSEL_FUN_002EDCE0"
     },
     {
       "address": 3071896,
@@ -1179,6 +1231,24 @@
       "symbol": "LVL_18_DAMOSEL_FUN_003356D8"
     },
     {
+      "address": 3366416,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_18_DAMOSEL_FUN_00335E10"
+    },
+    {
+      "address": 3374528,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_18_DAMOSEL_FUN_00337DC0"
+    },
+    {
+      "address": 3377296,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_18_DAMOSEL_FUN_00338890"
+    },
+    {
       "address": 3381024,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1224,6 +1294,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_18_DAMOSEL_FUN_0033DC28"
+    },
+    {
+      "address": 3403544,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_18_DAMOSEL_FUN_0033EF18"
     },
     {
       "address": 3408616,
@@ -1315,6 +1391,12 @@
       "symbol": "LVL_18_DAMOSEL_FUN_0034E938"
     },
     {
+      "address": 3470312,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_18_DAMOSEL_FUN_0034F3E8"
+    },
+    {
       "address": 3470952,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1325,6 +1407,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_18_DAMOSEL_FUN_00350DD0"
+    },
+    {
+      "address": 3489168,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_18_DAMOSEL_FUN_00353D90"
     },
     {
       "address": 3491568,
@@ -1355,6 +1443,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_18_DAMOSEL_FUN_003567F0"
+    },
+    {
+      "address": 3506720,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_18_DAMOSEL_FUN_00358220"
     },
     {
       "address": 3516584,
@@ -1796,6 +1890,12 @@
       "symbol": "LVL_18_DAMOSEL_FUN_003E29B8"
     },
     {
+      "address": 4075256,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_18_DAMOSEL_FUN_003E2EF8"
+    },
+    {
       "address": 4083952,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -2115,6 +2215,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_18_DAMOSEL_FUN_00448400"
+    },
+    {
+      "address": 4494848,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_18_DAMOSEL_FUN_00449600"
     },
     {
       "address": 4511664,

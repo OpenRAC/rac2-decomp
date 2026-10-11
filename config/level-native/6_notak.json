@@ -54,6 +54,13 @@
     "LVL_6_NOTAK_F023cd14a_D_001B22E8": 1778408,
     "LVL_6_NOTAK_F023cd14a_D_001B22F8": 1778424,
     "LVL_6_NOTAK_F03c444112283bc5f_AT003CCE08_ROLE00": 2332784,
+    "LVL_6_NOTAK_F043c77a5_FUN_00325E00": 3300864,
+    "LVL_6_NOTAK_F043c77a5_FUN_0032A1F0": 3318256,
+    "LVL_6_NOTAK_F043c77a5_FUN_0032D650": 3331664,
+    "LVL_6_NOTAK_F043c77a5_FUN_0032D740": 3331904,
+    "LVL_6_NOTAK_F043c77a5_FUN_0032DC80": 3333248,
+    "LVL_6_NOTAK_F043c77a5_FUN_0032DE48": 3333704,
+    "LVL_6_NOTAK_F043c77a5_FUN_0046C0C0": 4636864,
     "LVL_6_NOTAK_F07d03334_D_001A742C": 1733676,
     "LVL_6_NOTAK_F07d03334_D_001B2F88": 1781640,
     "LVL_6_NOTAK_F07d03334_FUN_00126108": 1204488,
@@ -123,6 +130,9 @@
     "LVL_6_NOTAK_F25780968_D_001A7350": 1733456,
     "LVL_6_NOTAK_F25780968_D_001A7354": 1733460,
     "LVL_6_NOTAK_F25780968_D_001B2F88": 1781640,
+    "LVL_6_NOTAK_F27f9be8e_FUN_0032D538": 3331384,
+    "LVL_6_NOTAK_F27f9be8e_FUN_0032E5D0": 3335632,
+    "LVL_6_NOTAK_F27f9be8e_FUN_0032E618": 3335704,
     "LVL_6_NOTAK_F280d7406_FUN_0032D5C8": 3331528,
     "LVL_6_NOTAK_F280d7406_FUN_0032E728": 3335976,
     "LVL_6_NOTAK_F280d7406_FUN_003708A0": 3606688,
@@ -152,6 +162,9 @@
     "LVL_6_NOTAK_F391de845_D_001B9840": 1808448,
     "LVL_6_NOTAK_F391de845_FUN_0032D788": 3331976,
     "LVL_6_NOTAK_F391de845_FUN_0039F398": 3797912,
+    "LVL_6_NOTAK_F3c007b59_FUN_0032D268": 3330664,
+    "LVL_6_NOTAK_F3c007b59_FUN_0032E728": 3335976,
+    "LVL_6_NOTAK_F3c007b59_FUN_003708A0": 3606688,
     "LVL_6_NOTAK_F40487154_FUN_0032D650": 3331664,
     "LVL_6_NOTAK_F40487154_FUN_0032DBD0": 3333072,
     "LVL_6_NOTAK_F40487154_FUN_0032DE28": 3333672,
@@ -218,6 +231,10 @@
     "LVL_6_NOTAK_F55a1acb8_D_001A63AC": 1729452,
     "LVL_6_NOTAK_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_6_NOTAK_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_6_NOTAK_F5621621c_FUN_0032DBB8": 3333048,
+    "LVL_6_NOTAK_F5621621c_FUN_0032DBD0": 3333072,
+    "LVL_6_NOTAK_F5621621c_FUN_0032DC80": 3333248,
+    "LVL_6_NOTAK_F5621621c_FUN_0035C218": 3523096,
     "LVL_6_NOTAK_F5a19df7a_FUN_0035A660": 3516000,
     "LVL_6_NOTAK_F5a19df7a_FUN_0035A780": 3516288,
     "LVL_6_NOTAK_F5a19df7a_FUN_003BC960": 3918176,
@@ -287,6 +304,10 @@
     "LVL_6_NOTAK_F7b2f1854_FUN_0047D3F0": 4707312,
     "LVL_6_NOTAK_F7b2f1854_FUN_0047E330": 4711216,
     "LVL_6_NOTAK_F7b2f1854_FUN_0047E3C8": 4711368,
+    "LVL_6_NOTAK_F7cacd225_FUN_0032D268": 3330664,
+    "LVL_6_NOTAK_F7cacd225_FUN_0032E718": 3335960,
+    "LVL_6_NOTAK_F7cacd225_FUN_0032E770": 3336048,
+    "LVL_6_NOTAK_F7cacd225_FUN_003708A0": 3606688,
     "LVL_6_NOTAK_F7cb419c1_D_001FF6C0": 2094784,
     "LVL_6_NOTAK_F7cb419c1_FUN_00398EF8": 3772152,
     "LVL_6_NOTAK_F8411efa9_FUN_00325E00": 3300864,
@@ -324,6 +345,11 @@
     "LVL_6_NOTAK_F904cc63b_FUN_00361CC8": 3546312,
     "LVL_6_NOTAK_F93479d13_D_00189E20": 1613344,
     "LVL_6_NOTAK_F93479d13_FUN_00350388": 3474312,
+    "LVL_6_NOTAK_F966dbf73_FUN_0035A620": 3515936,
+    "LVL_6_NOTAK_F966dbf73_FUN_0035A660": 3516000,
+    "LVL_6_NOTAK_F966dbf73_FUN_0035A6B8": 3516088,
+    "LVL_6_NOTAK_F966dbf73_FUN_0035A908": 3516680,
+    "LVL_6_NOTAK_F966dbf73_FUN_00375518": 3626264,
     "LVL_6_NOTAK_F97fc4e13_FUN_0032D3A0": 3330976,
     "LVL_6_NOTAK_F97fc4e13_FUN_0039A1D0": 3776976,
     "LVL_6_NOTAK_F9a90bcc4_FUN_0035A620": 3515936,
@@ -406,6 +432,11 @@
     "LVL_6_NOTAK_Fb342d477_FUN_00497D38": 4816184,
     "LVL_6_NOTAK_Fb342d477_FUN_00497DA8": 4816296,
     "LVL_6_NOTAK_Fb4cfb7e0_FUN_0035A620": 3515936,
+    "LVL_6_NOTAK_Fb5729173_FUN_0032D788": 3331976,
+    "LVL_6_NOTAK_Fb5729173_FUN_0032D7C0": 3332032,
+    "LVL_6_NOTAK_Fb5729173_FUN_0032DC80": 3333248,
+    "LVL_6_NOTAK_Fb5729173_FUN_0032E6B8": 3335864,
+    "LVL_6_NOTAK_Fb5729173_FUN_0035FBE8": 3537896,
     "LVL_6_NOTAK_Fb77d67f1_FUN_0032D238": 3330616,
     "LVL_6_NOTAK_Fb77d67f1_FUN_003708A0": 3606688,
     "LVL_6_NOTAK_Fb7feb893_D_001A7BB2": 1735602,
@@ -443,6 +474,12 @@
     "LVL_6_NOTAK_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_6_NOTAK_Fc936841d_FUN_0032D5C8": 3331528,
     "LVL_6_NOTAK_Fc936841d_FUN_0032D5F8": 3331576,
+    "LVL_6_NOTAK_Fc94396f4_D_00189E20": 1613344,
+    "LVL_6_NOTAK_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_6_NOTAK_Fc94396f4_FUN_003132D8": 3224280,
+    "LVL_6_NOTAK_Fc94396f4_FUN_00313358": 3224408,
+    "LVL_6_NOTAK_Fc94396f4_FUN_0032D5C8": 3331528,
+    "LVL_6_NOTAK_Fc94396f4_FUN_0032D8A8": 3332264,
     "LVL_6_NOTAK_Fccb147a4_FUN_003708A0": 3606688,
     "LVL_6_NOTAK_Fccb147a4_FUN_003C3080": 3944576,
     "LVL_6_NOTAK_Fcdb4d905_FUN_003239C8": 3291592,
@@ -477,6 +514,14 @@
     "LVL_6_NOTAK_Fdb046c5d_FUN_00365230": 3559984,
     "LVL_6_NOTAK_Fdb046c5d_FUN_003A0948": 3803464,
     "LVL_6_NOTAK_Fdb046c5d_FUN_003A0D28": 3804456,
+    "LVL_6_NOTAK_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_6_NOTAK_Fdd54ca5d_FUN_0032D268": 3330664,
+    "LVL_6_NOTAK_Fdd54ca5d_FUN_0032D5C8": 3331528,
+    "LVL_6_NOTAK_Fdd54ca5d_FUN_0032D650": 3331664,
+    "LVL_6_NOTAK_Fdd54ca5d_FUN_0032E718": 3335960,
+    "LVL_6_NOTAK_Fdd54ca5d_FUN_0032E728": 3335976,
+    "LVL_6_NOTAK_Fdd54ca5d_FUN_003708A0": 3606688,
+    "LVL_6_NOTAK_Fdd54ca5d_FUN_003C3080": 3944576,
     "LVL_6_NOTAK_Fe524d931_D_001A6480": 1729664,
     "LVL_6_NOTAK_Fe524d931_FUN_0032F930": 3340592,
     "LVL_6_NOTAK_Fe524d931_FUN_003A0AA8": 3803816,
@@ -522,6 +567,7 @@
     "LVL_6_NOTAK_Ff2d8e5ad_FUN_0032DAB0": 3332784,
     "LVL_6_NOTAK_Ff2d8e5ad_FUN_0032DB20": 3332896,
     "LVL_6_NOTAK_Ff2d8e5ad_FUN_00355490": 3495056,
+    "LVL_6_NOTAK_Ff454dd77_FUN_0032D538": 3331384,
     "LVL_6_NOTAK_Ff4dd22f3_FUN_0032D268": 3330664,
     "LVL_6_NOTAK_Ff4dd22f3_FUN_0032D5C8": 3331528,
     "LVL_6_NOTAK_Ff4dd22f3_FUN_003708A0": 3606688,
@@ -748,6 +794,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_6_NOTAK_FUN_00312B80"
+    },
+    {
+      "address": 3222592,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_6_NOTAK_FUN_00312C40"
     },
     {
       "address": 3223288,
@@ -1162,6 +1214,24 @@
       "symbol": "LVL_6_NOTAK_FUN_0035A5C0"
     },
     {
+      "address": 3518248,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_6_NOTAK_FUN_0035AF28"
+    },
+    {
+      "address": 3526064,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_6_NOTAK_FUN_0035CDB0"
+    },
+    {
+      "address": 3528832,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_6_NOTAK_FUN_0035D880"
+    },
+    {
       "address": 3532560,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1212,6 +1282,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_6_NOTAK_FUN_00363BC8"
+    },
+    {
+      "address": 3556096,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_6_NOTAK_FUN_00364300"
     },
     {
       "address": 3560968,
@@ -1303,6 +1379,12 @@
       "symbol": "LVL_6_NOTAK_FUN_00374008"
     },
     {
+      "address": 3623608,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_6_NOTAK_FUN_00374AB8"
+    },
+    {
       "address": 3624248,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1313,6 +1395,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_6_NOTAK_FUN_003764A0"
+    },
+    {
+      "address": 3642464,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_6_NOTAK_FUN_00379460"
     },
     {
       "address": 3645064,
@@ -1343,6 +1431,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_6_NOTAK_FUN_0037BE70"
+    },
+    {
+      "address": 3659936,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_6_NOTAK_FUN_0037D8A0"
     },
     {
       "address": 3669640,
@@ -1766,6 +1860,12 @@
       "symbol": "LVL_6_NOTAK_FUN_00409AC8"
     },
     {
+      "address": 4235272,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_6_NOTAK_FUN_0040A008"
+    },
+    {
       "address": 4243968,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -2055,6 +2155,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_6_NOTAK_FUN_0046C128"
+    },
+    {
+      "address": 4641576,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_6_NOTAK_FUN_0046D328"
     },
     {
       "address": 4658392,

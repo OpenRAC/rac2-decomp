@@ -52,6 +52,13 @@
     "LVL_10_HRUGIS_CLOUD_F01bd4546_FUN_0045C218": 4571672,
     "LVL_10_HRUGIS_CLOUD_F01bd4546_FUN_0045C260": 4571744,
     "LVL_10_HRUGIS_CLOUD_F03c444112283bc5f_AT003A3618_ROLE00": 2337584,
+    "LVL_10_HRUGIS_CLOUD_F043c77a5_FUN_00301440": 3150912,
+    "LVL_10_HRUGIS_CLOUD_F043c77a5_FUN_00305E10": 3169808,
+    "LVL_10_HRUGIS_CLOUD_F043c77a5_FUN_00308BB8": 3181496,
+    "LVL_10_HRUGIS_CLOUD_F043c77a5_FUN_00308CA8": 3181736,
+    "LVL_10_HRUGIS_CLOUD_F043c77a5_FUN_003091E8": 3183080,
+    "LVL_10_HRUGIS_CLOUD_F043c77a5_FUN_003093B0": 3183536,
+    "LVL_10_HRUGIS_CLOUD_F043c77a5_FUN_00435230": 4411952,
     "LVL_10_HRUGIS_CLOUD_F060b9f20_D_001A72D0": 1733328,
     "LVL_10_HRUGIS_CLOUD_F060b9f20_D_001A72D4": 1733332,
     "LVL_10_HRUGIS_CLOUD_F060b9f20_D_001B1FBC": 1777596,
@@ -110,6 +117,9 @@
     "LVL_10_HRUGIS_CLOUD_F250fbfa4_FUN_003087D0": 3180496,
     "LVL_10_HRUGIS_CLOUD_F250fbfa4_FUN_00308B30": 3181360,
     "LVL_10_HRUGIS_CLOUD_F250fbfa4_FUN_00344128": 3424552,
+    "LVL_10_HRUGIS_CLOUD_F27f9be8e_FUN_00308AA0": 3181216,
+    "LVL_10_HRUGIS_CLOUD_F27f9be8e_FUN_00309B38": 3185464,
+    "LVL_10_HRUGIS_CLOUD_F27f9be8e_FUN_00309B80": 3185536,
     "LVL_10_HRUGIS_CLOUD_F280d7406_FUN_00308B30": 3181360,
     "LVL_10_HRUGIS_CLOUD_F280d7406_FUN_00309C90": 3185808,
     "LVL_10_HRUGIS_CLOUD_F280d7406_FUN_00344128": 3424552,
@@ -138,6 +148,9 @@
     "LVL_10_HRUGIS_CLOUD_F391de845_D_001B9680": 1808000,
     "LVL_10_HRUGIS_CLOUD_F391de845_FUN_00308CF0": 3181808,
     "LVL_10_HRUGIS_CLOUD_F391de845_FUN_00372160": 3613024,
+    "LVL_10_HRUGIS_CLOUD_F3c007b59_FUN_003087D0": 3180496,
+    "LVL_10_HRUGIS_CLOUD_F3c007b59_FUN_00309C90": 3185808,
+    "LVL_10_HRUGIS_CLOUD_F3c007b59_FUN_00344128": 3424552,
     "LVL_10_HRUGIS_CLOUD_F3cde0d02_D_001CA200": 1876480,
     "LVL_10_HRUGIS_CLOUD_F3cde0d02_D_001D2000": 1908736,
     "LVL_10_HRUGIS_CLOUD_F40487154_FUN_00308BB8": 3181496,
@@ -200,6 +213,10 @@
     "LVL_10_HRUGIS_CLOUD_F55a1acb8_D_001A63AC": 1729452,
     "LVL_10_HRUGIS_CLOUD_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_10_HRUGIS_CLOUD_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_10_HRUGIS_CLOUD_F5621621c_FUN_00309120": 3182880,
+    "LVL_10_HRUGIS_CLOUD_F5621621c_FUN_00309138": 3182904,
+    "LVL_10_HRUGIS_CLOUD_F5621621c_FUN_003091E8": 3183080,
+    "LVL_10_HRUGIS_CLOUD_F5621621c_FUN_00336BC8": 3369928,
     "LVL_10_HRUGIS_CLOUD_F5a19df7a_FUN_00335200": 3363328,
     "LVL_10_HRUGIS_CLOUD_F5a19df7a_FUN_00335320": 3363616,
     "LVL_10_HRUGIS_CLOUD_F5a19df7a_FUN_003923D8": 3744728,
@@ -269,6 +286,10 @@
     "LVL_10_HRUGIS_CLOUD_F7b2f1854_FUN_00448A48": 4491848,
     "LVL_10_HRUGIS_CLOUD_F7b2f1854_FUN_00449988": 4495752,
     "LVL_10_HRUGIS_CLOUD_F7b2f1854_FUN_00449A20": 4495904,
+    "LVL_10_HRUGIS_CLOUD_F7cacd225_FUN_003087D0": 3180496,
+    "LVL_10_HRUGIS_CLOUD_F7cacd225_FUN_00309C80": 3185792,
+    "LVL_10_HRUGIS_CLOUD_F7cacd225_FUN_00309CD8": 3185880,
+    "LVL_10_HRUGIS_CLOUD_F7cacd225_FUN_00344128": 3424552,
     "LVL_10_HRUGIS_CLOUD_F7cb419c1_D_001FF500": 2094336,
     "LVL_10_HRUGIS_CLOUD_F7cb419c1_FUN_0036BDE0": 3587552,
     "LVL_10_HRUGIS_CLOUD_F82977136_D_001C9EE8": 1875688,
@@ -310,6 +331,11 @@
     "LVL_10_HRUGIS_CLOUD_F904cc63b_FUN_0033B008": 3387400,
     "LVL_10_HRUGIS_CLOUD_F93479d13_D_00189E20": 1613344,
     "LVL_10_HRUGIS_CLOUD_F93479d13_FUN_0032AF78": 3321720,
+    "LVL_10_HRUGIS_CLOUD_F966dbf73_FUN_003351C0": 3363264,
+    "LVL_10_HRUGIS_CLOUD_F966dbf73_FUN_00335200": 3363328,
+    "LVL_10_HRUGIS_CLOUD_F966dbf73_FUN_00335258": 3363416,
+    "LVL_10_HRUGIS_CLOUD_F966dbf73_FUN_003353E0": 3363808,
+    "LVL_10_HRUGIS_CLOUD_F966dbf73_FUN_00348DA0": 3444128,
     "LVL_10_HRUGIS_CLOUD_F97fc4e13_FUN_00308908": 3180808,
     "LVL_10_HRUGIS_CLOUD_F97fc4e13_FUN_0036D0B8": 3592376,
     "LVL_10_HRUGIS_CLOUD_F9a90bcc4_FUN_003351C0": 3363264,
@@ -397,6 +423,11 @@
     "LVL_10_HRUGIS_CLOUD_Fb342d477_FUN_00463390": 4600720,
     "LVL_10_HRUGIS_CLOUD_Fb342d477_FUN_00463400": 4600832,
     "LVL_10_HRUGIS_CLOUD_Fb4cfb7e0_FUN_003351C0": 3363264,
+    "LVL_10_HRUGIS_CLOUD_Fb5729173_FUN_00308CF0": 3181808,
+    "LVL_10_HRUGIS_CLOUD_Fb5729173_FUN_00308D28": 3181864,
+    "LVL_10_HRUGIS_CLOUD_Fb5729173_FUN_003091E8": 3183080,
+    "LVL_10_HRUGIS_CLOUD_Fb5729173_FUN_00309C20": 3185696,
+    "LVL_10_HRUGIS_CLOUD_Fb5729173_FUN_003397D8": 3381208,
     "LVL_10_HRUGIS_CLOUD_Fb77d67f1_FUN_003087A0": 3180448,
     "LVL_10_HRUGIS_CLOUD_Fb77d67f1_FUN_00344128": 3424552,
     "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB2": 1735602,
@@ -434,6 +465,12 @@
     "LVL_10_HRUGIS_CLOUD_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_10_HRUGIS_CLOUD_Fc936841d_FUN_00308B30": 3181360,
     "LVL_10_HRUGIS_CLOUD_Fc936841d_FUN_00308B60": 3181408,
+    "LVL_10_HRUGIS_CLOUD_Fc94396f4_D_00189E20": 1613344,
+    "LVL_10_HRUGIS_CLOUD_Fc94396f4_D_0018A0E0": 1614048,
+    "LVL_10_HRUGIS_CLOUD_Fc94396f4_FUN_002EE8D8": 3074264,
+    "LVL_10_HRUGIS_CLOUD_Fc94396f4_FUN_002EE958": 3074392,
+    "LVL_10_HRUGIS_CLOUD_Fc94396f4_FUN_00308B30": 3181360,
+    "LVL_10_HRUGIS_CLOUD_Fc94396f4_FUN_00308E10": 3182096,
     "LVL_10_HRUGIS_CLOUD_Fccb147a4_FUN_00344128": 3424552,
     "LVL_10_HRUGIS_CLOUD_Fccb147a4_FUN_00396870": 3762288,
     "LVL_10_HRUGIS_CLOUD_Fcdb4d905_FUN_002FEF80": 3141504,
@@ -468,6 +505,14 @@
     "LVL_10_HRUGIS_CLOUD_Fdb046c5d_FUN_0033E158": 3400024,
     "LVL_10_HRUGIS_CLOUD_Fdb046c5d_FUN_00373710": 3618576,
     "LVL_10_HRUGIS_CLOUD_Fdb046c5d_FUN_00373A60": 3619424,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_D_0018A0E0": 1614048,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_FUN_003087D0": 3180496,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_FUN_00308B30": 3181360,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_FUN_00308BB8": 3181496,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_FUN_00309C80": 3185792,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_FUN_00309C90": 3185808,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_FUN_00344128": 3424552,
+    "LVL_10_HRUGIS_CLOUD_Fdd54ca5d_FUN_00396870": 3762288,
     "LVL_10_HRUGIS_CLOUD_Fe524d931_D_001A6480": 1729664,
     "LVL_10_HRUGIS_CLOUD_Fe524d931_FUN_0030AE98": 3190424,
     "LVL_10_HRUGIS_CLOUD_Fe524d931_FUN_00373870": 3618928,
@@ -512,6 +557,7 @@
     "LVL_10_HRUGIS_CLOUD_Ff2d8e5ad_FUN_00309018": 3182616,
     "LVL_10_HRUGIS_CLOUD_Ff2d8e5ad_FUN_00309088": 3182728,
     "LVL_10_HRUGIS_CLOUD_Ff2d8e5ad_FUN_00330030": 3342384,
+    "LVL_10_HRUGIS_CLOUD_Ff454dd77_FUN_00308AA0": 3181216,
     "LVL_10_HRUGIS_CLOUD_Ff4dd22f3_FUN_003087D0": 3180496,
     "LVL_10_HRUGIS_CLOUD_Ff4dd22f3_FUN_00308B30": 3181360,
     "LVL_10_HRUGIS_CLOUD_Ff4dd22f3_FUN_00344128": 3424552,
@@ -738,6 +784,12 @@
       "meaning": "resident mode predicate: returns 0, 1 or 2 from the resident state words",
       "size": 188,
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_002EE180"
+    },
+    {
+      "address": 3072576,
+      "meaning": "Dispatches a shared mode to update the destination Z component or compose two temporary transforms through the measured helper sequence.",
+      "size": 372,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_002EE240"
     },
     {
       "address": 3073272,
@@ -1177,6 +1229,24 @@
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00335160"
     },
     {
+      "address": 3365016,
+      "meaning": "Updates one typed float field and applies the measured six-helper float pipeline to the provided inputs.",
+      "size": 360,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00335898"
+    },
+    {
+      "address": 3372416,
+      "meaning": "Copies one 16-byte value through the measured helper pipeline and stores the resulting record fields.",
+      "size": 332,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00337580"
+    },
+    {
+      "address": 3375184,
+      "meaning": "Updates an object float with a damped input term and applies symmetric helper and positive-limit clamps.",
+      "size": 336,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00338050"
+    },
+    {
       "address": 3378280,
       "meaning": "Walks the three columns of a four-float-wide row array, gathering each column into a four-element local whose fourth element is zeroed, passing that local twice plus 1.0f to a call and scattering the result back into the same column.",
       "size": 188,
@@ -1222,6 +1292,12 @@
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0033CC10"
+    },
+    {
+      "address": 3396264,
+      "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
+      "size": 376,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0033D2A8"
     },
     {
       "address": 3400536,
@@ -1295,6 +1371,12 @@
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00347890"
     },
     {
+      "address": 3441472,
+      "meaning": "Updates a frame state, dispatching a terminal path or otherwise reflecting one float field, advancing wrapped phase and byte fields, and reducing a timer.",
+      "size": 356,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00348340"
+    },
+    {
       "address": 3442112,
       "meaning": "Calls a three-argument callee twice and a two-argument callee twice over fields of the first object, folds a float field through a float-to-int callee into an int field of the object, and calls a last callee when the updated field is negative.",
       "size": 164,
@@ -1305,6 +1387,12 @@
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "size": 516,
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00349D28"
+    },
+    {
+      "address": 3460016,
+      "meaning": "Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float.",
+      "size": 404,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0034CBB0"
     },
     {
       "address": 3462616,
@@ -1335,6 +1423,12 @@
       "meaning": "Resets a record through a three-pointer helper, folds a float at offset 0x30 into the float at 0xc, increments the byte at 8, decrements the 16-bit counter at 10 and, when it reaches zero, adds 0xff000000 to the word at 4 and refills the counter with 2; then calls a helper when the top byte of the word at 4 is clear.",
       "size": 160,
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0034F5C0"
+    },
+    {
+      "address": 3477488,
+      "meaning": "Updates three bounded float fields at +16, +20, and +24.",
+      "size": 348,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00350FF0"
     },
     {
       "address": 3486912,
@@ -1752,6 +1846,12 @@
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_003D6C18"
     },
     {
+      "address": 4026712,
+      "meaning": "Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43.",
+      "size": 332,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_003D7158"
+    },
+    {
       "address": 4035408,
       "meaning": "one float gate followed by five integer gates; every failing gate",
       "size": 108,
@@ -2030,6 +2130,12 @@
       "meaning": "shared native body of family 9a8a2404",
       "size": 112,
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00435298"
+    },
+    {
+      "address": 4416664,
+      "meaning": "Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper.",
+      "size": 364,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00436498"
     },
     {
       "address": 4433480,

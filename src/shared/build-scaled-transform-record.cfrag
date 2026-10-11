@@ -1,0 +1,77 @@
+extern void @@ROLE_0_00@@(void *dst);
+extern long long @@ROLE_1_00@@(int id);
+extern float @@ROLE_2_00@@(float x, float y);
+extern float @@ROLE_3_00@@(void *vec);
+extern void @@ROLE_5_00@@(void *dst, void *src);
+extern void @@ROLE_6_00@@(void *dst, void *src, float scale);
+extern void @@ROLE_10_00@@(void *dst, void *src, int flag);
+
+#ifndef RAC2_T_BLOCK_F043C77A5
+#define RAC2_T_BLOCK_F043C77A5
+typedef struct { int q[4]; } BLOCK_F043c77a5;
+#endif
+
+
+#ifndef RAC2_T_LOC_F043C77A5
+#define RAC2_T_LOC_F043C77A5
+typedef struct {
+    BLOCK_F043c77a5 b0;
+    BLOCK_F043c77a5 b1;
+    BLOCK_F043c77a5 b2;
+    BLOCK_F043c77a5 b3;
+    int   k0, k1, k2, k3;
+    int   z80, z84, z88;
+    float f92, f96;
+    int   z100;
+    float f104, f108;
+    long long v112;
+    long long v120;
+    long long v128;
+    long long v136;
+    float m00, m01, m02, m03;
+    float m10, m11, m12, m13;
+    float m20, m21, m22, m23;
+    float v192, v196, v200, v204;
+    float v208, f212, f216, v220;
+} LOC_F043c77a5;
+#endif
+
+
+void @@FUNCTION@@(void *unused, float *b, float *a, int k, float f)
+{
+    LOC_F043c77a5 local;
+    float x;
+
+    @@ROLE_0_01@@(&local);
+    local.z80 = 0;
+    local.f92 = 1.0f;
+    local.f96 = 1.0f;
+    local.f104 = 1.0f;
+    local.f108 = 1.0f;
+    local.z84 = 0;
+    local.z88 = 0;
+    local.z100 = 0;
+    local.v120 = @@ROLE_1_01@@(11);
+    local.v128 = 0xFF9000000260LL;
+    local.v136 = 0x0000008000000048LL;
+    local.k3 = k;
+    local.k2 = k;
+    local.k1 = k;
+    local.k0 = k;
+    local.v112 = 0;
+    local.v220 = 0.0f;
+    local.f216 = @@ROLE_2_01@@(a[0], a[1]);
+    x = @@ROLE_2_02@@(@@ROLE_3_01@@(a), a[2]);
+    local.f212 = -x;
+    local.v208 = 0.0f;
+    @@ROLE_5_01@@(&local.m00, &local.v208);
+    local.v192 = b[0];
+    local.v196 = b[1];
+    local.v200 = b[2];
+    local.v204 = 1.0f;
+    @@ROLE_6_01@@(&local.b0, &local.b0, f);
+    @@ROLE_6_02@@(&local.b1, &local.b1, f);
+    @@ROLE_6_03@@(&local.b2, &local.b2, f);
+    @@ROLE_6_04@@(&local.b3, &local.b3, f);
+    @@ROLE_10_01@@(&local, &local.m00, 0);
+}

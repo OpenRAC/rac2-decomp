@@ -6695,3 +6695,573 @@ void LVL_22_DOBBO_ORBIT_FUN_0032AED0(char *self, int mask, int arg2,
                 buf, arg3, fa, fb);
     }
 }
+extern int LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3720(char *p);
+extern void LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_003330A8(char *self);
+extern float LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BD0(int v);
+extern float LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BD0(int v);
+extern int LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BE0(float f);
+extern void LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3A80(char *dst, char *src, char *vec);
+extern void LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_00383120(char *dst, char *src);
+extern void LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3AF0(char *dst, char *table, float scale);
+extern void LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3A80(char *dst, char *src, char *vec);
+extern void LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3AF0(char *dst, char *table, float scale);
+extern char LVL_22_DOBBO_ORBIT_Fdd54ca5d_D_0018A0E0[];
+
+void LVL_22_DOBBO_ORBIT_FUN_0033BE68(char *self)
+{
+    float vec[4];
+    float tmp[4];
+    char *s1;
+    char *p;
+    float f20;
+    float t;
+    unsigned int v;
+
+    if (LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3720(self + 10)) {
+        LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_003330A8(self);
+        return;
+    }
+    s1 = self + 32;
+    f20 = LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BD0(*(short *)(s1 + 30));
+    t = LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BD0(*(short *)(s1 + 28));
+    v = LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F4BE0(f20 * ((float)*(short *)(self + 10) / t));
+    v = v << 24;
+    v = v | (*(unsigned char *)(s1 + 19) << 16);
+    v = v | (*(unsigned char *)(s1 + 18) << 8);
+    v = v | *(unsigned char *)(s1 + 17);
+    *(unsigned int *)(self + 4) = v;
+    vec[3] = 0.0f;
+    vec[0] = *(float *)(self + 32);
+    vec[1] = *(float *)(s1 + 4);
+    vec[2] = *(float *)(s1 + 8);
+    LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3A80((char *)self + 16, (char *)self + 16, (char *)vec);
+    if (*(float *)(self + 28) != 0.0f) {
+        if (*(float *)(self + 28) == 2.0f)
+            LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_00383120((char *)self + 16, (char *)self + 16);
+        *(float *)(self + 28) = 2.0f;
+    }
+    p = (char *)tmp;
+    LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3AF0(p, LVL_22_DOBBO_ORBIT_Fdd54ca5d_D_0018A0E0, *(float *)(s1 + 12));
+    LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3A80((char *)vec, (char *)vec, p);
+    LVL_22_DOBBO_ORBIT_Fdd54ca5d_FUN_002F3AF0((char *)vec, (char *)vec, *(float *)(s1 + 24));
+    *(float *)s1 = vec[0];
+    *(float *)(s1 + 4) = vec[1];
+    *(float *)(s1 + 8) = vec[2];
+    *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(s1 + 16);
+    *(float *)(self + 12) = *(float *)(self + 12) + *(float *)(s1 + 20);
+}
+extern float LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F3C40(char *a, char *b);
+extern float LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4138(float x, float y);
+extern float LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4B70(float x, float y);
+extern float LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F3C78(char *a, char *b);
+extern int LVL_22_DOBBO_ORBIT_Fb5729173_FUN_00324748(char *a);
+
+float LVL_22_DOBBO_ORBIT_FUN_003291D8(char *a0, char *a1, int *a2,
+                                       float p1, float p2, float p3, float p4)
+{
+    float best = p4;
+    float hi = p3;
+    float radius;
+    float reach = p2;
+    float far;
+    float near;
+    float tmp;
+
+    *a2 = 0;
+    far = LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F3C40(a0, a1 + 16);
+    if (reach < far) {
+        *a2 = 1;
+    }
+
+    reach = 0.0f;
+    radius = LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4B70(LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4138(((float *)(a1 + 16))[0] - ((float *)a0)[0],
+                             ((float *)(a1 + 16))[1] - ((float *)a0)[1]), p1);
+    near = LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F3C78(a0, a1 + 16);
+    tmp = LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4B70(LVL_22_DOBBO_ORBIT_Fb5729173_FUN_002F4138(near, ((float *)(a1 + 16))[2] - ((float *)a0)[2]), 0.0f);
+
+    if (reach < hi) {
+        if (hi < radius) {
+            *a2 = 1;
+        }
+    }
+    if (0.0f < best) {
+        if (best < tmp) {
+            *a2 = 1;
+        }
+    }
+
+    reach = far + radius * far;
+    if (LVL_22_DOBBO_ORBIT_Fb5729173_FUN_00324748(a1) != 0) {
+        reach = reach + 8.0f;
+    }
+    return reach;
+}
+struct family_27f9_object {
+    unsigned char reserved[248];
+    float heading;
+};
+
+extern float LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F4AD0(float p, float x);
+extern float LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(float t);
+extern float LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(float t);
+extern float LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(float t);
+extern float LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(float t);
+extern float LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F4A88(float x, float y);
+
+float LVL_22_DOBBO_ORBIT_FUN_00320360(struct family_27f9_object *a0,
+                                         float *a1,
+                                         float p1, float p2, float p3, float p4)
+{
+    float t;
+    float v;
+    float f3;
+    float out;
+
+    t = LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F4AD0(p1, a0->heading);
+    v = t * 6.3661971092224121093750e+00f;
+    if (v > 1.0f) {
+        v = 1.0f;
+    } else {
+        if (v < -1.0f) {
+            v = -1.0f;
+        }
+    }
+    f3 = a1[0];
+    a1[0] = f3 + (p2 * v - p3 * f3);
+    if (p4 != 0.0f) {
+        if (a1[0] > p4) {
+            a1[0] = p4;
+        } else {
+            if (a1[0] < -p4) {
+                a1[0] = -p4;
+            }
+        }
+    }
+    if (LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(t) < a1[0]) {
+        a1[0] = LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(t);
+    } else {
+        if (a1[0] < -LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(t)) {
+            a1[0] = -LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F39F0(t);
+        }
+    }
+    out = LVL_22_DOBBO_ORBIT_F27f9be8e_FUN_002F4A88(a0->heading, a1[0]);
+    a0->heading = out;
+    return out;
+}
+
+#ifndef RAC2_T_S16_FC94396F4
+#define RAC2_T_S16_FC94396F4
+typedef signed short s16_Fc94396f4;
+#endif
+
+
+
+
+#ifndef RAC2_T_FAMILYC94396F4VECTOR_FC94396F4
+#define RAC2_T_FAMILYC94396F4VECTOR_FC94396F4
+typedef struct {
+    f32 x;
+    f32 y;
+    f32 z;
+} FamilyC94396F4Vector_Fc94396f4;
+#endif
+
+
+#ifndef RAC2_T_FAMILYC94396F4STATE_FC94396F4
+#define RAC2_T_FAMILYC94396F4STATE_FC94396F4
+typedef struct {
+    u8 reserved0[846];
+    s16_Fc94396f4 gate;
+    u8 reserved1[8004];
+    s32 state;
+    u8 reserved2[43];
+    u8 mode;
+} FamilyC94396F4State_Fc94396f4;
+#endif
+
+
+extern FamilyC94396F4State_Fc94396f4 LVL_22_DOBBO_ORBIT_Fc94396f4_D_00189E20;
+extern u8 LVL_22_DOBBO_ORBIT_Fc94396f4_D_0018A0E0[];
+
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3D60(u8 *buffer, u8 *table, f32 parameter);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9F10(u8 *buffer, FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9E90(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3D60(u8 *buffer, u8 *table, f32 parameter);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3D60(u8 *buffer, u8 *table, f32 parameter);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9F10(u8 *buffer, FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9E90(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, f32 zero);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(FamilyC94396F4Vector_Fc94396f4 *destination,
+                    FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+extern void LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(FamilyC94396F4Vector_Fc94396f4 *destination,
+                     FamilyC94396F4Vector_Fc94396f4 *source, u8 *buffer);
+
+void LVL_22_DOBBO_ORBIT_FUN_002D97F8(FamilyC94396F4Vector_Fc94396f4 *destination,
+                                      FamilyC94396F4Vector_Fc94396f4 *source,
+                                      f32 parameter)
+{
+    u8 first[16];
+    u8 second[16];
+
+    switch (LVL_22_DOBBO_ORBIT_Fc94396f4_D_00189E20.mode) {
+    case 0:
+        destination->z = source->z - parameter;
+        return;
+    case 1:
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3D60(first, (u8 *)&LVL_22_DOBBO_ORBIT_Fc94396f4_D_00189E20 + 672, -parameter);
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9F10(second, source, 0.0f);
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9E90(destination, destination, 0.0f);
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(destination, destination, second);
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(destination, destination, first);
+        return;
+    case 2:
+        if (LVL_22_DOBBO_ORBIT_Fc94396f4_D_00189E20.state == 58 && LVL_22_DOBBO_ORBIT_Fc94396f4_D_00189E20.gate == 0) {
+            LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3D60(first, (u8 *)&LVL_22_DOBBO_ORBIT_Fc94396f4_D_00189E20 + 672, -parameter);
+        } else {
+            LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3D60(first, LVL_22_DOBBO_ORBIT_Fc94396f4_D_0018A0E0, parameter);
+        }
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9F10(second, source, 0.0f);
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002D9E90(destination, destination, 0.0f);
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(destination, destination, second);
+        LVL_22_DOBBO_ORBIT_Fc94396f4_FUN_002F3A80(destination, destination, first);
+        return;
+    default:
+        return;
+    }
+}
+extern int LVL_22_DOBBO_ORBIT_F3c007b59_FUN_002F3720(void *p);
+extern void LVL_22_DOBBO_ORBIT_F3c007b59_FUN_003330A8(void *p);
+extern unsigned int LVL_22_DOBBO_ORBIT_F3c007b59_FUN_002F4BE0(float x);
+
+#ifndef RAC2_T_OBJ_F3C007B59
+#define RAC2_T_OBJ_F3C007B59
+typedef struct {
+    unsigned char pad0[4];
+    unsigned int w04;
+    unsigned char c08;
+    unsigned char c09;
+    unsigned char c10;
+    unsigned char c11;
+    float f12;
+    unsigned char pad16[8];
+    float f24;
+    unsigned char pad28[4];
+    float f36;
+    float f40;
+    float f44;
+} OBJ_F3c007b59;
+#endif
+
+
+void LVL_22_DOBBO_ORBIT_FUN_003373B8(OBJ_F3c007b59 *o)
+{
+    float *p = (float *)((char *)o + 32);
+    float f;
+    float y;
+
+    f = p[1] + p[3] * 1.3000000268220901489258e-02f;
+    p[1] = f;
+    if (f <= 0.0f || LVL_22_DOBBO_ORBIT_F3c007b59_FUN_002F3720(&o->c10) != 0) {
+        LVL_22_DOBBO_ORBIT_F3c007b59_FUN_003330A8(o);
+    } else {
+        f = p[1];
+        if (2.1999999880790710449219e-01f <= f) {
+            y = p[3];
+            y = -y;
+            p[3] = y;
+            p[1] = f + y * 1.3000000268220901489258e-02f;
+        }
+        o->f12 = o->f12 + 8.1900000000000000000000e+03f;
+        o->w04 = (o->w04 & 0xFFFFFFu) |
+                 (LVL_22_DOBBO_ORBIT_F3c007b59_FUN_002F4BE0(p[1] * 2.5500000000000000000000e+02f) << 24);
+        p[2] = p[2] + 1.2000000104308128356934e-02f;
+        if (p[2] > 1.0f)
+            p[2] = p[2] - 1.0f;
+        o->c08 = (unsigned char)(p[2] * 2.5500000000000000000000e+02f);
+        o->f24 = o->f24 - 1.9999999552965164184570e-02f;
+    }
+}
+extern void LVL_22_DOBBO_ORBIT_F043c77a5_FUN_0041C2F8(void *dst);
+extern long long LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002EC970(int id);
+extern float LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F4138(float x, float y);
+extern float LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3BF8(void *vec);
+extern void LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F4300(void *dst, void *src);
+extern void LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3AF0(void *dst, void *src, float scale);
+extern void LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F0D60(void *dst, void *src, int flag);
+
+#ifndef RAC2_T_BLOCK_F043C77A5
+#define RAC2_T_BLOCK_F043C77A5
+typedef struct { int q[4]; } BLOCK_F043c77a5;
+#endif
+
+
+#ifndef RAC2_T_LOC_F043C77A5
+#define RAC2_T_LOC_F043C77A5
+typedef struct {
+    BLOCK_F043c77a5 b0;
+    BLOCK_F043c77a5 b1;
+    BLOCK_F043c77a5 b2;
+    BLOCK_F043c77a5 b3;
+    int   k0, k1, k2, k3;
+    int   z80, z84, z88;
+    float f92, f96;
+    int   z100;
+    float f104, f108;
+    long long v112;
+    long long v120;
+    long long v128;
+    long long v136;
+    float m00, m01, m02, m03;
+    float m10, m11, m12, m13;
+    float m20, m21, m22, m23;
+    float v192, v196, v200, v204;
+    float v208, f212, f216, v220;
+} LOC_F043c77a5;
+#endif
+
+
+void LVL_22_DOBBO_ORBIT_FUN_0041D560(void *unused, float *b, float *a, int k, float f)
+{
+    LOC_F043c77a5 local;
+    float x;
+
+    LVL_22_DOBBO_ORBIT_F043c77a5_FUN_0041C2F8(&local);
+    local.z80 = 0;
+    local.f92 = 1.0f;
+    local.f96 = 1.0f;
+    local.f104 = 1.0f;
+    local.f108 = 1.0f;
+    local.z84 = 0;
+    local.z88 = 0;
+    local.z100 = 0;
+    local.v120 = LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002EC970(11);
+    local.v128 = 0xFF9000000260LL;
+    local.v136 = 0x0000008000000048LL;
+    local.k3 = k;
+    local.k2 = k;
+    local.k1 = k;
+    local.k0 = k;
+    local.v112 = 0;
+    local.v220 = 0.0f;
+    local.f216 = LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F4138(a[0], a[1]);
+    x = LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F4138(LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3BF8(a), a[2]);
+    local.f212 = -x;
+    local.v208 = 0.0f;
+    LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F4300(&local.m00, &local.v208);
+    local.v192 = b[0];
+    local.v196 = b[1];
+    local.v200 = b[2];
+    local.v204 = 1.0f;
+    LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3AF0(&local.b0, &local.b0, f);
+    LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3AF0(&local.b1, &local.b1, f);
+    LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3AF0(&local.b2, &local.b2, f);
+    LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F3AF0(&local.b3, &local.b3, f);
+    LVL_22_DOBBO_ORBIT_F043c77a5_FUN_002F0D60(&local, &local.m00, 0);
+}
+extern int LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F3720(short *p);
+extern void LVL_22_DOBBO_ORBIT_F7cacd225_FUN_003330A8(char *o);
+extern float LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4BD0(int n);
+extern float LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4BD0(int n);
+extern int LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4C28(int a, int b, float q);
+
+#ifndef RAC2_T_OBJ_F7CACD225
+#define RAC2_T_OBJ_F7CACD225
+typedef struct {
+    int pad0;
+    int f4;
+    short pad8;
+    short s10;
+    float f12;
+    float f16;
+    float f20;
+    float f24;
+    int pad28;
+    int f32;
+} Obj_F7cacd225;
+#endif
+
+
+void LVL_22_DOBBO_ORBIT_FUN_003403D0(Obj_F7cacd225 *o)
+{
+    int v;
+
+    if (o->f16 < 2.0f || o->f16 > 1021.0f ||
+        o->f20 < 2.0f || o->f20 > 1021.0f ||
+        o->f24 < 2.0f || o->f24 > 1021.0f ||
+        LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F3720(&o->s10) != 0) {
+        LVL_22_DOBBO_ORBIT_F7cacd225_FUN_003330A8((char *)o);
+        return;
+    }
+    v = o->f32;
+    if (v != 0) {
+        o->f12 = o->f12 * 0.99f;
+        o->f4 = LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4C28(0x30FFFFFF, o->f4, LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4BD0(o->s10 - 1) / LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4BD0(o->s10));
+    } else {
+        o->f12 = o->f12 * 0.95f;
+        o->f4 = LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4C28(0x603F1008, o->f4, LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4BD0(o->s10 - 1) / LVL_22_DOBBO_ORBIT_F7cacd225_FUN_002F4BD0(o->s10));
+    }
+}
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+extern float LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(float a);
+
+#ifndef RAC2_T_OBJ_FF454DD77
+#define RAC2_T_OBJ_FF454DD77
+typedef struct {
+    float f0;
+} Obj_Ff454dd77;
+#endif
+
+
+void LVL_22_DOBBO_ORBIT_FUN_00322C28(Obj_Ff454dd77 *o, float a, float b, float c, float d)
+{
+    if (LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a) < o->f0)
+        o->f0 = LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a);
+    else if (o->f0 < -LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a))
+        o->f0 = -LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a);
+
+    o->f0 = o->f0 + (b * a - c * o->f0);
+    if (0.0f < d) {
+        if (d < o->f0)
+            o->f0 = d;
+        else if (o->f0 < -d)
+            o->f0 = -d;
+    }
+
+    if (LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a) < o->f0)
+        o->f0 = LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a);
+    else if (o->f0 < -LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a))
+        o->f0 = -LVL_22_DOBBO_ORBIT_Ff454dd77_FUN_002F39F0(a);
+}
+#ifndef RAC2_T_V4_F5621621C
+#define RAC2_T_V4_F5621621C
+typedef int V4_F5621621c __attribute__((mode(TI)));
+#endif
+
+
+extern float LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4138(float a, float b);
+extern float LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4070(float a);
+extern float LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4088(float a);
+extern void LVL_22_DOBBO_ORBIT_F5621621c_FUN_003215D8(int v, void *rec);
+
+#ifndef RAC2_T_VEC16_F5621621C
+#define RAC2_T_VEC16_F5621621C
+typedef struct {
+    float x;
+    float y;
+    float z;
+    float w;
+} Vec16_F5621621c;
+#endif
+
+
+#ifndef RAC2_T_NODE_F5621621C
+#define RAC2_T_NODE_F5621621C
+typedef struct {
+    char pad[16];
+    float f16;
+    float f20;
+} Node_F5621621c;
+#endif
+
+
+#ifndef RAC2_T_REC_F5621621C
+#define RAC2_T_REC_F5621621C
+typedef struct {
+    float f0;
+    float f4;
+    float f8;
+    float f12;
+    int i16;
+    int i20;
+    signed char b24;
+    signed char b25;
+    unsigned short h26;
+    float f28;
+    int i32;
+} Rec_F5621621c;
+#endif
+
+
+void LVL_22_DOBBO_ORBIT_FUN_00322158(void *a0, Vec16_F5621621c *src, int *p, int n,
+                                        int t0, int t1, int t2, int t3,
+                                        float f1, float f2, float f3)
+{
+    Vec16_F5621621c vec;
+    Vec16_F5621621c *vp = &vec;
+    Rec_F5621621c rec;
+    int i;
+    int *q;
+
+    *(V4_F5621621c *)&vec = *(V4_F5621621c *)src;
+    if (n <= 0) return;
+    for (q = p, i = n; i != 0; i--, q++) {
+        Node_F5621621c *v = (Node_F5621621c *)*q;
+        float t;
+        if ((int)*q == t0) continue;
+        rec.i16 = (int)a0;
+        rec.h26 = *(unsigned short *)((char *)a0 + 170);
+        rec.i20 = t1;
+        rec.f28 = f1;
+        rec.i32 = t1;
+        rec.b24 = t2;
+        rec.b25 = t3;
+        t = LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4138(v->f16 - vp->x, v->f20 - vp->y);
+        rec.f0 = LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4070(t) * f2;
+        rec.f4 = LVL_22_DOBBO_ORBIT_F5621621c_FUN_002F4088(t) * f2;
+        rec.f8 = f3;
+        rec.f12 = 5.6279248046875000000000e3f;
+        LVL_22_DOBBO_ORBIT_F5621621c_FUN_003215D8(*q, &rec);
+    }
+}
+extern void LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FC88(int a);
+extern void LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FC88(int a);
+extern float LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FD20(float a, float b);
+extern unsigned int LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FCC8(int a, int b);
+extern void LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FEA8(char *p, float a, float b);
+extern char *LVL_22_DOBBO_ORBIT_F966dbf73_FUN_00337E18(float fa, float fb, float fc, float fd, char *p, int z,
+                     char *local, unsigned int v, int one);
+
+void LVL_22_DOBBO_ORBIT_FUN_003CA7E8(char *unused, char *arg)
+{
+    char local[16];
+    float f;
+    int i;
+    unsigned int v;
+    unsigned int w;
+    unsigned int x;
+    char *r;
+
+    i = 19;
+    do {
+        LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FC88(2);
+        i = i - 1;
+        LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FC88(2);
+        f = LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FD20(70000.0f, 150000.0f);
+        v = LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FCC8(10, 127);
+        w = (v << 8) | 0x7f000000U;
+        x = (v << 16) | w;
+        v = x | v;
+        LVL_22_DOBBO_ORBIT_F966dbf73_FUN_0031FEA8(local, 1.6666668670950457453728e-05f,
+                6.6666672937572002410889e-03f);
+        r = LVL_22_DOBBO_ORBIT_F966dbf73_FUN_00337E18(0.3f, 1.0f, 1.01f, f, arg, 0, local, v, 1);
+        if (r != 0) {
+            char *q = r + 32;
+
+            *(short *)(r + 10) = 120;
+            *(int *)(q + 4) = 2;
+            *(char *)(q + 10) = 127;
+            *(char *)(q + 11) = *(unsigned char *)(r + 10);
+        }
+    } while (i >= 0);
+}

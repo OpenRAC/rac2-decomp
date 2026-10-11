@@ -6,10 +6,10 @@
   "reference_sha256": "c609f24d897e1a82d49cdb9a8a7ece36ea83332414dc3cc6d588375e0bda55db",
   "reference_entry": 2783752,
   "candidate_source": "candidates/levels/22_dobbo_orbit-g8.c",
-  "source_sha256": "ced446b2e36b0e20b6f4b2c224b8c0ec168e19472deade88cf4b3c6571cb1e3c",
-  "catalog_sha256": "bbb8ffbff4629f60109e6f9be20a161b9156026327dbe0c44b5876c5f47e9148",
-  "object_sha256": "db126ebaa720e9eb2addadbc3f6a88ef44e27d5ca46082f5a200ebf0dea6fc72",
-  "candidate_elf_sha256": "69502b8cba515390fef3a1104a59593484f5432f76616197505b3b9765559d44",
+  "source_sha256": "62c4905591778ad9fa9bf773853359fb26e10071a1b1d6abff3de82ad4f1a154",
+  "catalog_sha256": "91535ac2b919d8be0c5408d7c57d3cfb43c933ed475e1e0afc6435ab521fb750",
+  "object_sha256": "6b0680be4efc37f8622c20255a1ab777cb078132db44dbdd759250a542f4fb95",
+  "candidate_elf_sha256": "a27cf1411f346c979a0b9eb3dab1f6466e3e4c6cee410049e5282fcc62b51ece",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -34,6 +34,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_002DC7A8",
+      "address": 3000232,
+      "size": 208,
+      "matched": true,
+      "reference_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "candidate_sha256": "d7f94e80461be5a23a228f65c19ea0d41cfe6e23bf2d83dd2f7883413f9cbe45",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 208
     },
     {
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_002DD2C8",
@@ -520,6 +531,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_0036A878",
+      "address": 3582072,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "72373831fb5f1c3254297a87f49f87c98ad6ef55e59e34875611a9202ec1f718",
+      "candidate_sha256": "72373831fb5f1c3254297a87f49f87c98ad6ef55e59e34875611a9202ec1f718",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
+    },
+    {
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_0037EAE8",
       "address": 3664616,
       "size": 76,
@@ -631,5 +653,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3548
+  "matched_code_bytes": 3844
 }

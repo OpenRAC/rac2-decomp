@@ -1,15 +1,15 @@
 {
   "default": {
-    "c_object_sha256": "b4f797d4c07306909be1936b61e593f49da8ca2cb962c3f6753209194af02641",
-    "candidate_elf_sha256": "51cf199c2ffcc627fd07f541e303eebf9160aee20390b9970ac1545d76e3cf38",
+    "c_object_sha256": "7f29f3d7af5ffd9d6ebbeae86b8af9f37208fe3adc41b9c102d7694f79aaee24",
+    "candidate_elf_sha256": "650a146de954832fb22a21c3a6e3a89f184a68df0e192b92e906206564cdf098",
     "candidate_source": "candidates/boot.c",
-    "catalog_sha256": "bcc1f8983df3f879fc81eaf860956b28a803ad7e35c3df43c9f8a24dc4686e4b",
+    "catalog_sha256": "ab37710e574e2facd9dbeada484857d5d69130e1fc12a886e8849d51332d3660",
     "full_boot_gate": {
       "bytes_compared": 2521763,
       "matched": true,
       "segments": 2
     },
-    "matched_code_bytes": 31356,
+    "matched_code_bytes": 33464,
     "program": "boot",
     "reference_sha256": "36d5814d8d95328d5839612ccdf7a2e7ecac0b6f868d3ad4bb2e98411f734b4a",
     "replacement_inputs": {
@@ -129,11 +129,14 @@
         "FUN_002A78D8",
         "FUN_002A7940",
         "FUN_002A7AA8",
+        "FUN_002A7CA0",
         "FUN_002A8860",
         "FUN_002A8A50",
         "FUN_002A8AF0",
         "FUN_002A8C00",
+        "FUN_002A9850",
         "FUN_002AA140",
+        "FUN_002AA198",
         "FUN_002AAF40",
         "FUN_002AB028",
         "FUN_002AB1F0",
@@ -143,6 +146,7 @@
         "FUN_002AD0B0",
         "FUN_002AD330",
         "FUN_002AD5F8",
+        "FUN_002AF2E8",
         "FUN_002B00B0",
         "FUN_002B0D60",
         "FUN_002B0DB8",
@@ -163,11 +167,13 @@
         "FUN_002BAF68",
         "FUN_002BB798",
         "FUN_002BC8E8",
+        "FUN_002BD398",
         "FUN_002BE9B8",
         "FUN_002C2080",
         "FUN_002C28F8",
         "FUN_002C37E0",
         "FUN_002C3EE8",
+        "FUN_002C5550",
         "FUN_002C7538",
         "FUN_002C7AE8",
         "FUN_002C7D58",
@@ -406,7 +412,7 @@
         "FUN_00351FA0"
       ]
     },
-    "source_sha256": "58b30b328ace3d537bdfdd2330f0ba0d74b6ca2e10be1013397e985472813231",
+    "source_sha256": "b0aa18b9eac5fba68c87cd4a6908149b3a88cda9b43f7654f9fdfde0dd645a68",
     "state": "integrated",
     "target": "SCUS_972.68",
     "tools": {
@@ -2073,6 +2079,21 @@
       "unit_id": "default-gnu8bed"
     },
     {
+      "address": 2784416,
+      "candidate_sha256": "b10276caba0c2db48a3b38ee5e65d02a3ba7420132da035d4b2cd11adf083f3e",
+      "candidate_source": "candidates/boot.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "boot-default",
+      "program": "boot",
+      "reference_sha256": "b10276caba0c2db48a3b38ee5e65d02a3ba7420132da035d4b2cd11adf083f3e",
+      "size": 360,
+      "state": "integrated",
+      "symbol": "FUN_002A7CA0",
+      "unit_id": "default-gnu8bed"
+    },
+    {
       "address": 2787424,
       "candidate_sha256": "b903c587273ae61c0dead2b0ac215a664b8499ccec4230e65d8b6a39d090c190",
       "candidate_source": "candidates/boot.c",
@@ -2133,6 +2154,21 @@
       "unit_id": "default-gnu8bed"
     },
     {
+      "address": 2791504,
+      "candidate_sha256": "9e6115d97e9418d304a2fe132ad6f74d0439ef2daa9f6fd7cc86184495536649",
+      "candidate_source": "candidates/boot.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "boot-default",
+      "program": "boot",
+      "reference_sha256": "9e6115d97e9418d304a2fe132ad6f74d0439ef2daa9f6fd7cc86184495536649",
+      "size": 332,
+      "state": "integrated",
+      "symbol": "FUN_002A9850",
+      "unit_id": "default-gnu8bed"
+    },
+    {
       "address": 2793792,
       "candidate_sha256": "ee9fcd22c5465c42b902c9fc80cffafef6baa65ed5ab54cb18faaa1247de6574",
       "candidate_source": "candidates/boot.c",
@@ -2145,6 +2181,21 @@
       "size": 16,
       "state": "integrated",
       "symbol": "FUN_002AA140",
+      "unit_id": "default-gnu8bed"
+    },
+    {
+      "address": 2793880,
+      "candidate_sha256": "43face932cfec3fcb55218fcddb2bd4836ee28d21afe135958671b37cd6a8da4",
+      "candidate_source": "candidates/boot.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "boot-default",
+      "program": "boot",
+      "reference_sha256": "43face932cfec3fcb55218fcddb2bd4836ee28d21afe135958671b37cd6a8da4",
+      "size": 336,
+      "state": "integrated",
+      "symbol": "FUN_002AA198",
       "unit_id": "default-gnu8bed"
     },
     {
@@ -2280,6 +2331,21 @@
       "size": 244,
       "state": "integrated",
       "symbol": "FUN_002AD5F8",
+      "unit_id": "default-gnu8bed"
+    },
+    {
+      "address": 2814696,
+      "candidate_sha256": "ff4a874835047caed7e36a4446731095aa9723e3abc6ed3fd6cce55410dd51b1",
+      "candidate_source": "candidates/boot.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "boot-default",
+      "program": "boot",
+      "reference_sha256": "ff4a874835047caed7e36a4446731095aa9723e3abc6ed3fd6cce55410dd51b1",
+      "size": 376,
+      "state": "integrated",
+      "symbol": "FUN_002AF2E8",
       "unit_id": "default-gnu8bed"
     },
     {
@@ -2583,6 +2649,21 @@
       "unit_id": "default-gnu8bed"
     },
     {
+      "address": 2872216,
+      "candidate_sha256": "c58d9eb9bb8c8226467da217edb92d58ce6c8635769f6c4404c30ff2327a8c6a",
+      "candidate_source": "candidates/boot.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "boot-default",
+      "program": "boot",
+      "reference_sha256": "c58d9eb9bb8c8226467da217edb92d58ce6c8635769f6c4404c30ff2327a8c6a",
+      "size": 356,
+      "state": "integrated",
+      "symbol": "FUN_002BD398",
+      "unit_id": "default-gnu8bed"
+    },
+    {
       "address": 2877880,
       "candidate_sha256": "a00bf4551476b3398010f84ef1b5d012d26586b661ef687e29778c6190b0d316",
       "candidate_source": "candidates/boot.c",
@@ -2655,6 +2736,21 @@
       "size": 160,
       "state": "integrated",
       "symbol": "FUN_002C3EE8",
+      "unit_id": "default-gnu8bed"
+    },
+    {
+      "address": 2905424,
+      "candidate_sha256": "a97fc82e9cb92340bf00be3a80303ae30e2219b479425ec234af388a24ae90ae",
+      "candidate_source": "candidates/boot.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "boot-default",
+      "program": "boot",
+      "reference_sha256": "a97fc82e9cb92340bf00be3a80303ae30e2219b479425ec234af388a24ae90ae",
+      "size": 348,
+      "state": "integrated",
+      "symbol": "FUN_002C5550",
       "unit_id": "default-gnu8bed"
     },
     {
@@ -6244,7 +6340,7 @@
     }
   ],
   "kind": "boot-c-owner-integration",
-  "matched_code_bytes": 32500,
+  "matched_code_bytes": 34608,
   "program": "boot",
   "reference_sha256": "36d5814d8d95328d5839612ccdf7a2e7ecac0b6f868d3ad4bb2e98411f734b4a",
   "schema": 3,

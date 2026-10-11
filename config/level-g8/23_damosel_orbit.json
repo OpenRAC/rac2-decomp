@@ -88,6 +88,9 @@
     "LVL_23_DAMOSEL_ORBIT_F998ff33d7f808dbf_AT003135C8_ROLE03": 1733664,
     "LVL_23_DAMOSEL_ORBIT_F99b76d48da369e8d_AT003134F0_ROLE00": 1283040,
     "LVL_23_DAMOSEL_ORBIT_F99b76d48da369e8d_AT003134F0_ROLE01": 1733664,
+    "LVL_23_DAMOSEL_ORBIT_F9c1eb693_D_00189E20": 1613344,
+    "LVL_23_DAMOSEL_ORBIT_F9c1eb693_D_001A7F9C": 1736604,
+    "LVL_23_DAMOSEL_ORBIT_F9c1eb693_D_001A7FA4": 1736612,
     "LVL_23_DAMOSEL_ORBIT_F9da4b6b15b3cf4a0_AT003833A0_ROLE00": 1781512,
     "LVL_23_DAMOSEL_ORBIT_Fa077d83e809ad7db_AT0031BD28_ROLE00": 1684200,
     "LVL_23_DAMOSEL_ORBIT_Fa077d83e809ad7db_AT0031BD28_ROLE01": 1735152,
@@ -117,6 +120,10 @@
     "LVL_23_DAMOSEL_ORBIT_Fde7724c328f7c2d0_AT002FD538_ROLE00": 1740212,
     "LVL_23_DAMOSEL_ORBIT_Fe44fc83bd69b4f14_AT003332B0_ROLE00": 1745776,
     "LVL_23_DAMOSEL_ORBIT_Fe6fa55215bad26dd_AT003332E8_ROLE00": 1745780,
+    "LVL_23_DAMOSEL_ORBIT_Fe8672ea5_D_001AC18C": 1753484,
+    "LVL_23_DAMOSEL_ORBIT_Fe8672ea5_D_001AC190": 1753488,
+    "LVL_23_DAMOSEL_ORBIT_Fe8672ea5_D_001B2DB0": 1781168,
+    "LVL_23_DAMOSEL_ORBIT_Fe8672ea5_FUN_002F8128": 3113256,
     "LVL_23_DAMOSEL_ORBIT_Fef45f15dfb57feb2_AT003060B8_ROLE00": 1741676,
     "LVL_23_DAMOSEL_ORBIT_Ff0259c87ab6a3193_AT002FD550_ROLE00": 1740212,
     "LVL_23_DAMOSEL_ORBIT_QWEN_339fe89f21bc_AT00383200_ROLE000": 3112640,
@@ -137,6 +144,12 @@
       "meaning": "Return the measured signed four-byte GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_002AC100"
+    },
+    {
+      "address": 3018376,
+      "meaning": "Selects one of two measured states, writes up to three optional float outputs, and reports whether a supported state was found.",
+      "size": 208,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_002E0E88"
     },
     {
       "address": 3021224,
@@ -401,6 +414,12 @@
       "meaning": "Store the incoming signed word in the measured GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_003332E8"
+    },
+    {
+      "address": 3600272,
+      "meaning": "Clears 512 fixed-stride words, publishes the span base and scalar state, then invokes one bound initializer.",
+      "size": 88,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_0036EF90"
     },
     {
       "address": 3682816,

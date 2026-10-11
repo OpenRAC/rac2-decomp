@@ -6533,3 +6533,314 @@ void FUN_0031E960(char *p)
 
     F5a19df7a_FUN_002FC560(0x47, 0x5360bUL);
 }
+extern float Fb5729173_FUN_00282E48(char *a, char *b);
+extern float Fb5729173_FUN_00283248(float x, float y);
+extern float Fb5729173_FUN_00283C80(float x, float y);
+extern float Fb5729173_FUN_00282E80(char *a, char *b);
+extern int Fb5729173_FUN_002ABB78(char *a);
+
+float FUN_002AF2E8(char *a0, char *a1, int *a2,
+                                       float p1, float p2, float p3, float p4)
+{
+    float best = p4;
+    float hi = p3;
+    float radius;
+    float reach = p2;
+    float far;
+    float near;
+    float tmp;
+
+    *a2 = 0;
+    far = Fb5729173_FUN_00282E48(a0, a1 + 16);
+    if (reach < far) {
+        *a2 = 1;
+    }
+
+    reach = 0.0f;
+    radius = Fb5729173_FUN_00283C80(Fb5729173_FUN_00283248(((float *)(a1 + 16))[0] - ((float *)a0)[0],
+                             ((float *)(a1 + 16))[1] - ((float *)a0)[1]), p1);
+    near = Fb5729173_FUN_00282E80(a0, a1 + 16);
+    tmp = Fb5729173_FUN_00283C80(Fb5729173_FUN_00283248(near, ((float *)(a1 + 16))[2] - ((float *)a0)[2]), 0.0f);
+
+    if (reach < hi) {
+        if (hi < radius) {
+            *a2 = 1;
+        }
+    }
+    if (0.0f < best) {
+        if (best < tmp) {
+            *a2 = 1;
+        }
+    }
+
+    reach = far + radius * far;
+    if (Fb5729173_FUN_002ABB78(a1) != 0) {
+        reach = reach + 8.0f;
+    }
+    return reach;
+}
+struct family_27f9_object {
+    unsigned char reserved[248];
+    float heading;
+};
+
+extern float F27f9be8e_FUN_00283BE0(float p, float x);
+extern float F27f9be8e_FUN_00282C48(float t);
+extern float F27f9be8e_FUN_00282C48(float t);
+extern float F27f9be8e_FUN_00282C48(float t);
+extern float F27f9be8e_FUN_00282C48(float t);
+extern float F27f9be8e_FUN_00283B98(float x, float y);
+
+float FUN_002A7CA0(struct family_27f9_object *a0,
+                                         float *a1,
+                                         float p1, float p2, float p3, float p4)
+{
+    float t;
+    float v;
+    float f3;
+    float out;
+
+    t = F27f9be8e_FUN_00283BE0(p1, a0->heading);
+    v = t * 6.3661971092224121093750e+00f;
+    if (v > 1.0f) {
+        v = 1.0f;
+    } else {
+        if (v < -1.0f) {
+            v = -1.0f;
+        }
+    }
+    f3 = a1[0];
+    a1[0] = f3 + (p2 * v - p3 * f3);
+    if (p4 != 0.0f) {
+        if (a1[0] > p4) {
+            a1[0] = p4;
+        } else {
+            if (a1[0] < -p4) {
+                a1[0] = -p4;
+            }
+        }
+    }
+    if (F27f9be8e_FUN_00282C48(t) < a1[0]) {
+        a1[0] = F27f9be8e_FUN_00282C48(t);
+    } else {
+        if (a1[0] < -F27f9be8e_FUN_00282C48(t)) {
+            a1[0] = -F27f9be8e_FUN_00282C48(t);
+        }
+    }
+    out = F27f9be8e_FUN_00283B98(a0->heading, a1[0]);
+    a0->heading = out;
+    return out;
+}
+extern int F3c007b59_FUN_00282978(void *p);
+extern void F3c007b59_FUN_002B9180(void *p);
+extern unsigned int F3c007b59_FUN_00283CF0(float x);
+
+#ifndef RAC2_T_OBJ_F3C007B59
+#define RAC2_T_OBJ_F3C007B59
+typedef struct {
+    unsigned char pad0[4];
+    unsigned int w04;
+    unsigned char c08;
+    unsigned char c09;
+    unsigned char c10;
+    unsigned char c11;
+    float f12;
+    unsigned char pad16[8];
+    float f24;
+    unsigned char pad28[4];
+    float f36;
+    float f40;
+    float f44;
+} OBJ_F3c007b59;
+#endif
+
+
+void FUN_002BD398(OBJ_F3c007b59 *o)
+{
+    float *p = (float *)((char *)o + 32);
+    float f;
+    float y;
+
+    f = p[1] + p[3] * 1.3000000268220901489258e-02f;
+    p[1] = f;
+    if (f <= 0.0f || F3c007b59_FUN_00282978(&o->c10) != 0) {
+        F3c007b59_FUN_002B9180(o);
+    } else {
+        f = p[1];
+        if (2.1999999880790710449219e-01f <= f) {
+            y = p[3];
+            y = -y;
+            p[3] = y;
+            p[1] = f + y * 1.3000000268220901489258e-02f;
+        }
+        o->f12 = o->f12 + 8.1900000000000000000000e+03f;
+        o->w04 = (o->w04 & 0xFFFFFFu) |
+                 (F3c007b59_FUN_00283CF0(p[1] * 2.5500000000000000000000e+02f) << 24);
+        p[2] = p[2] + 1.2000000104308128356934e-02f;
+        if (p[2] > 1.0f)
+            p[2] = p[2] - 1.0f;
+        o->c08 = (unsigned char)(p[2] * 2.5500000000000000000000e+02f);
+        o->f24 = o->f24 - 1.9999999552965164184570e-02f;
+    }
+}
+extern int F7cacd225_FUN_00282978(short *p);
+extern void F7cacd225_FUN_002B9180(char *o);
+extern float F7cacd225_FUN_00283CE0(int n);
+extern float F7cacd225_FUN_00283CE0(int n);
+extern int F7cacd225_FUN_00283D38(int a, int b, float q);
+
+#ifndef RAC2_T_OBJ_F7CACD225
+#define RAC2_T_OBJ_F7CACD225
+typedef struct {
+    int pad0;
+    int f4;
+    short pad8;
+    short s10;
+    float f12;
+    float f16;
+    float f20;
+    float f24;
+    int pad28;
+    int f32;
+} Obj_F7cacd225;
+#endif
+
+
+void FUN_002C5550(Obj_F7cacd225 *o)
+{
+    int v;
+
+    if (o->f16 < 2.0f || o->f16 > 1021.0f ||
+        o->f20 < 2.0f || o->f20 > 1021.0f ||
+        o->f24 < 2.0f || o->f24 > 1021.0f ||
+        F7cacd225_FUN_00282978(&o->s10) != 0) {
+        F7cacd225_FUN_002B9180((char *)o);
+        return;
+    }
+    v = o->f32;
+    if (v != 0) {
+        o->f12 = o->f12 * 0.99f;
+        o->f4 = F7cacd225_FUN_00283D38(0x30FFFFFF, o->f4, F7cacd225_FUN_00283CE0(o->s10 - 1) / F7cacd225_FUN_00283CE0(o->s10));
+    } else {
+        o->f12 = o->f12 * 0.95f;
+        o->f4 = F7cacd225_FUN_00283D38(0x603F1008, o->f4, F7cacd225_FUN_00283CE0(o->s10 - 1) / F7cacd225_FUN_00283CE0(o->s10));
+    }
+}
+extern float Ff454dd77_FUN_00282C48(float a);
+extern float Ff454dd77_FUN_00282C48(float a);
+extern float Ff454dd77_FUN_00282C48(float a);
+extern float Ff454dd77_FUN_00282C48(float a);
+extern float Ff454dd77_FUN_00282C48(float a);
+extern float Ff454dd77_FUN_00282C48(float a);
+extern float Ff454dd77_FUN_00282C48(float a);
+extern float Ff454dd77_FUN_00282C48(float a);
+
+#ifndef RAC2_T_OBJ_FF454DD77
+#define RAC2_T_OBJ_FF454DD77
+typedef struct {
+    float f0;
+} Obj_Ff454dd77;
+#endif
+
+
+void FUN_002AA198(Obj_Ff454dd77 *o, float a, float b, float c, float d)
+{
+    if (Ff454dd77_FUN_00282C48(a) < o->f0)
+        o->f0 = Ff454dd77_FUN_00282C48(a);
+    else if (o->f0 < -Ff454dd77_FUN_00282C48(a))
+        o->f0 = -Ff454dd77_FUN_00282C48(a);
+
+    o->f0 = o->f0 + (b * a - c * o->f0);
+    if (0.0f < d) {
+        if (d < o->f0)
+            o->f0 = d;
+        else if (o->f0 < -d)
+            o->f0 = -d;
+    }
+
+    if (Ff454dd77_FUN_00282C48(a) < o->f0)
+        o->f0 = Ff454dd77_FUN_00282C48(a);
+    else if (o->f0 < -Ff454dd77_FUN_00282C48(a))
+        o->f0 = -Ff454dd77_FUN_00282C48(a);
+}
+#ifndef RAC2_T_V4_F5621621C
+#define RAC2_T_V4_F5621621C
+typedef int V4_F5621621c __attribute__((mode(TI)));
+#endif
+
+
+extern float F5621621c_FUN_00283248(float a, float b);
+extern float F5621621c_FUN_00283180(float a);
+extern float F5621621c_FUN_00283198(float a);
+extern void F5621621c_FUN_002A8E20(int v, void *rec);
+
+#ifndef RAC2_T_VEC16_F5621621C
+#define RAC2_T_VEC16_F5621621C
+typedef struct {
+    float x;
+    float y;
+    float z;
+    float w;
+} Vec16_F5621621c;
+#endif
+
+
+#ifndef RAC2_T_NODE_F5621621C
+#define RAC2_T_NODE_F5621621C
+typedef struct {
+    char pad[16];
+    float f16;
+    float f20;
+} Node_F5621621c;
+#endif
+
+
+#ifndef RAC2_T_REC_F5621621C
+#define RAC2_T_REC_F5621621C
+typedef struct {
+    float f0;
+    float f4;
+    float f8;
+    float f12;
+    int i16;
+    int i20;
+    signed char b24;
+    signed char b25;
+    unsigned short h26;
+    float f28;
+    int i32;
+} Rec_F5621621c;
+#endif
+
+
+void FUN_002A9850(void *a0, Vec16_F5621621c *src, int *p, int n,
+                                        int t0, int t1, int t2, int t3,
+                                        float f1, float f2, float f3)
+{
+    Vec16_F5621621c vec;
+    Vec16_F5621621c *vp = &vec;
+    Rec_F5621621c rec;
+    int i;
+    int *q;
+
+    *(V4_F5621621c *)&vec = *(V4_F5621621c *)src;
+    if (n <= 0) return;
+    for (q = p, i = n; i != 0; i--, q++) {
+        Node_F5621621c *v = (Node_F5621621c *)*q;
+        float t;
+        if ((int)*q == t0) continue;
+        rec.i16 = (int)a0;
+        rec.h26 = *(unsigned short *)((char *)a0 + 170);
+        rec.i20 = t1;
+        rec.f28 = f1;
+        rec.i32 = t1;
+        rec.b24 = t2;
+        rec.b25 = t3;
+        t = F5621621c_FUN_00283248(v->f16 - vp->x, v->f20 - vp->y);
+        rec.f0 = F5621621c_FUN_00283180(t) * f2;
+        rec.f4 = F5621621c_FUN_00283198(t) * f2;
+        rec.f8 = f3;
+        rec.f12 = 5.6279248046875000000000e3f;
+        F5621621c_FUN_002A8E20(*q, &rec);
+    }
+}

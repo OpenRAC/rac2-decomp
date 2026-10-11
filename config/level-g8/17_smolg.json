@@ -88,6 +88,9 @@
     "LVL_17_SMOLG_F998ff33d7f808dbf_AT0030A388_ROLE03": 1733664,
     "LVL_17_SMOLG_F99b76d48da369e8d_AT0030A2B0_ROLE00": 1283040,
     "LVL_17_SMOLG_F99b76d48da369e8d_AT0030A2B0_ROLE01": 1733664,
+    "LVL_17_SMOLG_F9c1eb693_D_00189E20": 1613344,
+    "LVL_17_SMOLG_F9c1eb693_D_001A7F9C": 1736604,
+    "LVL_17_SMOLG_F9c1eb693_D_001A7FA4": 1736612,
     "LVL_17_SMOLG_F9da4b6b15b3cf4a0_AT0037EB30_ROLE00": 1782664,
     "LVL_17_SMOLG_Fa077d83e809ad7db_AT00312AE8_ROLE00": 1684200,
     "LVL_17_SMOLG_Fa077d83e809ad7db_AT00312AE8_ROLE01": 1735152,
@@ -117,6 +120,10 @@
     "LVL_17_SMOLG_Fde7724c328f7c2d0_AT002F42F8_ROLE00": 1740212,
     "LVL_17_SMOLG_Fe44fc83bd69b4f14_AT0032E0D8_ROLE00": 1745776,
     "LVL_17_SMOLG_Fe6fa55215bad26dd_AT0032E110_ROLE00": 1745780,
+    "LVL_17_SMOLG_Fe8672ea5_D_001AC18C": 1753484,
+    "LVL_17_SMOLG_Fe8672ea5_D_001AC190": 1753488,
+    "LVL_17_SMOLG_Fe8672ea5_D_001B3230": 1782320,
+    "LVL_17_SMOLG_Fe8672ea5_FUN_002EEE80": 3075712,
     "LVL_17_SMOLG_Fef45f15dfb57feb2_AT002FCE78_ROLE00": 1741676,
     "LVL_17_SMOLG_Ff0259c87ab6a3193_AT002F4310_ROLE00": 1740212,
     "LVL_17_SMOLG_QWEN_339fe89f21bc_AT0037E990_ROLE000": 3075048,
@@ -137,6 +144,12 @@
       "meaning": "Return the measured signed four-byte GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_17_SMOLG_FUN_002A5080"
+    },
+    {
+      "address": 2979088,
+      "meaning": "Selects one of two measured states, writes up to three optional float outputs, and reports whether a supported state was found.",
+      "size": 208,
+      "symbol": "LVL_17_SMOLG_FUN_002D7510"
     },
     {
       "address": 2981936,
@@ -401,6 +414,12 @@
       "meaning": "Store the incoming signed word in the measured GP cell. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_17_SMOLG_FUN_0032E110"
+    },
+    {
+      "address": 3581320,
+      "meaning": "Clears 512 fixed-stride words, publishes the span base and scalar state, then invokes one bound initializer.",
+      "size": 88,
+      "symbol": "LVL_17_SMOLG_FUN_0036A588"
     },
     {
       "address": 3664272,
