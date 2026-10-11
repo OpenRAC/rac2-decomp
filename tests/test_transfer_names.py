@@ -44,3 +44,20 @@ class HintRowTests(unittest.TestCase):
             self.assertTrue(function.startswith("0x") and string.startswith("0x"))
             self.assertRegex(token, r"^[A-Za-z0-9_]+$")
             self.assertIn(form, ("named", "mention"))
+
+
+class DataNameTests(unittest.TestCase):
+    def test_addresses_follow_lui_pairs_and_gp(self):
+        import transfer_data_names as td
+        lui_t0 = 0x3C080012  # lui t0,0x12
+        addiu_t0 = 0x25080010  # addiu t0,t0,0x10
+        lw_gp = 0x8F890020  # lw t1,0x20(gp)
+        self.assertEqual(td.addresses([lui_t0, addiu_t0, lw_gp]), [0x120010, td.GP + 0x20])
+
+    def test_carried_data_rows_are_unique(self):
+        import transfer_data_names as td
+        lines = (ROOT / "symbol_addrs/usa/symbol_addrs.txt").read_text(encoding="utf-8").splitlines()
+        rows = [transfer_names.SYM.match(l) for l in lines[lines.index(td.MARKER) + 1:] if l.strip()]
+        self.assertTrue(rows and all(rows))
+        self.assertEqual(len({m.group(1) for m in rows}), len(rows))
+        self.assertEqual(len({m.group(2).lower() for m in rows}), len(rows))

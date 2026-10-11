@@ -53,3 +53,7 @@ No newer Sony SDK mirror is public (ps2dev/ps2sdk is a different implementation)
 `scripts/ghidra_name_hints.py` scans the boot and all 27 overlays (loaded into the Ghidra project with `analyzeHeadless`, then `load_program_from_project` / `switch_program?program=`)
 for class-like names in referenced strings: 608 hints, 46 of them function names a diagnostic spells out (`Camera_CollPrimTest` in 27 overlays, `NPC_showMessage`, `Path_setWtoDist`).
 `name_overlay_functions.py` writes those to `config/datamine/ntsc-u-overlay-names.tsv`, which the report uses for level units.
+
+**Data names.** `scripts/transfer_data_names.py` carries Promises' v2.00 global-variable names (`g_cameraState`, `g_boltCount`, ...) to v1.01. Functions that are identical
+in both boots build their globals at the same instruction positions, so the paired addresses give an address map; a name moves only when all votes for its address agree
+(521 names, vote count in each comment). Credit: Promises/RC2-Going-Decompiled; permission record: OpenRAC/rac2-gc-decomp PR #74.
