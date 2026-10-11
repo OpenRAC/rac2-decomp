@@ -56,6 +56,197 @@ s32 LVL_8_TABORA_FUN_002C0170(s32 value) {
  switch(value) {case 1:return 0x72;case 2:return 0x70;case 3:return 0x6e;default:return 0;}
 }
 
+/* Frozen Batch A A01-shared-108; acknowledged claim 8fc9d5f80b3d5f44a785f41c0f987dca4231aa565dd750932d09299d0bf9e9c4. */
+typedef int BatchA_A01_s32;
+
+extern BatchA_A01_s32 BatchA_A01_D_001A7B90;
+extern BatchA_A01_s32 BatchA_A01_D_001A7BB8 __attribute__((sda));
+extern BatchA_A01_s32 BatchA_A01_FUN_00124418(void);
+extern BatchA_A01_s32 BatchA_A01_FUN_001257D0(BatchA_A01_s32, BatchA_A01_s32, BatchA_A01_s32, BatchA_A01_s32);
+
+void LVL_8_TABORA_FUN_002FB300(void) {
+    BatchA_A01_FUN_00124418();
+    if (BatchA_A01_D_001A7B90 != 0) BatchA_A01_D_001A7BB8 = 0;
+    if (*(BatchA_A01_s32 *)0x001a7bb8 != 0) BatchA_A01_FUN_001257D0(0,0,0x50,1);
+    else BatchA_A01_FUN_001257D0(0,1,BatchA_A01_D_001A7B90 != 0 ? 3 : 2,0);
+}
+
+/* Frozen Batch A A02-list-add-88; acknowledged claim 38ceeb041b6ba12996de10c402ca54295587db96246845b83b2ec894986b096f. */
+typedef unsigned char BatchA_A02_u8;
+typedef int BatchA_A02_s32;
+typedef struct { char _0[0x10]; BatchA_A02_u8 n; char _11[3]; BatchA_A02_s32 off; char _18[4]; BatchA_A02_s32 ent[1]; } BatchA_A02_Blk;
+void LVL_8_TABORA_FUN_0030B5C0(int *a0, int a1){
+  BatchA_A02_Blk *r;
+  int i;
+  a0 += a1;
+  r = *(BatchA_A02_Blk **)((char *)a0 + 0x48);
+  if (r->off) r->off = (int)r + r->off;
+  for (i = 0; i < r->n; i++) r->ent[i] = (int)r + r->ent[i];
+}
+
+/* Frozen Batch A A03-counter-mod50-80; acknowledged claim b5e8cf533fd3cee3cb2dcdd0bf7be9549f6cc39cd932c589176487a8b170abee. */
+typedef int BatchA_A03_s32;
+extern BatchA_A03_s32 BatchA_A03_D_001A8FE0[] __attribute__((sda));
+extern BatchA_A03_s32 BatchA_A03_D_001A7BC0[] __attribute__((sda));
+extern BatchA_A03_s32 BatchA_A03_D_001A7B90[] __attribute__((sda));
+void LVL_8_TABORA_FUN_003669E8(void)
+{
+    if (BatchA_A03_D_001A8FE0[0] == 0) {
+        BatchA_A03_s32 n = BatchA_A03_D_001A7BC0[0] + 1;
+        BatchA_A03_D_001A7BC0[0] = n;
+        if (n % 50 == 0) {
+            if (BatchA_A03_D_001A7B90[0]) {
+                BatchA_A03_D_001A7BC0[0] = n + 10;
+            }
+        }
+    }
+}
+
+/* Frozen Batch A A05-store-rotation-52; acknowledged claim 43a7518b17439f6bdc9390be9d4164b47eec4bed94a72d581fdec3b883b0a554. */
+typedef unsigned char BatchA_A05_u8;
+typedef unsigned short BatchA_A05_u16;
+typedef short BatchA_A05_s16;
+typedef unsigned int BatchA_A05_u32;
+typedef int BatchA_A05_s32;
+typedef float BatchA_A05_f32;
+typedef short BatchA_A05_BatchAs16;
+typedef unsigned short BatchA_A05_BatchAu16;
+typedef struct { BatchA_A05_u8 b[0x50]; BatchA_A05_BatchAs16 f50; BatchA_A05_BatchAs16 f52; BatchA_A05_u8 c[0x20]; BatchA_A05_BatchAs16 f74; BatchA_A05_BatchAs16 f76; BatchA_A05_u8 d[0x20]; BatchA_A05_BatchAs16 f98; BatchA_A05_BatchAs16 f9a; } BatchA_A05_BatchA52;
+extern BatchA_A05_BatchA52 BatchA_A05_BatchA_D001A63A8;
+void LVL_8_TABORA_FUN_0033BE08(BatchA_A05_s32 a0) {
+    if (a0 != 0) { BatchA_A05_BatchA_D001A63A8.f76 = 0; BatchA_A05_BatchA_D001A63A8.f74 = -0x8000; }
+    BatchA_A05_BatchA_D001A63A8.f9a = 0;
+    BatchA_A05_BatchA_D001A63A8.f50 = -0x8000;
+    BatchA_A05_BatchA_D001A63A8.f52 = 0;
+    BatchA_A05_BatchA_D001A63A8.f98 = -0x8000;
+}
+
+/* Frozen Batch A A06-inline-init-40; acknowledged claim f87e1c08ece3f12938d297032a913cd328169b7754a3ddd6dc5186c16697eb73. */
+typedef unsigned char BatchA_A06_u8;
+typedef unsigned short BatchA_A06_u16;
+typedef short BatchA_A06_s16;
+typedef unsigned int BatchA_A06_u32;
+typedef int BatchA_A06_s32;
+typedef float BatchA_A06_f32;
+typedef short BatchA_A06_BatchAs16;
+typedef unsigned short BatchA_A06_BatchAu16;
+void LVL_8_TABORA_FUN_00331588(void *a0, char *a1){
+    if (*(BatchA_A06_s32 *)(a1 + 0x14C) == 0) {
+        *(void **)(a1 + 0x144) = a0;
+        *(BatchA_A06_s32 *)(a1 + 0x14C) = 1;
+        *(BatchA_A06_BatchAs16 *)(a1 + 0x142) = 0;
+        *(BatchA_A06_s32 *)(a1 + 0x148) = 0;
+        *(BatchA_A06_BatchAs16 *)(a1 + 0x140) = 0;
+    }
+}
+
+/* Frozen Batch A A07-sda-multi-eq-44; acknowledged claim 6adc81ebaa8d8c8d04aa1aa3c8950e1d91861a258898c3cce6be7f792e8bdcf3. */
+typedef unsigned char BatchA_A07_u8;
+typedef unsigned short BatchA_A07_u16;
+typedef short BatchA_A07_s16;
+typedef unsigned int BatchA_A07_u32;
+typedef int BatchA_A07_s32;
+typedef float BatchA_A07_f32;
+typedef short BatchA_A07_BatchAs16;
+typedef unsigned short BatchA_A07_BatchAu16;
+extern BatchA_A07_s32 BatchA_A07_BatchA_D001A79F0a[] __attribute__((sda));
+BatchA_A07_s32 LVL_8_TABORA_FUN_002E2630(void) {
+    BatchA_A07_s32 v = BatchA_A07_BatchA_D001A79F0a[0];
+    return (v == 0x16) | (v == 0x2CE) | (v == 0x17);
+}
+
+/* Frozen Batch A A08-sda-offset-40; acknowledged claim 1c862bca494fc9285ae124fddbbb78dd145686c54c3afa751addc9271a2f8b70. */
+typedef unsigned char BatchA_A08_u8;
+typedef unsigned short BatchA_A08_u16;
+typedef short BatchA_A08_s16;
+typedef unsigned int BatchA_A08_u32;
+typedef int BatchA_A08_s32;
+typedef float BatchA_A08_f32;
+typedef short BatchA_A08_BatchAs16;
+typedef unsigned short BatchA_A08_BatchAu16;
+extern BatchA_A08_s32 BatchA_A08_BatchA_D001A904C[] __attribute__((sda));
+void LVL_8_TABORA_FUN_00318EA0(BatchA_A08_s32 a0, BatchA_A08_s32 a1) {
+    BatchA_A08_s32 base = BatchA_A08_BatchA_D001A904C[0];
+    BatchA_A08_s32 *p;
+    if (base == 0) return;
+    p = (BatchA_A08_s32 *)(base + 0x38000);
+    p[0x7368/4] = a0;
+    p[0x736C/4] = a1;
+}
+
+/* Frozen Batch A A11-sda-3store-28; acknowledged claim 9b61d4cdd097ce0a56790793fdd6c129d3f0d822e40e788cde17e6418bdea65f. */
+typedef unsigned char BatchA_A11_u8;
+typedef unsigned short BatchA_A11_u16;
+extern BatchA_A11_u8 BatchA_A11_D_001A63A8[];
+void LVL_8_TABORA_FUN_0033BE40(void) {
+    BatchA_A11_u8 *p = BatchA_A11_D_001A63A8;
+    *(BatchA_A11_u16 *)(p + 0x50) = 4;
+    *(BatchA_A11_u16 *)(p + 0x98) = 4;
+    *(BatchA_A11_u16 *)(p + 0x74) = 4;
+}
+
+/* Frozen Batch A A12-struct-2field-24; acknowledged claim bd1154c3cafd8922a3b91983a628b2fd75ee571bda11eb8a6f9eb94d569caf22. */
+typedef unsigned char BatchA_A12_u8;
+typedef unsigned short BatchA_A12_u16;
+typedef short BatchA_A12_s16;
+typedef unsigned int BatchA_A12_u32;
+typedef int BatchA_A12_s32;
+typedef float BatchA_A12_f32;
+typedef short BatchA_A12_BatchAs16;
+typedef unsigned short BatchA_A12_BatchAu16;
+typedef struct { BatchA_A12_s32 a; BatchA_A12_s32 b; } BatchA_A12_BatchA24;
+extern BatchA_A12_BatchA24 BatchA_A12_BatchA_D001FF980s;
+void LVL_8_TABORA_FUN_00352420(void) {
+    BatchA_A12_BatchA24 *p = &BatchA_A12_BatchA_D001FF980s;
+    p->a = 3;
+    p->b = 0;
+}
+
+/* Frozen Batch A A13-eq-getter-20; acknowledged claim 88eaf851f31627d1562797f83f79f60446fca428598034e69d6748fe46ec5a79. */
+typedef unsigned char BatchA_A13_u8;
+typedef unsigned short BatchA_A13_u16;
+typedef short BatchA_A13_s16;
+typedef unsigned int BatchA_A13_u32;
+typedef int BatchA_A13_s32;
+typedef float BatchA_A13_f32;
+typedef short BatchA_A13_BatchAs16;
+typedef unsigned short BatchA_A13_BatchAu16;
+extern unsigned int BatchA_A13_BatchA_D001A79F0b[] __attribute__((sda));
+unsigned int LVL_8_TABORA_FUN_002E24F8(void) { return BatchA_A13_BatchA_D001A79F0b[0] == 0x19u; }
+
+/* Frozen Batch A A14-struct-2field-20; acknowledged claim 3e0e0bb01b3da304ddd50c7212de48bebcbf96d3b2d117369779044d96f69b21. */
+typedef unsigned int BatchA_A14_u32;
+typedef struct { unsigned char pad[0x2494]; BatchA_A14_u32 a; BatchA_A14_u32 b; } BatchA_A14_S;
+extern BatchA_A14_S BatchA_A14_D_00189E20;
+void LVL_8_TABORA_FUN_002DDD38(void) {
+    BatchA_A14_D_00189E20.a = 0;
+    BatchA_A14_D_00189E20.b = 0;
+}
+
+/* Frozen Batch A A16-sda-byte-16; acknowledged claim 3b1980407c8765dd4baf122f505692e49c411cbff6089e896e8b3921ce208b41. */
+typedef unsigned char BatchA_A16_u8;
+typedef unsigned short BatchA_A16_u16;
+typedef short BatchA_A16_s16;
+typedef unsigned int BatchA_A16_u32;
+typedef int BatchA_A16_s32;
+typedef float BatchA_A16_f32;
+typedef short BatchA_A16_BatchAs16;
+typedef unsigned short BatchA_A16_BatchAu16;
+extern BatchA_A16_u8 BatchA_A16_BatchA_D001A7A0A[] __attribute__((sda));
+int LVL_8_TABORA_FUN_00300130(void) { return BatchA_A16_BatchA_D001A7A0A[0] != 0; }
+
+/* Frozen Batch A A19-sda-scalar-store-16; acknowledged claim 2b55fda7afa885c55177730972deffe120ad6648551d3c2c56e1d1f9fc8ac44b. */
+typedef unsigned char BatchA_A19_u8;
+typedef unsigned short BatchA_A19_u16;
+typedef short BatchA_A19_s16;
+typedef unsigned int BatchA_A19_u32;
+typedef int BatchA_A19_s32;
+typedef float BatchA_A19_f32;
+typedef short BatchA_A19_BatchAs16;
+typedef unsigned short BatchA_A19_BatchAu16;
+extern volatile unsigned int BatchA_A19_BatchA_D001AEB10 __attribute__((sda));
+void LVL_8_TABORA_FUN_00461A60(void) { BatchA_A19_BatchA_D001AEB10 = 0; }
+
 extern void LVL_8_TABORA_FUN_002E3480(f32, f32, f32, f32, s32, s32);
 
 void LVL_8_TABORA_FUN_002E2F28(u8 *object) {

@@ -1,2 +1,57 @@
 /* Clear one aligned 128-bit object through architectural zero. */
 void FUN_00282C88(TI128 *a0) { *a0 = 0; }
+
+/* Frozen Batch A A02-list-add-88; acknowledged claim 38ceeb041b6ba12996de10c402ca54295587db96246845b83b2ec894986b096f. */
+typedef unsigned char BatchA_A02_u8;
+typedef int BatchA_A02_s32;
+typedef struct { char _0[0x10]; BatchA_A02_u8 n; char _11[3]; BatchA_A02_s32 off; char _18[4]; BatchA_A02_s32 ent[1]; } BatchA_A02_Blk;
+void FUN_00293260(int *a0, int a1){
+  BatchA_A02_Blk *r;
+  int i;
+  a0 += a1;
+  r = *(BatchA_A02_Blk **)((char *)a0 + 0x48);
+  if (r->off) r->off = (int)r + r->off;
+  for (i = 0; i < r->n; i++) r->ent[i] = (int)r + r->ent[i];
+}
+
+/* Frozen Batch A A05-store-rotation-52; acknowledged claim 43a7518b17439f6bdc9390be9d4164b47eec4bed94a72d581fdec3b883b0a554. */
+typedef unsigned char BatchA_A05_u8;
+typedef unsigned short BatchA_A05_u16;
+typedef short BatchA_A05_s16;
+typedef unsigned int BatchA_A05_u32;
+typedef int BatchA_A05_s32;
+typedef float BatchA_A05_f32;
+typedef short BatchA_A05_BatchAs16;
+typedef unsigned short BatchA_A05_BatchAu16;
+typedef struct { BatchA_A05_u8 b[0x50]; BatchA_A05_BatchAs16 f50; BatchA_A05_BatchAs16 f52; BatchA_A05_u8 c[0x20]; BatchA_A05_BatchAs16 f74; BatchA_A05_BatchAs16 f76; BatchA_A05_u8 d[0x20]; BatchA_A05_BatchAs16 f98; BatchA_A05_BatchAs16 f9a; } BatchA_A05_BatchA52;
+extern BatchA_A05_BatchA52 BatchA_A05_BatchA_D001A63A8;
+void FUN_002B72E8(BatchA_A05_s32 a0) {
+    if (a0 != 0) { BatchA_A05_BatchA_D001A63A8.f76 = 0; BatchA_A05_BatchA_D001A63A8.f74 = -0x8000; }
+    BatchA_A05_BatchA_D001A63A8.f9a = 0;
+    BatchA_A05_BatchA_D001A63A8.f50 = -0x8000;
+    BatchA_A05_BatchA_D001A63A8.f52 = 0;
+    BatchA_A05_BatchA_D001A63A8.f98 = -0x8000;
+}
+
+/* Frozen Batch A A11-sda-3store-28; acknowledged claim 9b61d4cdd097ce0a56790793fdd6c129d3f0d822e40e788cde17e6418bdea65f. */
+typedef unsigned char BatchA_A11_u8;
+typedef unsigned short BatchA_A11_u16;
+extern BatchA_A11_u8 BatchA_A11_D_001A63A8[];
+void FUN_002B7320(void) {
+    BatchA_A11_u8 *p = BatchA_A11_D_001A63A8;
+    *(BatchA_A11_u16 *)(p + 0x50) = 4;
+    *(BatchA_A11_u16 *)(p + 0x98) = 4;
+    *(BatchA_A11_u16 *)(p + 0x74) = 4;
+}
+
+/* Frozen Batch A A16-sda-byte-16; acknowledged claim 3b1980407c8765dd4baf122f505692e49c411cbff6089e896e8b3921ce208b41. */
+typedef unsigned char BatchA_A16_u8;
+typedef unsigned short BatchA_A16_u16;
+typedef short BatchA_A16_s16;
+typedef unsigned int BatchA_A16_u32;
+typedef int BatchA_A16_s32;
+typedef float BatchA_A16_f32;
+typedef short BatchA_A16_BatchAs16;
+typedef unsigned short BatchA_A16_BatchAu16;
+extern BatchA_A16_u8 BatchA_A16_BatchA_D001A7A0A[] __attribute__((sda));
+int FUN_00288D58(void) { return BatchA_A16_BatchA_D001A7A0A[0] != 0; }
