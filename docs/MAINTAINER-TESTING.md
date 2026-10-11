@@ -27,6 +27,26 @@ API errors and stale PR heads cannot grant local trust.
 
 ## Local preparation and direct merge
 
+### Explicit delegated route
+
+LP also approves `ThorpenCodes` (immutable ID 29800182) for the explicit
+`campaign.py finalize --owner-local` and `merge_queue.py --owner-local` commands.
+The shared `scripts/local_validation_policy.py` pins both ID and login and checks
+Thorpen's live write, maintain or admin role on `OpenRAC/rac2-gc-decomp` before
+preparation or a merge request. A read-only role, spoofed identity or unverifiable
+permission response stops the operation. The primary account retains its existing
+authentication route.
+
+This delegation does not change `maintainer_test_policy.identity`, automatic
+PR/push CI selection, the bare `--maintainer-test` option or
+`maintainer_tests.py --test`: those remain primary-only. For either approved user,
+local matching gates still apply. A write role alone does not bypass GitHub branch
+protections; the account's PR-only exemptions and token access must separately
+allow the merge. The scripts neither alter repository access nor assert that
+GitHub independently ran the local tests.
+
+### Primary maintainer focused tests
+
 Use the repository environment and actual affected maintained test modules,
 including tests for dependency changes. For example:
 
@@ -43,7 +63,7 @@ presentation changes with unchanged matching inputs do not require a game build.
 The existing campaign finalizer remains available with repeated
 `--maintainer-test` selections and its mandatory focused policy/finalizer tests.
 Its historical plan fields do not themselves prove that a remote queue ran.
-The owner-only direct merge command is documented in `docs/MERGE-QUEUE.md`.
+The explicitly approved direct merge command is documented in `docs/MERGE-QUEUE.md`.
 The local route relies on the owner's judgement that the applicable tests and
 matching gates were completed; GitHub does not automatically verify that claim.
 

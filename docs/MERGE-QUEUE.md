@@ -31,11 +31,13 @@ a temporary combined commit and reruns the required checks on that commit.
 The configured policy uses merge commits, one build at a time, one PR per group,
 and `ALLGREEN` validation. Every group must pass; a green later contribution
 cannot excuse an earlier failure. Required checks have a 60-minute response
-timeout. Reviews remain required for actors outside the approved maintainer
-team. That team's existing review exemption uses GitHub's explicit `exempt`
-mode so queue admission honors it. The integrity and queue rules have no bypass
-actors: tests, proof freshness, description checks and queue validation remain
-mandatory for maintainers too. Reservations and discussion resolution remain.
+timeout. Reviews remain required outside the configured review exemptions.
+The existing review exemption uses GitHub's explicit `exempt` mode so queue
+admission honors it. Named local-route accounts need separately configured
+PR-only review/check/queue exemptions for a direct merge. Repository write access
+alone cannot grant them. Integrity restrictions have no bypass actors: deletion,
+non-fast-forward updates and unresolved discussions remain protected. Ordinary
+queue submissions still run their required checks. Reservations remain required.
 
 ## Proofs and conflicts
 
@@ -69,18 +71,34 @@ technical approval of a contribution.
 
 See GitHub's [merge queue guide](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue).
 
-## Primary maintainer exception
+## Explicit local-validation exception
 
-The primary maintainer, `llesieur99` (immutable user ID 191315338), may
-merge an exact reviewed head after completed local validation without waiting
-for remote full tests or the native queue:
+LP's approved accounts, `llesieur99` (immutable user ID 191315338) and
+`ThorpenCodes` (immutable user ID 29800182), may explicitly request an exact-head
+merge after completed local validation without waiting for remote full tests
+or the native queue. The shared `scripts/local_validation_policy.py` allowlist
+requires both ID and login. Thorpen must also have a current GitHub-verified
+write, maintain or admin repository role:
 
 ```sh
 python scripts/merge_queue.py <PR> --expected-head <SHA> --owner-local
 ```
 
 This is an explicit local-validation assertion, not a GitHub proof of local
-test results. The command refuses other accounts and changed heads.
-GitHub CI-check and queue exceptions apply only to this user on PR merges.
+test results. The command refuses unnamed accounts, read-only delegated users,
+changed heads and unavailable or inconsistent permission metadata. The automatic
+CI policy remains primary-only: Thorpen's PR/push events do not automatically
+select local trust. Bare `--maintainer-test` remains primary-only too.
+
+Repository write access, token authorization and ruleset bypass are distinct.
+The direct REST merge requires a token authorized for this repository (for a
+fine-grained token, Contents write) and the account's configured PR-only
+review/check/queue exemptions where applicable. The command grants no permissions,
+changes no ruleset, and never uses an administrator override or queue fallback
+after GitHub refuses it. Discussion resolution remains enforced.
+
+See GitHub's [collaborator permission endpoint](https://docs.github.com/en/rest/collaborators/collaborators#get-repository-permissions-for-a-user)
+and [merge endpoint](https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request).
+
 Deletion, non-fast-forward restrictions and other contributorsâ€™ required
 checks and queue remain enforced. Source matching acceptance stays byte-exact.

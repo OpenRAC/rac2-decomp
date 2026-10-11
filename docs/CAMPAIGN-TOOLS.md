@@ -127,7 +127,10 @@ lock shared by arbitrary editors. Keep the batch inputs frozen throughout.
 Repeating an applied invocation verifies its after-images without closing tasks
 twice.
 
-The authenticated primary maintainer should use the bounded local route:
+The explicitly approved local users, `llesieur99` (ID 191315338) and
+`ThorpenCodes` (ID 29800182), may use the bounded local route. Thorpen's
+authenticated ID/login and current repository write, maintain or admin role
+must be verified before preparation:
 
 ```text
 python scripts/campaign.py --runtime <private-runtime> finalize <action-id> --manifest <preparation-manifest.json> --output <new-private-finalization-directory> --owner-local --apply
@@ -140,6 +143,11 @@ module with `--maintainer-test test_name`. Matching, source-layout, report,
 fresh-tool and complete-image gates remain unchanged. This authenticated route
 waives exhaustive local unittest discovery; omitting `--owner-local` keeps it
 for the protected/default route.
+
+The allowlist lives in `scripts/local_validation_policy.py`; it does not extend
+the automatic primary-only CI selector or the bare `--maintainer-test` route.
+GitHub token access and ruleset exemptions are separate from local eligibility.
+The finalizer neither grants permissions nor proves that GitHub will allow a merge.
 
 If preparation fails before a plan exists, inspect `failed-checks.json` and its
 numbered log, correct the cause and use a new private output directory. Do not

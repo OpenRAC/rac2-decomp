@@ -856,7 +856,7 @@ def main(argv=None):
     f.add_argument("--maintainer-test", action="append", default=[],
                    help="Primary maintainer only: targeted local test module; repeat as needed. Full queue suite remains mandatory")
     f.add_argument("--owner-local", action="store_true",
-                   help="Primary maintainer only: use authenticated targeted finalizer tests (defaults to test_decomp_report)")
+                   help="Approved local users only: authenticated targeted finalizer tests (defaults to test_decomp_report)")
     f.add_argument("--maintainer-jobs", type=int, default=0,
                    help="Parallel targeted-test workers; zero selects up to four automatically")
     subs.add_parser("seed-history")
