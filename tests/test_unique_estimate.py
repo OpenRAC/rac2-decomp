@@ -33,7 +33,9 @@ class NormaliseTests(unittest.TestCase):
         self.assertTrue(catalog["heuristic"])
         report = ue.build_report(catalog)
         total = int(report["measures"]["totalCode"])
-        self.assertLess(total, sum(r["physical_code_bytes"] for r in catalog["images"].values()))
+        self.assertLess(total, sum(catalog["physical_code_bytes"].values()))
+        self.assertEqual({c["id"] for c in report["categories"]} >= {"executable", "core", "game", "level_code", "common", "levels"}, True)
+        self.assertTrue(any(u["name"].startswith("core/") for u in report["units"]))
         self.assertLessEqual(int(report["measures"]["matchedCode"]), total)
 
 

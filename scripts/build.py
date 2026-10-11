@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from elf_tools import assert_fresh, compare_loads, read_elf
+import private_dir
 import region as regions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -394,8 +395,8 @@ def main() -> int:
         if importlib.metadata.version(package) != version:
             raise ValueError(f"Use pinned {package} {version}")
     manifest_path = args.manifest.resolve()
-    if ROOT == manifest_path.parent or ROOT in manifest_path.parents:
-        raise ValueError("Private manifest and builds must remain outside source repository")
+    if not private_dir.allowed(manifest_path.parent):
+        raise ValueError("Private manifest and builds must remain outside the repository or under its git-ignored extracted/ folder")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     try:
         # Several releases share one serial; the manifest names its own region.

@@ -111,12 +111,31 @@ def accepted(level: str | None) -> list[tuple[int, int]]:
     return [(f["address"], f["size"]) for f in data["functions"] if f.get("matched") and f.get("integrated")]
 
 
+def object_cuts(ranges: dict[int, list[int]]) -> list[int]:
+    """Start of every object after a run of 0xCDCDCDCD, the linker's fill between retail objects."""
+    cuts = []
+    for base, words in ranges.items():
+        i = 0
+        while i < len(words):
+            if words[i] == 0xCDCDCDCD:
+                j = i
+                while j < len(words) and words[j] == 0xCDCDCDCD:
+                    j += 1
+                if j < len(words):
+                    cuts.append(base + j * 4)
+                i = j
+            else:
+                i += 1
+    return cuts
+
+
 def build_catalog(reference: Path, elf: Path) -> dict:
     region = regions.load(REGION)
     boot_bytes = elf.read_bytes()
     if hashlib.sha256(boot_bytes).hexdigest() != region.target["boot"]["sha256"]:
         raise SystemExit("ELF is not the pinned USA v1.01 boot executable")
-    images = [("boot", code_words(boot_bytes), accepted(None))]
+    boot_ranges = code_words(boot_bytes)
+    images = [("boot", boot_ranges, accepted(None))]
     for row in region.overlays["levels"]:
         path = reference / "levels" / row["level"] / "overlay.elf"
         images.append((row["level"], code_words(path.read_bytes()), accepted(row["level"])))
@@ -126,56 +145,121 @@ def build_catalog(reference: Path, elf: Path) -> dict:
             words = slice_words(ranges, address, size)
             if words is not None:
                 credited.add(digest(words))
-    seen: dict[str, int] = {}
-    units, physical = [], {}
+    per_image = {}
+    holders: dict[str, set[str]] = {}
     for name, ranges, _ in images:
-        total = new = new_credit = 0
+        rows = []
         for address, size in extents(ranges):
-            words = slice_words(ranges, address, size)
-            d = digest(words)
-            total += size
-            if d not in seen:
-                seen[d] = size
-                new += size
-                if d in credited:
-                    new_credit += size
-                units.append([name, address, size, int(d in credited)])
-        physical[name] = {"physical_code_bytes": total, "new_distinct_bytes": new, "new_credited_bytes": new_credit}
-    return {"schema": 1, "target": region.serial, "version": "1.01", "heuristic": True,
+            d = digest(slice_words(ranges, address, size))
+            rows.append((address, size, d))
+            holders.setdefault(d, set()).add(name)
+        per_image[name] = rows
+    boot_digests = {d for _, _, d in per_image["boot"]}
+    physical = {n: sum(r[1] for r in rows) for n, rows in per_image.items()}
+    functions = {"boot": [], "shared": {}, "specific": {}}
+    seen: set[str] = set()
+    for address, size, d in per_image["boot"]:
+        if d in seen:
+            continue
+        seen.add(d)
+        functions["boot"].append([address, size, int(d in credited)])
+    for name, rows in per_image.items():
+        if name == "boot":
+            continue
+        for address, size, d in rows:
+            if d in seen:
+                continue
+            seen.add(d)
+            kind = "shared" if len(holders[d] - {"boot"}) > 1 else "specific"
+            functions[kind].setdefault(name, []).append([address, size, int(d in credited)])
+    return {"schema": 2, "target": region.serial, "version": "1.01", "heuristic": True,
             "boot_sha256": region.target["boot"]["sha256"],
             "overlay_sha256": {r["level"]: r["sha256"] for r in region.overlays["levels"]},
-            "images": physical,
-            "distinct_functions": [u for u in units if u[0] == "boot"],
-            "note": "Estimate only. Distinct bodies are counted once by a relocation-masking heuristic; credited "
-                    "bytes come solely from accepted proofs of identical digest and extent."}
+            "physical_code_bytes": physical, "boot_object_starts": sorted(object_cuts(boot_ranges)),
+            "boot_code_sections": [[b, len(w) * 4] for b, w in boot_ranges.items()],
+            "functions": functions,
+            "note": "Estimate only. Distinct bodies are counted once by a relocation-masking heuristic; shared = a body "
+                    "present in two or more overlays, specific = in one; credited = an accepted proof with the same "
+                    "digest and extent. No bytes are stored."}
 
 
-def measures(code: int, matched: int, units: int, complete_units: int) -> dict:
+def level_title(level: str) -> str:
+    number, _, name = level.partition("_")
+    return f"Level {int(number):02d}: {name.replace('_', ' ').title()}"
+
+
+def measures(code: int, matched: int, funcs: int, matched_funcs: int, units: int, complete_units: int) -> dict:
     pct = matched / code * 100 if code else 0
-    return {"totalCode": str(code), "matchedCode": str(matched), "matchedCodePercent": pct, "totalData": "0",
-            "matchedData": "0", "matchedDataPercent": 0, "completeCode": str(matched), "completeCodePercent": pct,
-            "completeData": "0", "completeDataPercent": 0, "fuzzyMatchPercent": pct, "totalUnits": units,
-            "completeUnits": complete_units}
+    fpct = matched_funcs / funcs * 100 if funcs else 0
+    return {"fuzzyMatchPercent": pct, "totalCode": str(code), "matchedCode": str(matched), "matchedCodePercent": pct,
+            "totalFunctions": funcs, "matchedFunctions": matched_funcs, "matchedFunctionsPercent": fpct,
+            "completeCode": str(matched), "completeCodePercent": pct, "totalUnits": units, "completeUnits": complete_units,
+            "totalData": "0", "matchedData": "0", "matchedDataPercent": 0, "completeData": "0", "completeDataPercent": 0}
 
 
-def build_report(catalog: dict) -> dict:
-    units, cats = [], []
-    for name, row in catalog["images"].items():
-        size, done = row["new_distinct_bytes"], row["new_credited_bytes"]
-        group = "boot" if name == "boot" else "levels"
-        units.append({"name": f"{group}/{name}/distinct-code", "measures": measures(size, done, 1, int(size == done and size > 0)),
-                      "sections": [{"name": ".text", "size": str(size), "fuzzyMatchPercent": done / size * 100 if size else 0}],
-                      "metadata": {"complete": size > 0 and size == done, "autoGenerated": True,
-                                   "moduleName": name, "progressCategories": [group]}})
-    for cid, title in (("boot", "Boot ELF"), ("levels", "Level overlays (distinct code only)")):
+def unit(name: str, rows: list[list[int]], categories: list[str]) -> dict:
+    done = sum(r[1] for r in rows if r[2])
+    total = sum(r[1] for r in rows)
+    return {"name": name, "measures": measures(total, done, len(rows), sum(r[2] for r in rows), 1, int(bool(rows) and done == total)),
+            "sections": [{"name": ".text", "size": str(total), "fuzzyMatchPercent": done / total * 100 if total else 0}],
+            "functions": [{"name": f"func_{r[0]:08X}", "size": str(r[1]), "fuzzyMatchPercent": 100.0 if r[2] else 0.0,
+                           "metadata": {"virtualAddress": str(r[0])}} for r in rows],
+            "metadata": {"complete": bool(rows) and done == total, "autoGenerated": True, "progressCategories": categories}}
+
+
+def boot_units(catalog: dict, overrides: list[tuple[int, str]]) -> list[dict]:
+    """Boot objects: starts after linker fill, plus optional contributor-named rows of config/segments."""
+    cuts = sorted(set(catalog["boot_object_starts"]) | {a for a, _ in overrides} | {b for b, _ in catalog["boot_code_sections"]})
+    names = {a: n for a, n in overrides}
+    rows = sorted(catalog["functions"]["boot"])
+    out = []
+    first_section_end = min(catalog["boot_code_sections"])[0] + min(catalog["boot_code_sections"])[1]
+    for i, cut in enumerate(cuts):
+        end = cuts[i + 1] if i + 1 < len(cuts) else 1 << 32
+        chunk = [r for r in rows if cut <= r[0] < end]
+        if chunk:
+            group = "core" if cut < first_section_end else "game"
+            out.append(unit(f"{group}/{names.get(cut, f'{cut:08X}')}", chunk, ["executable", group]))
+    return out
+
+
+def build_report(catalog: dict, overrides: list[tuple[int, str]] | None = None) -> dict:
+    units = boot_units(catalog, overrides or [])
+    levels = sorted(catalog["physical_code_bytes"].keys() - {"boot"}, key=lambda n: int(n.split("_")[0]))
+    for level in levels:
+        for kind, group in (("shared", "common"), ("specific", "levels")):
+            rows = catalog["functions"][kind].get(level, [])
+            if rows:
+                cats = ["level_code", group] if kind == "shared" else ["level_code", group, f"level_{int(level.split('_')[0]):02d}"]
+                units.append(unit(f"{'shared' if kind == 'shared' else 'levels'}/{level}", rows, cats))
+    cats = []
+    names = [("executable", "Executable"), ("core", "Executable core code"), ("game", "Executable game code"), ("level_code", "Level code"),
+             ("common", "Shared level code"), ("levels", "Level-specific code")]
+    names += [(f"level_{int(l.split('_')[0]):02d}", level_title(l)) for l in levels]
+    for cid, title in names:
         sub = [u for u in units if cid in u["metadata"]["progressCategories"]]
-        cats.append({"id": cid, "name": title, "measures": measures(
-            sum(int(u["measures"]["totalCode"]) for u in sub), sum(int(u["measures"]["matchedCode"]) for u in sub),
-            len(sub), sum(u["measures"]["completeUnits"] for u in sub))})
+        if sub:
+            cats.append({"id": cid, "name": title, "measures": measures(
+                sum(int(u["measures"]["totalCode"]) for u in sub), sum(int(u["measures"]["matchedCode"]) for u in sub),
+                sum(u["measures"]["totalFunctions"] for u in sub), sum(u["measures"]["matchedFunctions"] for u in sub),
+                len(sub), sum(u["measures"]["completeUnits"] for u in sub))})
     total = sum(int(u["measures"]["totalCode"]) for u in units)
     done = sum(int(u["measures"]["matchedCode"]) for u in units)
-    return {"version": 2, "measures": measures(total, done, len(units), sum(u["measures"]["completeUnits"] for u in units)),
+    return {"version": 2, "measures": measures(total, done, sum(u["measures"]["totalFunctions"] for u in units),
+                                               sum(u["measures"]["matchedFunctions"] for u in units), len(units),
+                                               sum(u["measures"]["completeUnits"] for u in units)),
             "units": units, "categories": cats}
+
+
+def read_overrides() -> list[tuple[int, str]]:
+    path = ROOT / "config/segments/ntsc-u-boot.tsv"
+    rows = []
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.strip() and not line.startswith("#"):
+                address, name = line.split()[:2]
+                rows.append((int(address, 0), name))
+    return rows
 
 
 def main() -> int:
@@ -192,11 +276,12 @@ def main() -> int:
         ESTIMATE.write_text(json.dumps(build_catalog(args.reference, args.elf), separators=(",", ":")) + "\n", encoding="utf-8")
         print(f"wrote {ESTIMATE.relative_to(ROOT)}")
         return 0
-    report = build_report(json.loads(ESTIMATE.read_text(encoding="utf-8")))
+    report = build_report(json.loads(ESTIMATE.read_text(encoding="utf-8")), read_overrides())
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report) + "\n", encoding="utf-8")
     m = report["measures"]
-    print(f"{m['matchedCode']} / {m['totalCode']} distinct code bytes ({m['matchedCodePercent']:.4f}%) [heuristic estimate]")
+    print(f"{m['matchedCode']} / {m['totalCode']} distinct code bytes ({m['matchedCodePercent']:.4f}%), "
+          f"{m['matchedFunctions']} / {m['totalFunctions']} functions, {m['totalUnits']} units [heuristic estimate]")
     return 0
 
 

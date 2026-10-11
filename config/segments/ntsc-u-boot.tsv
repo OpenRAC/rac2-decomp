@@ -1,0 +1,5 @@
+# Optional names for boot objects of USA v1.01, one "<start address> <name>" row each.
+# Objects start after every run of linker fill (0xCDCDCDCD) and at each code section; they are named
+# by their start address (core/00115200, game/0026EA00) until their source file is identified. Add a
+# row to split a unit at a proven file boundary or to rename it; only the name changes, never the
+# address. Rows are read by scripts/unique_estimate.py when it builds the decomp.dev report.
