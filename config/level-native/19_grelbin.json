@@ -80,6 +80,12 @@
     "LVL_19_GRELBIN_F1fa78648_FUN_002EC930": 3066160,
     "LVL_19_GRELBIN_F1fa78648_FUN_003273E8": 3306472,
     "LVL_19_GRELBIN_F1fa78648_FUN_00327418": 3306520,
+    "LVL_19_GRELBIN_F213135aa_FUN_002EB950": 3062096,
+    "LVL_19_GRELBIN_F213135aa_FUN_002EBA38": 3062328,
+    "LVL_19_GRELBIN_F213135aa_FUN_002EBC08": 3062792,
+    "LVL_19_GRELBIN_F213135aa_FUN_002EC188": 3064200,
+    "LVL_19_GRELBIN_F213135aa_FUN_003183D8": 3245016,
+    "LVL_19_GRELBIN_F213135aa_FUN_0031CA78": 3263096,
     "LVL_19_GRELBIN_F250fbfa4_FUN_002EB5C0": 3061184,
     "LVL_19_GRELBIN_F250fbfa4_FUN_002EB920": 3062048,
     "LVL_19_GRELBIN_F250fbfa4_FUN_0032D4D0": 3331280,
@@ -175,6 +181,12 @@
     "LVL_19_GRELBIN_F55a1acb8_D_001A63AC": 1729452,
     "LVL_19_GRELBIN_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_19_GRELBIN_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_19_GRELBIN_F5a19df7a_FUN_00318380": 3244928,
+    "LVL_19_GRELBIN_F5a19df7a_FUN_003184A0": 3245216,
+    "LVL_19_GRELBIN_F5a19df7a_FUN_00379558": 3642712,
+    "LVL_19_GRELBIN_F5a19df7a_FUN_003CCEC0": 3985088,
+    "LVL_19_GRELBIN_F5a19df7a_FUN_003CD298": 3986072,
+    "LVL_19_GRELBIN_F5a19df7a_FUN_003CDAC0": 3988160,
     "LVL_19_GRELBIN_F5a29d35d_D_001A7240": 1733184,
     "LVL_19_GRELBIN_F5a29d35d_D_00226150": 2253136,
     "LVL_19_GRELBIN_F5a29d35d_FUN_0011AFE0": 1159136,
@@ -340,6 +352,18 @@
     "LVL_19_GRELBIN_Fb1b523716b470b36_AT00384470_ROLE01": 3062096,
     "LVL_19_GRELBIN_Fb1b523716b470b36_AT00386F18_ROLE00": 3062048,
     "LVL_19_GRELBIN_Fb1b523716b470b36_AT00386F18_ROLE01": 3062096,
+    "LVL_19_GRELBIN_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_19_GRELBIN_Fb1bbe20c_FUN_0035D538": 3527992,
+    "LVL_19_GRELBIN_Fb1bbe20c_FUN_00441B00": 4463360,
+    "LVL_19_GRELBIN_Fb1bbe20c_FUN_00441CF0": 4463856,
+    "LVL_19_GRELBIN_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_19_GRELBIN_Fb1c9893c_FUN_002D9490": 2987152,
+    "LVL_19_GRELBIN_Fb1c9893c_FUN_002EB920": 3062048,
+    "LVL_19_GRELBIN_Fb1c9893c_FUN_002EBDE8": 3063272,
+    "LVL_19_GRELBIN_Fb1c9893c_FUN_002EBF18": 3063576,
+    "LVL_19_GRELBIN_Fb1c9893c_FUN_002EBF30": 3063600,
+    "LVL_19_GRELBIN_Fb1c9893c_FUN_003183D8": 3245016,
+    "LVL_19_GRELBIN_Fb1c9893c_FUN_003184A0": 3245216,
     "LVL_19_GRELBIN_Fb342d477_D_0011AC40": 1158208,
     "LVL_19_GRELBIN_Fb342d477_D_0011AC60": 1158240,
     "LVL_19_GRELBIN_Fb342d477_FUN_00457480": 4551808,
@@ -464,6 +488,13 @@
     "LVL_19_GRELBIN_Ff26f272a_FUN_002EC1A8": 3064232,
     "LVL_19_GRELBIN_Ff26f272a_FUN_002EC410": 3064848,
     "LVL_19_GRELBIN_Ff26f272a_FUN_002EC930": 3066160,
+    "LVL_19_GRELBIN_Ff2d8e5ad_FUN_002EB920": 3062048,
+    "LVL_19_GRELBIN_Ff2d8e5ad_FUN_002EB990": 3062160,
+    "LVL_19_GRELBIN_Ff2d8e5ad_FUN_002EBAC8": 3062472,
+    "LVL_19_GRELBIN_Ff2d8e5ad_FUN_002EBDE8": 3063272,
+    "LVL_19_GRELBIN_Ff2d8e5ad_FUN_002EBE10": 3063312,
+    "LVL_19_GRELBIN_Ff2d8e5ad_FUN_002EBE80": 3063424,
+    "LVL_19_GRELBIN_Ff2d8e5ad_FUN_00313180": 3223936,
     "LVL_19_GRELBIN_Ff4dd22f3_FUN_002EB5C0": 3061184,
     "LVL_19_GRELBIN_Ff4dd22f3_FUN_002EB920": 3062048,
     "LVL_19_GRELBIN_Ff4dd22f3_FUN_0032D4D0": 3331280,
@@ -1027,6 +1058,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_0030E040"
     },
     {
+      "address": 3204336,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_19_GRELBIN_FUN_0030E4F0"
+    },
+    {
       "address": 3205040,
       "meaning": "shared native body of family 0820eb1123250c0b",
       "size": 192,
@@ -1102,6 +1139,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_19_GRELBIN_FUN_00322FF0"
+    },
+    {
+      "address": 3291576,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_19_GRELBIN_FUN_003239B8"
     },
     {
       "address": 3292808,
@@ -1435,6 +1478,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_0037E2A0"
     },
     {
+      "address": 3669808,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_19_GRELBIN_FUN_0037FF30"
+    },
+    {
       "address": 3670224,
       "size": 8,
       "symbol": "LVL_19_GRELBIN_FUN_003800D0"
@@ -1618,6 +1667,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_19_GRELBIN_FUN_003CD8B8"
+    },
+    {
+      "address": 3987744,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_19_GRELBIN_FUN_003CD920"
     },
     {
       "address": 3989864,
@@ -2106,16 +2161,34 @@
       "symbol": "LVL_19_GRELBIN_FUN_004447A8"
     },
     {
+      "address": 4475144,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_19_GRELBIN_FUN_00444908"
+    },
+    {
       "address": 4475480,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_19_GRELBIN_FUN_00444A58"
     },
     {
+      "address": 4475832,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_19_GRELBIN_FUN_00444BB8"
+    },
+    {
       "address": 4475984,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_19_GRELBIN_FUN_00444C50"
+    },
+    {
+      "address": 4476336,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_19_GRELBIN_FUN_00444DB0"
     },
     {
       "address": 4476488,

@@ -80,6 +80,12 @@
     "LVL_15_GORN_F1fa78648_FUN_00307C20": 3177504,
     "LVL_15_GORN_F1fa78648_FUN_00342140": 3416384,
     "LVL_15_GORN_F1fa78648_FUN_00342170": 3416432,
+    "LVL_15_GORN_F213135aa_FUN_00306C60": 3173472,
+    "LVL_15_GORN_F213135aa_FUN_00306D48": 3173704,
+    "LVL_15_GORN_F213135aa_FUN_00306EF8": 3174136,
+    "LVL_15_GORN_F213135aa_FUN_00307478": 3175544,
+    "LVL_15_GORN_F213135aa_FUN_00333378": 3355512,
+    "LVL_15_GORN_F213135aa_FUN_00337750": 3372880,
     "LVL_15_GORN_F250a61cf_D_001AD670": 1758832,
     "LVL_15_GORN_F250a61cf_D_001AD680": 1758848,
     "LVL_15_GORN_F250a61cf_D_001AD688": 1758856,
@@ -173,6 +179,12 @@
     "LVL_15_GORN_F55a1acb8_D_001A63AC": 1729452,
     "LVL_15_GORN_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_15_GORN_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_15_GORN_F5a19df7a_FUN_00333320": 3355424,
+    "LVL_15_GORN_F5a19df7a_FUN_00333440": 3355712,
+    "LVL_15_GORN_F5a19df7a_FUN_00397060": 3764320,
+    "LVL_15_GORN_F5a19df7a_FUN_003E8030": 4096048,
+    "LVL_15_GORN_F5a19df7a_FUN_003E8408": 4097032,
+    "LVL_15_GORN_F5a19df7a_FUN_003E8C30": 4099120,
     "LVL_15_GORN_F5a9e4f98_FUN_00453E48": 4537928,
     "LVL_15_GORN_F5a9e4f98_FUN_00454070": 4538480,
     "LVL_15_GORN_F5a9e4f98_FUN_00454370": 4539248,
@@ -331,6 +343,18 @@
     "LVL_15_GORN_Fb1b523716b470b36_AT003A3C48_ROLE01": 3173472,
     "LVL_15_GORN_Fb1b523716b470b36_AT003A66F0_ROLE00": 3173424,
     "LVL_15_GORN_Fb1b523716b470b36_AT003A66F0_ROLE01": 3173472,
+    "LVL_15_GORN_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_15_GORN_Fb1bbe20c_FUN_003781D0": 3637712,
+    "LVL_15_GORN_Fb1bbe20c_FUN_00458AD0": 4557520,
+    "LVL_15_GORN_Fb1bbe20c_FUN_00458CC0": 4558016,
+    "LVL_15_GORN_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_15_GORN_Fb1c9893c_FUN_002F4788": 3098504,
+    "LVL_15_GORN_Fb1c9893c_FUN_00306C30": 3173424,
+    "LVL_15_GORN_Fb1c9893c_FUN_003070D8": 3174616,
+    "LVL_15_GORN_Fb1c9893c_FUN_00307208": 3174920,
+    "LVL_15_GORN_Fb1c9893c_FUN_00307220": 3174944,
+    "LVL_15_GORN_Fb1c9893c_FUN_00333378": 3355512,
+    "LVL_15_GORN_Fb1c9893c_FUN_00333440": 3355712,
     "LVL_15_GORN_Fb342d477_D_0011AC40": 1158208,
     "LVL_15_GORN_Fb342d477_D_0011AC60": 1158240,
     "LVL_15_GORN_Fb342d477_FUN_0046E450": 4645968,
@@ -443,6 +467,13 @@
     "LVL_15_GORN_Ff26f272a_FUN_00307498": 3175576,
     "LVL_15_GORN_Ff26f272a_FUN_00307700": 3176192,
     "LVL_15_GORN_Ff26f272a_FUN_00307C20": 3177504,
+    "LVL_15_GORN_Ff2d8e5ad_FUN_00306C30": 3173424,
+    "LVL_15_GORN_Ff2d8e5ad_FUN_00306CA0": 3173536,
+    "LVL_15_GORN_Ff2d8e5ad_FUN_00306DD8": 3173848,
+    "LVL_15_GORN_Ff2d8e5ad_FUN_003070D8": 3174616,
+    "LVL_15_GORN_Ff2d8e5ad_FUN_00307100": 3174656,
+    "LVL_15_GORN_Ff2d8e5ad_FUN_00307170": 3174768,
+    "LVL_15_GORN_Ff2d8e5ad_FUN_0032E150": 3334480,
     "LVL_15_GORN_Ff4dd22f3_FUN_003068D0": 3172560,
     "LVL_15_GORN_Ff4dd22f3_FUN_00306C30": 3173424,
     "LVL_15_GORN_Ff4dd22f3_FUN_00348318": 3441432,
@@ -1008,6 +1039,12 @@
       "symbol": "LVL_15_GORN_FUN_00327AC0"
     },
     {
+      "address": 3314960,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_15_GORN_FUN_00329510"
+    },
+    {
       "address": 3315664,
       "meaning": "shared native body of family 19c820e81a180575",
       "size": 192,
@@ -1077,6 +1114,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_15_GORN_FUN_0033DAC0"
+    },
+    {
+      "address": 3400880,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_15_GORN_FUN_0033E4B0"
     },
     {
       "address": 3402112,
@@ -1410,6 +1453,12 @@
       "symbol": "LVL_15_GORN_FUN_0039BCA0"
     },
     {
+      "address": 3791152,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_15_GORN_FUN_0039D930"
+    },
+    {
       "address": 3791568,
       "size": 8,
       "symbol": "LVL_15_GORN_FUN_0039DAD0"
@@ -1599,6 +1648,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_15_GORN_FUN_003E8A28"
+    },
+    {
+      "address": 4098704,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_15_GORN_FUN_003E8A90"
     },
     {
       "address": 4100824,
@@ -2069,16 +2124,34 @@
       "symbol": "LVL_15_GORN_FUN_0045B778"
     },
     {
+      "address": 4569304,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_15_GORN_FUN_0045B8D8"
+    },
+    {
       "address": 4569640,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_15_GORN_FUN_0045BA28"
     },
     {
+      "address": 4569992,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_15_GORN_FUN_0045BB88"
+    },
+    {
       "address": 4570144,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_15_GORN_FUN_0045BC20"
+    },
+    {
+      "address": 4570496,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_15_GORN_FUN_0045BD80"
     },
     {
       "address": 4570648,

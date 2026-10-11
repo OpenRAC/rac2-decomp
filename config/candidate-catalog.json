@@ -51,6 +51,12 @@
     "F15a8b7f0_FUN_00282CC0": 2632896,
     "F15a8b7f0_FUN_00282D30": 2633008,
     "F15a8b7f0_FUN_002B9180": 2855296,
+    "F213135aa_FUN_00282CF0": 2632944,
+    "F213135aa_FUN_00282DD8": 2633176,
+    "F213135aa_FUN_00282F20": 2633504,
+    "F213135aa_FUN_002833F0": 2634736,
+    "F213135aa_FUN_002A7878": 2783352,
+    "F213135aa_FUN_002AB668": 2799208,
     "F250fbfa4_FUN_00282978": 2632056,
     "F250fbfa4_FUN_00282CC0": 2632896,
     "F250fbfa4_FUN_002B9180": 2855296,
@@ -88,6 +94,12 @@
     "F500f9762_FUN_00283CE0": 2637024,
     "F500f9762_FUN_00283CF0": 2637040,
     "F500f9762_FUN_002A04B8": 2753720,
+    "F5a19df7a_FUN_002A7820": 2783264,
+    "F5a19df7a_FUN_002A7940": 2783552,
+    "F5a19df7a_FUN_002FC560": 3130720,
+    "F5a19df7a_FUN_0031E2A0": 3269280,
+    "F5a19df7a_FUN_0031E560": 3269984,
+    "F5a19df7a_FUN_0031EB00": 3271424,
     "F5a9e4f98_FUN_003361A8": 3367336,
     "F5a9e4f98_FUN_003363D0": 3367888,
     "F5a9e4f98_FUN_003366D0": 3368656,
@@ -232,6 +244,10 @@
     "Fa5914967_FUN_00282F20": 2633504,
     "Faac80289_FUN_003361A8": 3367336,
     "Faac80289_FUN_00336968": 3369320,
+    "Fb1bbe20c_D_001A7BB2": 1735602,
+    "Fb1bbe20c_FUN_002E5E58": 3038808,
+    "Fb1bbe20c_FUN_0033AE28": 3386920,
+    "Fb1bbe20c_FUN_0033B018": 3387416,
     "Fb77d67f1_FUN_00282948": 2632008,
     "Fb77d67f1_FUN_002B9180": 2855296,
     "Fb7feb893_D_001A7BB2": 1735602,
@@ -298,6 +314,13 @@
     "Fe617c30b_FUN_002B9180": 2855296,
     "Fee2b87d1_D_0014B540": 1357120,
     "Fee2b87d1_D_00152CD0": 1387728,
+    "Ff2d8e5ad_FUN_00282CC0": 2632896,
+    "Ff2d8e5ad_FUN_00282D30": 2633008,
+    "Ff2d8e5ad_FUN_00282E48": 2633288,
+    "Ff2d8e5ad_FUN_00283098": 2633880,
+    "Ff2d8e5ad_FUN_002830C0": 2633920,
+    "Ff2d8e5ad_FUN_00283130": 2634032,
+    "Ff2d8e5ad_FUN_002A3110": 2765072,
     "Ff4dd22f3_FUN_00282978": 2632056,
     "Ff4dd22f3_FUN_00282CC0": 2632896,
     "Ff4dd22f3_FUN_002B9180": 2855296,
@@ -947,6 +970,14 @@
       "ranges": 1,
       "size": 276,
       "symbol": "FUN_0029AF98",
+      "xrefs": 1
+    },
+    {
+      "address": 2750112,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "ranges": 1,
+      "size": 412,
+      "symbol": "FUN_0029F6A0",
       "xrefs": 1
     },
     {
@@ -1627,6 +1658,14 @@
       "xrefs": 0
     },
     {
+      "address": 3154592,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "ranges": 1,
+      "size": 412,
+      "symbol": "FUN_003022A0",
+      "xrefs": 1
+    },
+    {
       "address": 3165032,
       "meaning": "Family 6eb4f363e5305bed: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00387408.",
       "ranges": 1,
@@ -1750,6 +1789,14 @@
       "ranges": 1,
       "size": 104,
       "symbol": "FUN_0031E8F8",
+      "xrefs": 1
+    },
+    {
+      "address": 3271008,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "ranges": 1,
+      "size": 412,
+      "symbol": "FUN_0031E960",
       "xrefs": 1
     },
     {
@@ -2239,6 +2286,14 @@
       "xrefs": 1
     },
     {
+      "address": 3398704,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_0033DC30",
+      "xrefs": 1
+    },
+    {
       "address": 3399040,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "ranges": 1,
@@ -2247,11 +2302,27 @@
       "xrefs": 1
     },
     {
+      "address": 3399392,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_0033DEE0",
+      "xrefs": 1
+    },
+    {
       "address": 3399544,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "ranges": 1,
       "size": 44,
       "symbol": "FUN_0033DF78",
+      "xrefs": 1
+    },
+    {
+      "address": 3399896,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_0033E0D8",
       "xrefs": 1
     },
     {

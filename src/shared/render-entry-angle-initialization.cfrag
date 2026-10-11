@@ -1,0 +1,47 @@
+#ifndef RAC2_T_V4_F213135AA
+#define RAC2_T_V4_F213135AA
+typedef struct { float x, y, z, w; } V4_F213135aa;
+#endif
+
+
+extern float @@ROLE_0_00@@(float a, float b);
+extern float @@ROLE_1_00@@(float a, float b);
+extern void @@ROLE_2_00@@(char *a, char *b);
+extern void @@ROLE_3_00@@(char *a, char *b, float f);
+extern void @@ROLE_4_00@@(char *a, char *b, char *c);
+extern void @@ROLE_5_00@@(char *a, char *b, char *c);
+extern void @@ROLE_6_00@@(char *a, char *b, float f);
+extern void @@ROLE_7_00@@(char *a, char *b, float f);
+
+int @@FUNCTION@@(char *obj, char *obj2, float x, float y)
+{
+    V4_F213135aa m0, m1, m2;
+    char *s1;
+    char *s3;
+    float f22;
+
+    s1 = *(char **)(obj + 104);
+    if (*(unsigned char *)(obj + 32) == 4)
+        return 0;
+    f22 = 0.0f;
+    if (x == 0.0f)
+        x = @@ROLE_0_01@@(-30.0f, 30.0f) * 1.7453294247388839721680e-02f;
+    if (y == 0.0f)
+        y = @@ROLE_1_01@@(f22, 30.0f) * 1.7453294247388839721680e-02f;
+    s3 = s1 + 32;
+    if (*(unsigned char *)(obj + 32) == 3) {
+        @@ROLE_2_01@@((char *)&m0, s1 + 16);
+        @@ROLE_3_01@@(s3, (char *)&m2, 1.3333334028720855712891e-01f);
+    }
+    *(float *)(s1 + 100) = f22;
+    *(float *)(s1 + 76) = x;
+    *(float *)(s1 + 72) = y;
+    *(char **)(s1 + 96) = obj2;
+    @@ROLE_4_01@@((char *)&m1, obj2 + 16, obj + 16);
+    s1 = s1 + 48;
+    @@ROLE_5_01@@((char *)&m0, s3, (char *)&m1);
+    @@ROLE_6_01@@(s1, (char *)&m0, 1.0f);
+    @@ROLE_7_01@@(s1, s1, 2.0943954586982727050781e-01f);
+    *(unsigned char *)(obj + 32) = 4;
+    return 1;
+}

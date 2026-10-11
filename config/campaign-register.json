@@ -1489,6 +1489,19 @@
       "returncode": 0,
       "state": "passed"
     },
+    "c6432822e6ec4bebb4ab2204b27c0331": {
+      "action_manifest_sha256": "1ad4fd1954ebf287a3e0c9f3f3c8ff392b8a5cc19982df330999a9db54041a20",
+      "action_outcome_sha256": "e28f2dcafd2ee35c380d19c691974744f9e23911da9be058f490907c929713ff",
+      "artifact": "prepared-run:builds/campaign-c6432822e6ec4bebb4ab2204b27c0331/report.json",
+      "artifact_sha256": "065d72adfca6de930243e6215825d7d54097d16a52eaf2cf53969cf1383a69b7",
+      "directory": "runtime:actions/c6432822e6ec4bebb4ab2204b27c0331",
+      "finished": "2026-10-11T07:50:22.050282+00:00",
+      "id": "c6432822e6ec4bebb4ab2204b27c0331",
+      "integration_credit": 0,
+      "kind": "integrate",
+      "returncode": 0,
+      "state": "passed"
+    },
     "ca6c0d54ed3f4a69ab6f5f08694931d1": {
       "artifact": "prepared-run:builds/campaign-ca6c0d54ed3f4a69ab6f5f08694931d1/report.json",
       "artifact_sha256": "aab861f9fb207409eb99f704fe4fe781841f074c0002ea006acd93586ff2aa2b",
@@ -5311,7 +5324,7 @@
       "validity": "historical_unverified"
     }
   },
-  "revision": 13500,
+  "revision": 13506,
   "schema": 1,
   "tasks": {
     "24_ship_shack-fun_002a3e18": {

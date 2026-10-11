@@ -94,6 +94,12 @@
     "LVL_18_DAMOSEL_F1fa78648_FUN_00309900": 3184896,
     "LVL_18_DAMOSEL_F1fa78648_FUN_00345188": 3428744,
     "LVL_18_DAMOSEL_F1fa78648_FUN_003451B8": 3428792,
+    "LVL_18_DAMOSEL_F213135aa_FUN_00308920": 3180832,
+    "LVL_18_DAMOSEL_F213135aa_FUN_00308A08": 3181064,
+    "LVL_18_DAMOSEL_F213135aa_FUN_00308BD8": 3181528,
+    "LVL_18_DAMOSEL_F213135aa_FUN_00309158": 3182936,
+    "LVL_18_DAMOSEL_F213135aa_FUN_003357D0": 3364816,
+    "LVL_18_DAMOSEL_F213135aa_FUN_00339D60": 3382624,
     "LVL_18_DAMOSEL_F236d541c_D_001A742C": 1733676,
     "LVL_18_DAMOSEL_F236d541c_D_001B2F88": 1781640,
     "LVL_18_DAMOSEL_F250fbfa4_FUN_00308590": 3179920,
@@ -197,6 +203,12 @@
     "LVL_18_DAMOSEL_F55a1acb8_D_001A63AC": 1729452,
     "LVL_18_DAMOSEL_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_18_DAMOSEL_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_18_DAMOSEL_F5a19df7a_FUN_00335778": 3364728,
+    "LVL_18_DAMOSEL_F5a19df7a_FUN_00335898": 3365016,
+    "LVL_18_DAMOSEL_F5a19df7a_FUN_003976B0": 3765936,
+    "LVL_18_DAMOSEL_F5a19df7a_FUN_003EAA08": 4106760,
+    "LVL_18_DAMOSEL_F5a19df7a_FUN_003EADE0": 4107744,
+    "LVL_18_DAMOSEL_F5a19df7a_FUN_003EB608": 4109832,
     "LVL_18_DAMOSEL_F5a9e4f98_FUN_00459298": 4559512,
     "LVL_18_DAMOSEL_F5a9e4f98_FUN_004594C0": 4560064,
     "LVL_18_DAMOSEL_F5a9e4f98_FUN_004597C0": 4560832,
@@ -361,6 +373,18 @@
     "LVL_18_DAMOSEL_Fb1b523716b470b36_AT003A47B8_ROLE01": 3180832,
     "LVL_18_DAMOSEL_Fb1b523716b470b36_AT003A7260_ROLE00": 3180784,
     "LVL_18_DAMOSEL_Fb1b523716b470b36_AT003A7260_ROLE01": 3180832,
+    "LVL_18_DAMOSEL_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_18_DAMOSEL_Fb1bbe20c_FUN_0037B810": 3651600,
+    "LVL_18_DAMOSEL_Fb1bbe20c_FUN_0045DF20": 4579104,
+    "LVL_18_DAMOSEL_Fb1bbe20c_FUN_0045E110": 4579600,
+    "LVL_18_DAMOSEL_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_18_DAMOSEL_Fb1c9893c_FUN_002F6298": 3105432,
+    "LVL_18_DAMOSEL_Fb1c9893c_FUN_003088F0": 3180784,
+    "LVL_18_DAMOSEL_Fb1c9893c_FUN_00308DB8": 3182008,
+    "LVL_18_DAMOSEL_Fb1c9893c_FUN_00308EE8": 3182312,
+    "LVL_18_DAMOSEL_Fb1c9893c_FUN_00308F00": 3182336,
+    "LVL_18_DAMOSEL_Fb1c9893c_FUN_003357D0": 3364816,
+    "LVL_18_DAMOSEL_Fb1c9893c_FUN_00335898": 3365016,
     "LVL_18_DAMOSEL_Fb342d477_D_0011AC40": 1158208,
     "LVL_18_DAMOSEL_Fb342d477_D_0011AC60": 1158240,
     "LVL_18_DAMOSEL_Fb342d477_FUN_004738A0": 4667552,
@@ -476,6 +500,13 @@
     "LVL_18_DAMOSEL_Ff26f272a_FUN_00309178": 3182968,
     "LVL_18_DAMOSEL_Ff26f272a_FUN_003093E0": 3183584,
     "LVL_18_DAMOSEL_Ff26f272a_FUN_00309900": 3184896,
+    "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_003088F0": 3180784,
+    "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_00308960": 3180896,
+    "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_00308A98": 3181208,
+    "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_00308DB8": 3182008,
+    "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_00308DE0": 3182048,
+    "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_00308E50": 3182160,
+    "LVL_18_DAMOSEL_Ff2d8e5ad_FUN_003305A8": 3343784,
     "LVL_18_DAMOSEL_Ff4dd22f3_FUN_00308590": 3179920,
     "LVL_18_DAMOSEL_Ff4dd22f3_FUN_003088F0": 3180784,
     "LVL_18_DAMOSEL_Ff4dd22f3_FUN_0034B1D0": 3453392,
@@ -1054,6 +1085,12 @@
       "symbol": "LVL_18_DAMOSEL_FUN_0032B068"
     },
     {
+      "address": 3324264,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_18_DAMOSEL_FUN_0032B968"
+    },
+    {
       "address": 3324968,
       "meaning": "shared native body of family 19c820e81a180575",
       "size": 192,
@@ -1123,6 +1160,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_18_DAMOSEL_FUN_003402E8"
+    },
+    {
+      "address": 3411304,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_18_DAMOSEL_FUN_00340D68"
     },
     {
       "address": 3412536,
@@ -1486,6 +1529,12 @@
       "symbol": "LVL_18_DAMOSEL_FUN_0039E5B0"
     },
     {
+      "address": 3801664,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_18_DAMOSEL_FUN_003A0240"
+    },
+    {
       "address": 3802080,
       "size": 8,
       "symbol": "LVL_18_DAMOSEL_FUN_003A03E0"
@@ -1675,6 +1724,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_18_DAMOSEL_FUN_003EB400"
+    },
+    {
+      "address": 4109416,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_18_DAMOSEL_FUN_003EB468"
     },
     {
       "address": 4111536,
@@ -2186,16 +2241,34 @@
       "symbol": "LVL_18_DAMOSEL_FUN_00460BC8"
     },
     {
+      "address": 4590888,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_18_DAMOSEL_FUN_00460D28"
+    },
+    {
       "address": 4591224,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_18_DAMOSEL_FUN_00460E78"
     },
     {
+      "address": 4591576,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_18_DAMOSEL_FUN_00460FD8"
+    },
+    {
       "address": 4591728,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_18_DAMOSEL_FUN_00461070"
+    },
+    {
+      "address": 4592080,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_18_DAMOSEL_FUN_004611D0"
     },
     {
       "address": 4592232,

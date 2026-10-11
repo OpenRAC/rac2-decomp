@@ -6479,3 +6479,251 @@ int LVL_13_BOLDAN_FUN_00447290(char *a0, int a1)
     }
     return (a1 >> 6) & 1;
 }
+#ifndef RAC2_T_V4_F213135AA
+#define RAC2_T_V4_F213135AA
+typedef struct { float x, y, z, w; } V4_F213135aa;
+#endif
+
+
+extern float LVL_13_BOLDAN_F213135aa_FUN_00324A48(float a, float b);
+extern float LVL_13_BOLDAN_F213135aa_FUN_00324A48(float a, float b);
+extern void LVL_13_BOLDAN_F213135aa_FUN_002F8FA0(char *a, char *b);
+extern void LVL_13_BOLDAN_F213135aa_FUN_002F8A20(char *a, char *b, float f);
+extern void LVL_13_BOLDAN_F213135aa_FUN_002F8770(char *a, char *b, char *c);
+extern void LVL_13_BOLDAN_F213135aa_FUN_002F8870(char *a, char *b, char *c);
+extern void LVL_13_BOLDAN_F213135aa_FUN_002F8A20(char *a, char *b, float f);
+extern void LVL_13_BOLDAN_F213135aa_FUN_00328E20(char *a, char *b, float f);
+
+int LVL_13_BOLDAN_FUN_0038B7D0(char *obj, char *obj2, float x, float y)
+{
+    V4_F213135aa m0, m1, m2;
+    char *s1;
+    char *s3;
+    float f22;
+
+    s1 = *(char **)(obj + 104);
+    if (*(unsigned char *)(obj + 32) == 4)
+        return 0;
+    f22 = 0.0f;
+    if (x == 0.0f)
+        x = LVL_13_BOLDAN_F213135aa_FUN_00324A48(-30.0f, 30.0f) * 1.7453294247388839721680e-02f;
+    if (y == 0.0f)
+        y = LVL_13_BOLDAN_F213135aa_FUN_00324A48(f22, 30.0f) * 1.7453294247388839721680e-02f;
+    s3 = s1 + 32;
+    if (*(unsigned char *)(obj + 32) == 3) {
+        LVL_13_BOLDAN_F213135aa_FUN_002F8FA0((char *)&m0, s1 + 16);
+        LVL_13_BOLDAN_F213135aa_FUN_002F8A20(s3, (char *)&m2, 1.3333334028720855712891e-01f);
+    }
+    *(float *)(s1 + 100) = f22;
+    *(float *)(s1 + 76) = x;
+    *(float *)(s1 + 72) = y;
+    *(char **)(s1 + 96) = obj2;
+    LVL_13_BOLDAN_F213135aa_FUN_002F8770((char *)&m1, obj2 + 16, obj + 16);
+    s1 = s1 + 48;
+    LVL_13_BOLDAN_F213135aa_FUN_002F8870((char *)&m0, s3, (char *)&m1);
+    LVL_13_BOLDAN_F213135aa_FUN_002F8A20(s1, (char *)&m0, 1.0f);
+    LVL_13_BOLDAN_F213135aa_FUN_00328E20(s1, s1, 2.0943954586982727050781e-01f);
+    *(unsigned char *)(obj + 32) = 4;
+    return 1;
+}
+extern void LVL_13_BOLDAN_Fb1bbe20c_FUN_00444850(char *p);
+extern void LVL_13_BOLDAN_Fb1bbe20c_FUN_00444A40(char *p, float x, float y);
+extern int LVL_13_BOLDAN_Fb1bbe20c_FUN_00368FB0(int a, int b, int c);
+extern volatile unsigned char LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 __attribute__((sda));
+
+int LVL_13_BOLDAN_FUN_00447658(char *object, int flags)
+{
+    float *vec;
+
+    LVL_13_BOLDAN_Fb1bbe20c_FUN_00444850(object + 8);
+    vec = *(float **)(object + 684);
+    LVL_13_BOLDAN_Fb1bbe20c_FUN_00444A40(object + 8, vec[0], vec[1]);
+
+    if ((flags & 0x40) && *(int *)(object + 680) == 0) {
+        int discarded = LVL_13_BOLDAN_Fb1bbe20c_FUN_00368FB0(4, 0, 0);
+        (void)discarded;
+        LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 = (LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 < 1);
+    }
+
+    return (flags >> 6) & 1;
+}
+extern void LVL_13_BOLDAN_Fb1bbe20c_FUN_00444850(char *p);
+extern void LVL_13_BOLDAN_Fb1bbe20c_FUN_00444A40(char *p, float x, float y);
+extern int LVL_13_BOLDAN_Fb1bbe20c_FUN_00368FB0(int a, int b, int c);
+extern volatile unsigned char LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 __attribute__((sda));
+
+int LVL_13_BOLDAN_FUN_00447908(char *object, int flags)
+{
+    float *vec;
+
+    LVL_13_BOLDAN_Fb1bbe20c_FUN_00444850(object + 8);
+    vec = *(float **)(object + 684);
+    LVL_13_BOLDAN_Fb1bbe20c_FUN_00444A40(object + 8, vec[0], vec[1]);
+
+    if ((flags & 0x40) && *(int *)(object + 680) == 0) {
+        int discarded = LVL_13_BOLDAN_Fb1bbe20c_FUN_00368FB0(4, 0, 0);
+        (void)discarded;
+        LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 = (LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 < 1);
+    }
+
+    return (flags >> 6) & 1;
+}
+extern void LVL_13_BOLDAN_Fb1bbe20c_FUN_00444850(char *p);
+extern void LVL_13_BOLDAN_Fb1bbe20c_FUN_00444A40(char *p, float x, float y);
+extern int LVL_13_BOLDAN_Fb1bbe20c_FUN_00368FB0(int a, int b, int c);
+extern volatile unsigned char LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 __attribute__((sda));
+
+int LVL_13_BOLDAN_FUN_00447B00(char *object, int flags)
+{
+    float *vec;
+
+    LVL_13_BOLDAN_Fb1bbe20c_FUN_00444850(object + 8);
+    vec = *(float **)(object + 684);
+    LVL_13_BOLDAN_Fb1bbe20c_FUN_00444A40(object + 8, vec[0], vec[1]);
+
+    if ((flags & 0x40) && *(int *)(object + 680) == 0) {
+        int discarded = LVL_13_BOLDAN_Fb1bbe20c_FUN_00368FB0(4, 0, 0);
+        (void)discarded;
+        LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 = (LVL_13_BOLDAN_Fb1bbe20c_D_001A7BB2 < 1);
+    }
+
+    return (flags >> 6) & 1;
+}
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_0031F820(unsigned char *a, int b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C98(unsigned char *a, long long v);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C98(unsigned char *a, long long v);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C28(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C28(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F87C8(unsigned char *a, unsigned char *b, float f);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F87C8(unsigned char *a, unsigned char *b, float f);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C00(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C00(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8740(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8740(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8740(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F87C8(unsigned char *a, unsigned char *b, float f);
+extern float LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8900(unsigned char *a, unsigned char *b);
+
+void LVL_13_BOLDAN_FUN_0031ABE0(
+    unsigned char *obj, unsigned int index, unsigned char *dest)
+{
+    unsigned char m0[16];
+    unsigned char m1[16];
+    unsigned char *base;
+    unsigned char *p;
+    short n;
+
+    base = *(unsigned char **)(obj + 36);
+    p = base + ((unsigned int)*(unsigned char *)(base + 44) << 4);
+    p = p + ((index << 4) + 64u);
+    n = *(short *)(p + 6);
+    if (n < *(short *)(p + 14))
+        n = *(short *)(p + 14);
+    if (n >= 0)
+        LVL_13_BOLDAN_Ff2d8e5ad_FUN_0031F820(obj, n + 1, (unsigned char *)0x80000000u);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C98(m0, *(long long *)(p));
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C98(m1, *(long long *)(p + 8));
+    *(float *)(m0 + 12) = 1.0f;
+    *(float *)(m1 + 12) = 1.0f;
+    if (n >= 0) {
+        LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C28(m0, m0, (unsigned char *)
+            (((unsigned int)*(short *)(p + 6) << 6) + 0x70000000u));
+        LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C28(m1, m1, (unsigned char *)
+            (((unsigned int)*(short *)(p + 14) << 6) + 0x70000000u));
+    }
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F87C8(m0, m0, *(float *)(obj + 44) * 0.0009765625f);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F87C8(m1, m1, *(float *)(obj + 44) * 0.0009765625f);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C00(m0, m0, obj + 192);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8C00(m1, m1, obj + 192);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8740(m0, m0, obj + 16);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8740(m1, m1, obj + 16);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8740(dest, m0, m1);
+    LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F87C8(dest, dest, 0.5f);
+    *(float *)(dest + 12) = LVL_13_BOLDAN_Ff2d8e5ad_FUN_002F8900(dest, m0);
+}
+extern void LVL_13_BOLDAN_F5a19df7a_FUN_00384E68(unsigned int a, unsigned long b);
+extern void LVL_13_BOLDAN_F5a19df7a_FUN_003D7020(char *p);
+extern void LVL_13_BOLDAN_F5a19df7a_FUN_003D73F8(char *p);
+extern char *LVL_13_BOLDAN_F5a19df7a_FUN_003249F0(int a, int b);
+extern float LVL_13_BOLDAN_F5a19df7a_FUN_00324B10(void);
+extern void LVL_13_BOLDAN_F5a19df7a_FUN_003D7C20(char *a, int b, float e, char *c, float f, int d, int g);
+
+void LVL_13_BOLDAN_FUN_003D7A80(char *p)
+{
+    char *q;
+    char *o;
+    char *r;
+    float v;
+    float w;
+
+    q = p + 16;
+    o = *(char **)(p + 104);
+    LVL_13_BOLDAN_F5a19df7a_FUN_00384E68(0x47, 0x53001UL);
+    LVL_13_BOLDAN_F5a19df7a_FUN_003D7020(p);
+    LVL_13_BOLDAN_F5a19df7a_FUN_003D73F8(p);
+
+    v = *(float *)(o + 24);
+    v = v * 0.5f;
+    r = LVL_13_BOLDAN_F5a19df7a_FUN_003249F0(80, 96);
+    w = LVL_13_BOLDAN_F5a19df7a_FUN_00324B10();
+    LVL_13_BOLDAN_F5a19df7a_FUN_003D7C20(q, 0x103080, v, r, w, 49, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 3.00000011920928955078125e-01f;
+    r = LVL_13_BOLDAN_F5a19df7a_FUN_003249F0(80, 96);
+    w = LVL_13_BOLDAN_F5a19df7a_FUN_00324B10();
+    LVL_13_BOLDAN_F5a19df7a_FUN_003D7C20(q, 0xFFFFFF, v, r, w, 49, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 6.99999988079071044921875e-01f;
+    r = LVL_13_BOLDAN_F5a19df7a_FUN_003249F0(8, 22);
+    w = LVL_13_BOLDAN_F5a19df7a_FUN_00324B10();
+    LVL_13_BOLDAN_F5a19df7a_FUN_003D7C20(q, 0x803010, v, r, w, 11, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 4.49999988079071044921875e-01f;
+    r = LVL_13_BOLDAN_F5a19df7a_FUN_003249F0(32, 64);
+    w = LVL_13_BOLDAN_F5a19df7a_FUN_00324B10();
+    LVL_13_BOLDAN_F5a19df7a_FUN_003D7C20(q, 0x803010, v, r, w, 11, 2);
+
+    LVL_13_BOLDAN_F5a19df7a_FUN_00384E68(0x47, 0x5360bUL);
+}
+extern float LVL_13_BOLDAN_Fb1c9893c_FUN_00324B10(void);
+extern float LVL_13_BOLDAN_Fb1c9893c_FUN_00324A48(float, float);
+extern float LVL_13_BOLDAN_Fb1c9893c_FUN_002F8D30(float);
+extern float LVL_13_BOLDAN_Fb1c9893c_FUN_002F8D48(float);
+extern void LVL_13_BOLDAN_Fb1c9893c_FUN_002F8C00(float *dst, float *src, char *table);
+extern void LVL_13_BOLDAN_Fb1c9893c_FUN_002F8740(float *dst, float *src, int arg);
+extern int LVL_13_BOLDAN_Fb1c9893c_D_001A8FF0 __attribute__((sda));
+extern void LVL_13_BOLDAN_Fb1c9893c_FUN_002E64D8(char *self, int a1, int a2, int a3, char *p4, char *p5,
+                    float *buf, int b3, float fa, float fb);
+
+void LVL_13_BOLDAN_FUN_0032F390(char *self, int mask, int arg2,
+                                        unsigned char arg3,
+                                        float f0, float f1, float f2, float f3)
+{
+    float buf[3];
+    float v;
+    float k;
+    float fa;
+    float fb;
+    int i;
+
+    for (i = 0; i < 15; i++) {
+        if (((mask >> i) ^ 1) & 1)
+            continue;
+        v = LVL_13_BOLDAN_Fb1c9893c_FUN_00324B10();
+        k = LVL_13_BOLDAN_Fb1c9893c_FUN_00324A48(f0, f1) * (1.0f / 60.0f);
+        buf[0] = LVL_13_BOLDAN_Fb1c9893c_FUN_002F8D30(v) * k;
+        buf[1] = LVL_13_BOLDAN_Fb1c9893c_FUN_002F8D48(v) * k;
+        buf[2] = 0.0f;
+        buf[2] = LVL_13_BOLDAN_Fb1c9893c_FUN_00324A48(f2, f3) * (1.0f / 60.0f);
+        if (LVL_13_BOLDAN_Fb1c9893c_D_001A8FF0 != 0)
+            LVL_13_BOLDAN_Fb1c9893c_FUN_002F8C00(buf, buf, self + 192);
+        LVL_13_BOLDAN_Fb1c9893c_FUN_002F8740(buf, buf, arg2);
+        fa = LVL_13_BOLDAN_Fb1c9893c_FUN_00324A48(90.0f, 270.0f);
+        fb = LVL_13_BOLDAN_Fb1c9893c_FUN_00324A48(10.0f, 20.0f);
+        LVL_13_BOLDAN_Fb1c9893c_FUN_002E64D8(self, 2, *(short *)(self + 170), i, self + 16, self + 240,
+                buf, arg3, fa, fb);
+    }
+}
