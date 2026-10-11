@@ -1,0 +1,21 @@
+# Per-unit compiler flags measured on the USA v2.00 split (Promises/RC2-Going-Decompiled; permission: PR #74), mapped to v1.01.
+# Default for every other unit: -G0 and no extra flags. Columns: v1.01 start, v2.00 start, v2.00 unit offset, -G, extra cc1 flags.
+# Compiler arm boundary: code below it comes from the SDK compiler (16-byte sq saves), at and above it from the engine compiler (8-byte sd saves): v2.00 0x00131D98, v1.01 0x00131D98
+0x00132220	0x00132220	0321A0	-G8	
+0x0026EA00	0x0026EA00	16E980	-G8	
+0x00282848	0x002831F8	183178	-G8	
+0x00282C30	0x002835D8	183558	-G8	
+0x00287BD8	0x00288600	188580	-G8	
+0x00290010	0x00290870	1907F0	-G8	-fno-gcse
+0x00290A40	0x002912B8	191238	-G8	-fno-gcse
+0x00298278	0x00299020	198FA0	-G8	-fno-gcse
+0x0029F338	0x002A0170	1A00F0	-G8	-fno-gcse
+0x002A7398	0x002A8200	1A8180	-G8	-fno-gcse -fno-strict-aliasing
+0x002B3380	0x002B4298	1B4218	-G8	-fno-gcse
+0x002C91E0	0x002CA100	1CA080	-G8	-fno-gcse
+0x002EF1E8	0x002F0040	1EFFC0	-G8	-fno-gcse
+0x002FC138	0x002FCFC8	1FCF48	-G8	-fno-gcse
+0x002FED90	0x002FFC20	1FFBA0	-G8	-fno-gcse
+0x00335270	0x00336068	235FE8	-G8	-fno-gcse -fno-strict-aliasing
+0x00347EA0	0x00348BD0	248B50	-G8	-fno-gcse
+0x0034F3B8	0x00350100	250080	-G8	-fno-gcse

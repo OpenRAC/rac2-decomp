@@ -1,0 +1,24 @@
+{
+  "game": "Ratchet & Clank: Going Commando",
+  "region": "USA",
+  "version": "2.00",
+  "serial": "SCUS_972.68",
+  "volume_label": "RATCHETANDCLANK2",
+  "redump": null,
+  "iso": {
+    "size": 3824615424,
+    "sha1": "eeba0fff2118b14cbf838e6638ef7af3e72c0c31",
+    "md5": "d684d7de14697dd0b1faa8b31206c710",
+    "crc32": "98197b41",
+    "sha256": "eda31b4519d16014164090e8a36733af63ef8e458a96d37d6054b65c00ec6e72"
+  },
+  "boot": {
+    "size": 2621256,
+    "sha1": "4124a79c1e5a1ceb56f514df0dbbc11f072af56f",
+    "sha256": "64dbf0d4c527d90a2a4ceb47b23d81848b62165a6449156729ca44711aa3e3ee"
+  },
+  "expected_levels": 27,
+  "compiler_flags": null,
+  "compiler_status": "Not measured for v2.00; the v1.01 profile is not assumed",
+  "identity_status": "pinned: disc, boot and 27 overlays measured with Wrench v0.6 from a contributor's disc"
+}

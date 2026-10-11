@@ -30,7 +30,7 @@ ISO and the full tool suite before contribution work. Missing prerequisites bloc
 that work; assist with setup, not an alternative contribution route. Never fabricate
 matching claims or download an SDK from an unverified source.
 
-Start or resume through [docs/CONTINUE.md](docs/CONTINUE.md). Read the optional
+Start or resume through [docs/CONTINUE.md](docs/CONTINUE.md); the accepted campaign targets USA v1.01 (the registry default and the source of every proof); USA v2.00 is a separate experimental route (`--region v2`) whose short-request loop is the first section there and whose results are exploratory candidates only. Read the optional
 ignored `.local/ENVIRONMENT.md` pointer for machine-specific tools and current
 private operational state. The public repository owns methods, task decisions
 and proofs; no long pasted prompt or personal workspace details belong here.

@@ -88,7 +88,37 @@ contributor compares identities before working. The
 GNU releases, not a download of our byte-matching EE profile. Do not substitute
 another compiler and report it as qualified.
 
+## Running the chain on Linux
+
+The scripts assume Windows + WSL. Without editing them, put `tools/linux/` on `PYTHONPATH`
+(`sitecustomize.py` redirects `wsl.exe` and `*.exe` calls) and point the runners at a container that
+sees the same paths, for example:
+
+```bash
+podman run -d --init --name rac2-gnu --userns=keep-id --security-opt label=disable \
+  -v $HOME:$HOME --tmpfs /rac2tmp:exec,mode=1777 rac2-linux:24.04 sleep infinity
+export PYTHONPATH=$PWD/tools/linux RAC2_LINUX_RUNNER="podman exec rac2-gnu bash -c" \
+  RAC2_WSL_TOOLS=<dir with cc1 cpp as> RAC2_WSL_TMP=/rac2tmp RAC2_EXE_RUNNER=<wibo>
+python scripts/try_function.py trials/usa-v2/IntToFloat.c --address 0x284690 --size 16
+```
+
+`rac2-linux` is the Ubuntu image from OpenRAC's `games/rac2/ntsc/host/` recipe, which also builds
+`cc1`/`cpp`/`as` from source (inputs are public and SHA-256 checked; see `docs/COMPILER-NOTES.md`).
+
 ## Legacy SN components
+
+Contributors fetch these themselves; they are git-ignored and never committed:
+`git clone https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_3.01 toolchain/sn-prodg-3.01` and
+`git clone https://github.com/AngheloAlf/sce_ps2_sdk_24 toolchain/sn-prodg-24`
+(the layout rac1-decomp uses). The assembler the repository pins (`Ps2EeAs.exe`, SHA-256
+`c839dd63…`, ProDG 2.0) is in a third community mirror; fetch `usr/local/sce/ee/gcc/ee/bin/ps2eeas.exe`
+and `ld.exe` from `AngheloAlf/SN-Systems-ProDG_for_PS2_2.0` into `toolchain/sn-prodg-2.0/ee/bin/`
+(renaming it to `Ps2EeAs.exe`) and compare both hashes with `progress/report.json`. With it, the USA v2.00
+boot reconstructs byte-identically (2,523,640 bytes). The 3.01 and SDK 2.4 assemblers do not. The tool root for `--toolchain` is
+`toolchain/sn-prodg-3.01/usr/local/sce/ee/gcc`. On Linux, run the Windows executables through
+[wibo](https://github.com/decompals/wibo) by exporting `RAC2_EXE_RUNNER=/path/to/wibo-x86_64`;
+`build.py` then prefixes every `.exe` call with it. A mirror is not proof of permission to use or distribute it.
+Verify the executables against the hashes in `progress/report.json` before relying on them.
 
 You must supply an authorized copy of the qualified legacy assembler/linker.
 We offer no verified public download URL for these exact components and do not

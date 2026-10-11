@@ -17,7 +17,8 @@ with the source commit and the repository file it informed.
   repository's USA v1.01 target. Its addresses, sources and proofs are leads
   here until re-measured against `config/target.json`.
 - Licence: the repository carries no `LICENSE` file at the reviewed revision.
-  No source text, script or data from it has been copied into this repository.
+  The initial gap-report PR copied no source. Subsequent tooling contributions
+  import the reference helpers below under their upstream GPL-2.0 licence.
 - Permission: the maintainer reports that the author agreed to reuse. The
   author's own approval on the pull request that introduced this file is the
   record; the scope and licence of any later adoption are to be stated in the
@@ -27,6 +28,8 @@ with the source commit and the repository file it informed.
 
 | Item | Used for | Where |
 | --- | --- | --- |
+| Reference shell/AWK/sed helpers from `tools/ee/` | Experimental reference only; no canonical build or match proof | `tools/ee/`, with retained GPL-2.0 [licence](tools/ee/LICENSE); contributor import history in PR #135; upstream licence revision `f134130e8e979843da090f89109a480b773bc2e3` |
+| v2.00/EU symbol maps and derived name hints | Exploratory naming with region-specific addresses | `symbol_addrs/` and `config/datamine/`; naming adds no match credit |
 | Gap comparison of their public tree against this repository | Listing leads we do not yet have | [docs/PROMISES-GAP-REPORT.md](docs/PROMISES-GAP-REPORT.md) |
 
 Anything adopted later from this project is added to the table above, with the

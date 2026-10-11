@@ -38,12 +38,12 @@ from loaded-byte coverage; the normal matching acceptance rule is unchanged.
 <!-- unique-code-progress:start -->
 | Metric | Matched C bytes | Total code bytes | Progress |
 | --- | ---: | ---: | ---: |
-| Conservative unique EE code (unsupported extents uncollapsed) | 592,308 | 44,400,168 | 1.3340% |
-| Loaded code (boot + 27 overlays) | 1,529,572 | 48,788,176 | 3.1351% |
+| Conservative unique EE code (unsupported extents uncollapsed) | 592,336 | 44,400,168 | 1.3341% |
+| Loaded code (boot + 27 overlays) | 1,529,816 | 48,788,176 | 3.1356% |
 
 Structurally supported function extents cover 40,075,248 loaded EE bytes; 231,732 EE bytes remain unresolved. VU code excluded: 86,368 bytes.
 Provisional representative partition: 37,641,816 bytes (certified: false); no global progress percentage is inferred from this partition.
-Conservative global partition retains unknown extents and gaps without deduplication: 8,626,560 loaded EE bytes have unsupported boundaries. The total follows the stated grouping policy and is not a certified original-source size. Supported subset: 592,308 / 35,773,608 unique bytes.
+Conservative global partition retains unknown extents and gaps without deduplication: 8,626,560 loaded EE bytes have unsupported boundaries. The total follows the stated grouping policy and is not a certified original-source size. Supported subset: 592,336 / 35,773,608 unique bytes.
 
 Shared boot binding: 22,576 static edges in combined pinned reference images. Runtime code preservation is unproved. See [the binding and remaining-duplication audit](docs/BOOT-SHARED-CODE-VERIFICATION.md).
 <!-- unique-code-progress:end -->
@@ -57,10 +57,10 @@ Recorded validation on **11 October 2026**:
 
 | Scope | Integrated C functions / placements | Matched C bytes |
 | --- | ---: | ---: |
-| Boot | 394 functions | 34,608 |
-| 27 level overlays | 14,736 placements | 1,494,964 |
+| Boot | 397 functions | 34,636 |
+| 27 level overlays | 14,763 placements | 1,495,180 |
 | Native overlay subset, included above | 10,340 placements | 1,255,028 |
-| **Total C coverage** | **Boot + all 27 overlays** | **1,529,572 / 48,788,176 (3.1351%)** |
+| **Total C coverage** | **Boot + all 27 overlays** | **1,529,816 / 48,788,176 (3.1356%)** |
 <!-- generated-progress:end -->
 
 The complete boot (**2,521,763 loaded bytes, two PT_LOAD segments**) and all
@@ -313,7 +313,8 @@ Intermediate percentages are milestones, not completion of the project.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE). It covers the repository's code, never the game,
+MIT — see [LICENSE](LICENSE). Imported reference helpers in `tools/ee/` retain
+their separate [GPL licence](tools/ee/LICENSE). The root licence covers the repository's own code, never the game,
 its assets or proprietary toolchains. Contributions use the same terms.
 `ports/pal-functional/` keeps its own MIT notice, copyright platypet2217-star,
 in [its LICENSE](ports/pal-functional/LICENSE).

@@ -24,6 +24,7 @@ import sys
 from pathlib import Path
 
 from wsl_chain import tool_hashes
+import private_dir
 import region as regions
 
 HERE = Path(__file__).resolve().parent
@@ -68,7 +69,7 @@ def missing_instruments(root: Path, instruments: tuple) -> list:
 
 def inside_repository(path: Path) -> bool:
     resolved = path.resolve()
-    return resolved == ROOT or ROOT in resolved.parents
+    return (resolved == ROOT or ROOT in resolved.parents) and not private_dir.allowed(resolved)
 
 
 def report_python(lines: list) -> bool:

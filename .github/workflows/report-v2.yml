@@ -1,0 +1,50 @@
+name: Report v2.00 (exploratory)
+
+# Publishes the experimental USA v2.00 candidate report (no matching credit). Runs beside the maintainer's
+# validation workflows and never replaces them.
+on:
+  push:
+    branches: [RAC2]
+  pull_request:
+    branches: [RAC2]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: SCUS_972.68 v2.00 exploratory report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: No game data, assets or disassembly in Git
+        run: python scripts/legal_check.py
+      - name: Build the USA v2.00 report from the committed catalogue and proofs
+        run: python scripts/v2_report.py report --output build/decomp/report-v2.json
+      - name: Validate the report with objdiff
+        # decomp.dev parses this artifact with objdiff; the release binary is pinned by version and SHA-256.
+        run: |
+          curl --fail --location --retry 3 -o "$RUNNER_TEMP/objdiff-cli" \
+            https://github.com/encounter/objdiff/releases/download/v3.8.1/objdiff-cli-linux-x86_64
+          echo "c8290281e82114bcc1a06ff73061110d3902a177822e750337de2537188e358f  $RUNNER_TEMP/objdiff-cli" | sha256sum --check
+          chmod +x "$RUNNER_TEMP/objdiff-cli"
+          "$RUNNER_TEMP/objdiff-cli" report changes build/decomp/report-v2.json build/decomp/report-v2.json \
+            -o "$RUNNER_TEMP/objdiff-validation.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SCUS_972.68_v2_report
+          path: build/decomp/report-v2.json
+          if-no-files-found: error
+      - name: Job summary
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          m = json.load(open("build/decomp/report-v2.json"))["measures"]
+          print("### USA v2.00 exploratory report (SCUS_972.68, no credit)")
+          print(f"Matched code: {int(m['matchedCode']):,} / {int(m['totalCode']):,} bytes ({m['matchedCodePercent']:.4f}%)")
+          print(f"Matched units: {m['completeUnits']} / {m['totalUnits']}")
+          PY

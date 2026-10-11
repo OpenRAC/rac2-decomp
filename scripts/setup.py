@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from elf_tools import read_elf
+import private_dir
 import region as regions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -131,8 +132,8 @@ def main() -> int:
     if not region.pinned and not args.measure_identity:
         region.require_pinned("disc, boot and overlay identity")
     runtime = args.runtime.resolve()
-    if runtime == ROOT or runtime in ROOT.parents or ROOT in runtime.parents:
-        raise ValueError("Runtime must be outside the source repository")
+    if runtime in ROOT.parents or not private_dir.allowed(runtime):
+        raise ValueError("Runtime must be outside the source repository or under its git-ignored extracted/ folder")
     run = runtime / "runs" / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8])
     run.mkdir(parents=True)
     iso = args.iso.resolve() if args.iso else None

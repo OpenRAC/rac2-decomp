@@ -1,0 +1,107 @@
+{
+ "schema": 1,
+ "target": "SCUS_972.68",
+ "version": "2.00",
+ "matches": [
+  {
+   "symbol": "LoadDiscToc",
+   "address": 1260152,
+   "size": 40,
+   "source": "trials/usa-v2/LoadDiscToc.c",
+   "source_sha256": "13b0a62a7dc89beb52340bdb37e874671a404e52e741041a33978bb1ed255515",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "relocs_masked": true,
+   "reference_sha256": "460ac094749f50cb98d0f55039a02ccde311f06883eab253f22c25df18229bf4",
+   "compared_sha256": "eefe9ed42c56278eb5c9dca81b47c32bcc52c613d371aca9ef16d63fc21496a2"
+  },
+  {
+   "symbol": "IntToFloat",
+   "address": 2639504,
+   "size": 16,
+   "source": "trials/usa-v2/IntToFloat.c",
+   "source_sha256": "81b52e6f92942ef1728d2e6a7c2b70d93796543fb6e21e1fe2cd358914cece68",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "reference_sha256": "c1e504a1520ea751993cb70ee75a0c1a34e0aec9abb8c2ef7a9fb873b9071368",
+   "compared_sha256": "c1e504a1520ea751993cb70ee75a0c1a34e0aec9abb8c2ef7a9fb873b9071368",
+   "relocs_masked": false
+  },
+  {
+   "symbol": "ApplyGsDisplayEnv",
+   "address": 2644016,
+   "size": 36,
+   "source": "trials/usa-v2/ApplyGsDisplayEnv.c",
+   "source_sha256": "29a937ff78c256142477a7e1cecd8c0f1d13df9a3fa9368711a188a3611a5629",
+   "flags": "-O2 -G8 -ffunction-sections",
+   "relocs_masked": true,
+   "reference_sha256": "ee971bbeb256392373a016d09965c1ffd2f710548af390ccc63887d65b4e9d7e",
+   "compared_sha256": "026821d9e0bef26bec066d9ef30296cc9f07c1594ccf537262b4622cb6f98f77"
+  },
+  {
+   "symbol": "MapSetCurrentLevel",
+   "address": 2712832,
+   "size": 32,
+   "source": "trials/usa-v2/MapSetCurrentLevel.c",
+   "source_sha256": "d6a8ed465ae89110057d2b9ca1d95ec0e15b8f050734cc416314f01005b9cb35",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "relocs_masked": true,
+   "reference_sha256": "ec10ab871634dc0f935ca73beac7d2118bafc3376dd56494a8c8d00d722602ed",
+   "compared_sha256": "1ea576fccaf441aca7df4e061f7525d15567286ea9b53284dfd13f19f1d3052d"
+  },
+  {
+   "symbol": "CalcSaveSectionsSize",
+   "address": 2735208,
+   "size": 56,
+   "source": "trials/usa-v2/CalcSaveSectionsSize.c",
+   "source_sha256": "90e7d17e8193e43bb1dbb8e13e3256b9713bac03d29981e5d5316c4c202b1809",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "relocs_masked": true,
+   "reference_sha256": "e3d988b815d33cccd6b5d7fd54c28c9dd7b052bf212e09ce81fc9e437aba44e2",
+   "compared_sha256": "e3d988b815d33cccd6b5d7fd54c28c9dd7b052bf212e09ce81fc9e437aba44e2"
+  },
+  {
+   "symbol": "ListScrollerSelectPrev",
+   "address": 2927032,
+   "size": 60,
+   "source": "trials/usa-v2/ListScrollerSelectPrev.c",
+   "source_sha256": "7bf33dfa66df1f1ae7825c12ebf93cd9c163ba7f094a4b03356169b8566994fa",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "relocs_masked": true,
+   "reference_sha256": "30f13d57f27faa5e71e1b5c2907dc88f2c193aad6e57bdd91cd59a543acb3be7",
+   "compared_sha256": "30f13d57f27faa5e71e1b5c2907dc88f2c193aad6e57bdd91cd59a543acb3be7"
+  },
+  {
+   "symbol": "ListScrollerSelectNext",
+   "address": 2927096,
+   "size": 60,
+   "source": "trials/usa-v2/ListScrollerSelectNext.c",
+   "source_sha256": "48bd560fe1b5ea9cb3303339d1607b46c3653cfaded1758cac01cc03ed072711",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "relocs_masked": true,
+   "reference_sha256": "213dac9477618b1e527b558c15ebe191c90d3022802a3e03f6f5fb58bb568a52",
+   "compared_sha256": "213dac9477618b1e527b558c15ebe191c90d3022802a3e03f6f5fb58bb568a52"
+  },
+  {
+   "symbol": "HasMobyGroup",
+   "address": 3257608,
+   "size": 16,
+   "source": "trials/usa-v2/HasMobyGroup.c",
+   "source_sha256": "f6a3ff39457a31b5abc4d3735f8884ad439a54bc26d238cfc913dcfbed7e377c",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "reference_sha256": "7df2a5cba813f7f5fb574981695fdf5c6a47f2551d2d027a5a4b9ccb92617a42",
+   "compared_sha256": "7df2a5cba813f7f5fb574981695fdf5c6a47f2551d2d027a5a4b9ccb92617a42",
+   "relocs_masked": false
+  },
+  {
+   "symbol": "SetPopupItemEnabled",
+   "address": 3445608,
+   "size": 16,
+   "source": "trials/usa-v2/SetPopupItemEnabled.c",
+   "source_sha256": "35b217fb2cdaa3b08c40836fd511bf87b01c4683a93ca22516c605d264d0fc55",
+   "flags": "-O2 -G0 -ffunction-sections",
+   "reference_sha256": "5e293ad6fa49727851d175fc6fa1bd093be1cf4b4d7afc33c27bd1907f23f7b3",
+   "compared_sha256": "5e293ad6fa49727851d175fc6fa1bd093be1cf4b4d7afc33c27bd1907f23f7b3",
+   "relocs_masked": false
+  }
+ ],
+ "status": "exploratory"
+}
