@@ -61,6 +61,61 @@ Different static callee classes or absolute data bindings may split the conserva
 
 `template_all_c_bytes` uses one representative size only when every complete placement has a current exact integrated C proof for its raw hash. `template_any_c_bytes` is a separate partial-coverage diagnostic. The percentage uses this same supplementary denominator; neither the old physical nor conservative numerator is reused. This does not add C credit or authorize compilation trials.
 
+## Measured wide relation, published beside the partition
+
+A second relation is published next to the narrow partition, never inside it:
+`wide_groups` in the `progress/code-reuse-families.json.gz` payload, pinned by
+`progress/code-reuse-families-wide-groups.json.gz`. It groups the maintained
+families that one source body could still cover once address halves are folded
+where the retail folds them, and it reports the frontier verdict for each group.
+The narrow families, their members and every numerator above stay exactly as
+they are: the wide relation adds no credit and removes no proof.
+
+It must not replace the narrow partition. The C numerator uses the narrow
+partition as its denominator, so merging families would place an already matched
+function in a family containing unmatched copies and make the all-member
+numerator decrease without losing one physical C proof. The current partition
+has 5,138 multi-member families; the October 6 baseline above recorded 5,120.
+
+The strict wide (W1) mask drops, besides the maintained fields, the low 16 bits
+of the `%hi`/`%lo` address halves the normalizer retains raw, wherever they feed
+an address use: a `lui` feeding `addiu`/`ori`, a `lui` feeding a memory base, and
+a `$gp`-relative memory displacement. It is not the maximal mask, which also
+absorbs constants and invents shares that no compiler would reproduce.
+
+The frontier is measured, not assumed. A group is **retained** only when every
+variable half of every member is folded into a memory operand or carried by
+`$gp`. A half materialised in a register (the retail writes `lui` plus
+`addiu`/`ori`) splits on the operand at compile time and is not winnable through
+this mask, so a group that materialises one is published with `retained: false`.
+Of 2,280 merge groups (29,279 narrow families, 16,547,556 bytes) 1,103 are
+retained (12,500 narrow families, 6,253,948 bytes). A group is a hypothesis for
+a compilation wave, never a promotion: the compiler remains the gate.
+
+Each group carries its wide template SHA256, size, placement count, the variable
+word positions and their classes, the merged narrow family ids and the verdict.
+Members of a family are recomputable from the catalogue with the maintained
+`template_key`; per-placement class strings stay private.
+
+The asset-free exporter validates the receipt it folds in: the schema and policy,
+internal counts, one group per family, and that every named family still exists
+in the current narrow partition at the measured size. CI then compares the
+serialization byte for byte, so a changed relation is refused like any other
+stale output. Rebuilding it from reference bytes is private, like the raw replay:
+
+```sh
+python scripts/code_reuse_report.py --repo . \
+  --catalog config/function-catalog/catalog.json \
+  --output PRIVATE_WIDE_SUMMARY.json --families-output PRIVATE_WIDE_FAMILIES.json.gz \
+  --references PRIVATE_REFERENCE_ROOT \
+  --wide-output progress/code-reuse-families-wide-groups.json.gz
+```
+
+With `--references` alone the same command remeasures the relation from the
+pinned images and refuses any disagreement with the committed receipt; the
+campaign finalizer runs that check on every finalized wave. Regenerate the
+receipt only from the pinned chain, never by hand.
+
 ## Authored source subset
 
 The report separately associates current integrated placements with the 31 known generated C sources, including boot-shared placements. It verifies canonical recipe fragment hashes and lengths, exact generated source bytes, catalogued definition slots and current exact placement proof pins. Grouping uses canonical fragment SHA256 and its definition slot, with non-identifier recipe literals retained as variants. No arbitrary lexical identifier normalization is introduced. Each member retains source/context SHA256; groups report min/max machine sizes and context variants. Unequal sizes never enter a single global machine-template group.

@@ -355,6 +355,11 @@
     "LVL_10_HRUGIS_CLOUD_Fb4cfb7e0_FUN_003351C0": 3363264,
     "LVL_10_HRUGIS_CLOUD_Fb77d67f1_FUN_003087A0": 3180448,
     "LVL_10_HRUGIS_CLOUD_Fb77d67f1_FUN_00344128": 3424552,
+    "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_00373870": 3618928,
+    "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DA10": 4512272,
+    "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DC00": 4512768,
     "LVL_10_HRUGIS_CLOUD_Fbbb7bee1_FUN_00308890": 3180688,
     "LVL_10_HRUGIS_CLOUD_Fbdd4a4aa_FUN_00308B30": 3181360,
     "LVL_10_HRUGIS_CLOUD_Fbdd4a4aa_FUN_00308BB8": 3181496,
@@ -377,6 +382,11 @@
     "LVL_10_HRUGIS_CLOUD_Fc3cb9262_FUN_00308B30": 3181360,
     "LVL_10_HRUGIS_CLOUD_Fc3cb9262_FUN_00309C90": 3185808,
     "LVL_10_HRUGIS_CLOUD_Fc3cb9262_FUN_00344128": 3424552,
+    "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_00373870": 3618928,
+    "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DA10": 4512272,
+    "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DC00": 4512768,
     "LVL_10_HRUGIS_CLOUD_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_10_HRUGIS_CLOUD_Fc936841d_FUN_00308B30": 3181360,
     "LVL_10_HRUGIS_CLOUD_Fc936841d_FUN_00308B60": 3181408,
@@ -2069,6 +2079,12 @@
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0044F5A0"
     },
     {
+      "address": 4519680,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0044F700"
+    },
+    {
       "address": 4522024,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2079,6 +2095,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_004502F0"
+    },
+    {
+      "address": 4523088,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00450450"
     },
     {
       "address": 4523704,

@@ -342,6 +342,11 @@
     "LVL_8_TABORA_Fb4cfb7e0_FUN_00327858": 3307608,
     "LVL_8_TABORA_Fb77d67f1_FUN_002F9A60": 3119712,
     "LVL_8_TABORA_Fb77d67f1_FUN_0033E208": 3400200,
+    "LVL_8_TABORA_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_8_TABORA_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_8_TABORA_Fb7feb893_FUN_0036DA40": 3594816,
+    "LVL_8_TABORA_Fb7feb893_FUN_0044C648": 4507208,
+    "LVL_8_TABORA_Fb7feb893_FUN_0044C838": 4507704,
     "LVL_8_TABORA_Fbbb7bee1_FUN_002F9B50": 3119952,
     "LVL_8_TABORA_Fbc82131e_D_001AD6B0": 1758896,
     "LVL_8_TABORA_Fbc82131e_D_001AD6C0": 1758912,
@@ -372,6 +377,11 @@
     "LVL_8_TABORA_Fc3cb9262_FUN_0033E208": 3400200,
     "LVL_8_TABORA_Fc459a266_D_00138180": 1278336,
     "LVL_8_TABORA_Fc459a266_D_00189E20": 1613344,
+    "LVL_8_TABORA_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_8_TABORA_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_8_TABORA_Fc558ca70_FUN_0036DA40": 3594816,
+    "LVL_8_TABORA_Fc558ca70_FUN_0044C648": 4507208,
+    "LVL_8_TABORA_Fc558ca70_FUN_0044C838": 4507704,
     "LVL_8_TABORA_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_8_TABORA_Fc936841d_FUN_002F9DF0": 3120624,
     "LVL_8_TABORA_Fc936841d_FUN_002F9E20": 3120672,
@@ -2015,6 +2025,12 @@
       "symbol": "LVL_8_TABORA_FUN_0044E1D8"
     },
     {
+      "address": 4514616,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_8_TABORA_FUN_0044E338"
+    },
+    {
       "address": 4516960,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2025,6 +2041,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_8_TABORA_FUN_0044EF28"
+    },
+    {
+      "address": 4518024,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_8_TABORA_FUN_0044F088"
     },
     {
       "address": 4518640,

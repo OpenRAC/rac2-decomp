@@ -327,6 +327,11 @@
     "LVL_22_DOBBO_ORBIT_Fb4cfb7e0_FUN_0031FC88": 3275912,
     "LVL_22_DOBBO_ORBIT_Fb77d67f1_FUN_002F36F0": 3094256,
     "LVL_22_DOBBO_ORBIT_Fb77d67f1_FUN_003330A8": 3354792,
+    "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00362E98": 3550872,
+    "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431158": 4395352,
+    "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431348": 4395848,
     "LVL_22_DOBBO_ORBIT_Fbbb7bee1_FUN_002F37E0": 3094496,
     "LVL_22_DOBBO_ORBIT_Fbdd4a4aa_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_Fbdd4a4aa_FUN_002F3AF0": 3095280,
@@ -349,6 +354,11 @@
     "LVL_22_DOBBO_ORBIT_Fc3cb9262_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_Fc3cb9262_FUN_002F4BE0": 3099616,
     "LVL_22_DOBBO_ORBIT_Fc3cb9262_FUN_003330A8": 3354792,
+    "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00362E98": 3550872,
+    "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431158": 4395352,
+    "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431348": 4395848,
     "LVL_22_DOBBO_ORBIT_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_22_DOBBO_ORBIT_Fc936841d_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_Fc936841d_FUN_002F3AB0": 3095216,
@@ -1957,6 +1967,12 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00432CE8"
     },
     {
+      "address": 4402760,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00432E48"
+    },
+    {
       "address": 4405104,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -1967,6 +1983,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00433A38"
+    },
+    {
+      "address": 4406168,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00433B98"
     },
     {
       "address": 4406784,

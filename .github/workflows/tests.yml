@@ -51,7 +51,7 @@ jobs:
         run: |
           test "$POLICY_RESULT" = success
           case "$GITHUB_EVENT_NAME:$TEST_MODE" in
-            merge_group:full|pull_request:full|pull_request:targeted|push:full|push:reuse|workflow_dispatch:full) ;;
+            merge_group:full|pull_request:full|pull_request:local|push:full|push:local|push:reuse|workflow_dispatch:full) ;;
             *) echo 'Missing or invalid test route'; exit 1 ;;
           esac
       - uses: actions/checkout@v4
@@ -62,9 +62,10 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install qualified boundary decoder
+        if: needs.policy.outputs.mode != 'local' || github.event_name == 'push'
         run: python -m pip install rabbitizer==1.16.2
       - name: Install pinned objdiff
-        if: github.event_name != 'pull_request' || needs.policy.outputs.mode == 'full'
+        if: needs.policy.outputs.mode != 'local' && (github.event_name != 'pull_request' || needs.policy.outputs.mode == 'full')
         run: |
           curl --fail --location --retry 3 -o "$RUNNER_TEMP/objdiff-cli" \
             https://github.com/encounter/objdiff/releases/download/v3.8.1/objdiff-cli-linux-x86_64
@@ -80,17 +81,21 @@ jobs:
       - name: Run complete tool suite
         if: github.event_name == 'merge_group' || needs.policy.outputs.mode == 'full' || (github.event_name == 'push' && needs.policy.outputs.mode == 'reuse' && steps.restore.outputs.reused != 'true')
         run: python -m unittest discover -s tests -v
-      - name: Run primary maintainer focused checks
-        if: github.event_name == 'pull_request' && needs.policy.outputs.mode == 'targeted'
-        env:
-          VERIFIED_BASE_SHA: ${{ needs.policy.outputs.base_sha }}
-        run: python scripts/maintainer_tests.py --ci-base "$VERIFIED_BASE_SHA"
-      - name: Verify primary maintainer source metadata
-        if: github.event_name == 'pull_request' && needs.policy.outputs.mode == 'targeted'
-        run: python scripts/ci_export.py --mode source
+      - name: Record primary maintainer local validation trust
+        if: needs.policy.outputs.mode == 'local'
+        run: echo 'Tool test route **local** trusts the authenticated primary maintainer local validation; no remote tool tests were executed.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish committed primary maintainer local reports
+        if: github.event_name == 'push' && needs.policy.outputs.mode == 'local'
+        run: python scripts/ci_export.py --mode local --event "$GITHUB_EVENT_PATH"
       - name: Generate and validate complete exports
         if: github.event_name == 'merge_group' || needs.policy.outputs.mode == 'full' || (github.event_name == 'push' && needs.policy.outputs.mode == 'reuse' && steps.restore.outputs.reused != 'true')
         run: python scripts/ci_export.py --mode full --objdiff "$RUNNER_TEMP/objdiff-cli"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && needs.policy.outputs.mode == 'local'
+        with:
+          name: SCUS_972.68_local-provenance
+          path: build/decomp/local-provenance.json
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'merge_group' || needs.policy.outputs.mode == 'full'
         with:

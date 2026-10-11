@@ -345,6 +345,11 @@
     "LVL_25_WUPASH_NEBULA_Fb4cfb7e0_FUN_0032CDD8": 3329496,
     "LVL_25_WUPASH_NEBULA_Fb77d67f1_FUN_00300870": 3147888,
     "LVL_25_WUPASH_NEBULA_Fb77d67f1_FUN_0033C570": 3392880,
+    "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0": 3586720,
+    "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CDD8": 4443608,
+    "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CFC8": 4444104,
     "LVL_25_WUPASH_NEBULA_Fbbb7bee1_FUN_00300960": 3148128,
     "LVL_25_WUPASH_NEBULA_Fbdd4a4aa_FUN_00300C00": 3148800,
     "LVL_25_WUPASH_NEBULA_Fbdd4a4aa_FUN_00300C70": 3148912,
@@ -367,6 +372,11 @@
     "LVL_25_WUPASH_NEBULA_Fc3cb9262_FUN_00300C00": 3148800,
     "LVL_25_WUPASH_NEBULA_Fc3cb9262_FUN_00301D48": 3153224,
     "LVL_25_WUPASH_NEBULA_Fc3cb9262_FUN_0033C570": 3392880,
+    "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0": 3586720,
+    "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CDD8": 4443608,
+    "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CFC8": 4444104,
     "LVL_25_WUPASH_NEBULA_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_25_WUPASH_NEBULA_Fc895cb79_D_001D1D00": 1907968,
     "LVL_25_WUPASH_NEBULA_Fc936841d_FUN_00300C00": 3148800,
@@ -2018,6 +2028,12 @@
       "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043E968"
     },
     {
+      "address": 4451016,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043EAC8"
+    },
+    {
       "address": 4453360,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2028,6 +2044,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043F6B8"
+    },
+    {
+      "address": 4454424,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043F818"
     },
     {
       "address": 4455040,

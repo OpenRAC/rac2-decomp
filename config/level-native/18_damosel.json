@@ -368,6 +368,11 @@
     "LVL_18_DAMOSEL_Fb4cfb7e0_FUN_00335738": 3364664,
     "LVL_18_DAMOSEL_Fb77d67f1_FUN_00308560": 3179872,
     "LVL_18_DAMOSEL_Fb77d67f1_FUN_0034B1D0": 3453392,
+    "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_18_DAMOSEL_Fb7feb893_FUN_0037B810": 3651600,
+    "LVL_18_DAMOSEL_Fb7feb893_FUN_0045DF20": 4579104,
+    "LVL_18_DAMOSEL_Fb7feb893_FUN_0045E110": 4579600,
     "LVL_18_DAMOSEL_Fbbb7bee1_FUN_00308650": 3180112,
     "LVL_18_DAMOSEL_Fbdd4a4aa_FUN_003088F0": 3180784,
     "LVL_18_DAMOSEL_Fbdd4a4aa_FUN_00308960": 3180896,
@@ -390,6 +395,11 @@
     "LVL_18_DAMOSEL_Fc3cb9262_FUN_003088F0": 3180784,
     "LVL_18_DAMOSEL_Fc3cb9262_FUN_00309A58": 3185240,
     "LVL_18_DAMOSEL_Fc3cb9262_FUN_0034B1D0": 3453392,
+    "LVL_18_DAMOSEL_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_18_DAMOSEL_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_18_DAMOSEL_Fc558ca70_FUN_0037B810": 3651600,
+    "LVL_18_DAMOSEL_Fc558ca70_FUN_0045DF20": 4579104,
+    "LVL_18_DAMOSEL_Fc558ca70_FUN_0045E110": 4579600,
     "LVL_18_DAMOSEL_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_18_DAMOSEL_Fc936841d_FUN_003088F0": 3180784,
     "LVL_18_DAMOSEL_Fc936841d_FUN_00308920": 3180832,
@@ -2146,6 +2156,12 @@
       "symbol": "LVL_18_DAMOSEL_FUN_0045FAB0"
     },
     {
+      "address": 4586512,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_18_DAMOSEL_FUN_0045FC10"
+    },
+    {
       "address": 4588856,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2156,6 +2172,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_18_DAMOSEL_FUN_00460800"
+    },
+    {
+      "address": 4589920,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_18_DAMOSEL_FUN_00460960"
     },
     {
       "address": 4590536,

@@ -332,6 +332,11 @@
     "LVL_2_MAKTAR_NEBULA_Fb4cfb7e0_FUN_0031E770": 3270512,
     "LVL_2_MAKTAR_NEBULA_Fb77d67f1_FUN_002F1BB0": 3087280,
     "LVL_2_MAKTAR_NEBULA_Fb77d67f1_FUN_003366A8": 3368616,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90": 3566736,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BB90": 4570000,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BD80": 4570496,
     "LVL_2_MAKTAR_NEBULA_Fbbb7bee1_FUN_002F1CA0": 3087520,
     "LVL_2_MAKTAR_NEBULA_Fbc82131e_D_001AD6B0": 1758896,
     "LVL_2_MAKTAR_NEBULA_Fbc82131e_D_001AD6C0": 1758912,
@@ -362,6 +367,11 @@
     "LVL_2_MAKTAR_NEBULA_Fc3cb9262_FUN_002F1F70": 3088240,
     "LVL_2_MAKTAR_NEBULA_Fc3cb9262_FUN_002F3158": 3092824,
     "LVL_2_MAKTAR_NEBULA_Fc3cb9262_FUN_003366A8": 3368616,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90": 3566736,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BB90": 4570000,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BD80": 4570496,
     "LVL_2_MAKTAR_NEBULA_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_2_MAKTAR_NEBULA_Fc936841d_FUN_002F1F70": 3088240,
     "LVL_2_MAKTAR_NEBULA_Fc936841d_FUN_002F1FA0": 3088288,
@@ -2040,6 +2050,12 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045D720"
     },
     {
+      "address": 4577408,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045D880"
+    },
+    {
       "address": 4579752,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2050,6 +2066,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E470"
+    },
+    {
+      "address": 4580816,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E5D0"
     },
     {
       "address": 4581432,

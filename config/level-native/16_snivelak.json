@@ -341,6 +341,11 @@
     "LVL_16_SNIVELAK_Fb4cfb7e0_FUN_00313EA0": 3227296,
     "LVL_16_SNIVELAK_Fb77d67f1_FUN_002E70F8": 3043576,
     "LVL_16_SNIVELAK_Fb77d67f1_FUN_00327D48": 3308872,
+    "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_16_SNIVELAK_Fb7feb893_FUN_003573E8": 3503080,
+    "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C1A0": 4440480,
+    "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C390": 4440976,
     "LVL_16_SNIVELAK_Fbbb7bee1_FUN_002E71E8": 3043816,
     "LVL_16_SNIVELAK_Fbdd4a4aa_FUN_002E7488": 3044488,
     "LVL_16_SNIVELAK_Fbdd4a4aa_FUN_002E7510": 3044624,
@@ -363,6 +368,11 @@
     "LVL_16_SNIVELAK_Fc3cb9262_FUN_002E7488": 3044488,
     "LVL_16_SNIVELAK_Fc3cb9262_FUN_002E8648": 3049032,
     "LVL_16_SNIVELAK_Fc3cb9262_FUN_00327D48": 3308872,
+    "LVL_16_SNIVELAK_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_16_SNIVELAK_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_16_SNIVELAK_Fc558ca70_FUN_003573E8": 3503080,
+    "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C1A0": 4440480,
+    "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C390": 4440976,
     "LVL_16_SNIVELAK_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_16_SNIVELAK_Fc936841d_FUN_002E7488": 3044488,
     "LVL_16_SNIVELAK_Fc936841d_FUN_002E74B8": 3044536,
@@ -2051,6 +2061,12 @@
       "symbol": "LVL_16_SNIVELAK_FUN_0043DD30"
     },
     {
+      "address": 4447888,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_16_SNIVELAK_FUN_0043DE90"
+    },
+    {
       "address": 4450232,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2061,6 +2077,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_16_SNIVELAK_FUN_0043EA80"
+    },
+    {
+      "address": 4451296,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_16_SNIVELAK_FUN_0043EBE0"
     },
     {
       "address": 4451912,

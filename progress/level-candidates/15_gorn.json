@@ -6,11 +6,11 @@
   "reference_sha256": "838098ef94f05d78f79be2f65291447db6c9468e7c44e2cab36396f720cce109",
   "reference_entry": 2869768,
   "candidate_source": "candidates/levels/15_gorn.c",
-  "source_sha256": "6560f42a9dca014a2fa16a41bcdd9399173d8f2c5da7ac411e7d747a69b7af20",
-  "catalog_sha256": "54ad3abe1dd014fa4c264beec41b9f5867d069ee09c76b6700271c959fc9cf3b",
-  "object_sha256": "da35482c9178916da87e90697420ed013e5744184622aa56ff599d8bb81f44b1",
-  "candidate_elf_sha256": "82607c8d394c8b815f2ad1484e5ebc9b8179a8dc779b251e2e57be0d66016d12",
-  "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+  "source_sha256": "2a7a23a3f40daf8d93a35452d1838b8d6120bd487811df13a76cecd1aa0ca0c6",
+  "catalog_sha256": "f1e6ca0548e7e79fbad301184d3d198c24044dfc4e92e34fb6fe45f179dced49",
+  "object_sha256": "b6ac21696e8314e96072b133d63921d703c00838989ee59d839e47574627e8b7",
+  "candidate_elf_sha256": "ae048275b1a735c692cb32b5243a59e75d25edce63881e631374e777e77f7a74",
+  "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
     "cpp": "2ac3d8d3ca177e6705ac2cbdd1bd9e9a7181ac3e40f6230dea6875c3218ec155",
@@ -2863,6 +2863,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_15_GORN_FUN_0045A7C0",
+      "address": 4564928,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "58541d6b899dc1aed6a25b89cafd4798a284d85ce833ed8c03a608d5e0796506",
+      "candidate_sha256": "58541d6b899dc1aed6a25b89cafd4798a284d85ce833ed8c03a608d5e0796506",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
+    },
+    {
       "symbol": "LVL_15_GORN_FUN_0045B0E8",
       "address": 4567272,
       "size": 44,
@@ -2883,6 +2894,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 44
+    },
+    {
+      "symbol": "LVL_15_GORN_FUN_0045B510",
+      "address": 4568336,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "f3610dc4fcc2b273ddea096e204aa58f1925da3ead62e95efeeccc231efc14c6",
+      "candidate_sha256": "f3610dc4fcc2b273ddea096e204aa58f1925da3ead62e95efeeccc231efc14c6",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
     },
     {
       "symbol": "LVL_15_GORN_FUN_0045B778",
@@ -3381,5 +3403,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 37712
+  "matched_code_bytes": 38232
 }

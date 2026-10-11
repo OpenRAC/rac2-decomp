@@ -38,12 +38,12 @@ from loaded-byte coverage; the normal matching acceptance rule is unchanged.
 <!-- unique-code-progress:start -->
 | Metric | Matched C bytes | Total code bytes | Progress |
 | --- | ---: | ---: | ---: |
-| Conservative unique EE code (unsupported extents uncollapsed) | 481,352 | 44,400,168 | 1.0841% |
-| Loaded code (boot + 27 overlays) | 1,342,608 | 48,788,176 | 2.7519% |
+| Conservative unique EE code (unsupported extents uncollapsed) | 495,400 | 44,400,168 | 1.1158% |
+| Loaded code (boot + 27 overlays) | 1,356,672 | 48,788,176 | 2.7807% |
 
 Structurally supported function extents cover 40,075,248 loaded EE bytes; 231,732 EE bytes remain unresolved. VU code excluded: 86,368 bytes.
 Provisional representative partition: 37,641,816 bytes (certified: false); no global progress percentage is inferred from this partition.
-Conservative global partition retains unknown extents and gaps without deduplication: 8,626,560 loaded EE bytes have unsupported boundaries. The total follows the stated grouping policy and is not a certified original-source size. Supported subset: 481,352 / 35,773,608 unique bytes.
+Conservative global partition retains unknown extents and gaps without deduplication: 8,626,560 loaded EE bytes have unsupported boundaries. The total follows the stated grouping policy and is not a certified original-source size. Supported subset: 495,400 / 35,773,608 unique bytes.
 
 Shared boot binding: 22,576 static edges in combined pinned reference images. Runtime code preservation is unproved. See [the binding and remaining-duplication audit](docs/BOOT-SHARED-CODE-VERIFICATION.md).
 <!-- unique-code-progress:end -->
@@ -57,10 +57,10 @@ Recorded validation on **11 October 2026**:
 
 | Scope | Integrated C functions / placements | Matched C bytes |
 | --- | ---: | ---: |
-| Boot | 377 functions | 30,112 |
-| 27 level overlays | 13,913 placements | 1,312,496 |
-| Native overlay subset, included above | 9,490 placements | 1,072,344 |
-| **Total C coverage** | **Boot + all 27 overlays** | **1,342,608 / 48,788,176 (2.7519%)** |
+| Boot | 379 functions | 30,632 |
+| 27 level overlays | 13,968 placements | 1,326,040 |
+| Native overlay subset, included above | 9,545 placements | 1,085,888 |
+| **Total C coverage** | **Boot + all 27 overlays** | **1,356,672 / 48,788,176 (2.7807%)** |
 <!-- generated-progress:end -->
 
 The complete boot (**2,521,763 loaded bytes, two PT_LOAD segments**) and all
@@ -285,7 +285,10 @@ The [supplementary reuse report](progress/code-reuse-report.json) measures
 complete instruction templates with explicit per-image address bindings. Its
 [family catalogue](progress/code-reuse-families.json.gz) lists the proved copies
 and independently validated authored C fragment reuse; the summary exposes
-uncertain boundary and residual totals.
+uncertain boundary and residual totals. The same catalogue publishes a measured
+wide relation that groups families whose address halves fold in a memory operand
+or `$gp`, with a retained frontier verdict; it sits beside the narrow partition,
+never in place of it, and carries no credit.
 This measure keeps its own all-placement C numerator and preserves the existing
 conservative and physical progress measures. It does not establish a 5 MB
 original-source total. See [the proof scope and measured baseline](docs/GLOBAL-CODE-REUSE.md).

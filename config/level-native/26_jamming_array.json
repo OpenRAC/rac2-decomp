@@ -326,6 +326,11 @@
     "LVL_26_JAMMING_ARRAY_Fb4cfb7e0_FUN_0031A860": 3254368,
     "LVL_26_JAMMING_ARRAY_Fb77d67f1_FUN_002EDF98": 3071896,
     "LVL_26_JAMMING_ARRAY_Fb77d67f1_FUN_0032F720": 3340064,
+    "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_0035EEF8": 3534584,
+    "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422CF0": 4336880,
+    "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422EE0": 4337376,
     "LVL_26_JAMMING_ARRAY_Fbbb7bee1_FUN_002EE088": 3072136,
     "LVL_26_JAMMING_ARRAY_Fbdd4a4aa_FUN_002EE328": 3072808,
     "LVL_26_JAMMING_ARRAY_Fbdd4a4aa_FUN_002EE398": 3072920,
@@ -348,6 +353,11 @@
     "LVL_26_JAMMING_ARRAY_Fc3cb9262_FUN_002EE328": 3072808,
     "LVL_26_JAMMING_ARRAY_Fc3cb9262_FUN_002EF4B0": 3077296,
     "LVL_26_JAMMING_ARRAY_Fc3cb9262_FUN_0032F720": 3340064,
+    "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_0035EEF8": 3534584,
+    "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422CF0": 4336880,
+    "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422EE0": 4337376,
     "LVL_26_JAMMING_ARRAY_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_26_JAMMING_ARRAY_Fc84472d1_D_001ADD98": 1760664,
     "LVL_26_JAMMING_ARRAY_Fc84472d1_D_001ADDB8": 1760696,
@@ -1966,6 +1976,12 @@
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_00424880"
     },
     {
+      "address": 4344288,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_004249E0"
+    },
+    {
       "address": 4346632,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -1976,6 +1992,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_004255D0"
+    },
+    {
+      "address": 4347696,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_00425730"
     },
     {
       "address": 4348312,

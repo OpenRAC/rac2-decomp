@@ -364,6 +364,11 @@
     "LVL_6_NOTAK_Fb4cfb7e0_FUN_0035A620": 3515936,
     "LVL_6_NOTAK_Fb77d67f1_FUN_0032D238": 3330616,
     "LVL_6_NOTAK_Fb77d67f1_FUN_003708A0": 3606688,
+    "LVL_6_NOTAK_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_6_NOTAK_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_6_NOTAK_Fb7feb893_FUN_003A0AA8": 3803816,
+    "LVL_6_NOTAK_Fb7feb893_FUN_004823B8": 4727736,
+    "LVL_6_NOTAK_Fb7feb893_FUN_004825A8": 4728232,
     "LVL_6_NOTAK_Fbbb7bee1_FUN_0032D328": 3330856,
     "LVL_6_NOTAK_Fbdd4a4aa_FUN_0032D5C8": 3331528,
     "LVL_6_NOTAK_Fbdd4a4aa_FUN_0032D650": 3331664,
@@ -386,6 +391,11 @@
     "LVL_6_NOTAK_Fc3cb9262_FUN_0032D5C8": 3331528,
     "LVL_6_NOTAK_Fc3cb9262_FUN_0032E728": 3335976,
     "LVL_6_NOTAK_Fc3cb9262_FUN_003708A0": 3606688,
+    "LVL_6_NOTAK_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_6_NOTAK_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_6_NOTAK_Fc558ca70_FUN_003A0AA8": 3803816,
+    "LVL_6_NOTAK_Fc558ca70_FUN_004823B8": 4727736,
+    "LVL_6_NOTAK_Fc558ca70_FUN_004825A8": 4728232,
     "LVL_6_NOTAK_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_6_NOTAK_Fc936841d_FUN_0032D5C8": 3331528,
     "LVL_6_NOTAK_Fc936841d_FUN_0032D5F8": 3331576,
@@ -2106,6 +2116,12 @@
       "symbol": "LVL_6_NOTAK_FUN_00483F48"
     },
     {
+      "address": 4735144,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_6_NOTAK_FUN_004840A8"
+    },
+    {
       "address": 4737488,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2116,6 +2132,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_6_NOTAK_FUN_00484C98"
+    },
+    {
+      "address": 4738552,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_6_NOTAK_FUN_00484DF8"
     },
     {
       "address": 4739168,

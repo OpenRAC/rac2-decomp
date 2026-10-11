@@ -6,11 +6,11 @@
   "reference_sha256": "d093f5f5922a2da0628e552a01d3b32ca5d30c23ef844b8716732343fe6c8b60",
   "reference_entry": 2812680,
   "candidate_source": "candidates/levels/13_boldan.c",
-  "source_sha256": "432f6bdddd8118de240bfdf80152eb34913acef12f94435c893bb58d06963dea",
-  "catalog_sha256": "7830f29119fcaed06cf95e9686d4f5e3130ff24ec46d78b4564f2877e201ba55",
-  "object_sha256": "e24155b2869b864fefc697aad8b4a5aa515fe9de8d3928c8d4c063e4a28a09e0",
-  "candidate_elf_sha256": "07951efc804fa12e1e62eddf2372f306eb994193c8e9d5f893190b73b9c05713",
-  "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+  "source_sha256": "1a710ea114bcda9c9baf4084cd1f11f40fa5102689309c5a26cd48dbe4b6b69a",
+  "catalog_sha256": "e6245a82b829e900e2aa55b28d2e35ec97b4db24fc32ac8974b6a55f84f73113",
+  "object_sha256": "36c837b30fa630aad2441e0837e743079226cf27e010f78b343137aff44f3a15",
+  "candidate_elf_sha256": "12298c9e41cd815f82b34f2d34384898f8faba9a39894c1341f3a67515b0602c",
+  "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
     "cpp": "2ac3d8d3ca177e6705ac2cbdd1bd9e9a7181ac3e40f6230dea6875c3218ec155",
@@ -2830,6 +2830,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_13_BOLDAN_FUN_00446540",
+      "address": 4482368,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "f585dfe53d054b1aba62c6b6d6895755730762a82ad7064d736511e8d2edd5ad",
+      "candidate_sha256": "f585dfe53d054b1aba62c6b6d6895755730762a82ad7064d736511e8d2edd5ad",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
+    },
+    {
       "symbol": "LVL_13_BOLDAN_FUN_00446E68",
       "address": 4484712,
       "size": 44,
@@ -2850,6 +2861,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 44
+    },
+    {
+      "symbol": "LVL_13_BOLDAN_FUN_00447290",
+      "address": 4485776,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "1e10991c8a5971761798db8312a1eba370af28f3d5b46e007fe8f0060cd83a6d",
+      "candidate_sha256": "1e10991c8a5971761798db8312a1eba370af28f3d5b46e007fe8f0060cd83a6d",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
     },
     {
       "symbol": "LVL_13_BOLDAN_FUN_004474F8",
@@ -3348,5 +3370,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 36976
+  "matched_code_bytes": 37496
 }

@@ -327,6 +327,11 @@
     "LVL_23_DAMOSEL_ORBIT_Fb4cfb7e0_FUN_003243A0": 3294112,
     "LVL_23_DAMOSEL_ORBIT_Fb77d67f1_FUN_002F7DD0": 3112400,
     "LVL_23_DAMOSEL_ORBIT_Fb77d67f1_FUN_003377C0": 3372992,
+    "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_003675B0": 3569072,
+    "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446790": 4482960,
+    "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446980": 4483456,
     "LVL_23_DAMOSEL_ORBIT_Fbbb7bee1_FUN_002F7EC0": 3112640,
     "LVL_23_DAMOSEL_ORBIT_Fbdd4a4aa_FUN_002F8160": 3113312,
     "LVL_23_DAMOSEL_ORBIT_Fbdd4a4aa_FUN_002F81D0": 3113424,
@@ -349,6 +354,11 @@
     "LVL_23_DAMOSEL_ORBIT_Fc3cb9262_FUN_002F8160": 3113312,
     "LVL_23_DAMOSEL_ORBIT_Fc3cb9262_FUN_002F9300": 3117824,
     "LVL_23_DAMOSEL_ORBIT_Fc3cb9262_FUN_003377C0": 3372992,
+    "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_003675B0": 3569072,
+    "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446790": 4482960,
+    "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446980": 4483456,
     "LVL_23_DAMOSEL_ORBIT_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_23_DAMOSEL_ORBIT_Fc936841d_FUN_002F8160": 3113312,
     "LVL_23_DAMOSEL_ORBIT_Fc936841d_FUN_002F8190": 3113360,
@@ -1964,6 +1974,12 @@
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00448320"
     },
     {
+      "address": 4490368,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00448480"
+    },
+    {
       "address": 4492712,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -1974,6 +1990,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00449070"
+    },
+    {
+      "address": 4493776,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_004491D0"
     },
     {
       "address": 4494392,

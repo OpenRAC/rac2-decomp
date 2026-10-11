@@ -6525,3 +6525,77 @@ void LVL_2_MAKTAR_NEBULA_FUN_002EBF00(int i0, int i1, int i2, int i3, int tag, v
          | ((long long)tag << 32);
     LVL_2_MAKTAR_NEBULA_Ff67aa9df_FUN_002EBE40(v, x);
 }
+extern void LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BB90(char *p);
+extern void LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BD80(char *p, float a, float b);
+extern void LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90(int a, int b, int c);
+
+extern volatile unsigned char LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95 __attribute__((sda));
+extern volatile unsigned char LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94 __attribute__((sda));
+
+int LVL_2_MAKTAR_NEBULA_FUN_0045D880(char *a0, int a1)
+{
+    char *p = a0 + 8;
+    float *q;
+    int v;
+
+    LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BB90(p);
+    q = *(float **)(a0 + 684);
+    LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BD80(p, q[0], q[1]);
+    if (a1 & 0x1000) {
+        LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x4000) {
+        LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x40) {
+        LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90(4, 0, 0);
+        switch (*(int *)(a0 + 680)) {
+        case 0:
+            LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95 = LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95 == 0;
+            break;
+        case 1:
+            LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94 = LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94 == 0;
+            break;
+        }
+    }
+    return (a1 >> 6) & 1;
+}
+extern void LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BB90(char *p);
+extern void LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BD80(char *p, float a, float b);
+extern void LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90(int a, int b, int c);
+
+extern volatile unsigned char LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2 __attribute__((sda));
+extern volatile unsigned char LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3 __attribute__((sda));
+
+int LVL_2_MAKTAR_NEBULA_FUN_0045E5D0(char *a0, int a1)
+{
+    char *p = a0 + 8;
+    float *q;
+    int v;
+
+    LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BB90(p);
+    q = *(float **)(a0 + 684);
+    LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BD80(p, q[0], q[1]);
+    if (a1 & 0x1000) {
+        LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x4000) {
+        LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x40) {
+        LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90(4, 0, 0);
+        switch (*(int *)(a0 + 680)) {
+        case 0:
+            LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2 = LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2 == 0;
+            break;
+        case 1:
+            LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3 = LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3 == 0;
+            break;
+        }
+    }
+    return (a1 >> 6) & 1;
+}

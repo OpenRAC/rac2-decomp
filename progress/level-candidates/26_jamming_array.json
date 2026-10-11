@@ -6,11 +6,11 @@
   "reference_sha256": "575ab90300200e2c8bd49afba637aa9212e82d2ee17af618e2ad8c5bf78bd36b",
   "reference_entry": 2769288,
   "candidate_source": "candidates/levels/26_jamming_array.c",
-  "source_sha256": "54b1c00ac73b49a5b81a2a8a6e0d3556016e9ed9c59c495336cd101f20ff9069",
-  "catalog_sha256": "279b160630301cd0d3a38eac930d9157a30343d57bc9da700c5e3123d0611e48",
-  "object_sha256": "89df8c37423541a13958226a5411542852fb48335d65800e0e9fe7e5bdfde615",
-  "candidate_elf_sha256": "824ebdd360a2be6acb12252f9f5e2fb6716b75065e0394452791d739f39f6c26",
-  "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+  "source_sha256": "7313b6f5ab503f09e0fe36112dcd05dfba6a4e8ca02d687d70fd061cdbee44ed",
+  "catalog_sha256": "ceb34221b7db3014a34e0d46569dcdba90b0747cda15d6f04186914be3b47ceb",
+  "object_sha256": "775022c43640322398c8229166a625125b9c4460f10627d8adc47278975354e2",
+  "candidate_elf_sha256": "02c25d1c61222241adb59ddb926dff3da19ec54a6b8e17c483aa2618a0353ef2",
+  "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
     "cpp": "2ac3d8d3ca177e6705ac2cbdd1bd9e9a7181ac3e40f6230dea6875c3218ec155",
@@ -2775,6 +2775,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_004249E0",
+      "address": 4344288,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "7206845a408ffa0cef718be3eca0f954c8001061bbd6f01337c007e967a3b4fc",
+      "candidate_sha256": "7206845a408ffa0cef718be3eca0f954c8001061bbd6f01337c007e967a3b4fc",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
+    },
+    {
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_00425308",
       "address": 4346632,
       "size": 44,
@@ -2795,6 +2806,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 44
+    },
+    {
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_00425730",
+      "address": 4347696,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "4ce5b100c443e7bee88c009e0d158473e0488c0139853a2fbe67bb3a49d3cbd6",
+      "candidate_sha256": "4ce5b100c443e7bee88c009e0d158473e0488c0139853a2fbe67bb3a49d3cbd6",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
     },
     {
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_00425998",
@@ -3293,5 +3315,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 36052
+  "matched_code_bytes": 36572
 }

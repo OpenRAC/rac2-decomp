@@ -326,6 +326,11 @@
     "LVL_20_YEEDIL_Fb4cfb7e0_FUN_0032F680": 3339904,
     "LVL_20_YEEDIL_Fb77d67f1_FUN_00301ED0": 3153616,
     "LVL_20_YEEDIL_Fb77d67f1_FUN_00345160": 3428704,
+    "LVL_20_YEEDIL_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_20_YEEDIL_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_20_YEEDIL_Fb7feb893_FUN_003755E0": 3626464,
+    "LVL_20_YEEDIL_Fb7feb893_FUN_004678C8": 4618440,
+    "LVL_20_YEEDIL_Fb7feb893_FUN_00467AB8": 4618936,
     "LVL_20_YEEDIL_Fbbb7bee1_FUN_00301FC0": 3153856,
     "LVL_20_YEEDIL_Fbdd4a4aa_FUN_00302260": 3154528,
     "LVL_20_YEEDIL_Fbdd4a4aa_FUN_003022D0": 3154640,
@@ -348,6 +353,11 @@
     "LVL_20_YEEDIL_Fc3cb9262_FUN_00302260": 3154528,
     "LVL_20_YEEDIL_Fc3cb9262_FUN_003033C8": 3158984,
     "LVL_20_YEEDIL_Fc3cb9262_FUN_00345160": 3428704,
+    "LVL_20_YEEDIL_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_20_YEEDIL_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_20_YEEDIL_Fc558ca70_FUN_003755E0": 3626464,
+    "LVL_20_YEEDIL_Fc558ca70_FUN_004678C8": 4618440,
+    "LVL_20_YEEDIL_Fc558ca70_FUN_00467AB8": 4618936,
     "LVL_20_YEEDIL_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_20_YEEDIL_Fc84472d1_D_001ADD98": 1760664,
     "LVL_20_YEEDIL_Fc84472d1_D_001ADDB8": 1760696,
@@ -2012,6 +2022,12 @@
       "symbol": "LVL_20_YEEDIL_FUN_00469458"
     },
     {
+      "address": 4625848,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_20_YEEDIL_FUN_004695B8"
+    },
+    {
       "address": 4628192,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2022,6 +2038,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_20_YEEDIL_FUN_0046A1A8"
+    },
+    {
+      "address": 4629256,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_20_YEEDIL_FUN_0046A308"
     },
     {
       "address": 4629872,

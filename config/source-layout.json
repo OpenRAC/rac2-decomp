@@ -777,76 +777,86 @@
     },
     {
       "boundary_evidence": "authoritative contiguous source fragment; not an original object boundary",
+      "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+      "name": "flag-byte-toggle-descending"
+    },
+    {
+      "boundary_evidence": "authoritative contiguous source fragment; not an original object boundary",
+      "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+      "name": "flag-byte-toggle-ascending"
+    },
+    {
+      "boundary_evidence": "authoritative contiguous source fragment; not an original object boundary",
       "fragment": "src/boot/19-second-argument-forwarder.cfrag",
       "name": "19-second-argument-forwarder"
     }
   ],
-  "generator_sha256": "2df65a61fe2b3678790a98a91e94d7c99a9768f07a39cbad6abfb9a66082d3d7",
+  "generator_sha256": "fb01b27af4cceb91c2796a922d1b14bde902ce8e8ee560d768bac766aed22c37",
   "input_sha256": {
-    "candidates/boot.c": "95d0e59ef3c6ace619eb06423518797623765b9d51cf0b890ed723a0496a0ef2",
-    "candidates/levels/0_aranos_tutorial-g8.c": "2b2a91791c68383dded5258753d82276695ac0abf0d9681e41a47ea7c0509c08",
-    "candidates/levels/0_aranos_tutorial.c": "f0f3ae6d240e5cafe903fb101f343e9b1da581058fce623ef4cd155e4ca425df",
+    "candidates/boot.c": "52dc0e9e0cc85bb975e07bf55744601869457cd7925357162056a8d47d8cfb63",
+    "candidates/levels/0_aranos_tutorial-g8.c": "03e00d1a5643f33bcb8b86eb0818c5630ffab5d4aff835366772d263566a5ad7",
+    "candidates/levels/0_aranos_tutorial.c": "dce1851c9dc3e7aaadc0a09e2a3ecb805bf3bd6dabb290ee1824a531c9b442aa",
     "candidates/levels/10_hrugis_cloud-g8.c": "c5ae367859c70d7ea5247534395033888c68104ea073b652abb29805a8aa657c",
-    "candidates/levels/10_hrugis_cloud.c": "a8ad0d078e3f9968405db431dbbec2253f2db2496b60eb3f8b659060d3be91c4",
+    "candidates/levels/10_hrugis_cloud.c": "134b2eaf7e498b5343d788abd6925eae0ca8c4ec2a2c1d286a4edd2f90fe7fa8",
     "candidates/levels/11_joba-g8.c": "d185a54e050196005307ccef623fd2a9a29eefe0519fa748c1ccc6c73d9fcbe3",
-    "candidates/levels/11_joba.c": "ec3f3e81b5774cd65c73ad3f63795a43605ec55f29f2684c8046e13711752e99",
+    "candidates/levels/11_joba.c": "216506abbc5113be29eebc784d67f5d483eac80b9fcf35f7907f9dbc734cffb8",
     "candidates/levels/12_todano-g8.c": "af325594d8f8f1453257fdcffb021a7dd58f5fc9743c4706043e6d81e26521d1",
-    "candidates/levels/12_todano.c": "8159ea8cd4c239e6657182695715d1ac9808069cc4ded351a7f96ab3762c8908",
+    "candidates/levels/12_todano.c": "9709c21cdf025fdc8028e4003465b1210fa8cb6facd0cbda086311d1399cc3a8",
     "candidates/levels/13_boldan-g8.c": "3298ecdcf7bdee1c9270e426062b66c908b33826e5168574c2ad09a5cb546514",
-    "candidates/levels/13_boldan.c": "432f6bdddd8118de240bfdf80152eb34913acef12f94435c893bb58d06963dea",
+    "candidates/levels/13_boldan.c": "1a710ea114bcda9c9baf4084cd1f11f40fa5102689309c5a26cd48dbe4b6b69a",
     "candidates/levels/14_aranos_prison-g8.c": "67c563be0d36ed4c39d48c410357dc9d0b8f532495574a9e2e6ea3ef42a5e8be",
-    "candidates/levels/14_aranos_prison.c": "f0f07754852a790317952968a45f089d695c549ae9e30a4f3660c12edfe2fd85",
+    "candidates/levels/14_aranos_prison.c": "75c2bd9338970ef5baf7e7e9dc01fd317cd513587e4ac5da34c6e04148490342",
     "candidates/levels/15_gorn-g8.c": "008eb01e65ea57eebf0713dbbf4c474a984ae5f4b74fc98319bb427a72657424",
-    "candidates/levels/15_gorn.c": "6560f42a9dca014a2fa16a41bcdd9399173d8f2c5da7ac411e7d747a69b7af20",
+    "candidates/levels/15_gorn.c": "2a7a23a3f40daf8d93a35452d1838b8d6120bd487811df13a76cecd1aa0ca0c6",
     "candidates/levels/16_snivelak-g8.c": "d8938c3cc1e36536593565b9a9125944db6f5fa842117f1bd70ac4f703fa1d21",
-    "candidates/levels/16_snivelak.c": "5121b0cf75ade30c2e942838e52300f8d640dfdbf825bb7f7f2f0ed6c0e43001",
+    "candidates/levels/16_snivelak.c": "670acbeb71596c30b9e5bb8eae6cd6a2ac6094e4e569030dbdadc9dcfc08b736",
     "candidates/levels/17_smolg-g8.c": "42e0649acf33d7dc9e9fe30e48fa43a93e34bbc25960fab0c693715df11d6d76",
-    "candidates/levels/17_smolg.c": "942332418c19f7c9e6a45e7440d472eebbc9a8fb0e6a93c0a9801cc13234eb27",
+    "candidates/levels/17_smolg.c": "582b01b19c6afa435afe0e9473c93fce8731f2e822debda83625b3335193c1e9",
     "candidates/levels/18_damosel-g8.c": "4b36fc9effea1228676be7bc592ea1f71f96aca29da7025f5c8ae1b0e9d3dc95",
-    "candidates/levels/18_damosel.c": "692d6305be843aff74f7143438286e7236585bbbff642cea2c705b9d6b4b7781",
+    "candidates/levels/18_damosel.c": "a8df8320d98447721c6930e67939242b0e6db52bbdae32f65ae50e115ac60398",
     "candidates/levels/19_grelbin-g8.c": "e726c872f54f4a8af887f6d236be4236d468e1efc6b03ec72b13ece471382cde",
-    "candidates/levels/19_grelbin.c": "3af1a4807fab0c55f2093fb2890dc8bb1acbb488432663702f86736c761f7e43",
+    "candidates/levels/19_grelbin.c": "ba95b9de30b0ca76593c0eb2473fbf7df7ab37b2c073c3de9546a0a6f79af74b",
     "candidates/levels/1_oozla-g8.c": "7963e5cadbfecc1e477e80d21a4b7fe51ec6c042fafb81c5a479256d28897f76",
-    "candidates/levels/1_oozla.c": "e4780af38377139d2dc21c82c1c4ceb0fa567ca571d5dea8df494f25a047e177",
+    "candidates/levels/1_oozla.c": "14034e9ee7046e37682b76bcfe37b8554f3aac35cc7cb62a93c8542e1bdb793b",
     "candidates/levels/20_yeedil-g8.c": "d9b34c1ae63f68e8a18245f24297d37e3050a4f4ee3d212c3fd85d49d7539141",
-    "candidates/levels/20_yeedil.c": "694c80ea302abe81bc2aced40316367238240cbe4d0e4fe399165090fe370618",
+    "candidates/levels/20_yeedil.c": "7a7f5307e1317c4730816ee00406f0d6b0293b01dd6a0b898c381312da14bf62",
     "candidates/levels/22_dobbo_orbit-g8.c": "ced446b2e36b0e20b6f4b2c224b8c0ec168e19472deade88cf4b3c6571cb1e3c",
-    "candidates/levels/22_dobbo_orbit.c": "416271ec3ebeabc3c5054e19f0118eda21ee6b8f343ef23458c2a217e67d1f76",
+    "candidates/levels/22_dobbo_orbit.c": "4538f29f4f0443647ab9402be82b8024ff3bf00abe5a4cf23a722c63be0907f1",
     "candidates/levels/23_damosel_orbit-g8.c": "5932b06ce96fcce4c97e700e36b04eaf925184d4ed01380557d7d93b1752a3fc",
-    "candidates/levels/23_damosel_orbit.c": "6c537be89d067720e6ea5a43a770a02381100123902afcfe6e10ca1f1b41e4d9",
+    "candidates/levels/23_damosel_orbit.c": "ecd8de172264aa1077d5e44f53fa576620419fa552e22a1394fb9054e6954ba0",
     "candidates/levels/24_ship_shack-g8.c": "9cc33e4de06079206a760db1f6fdab60ed9ff9467379ef21a9e2873c53194a63",
-    "candidates/levels/24_ship_shack.c": "e27677d59cdf9ca9596da30531ce8fce0efe303faf6b1cde7ece4ed74d63605a",
+    "candidates/levels/24_ship_shack.c": "5ebe7e222a47e17b7fc8a8e08b3a6a6e2a81ed805c1d529d0d1bb5bcdc08a892",
     "candidates/levels/25_wupash_nebula-g8.c": "f1170c4c39298464360a1472e184c9bbaec48100ef34715a1420d9ac12afd6a8",
-    "candidates/levels/25_wupash_nebula.c": "4c1f71eb6c0baf06ba354d877bd354407ca549dfbb420eca54c859cc6b21f8f3",
+    "candidates/levels/25_wupash_nebula.c": "71400dc7c960cf108a9ec6c6f0294203b38fe9ce2a3f58b21fc1d634d9936710",
     "candidates/levels/26_jamming_array-g8.c": "7a885863780358b7909ef083a08bd62f27b02cb9fc626e1eddc6ebbbfb5781fd",
-    "candidates/levels/26_jamming_array.c": "54b1c00ac73b49a5b81a2a8a6e0d3556016e9ed9c59c495336cd101f20ff9069",
-    "candidates/levels/2_maktar_nebula-g8.c": "72784634839f2034f82515852685db15b1c57ded7c0b43056b737c7699ec2ace",
-    "candidates/levels/2_maktar_nebula.c": "6e4e0d84639838903759ced1a5877897f130a3ba04790566f2875228af3a712f",
+    "candidates/levels/26_jamming_array.c": "7313b6f5ab503f09e0fe36112dcd05dfba6a4e8ca02d687d70fd061cdbee44ed",
+    "candidates/levels/2_maktar_nebula-g8.c": "43006eb31e91c126597fbb0f634ce113ca6dc1e2235af62268e23d0df2af96a0",
+    "candidates/levels/2_maktar_nebula.c": "17bba9b94be1cffe43fee3fa15922f999f5216349685dafcc50fc15c30ef0c2c",
     "candidates/levels/30_insomniac_museum-g8.c": "303db90632814ef2fe2ab308bc8bb1164e04b33906dc36fc2bcefb8b2c599641",
-    "candidates/levels/30_insomniac_museum.c": "7d5b25d7edda5762d8fe743b9e15e1c6b6004081384d17ca53e74c81ca1c8700",
+    "candidates/levels/30_insomniac_museum.c": "9213aa848dcc107543c2d45c22293b636358ba2fbee17103d0c911d39086010a",
     "candidates/levels/3_endako-g8.c": "9268b7a48498158b894d37bae0d57c0ee3c7362dc62ee3110818652d0b3fd2c3",
-    "candidates/levels/3_endako.c": "1f218b04a3d72903aae089bd8867d3c7465709790949006d8c065fc4f890f2bf",
+    "candidates/levels/3_endako.c": "3a52c37b0a15f16094ebe878b521cd23bf08b47c9d140df17d7e25c9bf5b94ba",
     "candidates/levels/4_barlow-g8.c": "4eac3ef60459175fc27fc8f32c8994d9a7bcefcf978a493dd3ed9841103bc6fc",
     "candidates/levels/4_barlow.c": "73a4ff4b6151540c97d05fa7b8cfc6d5092c7dd3568a1c6f288a0e7dff4dfc42",
     "candidates/levels/5_feltzin_system-g8.c": "c0250a0a39e40d4dcea843bd224432c5a8bc1535d1718e9dbaa2fd5aa5b83a3c",
-    "candidates/levels/5_feltzin_system.c": "b7fd338edcc6363122d8a823af334163e528d47e4553849726ae64da2f80d43e",
+    "candidates/levels/5_feltzin_system.c": "7baad98d4f664e439bdc44ae7a9762bd34c8ff132226ae7fd0cf7271b6df5e03",
     "candidates/levels/6_notak-g8.c": "d2b3bab29f2830ad4e38ef087a8f3c553a0b3e1c9a1e0b78af8a3a956c5c699a",
-    "candidates/levels/6_notak.c": "ba78a17fd18905a571a177f627d2740b3cb7eae38906654d81ba5ed7dc191630",
+    "candidates/levels/6_notak.c": "1fb5840f01bdf6267979402f27bd5547e8d8d2ba584ff948c58c251193fff713",
     "candidates/levels/7_siberius-g8.c": "40a346057d1ec75764ef68d159948fdbff3f1b66a4932ad4aaa8eac38488c8c0",
-    "candidates/levels/7_siberius.c": "112d4cdaa47c14f3cebda551f0f356dac6efe5ebf247484a09a9fa909df883ea",
-    "candidates/levels/8_tabora-g8.c": "cb3db550038b88436f1fa042e9bd7d3971d60c8bd34c18e09d3e117e3b25d6c4",
-    "candidates/levels/8_tabora.c": "704262294114c86f922ab1f8bee0e6097774bbf08bd465bda525d1499a4eaaad",
+    "candidates/levels/7_siberius.c": "07d2c5f3a26ee1b34c6948a87bb86f46ba41412a374858e82763ec7af315410f",
+    "candidates/levels/8_tabora-g8.c": "cfdc9339a89e8504b3d8186e7d150d6789fc8e9fe0a898caefa1f90b8fd5b963",
+    "candidates/levels/8_tabora.c": "e6bdd37f67d563043be8a0ca855ac7b3ba6d98606eb0be23888dacc30353a176",
     "candidates/levels/9_dobbo-g8.c": "5e7dc0b49a795f37f959b1974ecda0b11976bdc69114365e98e0d15fb88b18b4",
-    "candidates/levels/9_dobbo.c": "bb55992b30026bdb4683eb101557f79fd892fefa8d671cf84717b70a0c3649a8",
+    "candidates/levels/9_dobbo.c": "ed091bf8502f9feb882bb31ae5e686ee5cdfaf01f838a397f16bc174b4a7e442",
     "candidates/sdk/cpr8_source_unit.c": "526e6888e54dea5025a27a013101d88024c434cc99ce0121c06d67d84c19a66e",
     "candidates/sdk/ipu_restart_dma.c": "590d6a10dcc6883cd4724257300aaf6c5f5fe25e5745b60d463918039ba81bea",
     "candidates/sdk/sysbit_flush.c": "b6921af8b6d1fb1b6d65860b0f6130f5a8f6e6bc57777439e6844df8460391f4",
     "config/boot-units/sdk-cpr8.json": "d3b35d02f2ab660e84aeedf65aabde12b89286d97ba012bc27fa8fd5291175c5",
     "config/boot-units/sdk-ipu-restart-dma.json": "186e6faca67f024ca46baf69e37b0625cbaae33cc143df3204d9d01332175c31",
     "config/boot-units/sdk-sysbit-flush.json": "8997e4370cf6c1a4aaf13d44c4234d78b0226618a7895319ecc1618d93e1d031",
-    "config/candidate-catalog.json": "8843ff8f5bc5f017401cb903d6b91f60b551e658d72f1ef90b35a4659459598c",
+    "config/candidate-catalog.json": "7cc2e1e757f35becca5972ce9a25eff14db7460f12f4a8aeec2c296e992a76cd",
     "config/compiler-profiles/owned-sdk-b9-single-text-controls-v1.json": "b6274a824c321458200375da3012c3cd35163f1994402caf6f9c78bfb71023b6",
-    "config/level-g8/0_aranos_tutorial.json": "c34bad8c07d55a46fe687f10265d4c6646bdd25b6cd6f90e484fedff174d0903",
+    "config/level-g8/0_aranos_tutorial.json": "234cde22967d92aff653426f3d7a4b1f05d4355d65ba71e7675ba5d44b5dab8c",
     "config/level-g8/10_hrugis_cloud.json": "48373fa338fe82e3806b617dc5ecfba742b5b523a62350f6acc74937b8488d33",
     "config/level-g8/11_joba.json": "9c92156bc99fd7bce9e96bad0e53f6ce8b5b5e1f8f661adf7a62f7a5c2166652",
     "config/level-g8/12_todano.json": "1252045a9d566cc1725b24938fde80e3d357fed09d16350587f9a19a4d5e0379",
@@ -864,42 +874,42 @@
     "config/level-g8/24_ship_shack.json": "55e6e9f670fe7dee6876a2466540750f98f0647868eedb92bc4a044167d30cc3",
     "config/level-g8/25_wupash_nebula.json": "1e4677fb3418cefdba78b9c2b852130a1ccf33f74a2f1f87fd8748f58f8e2697",
     "config/level-g8/26_jamming_array.json": "8046fdaed76851507d1a5d8218b672557fe4ed601cc474be13bfbcef3e638fb6",
-    "config/level-g8/2_maktar_nebula.json": "f2c7648598713d5b38172ae71480ff2755332d350d8bc13db921930509d9a57a",
+    "config/level-g8/2_maktar_nebula.json": "4f932cf1ddc82fcc98766a376ab2be2a48a70be08e09d69aab8fb56bd2dc7429",
     "config/level-g8/30_insomniac_museum.json": "52947bebf01565a97818218afd8d2f7facf235d6bbe6d9c55e8ad449689b9e3f",
     "config/level-g8/3_endako.json": "151e89e98e80e066a2954fcbae39123d930aa74fe3e4322401548ce36eb92008",
     "config/level-g8/4_barlow.json": "cf1a198ce56d75c886d9e6b46d01201de8a7003abd1096861636a4d58e07a8de",
     "config/level-g8/5_feltzin_system.json": "371ddb612960de237691532ff41a1aa2e137f1ad7f4849553d43e6f178cdee5b",
     "config/level-g8/6_notak.json": "58ba13bd9b4dcbeed4dbc9be5e3dd81c4db33082b4e4466df422db056a164d7f",
     "config/level-g8/7_siberius.json": "ac8f55c48fbe540a0d771121d3cebd5852e00969a2e7af52926ddf070e4149fb",
-    "config/level-g8/8_tabora.json": "36abeb5a5d217cbe46b23d0d111369fdb880da2724968ba8e1c63c2993946cdf",
+    "config/level-g8/8_tabora.json": "0e1311563066ad8d1d17ceae412c23efba8fb340db9f2e00cc10bd2a76457cfe",
     "config/level-g8/9_dobbo.json": "15bbb205808b483df0985ad88929c31cc98b53b944d7af21c5f704dc3e28f3b9",
-    "config/level-native/0_aranos_tutorial.json": "66aa8144dfc9523ad15e9cb82c2f631ce125b728ba835d004137a819444ac322",
-    "config/level-native/10_hrugis_cloud.json": "04ad3611d988c4da1c36bd0049cbd2d980f961e14e5205e71f916d2805335ca5",
-    "config/level-native/11_joba.json": "da76510a8f388a66d999fb4fada24b956696429593b4286225eeef5a06d1cc8f",
-    "config/level-native/12_todano.json": "21e5d67d6bf6258aed1b8fb759d2a79f1a36d131e08d411f2cf45d3ede2c35d7",
-    "config/level-native/13_boldan.json": "7830f29119fcaed06cf95e9686d4f5e3130ff24ec46d78b4564f2877e201ba55",
-    "config/level-native/14_aranos_prison.json": "514ab1238ec2ae4badcddd5b6ce8255978ec6bdd8c750c2f78a2fe332c1f72b7",
-    "config/level-native/15_gorn.json": "54ad3abe1dd014fa4c264beec41b9f5867d069ee09c76b6700271c959fc9cf3b",
-    "config/level-native/16_snivelak.json": "df176bb87f5bce885e532718b71506203e75fa88d0be431a2e746abef888f6b4",
-    "config/level-native/17_smolg.json": "02d97d2aedb4017230be03e0d19b4abcafd81ef65d369b2f0f4f4597e6376fc9",
-    "config/level-native/18_damosel.json": "da0548e60c2dad5a224f1533303c7710a219572e24fd2ddd39371a636818e467",
-    "config/level-native/19_grelbin.json": "97b3220cb412f1f75861cb3cafcd4aeae2b502e2091db5299fcc7cb680ef6da3",
-    "config/level-native/1_oozla.json": "7e63d15ce4eafee36078d404a067964b720f870dc556007334e788268dfd9a8a",
-    "config/level-native/20_yeedil.json": "61cc91b4edf7887ce1ba76bc3f35842d5a408c232533972816ed968fe1a13d09",
-    "config/level-native/22_dobbo_orbit.json": "7a7a61094ec865234fca9e0a6ff05850e102a5d21d38f3464023c9461e2a463d",
-    "config/level-native/23_damosel_orbit.json": "21ca2046fdb8bb710afbabc6ea5df899db020ab9c2ff552e0934ab145835c6d1",
-    "config/level-native/24_ship_shack.json": "0e9e08f3bc9aa895a72428205fc75b0126771918d17e7a159febb95da65ac88f",
-    "config/level-native/25_wupash_nebula.json": "de84f9f6fa9c619481b952bb4a576b8c51a9c9926e7137775d9586517c33b316",
-    "config/level-native/26_jamming_array.json": "279b160630301cd0d3a38eac930d9157a30343d57bc9da700c5e3123d0611e48",
-    "config/level-native/2_maktar_nebula.json": "0da65caf173fc7f597901f529b1e0e959564ff519363131cdaf68387b6a21856",
-    "config/level-native/30_insomniac_museum.json": "5b703ceb21f5ca323b8ecbc3ad57de4e2485f9da5e085452143a93ede35738ac",
-    "config/level-native/3_endako.json": "8873221bf73104803770478fd79fed64ada22eb5d259d391a9495383d2099ee5",
+    "config/level-native/0_aranos_tutorial.json": "f9068dba0d0fa70019c3a5bf80432182723653a50894d4d18eed3009a8502de8",
+    "config/level-native/10_hrugis_cloud.json": "eaece230ee6c6bcbfd113deeda49e5253308342b767bd385fd1b2bf3e185e243",
+    "config/level-native/11_joba.json": "0ad8d6f60d67a215a61f575542faad2e85a366a185e1c2d32005c65bb9ed4fb7",
+    "config/level-native/12_todano.json": "7b657386ef9fae7dc67446380b7e51a7154282ab464f27e9ce736a47fb7229cf",
+    "config/level-native/13_boldan.json": "e6245a82b829e900e2aa55b28d2e35ec97b4db24fc32ac8974b6a55f84f73113",
+    "config/level-native/14_aranos_prison.json": "1f2ee8b0c6abaa88f2a94008d51d1b822a5e30c97f5834608429893d185c74c5",
+    "config/level-native/15_gorn.json": "f1e6ca0548e7e79fbad301184d3d198c24044dfc4e92e34fb6fe45f179dced49",
+    "config/level-native/16_snivelak.json": "3925d48f4373af14c31007e7c2827ec6ebb77cb6c17647d25c5c660682cfe12c",
+    "config/level-native/17_smolg.json": "4ccfd5916a946b559e35bf1b32ca7509d1f8de9f73f01775f2925a530413be17",
+    "config/level-native/18_damosel.json": "7f89fafb5a2943f8ddeb2d19b90caa94aa785b41aa927874777875f69c5396e9",
+    "config/level-native/19_grelbin.json": "71cd0e8b3b17c2f855e23997663377ca167bcf39a8d884bed5393c483bffbc83",
+    "config/level-native/1_oozla.json": "023e844fdbd8069dbc4008a22bed5d34a31c8f7e3500b7a7179e72d265ad6592",
+    "config/level-native/20_yeedil.json": "e97c68a6e366a3e7e47cf3166e8020e99e4ae8bf2079f4fef3c9981787055a56",
+    "config/level-native/22_dobbo_orbit.json": "72cfe8b9ffc0f5dafb7e10d40e861a98bc68bb2eef61e868f952ba0efee5dbe8",
+    "config/level-native/23_damosel_orbit.json": "bca94edcc84f3d07ea3a0bfda733fb866d5144008c5510924f9dd59394055d73",
+    "config/level-native/24_ship_shack.json": "63045f565c591cbf8c6146fdbd80656001653d71143f2489069a16065dc99447",
+    "config/level-native/25_wupash_nebula.json": "2d2f2dddcc9b2968cb943fb4930dbfc1fe4962056d7c73f60a89392fefcb1035",
+    "config/level-native/26_jamming_array.json": "ceb34221b7db3014a34e0d46569dcdba90b0747cda15d6f04186914be3b47ceb",
+    "config/level-native/2_maktar_nebula.json": "93f543e2ed0b94af7a3e5d9797ec566e47d07c68340e2839b2dc35c621e04998",
+    "config/level-native/30_insomniac_museum.json": "31f0917b7422fa2e0773778e29acf193a1fc3e6859b1a0e07cc7c7d0cf58ae84",
+    "config/level-native/3_endako.json": "62d13718c3536c608beb1d9f9f7ce5eee8e4c60cae318b32042535f95339abd7",
     "config/level-native/4_barlow.json": "083eb683041853d6569c539285919b461de028e9ebfcdb0cd3d64b456c38ecfd",
-    "config/level-native/5_feltzin_system.json": "b58d14810d7312a72741fe930d71f4f0bddfe9aeff68557627da93eff604c886",
-    "config/level-native/6_notak.json": "d773401262394d0f9be4d93b15ad342193d0216e6f5ceb1f9f7f4ec3a82509fa",
-    "config/level-native/7_siberius.json": "6caa0757cc9f33684a713c9cb255c28fe7b1bfa054072bdec52280e4be8fa821",
-    "config/level-native/8_tabora.json": "38b9d7a5a7c39f7bea01912cb31e0b1e3d9f07dec8187a83b7011a133493133d",
-    "config/level-native/9_dobbo.json": "ee5113b099c293932fdd7cda1ec1b9b0ba414fee7664d3aacd99b7676a4e30e5",
+    "config/level-native/5_feltzin_system.json": "8f40ad4c49d2334b90a53cb35138ec93b0d8c977580985beafa908dff18dd480",
+    "config/level-native/6_notak.json": "2c014e59b677e4cf6916c34817b764d2b6da5712559a763c27d26c6437a2252f",
+    "config/level-native/7_siberius.json": "0e7018ab5aa3de646820197d46ed7e52e2b7d0a3edea223d247ccad54fa3b219",
+    "config/level-native/8_tabora.json": "a0c59231fb124c9c1895d7bd9fb804b4cbd0caa1616b1d7667008d237c445243",
+    "config/level-native/9_dobbo.json": "365739746896c44e1c8d77602d482885205a81e771b0d9a1addf589fc1f948e7",
     "config/target.json": "36ac2984abe5328806b509105a955f747609bd0dc5f3d4b0dedd375d1557a8ec",
     "progress/compiler-profiles/owned-sdk-b9-leaf-controls.json": "d28fdadf81b63778c25592200771dff28964e4b8f9084818cbd37db2178b40d2",
     "src/sdk/cpr8_source_unit.c": "526e6888e54dea5025a27a013101d88024c434cc99ce0121c06d67d84c19a66e",
@@ -908,18 +918,18 @@
   },
   "machine_proof_status": "unverified after authoring; regenerate all affected reviews and loaded-byte gates",
   "metrics": {
-    "boot_authored_functions": 374,
-    "boot_catalogued_machine_bytes": 28968,
+    "boot_authored_functions": 376,
+    "boot_catalogued_machine_bytes": 29488,
     "identity_basis": "catalogued definitions compared as exact source bytes after recorded symbol-only substitutions; not a new machine proof",
-    "native_authored_variant_catalogued_bytes_upper_bound": 816920,
-    "native_base_family_placements": 1636,
-    "native_explicit_base_source_families": 221,
-    "native_replicated_catalogued_bytes": 984968,
-    "native_replicated_placements": 8078,
-    "native_unique_authored_source_variants": 6664,
-    "native_unique_family_or_singleton_work_items": 6663,
-    "native_unique_representative_catalogued_bytes": 816896,
-    "native_unmerged_singletons": 6442,
+    "native_authored_variant_catalogued_bytes_upper_bound": 830440,
+    "native_base_family_placements": 1638,
+    "native_explicit_base_source_families": 223,
+    "native_replicated_catalogued_bytes": 998488,
+    "native_replicated_placements": 8130,
+    "native_unique_authored_source_variants": 6716,
+    "native_unique_family_or_singleton_work_items": 6715,
+    "native_unique_representative_catalogued_bytes": 830416,
+    "native_unmerged_singletons": 6492,
     "pilot_family_authored_source_variants": 2,
     "pilot_family_placements": 27,
     "pilot_family_replicated_catalogued_bytes": 648,
@@ -928,10 +938,64 @@
     "sdk_authored_functions": 3,
     "sdk_catalogued_machine_bytes": 1144,
     "shared_native_prelude_variants": 29,
-    "total_unique_authored_source_variants_in_scope": 7041,
+    "total_unique_authored_source_variants_in_scope": 7095,
     "warning": "Representative catalogued bytes are an organization metric, not loaded-byte progress or a new accepted match. Do not add this numerator to the public report."
   },
   "native_source_families": [
+    {
+      "catalogued_size": 260,
+      "id": "native-00433198",
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "placements": [
+        {
+          "address": 4403608,
+          "body_sha256": "67ff0f01ddccb53826107231587baf42ae22e4270da9a3385ad31177b738a3e0",
+          "catalogue": "config/level-native/0_aranos_tutorial.json",
+          "catalogued_size": 260,
+          "explicit_symbol_substitutions": {
+            "LVL_0_ARANOS_TUTORIAL_FUN_00433198": "@@FUNCTION@@",
+            "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+            "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+            "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_0035F508": "@@EXTERNAL_0035F508@@",
+            "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430758": "@@EXTERNAL_00430758@@",
+            "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430948": "@@EXTERNAL_00430948@@"
+          },
+          "level": "0_aranos_tutorial",
+          "normalized_body_sha256": "9ffdd2b03518c14fa21af570e283bc2fa9d1eebc52afa54521e8b5610232d679",
+          "program": "levels/0_aranos_tutorial",
+          "source": "candidates/levels/0_aranos_tutorial.c",
+          "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00433198"
+        }
+      ],
+      "template_sha256": "9ffdd2b03518c14fa21af570e283bc2fa9d1eebc52afa54521e8b5610232d679"
+    },
+    {
+      "catalogued_size": 260,
+      "id": "native-00432448",
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "placements": [
+        {
+          "address": 4400200,
+          "body_sha256": "52d1394d575e5c2b00407ca8f1c9401fd2567018cfac83df81a074b3d74aa62a",
+          "catalogue": "config/level-native/0_aranos_tutorial.json",
+          "catalogued_size": 260,
+          "explicit_symbol_substitutions": {
+            "LVL_0_ARANOS_TUTORIAL_FUN_00432448": "@@FUNCTION@@",
+            "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+            "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+            "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_0035F508": "@@EXTERNAL_0035F508@@",
+            "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430758": "@@EXTERNAL_00430758@@",
+            "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430948": "@@EXTERNAL_00430948@@"
+          },
+          "level": "0_aranos_tutorial",
+          "normalized_body_sha256": "46e345ea08d96b56431d145fd7ecb8b6c910df991ca15f90d32e525d02be060b",
+          "program": "levels/0_aranos_tutorial",
+          "source": "candidates/levels/0_aranos_tutorial.c",
+          "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00432448"
+        }
+      ],
+      "template_sha256": "46e345ea08d96b56431d145fd7ecb8b6c910df991ca15f90d32e525d02be060b"
+    },
     {
       "catalogued_size": 156,
       "id": "native-002e8a70",
@@ -32810,6 +32874,25 @@
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0044F5A0"
     },
     {
+      "address": 4519680,
+      "body_sha256": "a895e9761ecf3be83b0129ce94ab006ab71b30ff518192664937b4fdd69ab71f",
+      "catalogue": "config/level-native/10_hrugis_cloud.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_10_HRUGIS_CLOUD_FUN_0044F700": "@@FUNCTION@@",
+        "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_00373870": "@@EXTERNAL_00373870@@",
+        "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DA10": "@@EXTERNAL_0044DA10@@",
+        "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DC00": "@@EXTERNAL_0044DC00@@"
+      },
+      "level": "10_hrugis_cloud",
+      "normalized_body_sha256": "f742571c27ba7da6311c814f1c9687d0a42359f664dff7c8e687d419a622574e",
+      "program": "levels/10_hrugis_cloud",
+      "source": "candidates/levels/10_hrugis_cloud.c",
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_0044F700"
+    },
+    {
       "address": 4522024,
       "body_sha256": "3b7e02b98ed37980afe5b5277ce55e1dd2d0074b52420d525d895402c9a0ea9e",
       "catalogue": "config/level-native/10_hrugis_cloud.json",
@@ -32838,6 +32921,25 @@
       "program": "levels/10_hrugis_cloud",
       "source": "candidates/levels/10_hrugis_cloud.c",
       "symbol": "LVL_10_HRUGIS_CLOUD_FUN_004502F0"
+    },
+    {
+      "address": 4523088,
+      "body_sha256": "e211ca0601e78f9f21ae57f4ba4670fce2354c990dc4f45dccf679384091d4c2",
+      "catalogue": "config/level-native/10_hrugis_cloud.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_10_HRUGIS_CLOUD_FUN_00450450": "@@FUNCTION@@",
+        "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_00373870": "@@EXTERNAL_00373870@@",
+        "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DA10": "@@EXTERNAL_0044DA10@@",
+        "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DC00": "@@EXTERNAL_0044DC00@@"
+      },
+      "level": "10_hrugis_cloud",
+      "normalized_body_sha256": "9f61ea7ae40b246fec8c935f90284ce1e433bdb6bd11955fb3a4170acbee4dc0",
+      "program": "levels/10_hrugis_cloud",
+      "source": "candidates/levels/10_hrugis_cloud.c",
+      "symbol": "LVL_10_HRUGIS_CLOUD_FUN_00450450"
     },
     {
       "address": 4523704,
@@ -36877,6 +36979,25 @@
       "symbol": "LVL_11_JOBA_FUN_00493C40"
     },
     {
+      "address": 4799904,
+      "body_sha256": "f8f547e4f5803618ff750956b6a26d79a14401fa2228ba784864e45be4631eb0",
+      "catalogue": "config/level-native/11_joba.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_11_JOBA_FUN_00493DA0": "@@FUNCTION@@",
+        "LVL_11_JOBA_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_11_JOBA_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_11_JOBA_Fc558ca70_FUN_00373E20": "@@EXTERNAL_00373E20@@",
+        "LVL_11_JOBA_Fc558ca70_FUN_004920B0": "@@EXTERNAL_004920B0@@",
+        "LVL_11_JOBA_Fc558ca70_FUN_004922A0": "@@EXTERNAL_004922A0@@"
+      },
+      "level": "11_joba",
+      "normalized_body_sha256": "d7c662497f7b98be9f233962127a759ec61bf183abf1fda9b3bafe335e44303e",
+      "program": "levels/11_joba",
+      "source": "candidates/levels/11_joba.c",
+      "symbol": "LVL_11_JOBA_FUN_00493DA0"
+    },
+    {
       "address": 4802248,
       "body_sha256": "3c388e0e33d910e5fde246b6bdfbb3b12750b347a4d3c2ba677a5eeb4f27bfec",
       "catalogue": "config/level-native/11_joba.json",
@@ -36905,6 +37026,25 @@
       "program": "levels/11_joba",
       "source": "candidates/levels/11_joba.c",
       "symbol": "LVL_11_JOBA_FUN_00494990"
+    },
+    {
+      "address": 4803312,
+      "body_sha256": "fc910f35484c049425cecd0b85bd7aec0eb0c7e522b1e07d9c2932bdd7fb610f",
+      "catalogue": "config/level-native/11_joba.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_11_JOBA_FUN_00494AF0": "@@FUNCTION@@",
+        "LVL_11_JOBA_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_11_JOBA_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_11_JOBA_Fb7feb893_FUN_00373E20": "@@EXTERNAL_00373E20@@",
+        "LVL_11_JOBA_Fb7feb893_FUN_004920B0": "@@EXTERNAL_004920B0@@",
+        "LVL_11_JOBA_Fb7feb893_FUN_004922A0": "@@EXTERNAL_004922A0@@"
+      },
+      "level": "11_joba",
+      "normalized_body_sha256": "9d2818c90167cdb483a7da84288ae096870b556e310e83351d177051de70cb96",
+      "program": "levels/11_joba",
+      "source": "candidates/levels/11_joba.c",
+      "symbol": "LVL_11_JOBA_FUN_00494AF0"
     },
     {
       "address": 4803928,
@@ -40864,6 +41004,25 @@
       "symbol": "LVL_12_TODANO_FUN_00448A88"
     },
     {
+      "address": 4492264,
+      "body_sha256": "84176da225ca2d38b1b40dee5cbbfb46034e4e48d7f4756ace16dfd9ef70459f",
+      "catalogue": "config/level-native/12_todano.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_12_TODANO_FUN_00448BE8": "@@FUNCTION@@",
+        "LVL_12_TODANO_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_12_TODANO_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_12_TODANO_Fc558ca70_FUN_00364F58": "@@EXTERNAL_00364F58@@",
+        "LVL_12_TODANO_Fc558ca70_FUN_00446EF8": "@@EXTERNAL_00446EF8@@",
+        "LVL_12_TODANO_Fc558ca70_FUN_004470E8": "@@EXTERNAL_004470E8@@"
+      },
+      "level": "12_todano",
+      "normalized_body_sha256": "7f3a22b958dca30cb8b043bc9857417669fe3f84bedd947acbde660c30abcbaa",
+      "program": "levels/12_todano",
+      "source": "candidates/levels/12_todano.c",
+      "symbol": "LVL_12_TODANO_FUN_00448BE8"
+    },
+    {
       "address": 4494608,
       "body_sha256": "f2a562ea871e02f5e7bba2d49197e3877be76feb1f07b3e54631ec5c7083e017",
       "catalogue": "config/level-native/12_todano.json",
@@ -40892,6 +41051,25 @@
       "program": "levels/12_todano",
       "source": "candidates/levels/12_todano.c",
       "symbol": "LVL_12_TODANO_FUN_004497D8"
+    },
+    {
+      "address": 4495672,
+      "body_sha256": "97f4ee0c4a391c6587e1cc67bd2ae4a4c8c22a78c7b1bf9b82a4b19a25754ddc",
+      "catalogue": "config/level-native/12_todano.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_12_TODANO_FUN_00449938": "@@FUNCTION@@",
+        "LVL_12_TODANO_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_12_TODANO_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_12_TODANO_Fb7feb893_FUN_00364F58": "@@EXTERNAL_00364F58@@",
+        "LVL_12_TODANO_Fb7feb893_FUN_00446EF8": "@@EXTERNAL_00446EF8@@",
+        "LVL_12_TODANO_Fb7feb893_FUN_004470E8": "@@EXTERNAL_004470E8@@"
+      },
+      "level": "12_todano",
+      "normalized_body_sha256": "1107cb4300592ddddfab3f62c12f2f00b6e7946112688b2bd97056866cbd30a4",
+      "program": "levels/12_todano",
+      "source": "candidates/levels/12_todano.c",
+      "symbol": "LVL_12_TODANO_FUN_00449938"
     },
     {
       "address": 4496288,
@@ -44857,6 +45035,25 @@
       "symbol": "LVL_13_BOLDAN_FUN_004463E0"
     },
     {
+      "address": 4482368,
+      "body_sha256": "08fb5f45c55f06c1e7224fec12f5153fdd26d48096f2f39be47fae77e5a07721",
+      "catalogue": "config/level-native/13_boldan.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_13_BOLDAN_FUN_00446540": "@@FUNCTION@@",
+        "LVL_13_BOLDAN_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_13_BOLDAN_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_13_BOLDAN_Fc558ca70_FUN_00368FB0": "@@EXTERNAL_00368FB0@@",
+        "LVL_13_BOLDAN_Fc558ca70_FUN_00444850": "@@EXTERNAL_00444850@@",
+        "LVL_13_BOLDAN_Fc558ca70_FUN_00444A40": "@@EXTERNAL_00444A40@@"
+      },
+      "level": "13_boldan",
+      "normalized_body_sha256": "6d86bfe5ac2c2b31ba751afd66c287e374c40e9e2fcdb7fb8b83c308eef23b31",
+      "program": "levels/13_boldan",
+      "source": "candidates/levels/13_boldan.c",
+      "symbol": "LVL_13_BOLDAN_FUN_00446540"
+    },
+    {
       "address": 4484712,
       "body_sha256": "d6df81f1f368ef2edb1a1289afa86f189dcc6b4050b707fe44975dc0f796d805",
       "catalogue": "config/level-native/13_boldan.json",
@@ -44885,6 +45082,25 @@
       "program": "levels/13_boldan",
       "source": "candidates/levels/13_boldan.c",
       "symbol": "LVL_13_BOLDAN_FUN_00447130"
+    },
+    {
+      "address": 4485776,
+      "body_sha256": "25c56bd57d84b39b54ec587a3e6780163310c4c784a64f17bb59776a21912197",
+      "catalogue": "config/level-native/13_boldan.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_13_BOLDAN_FUN_00447290": "@@FUNCTION@@",
+        "LVL_13_BOLDAN_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_13_BOLDAN_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_13_BOLDAN_Fb7feb893_FUN_00368FB0": "@@EXTERNAL_00368FB0@@",
+        "LVL_13_BOLDAN_Fb7feb893_FUN_00444850": "@@EXTERNAL_00444850@@",
+        "LVL_13_BOLDAN_Fb7feb893_FUN_00444A40": "@@EXTERNAL_00444A40@@"
+      },
+      "level": "13_boldan",
+      "normalized_body_sha256": "de8eb2e58f52bbc86fbd994ebc9816595a1ca1bc26e15b85e9fcc432d8deb7b0",
+      "program": "levels/13_boldan",
+      "source": "candidates/levels/13_boldan.c",
+      "symbol": "LVL_13_BOLDAN_FUN_00447290"
     },
     {
       "address": 4486392,
@@ -48970,6 +49186,25 @@
       "symbol": "LVL_14_ARANOS_PRISON_FUN_004505D8"
     },
     {
+      "address": 4523832,
+      "body_sha256": "6bea1a5d4d59a029cf29ac1026c19d182a5d7f4bdb7c6e881e563b26240caf0a",
+      "catalogue": "config/level-native/14_aranos_prison.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_14_ARANOS_PRISON_FUN_00450738": "@@FUNCTION@@",
+        "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30": "@@EXTERNAL_00369C30@@",
+        "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EA48": "@@EXTERNAL_0044EA48@@",
+        "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EC38": "@@EXTERNAL_0044EC38@@"
+      },
+      "level": "14_aranos_prison",
+      "normalized_body_sha256": "e194740c383450f9eae500ab4e74452814b529be82aedef0b3a1b0ff239eb943",
+      "program": "levels/14_aranos_prison",
+      "source": "candidates/levels/14_aranos_prison.c",
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00450738"
+    },
+    {
       "address": 4526176,
       "body_sha256": "875a416894d76cdf5f168c55a71b3df5e1ca134351fc7ecb4a530a8ec190e01f",
       "catalogue": "config/level-native/14_aranos_prison.json",
@@ -48998,6 +49233,25 @@
       "program": "levels/14_aranos_prison",
       "source": "candidates/levels/14_aranos_prison.c",
       "symbol": "LVL_14_ARANOS_PRISON_FUN_00451328"
+    },
+    {
+      "address": 4527240,
+      "body_sha256": "e800197db5ae61b9e12af381f9961670cc1bc6d06c42eaada82fc51a48504a94",
+      "catalogue": "config/level-native/14_aranos_prison.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_14_ARANOS_PRISON_FUN_00451488": "@@FUNCTION@@",
+        "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30": "@@EXTERNAL_00369C30@@",
+        "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EA48": "@@EXTERNAL_0044EA48@@",
+        "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EC38": "@@EXTERNAL_0044EC38@@"
+      },
+      "level": "14_aranos_prison",
+      "normalized_body_sha256": "16f76794e66d6a3dd691ac57f0e3dcfe787c8480745011b3ca7694ac8c409d2c",
+      "program": "levels/14_aranos_prison",
+      "source": "candidates/levels/14_aranos_prison.c",
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00451488"
     },
     {
       "address": 4527856,
@@ -52961,6 +53215,25 @@
       "symbol": "LVL_15_GORN_FUN_0045A660"
     },
     {
+      "address": 4564928,
+      "body_sha256": "0287f998a565a738d9a1039189347971d8e4dabee8cf25f802f3cf9131cfc319",
+      "catalogue": "config/level-native/15_gorn.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_15_GORN_FUN_0045A7C0": "@@FUNCTION@@",
+        "LVL_15_GORN_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_15_GORN_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_15_GORN_Fc558ca70_FUN_003781D0": "@@EXTERNAL_003781D0@@",
+        "LVL_15_GORN_Fc558ca70_FUN_00458AD0": "@@EXTERNAL_00458AD0@@",
+        "LVL_15_GORN_Fc558ca70_FUN_00458CC0": "@@EXTERNAL_00458CC0@@"
+      },
+      "level": "15_gorn",
+      "normalized_body_sha256": "3c0ddb6655a6ceb112ae474ec6450b2037dc0943749b36e0f0c3f71dc0fbb2cb",
+      "program": "levels/15_gorn",
+      "source": "candidates/levels/15_gorn.c",
+      "symbol": "LVL_15_GORN_FUN_0045A7C0"
+    },
+    {
       "address": 4567272,
       "body_sha256": "0c7c8a06f96a322e9ffad68fd0b03e6b2ee555e13ac6b3649ce5b78e00f042f4",
       "catalogue": "config/level-native/15_gorn.json",
@@ -52989,6 +53262,25 @@
       "program": "levels/15_gorn",
       "source": "candidates/levels/15_gorn.c",
       "symbol": "LVL_15_GORN_FUN_0045B3B0"
+    },
+    {
+      "address": 4568336,
+      "body_sha256": "d55a5e1df7078b1323a0b444d69f7fabfff9b1dc5d455f07c38cbd42525c2340",
+      "catalogue": "config/level-native/15_gorn.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_15_GORN_FUN_0045B510": "@@FUNCTION@@",
+        "LVL_15_GORN_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_15_GORN_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_15_GORN_Fb7feb893_FUN_003781D0": "@@EXTERNAL_003781D0@@",
+        "LVL_15_GORN_Fb7feb893_FUN_00458AD0": "@@EXTERNAL_00458AD0@@",
+        "LVL_15_GORN_Fb7feb893_FUN_00458CC0": "@@EXTERNAL_00458CC0@@"
+      },
+      "level": "15_gorn",
+      "normalized_body_sha256": "7e4b76484ed22883d05de12dcfc18e61bfdccab46b2f76df5eda1c97115f6dec",
+      "program": "levels/15_gorn",
+      "source": "candidates/levels/15_gorn.c",
+      "symbol": "LVL_15_GORN_FUN_0045B510"
     },
     {
       "address": 4568952,
@@ -56918,6 +57210,25 @@
       "symbol": "LVL_16_SNIVELAK_FUN_0043DD30"
     },
     {
+      "address": 4447888,
+      "body_sha256": "1c704f86bc3ccde9d8dbce60424a8bfe4c4baca02ef4bf01ac8313cf52755733",
+      "catalogue": "config/level-native/16_snivelak.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_16_SNIVELAK_FUN_0043DE90": "@@FUNCTION@@",
+        "LVL_16_SNIVELAK_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_16_SNIVELAK_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_16_SNIVELAK_Fc558ca70_FUN_003573E8": "@@EXTERNAL_003573E8@@",
+        "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C1A0": "@@EXTERNAL_0043C1A0@@",
+        "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C390": "@@EXTERNAL_0043C390@@"
+      },
+      "level": "16_snivelak",
+      "normalized_body_sha256": "21c18d0b22e05fefea75d95b3f518977a30242769c9340f75a56934f38327098",
+      "program": "levels/16_snivelak",
+      "source": "candidates/levels/16_snivelak.c",
+      "symbol": "LVL_16_SNIVELAK_FUN_0043DE90"
+    },
+    {
       "address": 4450232,
       "body_sha256": "ea20b5322fe70736c6405284006651b97cf4bfbb775ca66c7279590a97070ad6",
       "catalogue": "config/level-native/16_snivelak.json",
@@ -56946,6 +57257,25 @@
       "program": "levels/16_snivelak",
       "source": "candidates/levels/16_snivelak.c",
       "symbol": "LVL_16_SNIVELAK_FUN_0043EA80"
+    },
+    {
+      "address": 4451296,
+      "body_sha256": "fa658a9f4265489f104c3ffa24a8bc5dca172331d31d9d8fb6c6677e4f05f8e6",
+      "catalogue": "config/level-native/16_snivelak.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_16_SNIVELAK_FUN_0043EBE0": "@@FUNCTION@@",
+        "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_16_SNIVELAK_Fb7feb893_FUN_003573E8": "@@EXTERNAL_003573E8@@",
+        "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C1A0": "@@EXTERNAL_0043C1A0@@",
+        "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C390": "@@EXTERNAL_0043C390@@"
+      },
+      "level": "16_snivelak",
+      "normalized_body_sha256": "62b110b6e4b5730ba7d329349c7d41be5a47420c6ec1b735b50e6201397c7716",
+      "program": "levels/16_snivelak",
+      "source": "candidates/levels/16_snivelak.c",
+      "symbol": "LVL_16_SNIVELAK_FUN_0043EBE0"
     },
     {
       "address": 4451912,
@@ -60891,6 +61221,25 @@
       "symbol": "LVL_17_SMOLG_FUN_0043EDB8"
     },
     {
+      "address": 4452120,
+      "body_sha256": "0acdd27c0171868bc561fc5233fd53dba016ad564205b92f025965f5937f959e",
+      "catalogue": "config/level-native/17_smolg.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_17_SMOLG_FUN_0043EF18": "@@FUNCTION@@",
+        "LVL_17_SMOLG_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_17_SMOLG_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_17_SMOLG_Fc558ca70_FUN_00362B18": "@@EXTERNAL_00362B18@@",
+        "LVL_17_SMOLG_Fc558ca70_FUN_0043D228": "@@EXTERNAL_0043D228@@",
+        "LVL_17_SMOLG_Fc558ca70_FUN_0043D418": "@@EXTERNAL_0043D418@@"
+      },
+      "level": "17_smolg",
+      "normalized_body_sha256": "a7396c1b9b4e9f7ae1e62966c1d252c4e2c9d0ba2ba3f16142b6fbe6987622e6",
+      "program": "levels/17_smolg",
+      "source": "candidates/levels/17_smolg.c",
+      "symbol": "LVL_17_SMOLG_FUN_0043EF18"
+    },
+    {
       "address": 4454464,
       "body_sha256": "758bdc36dbc34f60deb1e5ebf4e8fa0b3ecf550a74f35a98bf998c7ce9cc6d60",
       "catalogue": "config/level-native/17_smolg.json",
@@ -60919,6 +61268,25 @@
       "program": "levels/17_smolg",
       "source": "candidates/levels/17_smolg.c",
       "symbol": "LVL_17_SMOLG_FUN_0043FB08"
+    },
+    {
+      "address": 4455528,
+      "body_sha256": "2de0201d82e5365201ad7fa237e6630f5f79f501f63e56f0d761f18fb4500c37",
+      "catalogue": "config/level-native/17_smolg.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_17_SMOLG_FUN_0043FC68": "@@FUNCTION@@",
+        "LVL_17_SMOLG_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_17_SMOLG_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_17_SMOLG_Fb7feb893_FUN_00362B18": "@@EXTERNAL_00362B18@@",
+        "LVL_17_SMOLG_Fb7feb893_FUN_0043D228": "@@EXTERNAL_0043D228@@",
+        "LVL_17_SMOLG_Fb7feb893_FUN_0043D418": "@@EXTERNAL_0043D418@@"
+      },
+      "level": "17_smolg",
+      "normalized_body_sha256": "887e66d66aaf1642b19abc8dd493cdddcc75149a255d295450883b2bdd0686ea",
+      "program": "levels/17_smolg",
+      "source": "candidates/levels/17_smolg.c",
+      "symbol": "LVL_17_SMOLG_FUN_0043FC68"
     },
     {
       "address": 4456144,
@@ -64863,6 +65231,25 @@
       "symbol": "LVL_18_DAMOSEL_FUN_0045FAB0"
     },
     {
+      "address": 4586512,
+      "body_sha256": "d7b29f04a02426ad87429f1f728aff95aa25bbb43e20c3d029d04e50f402b03e",
+      "catalogue": "config/level-native/18_damosel.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_18_DAMOSEL_FUN_0045FC10": "@@FUNCTION@@",
+        "LVL_18_DAMOSEL_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_18_DAMOSEL_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_18_DAMOSEL_Fc558ca70_FUN_0037B810": "@@EXTERNAL_0037B810@@",
+        "LVL_18_DAMOSEL_Fc558ca70_FUN_0045DF20": "@@EXTERNAL_0045DF20@@",
+        "LVL_18_DAMOSEL_Fc558ca70_FUN_0045E110": "@@EXTERNAL_0045E110@@"
+      },
+      "level": "18_damosel",
+      "normalized_body_sha256": "ba5b3aa6b91a3f5da1540a306c0d006ad1246972d274d7976d7f6bafd62a3adb",
+      "program": "levels/18_damosel",
+      "source": "candidates/levels/18_damosel.c",
+      "symbol": "LVL_18_DAMOSEL_FUN_0045FC10"
+    },
+    {
       "address": 4588856,
       "body_sha256": "1872dc730ad6843e32034f45fd23ac2cb8acd0ef24598611773bda5f20c38251",
       "catalogue": "config/level-native/18_damosel.json",
@@ -64891,6 +65278,25 @@
       "program": "levels/18_damosel",
       "source": "candidates/levels/18_damosel.c",
       "symbol": "LVL_18_DAMOSEL_FUN_00460800"
+    },
+    {
+      "address": 4589920,
+      "body_sha256": "0a0d50e9c2b9242d789b6f38a976b0d80da4f63469f67a503b1eb162eb9ad4ca",
+      "catalogue": "config/level-native/18_damosel.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_18_DAMOSEL_FUN_00460960": "@@FUNCTION@@",
+        "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_18_DAMOSEL_Fb7feb893_FUN_0037B810": "@@EXTERNAL_0037B810@@",
+        "LVL_18_DAMOSEL_Fb7feb893_FUN_0045DF20": "@@EXTERNAL_0045DF20@@",
+        "LVL_18_DAMOSEL_Fb7feb893_FUN_0045E110": "@@EXTERNAL_0045E110@@"
+      },
+      "level": "18_damosel",
+      "normalized_body_sha256": "91977a16b6be33e0835d6b86a52d1f979282b51c04886e659ac878f76e207777",
+      "program": "levels/18_damosel",
+      "source": "candidates/levels/18_damosel.c",
+      "symbol": "LVL_18_DAMOSEL_FUN_00460960"
     },
     {
       "address": 4590536,
@@ -68764,6 +69170,25 @@
       "symbol": "LVL_19_GRELBIN_FUN_00443690"
     },
     {
+      "address": 4470768,
+      "body_sha256": "57ae9387f8576ca5a5d43b8dde36d899dfde1752a3fe31ec5616bd67ee6baa7f",
+      "catalogue": "config/level-native/19_grelbin.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_19_GRELBIN_FUN_004437F0": "@@FUNCTION@@",
+        "LVL_19_GRELBIN_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_19_GRELBIN_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_19_GRELBIN_Fc558ca70_FUN_0035D538": "@@EXTERNAL_0035D538@@",
+        "LVL_19_GRELBIN_Fc558ca70_FUN_00441B00": "@@EXTERNAL_00441B00@@",
+        "LVL_19_GRELBIN_Fc558ca70_FUN_00441CF0": "@@EXTERNAL_00441CF0@@"
+      },
+      "level": "19_grelbin",
+      "normalized_body_sha256": "8d83835385bf114f5134ec1137bd5089494ac888986aeca74c18259fe1115365",
+      "program": "levels/19_grelbin",
+      "source": "candidates/levels/19_grelbin.c",
+      "symbol": "LVL_19_GRELBIN_FUN_004437F0"
+    },
+    {
       "address": 4473112,
       "body_sha256": "4efc02676fb594fc0b53784cf89a7edab5a7f7889cbf7abb74613143f8232798",
       "catalogue": "config/level-native/19_grelbin.json",
@@ -68792,6 +69217,25 @@
       "program": "levels/19_grelbin",
       "source": "candidates/levels/19_grelbin.c",
       "symbol": "LVL_19_GRELBIN_FUN_004443E0"
+    },
+    {
+      "address": 4474176,
+      "body_sha256": "87b93ab8ccaa7ab1e4d9211f0b450e4ecdd7076179a8f4fd1a7aaf26c710b054",
+      "catalogue": "config/level-native/19_grelbin.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_19_GRELBIN_FUN_00444540": "@@FUNCTION@@",
+        "LVL_19_GRELBIN_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_19_GRELBIN_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_19_GRELBIN_Fb7feb893_FUN_0035D538": "@@EXTERNAL_0035D538@@",
+        "LVL_19_GRELBIN_Fb7feb893_FUN_00441B00": "@@EXTERNAL_00441B00@@",
+        "LVL_19_GRELBIN_Fb7feb893_FUN_00441CF0": "@@EXTERNAL_00441CF0@@"
+      },
+      "level": "19_grelbin",
+      "normalized_body_sha256": "d4fd6b3bc2515044ac37cba85ce0c7a01ac48d3f3ce7b09686e862b40f60a60e",
+      "program": "levels/19_grelbin",
+      "source": "candidates/levels/19_grelbin.c",
+      "symbol": "LVL_19_GRELBIN_FUN_00444540"
     },
     {
       "address": 4474792,
@@ -72493,6 +72937,25 @@
       "symbol": "LVL_1_OOZLA_FUN_004352F0"
     },
     {
+      "address": 4412496,
+      "body_sha256": "e67e6c2fe9075278db5c7481fea12c59d9f5d3babb15d4e2f4f3256d83e96d39",
+      "catalogue": "config/level-native/1_oozla.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_1_OOZLA_FUN_00435450": "@@FUNCTION@@",
+        "LVL_1_OOZLA_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_1_OOZLA_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_1_OOZLA_Fc558ca70_FUN_003558E0": "@@EXTERNAL_003558E0@@",
+        "LVL_1_OOZLA_Fc558ca70_FUN_00433760": "@@EXTERNAL_00433760@@",
+        "LVL_1_OOZLA_Fc558ca70_FUN_00433950": "@@EXTERNAL_00433950@@"
+      },
+      "level": "1_oozla",
+      "normalized_body_sha256": "fdfb42a25e31706937c178b60bdf9e2a9f496161c54a23c3955000a9b6556088",
+      "program": "levels/1_oozla",
+      "source": "candidates/levels/1_oozla.c",
+      "symbol": "LVL_1_OOZLA_FUN_00435450"
+    },
+    {
       "address": 4414840,
       "body_sha256": "3b6d677878aabb7e4b50b179c2fa5cab707c97e7e54aa5fb8b53b2f3f4b9b34e",
       "catalogue": "config/level-native/1_oozla.json",
@@ -72521,6 +72984,25 @@
       "program": "levels/1_oozla",
       "source": "candidates/levels/1_oozla.c",
       "symbol": "LVL_1_OOZLA_FUN_00436040"
+    },
+    {
+      "address": 4415904,
+      "body_sha256": "6de7568638b11e9a4c1ea52d4446e5ab68cdb6b98a7af60a028270980f2d7999",
+      "catalogue": "config/level-native/1_oozla.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_1_OOZLA_FUN_004361A0": "@@FUNCTION@@",
+        "LVL_1_OOZLA_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_1_OOZLA_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_1_OOZLA_Fb7feb893_FUN_003558E0": "@@EXTERNAL_003558E0@@",
+        "LVL_1_OOZLA_Fb7feb893_FUN_00433760": "@@EXTERNAL_00433760@@",
+        "LVL_1_OOZLA_Fb7feb893_FUN_00433950": "@@EXTERNAL_00433950@@"
+      },
+      "level": "1_oozla",
+      "normalized_body_sha256": "9de95fb57eb6e5ca92b7e1eec39ed5c631c586caef82526331f35423a66af470",
+      "program": "levels/1_oozla",
+      "source": "candidates/levels/1_oozla.c",
+      "symbol": "LVL_1_OOZLA_FUN_004361A0"
     },
     {
       "address": 4416520,
@@ -76510,6 +76992,25 @@
       "symbol": "LVL_20_YEEDIL_FUN_00469458"
     },
     {
+      "address": 4625848,
+      "body_sha256": "565368f3bcf2f28729bfff93c1ee780feba5cdba86a0b2a8e1d0f32a114aff79",
+      "catalogue": "config/level-native/20_yeedil.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_20_YEEDIL_FUN_004695B8": "@@FUNCTION@@",
+        "LVL_20_YEEDIL_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_20_YEEDIL_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_20_YEEDIL_Fc558ca70_FUN_003755E0": "@@EXTERNAL_003755E0@@",
+        "LVL_20_YEEDIL_Fc558ca70_FUN_004678C8": "@@EXTERNAL_004678C8@@",
+        "LVL_20_YEEDIL_Fc558ca70_FUN_00467AB8": "@@EXTERNAL_00467AB8@@"
+      },
+      "level": "20_yeedil",
+      "normalized_body_sha256": "d4045d7547547f2a4910c33ee3d75bab0f5c2c9b6de0920a9d883e2d637096fa",
+      "program": "levels/20_yeedil",
+      "source": "candidates/levels/20_yeedil.c",
+      "symbol": "LVL_20_YEEDIL_FUN_004695B8"
+    },
+    {
       "address": 4628192,
       "body_sha256": "47d12a4eb58b6ade5a8e5dac6f84fd545256cf127b9186e19a3f305bd5cf2aac",
       "catalogue": "config/level-native/20_yeedil.json",
@@ -76538,6 +77039,25 @@
       "program": "levels/20_yeedil",
       "source": "candidates/levels/20_yeedil.c",
       "symbol": "LVL_20_YEEDIL_FUN_0046A1A8"
+    },
+    {
+      "address": 4629256,
+      "body_sha256": "ed6eb64b3a1cbd441a8a9551b818de91bb7f39825effc9d3f68982e68aef358d",
+      "catalogue": "config/level-native/20_yeedil.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_20_YEEDIL_FUN_0046A308": "@@FUNCTION@@",
+        "LVL_20_YEEDIL_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_20_YEEDIL_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_20_YEEDIL_Fb7feb893_FUN_003755E0": "@@EXTERNAL_003755E0@@",
+        "LVL_20_YEEDIL_Fb7feb893_FUN_004678C8": "@@EXTERNAL_004678C8@@",
+        "LVL_20_YEEDIL_Fb7feb893_FUN_00467AB8": "@@EXTERNAL_00467AB8@@"
+      },
+      "level": "20_yeedil",
+      "normalized_body_sha256": "dfccc77e66cafc025bcb2598bf842662ee25c25f307adc9cb2801659191ba918",
+      "program": "levels/20_yeedil",
+      "source": "candidates/levels/20_yeedil.c",
+      "symbol": "LVL_20_YEEDIL_FUN_0046A308"
     },
     {
       "address": 4629872,
@@ -80484,6 +81004,25 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00432CE8"
     },
     {
+      "address": 4402760,
+      "body_sha256": "d3557b29e37fa48dc96739714e9f7867ac452d76c6c5fec963b5e350629f828b",
+      "catalogue": "config/level-native/22_dobbo_orbit.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_22_DOBBO_ORBIT_FUN_00432E48": "@@FUNCTION@@",
+        "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00362E98": "@@EXTERNAL_00362E98@@",
+        "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431158": "@@EXTERNAL_00431158@@",
+        "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431348": "@@EXTERNAL_00431348@@"
+      },
+      "level": "22_dobbo_orbit",
+      "normalized_body_sha256": "d0f297a097299d75d2e9d9909aba93526116b3d391f377a4e997f3ed0145fa1e",
+      "program": "levels/22_dobbo_orbit",
+      "source": "candidates/levels/22_dobbo_orbit.c",
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00432E48"
+    },
+    {
       "address": 4405104,
       "body_sha256": "c73748e89b1b3e242a934be7e08b4a541a2f81fede97be34eb1c0bb1f4b56068",
       "catalogue": "config/level-native/22_dobbo_orbit.json",
@@ -80512,6 +81051,25 @@
       "program": "levels/22_dobbo_orbit",
       "source": "candidates/levels/22_dobbo_orbit.c",
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00433A38"
+    },
+    {
+      "address": 4406168,
+      "body_sha256": "49ce990335c4d1b3170883a455a6c5db0e6fb8b3461b9acdafbd9353e11bc066",
+      "catalogue": "config/level-native/22_dobbo_orbit.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_22_DOBBO_ORBIT_FUN_00433B98": "@@FUNCTION@@",
+        "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00362E98": "@@EXTERNAL_00362E98@@",
+        "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431158": "@@EXTERNAL_00431158@@",
+        "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431348": "@@EXTERNAL_00431348@@"
+      },
+      "level": "22_dobbo_orbit",
+      "normalized_body_sha256": "09d52d7a51e5a342b15fe7f692aa970113babb209b32fb44b0303261d6f199c4",
+      "program": "levels/22_dobbo_orbit",
+      "source": "candidates/levels/22_dobbo_orbit.c",
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00433B98"
     },
     {
       "address": 4406784,
@@ -84444,6 +85002,25 @@
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00448320"
     },
     {
+      "address": 4490368,
+      "body_sha256": "03628140445bb59e54a1db2e6a03f9ac65958bc1ea94d8f13eccb3d901ae4bf8",
+      "catalogue": "config/level-native/23_damosel_orbit.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_23_DAMOSEL_ORBIT_FUN_00448480": "@@FUNCTION@@",
+        "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_003675B0": "@@EXTERNAL_003675B0@@",
+        "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446790": "@@EXTERNAL_00446790@@",
+        "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446980": "@@EXTERNAL_00446980@@"
+      },
+      "level": "23_damosel_orbit",
+      "normalized_body_sha256": "d8f399a485e73710bc7a6a31e8eb127d063338e9c48a96e25ffc1966f6476fbc",
+      "program": "levels/23_damosel_orbit",
+      "source": "candidates/levels/23_damosel_orbit.c",
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00448480"
+    },
+    {
       "address": 4492712,
       "body_sha256": "4b098686c33ce046061077e34fb452770d7e29e2bc6adc2a8fe4e20b15a8d143",
       "catalogue": "config/level-native/23_damosel_orbit.json",
@@ -84472,6 +85049,25 @@
       "program": "levels/23_damosel_orbit",
       "source": "candidates/levels/23_damosel_orbit.c",
       "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_00449070"
+    },
+    {
+      "address": 4493776,
+      "body_sha256": "269e7bdf3ecbac7652eae7cb436bdf53cbde44531e5ed1606c76bd869da2f30b",
+      "catalogue": "config/level-native/23_damosel_orbit.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_23_DAMOSEL_ORBIT_FUN_004491D0": "@@FUNCTION@@",
+        "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_003675B0": "@@EXTERNAL_003675B0@@",
+        "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446790": "@@EXTERNAL_00446790@@",
+        "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446980": "@@EXTERNAL_00446980@@"
+      },
+      "level": "23_damosel_orbit",
+      "normalized_body_sha256": "e6074b382022e074266efd99fe6dd156498a9dc2709247499cacdc0f4c8449c5",
+      "program": "levels/23_damosel_orbit",
+      "source": "candidates/levels/23_damosel_orbit.c",
+      "symbol": "LVL_23_DAMOSEL_ORBIT_FUN_004491D0"
     },
     {
       "address": 4494392,
@@ -88633,6 +89229,25 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_004111D0"
     },
     {
+      "address": 4264752,
+      "body_sha256": "10ff43493efdfa174c97f9a84d962af53d6adc073789e7999c24ebc0452c8f97",
+      "catalogue": "config/level-native/24_ship_shack.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_24_SHIP_SHACK_FUN_00411330": "@@FUNCTION@@",
+        "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_24_SHIP_SHACK_Fc558ca70_FUN_00356B70": "@@EXTERNAL_00356B70@@",
+        "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F640": "@@EXTERNAL_0040F640@@",
+        "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F830": "@@EXTERNAL_0040F830@@"
+      },
+      "level": "24_ship_shack",
+      "normalized_body_sha256": "c4eb7c51f5df5b9da72f8dea3043899ae012adf6f7e45a341a84b44eed24f957",
+      "program": "levels/24_ship_shack",
+      "source": "candidates/levels/24_ship_shack.c",
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00411330"
+    },
+    {
       "address": 4267096,
       "body_sha256": "e9af4a6b22fde964fc08b37931f3ebc2b20354840815cdfdd35dd0a0cf8434f1",
       "catalogue": "config/level-native/24_ship_shack.json",
@@ -88661,6 +89276,25 @@
       "program": "levels/24_ship_shack",
       "source": "candidates/levels/24_ship_shack.c",
       "symbol": "LVL_24_SHIP_SHACK_FUN_00411F20"
+    },
+    {
+      "address": 4268160,
+      "body_sha256": "99698b9364949722dacdae12528238010c33db709bd27cc6d87357b2ec432ff0",
+      "catalogue": "config/level-native/24_ship_shack.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_24_SHIP_SHACK_FUN_00412080": "@@FUNCTION@@",
+        "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_24_SHIP_SHACK_Fb7feb893_FUN_00356B70": "@@EXTERNAL_00356B70@@",
+        "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F640": "@@EXTERNAL_0040F640@@",
+        "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F830": "@@EXTERNAL_0040F830@@"
+      },
+      "level": "24_ship_shack",
+      "normalized_body_sha256": "bef1df20c4451b0e04ec97ea01c6a158b268bb95f602a06a7128200f90758b28",
+      "program": "levels/24_ship_shack",
+      "source": "candidates/levels/24_ship_shack.c",
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00412080"
     },
     {
       "address": 4268776,
@@ -92617,6 +93251,25 @@
       "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043E968"
     },
     {
+      "address": 4451016,
+      "body_sha256": "f844d6fb2bc29347e9f14f23d0b4b9e582464d1b8c75d58ea5f441a1b7e82b5c",
+      "catalogue": "config/level-native/25_wupash_nebula.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_25_WUPASH_NEBULA_FUN_0043EAC8": "@@FUNCTION@@",
+        "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0": "@@EXTERNAL_0036BAA0@@",
+        "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CDD8": "@@EXTERNAL_0043CDD8@@",
+        "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CFC8": "@@EXTERNAL_0043CFC8@@"
+      },
+      "level": "25_wupash_nebula",
+      "normalized_body_sha256": "39ececc6b0b45d0dfa877690fdef69404daca0d35aaaeeee055dc96cfd2c3dae",
+      "program": "levels/25_wupash_nebula",
+      "source": "candidates/levels/25_wupash_nebula.c",
+      "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043EAC8"
+    },
+    {
       "address": 4453360,
       "body_sha256": "43975669a6701d495d0b14f90f4516bec9e815398197c105e2b0571a573284eb",
       "catalogue": "config/level-native/25_wupash_nebula.json",
@@ -92645,6 +93298,25 @@
       "program": "levels/25_wupash_nebula",
       "source": "candidates/levels/25_wupash_nebula.c",
       "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043F6B8"
+    },
+    {
+      "address": 4454424,
+      "body_sha256": "c45c1fcf468264fa81833c622c5fb7a68181d43578ccb823ecfe4e01989192c2",
+      "catalogue": "config/level-native/25_wupash_nebula.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_25_WUPASH_NEBULA_FUN_0043F818": "@@FUNCTION@@",
+        "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0": "@@EXTERNAL_0036BAA0@@",
+        "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CDD8": "@@EXTERNAL_0043CDD8@@",
+        "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CFC8": "@@EXTERNAL_0043CFC8@@"
+      },
+      "level": "25_wupash_nebula",
+      "normalized_body_sha256": "4807736e7878068905fd9ea05c8d61088932003a368eae1e5ca77721a0dd6412",
+      "program": "levels/25_wupash_nebula",
+      "source": "candidates/levels/25_wupash_nebula.c",
+      "symbol": "LVL_25_WUPASH_NEBULA_FUN_0043F818"
     },
     {
       "address": 4455040,
@@ -96577,6 +97249,25 @@
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_00424880"
     },
     {
+      "address": 4344288,
+      "body_sha256": "47af7c252c12e714e8b9ecfb74871ef4f3c1fbd98474e9c16efeda3ddb9ca3bc",
+      "catalogue": "config/level-native/26_jamming_array.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_26_JAMMING_ARRAY_FUN_004249E0": "@@FUNCTION@@",
+        "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_0035EEF8": "@@EXTERNAL_0035EEF8@@",
+        "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422CF0": "@@EXTERNAL_00422CF0@@",
+        "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422EE0": "@@EXTERNAL_00422EE0@@"
+      },
+      "level": "26_jamming_array",
+      "normalized_body_sha256": "3aebd2b6fb59bbc2a1557922d764457760a733fc055a3aed00ab5dff4da1ee30",
+      "program": "levels/26_jamming_array",
+      "source": "candidates/levels/26_jamming_array.c",
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_004249E0"
+    },
+    {
       "address": 4346632,
       "body_sha256": "e51423d3f8f9bb58e60a6a7aa1f9df7846f13efb397d6756e0ab80eaf63711e6",
       "catalogue": "config/level-native/26_jamming_array.json",
@@ -96605,6 +97296,25 @@
       "program": "levels/26_jamming_array",
       "source": "candidates/levels/26_jamming_array.c",
       "symbol": "LVL_26_JAMMING_ARRAY_FUN_004255D0"
+    },
+    {
+      "address": 4347696,
+      "body_sha256": "eff4cf62e6e30720419c1d5998c50e47b989e147019183597099dd772a2924cb",
+      "catalogue": "config/level-native/26_jamming_array.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_26_JAMMING_ARRAY_FUN_00425730": "@@FUNCTION@@",
+        "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_0035EEF8": "@@EXTERNAL_0035EEF8@@",
+        "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422CF0": "@@EXTERNAL_00422CF0@@",
+        "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422EE0": "@@EXTERNAL_00422EE0@@"
+      },
+      "level": "26_jamming_array",
+      "normalized_body_sha256": "ef5604898cb9fe00667406a6392106c83a1ca0ee6ff88cf5e6ff0fe02f5653f6",
+      "program": "levels/26_jamming_array",
+      "source": "candidates/levels/26_jamming_array.c",
+      "symbol": "LVL_26_JAMMING_ARRAY_FUN_00425730"
     },
     {
       "address": 4348312,
@@ -100566,6 +101276,25 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045D720"
     },
     {
+      "address": 4577408,
+      "body_sha256": "772e6d70f03c438103802c178e2a69e365fcc5905d928eb55fa1dbed41499cf3",
+      "catalogue": "config/level-native/2_maktar_nebula.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_2_MAKTAR_NEBULA_FUN_0045D880": "@@FUNCTION@@",
+        "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90": "@@EXTERNAL_00366C90@@",
+        "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BB90": "@@EXTERNAL_0045BB90@@",
+        "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BD80": "@@EXTERNAL_0045BD80@@"
+      },
+      "level": "2_maktar_nebula",
+      "normalized_body_sha256": "643cfc366a66ecb1f551d11ae15c234a6c00dd01bfdcf5d786c98be9a243d327",
+      "program": "levels/2_maktar_nebula",
+      "source": "candidates/levels/2_maktar_nebula.c",
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045D880"
+    },
+    {
       "address": 4579752,
       "body_sha256": "9392c656eb0ca538228eb522392dec35d4da8249bf757f7db06619d0ef5b3e55",
       "catalogue": "config/level-native/2_maktar_nebula.json",
@@ -100594,6 +101323,25 @@
       "program": "levels/2_maktar_nebula",
       "source": "candidates/levels/2_maktar_nebula.c",
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E470"
+    },
+    {
+      "address": 4580816,
+      "body_sha256": "4eb732a26ebdf46bda189a5d275e3ec3d4e4fd30a2b1f0c63402c43d5af30abb",
+      "catalogue": "config/level-native/2_maktar_nebula.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_2_MAKTAR_NEBULA_FUN_0045E5D0": "@@FUNCTION@@",
+        "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90": "@@EXTERNAL_00366C90@@",
+        "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BB90": "@@EXTERNAL_0045BB90@@",
+        "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BD80": "@@EXTERNAL_0045BD80@@"
+      },
+      "level": "2_maktar_nebula",
+      "normalized_body_sha256": "f70aa86f877cedb5e5c0008cc94356117311acb3f46ab744a07dac8527296744",
+      "program": "levels/2_maktar_nebula",
+      "source": "candidates/levels/2_maktar_nebula.c",
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E5D0"
     },
     {
       "address": 4581432,
@@ -104512,6 +105260,25 @@
       "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_00435EC0"
     },
     {
+      "address": 4415520,
+      "body_sha256": "3ce0313a355472b2af6671df1f6f7e5d22f4d065f7e31ce913666e31f6a72990",
+      "catalogue": "config/level-native/30_insomniac_museum.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_30_INSOMNIAC_MUSEUM_FUN_00436020": "@@FUNCTION@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_0035FF10": "@@EXTERNAL_0035FF10@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_00434330": "@@EXTERNAL_00434330@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_00434520": "@@EXTERNAL_00434520@@"
+      },
+      "level": "30_insomniac_museum",
+      "normalized_body_sha256": "318c9b07aa86d709913b2dfee01fd4396def5aa7c20aee3117d6390887793893",
+      "program": "levels/30_insomniac_museum",
+      "source": "candidates/levels/30_insomniac_museum.c",
+      "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_00436020"
+    },
+    {
       "address": 4417864,
       "body_sha256": "66e2bd47425c45059ab6f412cb45167e96763031d119b09729382f57bfa54ebc",
       "catalogue": "config/level-native/30_insomniac_museum.json",
@@ -104540,6 +105307,25 @@
       "program": "levels/30_insomniac_museum",
       "source": "candidates/levels/30_insomniac_museum.c",
       "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_00436C10"
+    },
+    {
+      "address": 4418928,
+      "body_sha256": "99137a445cdf61cda9499ca13cb76ec105a68827a695de8cdc24f64460eaa085",
+      "catalogue": "config/level-native/30_insomniac_museum.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_30_INSOMNIAC_MUSEUM_FUN_00436D70": "@@FUNCTION@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_0035FF10": "@@EXTERNAL_0035FF10@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_00434330": "@@EXTERNAL_00434330@@",
+        "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_00434520": "@@EXTERNAL_00434520@@"
+      },
+      "level": "30_insomniac_museum",
+      "normalized_body_sha256": "7a0fcf4c236628984a3ba7eb98bc9ba628709b8aaa4d3447ee00f73c624f6ffd",
+      "program": "levels/30_insomniac_museum",
+      "source": "candidates/levels/30_insomniac_museum.c",
+      "symbol": "LVL_30_INSOMNIAC_MUSEUM_FUN_00436D70"
     },
     {
       "address": 4419544,
@@ -108497,6 +109283,25 @@
       "symbol": "LVL_3_ENDAKO_FUN_00443258"
     },
     {
+      "address": 4469688,
+      "body_sha256": "52506b8f50d99ed7942b54f014322c5d28e6b8dfb7349d263f8f047c33c8f039",
+      "catalogue": "config/level-native/3_endako.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_3_ENDAKO_FUN_004433B8": "@@FUNCTION@@",
+        "LVL_3_ENDAKO_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_3_ENDAKO_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_3_ENDAKO_Fc558ca70_FUN_00360BE0": "@@EXTERNAL_00360BE0@@",
+        "LVL_3_ENDAKO_Fc558ca70_FUN_004416C8": "@@EXTERNAL_004416C8@@",
+        "LVL_3_ENDAKO_Fc558ca70_FUN_004418B8": "@@EXTERNAL_004418B8@@"
+      },
+      "level": "3_endako",
+      "normalized_body_sha256": "292898257e1a3912697b8aee4a2c392ad4eddb6efe16e351f10a57cf43e4c29e",
+      "program": "levels/3_endako",
+      "source": "candidates/levels/3_endako.c",
+      "symbol": "LVL_3_ENDAKO_FUN_004433B8"
+    },
+    {
       "address": 4472032,
       "body_sha256": "f98fc87f91d8a7f03bd634dac79ab15b4c6a87d5bc10bdc308720961d8eaa45f",
       "catalogue": "config/level-native/3_endako.json",
@@ -108525,6 +109330,25 @@
       "program": "levels/3_endako",
       "source": "candidates/levels/3_endako.c",
       "symbol": "LVL_3_ENDAKO_FUN_00443FA8"
+    },
+    {
+      "address": 4473096,
+      "body_sha256": "e029356b2b11d387a600267b9608a62a43f7689597d2d93522f6913cc7449c10",
+      "catalogue": "config/level-native/3_endako.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_3_ENDAKO_FUN_00444108": "@@FUNCTION@@",
+        "LVL_3_ENDAKO_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_3_ENDAKO_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_3_ENDAKO_Fb7feb893_FUN_00360BE0": "@@EXTERNAL_00360BE0@@",
+        "LVL_3_ENDAKO_Fb7feb893_FUN_004416C8": "@@EXTERNAL_004416C8@@",
+        "LVL_3_ENDAKO_Fb7feb893_FUN_004418B8": "@@EXTERNAL_004418B8@@"
+      },
+      "level": "3_endako",
+      "normalized_body_sha256": "a4d764894466be13e7a91118b96fe81b9014d2eaf7a25b9d247fe759ab156cf7",
+      "program": "levels/3_endako",
+      "source": "candidates/levels/3_endako.c",
+      "symbol": "LVL_3_ENDAKO_FUN_00444108"
     },
     {
       "address": 4473712,
@@ -114402,6 +115226,25 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044D9E0"
     },
     {
+      "address": 4512576,
+      "body_sha256": "f383870aacd095ca87fab7f7371c7cd14cd388de9aea95c38a32d510e6e3fb0b",
+      "catalogue": "config/level-native/5_feltzin_system.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_5_FELTZIN_SYSTEM_FUN_0044DB40": "@@FUNCTION@@",
+        "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_00371A60": "@@EXTERNAL_00371A60@@",
+        "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044BE50": "@@EXTERNAL_0044BE50@@",
+        "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044C040": "@@EXTERNAL_0044C040@@"
+      },
+      "level": "5_feltzin_system",
+      "normalized_body_sha256": "80c4719b94e5a558fa3718f1c7adef2d37d11c7ba0e88e25c7f2f59c75c002e4",
+      "program": "levels/5_feltzin_system",
+      "source": "candidates/levels/5_feltzin_system.c",
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044DB40"
+    },
+    {
       "address": 4514920,
       "body_sha256": "1c82163adc46785d4df35e62382b6c2c86087afa25b233f7c95debb34b1ad51c",
       "catalogue": "config/level-native/5_feltzin_system.json",
@@ -114430,6 +115273,25 @@
       "program": "levels/5_feltzin_system",
       "source": "candidates/levels/5_feltzin_system.c",
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044E730"
+    },
+    {
+      "address": 4515984,
+      "body_sha256": "32481ae761fda078bd56fcfb8c8b0f81a61577f6ca08bb76636f1a34b39c0145",
+      "catalogue": "config/level-native/5_feltzin_system.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_5_FELTZIN_SYSTEM_FUN_0044E890": "@@FUNCTION@@",
+        "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_00371A60": "@@EXTERNAL_00371A60@@",
+        "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044BE50": "@@EXTERNAL_0044BE50@@",
+        "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044C040": "@@EXTERNAL_0044C040@@"
+      },
+      "level": "5_feltzin_system",
+      "normalized_body_sha256": "5ef5da620fcc8bf41f85e804a1283238cc58f6ded936336916cc65a6d4f18588",
+      "program": "levels/5_feltzin_system",
+      "source": "candidates/levels/5_feltzin_system.c",
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044E890"
     },
     {
       "address": 4516600,
@@ -118417,6 +119279,25 @@
       "symbol": "LVL_6_NOTAK_FUN_00483F48"
     },
     {
+      "address": 4735144,
+      "body_sha256": "c1e32066b98f5c594e5c5df0af56c1bddace419a4a04659996d491f0d58375fd",
+      "catalogue": "config/level-native/6_notak.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_6_NOTAK_FUN_004840A8": "@@FUNCTION@@",
+        "LVL_6_NOTAK_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_6_NOTAK_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_6_NOTAK_Fc558ca70_FUN_003A0AA8": "@@EXTERNAL_003A0AA8@@",
+        "LVL_6_NOTAK_Fc558ca70_FUN_004823B8": "@@EXTERNAL_004823B8@@",
+        "LVL_6_NOTAK_Fc558ca70_FUN_004825A8": "@@EXTERNAL_004825A8@@"
+      },
+      "level": "6_notak",
+      "normalized_body_sha256": "c2ad12907371981df20c427166321f067a1f28758b5a29cf4d07b4095a02be18",
+      "program": "levels/6_notak",
+      "source": "candidates/levels/6_notak.c",
+      "symbol": "LVL_6_NOTAK_FUN_004840A8"
+    },
+    {
       "address": 4737488,
       "body_sha256": "5231f9eb5be7269fd5a49b2020ad2713555fd8f9edc504f66ae96cd7c38bab65",
       "catalogue": "config/level-native/6_notak.json",
@@ -118445,6 +119326,25 @@
       "program": "levels/6_notak",
       "source": "candidates/levels/6_notak.c",
       "symbol": "LVL_6_NOTAK_FUN_00484C98"
+    },
+    {
+      "address": 4738552,
+      "body_sha256": "2a72daf90ca39587b00ff9db2b017988e24b196f28541097464288e606fe496b",
+      "catalogue": "config/level-native/6_notak.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_6_NOTAK_FUN_00484DF8": "@@FUNCTION@@",
+        "LVL_6_NOTAK_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_6_NOTAK_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_6_NOTAK_Fb7feb893_FUN_003A0AA8": "@@EXTERNAL_003A0AA8@@",
+        "LVL_6_NOTAK_Fb7feb893_FUN_004823B8": "@@EXTERNAL_004823B8@@",
+        "LVL_6_NOTAK_Fb7feb893_FUN_004825A8": "@@EXTERNAL_004825A8@@"
+      },
+      "level": "6_notak",
+      "normalized_body_sha256": "1b664dbf45793b91b210a5728705c7cfac60ea34444e1846bd9c33183b3ff565",
+      "program": "levels/6_notak",
+      "source": "candidates/levels/6_notak.c",
+      "symbol": "LVL_6_NOTAK_FUN_00484DF8"
     },
     {
       "address": 4739168,
@@ -122301,6 +123201,25 @@
       "symbol": "LVL_7_SIBERIUS_FUN_0042DE80"
     },
     {
+      "address": 4382688,
+      "body_sha256": "30ef8b43b1a5c1f246a9e864045a3ed5ec540fa597d5d13075f361ec45657303",
+      "catalogue": "config/level-native/7_siberius.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_7_SIBERIUS_FUN_0042DFE0": "@@FUNCTION@@",
+        "LVL_7_SIBERIUS_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_7_SIBERIUS_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_7_SIBERIUS_Fc558ca70_FUN_003555E8": "@@EXTERNAL_003555E8@@",
+        "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C2F0": "@@EXTERNAL_0042C2F0@@",
+        "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C4E0": "@@EXTERNAL_0042C4E0@@"
+      },
+      "level": "7_siberius",
+      "normalized_body_sha256": "dc4848ec626c077848af4b199f6cb65bb820f69426b77f41b6b56e21b2eb363f",
+      "program": "levels/7_siberius",
+      "source": "candidates/levels/7_siberius.c",
+      "symbol": "LVL_7_SIBERIUS_FUN_0042DFE0"
+    },
+    {
       "address": 4385032,
       "body_sha256": "4579ba060143793a9dfaf036909d30e9b8869846d1eb3b4e837e48ff45bfe905",
       "catalogue": "config/level-native/7_siberius.json",
@@ -122329,6 +123248,25 @@
       "program": "levels/7_siberius",
       "source": "candidates/levels/7_siberius.c",
       "symbol": "LVL_7_SIBERIUS_FUN_0042EBD0"
+    },
+    {
+      "address": 4386096,
+      "body_sha256": "ac5b276370418a134bc8501ba1c029a90e9e99075d7cc7ed29f8116060e1f90c",
+      "catalogue": "config/level-native/7_siberius.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_7_SIBERIUS_FUN_0042ED30": "@@FUNCTION@@",
+        "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_7_SIBERIUS_Fb7feb893_FUN_003555E8": "@@EXTERNAL_003555E8@@",
+        "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C2F0": "@@EXTERNAL_0042C2F0@@",
+        "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C4E0": "@@EXTERNAL_0042C4E0@@"
+      },
+      "level": "7_siberius",
+      "normalized_body_sha256": "97d6f3c3a6a83ef172224db8f1ef783dcbb0197a31e12e05c4ae2cb82337c937",
+      "program": "levels/7_siberius",
+      "source": "candidates/levels/7_siberius.c",
+      "symbol": "LVL_7_SIBERIUS_FUN_0042ED30"
     },
     {
       "address": 4386712,
@@ -126200,6 +127138,25 @@
       "symbol": "LVL_8_TABORA_FUN_0044E1D8"
     },
     {
+      "address": 4514616,
+      "body_sha256": "1642d0c936186c7ffbd25b3eb540e03b4bd8e25d57ddfd0695fe764bfbe914ce",
+      "catalogue": "config/level-native/8_tabora.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_8_TABORA_FUN_0044E338": "@@FUNCTION@@",
+        "LVL_8_TABORA_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_8_TABORA_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_8_TABORA_Fc558ca70_FUN_0036DA40": "@@EXTERNAL_0036DA40@@",
+        "LVL_8_TABORA_Fc558ca70_FUN_0044C648": "@@EXTERNAL_0044C648@@",
+        "LVL_8_TABORA_Fc558ca70_FUN_0044C838": "@@EXTERNAL_0044C838@@"
+      },
+      "level": "8_tabora",
+      "normalized_body_sha256": "82af563b522a9e43d03e528c6a8e0a8aa44ffac4d60378b29cbf174153cce3ef",
+      "program": "levels/8_tabora",
+      "source": "candidates/levels/8_tabora.c",
+      "symbol": "LVL_8_TABORA_FUN_0044E338"
+    },
+    {
       "address": 4516960,
       "body_sha256": "0905c163a849e0638a6e2b4f84ff300db3d4d4f2b7a015d80852aee0e1b0b705",
       "catalogue": "config/level-native/8_tabora.json",
@@ -126228,6 +127185,25 @@
       "program": "levels/8_tabora",
       "source": "candidates/levels/8_tabora.c",
       "symbol": "LVL_8_TABORA_FUN_0044EF28"
+    },
+    {
+      "address": 4518024,
+      "body_sha256": "995486f8a96944b99c5fdc8c0b3fe3e4566fbef5c3bef17b9be02d3ec48cf230",
+      "catalogue": "config/level-native/8_tabora.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_8_TABORA_FUN_0044F088": "@@FUNCTION@@",
+        "LVL_8_TABORA_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_8_TABORA_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_8_TABORA_Fb7feb893_FUN_0036DA40": "@@EXTERNAL_0036DA40@@",
+        "LVL_8_TABORA_Fb7feb893_FUN_0044C648": "@@EXTERNAL_0044C648@@",
+        "LVL_8_TABORA_Fb7feb893_FUN_0044C838": "@@EXTERNAL_0044C838@@"
+      },
+      "level": "8_tabora",
+      "normalized_body_sha256": "f082e604a9f62421b3dc53e9f8ce2d8cc73d782aedb00aaca89e9a7e505ae1ec",
+      "program": "levels/8_tabora",
+      "source": "candidates/levels/8_tabora.c",
+      "symbol": "LVL_8_TABORA_FUN_0044F088"
     },
     {
       "address": 4518640,
@@ -130177,6 +131153,25 @@
       "symbol": "LVL_9_DOBBO_FUN_00440FD0"
     },
     {
+      "address": 4460848,
+      "body_sha256": "c3fdeb45afb8e7409f6d388ae68280f265f61bb068ddbb355f42cfb3a02e9418",
+      "catalogue": "config/level-native/9_dobbo.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_9_DOBBO_FUN_00441130": "@@FUNCTION@@",
+        "LVL_9_DOBBO_Fc558ca70_D_001A7B94": "@@EXTERNAL_001A7B94@@",
+        "LVL_9_DOBBO_Fc558ca70_D_001A7B95": "@@EXTERNAL_001A7B95@@",
+        "LVL_9_DOBBO_Fc558ca70_FUN_0035C990": "@@EXTERNAL_0035C990@@",
+        "LVL_9_DOBBO_Fc558ca70_FUN_0043F440": "@@EXTERNAL_0043F440@@",
+        "LVL_9_DOBBO_Fc558ca70_FUN_0043F630": "@@EXTERNAL_0043F630@@"
+      },
+      "level": "9_dobbo",
+      "normalized_body_sha256": "2396c4f777924c2dc376a5e11fc3d34e6e12f6d19e5a6094a12c3208d8418b23",
+      "program": "levels/9_dobbo",
+      "source": "candidates/levels/9_dobbo.c",
+      "symbol": "LVL_9_DOBBO_FUN_00441130"
+    },
+    {
       "address": 4463192,
       "body_sha256": "c8f600a837d5b7e6f63735b26ff6f59bbd17348d2206f47e8af95bfb334c618e",
       "catalogue": "config/level-native/9_dobbo.json",
@@ -130205,6 +131200,25 @@
       "program": "levels/9_dobbo",
       "source": "candidates/levels/9_dobbo.c",
       "symbol": "LVL_9_DOBBO_FUN_00441D20"
+    },
+    {
+      "address": 4464256,
+      "body_sha256": "677a0d708517907964c4e28aae80be530fe7a80bd541c046a936708ecca0725d",
+      "catalogue": "config/level-native/9_dobbo.json",
+      "catalogued_size": 260,
+      "explicit_symbol_substitutions": {
+        "LVL_9_DOBBO_FUN_00441E80": "@@FUNCTION@@",
+        "LVL_9_DOBBO_Fb7feb893_D_001A7BB2": "@@EXTERNAL_001A7BB2@@",
+        "LVL_9_DOBBO_Fb7feb893_D_001A7BB3": "@@EXTERNAL_001A7BB3@@",
+        "LVL_9_DOBBO_Fb7feb893_FUN_0035C990": "@@EXTERNAL_0035C990@@",
+        "LVL_9_DOBBO_Fb7feb893_FUN_0043F440": "@@EXTERNAL_0043F440@@",
+        "LVL_9_DOBBO_Fb7feb893_FUN_0043F630": "@@EXTERNAL_0043F630@@"
+      },
+      "level": "9_dobbo",
+      "normalized_body_sha256": "ed733d39a4fa1a83fdc580b0c22996ccf653ec583f1810952dd627eec2bfe8a1",
+      "program": "levels/9_dobbo",
+      "source": "candidates/levels/9_dobbo.c",
+      "symbol": "LVL_9_DOBBO_FUN_00441E80"
     },
     {
       "address": 4464872,
@@ -132843,24 +133857,68 @@
           "source_text_bytes": 876
         },
         {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "FUN_0033CB18",
+            "@@ROLE_0_00@@": "Fc558ca70_FUN_0033AE28",
+            "@@ROLE_0_01@@": "Fc558ca70_FUN_0033AE28",
+            "@@ROLE_1_00@@": "Fc558ca70_FUN_0033B018",
+            "@@ROLE_1_01@@": "Fc558ca70_FUN_0033B018",
+            "@@ROLE_2_00@@": "Fc558ca70_FUN_002E5E58",
+            "@@ROLE_2_01@@": "Fc558ca70_FUN_002E5E58",
+            "@@ROLE_2_02@@": "Fc558ca70_FUN_002E5E58",
+            "@@ROLE_2_03@@": "Fc558ca70_FUN_002E5E58"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "FUN_0033D868",
+            "@@ROLE_0_00@@": "Fb7feb893_FUN_0033AE28",
+            "@@ROLE_0_01@@": "Fb7feb893_FUN_0033AE28",
+            "@@ROLE_1_00@@": "Fb7feb893_FUN_0033B018",
+            "@@ROLE_1_01@@": "Fb7feb893_FUN_0033B018",
+            "@@ROLE_2_00@@": "Fb7feb893_FUN_002E5E58",
+            "@@ROLE_2_01@@": "Fb7feb893_FUN_002E5E58",
+            "@@ROLE_2_02@@": "Fb7feb893_FUN_002E5E58",
+            "@@ROLE_2_03@@": "Fb7feb893_FUN_002E5E58"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
+        },
+        {
           "fragment": "src/boot/19-second-argument-forwarder.cfrag",
           "sha256": "089cc5f4a2891ba3ef0a4231619cf8ba8b28acf15383c9fb060d0da1f7a58d2c",
           "source_text_bytes": 79
         }
       ],
-      "sha256": "95d0e59ef3c6ace619eb06423518797623765b9d51cf0b890ed723a0496a0ef2",
-      "source_text_bytes": 157866
+      "sha256": "52dc0e9e0cc85bb975e07bf55744601869457cd7925357162056a8d47d8cfb63",
+      "source_text_bytes": 160165
     },
     "candidates/levels/0_aranos_tutorial-g8.c": {
       "pieces": [
         {
           "fragment": "src/levels/smalldata/0_aranos_tutorial-qwen-recovery-ae36934fec6c.cfrag",
-          "sha256": "2b2a91791c68383dded5258753d82276695ac0abf0d9681e41a47ea7c0509c08",
-          "source_text_bytes": 39773
+          "sha256": "03e00d1a5643f33bcb8b86eb0818c5630ffab5d4aff835366772d263566a5ad7",
+          "source_text_bytes": 40019
         }
       ],
-      "sha256": "2b2a91791c68383dded5258753d82276695ac0abf0d9681e41a47ea7c0509c08",
-      "source_text_bytes": 39773
+      "sha256": "03e00d1a5643f33bcb8b86eb0818c5630ffab5d4aff835366772d263566a5ad7",
+      "source_text_bytes": 40019
     },
     "candidates/levels/0_aranos_tutorial.c": {
       "pieces": [
@@ -136539,10 +137597,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_0_ARANOS_TUTORIAL_FUN_00432448",
+            "@@ROLE_0_00@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430758",
+            "@@ROLE_0_01@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430758",
+            "@@ROLE_1_00@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430948",
+            "@@ROLE_1_01@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430948",
+            "@@ROLE_2_00@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_0035F508",
+            "@@ROLE_2_01@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_0035F508",
+            "@@ROLE_2_02@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_0035F508",
+            "@@ROLE_2_03@@": "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_0035F508"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_0_ARANOS_TUTORIAL_FUN_00433198",
+            "@@ROLE_0_00@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430758",
+            "@@ROLE_0_01@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430758",
+            "@@ROLE_1_00@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430948",
+            "@@ROLE_1_01@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430948",
+            "@@ROLE_2_00@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_0035F508",
+            "@@ROLE_2_01@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_0035F508",
+            "@@ROLE_2_02@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_0035F508",
+            "@@ROLE_2_03@@": "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_0035F508"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "f0f3ae6d240e5cafe903fb101f343e9b1da581058fce623ef4cd155e4ca425df",
-      "source_text_bytes": 236691
+      "sha256": "dce1851c9dc3e7aaadc0a09e2a3ecb805bf3bd6dabb290ee1824a531c9b442aa",
+      "source_text_bytes": 239650
     },
     "candidates/levels/10_hrugis_cloud-g8.c": {
       "pieces": [
@@ -140455,10 +141557,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_10_HRUGIS_CLOUD_FUN_0044F700",
+            "@@ROLE_0_00@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DA10",
+            "@@ROLE_0_01@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DA10",
+            "@@ROLE_1_00@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DC00",
+            "@@ROLE_1_01@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_0044DC00",
+            "@@ROLE_2_00@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_00373870",
+            "@@ROLE_2_01@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_00373870",
+            "@@ROLE_2_02@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_00373870",
+            "@@ROLE_2_03@@": "LVL_10_HRUGIS_CLOUD_Fc558ca70_FUN_00373870"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_10_HRUGIS_CLOUD_FUN_00450450",
+            "@@ROLE_0_00@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DA10",
+            "@@ROLE_0_01@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DA10",
+            "@@ROLE_1_00@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DC00",
+            "@@ROLE_1_01@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_0044DC00",
+            "@@ROLE_2_00@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_00373870",
+            "@@ROLE_2_01@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_00373870",
+            "@@ROLE_2_02@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_00373870",
+            "@@ROLE_2_03@@": "LVL_10_HRUGIS_CLOUD_Fb7feb893_FUN_00373870"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "a8ad0d078e3f9968405db431dbbec2253f2db2496b60eb3f8b659060d3be91c4",
-      "source_text_bytes": 250556
+      "sha256": "134b2eaf7e498b5343d788abd6925eae0ca8c4ec2a2c1d286a4edd2f90fe7fa8",
+      "source_text_bytes": 253455
     },
     "candidates/levels/11_joba-g8.c": {
       "pieces": [
@@ -144384,10 +145530,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_11_JOBA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_11_JOBA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_11_JOBA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_11_JOBA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_11_JOBA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_11_JOBA_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_11_JOBA_FUN_00493DA0",
+            "@@ROLE_0_00@@": "LVL_11_JOBA_Fc558ca70_FUN_004920B0",
+            "@@ROLE_0_01@@": "LVL_11_JOBA_Fc558ca70_FUN_004920B0",
+            "@@ROLE_1_00@@": "LVL_11_JOBA_Fc558ca70_FUN_004922A0",
+            "@@ROLE_1_01@@": "LVL_11_JOBA_Fc558ca70_FUN_004922A0",
+            "@@ROLE_2_00@@": "LVL_11_JOBA_Fc558ca70_FUN_00373E20",
+            "@@ROLE_2_01@@": "LVL_11_JOBA_Fc558ca70_FUN_00373E20",
+            "@@ROLE_2_02@@": "LVL_11_JOBA_Fc558ca70_FUN_00373E20",
+            "@@ROLE_2_03@@": "LVL_11_JOBA_Fc558ca70_FUN_00373E20"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_11_JOBA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_11_JOBA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_11_JOBA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_11_JOBA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_11_JOBA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_11_JOBA_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_11_JOBA_FUN_00494AF0",
+            "@@ROLE_0_00@@": "LVL_11_JOBA_Fb7feb893_FUN_004920B0",
+            "@@ROLE_0_01@@": "LVL_11_JOBA_Fb7feb893_FUN_004920B0",
+            "@@ROLE_1_00@@": "LVL_11_JOBA_Fb7feb893_FUN_004922A0",
+            "@@ROLE_1_01@@": "LVL_11_JOBA_Fb7feb893_FUN_004922A0",
+            "@@ROLE_2_00@@": "LVL_11_JOBA_Fb7feb893_FUN_00373E20",
+            "@@ROLE_2_01@@": "LVL_11_JOBA_Fb7feb893_FUN_00373E20",
+            "@@ROLE_2_02@@": "LVL_11_JOBA_Fb7feb893_FUN_00373E20",
+            "@@ROLE_2_03@@": "LVL_11_JOBA_Fb7feb893_FUN_00373E20"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "ec3f3e81b5774cd65c73ad3f63795a43605ec55f29f2684c8046e13711752e99",
-      "source_text_bytes": 233342
+      "sha256": "216506abbc5113be29eebc784d67f5d483eac80b9fcf35f7907f9dbc734cffb8",
+      "source_text_bytes": 236001
     },
     "candidates/levels/12_todano-g8.c": {
       "pieces": [
@@ -148098,10 +149288,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_12_TODANO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_12_TODANO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_12_TODANO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_12_TODANO_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_12_TODANO_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_12_TODANO_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_12_TODANO_FUN_00448BE8",
+            "@@ROLE_0_00@@": "LVL_12_TODANO_Fc558ca70_FUN_00446EF8",
+            "@@ROLE_0_01@@": "LVL_12_TODANO_Fc558ca70_FUN_00446EF8",
+            "@@ROLE_1_00@@": "LVL_12_TODANO_Fc558ca70_FUN_004470E8",
+            "@@ROLE_1_01@@": "LVL_12_TODANO_Fc558ca70_FUN_004470E8",
+            "@@ROLE_2_00@@": "LVL_12_TODANO_Fc558ca70_FUN_00364F58",
+            "@@ROLE_2_01@@": "LVL_12_TODANO_Fc558ca70_FUN_00364F58",
+            "@@ROLE_2_02@@": "LVL_12_TODANO_Fc558ca70_FUN_00364F58",
+            "@@ROLE_2_03@@": "LVL_12_TODANO_Fc558ca70_FUN_00364F58"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_12_TODANO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_12_TODANO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_12_TODANO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_12_TODANO_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_12_TODANO_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_12_TODANO_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_12_TODANO_FUN_00449938",
+            "@@ROLE_0_00@@": "LVL_12_TODANO_Fb7feb893_FUN_00446EF8",
+            "@@ROLE_0_01@@": "LVL_12_TODANO_Fb7feb893_FUN_00446EF8",
+            "@@ROLE_1_00@@": "LVL_12_TODANO_Fb7feb893_FUN_004470E8",
+            "@@ROLE_1_01@@": "LVL_12_TODANO_Fb7feb893_FUN_004470E8",
+            "@@ROLE_2_00@@": "LVL_12_TODANO_Fb7feb893_FUN_00364F58",
+            "@@ROLE_2_01@@": "LVL_12_TODANO_Fb7feb893_FUN_00364F58",
+            "@@ROLE_2_02@@": "LVL_12_TODANO_Fb7feb893_FUN_00364F58",
+            "@@ROLE_2_03@@": "LVL_12_TODANO_Fb7feb893_FUN_00364F58"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "8159ea8cd4c239e6657182695715d1ac9808069cc4ded351a7f96ab3762c8908",
-      "source_text_bytes": 220612
+      "sha256": "9709c21cdf025fdc8028e4003465b1210fa8cb6facd0cbda086311d1399cc3a8",
+      "source_text_bytes": 223331
     },
     "candidates/levels/13_boldan-g8.c": {
       "pieces": [
@@ -151823,10 +153057,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_13_BOLDAN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_13_BOLDAN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_13_BOLDAN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_13_BOLDAN_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_13_BOLDAN_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_13_BOLDAN_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_13_BOLDAN_FUN_00446540",
+            "@@ROLE_0_00@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00444850",
+            "@@ROLE_0_01@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00444850",
+            "@@ROLE_1_00@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00444A40",
+            "@@ROLE_1_01@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00444A40",
+            "@@ROLE_2_00@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00368FB0",
+            "@@ROLE_2_01@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00368FB0",
+            "@@ROLE_2_02@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00368FB0",
+            "@@ROLE_2_03@@": "LVL_13_BOLDAN_Fc558ca70_FUN_00368FB0"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_13_BOLDAN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_13_BOLDAN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_13_BOLDAN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_13_BOLDAN_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_13_BOLDAN_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_13_BOLDAN_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_13_BOLDAN_FUN_00447290",
+            "@@ROLE_0_00@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00444850",
+            "@@ROLE_0_01@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00444850",
+            "@@ROLE_1_00@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00444A40",
+            "@@ROLE_1_01@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00444A40",
+            "@@ROLE_2_00@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00368FB0",
+            "@@ROLE_2_01@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00368FB0",
+            "@@ROLE_2_02@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00368FB0",
+            "@@ROLE_2_03@@": "LVL_13_BOLDAN_Fb7feb893_FUN_00368FB0"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "432f6bdddd8118de240bfdf80152eb34913acef12f94435c893bb58d06963dea",
-      "source_text_bytes": 222628
+      "sha256": "1a710ea114bcda9c9baf4084cd1f11f40fa5102689309c5a26cd48dbe4b6b69a",
+      "source_text_bytes": 225347
     },
     "candidates/levels/14_aranos_prison-g8.c": {
       "pieces": [
@@ -155597,10 +156875,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_14_ARANOS_PRISON_FUN_00450738",
+            "@@ROLE_0_00@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EA48",
+            "@@ROLE_0_01@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EA48",
+            "@@ROLE_1_00@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EC38",
+            "@@ROLE_1_01@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EC38",
+            "@@ROLE_2_00@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30",
+            "@@ROLE_2_01@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30",
+            "@@ROLE_2_02@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30",
+            "@@ROLE_2_03@@": "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_14_ARANOS_PRISON_FUN_00451488",
+            "@@ROLE_0_00@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EA48",
+            "@@ROLE_0_01@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EA48",
+            "@@ROLE_1_00@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EC38",
+            "@@ROLE_1_01@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EC38",
+            "@@ROLE_2_00@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30",
+            "@@ROLE_2_01@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30",
+            "@@ROLE_2_02@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30",
+            "@@ROLE_2_03@@": "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "f0f07754852a790317952968a45f089d695c549ae9e30a4f3660c12edfe2fd85",
-      "source_text_bytes": 237857
+      "sha256": "75c2bd9338970ef5baf7e7e9dc01fd317cd513587e4ac5da34c6e04148490342",
+      "source_text_bytes": 240786
     },
     "candidates/levels/15_gorn-g8.c": {
       "pieces": [
@@ -159384,10 +160706,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_15_GORN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_15_GORN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_15_GORN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_15_GORN_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_15_GORN_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_15_GORN_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_15_GORN_FUN_0045A7C0",
+            "@@ROLE_0_00@@": "LVL_15_GORN_Fc558ca70_FUN_00458AD0",
+            "@@ROLE_0_01@@": "LVL_15_GORN_Fc558ca70_FUN_00458AD0",
+            "@@ROLE_1_00@@": "LVL_15_GORN_Fc558ca70_FUN_00458CC0",
+            "@@ROLE_1_01@@": "LVL_15_GORN_Fc558ca70_FUN_00458CC0",
+            "@@ROLE_2_00@@": "LVL_15_GORN_Fc558ca70_FUN_003781D0",
+            "@@ROLE_2_01@@": "LVL_15_GORN_Fc558ca70_FUN_003781D0",
+            "@@ROLE_2_02@@": "LVL_15_GORN_Fc558ca70_FUN_003781D0",
+            "@@ROLE_2_03@@": "LVL_15_GORN_Fc558ca70_FUN_003781D0"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_15_GORN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_15_GORN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_15_GORN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_15_GORN_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_15_GORN_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_15_GORN_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_15_GORN_FUN_0045B510",
+            "@@ROLE_0_00@@": "LVL_15_GORN_Fb7feb893_FUN_00458AD0",
+            "@@ROLE_0_01@@": "LVL_15_GORN_Fb7feb893_FUN_00458AD0",
+            "@@ROLE_1_00@@": "LVL_15_GORN_Fb7feb893_FUN_00458CC0",
+            "@@ROLE_1_01@@": "LVL_15_GORN_Fb7feb893_FUN_00458CC0",
+            "@@ROLE_2_00@@": "LVL_15_GORN_Fb7feb893_FUN_003781D0",
+            "@@ROLE_2_01@@": "LVL_15_GORN_Fb7feb893_FUN_003781D0",
+            "@@ROLE_2_02@@": "LVL_15_GORN_Fb7feb893_FUN_003781D0",
+            "@@ROLE_2_03@@": "LVL_15_GORN_Fb7feb893_FUN_003781D0"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "6560f42a9dca014a2fa16a41bcdd9399173d8f2c5da7ac411e7d747a69b7af20",
-      "source_text_bytes": 223382
+      "sha256": "2a7a23a3f40daf8d93a35452d1838b8d6120bd487811df13a76cecd1aa0ca0c6",
+      "source_text_bytes": 226041
     },
     "candidates/levels/16_snivelak-g8.c": {
       "pieces": [
@@ -163180,10 +164546,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_16_SNIVELAK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_16_SNIVELAK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_16_SNIVELAK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_16_SNIVELAK_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_16_SNIVELAK_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_16_SNIVELAK_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_16_SNIVELAK_FUN_0043DE90",
+            "@@ROLE_0_00@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C1A0",
+            "@@ROLE_0_01@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C1A0",
+            "@@ROLE_1_00@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C390",
+            "@@ROLE_1_01@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_0043C390",
+            "@@ROLE_2_00@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_003573E8",
+            "@@ROLE_2_01@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_003573E8",
+            "@@ROLE_2_02@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_003573E8",
+            "@@ROLE_2_03@@": "LVL_16_SNIVELAK_Fc558ca70_FUN_003573E8"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_16_SNIVELAK_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_16_SNIVELAK_FUN_0043EBE0",
+            "@@ROLE_0_00@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C1A0",
+            "@@ROLE_0_01@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C1A0",
+            "@@ROLE_1_00@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C390",
+            "@@ROLE_1_01@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_0043C390",
+            "@@ROLE_2_00@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_003573E8",
+            "@@ROLE_2_01@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_003573E8",
+            "@@ROLE_2_02@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_003573E8",
+            "@@ROLE_2_03@@": "LVL_16_SNIVELAK_Fb7feb893_FUN_003573E8"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "5121b0cf75ade30c2e942838e52300f8d640dfdbf825bb7f7f2f0ed6c0e43001",
-      "source_text_bytes": 232708
+      "sha256": "670acbeb71596c30b9e5bb8eae6cd6a2ac6094e4e569030dbdadc9dcfc08b736",
+      "source_text_bytes": 235487
     },
     "candidates/levels/17_smolg-g8.c": {
       "pieces": [
@@ -166853,10 +168263,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_17_SMOLG_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_17_SMOLG_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_17_SMOLG_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_17_SMOLG_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_17_SMOLG_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_17_SMOLG_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_17_SMOLG_FUN_0043EF18",
+            "@@ROLE_0_00@@": "LVL_17_SMOLG_Fc558ca70_FUN_0043D228",
+            "@@ROLE_0_01@@": "LVL_17_SMOLG_Fc558ca70_FUN_0043D228",
+            "@@ROLE_1_00@@": "LVL_17_SMOLG_Fc558ca70_FUN_0043D418",
+            "@@ROLE_1_01@@": "LVL_17_SMOLG_Fc558ca70_FUN_0043D418",
+            "@@ROLE_2_00@@": "LVL_17_SMOLG_Fc558ca70_FUN_00362B18",
+            "@@ROLE_2_01@@": "LVL_17_SMOLG_Fc558ca70_FUN_00362B18",
+            "@@ROLE_2_02@@": "LVL_17_SMOLG_Fc558ca70_FUN_00362B18",
+            "@@ROLE_2_03@@": "LVL_17_SMOLG_Fc558ca70_FUN_00362B18"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_17_SMOLG_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_17_SMOLG_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_17_SMOLG_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_17_SMOLG_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_17_SMOLG_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_17_SMOLG_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_17_SMOLG_FUN_0043FC68",
+            "@@ROLE_0_00@@": "LVL_17_SMOLG_Fb7feb893_FUN_0043D228",
+            "@@ROLE_0_01@@": "LVL_17_SMOLG_Fb7feb893_FUN_0043D228",
+            "@@ROLE_1_00@@": "LVL_17_SMOLG_Fb7feb893_FUN_0043D418",
+            "@@ROLE_1_01@@": "LVL_17_SMOLG_Fb7feb893_FUN_0043D418",
+            "@@ROLE_2_00@@": "LVL_17_SMOLG_Fb7feb893_FUN_00362B18",
+            "@@ROLE_2_01@@": "LVL_17_SMOLG_Fb7feb893_FUN_00362B18",
+            "@@ROLE_2_02@@": "LVL_17_SMOLG_Fb7feb893_FUN_00362B18",
+            "@@ROLE_2_03@@": "LVL_17_SMOLG_Fb7feb893_FUN_00362B18"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "942332418c19f7c9e6a45e7440d472eebbc9a8fb0e6a93c0a9801cc13234eb27",
-      "source_text_bytes": 216547
+      "sha256": "582b01b19c6afa435afe0e9473c93fce8731f2e822debda83625b3335193c1e9",
+      "source_text_bytes": 219236
     },
     "candidates/levels/18_damosel-g8.c": {
       "pieces": [
@@ -170874,10 +172328,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_18_DAMOSEL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_18_DAMOSEL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_18_DAMOSEL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_18_DAMOSEL_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_18_DAMOSEL_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_18_DAMOSEL_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_18_DAMOSEL_FUN_0045FC10",
+            "@@ROLE_0_00@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0045DF20",
+            "@@ROLE_0_01@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0045DF20",
+            "@@ROLE_1_00@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0045E110",
+            "@@ROLE_1_01@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0045E110",
+            "@@ROLE_2_00@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0037B810",
+            "@@ROLE_2_01@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0037B810",
+            "@@ROLE_2_02@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0037B810",
+            "@@ROLE_2_03@@": "LVL_18_DAMOSEL_Fc558ca70_FUN_0037B810"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_18_DAMOSEL_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_18_DAMOSEL_FUN_00460960",
+            "@@ROLE_0_00@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0045DF20",
+            "@@ROLE_0_01@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0045DF20",
+            "@@ROLE_1_00@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0045E110",
+            "@@ROLE_1_01@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0045E110",
+            "@@ROLE_2_00@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0037B810",
+            "@@ROLE_2_01@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0037B810",
+            "@@ROLE_2_02@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0037B810",
+            "@@ROLE_2_03@@": "LVL_18_DAMOSEL_Fb7feb893_FUN_0037B810"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "692d6305be843aff74f7143438286e7236585bbbff642cea2c705b9d6b4b7781",
-      "source_text_bytes": 245034
+      "sha256": "a8df8320d98447721c6930e67939242b0e6db52bbdae32f65ae50e115ac60398",
+      "source_text_bytes": 247783
     },
     "candidates/levels/19_grelbin-g8.c": {
       "pieces": [
@@ -174730,10 +176228,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_19_GRELBIN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_19_GRELBIN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_19_GRELBIN_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_19_GRELBIN_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_19_GRELBIN_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_19_GRELBIN_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_19_GRELBIN_FUN_004437F0",
+            "@@ROLE_0_00@@": "LVL_19_GRELBIN_Fc558ca70_FUN_00441B00",
+            "@@ROLE_0_01@@": "LVL_19_GRELBIN_Fc558ca70_FUN_00441B00",
+            "@@ROLE_1_00@@": "LVL_19_GRELBIN_Fc558ca70_FUN_00441CF0",
+            "@@ROLE_1_01@@": "LVL_19_GRELBIN_Fc558ca70_FUN_00441CF0",
+            "@@ROLE_2_00@@": "LVL_19_GRELBIN_Fc558ca70_FUN_0035D538",
+            "@@ROLE_2_01@@": "LVL_19_GRELBIN_Fc558ca70_FUN_0035D538",
+            "@@ROLE_2_02@@": "LVL_19_GRELBIN_Fc558ca70_FUN_0035D538",
+            "@@ROLE_2_03@@": "LVL_19_GRELBIN_Fc558ca70_FUN_0035D538"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_19_GRELBIN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_19_GRELBIN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_19_GRELBIN_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_19_GRELBIN_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_19_GRELBIN_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_19_GRELBIN_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_19_GRELBIN_FUN_00444540",
+            "@@ROLE_0_00@@": "LVL_19_GRELBIN_Fb7feb893_FUN_00441B00",
+            "@@ROLE_0_01@@": "LVL_19_GRELBIN_Fb7feb893_FUN_00441B00",
+            "@@ROLE_1_00@@": "LVL_19_GRELBIN_Fb7feb893_FUN_00441CF0",
+            "@@ROLE_1_01@@": "LVL_19_GRELBIN_Fb7feb893_FUN_00441CF0",
+            "@@ROLE_2_00@@": "LVL_19_GRELBIN_Fb7feb893_FUN_0035D538",
+            "@@ROLE_2_01@@": "LVL_19_GRELBIN_Fb7feb893_FUN_0035D538",
+            "@@ROLE_2_02@@": "LVL_19_GRELBIN_Fb7feb893_FUN_0035D538",
+            "@@ROLE_2_03@@": "LVL_19_GRELBIN_Fb7feb893_FUN_0035D538"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "3af1a4807fab0c55f2093fb2890dc8bb1acbb488432663702f86736c761f7e43",
-      "source_text_bytes": 235741
+      "sha256": "ba95b9de30b0ca76593c0eb2473fbf7df7ab37b2c073c3de9546a0a6f79af74b",
+      "source_text_bytes": 238490
     },
     "candidates/levels/1_oozla-g8.c": {
       "pieces": [
@@ -178095,10 +179637,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_1_OOZLA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_1_OOZLA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_1_OOZLA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_1_OOZLA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_1_OOZLA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_1_OOZLA_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_1_OOZLA_FUN_00435450",
+            "@@ROLE_0_00@@": "LVL_1_OOZLA_Fc558ca70_FUN_00433760",
+            "@@ROLE_0_01@@": "LVL_1_OOZLA_Fc558ca70_FUN_00433760",
+            "@@ROLE_1_00@@": "LVL_1_OOZLA_Fc558ca70_FUN_00433950",
+            "@@ROLE_1_01@@": "LVL_1_OOZLA_Fc558ca70_FUN_00433950",
+            "@@ROLE_2_00@@": "LVL_1_OOZLA_Fc558ca70_FUN_003558E0",
+            "@@ROLE_2_01@@": "LVL_1_OOZLA_Fc558ca70_FUN_003558E0",
+            "@@ROLE_2_02@@": "LVL_1_OOZLA_Fc558ca70_FUN_003558E0",
+            "@@ROLE_2_03@@": "LVL_1_OOZLA_Fc558ca70_FUN_003558E0"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_1_OOZLA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_1_OOZLA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_1_OOZLA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_1_OOZLA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_1_OOZLA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_1_OOZLA_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_1_OOZLA_FUN_004361A0",
+            "@@ROLE_0_00@@": "LVL_1_OOZLA_Fb7feb893_FUN_00433760",
+            "@@ROLE_0_01@@": "LVL_1_OOZLA_Fb7feb893_FUN_00433760",
+            "@@ROLE_1_00@@": "LVL_1_OOZLA_Fb7feb893_FUN_00433950",
+            "@@ROLE_1_01@@": "LVL_1_OOZLA_Fb7feb893_FUN_00433950",
+            "@@ROLE_2_00@@": "LVL_1_OOZLA_Fb7feb893_FUN_003558E0",
+            "@@ROLE_2_01@@": "LVL_1_OOZLA_Fb7feb893_FUN_003558E0",
+            "@@ROLE_2_02@@": "LVL_1_OOZLA_Fb7feb893_FUN_003558E0",
+            "@@ROLE_2_03@@": "LVL_1_OOZLA_Fb7feb893_FUN_003558E0"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "e4780af38377139d2dc21c82c1c4ceb0fa567ca571d5dea8df494f25a047e177",
-      "source_text_bytes": 198663
+      "sha256": "14034e9ee7046e37682b76bcfe37b8554f3aac35cc7cb62a93c8542e1bdb793b",
+      "source_text_bytes": 201322
     },
     "candidates/levels/20_yeedil-g8.c": {
       "pieces": [
@@ -181822,10 +183408,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_20_YEEDIL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_20_YEEDIL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_20_YEEDIL_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_20_YEEDIL_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_20_YEEDIL_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_20_YEEDIL_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_20_YEEDIL_FUN_004695B8",
+            "@@ROLE_0_00@@": "LVL_20_YEEDIL_Fc558ca70_FUN_004678C8",
+            "@@ROLE_0_01@@": "LVL_20_YEEDIL_Fc558ca70_FUN_004678C8",
+            "@@ROLE_1_00@@": "LVL_20_YEEDIL_Fc558ca70_FUN_00467AB8",
+            "@@ROLE_1_01@@": "LVL_20_YEEDIL_Fc558ca70_FUN_00467AB8",
+            "@@ROLE_2_00@@": "LVL_20_YEEDIL_Fc558ca70_FUN_003755E0",
+            "@@ROLE_2_01@@": "LVL_20_YEEDIL_Fc558ca70_FUN_003755E0",
+            "@@ROLE_2_02@@": "LVL_20_YEEDIL_Fc558ca70_FUN_003755E0",
+            "@@ROLE_2_03@@": "LVL_20_YEEDIL_Fc558ca70_FUN_003755E0"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_20_YEEDIL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_20_YEEDIL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_20_YEEDIL_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_20_YEEDIL_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_20_YEEDIL_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_20_YEEDIL_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_20_YEEDIL_FUN_0046A308",
+            "@@ROLE_0_00@@": "LVL_20_YEEDIL_Fb7feb893_FUN_004678C8",
+            "@@ROLE_0_01@@": "LVL_20_YEEDIL_Fb7feb893_FUN_004678C8",
+            "@@ROLE_1_00@@": "LVL_20_YEEDIL_Fb7feb893_FUN_00467AB8",
+            "@@ROLE_1_01@@": "LVL_20_YEEDIL_Fb7feb893_FUN_00467AB8",
+            "@@ROLE_2_00@@": "LVL_20_YEEDIL_Fb7feb893_FUN_003755E0",
+            "@@ROLE_2_01@@": "LVL_20_YEEDIL_Fb7feb893_FUN_003755E0",
+            "@@ROLE_2_02@@": "LVL_20_YEEDIL_Fb7feb893_FUN_003755E0",
+            "@@ROLE_2_03@@": "LVL_20_YEEDIL_Fb7feb893_FUN_003755E0"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "694c80ea302abe81bc2aced40316367238240cbe4d0e4fe399165090fe370618",
-      "source_text_bytes": 223740
+      "sha256": "7a7f5307e1317c4730816ee00406f0d6b0293b01dd6a0b898c381312da14bf62",
+      "source_text_bytes": 226459
     },
     "candidates/levels/22_dobbo_orbit-g8.c": {
       "pieces": [
@@ -185463,10 +187093,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_22_DOBBO_ORBIT_FUN_00432E48",
+            "@@ROLE_0_00@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431158",
+            "@@ROLE_0_01@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431158",
+            "@@ROLE_1_00@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431348",
+            "@@ROLE_1_01@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00431348",
+            "@@ROLE_2_00@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00362E98",
+            "@@ROLE_2_01@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00362E98",
+            "@@ROLE_2_02@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00362E98",
+            "@@ROLE_2_03@@": "LVL_22_DOBBO_ORBIT_Fc558ca70_FUN_00362E98"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_22_DOBBO_ORBIT_FUN_00433B98",
+            "@@ROLE_0_00@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431158",
+            "@@ROLE_0_01@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431158",
+            "@@ROLE_1_00@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431348",
+            "@@ROLE_1_01@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00431348",
+            "@@ROLE_2_00@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00362E98",
+            "@@ROLE_2_01@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00362E98",
+            "@@ROLE_2_02@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00362E98",
+            "@@ROLE_2_03@@": "LVL_22_DOBBO_ORBIT_Fb7feb893_FUN_00362E98"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "416271ec3ebeabc3c5054e19f0118eda21ee6b8f343ef23458c2a217e67d1f76",
-      "source_text_bytes": 225672
+      "sha256": "4538f29f4f0443647ab9402be82b8024ff3bf00abe5a4cf23a722c63be0907f1",
+      "source_text_bytes": 228541
     },
     "candidates/levels/23_damosel_orbit-g8.c": {
       "pieces": [
@@ -189112,10 +190786,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_23_DAMOSEL_ORBIT_FUN_00448480",
+            "@@ROLE_0_00@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446790",
+            "@@ROLE_0_01@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446790",
+            "@@ROLE_1_00@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446980",
+            "@@ROLE_1_01@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_00446980",
+            "@@ROLE_2_00@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_003675B0",
+            "@@ROLE_2_01@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_003675B0",
+            "@@ROLE_2_02@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_003675B0",
+            "@@ROLE_2_03@@": "LVL_23_DAMOSEL_ORBIT_Fc558ca70_FUN_003675B0"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_23_DAMOSEL_ORBIT_FUN_004491D0",
+            "@@ROLE_0_00@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446790",
+            "@@ROLE_0_01@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446790",
+            "@@ROLE_1_00@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446980",
+            "@@ROLE_1_01@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_00446980",
+            "@@ROLE_2_00@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_003675B0",
+            "@@ROLE_2_01@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_003675B0",
+            "@@ROLE_2_02@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_003675B0",
+            "@@ROLE_2_03@@": "LVL_23_DAMOSEL_ORBIT_Fb7feb893_FUN_003675B0"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "6c537be89d067720e6ea5a43a770a02381100123902afcfe6e10ca1f1b41e4d9",
-      "source_text_bytes": 231265
+      "sha256": "ecd8de172264aa1077d5e44f53fa576620419fa552e22a1394fb9054e6954ba0",
+      "source_text_bytes": 234194
     },
     "candidates/levels/24_ship_shack-g8.c": {
       "pieces": [
@@ -192666,10 +194384,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_24_SHIP_SHACK_FUN_00411330",
+            "@@ROLE_0_00@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F640",
+            "@@ROLE_0_01@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F640",
+            "@@ROLE_1_00@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F830",
+            "@@ROLE_1_01@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F830",
+            "@@ROLE_2_00@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_00356B70",
+            "@@ROLE_2_01@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_00356B70",
+            "@@ROLE_2_02@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_00356B70",
+            "@@ROLE_2_03@@": "LVL_24_SHIP_SHACK_Fc558ca70_FUN_00356B70"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_24_SHIP_SHACK_FUN_00412080",
+            "@@ROLE_0_00@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F640",
+            "@@ROLE_0_01@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F640",
+            "@@ROLE_1_00@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F830",
+            "@@ROLE_1_01@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F830",
+            "@@ROLE_2_00@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_00356B70",
+            "@@ROLE_2_01@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_00356B70",
+            "@@ROLE_2_02@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_00356B70",
+            "@@ROLE_2_03@@": "LVL_24_SHIP_SHACK_Fb7feb893_FUN_00356B70"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "e27677d59cdf9ca9596da30531ce8fce0efe303faf6b1cde7ece4ed74d63605a",
-      "source_text_bytes": 223855
+      "sha256": "5ebe7e222a47e17b7fc8a8e08b3a6a6e2a81ed805c1d529d0d1bb5bcdc08a892",
+      "source_text_bytes": 226694
     },
     "candidates/levels/25_wupash_nebula-g8.c": {
       "pieces": [
@@ -196438,10 +198200,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_25_WUPASH_NEBULA_FUN_0043EAC8",
+            "@@ROLE_0_00@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CDD8",
+            "@@ROLE_0_01@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CDD8",
+            "@@ROLE_1_00@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CFC8",
+            "@@ROLE_1_01@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CFC8",
+            "@@ROLE_2_00@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0",
+            "@@ROLE_2_01@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0",
+            "@@ROLE_2_02@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0",
+            "@@ROLE_2_03@@": "LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_25_WUPASH_NEBULA_FUN_0043F818",
+            "@@ROLE_0_00@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CDD8",
+            "@@ROLE_0_01@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CDD8",
+            "@@ROLE_1_00@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CFC8",
+            "@@ROLE_1_01@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CFC8",
+            "@@ROLE_2_00@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0",
+            "@@ROLE_2_01@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0",
+            "@@ROLE_2_02@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0",
+            "@@ROLE_2_03@@": "LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "4c1f71eb6c0baf06ba354d877bd354407ca549dfbb420eca54c859cc6b21f8f3",
-      "source_text_bytes": 241022
+      "sha256": "71400dc7c960cf108a9ec6c6f0294203b38fe9ce2a3f58b21fc1d634d9936710",
+      "source_text_bytes": 243951
     },
     "candidates/levels/26_jamming_array-g8.c": {
       "pieces": [
@@ -200087,21 +201893,65 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_26_JAMMING_ARRAY_FUN_004249E0",
+            "@@ROLE_0_00@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422CF0",
+            "@@ROLE_0_01@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422CF0",
+            "@@ROLE_1_00@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422EE0",
+            "@@ROLE_1_01@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_00422EE0",
+            "@@ROLE_2_00@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_0035EEF8",
+            "@@ROLE_2_01@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_0035EEF8",
+            "@@ROLE_2_02@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_0035EEF8",
+            "@@ROLE_2_03@@": "LVL_26_JAMMING_ARRAY_Fc558ca70_FUN_0035EEF8"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_26_JAMMING_ARRAY_FUN_00425730",
+            "@@ROLE_0_00@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422CF0",
+            "@@ROLE_0_01@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422CF0",
+            "@@ROLE_1_00@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422EE0",
+            "@@ROLE_1_01@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_00422EE0",
+            "@@ROLE_2_00@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_0035EEF8",
+            "@@ROLE_2_01@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_0035EEF8",
+            "@@ROLE_2_02@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_0035EEF8",
+            "@@ROLE_2_03@@": "LVL_26_JAMMING_ARRAY_Fb7feb893_FUN_0035EEF8"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "54b1c00ac73b49a5b81a2a8a6e0d3556016e9ed9c59c495336cd101f20ff9069",
-      "source_text_bytes": 231431
+      "sha256": "7313b6f5ab503f09e0fe36112dcd05dfba6a4e8ca02d687d70fd061cdbee44ed",
+      "source_text_bytes": 234360
     },
     "candidates/levels/2_maktar_nebula-g8.c": {
       "pieces": [
         {
           "fragment": "src/levels/smalldata/2_maktar_nebula-qwen-recovery-ae36934fec6c.cfrag",
-          "sha256": "72784634839f2034f82515852685db15b1c57ded7c0b43056b737c7699ec2ace",
-          "source_text_bytes": 39199
+          "sha256": "43006eb31e91c126597fbb0f634ce113ca6dc1e2235af62268e23d0df2af96a0",
+          "source_text_bytes": 39443
         }
       ],
-      "sha256": "72784634839f2034f82515852685db15b1c57ded7c0b43056b737c7699ec2ace",
-      "source_text_bytes": 39199
+      "sha256": "43006eb31e91c126597fbb0f634ce113ca6dc1e2235af62268e23d0df2af96a0",
+      "source_text_bytes": 39443
     },
     "candidates/levels/2_maktar_nebula.c": {
       "pieces": [
@@ -203894,10 +205744,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_2_MAKTAR_NEBULA_FUN_0045D880",
+            "@@ROLE_0_00@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BB90",
+            "@@ROLE_0_01@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BB90",
+            "@@ROLE_1_00@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BD80",
+            "@@ROLE_1_01@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BD80",
+            "@@ROLE_2_00@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90",
+            "@@ROLE_2_01@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90",
+            "@@ROLE_2_02@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90",
+            "@@ROLE_2_03@@": "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_2_MAKTAR_NEBULA_FUN_0045E5D0",
+            "@@ROLE_0_00@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BB90",
+            "@@ROLE_0_01@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BB90",
+            "@@ROLE_1_00@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BD80",
+            "@@ROLE_1_01@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BD80",
+            "@@ROLE_2_00@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90",
+            "@@ROLE_2_01@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90",
+            "@@ROLE_2_02@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90",
+            "@@ROLE_2_03@@": "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "6e4e0d84639838903759ced1a5877897f130a3ba04790566f2875228af3a712f",
-      "source_text_bytes": 241585
+      "sha256": "17bba9b94be1cffe43fee3fa15922f999f5216349685dafcc50fc15c30ef0c2c",
+      "source_text_bytes": 244484
     },
     "candidates/levels/30_insomniac_museum-g8.c": {
       "pieces": [
@@ -207557,10 +209451,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_30_INSOMNIAC_MUSEUM_FUN_00436020",
+            "@@ROLE_0_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_00434330",
+            "@@ROLE_0_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_00434330",
+            "@@ROLE_1_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_00434520",
+            "@@ROLE_1_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_00434520",
+            "@@ROLE_2_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_0035FF10",
+            "@@ROLE_2_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_0035FF10",
+            "@@ROLE_2_02@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_0035FF10",
+            "@@ROLE_2_03@@": "LVL_30_INSOMNIAC_MUSEUM_Fc558ca70_FUN_0035FF10"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_30_INSOMNIAC_MUSEUM_FUN_00436D70",
+            "@@ROLE_0_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_00434330",
+            "@@ROLE_0_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_00434330",
+            "@@ROLE_1_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_00434520",
+            "@@ROLE_1_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_00434520",
+            "@@ROLE_2_00@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_0035FF10",
+            "@@ROLE_2_01@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_0035FF10",
+            "@@ROLE_2_02@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_0035FF10",
+            "@@ROLE_2_03@@": "LVL_30_INSOMNIAC_MUSEUM_Fb7feb893_FUN_0035FF10"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "7d5b25d7edda5762d8fe743b9e15e1c6b6004081384d17ca53e74c81ca1c8700",
-      "source_text_bytes": 238418
+      "sha256": "9213aa848dcc107543c2d45c22293b636358ba2fbee17103d0c911d39086010a",
+      "source_text_bytes": 241437
     },
     "candidates/levels/3_endako-g8.c": {
       "pieces": [
@@ -211354,10 +213292,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_3_ENDAKO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_3_ENDAKO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_3_ENDAKO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_3_ENDAKO_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_3_ENDAKO_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_3_ENDAKO_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_3_ENDAKO_FUN_004433B8",
+            "@@ROLE_0_00@@": "LVL_3_ENDAKO_Fc558ca70_FUN_004416C8",
+            "@@ROLE_0_01@@": "LVL_3_ENDAKO_Fc558ca70_FUN_004416C8",
+            "@@ROLE_1_00@@": "LVL_3_ENDAKO_Fc558ca70_FUN_004418B8",
+            "@@ROLE_1_01@@": "LVL_3_ENDAKO_Fc558ca70_FUN_004418B8",
+            "@@ROLE_2_00@@": "LVL_3_ENDAKO_Fc558ca70_FUN_00360BE0",
+            "@@ROLE_2_01@@": "LVL_3_ENDAKO_Fc558ca70_FUN_00360BE0",
+            "@@ROLE_2_02@@": "LVL_3_ENDAKO_Fc558ca70_FUN_00360BE0",
+            "@@ROLE_2_03@@": "LVL_3_ENDAKO_Fc558ca70_FUN_00360BE0"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_3_ENDAKO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_3_ENDAKO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_3_ENDAKO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_3_ENDAKO_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_3_ENDAKO_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_3_ENDAKO_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_3_ENDAKO_FUN_00444108",
+            "@@ROLE_0_00@@": "LVL_3_ENDAKO_Fb7feb893_FUN_004416C8",
+            "@@ROLE_0_01@@": "LVL_3_ENDAKO_Fb7feb893_FUN_004416C8",
+            "@@ROLE_1_00@@": "LVL_3_ENDAKO_Fb7feb893_FUN_004418B8",
+            "@@ROLE_1_01@@": "LVL_3_ENDAKO_Fb7feb893_FUN_004418B8",
+            "@@ROLE_2_00@@": "LVL_3_ENDAKO_Fb7feb893_FUN_00360BE0",
+            "@@ROLE_2_01@@": "LVL_3_ENDAKO_Fb7feb893_FUN_00360BE0",
+            "@@ROLE_2_02@@": "LVL_3_ENDAKO_Fb7feb893_FUN_00360BE0",
+            "@@ROLE_2_03@@": "LVL_3_ENDAKO_Fb7feb893_FUN_00360BE0"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "1f218b04a3d72903aae089bd8867d3c7465709790949006d8c065fc4f890f2bf",
-      "source_text_bytes": 224419
+      "sha256": "3a52c37b0a15f16094ebe878b521cd23bf08b47c9d140df17d7e25c9bf5b94ba",
+      "source_text_bytes": 227108
     },
     "candidates/levels/4_barlow-g8.c": {
       "pieces": [
@@ -216708,10 +218690,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_5_FELTZIN_SYSTEM_FUN_0044DB40",
+            "@@ROLE_0_00@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044BE50",
+            "@@ROLE_0_01@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044BE50",
+            "@@ROLE_1_00@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044C040",
+            "@@ROLE_1_01@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044C040",
+            "@@ROLE_2_00@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_00371A60",
+            "@@ROLE_2_01@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_00371A60",
+            "@@ROLE_2_02@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_00371A60",
+            "@@ROLE_2_03@@": "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_00371A60"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_5_FELTZIN_SYSTEM_FUN_0044E890",
+            "@@ROLE_0_00@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044BE50",
+            "@@ROLE_0_01@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044BE50",
+            "@@ROLE_1_00@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044C040",
+            "@@ROLE_1_01@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044C040",
+            "@@ROLE_2_00@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_00371A60",
+            "@@ROLE_2_01@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_00371A60",
+            "@@ROLE_2_02@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_00371A60",
+            "@@ROLE_2_03@@": "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_00371A60"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "b7fd338edcc6363122d8a823af334163e528d47e4553849726ae64da2f80d43e",
-      "source_text_bytes": 251960
+      "sha256": "7baad98d4f664e439bdc44ae7a9762bd34c8ff132226ae7fd0cf7271b6df5e03",
+      "source_text_bytes": 254889
     },
     "candidates/levels/6_notak-g8.c": {
       "pieces": [
@@ -220643,10 +222669,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_6_NOTAK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_6_NOTAK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_6_NOTAK_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_6_NOTAK_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_6_NOTAK_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_6_NOTAK_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_6_NOTAK_FUN_004840A8",
+            "@@ROLE_0_00@@": "LVL_6_NOTAK_Fc558ca70_FUN_004823B8",
+            "@@ROLE_0_01@@": "LVL_6_NOTAK_Fc558ca70_FUN_004823B8",
+            "@@ROLE_1_00@@": "LVL_6_NOTAK_Fc558ca70_FUN_004825A8",
+            "@@ROLE_1_01@@": "LVL_6_NOTAK_Fc558ca70_FUN_004825A8",
+            "@@ROLE_2_00@@": "LVL_6_NOTAK_Fc558ca70_FUN_003A0AA8",
+            "@@ROLE_2_01@@": "LVL_6_NOTAK_Fc558ca70_FUN_003A0AA8",
+            "@@ROLE_2_02@@": "LVL_6_NOTAK_Fc558ca70_FUN_003A0AA8",
+            "@@ROLE_2_03@@": "LVL_6_NOTAK_Fc558ca70_FUN_003A0AA8"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_6_NOTAK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_6_NOTAK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_6_NOTAK_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_6_NOTAK_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_6_NOTAK_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_6_NOTAK_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_6_NOTAK_FUN_00484DF8",
+            "@@ROLE_0_00@@": "LVL_6_NOTAK_Fb7feb893_FUN_004823B8",
+            "@@ROLE_0_01@@": "LVL_6_NOTAK_Fb7feb893_FUN_004823B8",
+            "@@ROLE_1_00@@": "LVL_6_NOTAK_Fb7feb893_FUN_004825A8",
+            "@@ROLE_1_01@@": "LVL_6_NOTAK_Fb7feb893_FUN_004825A8",
+            "@@ROLE_2_00@@": "LVL_6_NOTAK_Fb7feb893_FUN_003A0AA8",
+            "@@ROLE_2_01@@": "LVL_6_NOTAK_Fb7feb893_FUN_003A0AA8",
+            "@@ROLE_2_02@@": "LVL_6_NOTAK_Fb7feb893_FUN_003A0AA8",
+            "@@ROLE_2_03@@": "LVL_6_NOTAK_Fb7feb893_FUN_003A0AA8"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "ba78a17fd18905a571a177f627d2740b3cb7eae38906654d81ba5ed7dc191630",
-      "source_text_bytes": 229444
+      "sha256": "1fb5840f01bdf6267979402f27bd5547e8d8d2ba584ff948c58c251193fff713",
+      "source_text_bytes": 232103
     },
     "candidates/levels/7_siberius-g8.c": {
       "pieces": [
@@ -224364,21 +226434,65 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_7_SIBERIUS_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_7_SIBERIUS_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_7_SIBERIUS_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_7_SIBERIUS_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_7_SIBERIUS_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_7_SIBERIUS_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_7_SIBERIUS_FUN_0042DFE0",
+            "@@ROLE_0_00@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C2F0",
+            "@@ROLE_0_01@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C2F0",
+            "@@ROLE_1_00@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C4E0",
+            "@@ROLE_1_01@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C4E0",
+            "@@ROLE_2_00@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_003555E8",
+            "@@ROLE_2_01@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_003555E8",
+            "@@ROLE_2_02@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_003555E8",
+            "@@ROLE_2_03@@": "LVL_7_SIBERIUS_Fc558ca70_FUN_003555E8"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_7_SIBERIUS_FUN_0042ED30",
+            "@@ROLE_0_00@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C2F0",
+            "@@ROLE_0_01@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C2F0",
+            "@@ROLE_1_00@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C4E0",
+            "@@ROLE_1_01@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C4E0",
+            "@@ROLE_2_00@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_003555E8",
+            "@@ROLE_2_01@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_003555E8",
+            "@@ROLE_2_02@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_003555E8",
+            "@@ROLE_2_03@@": "LVL_7_SIBERIUS_Fb7feb893_FUN_003555E8"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "112d4cdaa47c14f3cebda551f0f356dac6efe5ebf247484a09a9fa909df883ea",
-      "source_text_bytes": 226415
+      "sha256": "07d2c5f3a26ee1b34c6948a87bb86f46ba41412a374858e82763ec7af315410f",
+      "source_text_bytes": 229164
     },
     "candidates/levels/8_tabora-g8.c": {
       "pieces": [
         {
           "fragment": "src/levels/smalldata/8_tabora-qwen-recovery-ae36934fec6c.cfrag",
-          "sha256": "cb3db550038b88436f1fa042e9bd7d3971d60c8bd34c18e09d3e117e3b25d6c4",
-          "source_text_bytes": 35035
+          "sha256": "cfdc9339a89e8504b3d8186e7d150d6789fc8e9fe0a898caefa1f90b8fd5b963",
+          "source_text_bytes": 35272
         }
       ],
-      "sha256": "cb3db550038b88436f1fa042e9bd7d3971d60c8bd34c18e09d3e117e3b25d6c4",
-      "source_text_bytes": 35035
+      "sha256": "cfdc9339a89e8504b3d8186e7d150d6789fc8e9fe0a898caefa1f90b8fd5b963",
+      "source_text_bytes": 35272
     },
     "candidates/levels/8_tabora.c": {
       "pieces": [
@@ -228153,10 +230267,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_8_TABORA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_8_TABORA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_8_TABORA_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_8_TABORA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_8_TABORA_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_8_TABORA_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_8_TABORA_FUN_0044E338",
+            "@@ROLE_0_00@@": "LVL_8_TABORA_Fc558ca70_FUN_0044C648",
+            "@@ROLE_0_01@@": "LVL_8_TABORA_Fc558ca70_FUN_0044C648",
+            "@@ROLE_1_00@@": "LVL_8_TABORA_Fc558ca70_FUN_0044C838",
+            "@@ROLE_1_01@@": "LVL_8_TABORA_Fc558ca70_FUN_0044C838",
+            "@@ROLE_2_00@@": "LVL_8_TABORA_Fc558ca70_FUN_0036DA40",
+            "@@ROLE_2_01@@": "LVL_8_TABORA_Fc558ca70_FUN_0036DA40",
+            "@@ROLE_2_02@@": "LVL_8_TABORA_Fc558ca70_FUN_0036DA40",
+            "@@ROLE_2_03@@": "LVL_8_TABORA_Fc558ca70_FUN_0036DA40"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_8_TABORA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_8_TABORA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_8_TABORA_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_8_TABORA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_8_TABORA_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_8_TABORA_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_8_TABORA_FUN_0044F088",
+            "@@ROLE_0_00@@": "LVL_8_TABORA_Fb7feb893_FUN_0044C648",
+            "@@ROLE_0_01@@": "LVL_8_TABORA_Fb7feb893_FUN_0044C648",
+            "@@ROLE_1_00@@": "LVL_8_TABORA_Fb7feb893_FUN_0044C838",
+            "@@ROLE_1_01@@": "LVL_8_TABORA_Fb7feb893_FUN_0044C838",
+            "@@ROLE_2_00@@": "LVL_8_TABORA_Fb7feb893_FUN_0036DA40",
+            "@@ROLE_2_01@@": "LVL_8_TABORA_Fb7feb893_FUN_0036DA40",
+            "@@ROLE_2_02@@": "LVL_8_TABORA_Fb7feb893_FUN_0036DA40",
+            "@@ROLE_2_03@@": "LVL_8_TABORA_Fb7feb893_FUN_0036DA40"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "704262294114c86f922ab1f8bee0e6097774bbf08bd465bda525d1499a4eaaad",
-      "source_text_bytes": 225756
+      "sha256": "e6bdd37f67d563043be8a0ca855ac7b3ba6d98606eb0be23888dacc30353a176",
+      "source_text_bytes": 228445
     },
     "candidates/levels/9_dobbo-g8.c": {
       "pieces": [
@@ -231850,10 +234008,54 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-descending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_9_DOBBO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_01@@": "LVL_9_DOBBO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA0_02@@": "LVL_9_DOBBO_Fc558ca70_D_001A7B95",
+            "@@BIND_DATA1_00@@": "LVL_9_DOBBO_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_01@@": "LVL_9_DOBBO_Fc558ca70_D_001A7B94",
+            "@@BIND_DATA1_02@@": "LVL_9_DOBBO_Fc558ca70_D_001A7B94",
+            "@@FUNCTION@@": "LVL_9_DOBBO_FUN_00441130",
+            "@@ROLE_0_00@@": "LVL_9_DOBBO_Fc558ca70_FUN_0043F440",
+            "@@ROLE_0_01@@": "LVL_9_DOBBO_Fc558ca70_FUN_0043F440",
+            "@@ROLE_1_00@@": "LVL_9_DOBBO_Fc558ca70_FUN_0043F630",
+            "@@ROLE_1_01@@": "LVL_9_DOBBO_Fc558ca70_FUN_0043F630",
+            "@@ROLE_2_00@@": "LVL_9_DOBBO_Fc558ca70_FUN_0035C990",
+            "@@ROLE_2_01@@": "LVL_9_DOBBO_Fc558ca70_FUN_0035C990",
+            "@@ROLE_2_02@@": "LVL_9_DOBBO_Fc558ca70_FUN_0035C990",
+            "@@ROLE_2_03@@": "LVL_9_DOBBO_Fc558ca70_FUN_0035C990"
+          },
+          "sha256": "093429da294c80bdb01461956eb2da1d08b5cbc078f22820a0db63c91feb7e03",
+          "source_text_bytes": 1078
+        },
+        {
+          "fragment": "src/shared/flag-byte-toggle-ascending.cfrag",
+          "replacements": {
+            "@@BIND_DATA0_00@@": "LVL_9_DOBBO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_01@@": "LVL_9_DOBBO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA0_02@@": "LVL_9_DOBBO_Fb7feb893_D_001A7BB2",
+            "@@BIND_DATA1_00@@": "LVL_9_DOBBO_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_01@@": "LVL_9_DOBBO_Fb7feb893_D_001A7BB3",
+            "@@BIND_DATA1_02@@": "LVL_9_DOBBO_Fb7feb893_D_001A7BB3",
+            "@@FUNCTION@@": "LVL_9_DOBBO_FUN_00441E80",
+            "@@ROLE_0_00@@": "LVL_9_DOBBO_Fb7feb893_FUN_0043F440",
+            "@@ROLE_0_01@@": "LVL_9_DOBBO_Fb7feb893_FUN_0043F440",
+            "@@ROLE_1_00@@": "LVL_9_DOBBO_Fb7feb893_FUN_0043F630",
+            "@@ROLE_1_01@@": "LVL_9_DOBBO_Fb7feb893_FUN_0043F630",
+            "@@ROLE_2_00@@": "LVL_9_DOBBO_Fb7feb893_FUN_0035C990",
+            "@@ROLE_2_01@@": "LVL_9_DOBBO_Fb7feb893_FUN_0035C990",
+            "@@ROLE_2_02@@": "LVL_9_DOBBO_Fb7feb893_FUN_0035C990",
+            "@@ROLE_2_03@@": "LVL_9_DOBBO_Fb7feb893_FUN_0035C990"
+          },
+          "sha256": "418f492097e0aabc8df65d92698e3e40791ac7e76cae291b2a6e33845be9d602",
+          "source_text_bytes": 1041
         }
       ],
-      "sha256": "bb55992b30026bdb4683eb101557f79fd892fefa8d671cf84717b70a0c3649a8",
-      "source_text_bytes": 217047
+      "sha256": "ed091bf8502f9feb882bb31ae5e686ee5cdfaf01f838a397f16bc174b4a7e442",
+      "source_text_bytes": 219706
     },
     "candidates/sdk/cpr8_source_unit.c": {
       "pieces": [

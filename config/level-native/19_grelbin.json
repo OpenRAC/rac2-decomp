@@ -350,6 +350,11 @@
     "LVL_19_GRELBIN_Fb52b2850_D_001DE1C0": 1958336,
     "LVL_19_GRELBIN_Fb77d67f1_FUN_002EB590": 3061136,
     "LVL_19_GRELBIN_Fb77d67f1_FUN_0032D4D0": 3331280,
+    "LVL_19_GRELBIN_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_19_GRELBIN_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_19_GRELBIN_Fb7feb893_FUN_0035D538": 3527992,
+    "LVL_19_GRELBIN_Fb7feb893_FUN_00441B00": 4463360,
+    "LVL_19_GRELBIN_Fb7feb893_FUN_00441CF0": 4463856,
     "LVL_19_GRELBIN_Fbbb7bee1_FUN_002EB680": 3061376,
     "LVL_19_GRELBIN_Fbdd4a4aa_FUN_002EB920": 3062048,
     "LVL_19_GRELBIN_Fbdd4a4aa_FUN_002EB990": 3062160,
@@ -376,6 +381,11 @@
     "LVL_19_GRELBIN_Fc3cb9262_FUN_0032D4D0": 3331280,
     "LVL_19_GRELBIN_Fc459a266_D_00138180": 1278336,
     "LVL_19_GRELBIN_Fc459a266_D_00189E20": 1613344,
+    "LVL_19_GRELBIN_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_19_GRELBIN_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_19_GRELBIN_Fc558ca70_FUN_0035D538": 3527992,
+    "LVL_19_GRELBIN_Fc558ca70_FUN_00441B00": 4463360,
+    "LVL_19_GRELBIN_Fc558ca70_FUN_00441CF0": 4463856,
     "LVL_19_GRELBIN_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_19_GRELBIN_Fc936841d_FUN_002EB920": 3062048,
     "LVL_19_GRELBIN_Fc936841d_FUN_002EB950": 3062096,
@@ -2066,6 +2076,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_00443690"
     },
     {
+      "address": 4470768,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_19_GRELBIN_FUN_004437F0"
+    },
+    {
       "address": 4473112,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2076,6 +2092,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_19_GRELBIN_FUN_004443E0"
+    },
+    {
+      "address": 4474176,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_19_GRELBIN_FUN_00444540"
     },
     {
       "address": 4474792,

@@ -345,6 +345,11 @@
     "LVL_3_ENDAKO_Fb52b2850_D_001DE1C0": 1958336,
     "LVL_3_ENDAKO_Fb77d67f1_FUN_002EEBF0": 3075056,
     "LVL_3_ENDAKO_Fb77d67f1_FUN_00331270": 3347056,
+    "LVL_3_ENDAKO_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_3_ENDAKO_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_3_ENDAKO_Fb7feb893_FUN_00360BE0": 3541984,
+    "LVL_3_ENDAKO_Fb7feb893_FUN_004416C8": 4462280,
+    "LVL_3_ENDAKO_Fb7feb893_FUN_004418B8": 4462776,
     "LVL_3_ENDAKO_Fbbb7bee1_FUN_002EECE0": 3075296,
     "LVL_3_ENDAKO_Fbdd4a4aa_FUN_002EEFB0": 3076016,
     "LVL_3_ENDAKO_Fbdd4a4aa_FUN_002EF020": 3076128,
@@ -367,6 +372,11 @@
     "LVL_3_ENDAKO_Fc3cb9262_FUN_002EEFB0": 3076016,
     "LVL_3_ENDAKO_Fc3cb9262_FUN_002F0158": 3080536,
     "LVL_3_ENDAKO_Fc3cb9262_FUN_00331270": 3347056,
+    "LVL_3_ENDAKO_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_3_ENDAKO_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_3_ENDAKO_Fc558ca70_FUN_00360BE0": 3541984,
+    "LVL_3_ENDAKO_Fc558ca70_FUN_004416C8": 4462280,
+    "LVL_3_ENDAKO_Fc558ca70_FUN_004418B8": 4462776,
     "LVL_3_ENDAKO_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_3_ENDAKO_Fc936841d_FUN_002EEFB0": 3076016,
     "LVL_3_ENDAKO_Fc936841d_FUN_002EEFE0": 3076064,
@@ -2040,6 +2050,12 @@
       "symbol": "LVL_3_ENDAKO_FUN_00443258"
     },
     {
+      "address": 4469688,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_3_ENDAKO_FUN_004433B8"
+    },
+    {
       "address": 4472032,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2050,6 +2066,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_3_ENDAKO_FUN_00443FA8"
+    },
+    {
+      "address": 4473096,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_3_ENDAKO_FUN_00444108"
     },
     {
       "address": 4473712,

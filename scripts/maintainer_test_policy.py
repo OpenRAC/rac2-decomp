@@ -8,6 +8,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 import time
 from pathlib import Path
 import urllib.request
@@ -18,20 +19,20 @@ MAINTAINER_ID = 191315338
 MAINTAINER_LOGIN = "llesieur99"
 WORKFLOW = ".github/workflows/tests.yml"
 # Updated only after reviewing the literal, unconditional merge-group suite.
-QUALIFIED_WORKFLOW_SHA256 = "dfb2d42a7f63161dc55e7b8bf284ad9bab44014f0e35089667011d19597a15b7"
-QUALIFIED_EXPORTER_SHA256 = "901dd0ed500fc9f8813583a7db8f90d9e85702bed2c2e4ad18f03a607434acf2"
+QUALIFIED_WORKFLOW_SHA256 = "5de68b388504a1671d3d27bbbbd7f496e40894b94b07202ae01810c0a83032d6"
+QUALIFIED_EXPORTER_SHA256 = "23c31fb7c07bf136b6a477e4fa7b3e01aec0e85bc7bb2eb21d14a8a6deab116e"
 FULL_JOB = "validation"
 FULL_STEP = "Run complete tool suite"
 ASSOCIATION_PENDING = "exact merged PR association is still pending"
 
 
 def identity(user):
-    return (isinstance(user, dict) and user.get("id") == MAINTAINER_ID
+    return (isinstance(user, dict) and type(user.get("id")) is int and user.get("id") == MAINTAINER_ID
             and user.get("login") == MAINTAINER_LOGIN)
 
 
 def same_repository(value):
-    return (isinstance(value, dict) and value.get("id") == REPOSITORY_ID
+    return (isinstance(value, dict) and type(value.get("id")) is int and value.get("id") == REPOSITORY_ID
             and value.get("full_name") == REPOSITORY)
 
 
@@ -58,22 +59,40 @@ def full(reason):
     return {"mode": "full", "reason": reason}
 
 
+def valid_sha(value):
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{40}", value) is not None
+
+
+def owner_local_push(event_name, event, sha):
+    """GitHub's immutable sender and exact protected commit authorize local trust."""
+    return (event_name == "push" and same_repository(event.get("repository"))
+            and identity(event.get("sender")) and event.get("ref") == "refs/heads/RAC2"
+            and valid_sha(sha) and event.get("after") == sha
+            and event.get("deleted") is not True)
+
+
 def select(event_name, event, sha, api):
-    """Only exact-SHA queue evidence can replace a post-merge suite."""
+    """The owner trusts local tests; all other routes retain full/queue proof."""
     if event_name == "merge_group":
         return full("merge groups always run the complete suite")
     if not same_repository(event.get("repository")):
         return full("repository identity is not qualified")
     if event_name == "pull_request":
         supplied = event.get("pull_request", {})
+        if type(event.get("number")) is not int or event["number"] < 1:
+            return full("PR number is invalid")
         pr = api.get("pulls/" + str(event["number"]))
         if (trusted_pr(pr) and pr.get("state") == "open" and pr.get("number") == event["number"]
+                and valid_sha(pr.get("head", {}).get("sha")) and valid_sha(pr.get("base", {}).get("sha"))
                 and supplied.get("head", {}).get("sha") == pr.get("head", {}).get("sha")
                 and supplied.get("base", {}).get("sha") == pr.get("base", {}).get("sha")):
-            return {"mode": "targeted", "reason": "authenticated primary maintainer PR",
+            return {"mode": "local", "reason": "authenticated primary maintainer PR trusts local validation",
                     "base_sha": pr["base"]["sha"], "head_sha": pr["head"]["sha"]}
         return full("PR identity, repository or exact reviewed head is not qualified")
-    if event_name != "push" or event.get("ref") != "refs/heads/RAC2" or event.get("after") != sha:
+    if owner_local_push(event_name, event, sha):
+        return {"mode": "local", "reason": "authenticated primary maintainer push trusts local validation",
+                "commit_sha": sha, "local_validation_trusted": True, "remote_full_validation": False}
+    if event_name != "push" or event.get("ref") != "refs/heads/RAC2" or not valid_sha(sha) or event.get("after") != sha:
         return full("only an exact protected-branch push can reuse queue tests")
     prs = api.get("commits/" + sha + "/pulls?per_page=100")
     if type(prs) is list and not prs:

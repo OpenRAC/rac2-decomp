@@ -6,11 +6,11 @@
   "reference_sha256": "76b77dbbc9a3e15f1c4f202a36b37d01bdaff7936142c14b5b35a1552a85287a",
   "reference_entry": 2769288,
   "candidate_source": "candidates/levels/7_siberius.c",
-  "source_sha256": "112d4cdaa47c14f3cebda551f0f356dac6efe5ebf247484a09a9fa909df883ea",
-  "catalog_sha256": "6caa0757cc9f33684a713c9cb255c28fe7b1bfa054072bdec52280e4be8fa821",
-  "object_sha256": "1773d7f34588ea8db6fa1c8a14a4b1f27de8a52f98a928c0808ab62d228b59f7",
-  "candidate_elf_sha256": "fd5f755b3af6bc3a48b10a086bf34cf1cd93e8346e1c81c1e7c229554eaf2bfd",
-  "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+  "source_sha256": "07d2c5f3a26ee1b34c6948a87bb86f46ba41412a374858e82763ec7af315410f",
+  "catalog_sha256": "0e7018ab5aa3de646820197d46ed7e52e2b7d0a3edea223d247ccad54fa3b219",
+  "object_sha256": "ba4c0b069816fdbcb302ae71854b60054ef2916dedf4324949a0efb8a9152e89",
+  "candidate_elf_sha256": "7f59c0478445fd1cbb58a38b0b968b0408e68918a3b0e12e804054b32ce8bd71",
+  "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
     "cpp": "2ac3d8d3ca177e6705ac2cbdd1bd9e9a7181ac3e40f6230dea6875c3218ec155",
@@ -2797,6 +2797,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_7_SIBERIUS_FUN_0042DFE0",
+      "address": 4382688,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "469621141be6b538b7f40b8d2f546329003e62757ddc6a6c4859b9d73a7ad381",
+      "candidate_sha256": "469621141be6b538b7f40b8d2f546329003e62757ddc6a6c4859b9d73a7ad381",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
+    },
+    {
       "symbol": "LVL_7_SIBERIUS_FUN_0042E908",
       "address": 4385032,
       "size": 44,
@@ -2817,6 +2828,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 44
+    },
+    {
+      "symbol": "LVL_7_SIBERIUS_FUN_0042ED30",
+      "address": 4386096,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "6e24d965cdb62cdb6f5f7051dedb0d1d74530744f1361e025eca147b007219c3",
+      "candidate_sha256": "6e24d965cdb62cdb6f5f7051dedb0d1d74530744f1361e025eca147b007219c3",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
     },
     {
       "symbol": "LVL_7_SIBERIUS_FUN_0042EF98",
@@ -3315,5 +3337,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 37196
+  "matched_code_bytes": 37716
 }

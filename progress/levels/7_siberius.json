@@ -1,51 +1,51 @@
 {
-  "boot_review_sha256": "1bc4bfc38b0502f9eeb0b4e82d4ee3a1a94a241685cddc14fac33467ccd7f0ad",
+  "boot_review_sha256": "42feb50efb4d86c2cc2d0b04880b8e735b62fffa70e9cf4a98f14b12bd0f49a7",
   "c_link_object_adapter": {
     "compiled_code_unchanged": true,
-    "compiled_object_sha256": "401d34cc074bfb8c8d172395c72a74e1edd90e2cbe68825480f2c451d1516eb4",
+    "compiled_object_sha256": "a38784a994da488ecbfe5c215ade3a207b1375d69226fb6b11efbadfc96e83f9",
     "integration_credit": 0,
     "kind": "reviewed-shared-import-relocation-adapter",
-    "link_object_sha256": "523439b0b3f0ac59462c72f61bc4ce54498797d04f603998e4a4cd1863a66b0d",
+    "link_object_sha256": "ec81ba83743a152936e487b9555868f098d94f7ceaa8d4a3686e21cc0d422838",
     "new_physical_bytes": 0,
     "relocation_changes": [
       {
         "caller": "FUN_0034F898",
         "caller_address": 4459896,
-        "new_r_info": 128004,
-        "new_symbol_index": 500,
+        "new_r_info": 128516,
+        "new_symbol_index": 502,
         "old_r_info": 67844,
         "old_symbol_index": 265,
         "provider": "FUN_001338C8",
         "provider_address": 1259720,
         "provider_reference_sha256": "df665c024f2c2f2122ca91cb5b61048030b7f98a3df2606d8c91441295d69d2f",
         "provider_size": 36,
-        "r_info_offset": 155160
+        "r_info_offset": 157036
       },
       {
         "caller": "FUN_0034FB20",
         "caller_address": 4460668,
-        "new_r_info": 144900,
-        "new_symbol_index": 566,
+        "new_r_info": 145412,
+        "new_symbol_index": 568,
         "old_r_info": 68100,
         "old_symbol_index": 266,
         "provider": "FUN_00133930",
         "provider_address": 1259824,
         "provider_reference_sha256": "d1b7a40a24b4537c4f9b704b87cafb6001ecaf64ef96c01c869fd05532732474",
         "provider_size": 44,
-        "r_info_offset": 155608
+        "r_info_offset": 157484
       },
       {
         "caller": "FUN_002B7170",
         "caller_address": 3294220,
-        "new_r_info": 159236,
-        "new_symbol_index": 622,
+        "new_r_info": 159748,
+        "new_symbol_index": 624,
         "old_r_info": 67588,
         "old_symbol_index": 264,
         "provider": "FUN_00133490",
         "provider_address": 1258640,
         "provider_reference_sha256": "1c102a1be303b46fbc85f02f327e97d8ecdbbf6635d3458a6454c0c7de75c75a",
         "provider_size": 40,
-        "r_info_offset": 155920
+        "r_info_offset": 157796
       }
     ],
     "schema": 1,
@@ -69,7 +69,7 @@
       {
         "index": 5,
         "name": ".mdebug",
-        "sha256": "fdb4bb455d57494f6403e57dd1f073d35bdedc2783b99eaab74059745a38e2b5"
+        "sha256": "027e3427c9592c84bc5e0aed8001c24e3bf0cc1be7666287e1d10c3da5b3388d"
       },
       {
         "index": 6,
@@ -2008,34 +2008,44 @@
       },
       {
         "index": 568,
+        "name": ".text.FUN_0033CB18",
+        "sha256": "6f812490f02ab6279f78ae2a1a9e0b9d75ae9608da1b81d1982b8699afca7a38"
+      },
+      {
+        "index": 570,
+        "name": ".text.FUN_0033D868",
+        "sha256": "6f812490f02ab6279f78ae2a1a9e0b9d75ae9608da1b81d1982b8699afca7a38"
+      },
+      {
+        "index": 572,
         "name": ".text.FUN_00336DA8",
         "sha256": "4e13dc63c008e40ee14d518ca3fab41f4f2755add3d7524f78711a838b7fa91b"
       },
       {
-        "index": 569,
+        "index": 573,
         "name": ".shstrtab",
-        "sha256": "c9d3943759ed491d59cc80a408876cc0a359e1d62be33d78d75e5ade702beabe"
+        "sha256": "0d47384ca9e9dc1bd785ca3a277b6caa1d1a4f49f9ee938c43a0786dbae506e6"
       },
       {
-        "index": 570,
+        "index": 574,
         "name": ".symtab",
-        "sha256": "64f1261bb9920d97e0aa1d24e6824d750655898e71ab2ff41f1abb3b09a81523"
+        "sha256": "0957c503661b6efae025d77be2d4490f480c36f39bb9b25fe721f12ecedde463"
       },
       {
-        "index": 571,
+        "index": 575,
         "name": ".strtab",
-        "sha256": "d8a0634de807fbce109e95a4c7a5714f4ddbb2342e76d0dd847f06a35c9f58c2"
+        "sha256": "e6162bd5b073a4581445bdd6e8cb2164398bbcfb080779e732ad9a8ad42db242"
       }
     ]
   },
-  "c_link_object_adapter_sha256": "b4254ce5a04faf473b2930fea4fa8d0ec038fd340ba5777a586215f7e3414a0c",
-  "c_link_object_sha256": "523439b0b3f0ac59462c72f61bc4ce54498797d04f603998e4a4cd1863a66b0d",
-  "c_object_sha256": "401d34cc074bfb8c8d172395c72a74e1edd90e2cbe68825480f2c451d1516eb4",
-  "candidate_elf_sha256": "0347911f9b4dffd96a8ab0b2f93e3844465b055757bbbbb94aff406b0e47bad8",
+  "c_link_object_adapter_sha256": "6c7bd068c5a29ab53f0c12a86f32074aaddeb87a03451a333edb516f4ad919a1",
+  "c_link_object_sha256": "ec81ba83743a152936e487b9555868f098d94f7ceaa8d4a3686e21cc0d422838",
+  "c_object_sha256": "a38784a994da488ecbfe5c215ade3a207b1375d69226fb6b11efbadfc96e83f9",
+  "candidate_elf_sha256": "433df9f59529ae9ac9dfd8325c4520272269e83253abed29e31d9e5e168928d1",
   "candidate_entry": 2769288,
   "candidate_source": "candidates/boot.c",
   "catalog_sha256": "05c7ef5b32379e5a076a5a6fac5897fba5daf4ea0b12c4fc879061eea1e584f3",
-  "dependency_sha256": "561ab5325231856a2117ecaab815a79bc3c48102e4061936f4b9e22403ede075",
+  "dependency_sha256": "496f9ebaec895c661ce361331335c706ec75f9ca2ab50bc3061d181f5136809c",
   "full_level_gate": {
     "bytes_compared": 2734104,
     "matched": true,
@@ -7853,6 +7863,20 @@
       "symbol": "LVL_7_SIBERIUS_FUN_0042DE80"
     },
     {
+      "address": 4382688,
+      "candidate_sha256": "469621141be6b538b7f40b8d2f546329003e62757ddc6a6c4859b9d73a7ad381",
+      "candidate_source": "candidates/levels/7_siberius.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "7_siberius",
+      "reference_sha256": "469621141be6b538b7f40b8d2f546329003e62757ddc6a6c4859b9d73a7ad381",
+      "size": 260,
+      "state": "integrated",
+      "symbol": "LVL_7_SIBERIUS_FUN_0042DFE0"
+    },
+    {
       "address": 4385032,
       "candidate_sha256": "b8ecc79cd579df2013cdffb7adc2a613721616c19b8db4866c04bc63e5ac4e31",
       "candidate_source": "candidates/levels/7_siberius.c",
@@ -7879,6 +7903,20 @@
       "size": 44,
       "state": "integrated",
       "symbol": "LVL_7_SIBERIUS_FUN_0042EBD0"
+    },
+    {
+      "address": 4386096,
+      "candidate_sha256": "6e24d965cdb62cdb6f5f7051dedb0d1d74530744f1361e025eca147b007219c3",
+      "candidate_source": "candidates/levels/7_siberius.c",
+      "different_bytes": 0,
+      "integrated": true,
+      "matched": true,
+      "origin": "level-native",
+      "program": "7_siberius",
+      "reference_sha256": "6e24d965cdb62cdb6f5f7051dedb0d1d74530744f1361e025eca147b007219c3",
+      "size": 260,
+      "state": "integrated",
+      "symbol": "LVL_7_SIBERIUS_FUN_0042ED30"
     },
     {
       "address": 4386712,
@@ -9184,14 +9222,14 @@
     }
   ],
   "kind": "level-c-integration",
-  "matched_code_bytes": 49076,
+  "matched_code_bytes": 49596,
   "native": {
     "catalog_path": "config/level-native/7_siberius.json",
     "object_qualification": {
-      "candidate_elf_sha256": "fd5f755b3af6bc3a48b10a086bf34cf1cd93e8346e1c81c1e7c229554eaf2bfd",
+      "candidate_elf_sha256": "7f59c0478445fd1cbb58a38b0b968b0408e68918a3b0e12e804054b32ce8bd71",
       "candidate_source": "candidates/levels/7_siberius.c",
-      "catalog_sha256": "6caa0757cc9f33684a713c9cb255c28fe7b1bfa054072bdec52280e4be8fa821",
-      "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+      "catalog_sha256": "0e7018ab5aa3de646820197d46ed7e52e2b7d0a3edea223d247ccad54fa3b219",
+      "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
       "flags": [
         "-O2",
         "-G0",
@@ -11971,6 +12009,17 @@
           "symbol": "LVL_7_SIBERIUS_FUN_0042DE80"
         },
         {
+          "address": 4382688,
+          "candidate_sha256": "469621141be6b538b7f40b8d2f546329003e62757ddc6a6c4859b9d73a7ad381",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 260,
+          "reference_sha256": "469621141be6b538b7f40b8d2f546329003e62757ddc6a6c4859b9d73a7ad381",
+          "size": 260,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_7_SIBERIUS_FUN_0042DFE0"
+        },
+        {
           "address": 4385032,
           "candidate_sha256": "b8ecc79cd579df2013cdffb7adc2a613721616c19b8db4866c04bc63e5ac4e31",
           "different_bytes": 0,
@@ -11991,6 +12040,17 @@
           "size": 44,
           "state": "matched_unintegrated",
           "symbol": "LVL_7_SIBERIUS_FUN_0042EBD0"
+        },
+        {
+          "address": 4386096,
+          "candidate_sha256": "6e24d965cdb62cdb6f5f7051dedb0d1d74530744f1361e025eca147b007219c3",
+          "different_bytes": 0,
+          "matched": true,
+          "produced_size": 260,
+          "reference_sha256": "6e24d965cdb62cdb6f5f7051dedb0d1d74530744f1361e025eca147b007219c3",
+          "size": 260,
+          "state": "matched_unintegrated",
+          "symbol": "LVL_7_SIBERIUS_FUN_0042ED30"
         },
         {
           "address": 4386712,
@@ -12489,14 +12549,14 @@
         }
       ],
       "kind": "level-native-candidate",
-      "matched_code_bytes": 37196,
-      "object_sha256": "1773d7f34588ea8db6fa1c8a14a4b1f27de8a52f98a928c0808ab62d228b59f7",
+      "matched_code_bytes": 37716,
+      "object_sha256": "ba4c0b069816fdbcb302ae71854b60054ef2916dedf4324949a0efb8a9152e89",
       "program": "levels/7_siberius",
       "read_only_sections": [],
       "reference_entry": 2769288,
       "reference_sha256": "76b77dbbc9a3e15f1c4f202a36b37d01bdaff7936142c14b5b35a1552a85287a",
       "schema": 1,
-      "source_sha256": "112d4cdaa47c14f3cebda551f0f356dac6efe5ebf247484a09a9fa909df883ea",
+      "source_sha256": "07d2c5f3a26ee1b34c6948a87bb86f46ba41412a374858e82763ec7af315410f",
       "state": "matched_unintegrated",
       "target": "SCUS_972.68",
       "tools": {
@@ -12506,9 +12566,9 @@
         "ld.exe": "80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48"
       }
     },
-    "object_sha256": "1773d7f34588ea8db6fa1c8a14a4b1f27de8a52f98a928c0808ab62d228b59f7",
+    "object_sha256": "ba4c0b069816fdbcb302ae71854b60054ef2916dedf4324949a0efb8a9152e89",
     "review_path": "progress/level-candidates/7_siberius.json",
-    "review_sha256": "76fd55280f9784dda338481cf291b9fafe636777cb93c40dfb3e8fe112a09ac0",
+    "review_sha256": "76d703d34c9e2c1fbe55698387171692a7c423b08b8d0eaa45a0ee7281bdc594",
     "source": "candidates/levels/7_siberius.c"
   },
   "program": "7_siberius",
@@ -12935,8 +12995,10 @@
       "LVL_7_SIBERIUS_FUN_0042D640",
       "LVL_7_SIBERIUS_FUN_0042D8F8",
       "LVL_7_SIBERIUS_FUN_0042DE80",
+      "LVL_7_SIBERIUS_FUN_0042DFE0",
       "LVL_7_SIBERIUS_FUN_0042E908",
       "LVL_7_SIBERIUS_FUN_0042EBD0",
+      "LVL_7_SIBERIUS_FUN_0042ED30",
       "LVL_7_SIBERIUS_FUN_0042EF98",
       "LVL_7_SIBERIUS_FUN_0042F248",
       "LVL_7_SIBERIUS_FUN_0042F440",
@@ -13036,50 +13098,50 @@
   "shared": {
     "c_link_object_adapter": {
       "compiled_code_unchanged": true,
-      "compiled_object_sha256": "401d34cc074bfb8c8d172395c72a74e1edd90e2cbe68825480f2c451d1516eb4",
+      "compiled_object_sha256": "a38784a994da488ecbfe5c215ade3a207b1375d69226fb6b11efbadfc96e83f9",
       "integration_credit": 0,
       "kind": "reviewed-shared-import-relocation-adapter",
-      "link_object_sha256": "523439b0b3f0ac59462c72f61bc4ce54498797d04f603998e4a4cd1863a66b0d",
+      "link_object_sha256": "ec81ba83743a152936e487b9555868f098d94f7ceaa8d4a3686e21cc0d422838",
       "new_physical_bytes": 0,
       "relocation_changes": [
         {
           "caller": "FUN_0034F898",
           "caller_address": 4459896,
-          "new_r_info": 128004,
-          "new_symbol_index": 500,
+          "new_r_info": 128516,
+          "new_symbol_index": 502,
           "old_r_info": 67844,
           "old_symbol_index": 265,
           "provider": "FUN_001338C8",
           "provider_address": 1259720,
           "provider_reference_sha256": "df665c024f2c2f2122ca91cb5b61048030b7f98a3df2606d8c91441295d69d2f",
           "provider_size": 36,
-          "r_info_offset": 155160
+          "r_info_offset": 157036
         },
         {
           "caller": "FUN_0034FB20",
           "caller_address": 4460668,
-          "new_r_info": 144900,
-          "new_symbol_index": 566,
+          "new_r_info": 145412,
+          "new_symbol_index": 568,
           "old_r_info": 68100,
           "old_symbol_index": 266,
           "provider": "FUN_00133930",
           "provider_address": 1259824,
           "provider_reference_sha256": "d1b7a40a24b4537c4f9b704b87cafb6001ecaf64ef96c01c869fd05532732474",
           "provider_size": 44,
-          "r_info_offset": 155608
+          "r_info_offset": 157484
         },
         {
           "caller": "FUN_002B7170",
           "caller_address": 3294220,
-          "new_r_info": 159236,
-          "new_symbol_index": 622,
+          "new_r_info": 159748,
+          "new_symbol_index": 624,
           "old_r_info": 67588,
           "old_symbol_index": 264,
           "provider": "FUN_00133490",
           "provider_address": 1258640,
           "provider_reference_sha256": "1c102a1be303b46fbc85f02f327e97d8ecdbbf6635d3458a6454c0c7de75c75a",
           "provider_size": 40,
-          "r_info_offset": 155920
+          "r_info_offset": 157796
         }
       ],
       "schema": 1,
@@ -13103,7 +13165,7 @@
         {
           "index": 5,
           "name": ".mdebug",
-          "sha256": "fdb4bb455d57494f6403e57dd1f073d35bdedc2783b99eaab74059745a38e2b5"
+          "sha256": "027e3427c9592c84bc5e0aed8001c24e3bf0cc1be7666287e1d10c3da5b3388d"
         },
         {
           "index": 6,
@@ -15042,30 +15104,40 @@
         },
         {
           "index": 568,
+          "name": ".text.FUN_0033CB18",
+          "sha256": "6f812490f02ab6279f78ae2a1a9e0b9d75ae9608da1b81d1982b8699afca7a38"
+        },
+        {
+          "index": 570,
+          "name": ".text.FUN_0033D868",
+          "sha256": "6f812490f02ab6279f78ae2a1a9e0b9d75ae9608da1b81d1982b8699afca7a38"
+        },
+        {
+          "index": 572,
           "name": ".text.FUN_00336DA8",
           "sha256": "4e13dc63c008e40ee14d518ca3fab41f4f2755add3d7524f78711a838b7fa91b"
         },
         {
-          "index": 569,
+          "index": 573,
           "name": ".shstrtab",
-          "sha256": "c9d3943759ed491d59cc80a408876cc0a359e1d62be33d78d75e5ade702beabe"
+          "sha256": "0d47384ca9e9dc1bd785ca3a277b6caa1d1a4f49f9ee938c43a0786dbae506e6"
         },
         {
-          "index": 570,
+          "index": 574,
           "name": ".symtab",
-          "sha256": "64f1261bb9920d97e0aa1d24e6824d750655898e71ab2ff41f1abb3b09a81523"
+          "sha256": "0957c503661b6efae025d77be2d4490f480c36f39bb9b25fe721f12ecedde463"
         },
         {
-          "index": 571,
+          "index": 575,
           "name": ".strtab",
-          "sha256": "d8a0634de807fbce109e95a4c7a5714f4ddbb2342e76d0dd847f06a35c9f58c2"
+          "sha256": "e6162bd5b073a4581445bdd6e8cb2164398bbcfb080779e732ad9a8ad42db242"
         }
       ]
     },
-    "c_link_object_adapter_sha256": "b4254ce5a04faf473b2930fea4fa8d0ec038fd340ba5777a586215f7e3414a0c",
-    "c_link_object_sha256": "523439b0b3f0ac59462c72f61bc4ce54498797d04f603998e4a4cd1863a66b0d",
-    "c_object_sha256": "401d34cc074bfb8c8d172395c72a74e1edd90e2cbe68825480f2c451d1516eb4",
-    "candidate_elf_sha256": "0347911f9b4dffd96a8ab0b2f93e3844465b055757bbbbb94aff406b0e47bad8",
+    "c_link_object_adapter_sha256": "6c7bd068c5a29ab53f0c12a86f32074aaddeb87a03451a333edb516f4ad919a1",
+    "c_link_object_sha256": "ec81ba83743a152936e487b9555868f098d94f7ceaa8d4a3686e21cc0d422838",
+    "c_object_sha256": "a38784a994da488ecbfe5c215ade3a207b1375d69226fb6b11efbadfc96e83f9",
+    "candidate_elf_sha256": "433df9f59529ae9ac9dfd8325c4520272269e83253abed29e31d9e5e168928d1",
     "candidate_source": "candidates/boot.c",
     "catalog_sha256": "05c7ef5b32379e5a076a5a6fac5897fba5daf4ea0b12c4fc879061eea1e584f3",
     "full_level_gate": {
@@ -15493,8 +15565,10 @@
         "LVL_7_SIBERIUS_FUN_0042D640",
         "LVL_7_SIBERIUS_FUN_0042D8F8",
         "LVL_7_SIBERIUS_FUN_0042DE80",
+        "LVL_7_SIBERIUS_FUN_0042DFE0",
         "LVL_7_SIBERIUS_FUN_0042E908",
         "LVL_7_SIBERIUS_FUN_0042EBD0",
+        "LVL_7_SIBERIUS_FUN_0042ED30",
         "LVL_7_SIBERIUS_FUN_0042EF98",
         "LVL_7_SIBERIUS_FUN_0042F248",
         "LVL_7_SIBERIUS_FUN_0042F440",
@@ -15590,7 +15664,7 @@
         "LVL_7_SIBERIUS_FUN_00371440"
       ]
     },
-    "source_sha256": "95d0e59ef3c6ace619eb06423518797623765b9d51cf0b890ed723a0496a0ef2",
+    "source_sha256": "52dc0e9e0cc85bb975e07bf55744601869457cd7925357162056a8d47d8cfb63",
     "state": "integrated",
     "target": "SCUS_972.68",
     "tools": {
@@ -15607,7 +15681,7 @@
       "candidate_elf_sha256": "38799249951837d3343cbb50e0e756cdd5ba8b4f0d8cff14c73dad18c3074048",
       "candidate_source": "candidates/levels/7_siberius-g8.c",
       "catalog_sha256": "ac8f55c48fbe540a0d771121d3cebd5852e00969a2e7af52926ddf070e4149fb",
-      "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+      "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
       "flags": [
         "-O2",
         "-G8",
@@ -16163,10 +16237,10 @@
     },
     "object_sha256": "246ff1ea33fc3d8b83bf729d1e2d7dbd0412d72aeb414831444e91888601eda3",
     "review_path": "progress/level-g8/7_siberius.json",
-    "review_sha256": "a82e3b430f8a515d5ac8dd913f19efda54713261edbe31c50886768e3a8ac88b",
+    "review_sha256": "8923e65966ce8cce085dc5d0c0a766289d477dc88b4778cd589b59b6cc26e458",
     "source": "candidates/levels/7_siberius-g8.c"
   },
-  "source_sha256": "95d0e59ef3c6ace619eb06423518797623765b9d51cf0b890ed723a0496a0ef2",
+  "source_sha256": "52dc0e9e0cc85bb975e07bf55744601869457cd7925357162056a8d47d8cfb63",
   "state": "integrated",
   "target": "SCUS_972.68",
   "tools": {

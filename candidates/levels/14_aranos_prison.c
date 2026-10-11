@@ -6440,3 +6440,77 @@ void LVL_14_ARANOS_PRISON_FUN_002F0370(int i0, int i1, int i2, int i3, int tag, 
          | ((long long)tag << 32);
     LVL_14_ARANOS_PRISON_Ff67aa9df_FUN_002F02B0(v, x);
 }
+extern void LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EA48(char *p);
+extern void LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EC38(char *p, float a, float b);
+extern void LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30(int a, int b, int c);
+
+extern volatile unsigned char LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95 __attribute__((sda));
+extern volatile unsigned char LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94 __attribute__((sda));
+
+int LVL_14_ARANOS_PRISON_FUN_00450738(char *a0, int a1)
+{
+    char *p = a0 + 8;
+    float *q;
+    int v;
+
+    LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EA48(p);
+    q = *(float **)(a0 + 684);
+    LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EC38(p, q[0], q[1]);
+    if (a1 & 0x1000) {
+        LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x4000) {
+        LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x40) {
+        LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30(4, 0, 0);
+        switch (*(int *)(a0 + 680)) {
+        case 0:
+            LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95 = LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95 == 0;
+            break;
+        case 1:
+            LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94 = LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94 == 0;
+            break;
+        }
+    }
+    return (a1 >> 6) & 1;
+}
+extern void LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EA48(char *p);
+extern void LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EC38(char *p, float a, float b);
+extern void LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30(int a, int b, int c);
+
+extern volatile unsigned char LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2 __attribute__((sda));
+extern volatile unsigned char LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3 __attribute__((sda));
+
+int LVL_14_ARANOS_PRISON_FUN_00451488(char *a0, int a1)
+{
+    char *p = a0 + 8;
+    float *q;
+    int v;
+
+    LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EA48(p);
+    q = *(float **)(a0 + 684);
+    LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EC38(p, q[0], q[1]);
+    if (a1 & 0x1000) {
+        LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x4000) {
+        LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x40) {
+        LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30(4, 0, 0);
+        switch (*(int *)(a0 + 680)) {
+        case 0:
+            LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2 = LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2 == 0;
+            break;
+        case 1:
+            LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3 = LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3 == 0;
+            break;
+        }
+    }
+    return (a1 >> 6) & 1;
+}

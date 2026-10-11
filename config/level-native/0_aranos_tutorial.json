@@ -331,6 +331,11 @@
     "LVL_0_ARANOS_TUTORIAL_Fb4cfb7e0_FUN_0031A728": 3254056,
     "LVL_0_ARANOS_TUTORIAL_Fb77d67f1_FUN_002EDD48": 3071304,
     "LVL_0_ARANOS_TUTORIAL_Fb77d67f1_FUN_0032FC10": 3341328,
+    "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_0_ARANOS_TUTORIAL_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_0035F508": 3536136,
+    "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430758": 4392792,
+    "LVL_0_ARANOS_TUTORIAL_Fb7feb893_FUN_00430948": 4393288,
     "LVL_0_ARANOS_TUTORIAL_Fbbb7bee1_FUN_002EDE38": 3071544,
     "LVL_0_ARANOS_TUTORIAL_Fbc82131e_D_001AD6B0": 1758896,
     "LVL_0_ARANOS_TUTORIAL_Fbc82131e_D_001AD6C0": 1758912,
@@ -357,6 +362,11 @@
     "LVL_0_ARANOS_TUTORIAL_Fc3cb9262_FUN_002EE108": 3072264,
     "LVL_0_ARANOS_TUTORIAL_Fc3cb9262_FUN_002EF250": 3076688,
     "LVL_0_ARANOS_TUTORIAL_Fc3cb9262_FUN_0032FC10": 3341328,
+    "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_0_ARANOS_TUTORIAL_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_0035F508": 3536136,
+    "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430758": 4392792,
+    "LVL_0_ARANOS_TUTORIAL_Fc558ca70_FUN_00430948": 4393288,
     "LVL_0_ARANOS_TUTORIAL_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_0_ARANOS_TUTORIAL_Fc936841d_FUN_002EE108": 3072264,
     "LVL_0_ARANOS_TUTORIAL_Fc936841d_FUN_002EE138": 3072312,
@@ -1993,6 +2003,12 @@
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_004322E8"
     },
     {
+      "address": 4400200,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00432448"
+    },
+    {
       "address": 4402544,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2003,6 +2019,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00433038"
+    },
+    {
+      "address": 4403608,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_00433198"
     },
     {
       "address": 4404224,

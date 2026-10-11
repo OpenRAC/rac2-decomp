@@ -328,6 +328,11 @@
     "LVL_12_TODANO_Fb4cfb7e0_FUN_0031E2A0": 3269280,
     "LVL_12_TODANO_Fb77d67f1_FUN_002F1598": 3085720,
     "LVL_12_TODANO_Fb77d67f1_FUN_00334F58": 3362648,
+    "LVL_12_TODANO_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_12_TODANO_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_12_TODANO_Fb7feb893_FUN_00364F58": 3559256,
+    "LVL_12_TODANO_Fb7feb893_FUN_00446EF8": 4484856,
+    "LVL_12_TODANO_Fb7feb893_FUN_004470E8": 4485352,
     "LVL_12_TODANO_Fbbb7bee1_FUN_002F1688": 3085960,
     "LVL_12_TODANO_Fbdd4a4aa_FUN_002F1928": 3086632,
     "LVL_12_TODANO_Fbdd4a4aa_FUN_002F19B0": 3086768,
@@ -350,6 +355,11 @@
     "LVL_12_TODANO_Fc3cb9262_FUN_002F1928": 3086632,
     "LVL_12_TODANO_Fc3cb9262_FUN_002F2AA8": 3091112,
     "LVL_12_TODANO_Fc3cb9262_FUN_00334F58": 3362648,
+    "LVL_12_TODANO_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_12_TODANO_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_12_TODANO_Fc558ca70_FUN_00364F58": 3559256,
+    "LVL_12_TODANO_Fc558ca70_FUN_00446EF8": 4484856,
+    "LVL_12_TODANO_Fc558ca70_FUN_004470E8": 4485352,
     "LVL_12_TODANO_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_12_TODANO_Fc84472d1_D_001ADD98": 1760664,
     "LVL_12_TODANO_Fc84472d1_D_001ADDB8": 1760696,
@@ -2000,6 +2010,12 @@
       "symbol": "LVL_12_TODANO_FUN_00448A88"
     },
     {
+      "address": 4492264,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_12_TODANO_FUN_00448BE8"
+    },
+    {
       "address": 4494608,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2010,6 +2026,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_12_TODANO_FUN_004497D8"
+    },
+    {
+      "address": 4495672,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_12_TODANO_FUN_00449938"
     },
     {
       "address": 4496288,

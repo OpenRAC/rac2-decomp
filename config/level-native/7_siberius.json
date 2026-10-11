@@ -339,6 +339,11 @@
     "LVL_7_SIBERIUS_Fb4cfb7e0_FUN_00310A98": 3213976,
     "LVL_7_SIBERIUS_Fb77d67f1_FUN_002E3F80": 3030912,
     "LVL_7_SIBERIUS_Fb77d67f1_FUN_003263C0": 3302336,
+    "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_7_SIBERIUS_Fb7feb893_FUN_003555E8": 3495400,
+    "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C2F0": 4375280,
+    "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C4E0": 4375776,
     "LVL_7_SIBERIUS_Fbbb7bee1_FUN_002E4070": 3031152,
     "LVL_7_SIBERIUS_Fbdd4a4aa_FUN_002E4310": 3031824,
     "LVL_7_SIBERIUS_Fbdd4a4aa_FUN_002E4398": 3031960,
@@ -361,6 +366,11 @@
     "LVL_7_SIBERIUS_Fc3cb9262_FUN_002E4310": 3031824,
     "LVL_7_SIBERIUS_Fc3cb9262_FUN_002E5470": 3036272,
     "LVL_7_SIBERIUS_Fc3cb9262_FUN_003263C0": 3302336,
+    "LVL_7_SIBERIUS_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_7_SIBERIUS_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_7_SIBERIUS_Fc558ca70_FUN_003555E8": 3495400,
+    "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C2F0": 4375280,
+    "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C4E0": 4375776,
     "LVL_7_SIBERIUS_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_7_SIBERIUS_Fc895cb79_D_001D1D00": 1907968,
     "LVL_7_SIBERIUS_Fc936841d_FUN_002E4310": 3031824,
@@ -1985,6 +1995,12 @@
       "symbol": "LVL_7_SIBERIUS_FUN_0042DE80"
     },
     {
+      "address": 4382688,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_7_SIBERIUS_FUN_0042DFE0"
+    },
+    {
       "address": 4385032,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -1995,6 +2011,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_7_SIBERIUS_FUN_0042EBD0"
+    },
+    {
+      "address": 4386096,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_7_SIBERIUS_FUN_0042ED30"
     },
     {
       "address": 4386712,

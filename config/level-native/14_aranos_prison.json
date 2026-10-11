@@ -332,6 +332,11 @@
     "LVL_14_ARANOS_PRISON_Fb4cfb7e0_FUN_00322028": 3285032,
     "LVL_14_ARANOS_PRISON_Fb77d67f1_FUN_002F5878": 3102840,
     "LVL_14_ARANOS_PRISON_Fb77d67f1_FUN_00339F18": 3383064,
+    "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_14_ARANOS_PRISON_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_00369C30": 3578928,
+    "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EA48": 4516424,
+    "LVL_14_ARANOS_PRISON_Fb7feb893_FUN_0044EC38": 4516920,
     "LVL_14_ARANOS_PRISON_Fbbb7bee1_FUN_002F5968": 3103080,
     "LVL_14_ARANOS_PRISON_Fbdd4a4aa_FUN_002F5C38": 3103800,
     "LVL_14_ARANOS_PRISON_Fbdd4a4aa_FUN_002F5CC0": 3103936,
@@ -354,6 +359,11 @@
     "LVL_14_ARANOS_PRISON_Fc3cb9262_FUN_002F5C38": 3103800,
     "LVL_14_ARANOS_PRISON_Fc3cb9262_FUN_002F6DD8": 3108312,
     "LVL_14_ARANOS_PRISON_Fc3cb9262_FUN_00339F18": 3383064,
+    "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_14_ARANOS_PRISON_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_00369C30": 3578928,
+    "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EA48": 4516424,
+    "LVL_14_ARANOS_PRISON_Fc558ca70_FUN_0044EC38": 4516920,
     "LVL_14_ARANOS_PRISON_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_14_ARANOS_PRISON_Fc936841d_FUN_002F5C38": 3103800,
     "LVL_14_ARANOS_PRISON_Fc936841d_FUN_002F5C68": 3103848,
@@ -2038,6 +2048,12 @@
       "symbol": "LVL_14_ARANOS_PRISON_FUN_004505D8"
     },
     {
+      "address": 4523832,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00450738"
+    },
+    {
       "address": 4526176,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2048,6 +2064,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_14_ARANOS_PRISON_FUN_00451328"
+    },
+    {
+      "address": 4527240,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_14_ARANOS_PRISON_FUN_00451488"
     },
     {
       "address": 4527856,

@@ -68,3 +68,19 @@ commit. Workflow changes still require code review; the format check is not a
 technical approval of a contribution.
 
 See GitHub's [merge queue guide](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue).
+
+## Primary maintainer exception
+
+The primary maintainer, `llesieur99` (immutable user ID 191315338), may
+merge an exact reviewed head after completed local validation without waiting
+for remote full tests or the native queue:
+
+```sh
+python scripts/merge_queue.py <PR> --expected-head <SHA> --owner-local
+```
+
+This is an explicit local-validation assertion, not a GitHub proof of local
+test results. The command refuses other accounts and changed heads.
+GitHub CI-check and queue exceptions apply only to this user on PR merges.
+Deletion, non-fast-forward restrictions and other contributorsâ€™ required
+checks and queue remain enforced. Source matching acceptance stays byte-exact.

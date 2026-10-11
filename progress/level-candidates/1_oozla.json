@@ -6,11 +6,11 @@
   "reference_sha256": "84c7e1d55cd34f7785ca8e72d03667707474c29249891735cef9dd0e53b834e3",
   "reference_entry": 2776968,
   "candidate_source": "candidates/levels/1_oozla.c",
-  "source_sha256": "e4780af38377139d2dc21c82c1c4ceb0fa567ca571d5dea8df494f25a047e177",
-  "catalog_sha256": "7e63d15ce4eafee36078d404a067964b720f870dc556007334e788268dfd9a8a",
-  "object_sha256": "a51e535de90deff8b84853fe73d2b6af935362f2eca10d2a26f32323571a392f",
-  "candidate_elf_sha256": "75c511a5ed927a3d6aecb780f8c97186a43599466fe7f4086c5f14948277e900",
-  "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+  "source_sha256": "14034e9ee7046e37682b76bcfe37b8554f3aac35cc7cb62a93c8542e1bdb793b",
+  "catalog_sha256": "023e844fdbd8069dbc4008a22bed5d34a31c8f7e3500b7a7179e72d265ad6592",
+  "object_sha256": "dbbde6a07739920703c825d684201e84d669c446172563739d4e2e1ec022f353",
+  "candidate_elf_sha256": "ccfb08088803b0783d00642d0352e87a969106949a738db0f89bfbea647024e8",
+  "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
     "cpp": "2ac3d8d3ca177e6705ac2cbdd1bd9e9a7181ac3e40f6230dea6875c3218ec155",
@@ -2588,6 +2588,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_1_OOZLA_FUN_00435450",
+      "address": 4412496,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "841896627d41d787b220f5bf1e64ecf2e12ffd993b1427cfe0ec3c93cabc6dd0",
+      "candidate_sha256": "841896627d41d787b220f5bf1e64ecf2e12ffd993b1427cfe0ec3c93cabc6dd0",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
+    },
+    {
       "symbol": "LVL_1_OOZLA_FUN_00435D78",
       "address": 4414840,
       "size": 44,
@@ -2608,6 +2619,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 44
+    },
+    {
+      "symbol": "LVL_1_OOZLA_FUN_004361A0",
+      "address": 4415904,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "f934d3556eba4d0b8445e754c5e62890aa49afccc5c2471f9e89a4d575209d80",
+      "candidate_sha256": "f934d3556eba4d0b8445e754c5e62890aa49afccc5c2471f9e89a4d575209d80",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
     },
     {
       "symbol": "LVL_1_OOZLA_FUN_00436408",
@@ -3095,5 +3117,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 33892
+  "matched_code_bytes": 34412
 }

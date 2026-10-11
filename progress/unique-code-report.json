@@ -1,8 +1,8 @@
 {
-  "catalog_sha256": "d9cd064dcb09c33cee617470272003911c27fe09fb90f0421209de4bb983f633",
+  "catalog_sha256": "1ada57f7b6d160e47b88ec53b37a16f84b72b077ac94073ee8428c8ad8097e08",
   "catalogue_complete": false,
   "coverage": {
-    "aliases": 14290,
+    "aliases": 14347,
     "catalogued_interval_bytes": 48470076,
     "excluded_vu_bytes": 86368,
     "placements": 109727,
@@ -12,7 +12,7 @@
   },
   "data_policy": "retain-unowned-data-address-operands",
   "graph_refinement": {
-    "boot_binding_artifact_sha256": "605d0a712d361b6dbbee1c4fc18726f8b06631678885dbec79ae38ca1e75ddb7",
+    "boot_binding_artifact_sha256": "bf0f160a78fd8a7478bf2063c15fdf20d156e8e97ff42e0d28b5fb7583d0fa07",
     "boot_binding_scope": "combined-pinned-reference-images",
     "combined_reference_boot_edges": 22576,
     "complete_dependency_rows": 109727,
@@ -34,10 +34,10 @@
   "group_policy": "graph-refined-structural-templates",
   "kind": "unique-code-progress",
   "metrics": {
-    "physical_matched_bytes": 1342608,
+    "physical_matched_bytes": 1356672,
     "physical_total_bytes": 48701808,
-    "unique_matched_bytes": 481352,
-    "unique_matched_percent": 1.084122024042792,
+    "unique_matched_bytes": 495400,
+    "unique_matched_percent": 1.1157615439653292,
     "unique_total_bytes": 44400168
   },
   "policy": "one equal-sized representative per conservative structural class refined by static target classes and retained unowned data address operands; all verified placements require current exact C integration; no semantic, original-data-object or original-source equivalence claim",
@@ -61,10 +61,10 @@
   "schema": 1,
   "target": "SCUS_972.68",
   "validated_subset": {
-    "any_c_unique_bytes": 493544,
+    "any_c_unique_bytes": 507592,
     "groups": 67988,
-    "matched_c_groups": 3173,
-    "matched_c_unique_bytes": 481352,
+    "matched_c_groups": 3228,
+    "matched_c_unique_bytes": 495400,
     "total_unique_bytes": 35773608
   }
 }

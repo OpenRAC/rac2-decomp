@@ -292,6 +292,11 @@
     "LVL_1_OOZLA_Fb4cfb7e0_FUN_003104E8": 3212520,
     "LVL_1_OOZLA_Fb77d67f1_FUN_002E30E0": 3027168,
     "LVL_1_OOZLA_Fb77d67f1_FUN_003258B8": 3299512,
+    "LVL_1_OOZLA_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_1_OOZLA_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_1_OOZLA_Fb7feb893_FUN_003558E0": 3496160,
+    "LVL_1_OOZLA_Fb7feb893_FUN_00433760": 4405088,
+    "LVL_1_OOZLA_Fb7feb893_FUN_00433950": 4405584,
     "LVL_1_OOZLA_Fbbb7bee1_FUN_002E31D0": 3027408,
     "LVL_1_OOZLA_Fbdd4a4aa_FUN_002E3470": 3028080,
     "LVL_1_OOZLA_Fbdd4a4aa_FUN_002E34E0": 3028192,
@@ -314,6 +319,11 @@
     "LVL_1_OOZLA_Fc3cb9262_FUN_002E3470": 3028080,
     "LVL_1_OOZLA_Fc3cb9262_FUN_002E45B8": 3032504,
     "LVL_1_OOZLA_Fc3cb9262_FUN_003258B8": 3299512,
+    "LVL_1_OOZLA_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_1_OOZLA_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_1_OOZLA_Fc558ca70_FUN_003558E0": 3496160,
+    "LVL_1_OOZLA_Fc558ca70_FUN_00433760": 4405088,
+    "LVL_1_OOZLA_Fc558ca70_FUN_00433950": 4405584,
     "LVL_1_OOZLA_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_1_OOZLA_Fc84472d1_D_001ADD98": 1760664,
     "LVL_1_OOZLA_Fc84472d1_D_001ADDB8": 1760696,
@@ -1833,6 +1843,12 @@
       "symbol": "LVL_1_OOZLA_FUN_004352F0"
     },
     {
+      "address": 4412496,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_1_OOZLA_FUN_00435450"
+    },
+    {
       "address": 4414840,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -1843,6 +1859,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_1_OOZLA_FUN_00436040"
+    },
+    {
+      "address": 4415904,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_1_OOZLA_FUN_004361A0"
     },
     {
       "address": 4416520,

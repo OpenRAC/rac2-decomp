@@ -326,6 +326,11 @@
     "LVL_17_SMOLG_Fb4cfb7e0_FUN_0031B160": 3256672,
     "LVL_17_SMOLG_Fb77d67f1_FUN_002EEAF8": 3074808,
     "LVL_17_SMOLG_Fb77d67f1_FUN_00332E48": 3354184,
+    "LVL_17_SMOLG_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_17_SMOLG_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_17_SMOLG_Fb7feb893_FUN_00362B18": 3549976,
+    "LVL_17_SMOLG_Fb7feb893_FUN_0043D228": 4444712,
+    "LVL_17_SMOLG_Fb7feb893_FUN_0043D418": 4445208,
     "LVL_17_SMOLG_Fbbb7bee1_FUN_002EEBE8": 3075048,
     "LVL_17_SMOLG_Fbdd4a4aa_FUN_002EEEB8": 3075768,
     "LVL_17_SMOLG_Fbdd4a4aa_FUN_002EEF40": 3075904,
@@ -348,6 +353,11 @@
     "LVL_17_SMOLG_Fc3cb9262_FUN_002EEEB8": 3075768,
     "LVL_17_SMOLG_Fc3cb9262_FUN_002F00C0": 3080384,
     "LVL_17_SMOLG_Fc3cb9262_FUN_00332E48": 3354184,
+    "LVL_17_SMOLG_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_17_SMOLG_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_17_SMOLG_Fc558ca70_FUN_00362B18": 3549976,
+    "LVL_17_SMOLG_Fc558ca70_FUN_0043D228": 4444712,
+    "LVL_17_SMOLG_Fc558ca70_FUN_0043D418": 4445208,
     "LVL_17_SMOLG_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_17_SMOLG_Fc936841d_FUN_002EEEB8": 3075768,
     "LVL_17_SMOLG_Fc936841d_FUN_002EEEE8": 3075816,
@@ -1979,6 +1989,12 @@
       "symbol": "LVL_17_SMOLG_FUN_0043EDB8"
     },
     {
+      "address": 4452120,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_17_SMOLG_FUN_0043EF18"
+    },
+    {
       "address": 4454464,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -1989,6 +2005,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_17_SMOLG_FUN_0043FB08"
+    },
+    {
+      "address": 4455528,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_17_SMOLG_FUN_0043FC68"
     },
     {
       "address": 4456144,

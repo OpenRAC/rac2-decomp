@@ -1040,7 +1040,19 @@ ordinary flow — not in a delay slot — needs the `.extern name, size` directi
 that the reconstructed backend only emits under `-G8`. Such families stay on the
 small-data unit route.
 
-A related format constraint: the level catalogue requires every external address
-to be word aligned, so a byte global at an odd address is bound through its
-aligned base with a constant index; the assembler folds the constant into the
-same immediate and the bytes are unchanged.
+A related format constraint, removed on 2026-10-11: the level catalogue used to
+require every external address to be word aligned, so a byte global at an odd
+address was bound through its aligned base with a constant index. That clause
+had no measured support — the level catalogue binds an external as an absolute
+symbol in the linker script (`NAME = 0xADDR;`), which carries no alignment
+requirement, and no other check on the native path held those addresses word
+aligned: `scripts/campaign.py` does not look at a level external's alignment at
+all, and the native catalogue's externals reach `scripts/integration.py` through
+`compile_level_c`, which merges them without an alignment test. (The `% 4` still
+in `integration.py` belongs to `level_catalog`, the separate shared placement
+read from `config/level-catalog.json`, which this change does not touch.)
+The byte flags 0x1A7B95 / 0x1A7B94 (family `c558ca7050ec6154`) and 0x1A7BB2 /
+0x1A7BB3 (family `b7feb89380591f87`) link byte-identically through the qualified
+chain, so a catalogue now names them directly. Only a non-integer type and an
+address outside 0..0xFFFFFFFF remain refused. Binding a byte global through its
+aligned base with a constant index stays valid where a body needs it.

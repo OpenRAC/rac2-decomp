@@ -340,6 +340,11 @@
     "LVL_13_BOLDAN_Fb4cfb7e0_FUN_003249B0": 3295664,
     "LVL_13_BOLDAN_Fb77d67f1_FUN_002F83B0": 3113904,
     "LVL_13_BOLDAN_Fb77d67f1_FUN_003395F0": 3380720,
+    "LVL_13_BOLDAN_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_13_BOLDAN_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_13_BOLDAN_Fb7feb893_FUN_00368FB0": 3575728,
+    "LVL_13_BOLDAN_Fb7feb893_FUN_00444850": 4474960,
+    "LVL_13_BOLDAN_Fb7feb893_FUN_00444A40": 4475456,
     "LVL_13_BOLDAN_Fbbb7bee1_FUN_002F84A0": 3114144,
     "LVL_13_BOLDAN_Fbdd4a4aa_FUN_002F8740": 3114816,
     "LVL_13_BOLDAN_Fbdd4a4aa_FUN_002F87C8": 3114952,
@@ -362,6 +367,11 @@
     "LVL_13_BOLDAN_Fc3cb9262_FUN_002F8740": 3114816,
     "LVL_13_BOLDAN_Fc3cb9262_FUN_002F98A0": 3119264,
     "LVL_13_BOLDAN_Fc3cb9262_FUN_003395F0": 3380720,
+    "LVL_13_BOLDAN_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_13_BOLDAN_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_13_BOLDAN_Fc558ca70_FUN_00368FB0": 3575728,
+    "LVL_13_BOLDAN_Fc558ca70_FUN_00444850": 4474960,
+    "LVL_13_BOLDAN_Fc558ca70_FUN_00444A40": 4475456,
     "LVL_13_BOLDAN_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_13_BOLDAN_Fc936841d_FUN_002F8740": 3114816,
     "LVL_13_BOLDAN_Fc936841d_FUN_002F8770": 3114864,
@@ -2006,6 +2016,12 @@
       "symbol": "LVL_13_BOLDAN_FUN_004463E0"
     },
     {
+      "address": 4482368,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_13_BOLDAN_FUN_00446540"
+    },
+    {
       "address": 4484712,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2016,6 +2032,12 @@
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_13_BOLDAN_FUN_00447130"
+    },
+    {
+      "address": 4485776,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_13_BOLDAN_FUN_00447290"
     },
     {
       "address": 4486392,
