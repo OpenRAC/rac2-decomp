@@ -6,10 +6,10 @@
   "reference_sha256": "eeab491a667c311b024745af7173ac08371e279ade0b4ab5d48b6f81fa751aaf",
   "reference_entry": 2782728,
   "candidate_source": "candidates/levels/19_grelbin.c",
-  "source_sha256": "12e6c8fde61c062feb8885fbd2c6281ac982c561c87dfde3bef896d9e22ebc89",
-  "catalog_sha256": "3d6f8440680302f114cfebaed788696eeefcefc91e6c6a1424ca5d75ecfe00d8",
-  "object_sha256": "152c23ee0f47fe0c34f1c73539b3bd2d8376e5ea726a8cf8284ad52f5a10fc86",
-  "candidate_elf_sha256": "4ac688ad59d9959c46a780aca4b5bf0b6c648626c26e2d163285b28d294e2ff2",
+  "source_sha256": "f25720d77e587a7db68ab91338db4a95bf724d90f848fc02b84bc3d87f49be56",
+  "catalog_sha256": "becd49f4d02016deee6eeb1494815d5309e4fa7041cc3ff9824e5d33d69cbb76",
+  "object_sha256": "b6718c383d828904a23d7ce34de8be60e8bad91185912183d18de4284898356b",
+  "candidate_elf_sha256": "2df408f18bd4a9a314126c7d230006332177cd7d25d35d75201940d61ca8fe8e",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -234,6 +234,17 @@
       "produced_size": 540
     },
     {
+      "symbol": "LVL_19_GRELBIN_FUN_002CFA20",
+      "address": 2947616,
+      "size": 20,
+      "matched": true,
+      "reference_sha256": "21a2f464e70cd8d1080941664f56ee948f254ef24d5e39c011a9ccd937d65441",
+      "candidate_sha256": "21a2f464e70cd8d1080941664f56ee948f254ef24d5e39c011a9ccd937d65441",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 20
+    },
+    {
       "symbol": "LVL_19_GRELBIN_FUN_002CFA38",
       "address": 2947640,
       "size": 96,
@@ -333,6 +344,17 @@
       "produced_size": 496
     },
     {
+      "symbol": "LVL_19_GRELBIN_FUN_002D4190",
+      "address": 2965904,
+      "size": 20,
+      "matched": true,
+      "reference_sha256": "7cefb3f41c3baf54c4c22dea0e9fa7d19fa45ae78a37c16224539224323f5e6e",
+      "candidate_sha256": "7cefb3f41c3baf54c4c22dea0e9fa7d19fa45ae78a37c16224539224323f5e6e",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 20
+    },
+    {
       "symbol": "LVL_19_GRELBIN_FUN_002D41A8",
       "address": 2965928,
       "size": 60,
@@ -353,6 +375,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 160
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_002D42C8",
+      "address": 2966216,
+      "size": 44,
+      "matched": true,
+      "reference_sha256": "6b77b4a0456ccb466fc04046b020429a98aec0b313bc9c2ce36f77f1d2b1e9f7",
+      "candidate_sha256": "6b77b4a0456ccb466fc04046b020429a98aec0b313bc9c2ce36f77f1d2b1e9f7",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 44
     },
     {
       "symbol": "LVL_19_GRELBIN_FUN_002D4390",
@@ -564,6 +597,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_19_GRELBIN_FUN_002ECE50",
+      "address": 3067472,
+      "size": 108,
+      "matched": true,
+      "reference_sha256": "c2bb04e14e71ad20fa7b9c01c84dcc60cdb12aac144b1d3fa85d87f290a2e31b",
+      "candidate_sha256": "c2bb04e14e71ad20fa7b9c01c84dcc60cdb12aac144b1d3fa85d87f290a2e31b",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 108
+    },
+    {
       "symbol": "LVL_19_GRELBIN_FUN_002EDD70",
       "address": 3071344,
       "size": 128,
@@ -641,6 +685,17 @@
       "produced_size": 48
     },
     {
+      "symbol": "LVL_19_GRELBIN_FUN_002F1C80",
+      "address": 3087488,
+      "size": 16,
+      "matched": true,
+      "reference_sha256": "07682ae1ed098effc080efd4bace07aaaba6df6e652f371c7e6ac446a8944aad",
+      "candidate_sha256": "07682ae1ed098effc080efd4bace07aaaba6df6e652f371c7e6ac446a8944aad",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 16
+    },
+    {
       "symbol": "LVL_19_GRELBIN_FUN_002F1CC0",
       "address": 3087552,
       "size": 8,
@@ -716,6 +771,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_002FCAB0",
+      "address": 3132080,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "c68726c13f558f7ea13ec88c83dd3833c6e5d7d2446e0111722931a2ab07669e",
+      "candidate_sha256": "c68726c13f558f7ea13ec88c83dd3833c6e5d7d2446e0111722931a2ab07669e",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
     },
     {
       "symbol": "LVL_19_GRELBIN_FUN_002FE170",
@@ -859,6 +925,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 52
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_0030A390",
+      "address": 3187600,
+      "size": 40,
+      "matched": true,
+      "reference_sha256": "e772b9dfd51e7ced3f4389afab75cc1067a5f8171f46b96f8c483eace53d9586",
+      "candidate_sha256": "e772b9dfd51e7ced3f4389afab75cc1067a5f8171f46b96f8c483eace53d9586",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 40
     },
     {
       "symbol": "LVL_19_GRELBIN_FUN_0030A4D8",
@@ -1081,6 +1158,17 @@
       "produced_size": 244
     },
     {
+      "symbol": "LVL_19_GRELBIN_FUN_003206D0",
+      "address": 3278544,
+      "size": 40,
+      "matched": true,
+      "reference_sha256": "63b380177a05dd2ffd5f169b5062694d04832ebff159d610d6d2f58b44b72313",
+      "candidate_sha256": "63b380177a05dd2ffd5f169b5062694d04832ebff159d610d6d2f58b44b72313",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 40
+    },
+    {
       "symbol": "LVL_19_GRELBIN_FUN_00320B00",
       "address": 3279616,
       "size": 128,
@@ -1167,6 +1255,28 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 88
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_0032B0D0",
+      "address": 3322064,
+      "size": 52,
+      "matched": true,
+      "reference_sha256": "9f70b27d299380e9059f5ac2c9bc902e747b92b8f2b22eb91106bddf07cc167c",
+      "candidate_sha256": "9f70b27d299380e9059f5ac2c9bc902e747b92b8f2b22eb91106bddf07cc167c",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 52
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_0032B108",
+      "address": 3322120,
+      "size": 28,
+      "matched": true,
+      "reference_sha256": "57558dc2e0aca9f2ac6744d503e7c0e1ce17965561e4adba31a54a86fdff565c",
+      "candidate_sha256": "57558dc2e0aca9f2ac6744d503e7c0e1ce17965561e4adba31a54a86fdff565c",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 28
     },
     {
       "symbol": "LVL_19_GRELBIN_FUN_0032B9F8",
@@ -1367,6 +1477,17 @@
       "produced_size": 344
     },
     {
+      "symbol": "LVL_19_GRELBIN_FUN_00340F08",
+      "address": 3411720,
+      "size": 32,
+      "matched": true,
+      "reference_sha256": "343a424cfca871d026618c227bd2907f575cb226396207e7abd232cd911312d2",
+      "candidate_sha256": "343a424cfca871d026618c227bd2907f575cb226396207e7abd232cd911312d2",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 32
+    },
+    {
       "symbol": "LVL_19_GRELBIN_FUN_00344360",
       "address": 3425120,
       "size": 148,
@@ -1508,6 +1629,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 592
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_003564E0",
+      "address": 3499232,
+      "size": 80,
+      "matched": true,
+      "reference_sha256": "fb0041560568534243309e32c4dc7efa113ff87d54a00d3eb6ac820e40f21c54",
+      "candidate_sha256": "fb0041560568534243309e32c4dc7efa113ff87d54a00d3eb6ac820e40f21c54",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 80
     },
     {
       "symbol": "LVL_19_GRELBIN_FUN_00356698",
@@ -2157,6 +2289,28 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_003DD7F0",
+      "address": 4052976,
+      "size": 16,
+      "matched": true,
+      "reference_sha256": "57db034079cdf06eecc88cf61d3025111017dc9f7f73d0b86806a5cea677f629",
+      "candidate_sha256": "57db034079cdf06eecc88cf61d3025111017dc9f7f73d0b86806a5cea677f629",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 16
+    },
+    {
+      "symbol": "LVL_19_GRELBIN_FUN_003DD840",
+      "address": 4053056,
+      "size": 36,
+      "matched": true,
+      "reference_sha256": "1a878cb542e6f799fbe60129fad48aaaa98f5cf11da59ed0a70b1368a9694a8a",
+      "candidate_sha256": "1a878cb542e6f799fbe60129fad48aaaa98f5cf11da59ed0a70b1368a9694a8a",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 36
     },
     {
       "symbol": "LVL_19_GRELBIN_FUN_003E1788",
@@ -3513,5 +3667,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 41604
+  "matched_code_bytes": 42224
 }

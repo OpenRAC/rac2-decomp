@@ -6,10 +6,10 @@
   "reference_sha256": "84c7e1d55cd34f7785ca8e72d03667707474c29249891735cef9dd0e53b834e3",
   "reference_entry": 2776968,
   "candidate_source": "candidates/levels/1_oozla.c",
-  "source_sha256": "4b307227a68f7472d7518cda91350cc7ab43703085cf318b28aeb4393aa1abf6",
-  "catalog_sha256": "fefe493864675509b75d2399a363a895d1b8b9ba0848655cda5a9ee601fd16a1",
-  "object_sha256": "445dde8bf884e15bcb2a1440d0b2065f5395b74930c5aebcc975a4771c9c3625",
-  "candidate_elf_sha256": "2e6357475c5e264eb48ac81186bd244000114280d6ae4d228869b2dfd38069d5",
+  "source_sha256": "dc1b8a8b3f4e2fbdf1571942acac21b6fb0cf4a17e85d08bc209c89600226070",
+  "catalog_sha256": "52aa6f3b008e46b69ac833b34aac2ef77a0c6f63fdfcec7ba4c438cf83ed3352",
+  "object_sha256": "fb3835d98b158cee169e35af93bc4488f4b32988b9f0efb93e84101694040103",
+  "candidate_elf_sha256": "eefecb3bc549db0d18501535dffd59b29cee538202c8a9e34791b088dd992516",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -234,6 +234,17 @@
       "produced_size": 444
     },
     {
+      "symbol": "LVL_1_OOZLA_FUN_002C7720",
+      "address": 2914080,
+      "size": 20,
+      "matched": true,
+      "reference_sha256": "21a2f464e70cd8d1080941664f56ee948f254ef24d5e39c011a9ccd937d65441",
+      "candidate_sha256": "21a2f464e70cd8d1080941664f56ee948f254ef24d5e39c011a9ccd937d65441",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 20
+    },
+    {
       "symbol": "LVL_1_OOZLA_FUN_002C7738",
       "address": 2914104,
       "size": 96,
@@ -311,6 +322,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_1_OOZLA_FUN_002CBEE0",
+      "address": 2932448,
+      "size": 20,
+      "matched": true,
+      "reference_sha256": "7cefb3f41c3baf54c4c22dea0e9fa7d19fa45ae78a37c16224539224323f5e6e",
+      "candidate_sha256": "7cefb3f41c3baf54c4c22dea0e9fa7d19fa45ae78a37c16224539224323f5e6e",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 20
+    },
+    {
       "symbol": "LVL_1_OOZLA_FUN_002CBEF8",
       "address": 2932472,
       "size": 60,
@@ -331,6 +353,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 160
+    },
+    {
+      "symbol": "LVL_1_OOZLA_FUN_002CC018",
+      "address": 2932760,
+      "size": 44,
+      "matched": true,
+      "reference_sha256": "6b77b4a0456ccb466fc04046b020429a98aec0b313bc9c2ce36f77f1d2b1e9f7",
+      "candidate_sha256": "6b77b4a0456ccb466fc04046b020429a98aec0b313bc9c2ce36f77f1d2b1e9f7",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 44
     },
     {
       "symbol": "LVL_1_OOZLA_FUN_002CC048",
@@ -520,6 +553,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_1_OOZLA_FUN_002E4980",
+      "address": 3033472,
+      "size": 108,
+      "matched": true,
+      "reference_sha256": "c2bb04e14e71ad20fa7b9c01c84dcc60cdb12aac144b1d3fa85d87f290a2e31b",
+      "candidate_sha256": "c2bb04e14e71ad20fa7b9c01c84dcc60cdb12aac144b1d3fa85d87f290a2e31b",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 108
+    },
+    {
       "symbol": "LVL_1_OOZLA_FUN_002E8778",
       "address": 3049336,
       "size": 48,
@@ -586,6 +630,17 @@
       "produced_size": 48
     },
     {
+      "symbol": "LVL_1_OOZLA_FUN_002E9728",
+      "address": 3053352,
+      "size": 16,
+      "matched": true,
+      "reference_sha256": "07682ae1ed098effc080efd4bace07aaaba6df6e652f371c7e6ac446a8944aad",
+      "candidate_sha256": "07682ae1ed098effc080efd4bace07aaaba6df6e652f371c7e6ac446a8944aad",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 16
+    },
+    {
       "symbol": "LVL_1_OOZLA_FUN_002E9768",
       "address": 3053416,
       "size": 8,
@@ -628,6 +683,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_1_OOZLA_FUN_002F4980",
+      "address": 3099008,
+      "size": 88,
+      "matched": true,
+      "reference_sha256": "c68726c13f558f7ea13ec88c83dd3833c6e5d7d2446e0111722931a2ab07669e",
+      "candidate_sha256": "c68726c13f558f7ea13ec88c83dd3833c6e5d7d2446e0111722931a2ab07669e",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 88
     },
     {
       "symbol": "LVL_1_OOZLA_FUN_002F6040",
@@ -850,6 +916,17 @@
       "produced_size": 244
     },
     {
+      "symbol": "LVL_1_OOZLA_FUN_003189C8",
+      "address": 3246536,
+      "size": 40,
+      "matched": true,
+      "reference_sha256": "63b380177a05dd2ffd5f169b5062694d04832ebff159d610d6d2f58b44b72313",
+      "candidate_sha256": "63b380177a05dd2ffd5f169b5062694d04832ebff159d610d6d2f58b44b72313",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 40
+    },
+    {
       "symbol": "LVL_1_OOZLA_FUN_00318DF8",
       "address": 3247608,
       "size": 128,
@@ -914,6 +991,28 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 88
+    },
+    {
+      "symbol": "LVL_1_OOZLA_FUN_003234F8",
+      "address": 3290360,
+      "size": 52,
+      "matched": true,
+      "reference_sha256": "9f70b27d299380e9059f5ac2c9bc902e747b92b8f2b22eb91106bddf07cc167c",
+      "candidate_sha256": "9f70b27d299380e9059f5ac2c9bc902e747b92b8f2b22eb91106bddf07cc167c",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 52
+    },
+    {
+      "symbol": "LVL_1_OOZLA_FUN_00323530",
+      "address": 3290416,
+      "size": 28,
+      "matched": true,
+      "reference_sha256": "57558dc2e0aca9f2ac6744d503e7c0e1ce17965561e4adba31a54a86fdff565c",
+      "candidate_sha256": "57558dc2e0aca9f2ac6744d503e7c0e1ce17965561e4adba31a54a86fdff565c",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 28
     },
     {
       "symbol": "LVL_1_OOZLA_FUN_00323E20",
@@ -3183,5 +3282,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 36104
+  "matched_code_bytes": 36520
 }

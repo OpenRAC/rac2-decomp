@@ -2,6 +2,26 @@
   "entry": 2844552,
   "externals": {
     "BOOT_FUN_00115DA8": 1138088,
+    "BatchA_A01_D_001A7B90": 1735568,
+    "BatchA_A01_D_001A7BB8": 1735608,
+    "BatchA_A01_FUN_00124418": 1197080,
+    "BatchA_A01_FUN_001257D0": 1202128,
+    "BatchA_A03_D_001A7B90": 1735568,
+    "BatchA_A03_D_001A7BC0": 1735616,
+    "BatchA_A03_D_001A8FE0": 1740768,
+    "BatchA_A05_BatchA_D001A63A8": 1729448,
+    "BatchA_A05_D_001A63A8": 1729448,
+    "BatchA_A07_BatchA_D001A79F0a": 1735152,
+    "BatchA_A07_D_001A79F0": 1735152,
+    "BatchA_A08_BatchA_D001A904C": 1740876,
+    "BatchA_A08_D_001A904C": 1740876,
+    "BatchA_A11_D_001A63A8": 1729448,
+    "BatchA_A13_BatchA_D001A79F0b": 1735152,
+    "BatchA_A13_D_001A79F0": 1735152,
+    "BatchA_A14_D_00189E20": 1613344,
+    "BatchA_A14_D_00189E20s": 1613344,
+    "BatchA_A16_BatchA_D001A7A0A": 1735178,
+    "BatchA_A16_D_001A7A0A": 1735178,
     "D_19B278": 1684088,
     "FUN_00133400": 1258496,
     "LVL_20_YEEDIL_D_00139568": 1283432,
@@ -641,6 +661,12 @@
       "symbol": "LVL_20_YEEDIL_FUN_002DCA60"
     },
     {
+      "address": 3038856,
+      "meaning": "A14-struct-2field-20 freshly exact-verified under family reservation",
+      "size": 20,
+      "symbol": "LVL_20_YEEDIL_FUN_002E5E88"
+    },
+    {
       "address": 3038880,
       "meaning": "shared native body of family c68ad20a",
       "size": 96,
@@ -707,6 +733,12 @@
       "symbol": "LVL_20_YEEDIL_FUN_002E89B0"
     },
     {
+      "address": 3057288,
+      "meaning": "A13-eq-getter-20 freshly exact-verified under family reservation",
+      "size": 20,
+      "symbol": "LVL_20_YEEDIL_FUN_002EA688"
+    },
+    {
       "address": 3057312,
       "meaning": "Return one when the resident mode word is25,5,10 or15, otherwise zero",
       "size": 60,
@@ -717,6 +749,12 @@
       "meaning": "Filter primary or fallback object's class identifier by mode and signed selection",
       "size": 160,
       "symbol": "LVL_20_YEEDIL_FUN_002EA720"
+    },
+    {
+      "address": 3057600,
+      "meaning": "A07-sda-multi-eq-44 freshly exact-verified under family reservation",
+      "size": 44,
+      "symbol": "LVL_20_YEEDIL_FUN_002EA7C0"
     },
     {
       "address": 3057800,
@@ -814,6 +852,12 @@
       "symbol": "LVL_20_YEEDIL_FUN_003011F8"
     },
     {
+      "address": 3159952,
+      "meaning": "A01-shared-108 freshly exact-verified under family reservation",
+      "size": 108,
+      "symbol": "LVL_20_YEEDIL_FUN_00303790"
+    },
+    {
       "address": 3175816,
       "meaning": "Change resident state word from1 to2 only when the mode word equals7",
       "size": 48,
@@ -850,6 +894,12 @@
       "symbol": "LVL_20_YEEDIL_FUN_00308398"
     },
     {
+      "address": 3179832,
+      "meaning": "A16-sda-byte-16 freshly exact-verified under family reservation",
+      "size": 16,
+      "symbol": "LVL_20_YEEDIL_FUN_00308538"
+    },
+    {
       "address": 3179896,
       "size": 8,
       "symbol": "LVL_20_YEEDIL_FUN_00308578"
@@ -874,6 +924,12 @@
       "address": 3214280,
       "size": 8,
       "symbol": "LVL_20_YEEDIL_FUN_00310BC8"
+    },
+    {
+      "address": 3224688,
+      "meaning": "A02-list-add-88 freshly exact-verified under family reservation",
+      "size": 88,
+      "symbol": "LVL_20_YEEDIL_FUN_00313470"
     },
     {
       "address": 3230512,
@@ -950,6 +1006,12 @@
       "meaning": "Call the registered handler with a table pointer built from one module base word plus the constant 36808, forwarding the incoming argument; do nothing when the base word is zero.",
       "size": 52,
       "symbol": "LVL_20_YEEDIL_FUN_00320CE0"
+    },
+    {
+      "address": 3280208,
+      "meaning": "A08-sda-offset-40 freshly exact-verified under family reservation",
+      "size": 40,
+      "symbol": "LVL_20_YEEDIL_FUN_00320D50"
     },
     {
       "address": 3280464,
@@ -1047,6 +1109,12 @@
       "symbol": "LVL_20_YEEDIL_FUN_00336550"
     },
     {
+      "address": 3374288,
+      "meaning": "A06-inline-init-40 freshly exact-verified under family reservation",
+      "size": 40,
+      "symbol": "LVL_20_YEEDIL_FUN_00337CD0"
+    },
+    {
       "address": 3375360,
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
@@ -1092,6 +1160,18 @@
       "meaning": "Pass resident active word to original stop helper when signed status is three, set status four and return one; otherwise zero",
       "size": 88,
       "symbol": "LVL_20_YEEDIL_FUN_00342BE8"
+    },
+    {
+      "address": 3420696,
+      "meaning": "A05-store-rotation-52 freshly exact-verified under family reservation",
+      "size": 52,
+      "symbol": "LVL_20_YEEDIL_FUN_00343218"
+    },
+    {
+      "address": 3420752,
+      "meaning": "A11-sda-3store-28 freshly exact-verified under family reservation",
+      "size": 28,
+      "symbol": "LVL_20_YEEDIL_FUN_00343250"
     },
     {
       "address": 3423040,
@@ -1278,6 +1358,12 @@
       "meaning": "Shared native body; original game role is unknown.",
       "size": 592,
       "symbol": "LVL_20_YEEDIL_FUN_00368C78"
+    },
+    {
+      "address": 3597616,
+      "meaning": "A03-counter-mod50-80 freshly exact-verified under family reservation",
+      "size": 80,
+      "symbol": "LVL_20_YEEDIL_FUN_0036E530"
     },
     {
       "address": 3598056,
@@ -1620,6 +1706,18 @@
       "meaning": "Store the supplied unsigned 32-bit word at owner byte offset 0xB 8.",
       "size": 8,
       "symbol": "LVL_20_YEEDIL_FUN_003FD078"
+    },
+    {
+      "address": 4182408,
+      "meaning": "A18-void-store-16 freshly exact-verified under family reservation",
+      "size": 16,
+      "symbol": "LVL_20_YEEDIL_FUN_003FD188"
+    },
+    {
+      "address": 4182488,
+      "meaning": "A09-cond-select-36 freshly exact-verified under family reservation",
+      "size": 36,
+      "symbol": "LVL_20_YEEDIL_FUN_003FD1D8"
     },
     {
       "address": 4198688,

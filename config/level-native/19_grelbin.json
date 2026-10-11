@@ -2,6 +2,29 @@
   "entry": 2782728,
   "externals": {
     "BOOT_FUN_00115DA8": 1138088,
+    "BatchA_A01_D_001A7B90": 1735568,
+    "BatchA_A01_D_001A7BB8": 1735608,
+    "BatchA_A01_FUN_00124418": 1197080,
+    "BatchA_A01_FUN_001257D0": 1202128,
+    "BatchA_A03_D_001A7B90": 1735568,
+    "BatchA_A03_D_001A7BC0": 1735616,
+    "BatchA_A03_D_001A8FE0": 1740768,
+    "BatchA_A05_BatchA_D001A63A8": 1729448,
+    "BatchA_A05_D_001A63A8": 1729448,
+    "BatchA_A07_BatchA_D001A79F0a": 1735152,
+    "BatchA_A07_D_001A79F0": 1735152,
+    "BatchA_A08_BatchA_D001A904C": 1740876,
+    "BatchA_A08_D_001A904C": 1740876,
+    "BatchA_A10_D_001FF8C0": 2095296,
+    "BatchA_A10_D_001FF8C0t": 2095808,
+    "BatchA_A10_D_001FFAC0": 2095808,
+    "BatchA_A11_D_001A63A8": 1729448,
+    "BatchA_A13_BatchA_D001A79F0b": 1735152,
+    "BatchA_A13_D_001A79F0": 1735152,
+    "BatchA_A14_D_00189E20": 1613344,
+    "BatchA_A14_D_00189E20s": 1613344,
+    "BatchA_A16_BatchA_D001A7A0A": 1735178,
+    "BatchA_A16_D_001A7A0A": 1735178,
     "D_19B278": 1684088,
     "FUN_00133400": 1258496,
     "LVL_19_GRELBIN_D_00139568": 1283432,
@@ -675,6 +698,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_002C8968"
     },
     {
+      "address": 2947616,
+      "meaning": "A14-struct-2field-20 freshly exact-verified under family reservation",
+      "size": 20,
+      "symbol": "LVL_19_GRELBIN_FUN_002CFA20"
+    },
+    {
       "address": 2947640,
       "meaning": "shared native body of family c68ad20a",
       "size": 96,
@@ -729,6 +758,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_002D24B8"
     },
     {
+      "address": 2965904,
+      "meaning": "A13-eq-getter-20 freshly exact-verified under family reservation",
+      "size": 20,
+      "symbol": "LVL_19_GRELBIN_FUN_002D4190"
+    },
+    {
       "address": 2965928,
       "meaning": "Return one when the resident mode word is25,5,10 or15, otherwise zero",
       "size": 60,
@@ -739,6 +774,12 @@
       "meaning": "Filter primary or fallback object's class identifier by mode and signed selection",
       "size": 160,
       "symbol": "LVL_19_GRELBIN_FUN_002D4228"
+    },
+    {
+      "address": 2966216,
+      "meaning": "A07-sda-multi-eq-44 freshly exact-verified under family reservation",
+      "size": 44,
+      "symbol": "LVL_19_GRELBIN_FUN_002D42C8"
     },
     {
       "address": 2966416,
@@ -854,6 +895,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_002EAC68"
     },
     {
+      "address": 3067472,
+      "meaning": "A01-shared-108 freshly exact-verified under family reservation",
+      "size": 108,
+      "symbol": "LVL_19_GRELBIN_FUN_002ECE50"
+    },
+    {
       "address": 3071344,
       "meaning": "shared native body of family cceeec15d32de301",
       "size": 128,
@@ -896,6 +943,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_002F1A58"
     },
     {
+      "address": 3087488,
+      "meaning": "A16-sda-byte-16 freshly exact-verified under family reservation",
+      "size": 16,
+      "symbol": "LVL_19_GRELBIN_FUN_002F1C80"
+    },
+    {
       "address": 3087552,
       "size": 8,
       "symbol": "LVL_19_GRELBIN_FUN_002F1CC0"
@@ -932,6 +985,12 @@
       "address": 3120952,
       "size": 8,
       "symbol": "LVL_19_GRELBIN_FUN_002F9F38"
+    },
+    {
+      "address": 3132080,
+      "meaning": "A02-list-add-88 freshly exact-verified under family reservation",
+      "size": 88,
+      "symbol": "LVL_19_GRELBIN_FUN_002FCAB0"
     },
     {
       "address": 3137904,
@@ -1008,6 +1067,12 @@
       "meaning": "Call the registered handler with a table pointer built from one module base word plus the constant 36808, forwarding the incoming argument; do nothing when the base word is zero.",
       "size": 52,
       "symbol": "LVL_19_GRELBIN_FUN_0030A320"
+    },
+    {
+      "address": 3187600,
+      "meaning": "A08-sda-offset-40 freshly exact-verified under family reservation",
+      "size": 40,
+      "symbol": "LVL_19_GRELBIN_FUN_0030A390"
     },
     {
       "address": 3187928,
@@ -1129,6 +1194,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_0031EF50"
     },
     {
+      "address": 3278544,
+      "meaning": "A06-inline-init-40 freshly exact-verified under family reservation",
+      "size": 40,
+      "symbol": "LVL_19_GRELBIN_FUN_003206D0"
+    },
+    {
       "address": 3279616,
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
@@ -1174,6 +1245,18 @@
       "meaning": "Pass resident active word to original stop helper when signed status is three, set status four and return one; otherwise zero",
       "size": 88,
       "symbol": "LVL_19_GRELBIN_FUN_0032AAA0"
+    },
+    {
+      "address": 3322064,
+      "meaning": "A05-store-rotation-52 freshly exact-verified under family reservation",
+      "size": 52,
+      "symbol": "LVL_19_GRELBIN_FUN_0032B0D0"
+    },
+    {
+      "address": 3322120,
+      "meaning": "A11-sda-3store-28 freshly exact-verified under family reservation",
+      "size": 28,
+      "symbol": "LVL_19_GRELBIN_FUN_0032B108"
     },
     {
       "address": 3324408,
@@ -1284,6 +1367,12 @@
       "symbol": "LVL_19_GRELBIN_FUN_0033F1E0"
     },
     {
+      "address": 3411720,
+      "meaning": "A10-twin-base-32 freshly exact-verified under family reservation",
+      "size": 32,
+      "symbol": "LVL_19_GRELBIN_FUN_00340F08"
+    },
+    {
       "address": 3425120,
       "meaning": "",
       "size": 148,
@@ -1360,6 +1449,12 @@
       "meaning": "Shared native body; original game role is unknown.",
       "size": 592,
       "symbol": "LVL_19_GRELBIN_FUN_00350C28"
+    },
+    {
+      "address": 3499232,
+      "meaning": "A03-counter-mod50-80 freshly exact-verified under family reservation",
+      "size": 80,
+      "symbol": "LVL_19_GRELBIN_FUN_003564E0"
     },
     {
       "address": 3499672,
@@ -1709,6 +1804,18 @@
       "meaning": "Store the supplied unsigned 32-bit word at owner byte offset 0xB 8.",
       "size": 8,
       "symbol": "LVL_19_GRELBIN_FUN_003DD6E0"
+    },
+    {
+      "address": 4052976,
+      "meaning": "A18-void-store-16 freshly exact-verified under family reservation",
+      "size": 16,
+      "symbol": "LVL_19_GRELBIN_FUN_003DD7F0"
+    },
+    {
+      "address": 4053056,
+      "meaning": "A09-cond-select-36 freshly exact-verified under family reservation",
+      "size": 36,
+      "symbol": "LVL_19_GRELBIN_FUN_003DD840"
     },
     {
       "address": 4069256,

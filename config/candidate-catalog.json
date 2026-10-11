@@ -2,6 +2,11 @@
   "evidence": "Ghidra saved GC programme, read-only headless extraction 2026-10-01; body ranges and delay slots cross-checked with fresh splat output. The third lot was located by exact byte search of the reviewed RAC1 C bodies in the pinned RAC2 image and each entry was kept only after the qualified compiler reproduced its bytes.",
   "externals": {
     "BOOT_D_001395B8": 1283512,
+    "BatchA_A05_BatchA_D001A63A8": 1729448,
+    "BatchA_A05_D_001A63A8": 1729448,
+    "BatchA_A11_D_001A63A8": 1729448,
+    "BatchA_A16_BatchA_D001A7A0A": 1735178,
+    "BatchA_A16_D_001A7A0A": 1735178,
     "D_00133E74": 1261172,
     "D_00134688": 1263240,
     "D_001346A0": 1263264,
@@ -861,6 +866,12 @@
       "symbol": "FUN_00288BB8"
     },
     {
+      "address": 2657624,
+      "meaning": "A16-sda-byte-16 freshly exact-verified under family reservation",
+      "size": 16,
+      "symbol": "FUN_00288D58"
+    },
+    {
       "address": 2657672,
       "size": 8,
       "symbol": "FUN_00288D88"
@@ -896,6 +907,12 @@
       "meaning": "Invoke both measured index-based helpers with the same supplied 64-bit index.",
       "size": 44,
       "symbol": "FUN_00291758"
+    },
+    {
+      "address": 2699872,
+      "meaning": "A02-list-add-88 freshly exact-verified under family reservation",
+      "size": 88,
+      "symbol": "FUN_00293260"
     },
     {
       "address": 2700472,
@@ -1243,6 +1260,18 @@
       "size": 372,
       "symbol": "FUN_002B7170",
       "xrefs": 0
+    },
+    {
+      "address": 2847464,
+      "meaning": "A05-store-rotation-52 freshly exact-verified under family reservation",
+      "size": 52,
+      "symbol": "FUN_002B72E8"
+    },
+    {
+      "address": 2847520,
+      "meaning": "A11-sda-3store-28 freshly exact-verified under family reservation",
+      "size": 28,
+      "symbol": "FUN_002B7320"
     },
     {
       "address": 2847552,

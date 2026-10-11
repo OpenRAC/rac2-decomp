@@ -710,6 +710,328 @@ Measure all seventeen complete functions in the intended unit. Retain refusals, 
 
 Reopen condition: Independent measured type, layout, ABI or source lifetime evidence; no expression or register forcing.
 
+## batch-a-reserved-a01-o2-g0-ffunction-sections-20261011
+
+State: `stopped`. Kind: `candidate`.
+
+Review complete-symbol results before legitimate Batch A integration; original unreserved matching confers no compliance or credit.
+
+Reopen condition: Only a new concrete admission defect in the retained original input; do not repeat the superseded task.
+
+- `reservation:claim/8fc9d5f80b3d5f44a785f41c0f987dca4231aa565dd750932d09299d0bf9e9c4`
+
+## batch-a-reserved-a01-o2-g0-ffunction-sections-20261011-admission-fix2
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/8fc9d5f80b3d5f44a785f41c0f987dca4231aa565dd750932d09299d0bf9e9c4`
+- `runtime:trials/da633ccba693488e83d2c976da9620f5/outcome.json`
+
+## batch-a-reserved-a01-o2-g8-ffunction-sections-20261011-admission-fix2
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/8fc9d5f80b3d5f44a785f41c0f987dca4231aa565dd750932d09299d0bf9e9c4`
+- `runtime:trials/da633ccba693488e83d2c976da9620f5/outcome.json`
+
+## batch-a-reserved-a02-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/38ceeb041b6ba12996de10c402ca54295587db96246845b83b2ec894986b096f`
+
+## batch-a-reserved-a02-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/38ceeb041b6ba12996de10c402ca54295587db96246845b83b2ec894986b096f`
+
+## batch-a-reserved-a03-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/b5e8cf533fd3cee3cb2dcdd0bf7be9549f6cc39cd932c589176487a8b170abee`
+
+## batch-a-reserved-a03-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/b5e8cf533fd3cee3cb2dcdd0bf7be9549f6cc39cd932c589176487a8b170abee`
+
+## batch-a-reserved-a04-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/8c4d82cfbf43e138ed35e757fdaeee3e7c4651fa684549ba9d5e8ac22c56d111`
+
+## batch-a-reserved-a04-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/8c4d82cfbf43e138ed35e757fdaeee3e7c4651fa684549ba9d5e8ac22c56d111`
+
+## batch-a-reserved-a05-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/43a7518b17439f6bdc9390be9d4164b47eec4bed94a72d581fdec3b883b0a554`
+
+## batch-a-reserved-a05-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/43a7518b17439f6bdc9390be9d4164b47eec4bed94a72d581fdec3b883b0a554`
+
+## batch-a-reserved-a06-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/f87e1c08ece3f12938d297032a913cd328169b7754a3ddd6dc5186c16697eb73`
+
+## batch-a-reserved-a06-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/f87e1c08ece3f12938d297032a913cd328169b7754a3ddd6dc5186c16697eb73`
+
+## batch-a-reserved-a07-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/6adc81ebaa8d8c8d04aa1aa3c8950e1d91861a258898c3cce6be7f792e8bdcf3`
+
+## batch-a-reserved-a07-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/6adc81ebaa8d8c8d04aa1aa3c8950e1d91861a258898c3cce6be7f792e8bdcf3`
+
+## batch-a-reserved-a08-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/1c862bca494fc9285ae124fddbbb78dd145686c54c3afa751addc9271a2f8b70`
+
+## batch-a-reserved-a08-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/1c862bca494fc9285ae124fddbbb78dd145686c54c3afa751addc9271a2f8b70`
+
+## batch-a-reserved-a09-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/3dadb64036892dfb357f8b3f0f7b47fc608b60613dcd8c823ef8df1bc26f7e5b`
+
+## batch-a-reserved-a10-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/b588059f8808a6607867ee41ec367b24cfb85d2f4cc33273a4392842e34233d5`
+
+## batch-a-reserved-a11-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/9b61d4cdd097ce0a56790793fdd6c129d3f0d822e40e788cde17e6418bdea65f`
+
+## batch-a-reserved-a11-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/9b61d4cdd097ce0a56790793fdd6c129d3f0d822e40e788cde17e6418bdea65f`
+
+## batch-a-reserved-a12-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/bd1154c3cafd8922a3b91983a628b2fd75ee571bda11eb8a6f9eb94d569caf22`
+
+## batch-a-reserved-a13-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/88eaf851f31627d1562797f83f79f60446fca428598034e69d6748fe46ec5a79`
+
+## batch-a-reserved-a13-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/88eaf851f31627d1562797f83f79f60446fca428598034e69d6748fe46ec5a79`
+
+## batch-a-reserved-a14-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/3e0e0bb01b3da304ddd50c7212de48bebcbf96d3b2d117369779044d96f69b21`
+
+## batch-a-reserved-a14-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/3e0e0bb01b3da304ddd50c7212de48bebcbf96d3b2d117369779044d96f69b21`
+
+## batch-a-reserved-a15-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/6d4515f9ca5619f8d02349c6c2ad116dc989f5a4c317c4d31105f9a9271aa080`
+
+## batch-a-reserved-a16-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/3b1980407c8765dd4baf122f505692e49c411cbff6089e896e8b3921ce208b41`
+
+## batch-a-reserved-a16-o2-g8-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/3b1980407c8765dd4baf122f505692e49c411cbff6089e896e8b3921ce208b41`
+
+## batch-a-reserved-a17-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/7f1651fad6549be052f7918b7076847d9137c1a662543c776097b8331a4fe6a9`
+
+## batch-a-reserved-a18-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/4cf4f8b91176606a7af1fd853f7ccd89fa63964199d0883686e46fb6a47255a8`
+
+## batch-a-reserved-a19-o2-g0-ffunction-sections-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Close only through fresh current complete-symbol and full-image integration proofs; prior generic-symbol immutable trial remains historical evidence.
+
+Reopen condition: A valid acknowledged family reservation permits fresh verification of retained frozen Batch A input.
+
+- `reservation:claim/2b55fda7afa885c55177730972deffe120ad6648551d3c2c56e1d1f9fc8ac44b`
+
 ## bitmap80-missing-0_aranos_tutorial-002adf80-context-v2-fixed-20261006
 
 State: `integrated`. Kind: `candidate`.

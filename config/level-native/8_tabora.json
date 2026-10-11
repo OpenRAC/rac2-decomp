@@ -2,6 +2,30 @@
   "entry": 2843784,
   "externals": {
     "BOOT_FUN_00115DA8": 1138088,
+    "BatchA_A01_D_001A7B90": 1735568,
+    "BatchA_A01_D_001A7BB8": 1735608,
+    "BatchA_A01_FUN_00124418": 1197080,
+    "BatchA_A01_FUN_001257D0": 1202128,
+    "BatchA_A03_D_001A7B90": 1735568,
+    "BatchA_A03_D_001A7BC0": 1735616,
+    "BatchA_A03_D_001A8FE0": 1740768,
+    "BatchA_A05_BatchA_D001A63A8": 1729448,
+    "BatchA_A05_D_001A63A8": 1729448,
+    "BatchA_A07_BatchA_D001A79F0a": 1735152,
+    "BatchA_A07_D_001A79F0": 1735152,
+    "BatchA_A08_BatchA_D001A904C": 1740876,
+    "BatchA_A08_D_001A904C": 1740876,
+    "BatchA_A11_D_001A63A8": 1729448,
+    "BatchA_A12_BatchA_D001FF980s": 2095488,
+    "BatchA_A12_D_001FF980s": 2095488,
+    "BatchA_A13_BatchA_D001A79F0b": 1735152,
+    "BatchA_A13_D_001A79F0": 1735152,
+    "BatchA_A14_D_00189E20": 1613344,
+    "BatchA_A14_D_00189E20s": 1613344,
+    "BatchA_A16_BatchA_D001A7A0A": 1735178,
+    "BatchA_A16_D_001A7A0A": 1735178,
+    "BatchA_A19_BatchA_D001AEB10": 1764112,
+    "BatchA_A19_D_001AEB10": 1764112,
     "D_19B278": 1684088,
     "FUN_00133400": 1258496,
     "LVL_8_TABORA_D_00139568": 1283432,
@@ -655,6 +679,12 @@
       "symbol": "LVL_8_TABORA_FUN_002D6F48"
     },
     {
+      "address": 3005752,
+      "meaning": "A14-struct-2field-20 freshly exact-verified under family reservation",
+      "size": 20,
+      "symbol": "LVL_8_TABORA_FUN_002DDD38"
+    },
+    {
       "address": 3005776,
       "meaning": "shared native body of family c68ad20a",
       "size": 96,
@@ -709,6 +739,12 @@
       "symbol": "LVL_8_TABORA_FUN_002E0820"
     },
     {
+      "address": 3024120,
+      "meaning": "A13-eq-getter-20 freshly exact-verified under family reservation",
+      "size": 20,
+      "symbol": "LVL_8_TABORA_FUN_002E24F8"
+    },
+    {
       "address": 3024144,
       "meaning": "Return one when the resident mode word is25,5,10 or15, otherwise zero",
       "size": 60,
@@ -719,6 +755,12 @@
       "meaning": "Filter primary or fallback object's class identifier by mode and signed selection",
       "size": 160,
       "symbol": "LVL_8_TABORA_FUN_002E2590"
+    },
+    {
+      "address": 3024432,
+      "meaning": "A07-sda-multi-eq-44 freshly exact-verified under family reservation",
+      "size": 44,
+      "symbol": "LVL_8_TABORA_FUN_002E2630"
     },
     {
       "address": 3024480,
@@ -857,6 +899,12 @@
       "symbol": "LVL_8_TABORA_FUN_002F9128"
     },
     {
+      "address": 3126016,
+      "meaning": "A01-shared-108 freshly exact-verified under family reservation",
+      "size": 108,
+      "symbol": "LVL_8_TABORA_FUN_002FB300"
+    },
+    {
       "address": 3141880,
       "meaning": "Change resident state word from1 to2 only when the mode word equals7",
       "size": 48,
@@ -893,6 +941,12 @@
       "symbol": "LVL_8_TABORA_FUN_002FFF08"
     },
     {
+      "address": 3146032,
+      "meaning": "A16-sda-byte-16 freshly exact-verified under family reservation",
+      "size": 16,
+      "symbol": "LVL_8_TABORA_FUN_00300130"
+    },
+    {
       "address": 3146096,
       "size": 8,
       "symbol": "LVL_8_TABORA_FUN_00300170"
@@ -917,6 +971,12 @@
       "address": 3180048,
       "size": 8,
       "symbol": "LVL_8_TABORA_FUN_00308610"
+    },
+    {
+      "address": 3192256,
+      "meaning": "A02-list-add-88 freshly exact-verified under family reservation",
+      "size": 88,
+      "symbol": "LVL_8_TABORA_FUN_0030B5C0"
     },
     {
       "address": 3198080,
@@ -987,6 +1047,12 @@
       "meaning": "Call the registered handler with a table pointer built from one module base word plus the constant 36808, forwarding the incoming argument; do nothing when the base word is zero.",
       "size": 52,
       "symbol": "LVL_8_TABORA_FUN_00318E30"
+    },
+    {
+      "address": 3247776,
+      "meaning": "A08-sda-offset-40 freshly exact-verified under family reservation",
+      "size": 40,
+      "symbol": "LVL_8_TABORA_FUN_00318EA0"
     },
     {
       "address": 3248104,
@@ -1096,6 +1162,12 @@
       "symbol": "LVL_8_TABORA_FUN_003300C8"
     },
     {
+      "address": 3347848,
+      "meaning": "A06-inline-init-40 freshly exact-verified under family reservation",
+      "size": 40,
+      "symbol": "LVL_8_TABORA_FUN_00331588"
+    },
+    {
       "address": 3348920,
       "meaning": "When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown.",
       "size": 128,
@@ -1141,6 +1213,18 @@
       "meaning": "Pass resident active word to original stop helper when signed status is three, set status four and return one; otherwise zero",
       "size": 88,
       "symbol": "LVL_8_TABORA_FUN_0033B7D8"
+    },
+    {
+      "address": 3390984,
+      "meaning": "A05-store-rotation-52 freshly exact-verified under family reservation",
+      "size": 52,
+      "symbol": "LVL_8_TABORA_FUN_0033BE08"
+    },
+    {
+      "address": 3391040,
+      "meaning": "A11-sda-3store-28 freshly exact-verified under family reservation",
+      "size": 28,
+      "symbol": "LVL_8_TABORA_FUN_0033BE40"
     },
     {
       "address": 3393328,
@@ -1245,6 +1329,12 @@
       "symbol": "LVL_8_TABORA_FUN_0034FC78"
     },
     {
+      "address": 3482656,
+      "meaning": "A12-struct-2field-24 freshly exact-verified under family reservation",
+      "size": 24,
+      "symbol": "LVL_8_TABORA_FUN_00352420"
+    },
+    {
       "address": 3491944,
       "meaning": "shared native body of family 330e1aef",
       "size": 148,
@@ -1321,6 +1411,12 @@
       "meaning": "Shared native body; original game role is unknown.",
       "size": 592,
       "symbol": "LVL_8_TABORA_FUN_00361130"
+    },
+    {
+      "address": 3566056,
+      "meaning": "A03-counter-mod50-80 freshly exact-verified under family reservation",
+      "size": 80,
+      "symbol": "LVL_8_TABORA_FUN_003669E8"
     },
     {
       "address": 3566496,
@@ -2351,6 +2447,12 @@
       "meaning": "Writes three consecutive 32-bit counters of a shared global block to zero, then passes the block's +880 tail to one routine and calls a second initialiser; returns nothing.",
       "size": 56,
       "symbol": "LVL_8_TABORA_FUN_004604A0"
+    },
+    {
+      "address": 4594272,
+      "meaning": "A19-sda-scalar-store-16 freshly exact-verified under family reservation",
+      "size": 16,
+      "symbol": "LVL_8_TABORA_FUN_00461A60"
     },
     {
       "address": 4595160,

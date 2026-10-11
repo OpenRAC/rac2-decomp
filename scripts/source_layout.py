@@ -32,6 +32,26 @@ SHIP_CLEAR_VARIANT = b"void @@FUNCTION@@(int *object) {\n    object[0] = 0;\n   
 # authored body is the family identity, so any program may anchor one. The
 # legacy anchor program keeps its historical family id spelling.
 BASE_SEED_PLACEMENTS = (
+    # Frozen Batch A exact-source family anchors; each placement keeps its byte proof.
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_002EF618'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_002FEF50'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_003584B0'),
+    ('11_joba', 'LVL_11_JOBA_FUN_003F9E30'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_0032DCC8'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_00322A98'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_002D6848'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_0030C830'),
+    ('18_damosel', 'LVL_18_DAMOSEL_FUN_003F8E80'),
+    ('19_grelbin', 'LVL_19_GRELBIN_FUN_00340F08'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_0032DD00'),
+    ('16_snivelak', 'LVL_16_SNIVELAK_FUN_0033BDC8'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_002D6710'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_002D1F60'),
+    ('15_gorn', 'LVL_15_GORN_FUN_0035BB88'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_002F43C0'),
+    ('11_joba', 'LVL_11_JOBA_FUN_003F9CD0'),
+    ('18_damosel', 'LVL_18_DAMOSEL_FUN_003F8E30'),
+    ('0_aranos_tutorial', 'LVL_0_ARANOS_TUTORIAL_FUN_00445B70'),
     ("0_aranos_tutorial", "LVL_0_ARANOS_TUTORIAL_FUN_00326220"),
     ("0_aranos_tutorial", "LVL_0_ARANOS_TUTORIAL_FUN_003CBE90"),
     ("0_aranos_tutorial", "LVL_0_ARANOS_TUTORIAL_FUN_00310908"),
