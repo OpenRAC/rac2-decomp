@@ -110,6 +110,30 @@ class MaintainerTests(unittest.TestCase):
         with patch.object(tests.unittest.defaultTestLoader, "loadTestsFromNames", return_value=unittest.TestSuite()):
             self.assertEqual(tests.run_modules(self.repo, ["test_source_layout"]), 1)
 
+    def test_parallel_modules_use_isolated_workers_and_aggregate_results(self):
+        completed = subprocess.CompletedProcess([], 0, "worker output\n", "")
+        with patch.object(tests.subprocess, "run", return_value=completed) as invoked, \
+                patch.object(tests.os, "cpu_count", return_value=8), \
+                patch.object(tests, "test_ids", return_value=["a.one", "a.two", "b.one", "b.two"]):
+            self.assertEqual(tests.run_modules_parallel(
+                self.repo, ["test_source_layout", "test_maintainer_tests"], jobs=0), 0)
+        self.assertEqual(invoked.call_count, 4)
+        for call in invoked.call_args_list:
+            self.assertEqual(call.kwargs["cwd"], self.repo)
+            self.assertTrue(call.kwargs["capture_output"])
+
+    def test_parallel_modules_report_any_worker_failure(self):
+        def result(command, **kwargs):
+            return subprocess.CompletedProcess(command, 1 if "a.one" in command else 0, "", "failed\n")
+        with patch.object(tests.subprocess, "run", side_effect=result), \
+                patch.object(tests, "test_ids", return_value=["a.one", "b.one"]):
+            self.assertEqual(tests.run_modules_parallel(
+                self.repo, ["test_source_layout", "test_maintainer_tests"], jobs=2), 1)
+
+    def test_parallel_jobs_must_be_nonnegative(self):
+        with self.assertRaises(ValueError):
+            tests.run_modules_parallel(self.repo, ["test_source_layout"], jobs=-1)
+
 
 if __name__ == "__main__":
     unittest.main()

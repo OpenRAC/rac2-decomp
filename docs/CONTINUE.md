@@ -68,6 +68,13 @@ Refresh source inventory, register views and the README bar when their inputs
 change. Use detailed English commits, explicit staging and a normal push, then
 verify the remote SHA and CI. Never force-push or include private runtime data.
 
+For LP's authenticated primary-maintainer publication path, pass
+`--owner-local` to `campaign.py finalize`. It keeps the complete matching and
+freshness gates while selecting the bounded report/finalizer/policy tests and
+running isolated test-case shards on multiple workers. The exhaustive default remains
+available for protected queue validation; do not invoke it accidentally as a
+routine owner-local prepublication test.
+
 Integrate an eligible reviewed PR through the [merge queue](MERGE-QUEUE.md).
 It checks the temporary combined commit against the latest `RAC2`; an older
 topic base alone does not require another manual merge. If shared C, catalogue

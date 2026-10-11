@@ -127,6 +127,20 @@ lock shared by arbitrary editors. Keep the batch inputs frozen throughout.
 Repeating an applied invocation verifies its after-images without closing tasks
 twice.
 
+The authenticated primary maintainer should use the bounded local route:
+
+```text
+python scripts/campaign.py --runtime <private-runtime> finalize <action-id> --manifest <preparation-manifest.json> --output <new-private-finalization-directory> --owner-local --apply
+```
+
+`--owner-local` selects `test_decomp_report` plus the finalizer and maintainer
+policy guards, and shards their test cases across up to four isolated worker
+processes. Override the bound with `--maintainer-jobs <n>` or add a maintained
+module with `--maintainer-test test_name`. Matching, source-layout, report,
+fresh-tool and complete-image gates remain unchanged. This authenticated route
+waives exhaustive local unittest discovery; omitting `--owner-local` keeps it
+for the protected/default route.
+
 If preparation fails before a plan exists, inspect `failed-checks.json` and its
 numbered log, correct the cause and use a new private output directory. Do not
 overwrite the failed bank. An abruptly killed publisher may leave a register

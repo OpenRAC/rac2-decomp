@@ -591,9 +591,10 @@ def _prepare(store, repo, action_id, manifest, output, references, tasks, runner
         # Identity was authenticated before preparation. This private snapshot
         # has no Git origin; run its explicit tests without re-authenticating it.
         code = ("import sys;from pathlib import Path;sys.path.insert(0,'scripts');"
-                "from maintainer_tests import run_modules;"
-                "sys.exit(run_modules(Path.cwd(),sys.argv[1:]))")
-        run("19-targeted-maintainer-tests", "", [], [sys.executable, "-c", code, *test_policy["modules"]])
+                "from maintainer_tests import run_modules_parallel;"
+                "sys.exit(run_modules_parallel(Path.cwd(),sys.argv[2:],int(sys.argv[1])))")
+        run("19-targeted-maintainer-tests", "", [], [sys.executable, "-c", code,
+            str(test_policy["jobs"]), *test_policy["modules"]])
     # All output chunks are explicitly declared by the independently validated manifest.
     allowed = FIXED_OUTPUTS | {"progress/levels/" + level + ".json" for level in levels} | {"config/function-catalog/catalog.json"}
     for chunk in catalog["function_chunks"]:
@@ -983,7 +984,8 @@ def _publish(repo, output, plan, journal):
 
 
 def finalize(store, repo, action_id, *, manifest, output, tasks=(), apply=False,
-             references=None, runner=subprocess.run, maintainer_tests=()):
+             references=None, runner=subprocess.run, maintainer_tests=(), owner_local=False,
+             maintainer_jobs=0):
     """Return a private review receipt; ``apply`` publishes the same prepared plan.
 
     ``manifest`` is the exact reference manifest recorded by build/integrate.
@@ -992,12 +994,22 @@ def finalize(store, repo, action_id, *, manifest, output, tasks=(), apply=False,
     Research tasks remain explicit outstanding decisions and gain no false closure.
     """
     repo = Path(repo).resolve()
+    if owner_local and not maintainer_tests:
+        maintainer_tests = ("test_decomp_report",)
+    if maintainer_jobs and not (owner_local or maintainer_tests):
+        raise ValueError("Maintainer test jobs require --owner-local or --maintainer-test")
     test_policy = None
     if maintainer_tests:
         from maintainer_tests import authenticate, validate_modules
         modules = validate_modules(repo, [*maintainer_tests, "test_campaign_finalize", "test_maintainer_tests", "test_maintainer_test_policy"])
+        if type(maintainer_jobs) is not int or maintainer_jobs < 0:
+            raise ValueError("Maintainer test jobs must be zero or a positive integer")
+        jobs = min(maintainer_jobs or min(4, os.cpu_count() or 1), len(modules))
         test_policy = {"mode": "targeted", "actor": authenticate(repo), "modules": modules,
-                       "full_merge_queue_suite_required": True, "matching_gates_unchanged": True}
+                       "owner_local": bool(owner_local), "jobs": jobs,
+                       "full_merge_queue_suite_required": not owner_local,
+                       "owner_local_full_suite_waived": bool(owner_local),
+                       "matching_gates_unchanged": True}
     output = _private_output(output, repo)
     manifest = _private(manifest, repo)
     tasks = tuple(tasks)

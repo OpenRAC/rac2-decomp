@@ -11,6 +11,12 @@ Keep required local matching proofs, current inputs and appropriate tests;
 never fabricate matching credit. Other accounts retain the protected queue
 and required checks. Manual full CI remains available on demand.
 
+For campaign publication, the same maintainer uses `campaign.py finalize --owner-local`;
+this authenticates the GitHub account, keeps every matching and
+freshness gate, and runs the bounded report/finalizer/policy modules in parallel
+worker processes by test-case shard. Omit it only when the exhaustive local unittest suite is
+actually intended.
+
 For a first-time contributor, read [docs/CONTRIBUTOR-QUICKSTART.md](docs/CONTRIBUTOR-QUICKSTART.md)
 and [toolchain/README.md](toolchain/README.md). Default to a fork/topic branch and
 draft PR targeting `RAC2`; do not inherit the maintainer's direct-push permissions
