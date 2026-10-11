@@ -113,3 +113,16 @@ Source files are not identified yet: units are named by start address (or `lib_<
 functions and finds them in the v1.01 boot. Five units are named after a rac1 file (`drawquad`, `miscproc`, `pause`, `tfragproc`, `movie_readbuf`);
 the 146 function-level matches of 35 rac1 files (for example 56 of 78 `fastfunc` functions) are kept in `config/segments/ntsc-u-rac1-matches.tsv`
 as reference data for renaming further units. Most files match only partly, so a unit is named only when its first function and at least one more match in order.
+
+**Names and file anchors for v1.01.** `scripts/transfer_names.py --v1 <reference>/boot.elf` carries the v2.00 function names (Promises) over by
+unique digest match: 897 names are now in `symbol_addrs/usa/symbol_addrs.txt` below a generated marker, and the report shows them.
+`scripts/ghidra_anchors.py` lists the functions that reference a source-file name string in the boot (`hud.cpp`, `loaders.cpp`, `map.cpp`,
+`gui/behaviors.cpp`, `gui/memoryManagement.cpp`, `gui/mathUtil.cpp`; seven functions in `config/segments/ntsc-u-file-anchors.tsv`). It talks to a headless
+Ghidra MCP container started on your own private project folder, for example:
+
+```bash
+podman run -d --name ghidra-rac2-v101 --security-opt label=disable -p 127.0.0.1:18089:8089 -p 127.0.0.1:18081:8081 \
+  -v $PWD/extracted/ghidra:/projects -v "$R:/baserom:ro" -e PS2_BINARY=/baserom/boot.elf -e PROJECT_NAME=rac2 \
+  -e GHIDRA_MCP_AUTH_TOKEN=rac2-local ghcr.io/lynder063/rac1-ghidra-ps2-mcp:latest      # image from rac1-decomp's container workflow
+GHIDRA_MCP_AUTH_TOKEN=rac2-local python scripts/ghidra_anchors.py --url http://127.0.0.1:18089
+```
