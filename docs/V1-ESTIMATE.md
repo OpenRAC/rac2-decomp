@@ -57,3 +57,7 @@ for class-like names in referenced strings: 608 hints, 46 of them function names
 **Data names.** `scripts/transfer_data_names.py` carries Promises' v2.00 global-variable names (`g_cameraState`, `g_boltCount`, ...) to v1.01. Functions that are identical
 in both boots build their globals at the same instruction positions, so the paired addresses give an address map; a name moves only when all votes for its address agree
 (521 names, vote count in each comment). Credit: Promises/RC2-Going-Decompiled; permission record: OpenRAC/rac2-gc-decomp PR #74.
+
+**Compiler flags per unit.** `scripts/unit_flags.py --script <objdiff_build.sh> --v1 <reference>/boot.elf` maps the per-unit `-G` and `cc1` flags Promises measured on v2.00 to
+v1.01 (`config/segments/ntsc-u-unit-flags.tsv`: 18 units, all `-G8`, most with `-fno-gcse`). Everything else is `-G0`. The SDK/engine compiler arm boundary is `0x131D98` in both builds
+(below it 16-byte `sq` saves, from it 8-byte `sd` saves). Facts only; no code is copied (PR #74).
