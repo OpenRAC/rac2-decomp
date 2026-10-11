@@ -236,6 +236,9 @@ class MergeGroupTests(unittest.TestCase):
         self.files = [{"filename": "README.md"}]
         self.other = []
         self.latest_pr = self.latest_rules = self.latest_refs = self.latest_commit = self.latest_associated = self.latest_other = None
+        self.source_refs = {}
+        self.latest_source_refs = None
+        self.open_prs = self.latest_open_prs = None
         self.failure_endpoint = None
         self.calls = []
         self.counts = {}
@@ -254,6 +257,9 @@ class MergeGroupTests(unittest.TestCase):
         later = self.counts[endpoint] > 1
         if "/rules/branches/RAC2?" in endpoint:
             return copy.deepcopy(self.latest_rules if later and self.latest_rules is not None else self.rules)
+        if endpoint in self.source_refs:
+            refs = self.latest_source_refs if later and self.latest_source_refs is not None else self.source_refs
+            return copy.deepcopy(refs[endpoint])
         if "/git/ref/" in endpoint:
             refs = self.latest_refs if later and self.latest_refs is not None else self.refs
             return copy.deepcopy(refs["refs/" + endpoint.split("/git/ref/", 1)[1]])
@@ -266,6 +272,8 @@ class MergeGroupTests(unittest.TestCase):
         if "/files?" in endpoint:
             return copy.deepcopy(self.files)
         if "?state=open" in endpoint:
+            if self.open_prs is not None:
+                return copy.deepcopy(self.latest_open_prs if later and self.latest_open_prs is not None else self.open_prs)
             other = self.latest_other if later and self.latest_other is not None else self.other
             return copy.deepcopy([self.pr] + other)
         self.assertEqual(endpoint, f"repos/{self.repo}/pulls/{self.pr['number']}")
@@ -289,6 +297,194 @@ class MergeGroupTests(unittest.TestCase):
         self.assertEqual(self.run_event(), 0)
         self.assertTrue(all(count == 2 for endpoint, count in self.counts.items() if "/files?" not in endpoint))
         self.assertTrue(all("/pulls/999" not in endpoint for _, endpoint, _ in self.calls))
+
+    def use_fork_fallback(self):
+        self.associated = []
+        self.pr["head"].update(ref="RAC2-docs", repo={"full_name": "contributor/fork"})
+        endpoint = "repos/contributor/fork/git/ref/heads/RAC2-docs"
+        self.source_refs[endpoint] = {"ref": "refs/heads/RAC2-docs", "object": {"type": "commit", "sha": self.pr["head"]["sha"]}}
+        return endpoint
+
+    def test_empty_association_binds_unique_live_fork_ref_twice_without_writes(self):
+        endpoint = self.use_fork_fallback()
+        self.assertEqual(self.run_event(), 0)
+        self.assertEqual(self.counts[endpoint], 2)
+        self.assertEqual(self.counts[f"repos/{self.repo}/pulls?state=open&base=RAC2&per_page=100&page=1"], 4)
+
+    def test_measured_fork_parent_and_live_source_ref_pass(self):
+        base = "77070933dcfecb510da88ba6eb699a36d54338ad"
+        source = "2a06e0d790865218727545d8f83576fc09018bb7"
+        head = "4223efd1ec4ca2d41a2d4a14a3b279764dddb6ae"
+        self.event["merge_group"].update(base_sha=base, head_sha=head)
+        os.environ["GITHUB_SHA"] = head
+        self.refs["refs/heads/RAC2"]["object"]["sha"] = base
+        self.refs[self.event["merge_group"]["head_ref"]]["object"]["sha"] = head
+        self.commit.update(sha=head, parents=[{"sha": base}, {"sha": source}])
+        self.pr["number"] = 95
+        self.pr["base"]["sha"] = base
+        self.pr["head"]["sha"] = source
+        self.use_fork_fallback()
+        self.pr["head"]["repo"]["full_name"] = "platypet2217-star/rac2-gc-decomp-pal"
+        endpoint = "repos/platypet2217-star/rac2-gc-decomp-pal/git/ref/heads/RAC2-docs"
+        self.source_refs[endpoint] = self.source_refs.pop("repos/contributor/fork/git/ref/heads/RAC2-docs")
+        self.assertEqual(self.run_event(), 0)
+        self.assertEqual(self.counts[endpoint], 2)
+
+    def test_nonempty_wrong_or_malformed_association_never_uses_fallback(self):
+        self.use_fork_fallback()
+        for rows in ([{**copy.deepcopy(self.pr), "state": "closed"}],
+                     [{**copy.deepcopy(self.pr), "head": {"sha": "d" * 40}}],
+                     [{"number": True}], [copy.deepcopy(self.pr)] * 2):
+            with self.subTest(rows=rows):
+                self.reset_calls()
+                self.associated = rows
+                self.assertEqual(self.run_event(), 1)
+                self.assertFalse(any("?state=open" in endpoint for _, endpoint, _ in self.calls))
+                self.assertFalse(any(endpoint in self.source_refs for _, endpoint, _ in self.calls))
+
+    def test_empty_association_still_requires_exact_nondraft_open_target_pr(self):
+        self.use_fork_fallback()
+        for field, value in (("state", "closed"), ("draft", True), ("head", {"sha": "d" * 40}),
+                             ("base", {"sha": "e" * 40, "ref": "other", "repo": {"full_name": self.repo}}),
+                             ("base", {"sha": "e" * 40, "ref": "RAC2", "repo": {"full_name": "foreign/repo"}})):
+            with self.subTest(field=field):
+                self.reset_calls()
+                candidate = copy.deepcopy(self.pr)
+                candidate[field] = value
+                self.open_prs = [candidate]
+                self.assertEqual(self.run_event(), 1)
+        self.open_prs = []
+        self.assertEqual(self.run_event(), 1)
+
+    def test_fallback_duplicate_pr_number_or_source_head_is_rejected(self):
+        self.use_fork_fallback()
+        second = copy.deepcopy(self.pr)
+        second["number"] = 43
+        for rows in ([self.pr, second], [self.pr, self.pr]):
+            with self.subTest(rows=rows):
+                self.reset_calls()
+                self.open_prs = rows
+                self.assertEqual(self.run_event(), 1)
+
+    def test_fallback_malformed_open_pr_and_head_identity_fail_closed(self):
+        self.use_fork_fallback()
+        for row in ({"number": True}, {"number": 0}, {"number": 43, "head": {"sha": "bad"}},
+                    {**copy.deepcopy(self.pr), "head": None}):
+            with self.subTest(row=row):
+                self.reset_calls()
+                self.open_prs = [row]
+                self.assertEqual(self.run_event(), 1)
+
+    def test_fallback_source_repository_and_ref_are_required_safe_identities(self):
+        self.use_fork_fallback()
+        for repo, ref in ((None, "RAC2-docs"), ({"full_name": "../wrong/repo"}, "RAC2-docs"),
+                          ({"full_name": "contributor/fork?secret"}, "RAC2-docs"),
+                          ({"full_name": "contributor/.."}, "RAC2-docs"),
+                          ({"full_name": "contributor/fork"}, "../RAC2"),
+                          ({"full_name": "contributor/fork"}, "RAC2-docs?x=y"),
+                          ({"full_name": "contributor/fork"}, "RAC2//docs"),
+                          ({"full_name": "contributor/fork"}, "RAC2-docs/"),
+                          ({"full_name": "contributor/fork"}, None)):
+            with self.subTest(repo=repo, ref=ref):
+                self.reset_calls()
+                self.open_prs = [copy.deepcopy(self.pr)]
+                self.open_prs[0]["head"].update(repo=repo, ref=ref)
+                self.assertEqual(self.run_event(), 1)
+                self.assertFalse(any(endpoint in self.source_refs for _, endpoint, _ in self.calls))
+
+    def test_fallback_source_ref_name_type_and_exact_parent_sha_are_verified(self):
+        endpoint = self.use_fork_fallback()
+        original = copy.deepcopy(self.source_refs[endpoint])
+        for field, value in (("ref", "refs/heads/other"),
+                             ("object", {"type": "tag", "sha": "a" * 40}),
+                             ("object", {"type": "commit", "sha": "d" * 40}),
+                             ("object", {"type": "commit", "sha": "bad"})):
+            with self.subTest(field=field):
+                self.reset_calls()
+                self.source_refs[endpoint] = copy.deepcopy(original)
+                self.source_refs[endpoint][field] = value
+                self.assertEqual(self.run_event(), 1)
+
+    def test_fallback_source_ref_movement_before_success_fails(self):
+        endpoint = self.use_fork_fallback()
+        self.latest_source_refs = copy.deepcopy(self.source_refs)
+        self.latest_source_refs[endpoint]["object"]["sha"] = "d" * 40
+        self.assertEqual(self.run_event(), 1)
+        self.assertEqual(self.counts[endpoint], 2)
+
+    def test_fallback_rebound_source_provenance_cannot_borrow_same_sha(self):
+        self.use_fork_fallback()
+        self.open_prs = [copy.deepcopy(self.pr)]
+        for repo, ref in (("another/fork", "RAC2-docs"), ("contributor/fork", "another-branch")):
+            with self.subTest(repo=repo, ref=ref):
+                self.reset_calls()
+                self.latest_open_prs = [copy.deepcopy(self.pr)]
+                self.latest_open_prs[0]["head"].update(repo={"full_name": repo}, ref=ref)
+                self.source_refs[f"repos/{repo}/git/ref/heads/{ref}"] = {"ref": "refs/heads/" + ref, "object": {"type": "commit", "sha": "a" * 40}}
+                self.assertEqual(self.run_event(), 1)
+
+    def test_fallback_pr_snapshot_must_retain_source_repository_and_ref(self):
+        self.use_fork_fallback()
+        for field, value in (("repo", {"full_name": "another/fork"}), ("ref", "another-branch")):
+            with self.subTest(field=field):
+                self.reset_calls()
+                self.latest_pr = copy.deepcopy(self.pr)
+                self.latest_pr["head"][field] = value
+                self.assertEqual(self.run_event(), 1)
+                self.assertIn("pr_snapshot_final", self.output)
+
+    def test_fallback_evidence_route_change_before_success_requires_rerun(self):
+        self.use_fork_fallback()
+        self.latest_associated = [copy.deepcopy(self.pr)]
+        self.assertEqual(self.run_event(), 1)
+
+    def test_fallback_api_errors_cannot_be_treated_as_empty_evidence(self):
+        source_endpoint = self.use_fork_fallback()
+        for endpoint in (f"repos/{self.repo}/commits/" + "a" * 40 + "/pulls?per_page=100&page=1",
+                         f"repos/{self.repo}/pulls?state=open&base=RAC2&per_page=100&page=1", source_endpoint):
+            with self.subTest(endpoint=endpoint):
+                self.reset_calls()
+                self.failure_endpoint = endpoint
+                self.assertEqual(self.run_event(), 1)
+                self.assertIn("association (api_forbidden)", self.output)
+                if "/commits/" in endpoint:
+                    self.assertFalse(any("?state=open" in path for _, path, _ in self.calls))
+
+    def test_fallback_keeps_body_files_and_snapshot_contract(self):
+        self.use_fork_fallback()
+        self.pr["body"] = "please merge"
+        self.assertEqual(self.run_event(), 1)
+        self.reset_calls()
+        self.pr["body"] = body()
+        self.files = []
+        self.assertEqual(self.run_event(), 1)
+        self.reset_calls()
+        self.files = [{"filename": "README.md"}]
+        self.latest_pr = copy.deepcopy(self.pr)
+        self.latest_pr["body"] = "edited"
+        self.assertEqual(self.run_event(), 1)
+
+    def test_fallback_open_scan_paginates_and_refuses_truncation(self):
+        self.use_fork_fallback()
+        first = [{**copy.deepcopy(self.pr), "number": n, "head": {"sha": "d" * 40}} for n in range(100, 200)]
+        def paged(method, endpoint, payload=None):
+            if "?state=open" in endpoint:
+                self.calls.append((method, endpoint, payload))
+                return copy.deepcopy([self.pr] if endpoint.endswith("page=2") else first)
+            return self.fake_api(method, endpoint, payload)
+        with patch.object(contract, "api", side_effect=paged), patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(contract.handle_event(self.event), 0)
+        self.assertEqual(sum("?state=open" in endpoint for _, endpoint, _ in self.calls), 8)
+        def truncated(method, endpoint, payload=None):
+            if "?state=open" in endpoint:
+                self.calls.append((method, endpoint, payload))
+                return copy.deepcopy(first)
+            return self.fake_api(method, endpoint, payload)
+        self.reset_calls()
+        with patch.object(contract, "api", side_effect=truncated), patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(contract.handle_event(self.event), 1)
+        self.assertEqual(sum("?state=open" in endpoint for _, endpoint, _ in self.calls), contract.MAX_REST_PAGES)
+        self.assertFalse(any(endpoint in self.source_refs for _, endpoint, _ in self.calls))
 
     def test_measured_real_queue_commit_shape_and_behind_pr_pass(self):
         base = "6a6fe2c31e2a59984097163b2cf8678c170165b9"

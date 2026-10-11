@@ -88,6 +88,12 @@
     "LVL_24_SHIP_SHACK_F1fa78648_FUN_002ED838": 3070008,
     "LVL_24_SHIP_SHACK_F1fa78648_FUN_003236A8": 3290792,
     "LVL_24_SHIP_SHACK_F1fa78648_FUN_003236D8": 3290840,
+    "LVL_24_SHIP_SHACK_F213135aa_FUN_002EC878": 3065976,
+    "LVL_24_SHIP_SHACK_F213135aa_FUN_002EC960": 3066208,
+    "LVL_24_SHIP_SHACK_F213135aa_FUN_002ECB10": 3066640,
+    "LVL_24_SHIP_SHACK_F213135aa_FUN_002ED090": 3068048,
+    "LVL_24_SHIP_SHACK_F213135aa_FUN_00318A40": 3246656,
+    "LVL_24_SHIP_SHACK_F213135aa_FUN_0031C818": 3262488,
     "LVL_24_SHIP_SHACK_F250fbfa4_FUN_002EC4E8": 3065064,
     "LVL_24_SHIP_SHACK_F250fbfa4_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_F250fbfa4_FUN_00327640": 3307072,
@@ -174,6 +180,12 @@
     "LVL_24_SHIP_SHACK_F55a1acb8_D_001A63AC": 1729452,
     "LVL_24_SHIP_SHACK_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_24_SHIP_SHACK_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_24_SHIP_SHACK_F5a19df7a_FUN_003189E8": 3246568,
+    "LVL_24_SHIP_SHACK_F5a19df7a_FUN_00318B08": 3246856,
+    "LVL_24_SHIP_SHACK_F5a19df7a_FUN_00372790": 3614608,
+    "LVL_24_SHIP_SHACK_F5a19df7a_FUN_003B94E0": 3904736,
+    "LVL_24_SHIP_SHACK_F5a19df7a_FUN_003B98B8": 3905720,
+    "LVL_24_SHIP_SHACK_F5a19df7a_FUN_003BA0E0": 3907808,
     "LVL_24_SHIP_SHACK_F5a9e4f98_FUN_0040A9B8": 4237752,
     "LVL_24_SHIP_SHACK_F5a9e4f98_FUN_0040ABE0": 4238304,
     "LVL_24_SHIP_SHACK_F5a9e4f98_FUN_0040AEE0": 4239072,
@@ -335,6 +347,18 @@
     "LVL_24_SHIP_SHACK_Fb1b523716b470b36_AT0037D5E0_ROLE01": 3065976,
     "LVL_24_SHIP_SHACK_Fb1b523716b470b36_AT00380088_ROLE00": 3065928,
     "LVL_24_SHIP_SHACK_Fb1b523716b470b36_AT00380088_ROLE01": 3065976,
+    "LVL_24_SHIP_SHACK_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_24_SHIP_SHACK_Fb1bbe20c_FUN_00356B70": 3500912,
+    "LVL_24_SHIP_SHACK_Fb1bbe20c_FUN_0040F640": 4257344,
+    "LVL_24_SHIP_SHACK_Fb1bbe20c_FUN_0040F830": 4257840,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_FUN_002DAA08": 2992648,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_FUN_002EC848": 3065928,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_FUN_002ECCF0": 3067120,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_FUN_002ECE20": 3067424,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_FUN_002ECE38": 3067448,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_FUN_00318A40": 3246656,
+    "LVL_24_SHIP_SHACK_Fb1c9893c_FUN_00318B08": 3246856,
     "LVL_24_SHIP_SHACK_Fb342d477_D_0011AC40": 1158208,
     "LVL_24_SHIP_SHACK_Fb342d477_D_0011AC60": 1158240,
     "LVL_24_SHIP_SHACK_Fb342d477_FUN_00424FC0": 4345792,
@@ -342,6 +366,11 @@
     "LVL_24_SHIP_SHACK_Fb4cfb7e0_FUN_003189A8": 3246504,
     "LVL_24_SHIP_SHACK_Fb77d67f1_FUN_002EC4B8": 3065016,
     "LVL_24_SHIP_SHACK_Fb77d67f1_FUN_00327640": 3307072,
+    "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_24_SHIP_SHACK_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_24_SHIP_SHACK_Fb7feb893_FUN_00356B70": 3500912,
+    "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F640": 4257344,
+    "LVL_24_SHIP_SHACK_Fb7feb893_FUN_0040F830": 4257840,
     "LVL_24_SHIP_SHACK_Fbbb7bee1_FUN_002EC5A8": 3065256,
     "LVL_24_SHIP_SHACK_Fbdd4a4aa_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_Fbdd4a4aa_FUN_002EC8B8": 3066040,
@@ -364,6 +393,11 @@
     "LVL_24_SHIP_SHACK_Fc3cb9262_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_Fc3cb9262_FUN_002ED990": 3070352,
     "LVL_24_SHIP_SHACK_Fc3cb9262_FUN_00327640": 3307072,
+    "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_24_SHIP_SHACK_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_24_SHIP_SHACK_Fc558ca70_FUN_00356B70": 3500912,
+    "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F640": 4257344,
+    "LVL_24_SHIP_SHACK_Fc558ca70_FUN_0040F830": 4257840,
     "LVL_24_SHIP_SHACK_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_24_SHIP_SHACK_Fc936841d_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_Fc936841d_FUN_002EC878": 3065976,
@@ -433,6 +467,13 @@
     "LVL_24_SHIP_SHACK_Ff26f272a_FUN_002ED0B0": 3068080,
     "LVL_24_SHIP_SHACK_Ff26f272a_FUN_002ED318": 3068696,
     "LVL_24_SHIP_SHACK_Ff26f272a_FUN_002ED838": 3070008,
+    "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002EC848": 3065928,
+    "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002EC8B8": 3066040,
+    "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002EC9F0": 3066352,
+    "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002ECCF0": 3067120,
+    "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002ECD18": 3067160,
+    "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_002ECD88": 3067272,
+    "LVL_24_SHIP_SHACK_Ff2d8e5ad_FUN_00313818": 3225624,
     "LVL_24_SHIP_SHACK_Ff4dd22f3_FUN_002EC4E8": 3065064,
     "LVL_24_SHIP_SHACK_Ff4dd22f3_FUN_002EC848": 3065928,
     "LVL_24_SHIP_SHACK_Ff4dd22f3_FUN_00327640": 3307072,
@@ -1049,6 +1090,12 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_0030D210"
     },
     {
+      "address": 3206160,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_0030EC10"
+    },
+    {
       "address": 3208784,
       "meaning": "Reserve or reuse an object slot, reset its associated state and return signed slot index",
       "size": 84,
@@ -1106,6 +1153,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_24_SHIP_SHACK_FUN_00321870"
+    },
+    {
+      "address": 3285032,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00322028"
     },
     {
       "address": 3286264,
@@ -1427,6 +1480,12 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_003773D0"
     },
     {
+      "address": 3641440,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00379060"
+    },
+    {
       "address": 3641856,
       "size": 8,
       "symbol": "LVL_24_SHIP_SHACK_FUN_00379200"
@@ -1604,6 +1663,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_24_SHIP_SHACK_FUN_003B9ED8"
+    },
+    {
+      "address": 3907392,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_003B9F40"
     },
     {
       "address": 3909512,
@@ -2044,6 +2109,12 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_004111D0"
     },
     {
+      "address": 4264752,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00411330"
+    },
+    {
       "address": 4267096,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2056,10 +2127,22 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_00411F20"
     },
     {
+      "address": 4268160,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00412080"
+    },
+    {
       "address": 4268776,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_24_SHIP_SHACK_FUN_004122E8"
+    },
+    {
+      "address": 4269128,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_00412448"
     },
     {
       "address": 4269464,
@@ -2068,10 +2151,22 @@
       "symbol": "LVL_24_SHIP_SHACK_FUN_00412598"
     },
     {
+      "address": 4269816,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_004126F8"
+    },
+    {
       "address": 4269968,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_24_SHIP_SHACK_FUN_00412790"
+    },
+    {
+      "address": 4270320,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_24_SHIP_SHACK_FUN_004128F0"
     },
     {
       "address": 4270472,

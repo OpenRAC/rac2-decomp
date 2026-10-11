@@ -181,6 +181,11 @@ def queue_member(repo: str, group: dict, stage_hook=None) -> dict:
         raise ValueError("Synthetic ancestry does not bind the current base and source")
     stage("association")
     associated = bounded_list(f"repos/{repo}/commits/{source}/pulls")
+    # Fork heads may have no commit association in the target repository. Only
+    # a successful empty response permits the bounded live PR/ref proof below.
+    fallback = not associated
+    if fallback:
+        associated = bounded_list(f"repos/{repo}/pulls?state=open&base=RAC2")
     matches = []
     numbers = set()
     for pr in associated:
@@ -194,10 +199,24 @@ def queue_member(repo: str, group: dict, stage_hook=None) -> dict:
                 and pr["base"]["repo"]["full_name"] == repo):
             if pr["draft"] is not False:
                 raise ValueError("Queued source is draft")
+            matching_pr = pr
             matches.append({"number": number, "headRefOid": head, "baseRefOid": pr_base,
                             "baseRefName": "RAC2", "repository": {"nameWithOwner": repo}})
     if len(matches) != 1:
         raise ValueError("No unique open RAC2 PR matches the source parent")
+    if fallback:
+        head_repo = matching_pr["head"]["repo"]["full_name"]
+        head_ref = matching_pr["head"]["ref"]
+        if (not isinstance(head_repo, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", head_repo)
+                or any(part in {".", ".."} for part in head_repo.split("/"))
+                or not isinstance(head_ref, str) or not re.fullmatch(r"[A-Za-z0-9_-][A-Za-z0-9_./-]*", head_ref)
+                or ".." in head_ref or "//" in head_ref or head_ref.endswith(("/", "."))):
+            raise ValueError("Invalid source repository or ref")
+        actual = api("GET", f"repos/{head_repo}/git/ref/heads/{head_ref}")
+        if (actual["ref"] != "refs/heads/" + head_ref or actual["object"]["type"] != "commit"
+                or sha_value(actual["object"]["sha"]) != source):
+            raise ValueError("Live source ref does not bind the source parent")
+        matches[0].update(headRepository=head_repo, headRefName=head_ref)
     # Cached PR base metadata can be older than current RAC2; retain it separately.
     return {"head": group["head_sha"], "base": base, "source": source,
             "policy": {"ruleset_id": rule["ruleset_id"], "parameters": params}, "pr": matches[0]}
@@ -205,6 +224,11 @@ def queue_member(repo: str, group: dict, stage_hook=None) -> dict:
 
 def queued_pr_snapshot(pr: dict, repo: str, member: dict) -> tuple:
     expected = member["pr"]
+    source_ref = None
+    if "headRepository" in expected:
+        source_ref = (pr["head"]["repo"]["full_name"], pr["head"]["ref"])
+        if source_ref != (expected["headRepository"], expected["headRefName"]):
+            raise ValueError("Queued PR source repository or ref changed")
     if (type(pr["number"]) is not int or pr["number"] != expected["number"]
             or pr["state"] != "open" or pr["draft"] is not False
             or pr["base"]["ref"] != "RAC2" or pr["base"]["repo"]["full_name"] != repo
@@ -216,7 +240,7 @@ def queued_pr_snapshot(pr: dict, repo: str, member: dict) -> tuple:
         raise ValueError("Queued PR no longer matches its entry")
     return (pr["number"], pr["state"], pr["draft"], pr["head"]["sha"], pr["base"]["sha"],
             pr["base"]["ref"], pr["base"]["repo"]["full_name"], pr.get("body"),
-            pr["updated_at"], pr["changed_files"])
+            pr["updated_at"], pr["changed_files"], source_ref)
 
 
 def queued_head_duplicates(repo: str, number: int, sha: str) -> bool:

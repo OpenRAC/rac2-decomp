@@ -120,8 +120,15 @@ def load_catalog(level: str, root: Path = ROOT, profile: str = "native") -> dict
     if not isinstance(externals, dict):
         raise ValueError("Invalid native externals")
     for name, address in externals.items():
+        # An external is bound as an absolute symbol in the linker script
+        # (`NAME = 0xADDR;`), which carries no alignment requirement, so the
+        # word-alignment clause this check used to carry had no measured
+        # support: the qualified chain links the byte flags of the families
+        # c558ca7050ec6154 and b7feb89380591f87 at 0x1A7B95 / 0x1A7B94 /
+        # 0x1A7BB2 / 0x1A7BB3 byte-identically. Only the address range and the
+        # integer type are invariants here.
         if (not isinstance(name, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name)
-                or type(address) is not int or address < 0 or address > 0xFFFFFFFF or address % 4
+                or type(address) is not int or address < 0 or address > 0xFFFFFFFF
                 or name in {item["symbol"] for item in functions}):
             raise ValueError("Invalid native external identity")
     gp = catalog.get("gp", 0)

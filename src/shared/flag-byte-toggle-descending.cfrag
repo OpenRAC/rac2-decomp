@@ -1,0 +1,37 @@
+extern void @@ROLE_0_00@@(char *p);
+extern void @@ROLE_1_00@@(char *p, float a, float b);
+extern void @@ROLE_2_00@@(int a, int b, int c);
+
+extern volatile unsigned char @@BIND_DATA0_00@@ __attribute__((sda));
+extern volatile unsigned char @@BIND_DATA1_00@@ __attribute__((sda));
+
+int @@FUNCTION@@(char *a0, int a1)
+{
+    char *p = a0 + 8;
+    float *q;
+    int v;
+
+    @@ROLE_0_01@@(p);
+    q = *(float **)(a0 + 684);
+    @@ROLE_1_01@@(p, q[0], q[1]);
+    if (a1 & 0x1000) {
+        @@ROLE_2_01@@(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x4000) {
+        @@ROLE_2_02@@(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x40) {
+        @@ROLE_2_03@@(4, 0, 0);
+        switch (*(int *)(a0 + 680)) {
+        case 0:
+            @@BIND_DATA0_01@@ = @@BIND_DATA0_02@@ == 0;
+            break;
+        case 1:
+            @@BIND_DATA1_01@@ = @@BIND_DATA1_02@@ == 0;
+            break;
+        }
+    }
+    return (a1 >> 6) & 1;
+}

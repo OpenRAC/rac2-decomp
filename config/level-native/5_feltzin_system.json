@@ -87,6 +87,12 @@
     "LVL_5_FELTZIN_SYSTEM_F1fa78648_FUN_00307620": 3175968,
     "LVL_5_FELTZIN_SYSTEM_F1fa78648_FUN_0033E430": 3400752,
     "LVL_5_FELTZIN_SYSTEM_F1fa78648_FUN_0033E460": 3400800,
+    "LVL_5_FELTZIN_SYSTEM_F213135aa_FUN_00306660": 3171936,
+    "LVL_5_FELTZIN_SYSTEM_F213135aa_FUN_00306748": 3172168,
+    "LVL_5_FELTZIN_SYSTEM_F213135aa_FUN_003068F8": 3172600,
+    "LVL_5_FELTZIN_SYSTEM_F213135aa_FUN_00306E78": 3174008,
+    "LVL_5_FELTZIN_SYSTEM_F213135aa_FUN_00332B50": 3353424,
+    "LVL_5_FELTZIN_SYSTEM_F213135aa_FUN_00336928": 3369256,
     "LVL_5_FELTZIN_SYSTEM_F250fbfa4_FUN_003062D0": 3171024,
     "LVL_5_FELTZIN_SYSTEM_F250fbfa4_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_F250fbfa4_FUN_003423C8": 3417032,
@@ -174,6 +180,12 @@
     "LVL_5_FELTZIN_SYSTEM_F55a1acb8_D_001A63AC": 1729452,
     "LVL_5_FELTZIN_SYSTEM_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_5_FELTZIN_SYSTEM_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_00332AF8": 3353336,
+    "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_00332C18": 3353624,
+    "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_003906F8": 3737336,
+    "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_003DE740": 4056896,
+    "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_003DEB18": 4057880,
+    "LVL_5_FELTZIN_SYSTEM_F5a19df7a_FUN_003DF340": 4059968,
     "LVL_5_FELTZIN_SYSTEM_F5a9e4f98_FUN_004471C8": 4485576,
     "LVL_5_FELTZIN_SYSTEM_F5a9e4f98_FUN_004473F0": 4486128,
     "LVL_5_FELTZIN_SYSTEM_F5a9e4f98_FUN_004476F0": 4486896,
@@ -355,6 +367,18 @@
     "LVL_5_FELTZIN_SYSTEM_Fb1b523716b470b36_AT0039DAA8_ROLE01": 3171936,
     "LVL_5_FELTZIN_SYSTEM_Fb1b523716b470b36_AT003A0550_ROLE00": 3171888,
     "LVL_5_FELTZIN_SYSTEM_Fb1b523716b470b36_AT003A0550_ROLE01": 3171936,
+    "LVL_5_FELTZIN_SYSTEM_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_5_FELTZIN_SYSTEM_Fb1bbe20c_FUN_00371A60": 3611232,
+    "LVL_5_FELTZIN_SYSTEM_Fb1bbe20c_FUN_0044BE50": 4505168,
+    "LVL_5_FELTZIN_SYSTEM_Fb1bbe20c_FUN_0044C040": 4505664,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_FUN_002F4188": 3096968,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_FUN_00306630": 3171888,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_FUN_00306AD8": 3173080,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_FUN_00306C08": 3173384,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_FUN_00306C20": 3173408,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_FUN_00332B50": 3353424,
+    "LVL_5_FELTZIN_SYSTEM_Fb1c9893c_FUN_00332C18": 3353624,
     "LVL_5_FELTZIN_SYSTEM_Fb342d477_D_0011AC40": 1158208,
     "LVL_5_FELTZIN_SYSTEM_Fb342d477_D_0011AC60": 1158240,
     "LVL_5_FELTZIN_SYSTEM_Fb342d477_FUN_004617D0": 4593616,
@@ -362,6 +386,11 @@
     "LVL_5_FELTZIN_SYSTEM_Fb4cfb7e0_FUN_00332AB8": 3353272,
     "LVL_5_FELTZIN_SYSTEM_Fb77d67f1_FUN_003062A0": 3170976,
     "LVL_5_FELTZIN_SYSTEM_Fb77d67f1_FUN_003423C8": 3417032,
+    "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_5_FELTZIN_SYSTEM_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_00371A60": 3611232,
+    "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044BE50": 4505168,
+    "LVL_5_FELTZIN_SYSTEM_Fb7feb893_FUN_0044C040": 4505664,
     "LVL_5_FELTZIN_SYSTEM_Fbbb7bee1_FUN_00306390": 3171216,
     "LVL_5_FELTZIN_SYSTEM_Fbdd4a4aa_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_Fbdd4a4aa_FUN_003066A0": 3172000,
@@ -384,6 +413,11 @@
     "LVL_5_FELTZIN_SYSTEM_Fc3cb9262_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_Fc3cb9262_FUN_00307778": 3176312,
     "LVL_5_FELTZIN_SYSTEM_Fc3cb9262_FUN_003423C8": 3417032,
+    "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_5_FELTZIN_SYSTEM_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_00371A60": 3611232,
+    "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044BE50": 4505168,
+    "LVL_5_FELTZIN_SYSTEM_Fc558ca70_FUN_0044C040": 4505664,
     "LVL_5_FELTZIN_SYSTEM_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_5_FELTZIN_SYSTEM_Fc936841d_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_Fc936841d_FUN_00306660": 3171936,
@@ -460,6 +494,13 @@
     "LVL_5_FELTZIN_SYSTEM_Ff26f272a_FUN_00306E98": 3174040,
     "LVL_5_FELTZIN_SYSTEM_Ff26f272a_FUN_00307100": 3174656,
     "LVL_5_FELTZIN_SYSTEM_Ff26f272a_FUN_00307620": 3175968,
+    "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_00306630": 3171888,
+    "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_003066A0": 3172000,
+    "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_003067D8": 3172312,
+    "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_00306AD8": 3173080,
+    "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_00306B00": 3173120,
+    "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_00306B70": 3173232,
+    "LVL_5_FELTZIN_SYSTEM_Ff2d8e5ad_FUN_0032D928": 3332392,
     "LVL_5_FELTZIN_SYSTEM_Ff4dd22f3_FUN_003062D0": 3171024,
     "LVL_5_FELTZIN_SYSTEM_Ff4dd22f3_FUN_00306630": 3171888,
     "LVL_5_FELTZIN_SYSTEM_Ff4dd22f3_FUN_003423C8": 3417032,
@@ -1034,6 +1075,12 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00328478"
     },
     {
+      "address": 3312872,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00328CE8"
+    },
+    {
       "address": 3315496,
       "meaning": "Reserve or reuse an object slot, reset its associated state and return signed slot index",
       "size": 84,
@@ -1097,6 +1144,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0033C5F8"
+    },
+    {
+      "address": 3394992,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0033CDB0"
     },
     {
       "address": 3396224,
@@ -1448,6 +1501,12 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00395338"
     },
     {
+      "address": 3764168,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00396FC8"
+    },
+    {
       "address": 3764584,
       "size": 8,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_00397168"
@@ -1637,6 +1696,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_003DF138"
+    },
+    {
+      "address": 4059552,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_003DF1A0"
     },
     {
       "address": 4061672,
@@ -2095,6 +2160,12 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044D9E0"
     },
     {
+      "address": 4512576,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044DB40"
+    },
+    {
       "address": 4514920,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2107,10 +2178,22 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044E730"
     },
     {
+      "address": 4515984,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044E890"
+    },
+    {
       "address": 4516600,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044EAF8"
+    },
+    {
+      "address": 4516952,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044EC58"
     },
     {
       "address": 4517288,
@@ -2119,10 +2202,22 @@
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044EDA8"
     },
     {
+      "address": 4517640,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044EF08"
+    },
+    {
       "address": 4517792,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044EFA0"
+    },
+    {
+      "address": 4518144,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_5_FELTZIN_SYSTEM_FUN_0044F100"
     },
     {
       "address": 4518296,

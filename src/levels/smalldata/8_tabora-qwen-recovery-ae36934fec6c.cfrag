@@ -863,3 +863,12 @@ void LVL_8_TABORA_FUN_00389910(QwenRecovery_339fe89f21bc_WrapperWaitMaskU64 mask
         LVL_8_TABORA_QWEN_339fe89f21bc_AT00389910_ROLE000(0x400);
 }
 
+
+/* Store the observed raw 32-bit input in the GP-relative cell.
+   The original owner and semantic value remain unknown. */
+extern unsigned int D_001AA430;
+
+void LVL_8_TABORA_FUN_00339468(unsigned int value)
+{
+    D_001AA430 = value;
+}

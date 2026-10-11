@@ -898,3 +898,12 @@ void LVL_0_ARANOS_TUTORIAL_FUN_0037B368(QwenRecovery_339fe89f21bc_WrapperWaitMas
         LVL_0_ARANOS_TUTORIAL_QWEN_339fe89f21bc_AT0037B368_ROLE000(0x400);
 }
 
+
+/* Store the observed raw 32-bit input in the GP-relative cell.
+   The original owner and semantic value remain unknown. */
+extern unsigned int D_001AA430;
+
+void LVL_0_ARANOS_TUTORIAL_FUN_0032B280(unsigned int value)
+{
+    D_001AA430 = value;
+}

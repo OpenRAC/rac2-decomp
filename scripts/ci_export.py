@@ -1,17 +1,17 @@
 """One producer for current CI metadata checks and public report artifacts.
 
 Source mode is limited pre-queue metadata validation, never a full-suite receipt.
+Local mode trusts the owner's committed local reports and publishes metadata,
+without a remote tool-suite or fresh unique/reuse classification receipt.
 Full mode keeps the actual expensive checks once. Legal-reference raw gates
 remain the maintained local workflow's responsibility.
 """
 import argparse
-import gzip
 import hashlib
 import json
 import os
 from pathlib import Path
 import subprocess
-import io
 import sys
 import sysconfig
 import importlib.metadata
@@ -152,24 +152,92 @@ def unique_and_reuse(repo, output):
         raise ValueError("Current unique serialization differs")
     (output / "unique-summary.json").write_bytes(summary_bytes)
     (output / "unique-report.json").write_bytes(uq.encoded(uq.objdiff(primary)))
-    report, details = reuse.generate(catalog, credit, primary)
+    wide = reuse.wide_groups(repo)
+    report, details = reuse.generate(catalog, credit, primary, wide)
     authored, authored_details = reuse.authored_subset(repo, credit)
     report.update(authored_C_reuse_subset=authored, catalog_sha256=reuse.digest(raw),
-                  input_sha256=reuse.snapshot(repo, path, catalog))
-    payload = reuse.encoded({"schema": 1, "policy": reuse.POLICY, "template_families": details,
-                             "authored_C_fragment_families": authored_details})
-    buffer = io.BytesIO()
-    with gzip.GzipFile(fileobj=buffer, mode="wb", filename="", mtime=0) as stream:
-        stream.write(payload)
-    families = buffer.getvalue()
+                  input_sha256=reuse.snapshot(repo, path, catalog),
+                  wide_group_reference=reuse.wide_reference(wide))
+    families = reuse.compressed(reuse.encoded(reuse.families_payload(details, authored_details, wide)))
     report["families_sha256"] = reuse.digest(families)
     if (reuse.encoded(report) != (repo / "progress/code-reuse-report.json").read_bytes()
             or families != (repo / "progress/code-reuse-families.json.gz").read_bytes()):
         raise ValueError("Current reusable-code serialization differs")
 
 
-def produce(repo, mode, objdiff=None):
+def local_reports(repo, before, event):
+    """Publish current committed local snapshots; never mint full queue proof."""
+    from maintainer_test_policy import owner_local_push
+    if not owner_local_push(os.environ.get("GITHUB_EVENT_NAME"), event, os.environ.get("GITHUB_SHA")):
+        raise ValueError("Local publication requires the exact primary maintainer push")
+    source = source_metadata(repo)
+    from progress_module_report import verified_report
+    physical = verified_report(repo)
+    physical_display(repo, physical)
+    read = lambda relative: json.loads(contained(repo, relative).read_bytes())
+    summary = read("progress/unique-code-report.json")
+    reuse = read("progress/code-reuse-report.json")
+    catalog_path = "config/function-catalog/catalog.json"
+    catalog = read(catalog_path)
+    catalog_sha = before.get(catalog_path)
+    if (summary.get("catalog_sha256") != catalog_sha or reuse.get("catalog_sha256") != catalog_sha
+            or reuse.get("primary_reference", {}).get("metrics") != summary.get("metrics")):
+        raise ValueError("Local report catalogue or primary metrics changed")
+    pins = {row["path"]: row["sha256"] for row in catalog["input_pins"]}
+    for snapshot in (pins, reuse["input_sha256"]):
+        for relative, expected in snapshot.items():
+            if before.get(relative) != expected:
+                raise ValueError("Local report input snapshot changed")
+    for row in catalog.get("function_chunks", []):
+        relative = (Path(catalog_path).parent / row["path"]).as_posix()
+        if before.get(relative) != row["sha256"]:
+            raise ValueError("Local catalogue chunk changed")
+    if before.get("progress/code-reuse-families.json.gz") != reuse.get("families_sha256"):
+        raise ValueError("Local reusable-code family snapshot changed")
+    metrics = summary["metrics"]
+    excluded_vu = summary["coverage"]["excluded_vu_bytes"]
+    if type(excluded_vu) is not int or excluded_vu < 0:
+        raise ValueError("Local unique VU exclusion is invalid")
+    if (metrics["physical_total_bytes"] + excluded_vu != int(physical["measures"]["totalCode"])
+            or metrics["physical_matched_bytes"] != int(physical["measures"]["matchedCode"])):
+        raise ValueError("Local unique summary differs from current physical proof")
+    total, matched = metrics["unique_total_bytes"], metrics["unique_matched_bytes"]
+    if type(total) is not int or type(matched) is not int or not 0 <= matched <= total:
+        raise ValueError("Local unique aggregate is invalid")
+    from progress_modules import group_report
+    from decomp_report import measures
+    grouped, modules = group_report(physical, repo)
+    aggregate = measures(total, 0, 1, matched, 0)
+    unique = {"version": 2, "measures": aggregate,
+              "units": [{"name": "committed-local-unique-summary", "measures": aggregate,
+                         "metadata": {"complete": False, "autoGenerated": True, "progressCategories": ["unique"]}}],
+              "categories": [{"id": "unique", "name": "Committed conservative unique EE summary", "measures": aggregate}]}
+    output = repo / "build/decomp"
+    output.mkdir(parents=True, exist_ok=True)
+    for name, value in (("report.json", grouped), ("source-modules.json", modules), ("unique-report.json", unique)):
+        (output / name).write_bytes((json.dumps(value, indent=2) + "\n").encode())
+    (output / "unique-summary.json").write_bytes(contained(repo, "progress/unique-code-report.json").read_bytes())
+    if inputs(repo) != before:
+        raise ValueError("Local report inputs changed during publication")
+    names = {name: path for name, path in FILES.items() if "objdiff-validation" not in name}
+    provenance = {"schema": 1, "kind": "owner-local-report-publication", "mode": "local",
+                  "commit_sha": os.environ["GITHUB_SHA"],
+                  "repository": {key: event["repository"][key] for key in ("id", "full_name")},
+                  "actor": {key: event["sender"][key] for key in ("id", "login")},
+                  "local_validation_trusted": True, "local_validation_automatically_verified": False,
+                  "remote_full_validation": False, "fresh_unique_reuse_classification": False,
+                  "unique_view": "aggregate from committed summary; no per-class regeneration",
+                  "source": source, "inputs": before,
+                  "outputs": {name: sha(contained(repo, path).read_bytes()) for name, path in names.items()}}
+    (output / "local-provenance.json").write_bytes((json.dumps(provenance, sort_keys=True) + "\n").encode())
+    return {"mode": "local", "local_validation_trusted": True, "full_validation": False,
+            "fresh_unique_reuse_classification": False, "provenance": str(output / "local-provenance.json")}
+
+
+def produce(repo, mode, objdiff=None, event=None):
     before = inputs(repo)
+    if mode == "local":
+        return local_reports(repo, before, event or {})
     source = source_metadata(repo)
     from progress_module_report import verified_report
     physical = verified_report(repo)  # Original generate + validate_object_proof once.
@@ -228,11 +296,13 @@ def produce(repo, mode, objdiff=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("source", "full"), required=True)
+    parser.add_argument("--mode", choices=("source", "full", "local"), required=True)
     parser.add_argument("--objdiff", type=Path)
+    parser.add_argument("--event", type=Path)
     args = parser.parse_args()
     try:
-        print(json.dumps(produce(ROOT, args.mode, args.objdiff), sort_keys=True))
+        event = json.loads(args.event.read_bytes()) if args.event else None
+        print(json.dumps(produce(ROOT, args.mode, args.objdiff, event), sort_keys=True))
     except Exception:
         print("CI export failed: validation", flush=True)
         return 1

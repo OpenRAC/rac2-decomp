@@ -1,5 +1,16 @@
 # Repository language and commit messages
 
+## Primary maintainer local-validation route
+
+LP explicitly authorizes `llesieur99` (GitHub user ID 191315338) to rely on
+completed local validation and merge without waiting for remote full suites
+or the native queue. Use `scripts/merge_queue.py <PR> --expected-head <SHA>
+--owner-local` for this explicitly selected route. It authenticates the account
+and pins the actual PR head. GitHub does not attest that local tests passed.
+Keep required local matching proofs, current inputs and appropriate tests;
+never fabricate matching credit. Other accounts retain the protected queue
+and required checks. Manual full CI remains available on demand.
+
 For a first-time contributor, read [docs/CONTRIBUTOR-QUICKSTART.md](docs/CONTRIBUTOR-QUICKSTART.md)
 and [toolchain/README.md](toolchain/README.md). Default to a fork/topic branch and
 draft PR targeting `RAC2`; do not inherit the maintainer's direct-push permissions

@@ -46,13 +46,36 @@ def enqueue(number, expected_head):
     return {"queued": True, "pr": number, "head": expected_head, "position": entry["position"]}
 
 
+def merge_owner_local(number, expected_head):
+    """Explicit local-validation route; only the authenticated owner can use it."""
+    if type(number) is not int or number < 1 or not re.fullmatch(r"[0-9a-f]{40}", expected_head):
+        raise ValueError("A positive PR number and its exact 40-character head SHA are required")
+    actor = gh_api("GET", "user")
+    if actor.get("id") != 191315338 or actor.get("login") != "llesieur99":
+        raise ValueError("The owner-local route requires the authenticated primary maintainer")
+    pr = gh_api("GET", f"repos/{REPOSITORY}/pulls/{number}")
+    if (pr["number"] != number or pr["state"] != "open" or pr["draft"] is not False
+            or pr["base"]["ref"] != "RAC2" or pr["base"]["repo"]["full_name"] != REPOSITORY
+            or pr["base"]["repo"]["id"] != 1400228215 or pr["head"]["sha"] != expected_head):
+        raise ValueError("The current open RAC2 PR does not match the locally validated head")
+    reply = gh_api("PUT", f"repos/{REPOSITORY}/pulls/{number}/merge",
+                   {"sha": expected_head, "merge_method": "merge"})
+    if reply.get("merged") is not True or not re.fullmatch(r"[0-9a-f]{40}", reply.get("sha", "")):
+        raise ValueError("GitHub did not acknowledge the exact-head owner merge")
+    return {"merged": True, "pr": number, "head": expected_head,
+            "commit": reply["sha"], "validation": "owner-local", "local_tests_verified_by_github": False}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("pr", type=int)
     parser.add_argument("--expected-head", required=True)
+    parser.add_argument("--owner-local", action="store_true",
+                        help="Owner only: merge this exact head after completed local validation")
     args = parser.parse_args()
     try:
-        print(json.dumps(enqueue(args.pr, args.expected_head)))
+        print(json.dumps(merge_owner_local(args.pr, args.expected_head) if args.owner_local
+                         else enqueue(args.pr, args.expected_head)))
         return 0
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError) as error:
         # Fixed local ValueErrors are safe; never print API payloads or credentials.

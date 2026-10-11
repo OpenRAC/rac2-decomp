@@ -75,6 +75,12 @@
     "LVL_2_MAKTAR_NEBULA_F1fa78648_FUN_002F3000": 3092480,
     "LVL_2_MAKTAR_NEBULA_F1fa78648_FUN_0032FC80": 3341440,
     "LVL_2_MAKTAR_NEBULA_F1fa78648_FUN_0032FCB0": 3341488,
+    "LVL_2_MAKTAR_NEBULA_F213135aa_FUN_002F1FA0": 3088288,
+    "LVL_2_MAKTAR_NEBULA_F213135aa_FUN_002F20A0": 3088544,
+    "LVL_2_MAKTAR_NEBULA_F213135aa_FUN_002F2270": 3089008,
+    "LVL_2_MAKTAR_NEBULA_F213135aa_FUN_002F27F0": 3090416,
+    "LVL_2_MAKTAR_NEBULA_F213135aa_FUN_0031E808": 3270664,
+    "LVL_2_MAKTAR_NEBULA_F213135aa_FUN_00322F98": 3288984,
     "LVL_2_MAKTAR_NEBULA_F250fbfa4_FUN_002F1BE0": 3087328,
     "LVL_2_MAKTAR_NEBULA_F250fbfa4_FUN_002F1F70": 3088240,
     "LVL_2_MAKTAR_NEBULA_F250fbfa4_FUN_003366A8": 3368616,
@@ -165,6 +171,12 @@
     "LVL_2_MAKTAR_NEBULA_F55a1acb8_D_001A63AC": 1729452,
     "LVL_2_MAKTAR_NEBULA_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_2_MAKTAR_NEBULA_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_2_MAKTAR_NEBULA_F5a19df7a_FUN_0031E7B0": 3270576,
+    "LVL_2_MAKTAR_NEBULA_F5a19df7a_FUN_0031E8D0": 3270864,
+    "LVL_2_MAKTAR_NEBULA_F5a19df7a_FUN_00382CB8": 3681464,
+    "LVL_2_MAKTAR_NEBULA_F5a19df7a_FUN_003E5048": 4083784,
+    "LVL_2_MAKTAR_NEBULA_F5a19df7a_FUN_003E5420": 4084768,
+    "LVL_2_MAKTAR_NEBULA_F5a19df7a_FUN_003E5C48": 4086856,
     "LVL_2_MAKTAR_NEBULA_F5a9e4f98_FUN_00456F08": 4550408,
     "LVL_2_MAKTAR_NEBULA_F5a9e4f98_FUN_00457130": 4550960,
     "LVL_2_MAKTAR_NEBULA_F5a9e4f98_FUN_00457430": 4551728,
@@ -325,6 +337,18 @@
     "LVL_2_MAKTAR_NEBULA_Fb1b523716b470b36_AT00390BD0_ROLE01": 3088288,
     "LVL_2_MAKTAR_NEBULA_Fb1b523716b470b36_AT00393690_ROLE00": 3088240,
     "LVL_2_MAKTAR_NEBULA_Fb1b523716b470b36_AT00393690_ROLE01": 3088288,
+    "LVL_2_MAKTAR_NEBULA_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_2_MAKTAR_NEBULA_Fb1bbe20c_FUN_00366C90": 3566736,
+    "LVL_2_MAKTAR_NEBULA_Fb1bbe20c_FUN_0045BB90": 4570000,
+    "LVL_2_MAKTAR_NEBULA_Fb1bbe20c_FUN_0045BD80": 4570496,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_FUN_002DEF00": 3010304,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_FUN_002F1F70": 3088240,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_FUN_002F2450": 3089488,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_FUN_002F2580": 3089792,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_FUN_002F2598": 3089816,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_FUN_0031E808": 3270664,
+    "LVL_2_MAKTAR_NEBULA_Fb1c9893c_FUN_0031E8D0": 3270864,
     "LVL_2_MAKTAR_NEBULA_Fb342d477_D_0011AC40": 1158208,
     "LVL_2_MAKTAR_NEBULA_Fb342d477_D_0011AC60": 1158240,
     "LVL_2_MAKTAR_NEBULA_Fb342d477_FUN_00471510": 4658448,
@@ -332,6 +356,11 @@
     "LVL_2_MAKTAR_NEBULA_Fb4cfb7e0_FUN_0031E770": 3270512,
     "LVL_2_MAKTAR_NEBULA_Fb77d67f1_FUN_002F1BB0": 3087280,
     "LVL_2_MAKTAR_NEBULA_Fb77d67f1_FUN_003366A8": 3368616,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_00366C90": 3566736,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BB90": 4570000,
+    "LVL_2_MAKTAR_NEBULA_Fb7feb893_FUN_0045BD80": 4570496,
     "LVL_2_MAKTAR_NEBULA_Fbbb7bee1_FUN_002F1CA0": 3087520,
     "LVL_2_MAKTAR_NEBULA_Fbc82131e_D_001AD6B0": 1758896,
     "LVL_2_MAKTAR_NEBULA_Fbc82131e_D_001AD6C0": 1758912,
@@ -362,6 +391,11 @@
     "LVL_2_MAKTAR_NEBULA_Fc3cb9262_FUN_002F1F70": 3088240,
     "LVL_2_MAKTAR_NEBULA_Fc3cb9262_FUN_002F3158": 3092824,
     "LVL_2_MAKTAR_NEBULA_Fc3cb9262_FUN_003366A8": 3368616,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_00366C90": 3566736,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BB90": 4570000,
+    "LVL_2_MAKTAR_NEBULA_Fc558ca70_FUN_0045BD80": 4570496,
     "LVL_2_MAKTAR_NEBULA_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_2_MAKTAR_NEBULA_Fc936841d_FUN_002F1F70": 3088240,
     "LVL_2_MAKTAR_NEBULA_Fc936841d_FUN_002F1FA0": 3088288,
@@ -435,6 +469,13 @@
     "LVL_2_MAKTAR_NEBULA_Ff26f272a_FUN_002F2810": 3090448,
     "LVL_2_MAKTAR_NEBULA_Ff26f272a_FUN_002F2A78": 3091064,
     "LVL_2_MAKTAR_NEBULA_Ff26f272a_FUN_002F3000": 3092480,
+    "LVL_2_MAKTAR_NEBULA_Ff2d8e5ad_FUN_002F1F70": 3088240,
+    "LVL_2_MAKTAR_NEBULA_Ff2d8e5ad_FUN_002F1FF8": 3088376,
+    "LVL_2_MAKTAR_NEBULA_Ff2d8e5ad_FUN_002F2130": 3088688,
+    "LVL_2_MAKTAR_NEBULA_Ff2d8e5ad_FUN_002F2450": 3089488,
+    "LVL_2_MAKTAR_NEBULA_Ff2d8e5ad_FUN_002F2478": 3089528,
+    "LVL_2_MAKTAR_NEBULA_Ff2d8e5ad_FUN_002F24E8": 3089640,
+    "LVL_2_MAKTAR_NEBULA_Ff2d8e5ad_FUN_003195E0": 3249632,
     "LVL_2_MAKTAR_NEBULA_Ff4dd22f3_FUN_002F1BE0": 3087328,
     "LVL_2_MAKTAR_NEBULA_Ff4dd22f3_FUN_002F1F70": 3088240,
     "LVL_2_MAKTAR_NEBULA_Ff4dd22f3_FUN_003366A8": 3368616,
@@ -997,6 +1038,12 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00312F18"
     },
     {
+      "address": 3230112,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_003149A0"
+    },
+    {
       "address": 3232736,
       "meaning": "Reserve or reuse an object slot, reset its associated state and return signed slot index",
       "size": 84,
@@ -1072,6 +1119,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00329A90"
+    },
+    {
+      "address": 3321960,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0032B068"
     },
     {
       "address": 3324624,
@@ -1393,6 +1446,12 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_003878F8"
     },
     {
+      "address": 3708296,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00389588"
+    },
+    {
       "address": 3708712,
       "size": 8,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00389728"
@@ -1570,6 +1629,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_003E5A40"
+    },
+    {
+      "address": 4086440,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_003E5AA8"
     },
     {
       "address": 4088560,
@@ -2040,6 +2105,12 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045D720"
     },
     {
+      "address": 4577408,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045D880"
+    },
+    {
       "address": 4579752,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -2052,10 +2123,22 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E470"
     },
     {
+      "address": 4580816,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E5D0"
+    },
+    {
       "address": 4581432,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E838"
+    },
+    {
+      "address": 4581784,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045E998"
     },
     {
       "address": 4582120,
@@ -2064,10 +2147,22 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045EAE8"
     },
     {
+      "address": 4582472,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045EC48"
+    },
+    {
       "address": 4582624,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045ECE0"
+    },
+    {
+      "address": 4582976,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_0045EE40"
     },
     {
       "address": 4583128,

@@ -6535,3 +6535,325 @@ void LVL_25_WUPASH_NEBULA_FUN_002FBDC0(int i0, int i1, int i2, int i3, int tag, 
          | ((long long)tag << 32);
     LVL_25_WUPASH_NEBULA_Ff67aa9df_FUN_002FBD00(v, x);
 }
+extern void LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CDD8(char *p);
+extern void LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CFC8(char *p, float a, float b);
+extern void LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0(int a, int b, int c);
+
+extern volatile unsigned char LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95 __attribute__((sda));
+extern volatile unsigned char LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94 __attribute__((sda));
+
+int LVL_25_WUPASH_NEBULA_FUN_0043EAC8(char *a0, int a1)
+{
+    char *p = a0 + 8;
+    float *q;
+    int v;
+
+    LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CDD8(p);
+    q = *(float **)(a0 + 684);
+    LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0043CFC8(p, q[0], q[1]);
+    if (a1 & 0x1000) {
+        LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x4000) {
+        LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x40) {
+        LVL_25_WUPASH_NEBULA_Fc558ca70_FUN_0036BAA0(4, 0, 0);
+        switch (*(int *)(a0 + 680)) {
+        case 0:
+            LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95 = LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B95 == 0;
+            break;
+        case 1:
+            LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94 = LVL_25_WUPASH_NEBULA_Fc558ca70_D_001A7B94 == 0;
+            break;
+        }
+    }
+    return (a1 >> 6) & 1;
+}
+extern void LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CDD8(char *p);
+extern void LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CFC8(char *p, float a, float b);
+extern void LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0(int a, int b, int c);
+
+extern volatile unsigned char LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2 __attribute__((sda));
+extern volatile unsigned char LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3 __attribute__((sda));
+
+int LVL_25_WUPASH_NEBULA_FUN_0043F818(char *a0, int a1)
+{
+    char *p = a0 + 8;
+    float *q;
+    int v;
+
+    LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CDD8(p);
+    q = *(float **)(a0 + 684);
+    LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0043CFC8(p, q[0], q[1]);
+    if (a1 & 0x1000) {
+        LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x4000) {
+        LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0(3, 0, 0);
+        v = *(int *)(a0 + 680);
+        *(int *)(a0 + 680) = (v + 1) % 2;
+    } else if (a1 & 0x40) {
+        LVL_25_WUPASH_NEBULA_Fb7feb893_FUN_0036BAA0(4, 0, 0);
+        switch (*(int *)(a0 + 680)) {
+        case 0:
+            LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2 = LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB2 == 0;
+            break;
+        case 1:
+            LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3 = LVL_25_WUPASH_NEBULA_Fb7feb893_D_001A7BB3 == 0;
+            break;
+        }
+    }
+    return (a1 >> 6) & 1;
+}
+#ifndef RAC2_T_V4_F213135AA
+#define RAC2_T_V4_F213135AA
+typedef struct { float x, y, z, w; } V4_F213135aa;
+#endif
+
+
+extern float LVL_25_WUPASH_NEBULA_F213135aa_FUN_0032CE70(float a, float b);
+extern float LVL_25_WUPASH_NEBULA_F213135aa_FUN_0032CE70(float a, float b);
+extern void LVL_25_WUPASH_NEBULA_F213135aa_FUN_00301448(char *a, char *b);
+extern void LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300EC8(char *a, char *b, float f);
+extern void LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300C30(char *a, char *b, char *c);
+extern void LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300D18(char *a, char *b, char *c);
+extern void LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300EC8(char *a, char *b, float f);
+extern void LVL_25_WUPASH_NEBULA_F213135aa_FUN_00330C48(char *a, char *b, float f);
+
+int LVL_25_WUPASH_NEBULA_FUN_00390E70(char *obj, char *obj2, float x, float y)
+{
+    V4_F213135aa m0, m1, m2;
+    char *s1;
+    char *s3;
+    float f22;
+
+    s1 = *(char **)(obj + 104);
+    if (*(unsigned char *)(obj + 32) == 4)
+        return 0;
+    f22 = 0.0f;
+    if (x == 0.0f)
+        x = LVL_25_WUPASH_NEBULA_F213135aa_FUN_0032CE70(-30.0f, 30.0f) * 1.7453294247388839721680e-02f;
+    if (y == 0.0f)
+        y = LVL_25_WUPASH_NEBULA_F213135aa_FUN_0032CE70(f22, 30.0f) * 1.7453294247388839721680e-02f;
+    s3 = s1 + 32;
+    if (*(unsigned char *)(obj + 32) == 3) {
+        LVL_25_WUPASH_NEBULA_F213135aa_FUN_00301448((char *)&m0, s1 + 16);
+        LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300EC8(s3, (char *)&m2, 1.3333334028720855712891e-01f);
+    }
+    *(float *)(s1 + 100) = f22;
+    *(float *)(s1 + 76) = x;
+    *(float *)(s1 + 72) = y;
+    *(char **)(s1 + 96) = obj2;
+    LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300C30((char *)&m1, obj2 + 16, obj + 16);
+    s1 = s1 + 48;
+    LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300D18((char *)&m0, s3, (char *)&m1);
+    LVL_25_WUPASH_NEBULA_F213135aa_FUN_00300EC8(s1, (char *)&m0, 1.0f);
+    LVL_25_WUPASH_NEBULA_F213135aa_FUN_00330C48(s1, s1, 2.0943954586982727050781e-01f);
+    *(unsigned char *)(obj + 32) = 4;
+    return 1;
+}
+extern void LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CDD8(char *p);
+extern void LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CFC8(char *p, float x, float y);
+extern int LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0036BAA0(int a, int b, int c);
+extern volatile unsigned char LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 __attribute__((sda));
+
+int LVL_25_WUPASH_NEBULA_FUN_0043FBE0(char *object, int flags)
+{
+    float *vec;
+
+    LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CDD8(object + 8);
+    vec = *(float **)(object + 684);
+    LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CFC8(object + 8, vec[0], vec[1]);
+
+    if ((flags & 0x40) && *(int *)(object + 680) == 0) {
+        int discarded = LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0036BAA0(4, 0, 0);
+        (void)discarded;
+        LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 = (LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 < 1);
+    }
+
+    return (flags >> 6) & 1;
+}
+extern void LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CDD8(char *p);
+extern void LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CFC8(char *p, float x, float y);
+extern int LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0036BAA0(int a, int b, int c);
+extern volatile unsigned char LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 __attribute__((sda));
+
+int LVL_25_WUPASH_NEBULA_FUN_0043FE90(char *object, int flags)
+{
+    float *vec;
+
+    LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CDD8(object + 8);
+    vec = *(float **)(object + 684);
+    LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CFC8(object + 8, vec[0], vec[1]);
+
+    if ((flags & 0x40) && *(int *)(object + 680) == 0) {
+        int discarded = LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0036BAA0(4, 0, 0);
+        (void)discarded;
+        LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 = (LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 < 1);
+    }
+
+    return (flags >> 6) & 1;
+}
+extern void LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CDD8(char *p);
+extern void LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CFC8(char *p, float x, float y);
+extern int LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0036BAA0(int a, int b, int c);
+extern volatile unsigned char LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 __attribute__((sda));
+
+int LVL_25_WUPASH_NEBULA_FUN_00440088(char *object, int flags)
+{
+    float *vec;
+
+    LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CDD8(object + 8);
+    vec = *(float **)(object + 684);
+    LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0043CFC8(object + 8, vec[0], vec[1]);
+
+    if ((flags & 0x40) && *(int *)(object + 680) == 0) {
+        int discarded = LVL_25_WUPASH_NEBULA_Fb1bbe20c_FUN_0036BAA0(4, 0, 0);
+        (void)discarded;
+        LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 = (LVL_25_WUPASH_NEBULA_Fb1bbe20c_D_001A7BB2 < 1);
+    }
+
+    return (flags >> 6) & 1;
+}
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00327C48(unsigned char *a, int b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00301140(unsigned char *a, long long v);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00301140(unsigned char *a, long long v);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010D0(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010D0(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C70(unsigned char *a, unsigned char *b, float f);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C70(unsigned char *a, unsigned char *b, float f);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010A8(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010A8(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C00(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C00(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C00(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C70(unsigned char *a, unsigned char *b, float f);
+extern float LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300DA8(unsigned char *a, unsigned char *b);
+
+void LVL_25_WUPASH_NEBULA_FUN_00323040(
+    unsigned char *obj, unsigned int index, unsigned char *dest)
+{
+    unsigned char m0[16];
+    unsigned char m1[16];
+    unsigned char *base;
+    unsigned char *p;
+    short n;
+
+    base = *(unsigned char **)(obj + 36);
+    p = base + ((unsigned int)*(unsigned char *)(base + 44) << 4);
+    p = p + ((index << 4) + 64u);
+    n = *(short *)(p + 6);
+    if (n < *(short *)(p + 14))
+        n = *(short *)(p + 14);
+    if (n >= 0)
+        LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00327C48(obj, n + 1, (unsigned char *)0x80000000u);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00301140(m0, *(long long *)(p));
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00301140(m1, *(long long *)(p + 8));
+    *(float *)(m0 + 12) = 1.0f;
+    *(float *)(m1 + 12) = 1.0f;
+    if (n >= 0) {
+        LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010D0(m0, m0, (unsigned char *)
+            (((unsigned int)*(short *)(p + 6) << 6) + 0x70000000u));
+        LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010D0(m1, m1, (unsigned char *)
+            (((unsigned int)*(short *)(p + 14) << 6) + 0x70000000u));
+    }
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C70(m0, m0, *(float *)(obj + 44) * 0.0009765625f);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C70(m1, m1, *(float *)(obj + 44) * 0.0009765625f);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010A8(m0, m0, obj + 192);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_003010A8(m1, m1, obj + 192);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C00(m0, m0, obj + 16);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C00(m1, m1, obj + 16);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C00(dest, m0, m1);
+    LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300C70(dest, dest, 0.5f);
+    *(float *)(dest + 12) = LVL_25_WUPASH_NEBULA_Ff2d8e5ad_FUN_00300DA8(dest, m0);
+}
+extern void LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0038A5A0(unsigned int a, unsigned long b);
+extern void LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D73E0(char *p);
+extern void LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D77B8(char *p);
+extern char *LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CE18(int a, int b);
+extern float LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CF38(void);
+extern void LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D7FE0(char *a, int b, float e, char *c, float f, int d, int g);
+
+void LVL_25_WUPASH_NEBULA_FUN_003D7E40(char *p)
+{
+    char *q;
+    char *o;
+    char *r;
+    float v;
+    float w;
+
+    q = p + 16;
+    o = *(char **)(p + 104);
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0038A5A0(0x47, 0x53001UL);
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D73E0(p);
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D77B8(p);
+
+    v = *(float *)(o + 24);
+    v = v * 0.5f;
+    r = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CE18(80, 96);
+    w = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CF38();
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D7FE0(q, 0x103080, v, r, w, 49, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 3.00000011920928955078125e-01f;
+    r = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CE18(80, 96);
+    w = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CF38();
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D7FE0(q, 0xFFFFFF, v, r, w, 49, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 6.99999988079071044921875e-01f;
+    r = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CE18(8, 22);
+    w = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CF38();
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D7FE0(q, 0x803010, v, r, w, 11, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 4.49999988079071044921875e-01f;
+    r = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CE18(32, 64);
+    w = LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0032CF38();
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_003D7FE0(q, 0x803010, v, r, w, 11, 2);
+
+    LVL_25_WUPASH_NEBULA_F5a19df7a_FUN_0038A5A0(0x47, 0x5360bUL);
+}
+extern float LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_0032CF38(void);
+extern float LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_0032CE70(float, float);
+extern float LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_003011D8(float);
+extern float LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_003011F0(float);
+extern void LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_003010A8(float *dst, float *src, char *table);
+extern void LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_00300C00(float *dst, float *src, int arg);
+extern int LVL_25_WUPASH_NEBULA_Fb1c9893c_D_001A8FF0 __attribute__((sda));
+extern void LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_002EEB08(char *self, int a1, int a2, int a3, char *p4, char *p5,
+                    float *buf, int b3, float fa, float fb);
+
+void LVL_25_WUPASH_NEBULA_FUN_00336F58(char *self, int mask, int arg2,
+                                        unsigned char arg3,
+                                        float f0, float f1, float f2, float f3)
+{
+    float buf[3];
+    float v;
+    float k;
+    float fa;
+    float fb;
+    int i;
+
+    for (i = 0; i < 15; i++) {
+        if (((mask >> i) ^ 1) & 1)
+            continue;
+        v = LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_0032CF38();
+        k = LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_0032CE70(f0, f1) * (1.0f / 60.0f);
+        buf[0] = LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_003011D8(v) * k;
+        buf[1] = LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_003011F0(v) * k;
+        buf[2] = 0.0f;
+        buf[2] = LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_0032CE70(f2, f3) * (1.0f / 60.0f);
+        if (LVL_25_WUPASH_NEBULA_Fb1c9893c_D_001A8FF0 != 0)
+            LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_003010A8(buf, buf, self + 192);
+        LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_00300C00(buf, buf, arg2);
+        fa = LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_0032CE70(90.0f, 270.0f);
+        fb = LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_0032CE70(10.0f, 20.0f);
+        LVL_25_WUPASH_NEBULA_Fb1c9893c_FUN_002EEB08(self, 2, *(short *)(self + 170), i, self + 16, self + 240,
+                buf, arg3, fa, fb);
+    }
+}

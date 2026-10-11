@@ -1,6 +1,7 @@
 """Supplementary lossless binding-template and proved authored-fragment reuse."""
 from __future__ import annotations
 import argparse
+from collections import Counter
 import gzip
 import hashlib
 import io
@@ -13,6 +14,17 @@ import sys
 SUPPORTED = {"qualified_complete", "flow_supported_inferred"}
 POLICY = "binding-parameterized-lossless-machine-templates-v1"
 CERT_FIELDS = {"raw_sha256", "normalized_sha256", "reconstructed_sha256", "normalizer_sha256", "exact"}
+# Measured strict wide relation, never a replacement for the narrow partition:
+# the corpus keeps its own families as the denominator of the C numerator.
+WIDE_RECEIPT = "progress/code-reuse-families-wide-groups.json.gz"
+WIDE_POLICY = "strict-wide-address-half-fold-v1"
+WIDE_MASK = ("maintained narrow fields plus the low 16 bits of the %hi/%lo address halves the "
+             "normalizer retains raw, where they feed an address use: lui feeding addiu/ori, "
+             "lui feeding a memory base, and $gp-relative memory displacement")
+WIDE_FRONTIER = ("a merge group is retained only when no placement materialises a variable address "
+                 "half in a register; a half folded into a memory operand or carried by $gp stays "
+                 "where the retail keeps it, while lui plus addiu/ori splits on the operand")
+WIDE_REJECTING = {"reg", "reg_chained", "reg_chained_mem"}
 
 
 def encoded(value):
@@ -63,7 +75,196 @@ def template_key(row):
             json.dumps(binding_alias_pattern(norm["relocations"]), separators=(",", ":")))
 
 
-def generate(catalog, credit, primary):
+def wide_classed(body):
+    """Word positions the strict wide mask drops, each with the class of address use.
+
+    The loop below is the maintained W1 discovery rule, kept verbatim from the
+    accepted private measurement so the masked position set is identical:
+    a lui feeding a memory base folds the half into the operand (``mem_folded``),
+    a memory base held in a chained register is ``reg_chained_mem``, a memory
+    instruction based on $gp carries a signed ``gp`` displacement, and a lui
+    consumed by addiu/ori materialises the half in a register (``reg``).
+    """
+    words = struct.unpack("<%dI" % (len(body) // 4), body)
+    prov = {}
+    out = {}
+    for index, word in enumerate(words):
+        opcode = word >> 26
+        rs, rt, rd = (word >> 21) & 31, (word >> 16) & 31, (word >> 11) & 31
+        if opcode in (0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07):
+            prov.clear()
+        if (0x20 <= opcode <= 0x3F) or opcode in (0x1E, 0x1F):
+            if rs in prov:
+                origin, kind = prov.pop(rs)
+                use = "mem_folded" if kind == "lui" else "reg_chained_mem"
+                out.setdefault(origin, set()).add(use)
+                out.setdefault(index, set()).add(use)
+            elif rs == 28:
+                out.setdefault(index, set()).add("gp")
+            prov.pop(rt, None)
+        elif opcode == 0x0F:
+            prov[rt] = (index, "lui")
+        elif opcode in (0x08, 0x09, 0x18, 0x19) or opcode == 0x0D:
+            if rs in prov:
+                origin, _ = prov.pop(rs)
+                out.setdefault(origin, set()).add("reg")
+                out.setdefault(index, set()).add("reg")
+                prov[rt] = (index, "chain")
+            else:
+                prov.pop(rt, None)
+        else:
+            prov.pop(rt, None)
+            if opcode == 0:
+                prov.pop(rd, None)
+    return {position: frozenset(classes) for position, classes in out.items()}
+
+
+def narrow_covered(relocations, address):
+    """Word index -> OR of the maintained field masks restricted to the low half."""
+    from relocation_identity import _field_parts
+    covered = {}
+    for relocation in relocations:
+        for offset, mask, _ in _field_parts(relocation, address):
+            covered[offset // 4] = covered.get(offset // 4, 0) | (mask & 0xFFFF)
+    return covered
+
+
+def wide_template(template, classes):
+    """The narrow template with every classified low address half erased."""
+    wide = bytearray(template)
+    for position in classes:
+        word = struct.unpack_from("<I", wide, position * 4)[0]
+        struct.pack_into("<I", wide, position * 4, word & 0xFFFF0000)
+    return bytes(wide)
+
+
+def wide_relation(records):
+    """Strict wide (W1) merge groups of the supported partition, plus the frontier verdict.
+
+    ``records`` are per supported placement: size, narrow template, classified
+    positions and the maintained mask coverage.  A group is published only when
+    it merges at least two narrow families; a group is retained only when every
+    variable half of every member is folded into a memory operand or carried by
+    $gp.  Singletons of the wide partition are counted as controls, not groups.
+    """
+    partitions = {}
+    for record in records:
+        key = (record["size"], digest(wide_template(record["narrow"], record["classes"])))
+        partitions.setdefault(key, []).append(record)
+    groups = []
+    for (size, wide_sha256), members in sorted(partitions.items()):
+        families = sorted({member["family"] for member in members})
+        if len(families) < 2:
+            continue
+        extra = set()
+        for member in members:
+            for position in member["classes"]:
+                if member["covered"].get(position, 0) != 0xFFFF:
+                    extra.add(position)
+        variable = sorted(position for position in extra
+                          if len({struct.unpack_from("<I", member["narrow"], position * 4)[0] & 0xFFFF
+                                  for member in members}) > 1)
+        classes = {}
+        for position in variable:
+            for member in members:
+                for name in member["classes"].get(position, ()):
+                    classes[name] = classes.get(name, 0) + 1
+        retained = all(not (set(name for position in variable
+                                for name in member["classes"].get(position, ())) & WIDE_REJECTING)
+                       for member in members)
+        groups.append({"id": wide_sha256[:16], "sha256": wide_sha256, "size": size,
+                       "placements": len(members), "retained": retained,
+                       "variable_positions": variable, "variable_classes": classes,
+                       "families": families})
+    groups.sort(key=lambda group: (-group["size"] * group["placements"], -group["size"], group["sha256"]))
+    counts = {"groups": len(groups),
+              "retained_groups": sum(group["retained"] for group in groups),
+              "families": sum(len(group["families"]) for group in groups),
+              "placements": sum(group["placements"] for group in groups),
+              "retained_families": sum(len(group["families"]) for group in groups if group["retained"]),
+              "retained_placements": sum(group["placements"] for group in groups if group["retained"]),
+              "merged_bytes": sum(group["size"] * group["placements"] for group in groups),
+              "retained_bytes": sum(group["size"] * group["placements"]
+                                    for group in groups if group["retained"])}
+    narrow_members = Counter(record["family"] for record in records)
+    return {"schema": 1, "policy": WIDE_POLICY, "mask": WIDE_MASK, "frontier": WIDE_FRONTIER,
+            "controls": {"narrow_families": len(narrow_members),
+                         "narrow_multi_member_families": sum(count > 1 for count in narrow_members.values()),
+                         "wide_families_including_singletons": len(partitions),
+                         "wide_multi_member_families": sum(len(members) > 1
+                                                           for members in partitions.values())},
+            "counts": counts, "groups": groups}
+
+
+def wide_groups(repo):
+    """Load and validate the pinned measured wide relation; never a replacement partition."""
+    path = repo / WIDE_RECEIPT
+    require(path.is_file() and not path.is_symlink(), "Missing measured wide-family relation")
+    document = json.loads(gzip.decompress(path.read_bytes()).decode("utf8"))
+    require(document.get("schema") == 1 and document.get("policy") == WIDE_POLICY,
+            "Unknown measured wide-family relation schema")
+    groups, seen = document.get("groups"), set()
+    require(isinstance(groups, list) and isinstance(document.get("counts"), dict),
+            "Malformed measured wide-family relation")
+    for group in groups:
+        require(isinstance(group, dict) and set(group) == {"id", "sha256", "size", "placements", "retained",
+                "variable_positions", "variable_classes", "families"}, "Malformed wide merge group")
+        require(type(group["size"]) is int and group["size"] > 0 and type(group["placements"]) is int
+                and group["placements"] > 1 and type(group["retained"]) is bool, "Invalid wide merge group counts")
+        require(re.fullmatch(r"[0-9a-f]{64}", group["sha256"]) is not None
+                and group["id"] == group["sha256"][:16], "Invalid wide merge group identity")
+        families = group["families"]
+        require(isinstance(families, list) and len(families) > 1 and families == sorted(set(families))
+                and all(re.fullmatch(r"[0-9a-f]{64}", name) is not None for name in families),
+                "Invalid wide merge group families")
+        require(all(name not in seen for name in families), "Narrow family belongs to two wide groups")
+        seen.update(families)
+        require(group["variable_positions"] == sorted(set(group["variable_positions"]))
+                and all(type(position) is int and position >= 0 for position in group["variable_positions"])
+                and isinstance(group["variable_classes"], dict)
+                and all(name in {"mem_folded", "gp", "reg", "reg_chained", "reg_chained_mem"}
+                        and type(count) is int and count > 0 for name, count in group["variable_classes"].items()),
+                "Invalid wide merge group frontier evidence")
+        require(not group["retained"] or not (set(group["variable_classes"]) & WIDE_REJECTING),
+                "Retained wide group reports a materialised variable half")
+    counts = document["counts"]
+    require(counts == {"groups": len(groups),
+                       "retained_groups": sum(group["retained"] for group in groups),
+                       "families": sum(len(group["families"]) for group in groups),
+                       "placements": sum(group["placements"] for group in groups),
+                       "retained_families": sum(len(group["families"]) for group in groups if group["retained"]),
+                       "retained_placements": sum(group["placements"] for group in groups if group["retained"]),
+                       "merged_bytes": sum(group["size"] * group["placements"] for group in groups),
+                       "retained_bytes": sum(group["size"] * group["placements"]
+                                             for group in groups if group["retained"])},
+            "Measured wide-family relation counts disagree with its groups")
+    return document
+
+
+def wide_bytes(document):
+    return compressed(encoded(document))
+
+
+def compressed(payload):
+    buffer = io.BytesIO()
+    with gzip.GzipFile(fileobj=buffer, mode="wb", filename="", mtime=0) as stream:
+        stream.write(payload)
+    return buffer.getvalue()
+
+
+def families_payload(details, authored_details, wide):
+    return {"schema": 1, "policy": POLICY, "template_families": details,
+            "wide_groups": wide, "authored_C_fragment_families": authored_details}
+
+
+def wide_reference(wide):
+    """Compact summary pointer to the relation published beside the narrow partition."""
+    return {"policy": wide["policy"], "receipt": WIDE_RECEIPT, "groups": wide["counts"]["groups"],
+            "retained_groups": wide["counts"]["retained_groups"],
+            "narrow_families_in_a_group": wide["counts"]["families"]}
+
+
+def generate(catalog, credit, primary, wide):
     from unique_code_report import validate_catalog, no_overlap, sha
     programs, rows = validate_catalog(catalog)
     for program in programs:
@@ -114,6 +315,15 @@ def generate(catalog, credit, primary):
                           "size": r["size"], "raw_sha256": r["raw_sha256"],
                           "boundary": r["boundary"]["status"], "matched_c": member_key(r) in credit,
                           "relocations": r["normalization"]["relocations"]} for r in members]))
+    # The measured wide relation is published beside this partition, never inside
+    # it: every named family must still exist here at the measured size.
+    supported_families = {digest(encoded(key)): key[0] for key, members in groups.items()
+                          if len(key) == 4 and all(supported(member) for member in members)}
+    for group in wide["groups"]:
+        for name in group["families"]:
+            require(name in supported_families, "Measured wide group names an unknown narrow family")
+            require(supported_families[name] == group["size"],
+                    "Measured wide group size differs from its narrow family")
     physical = sum(s["size"] for p in programs.values() for s in p["ee_sections"])
     covered = sum(r["size"] for r in rows)
     gap = physical - covered
@@ -219,16 +429,15 @@ def authored_subset(repo, credit):
         "original_source_equivalence_proven": False}, [d for d in details if d["placements"] > 1]
 
 
-def replay(catalog, references):
+def pinned_bodies(catalog, references):
+    """Load and verify every mapped body from the private pinned reference root."""
     from unique_code_report import validate_catalog
-    from relocation_identity import _field_parts, reconstruct, NORMALIZER_SHA256
     from elf_tools import read_elf, _mappings, _mapped_bytes
     programs, rows = validate_catalog(catalog)
-    require(catalog["normalizer"]["sha256"] == NORMALIZER_SHA256, "Private replay normalizer drift")
     by_program = {}
     for row in rows:
         by_program.setdefault(row["program"], []).append(row)
-    reconstructed = 0
+    bodies = {}
     for program, members in sorted(by_program.items()):
         path = references / ("boot.elf" if program == "boot" else program + "/overlay.elf")
         require(path.resolve().is_relative_to(references.resolve()), "Private reference path escapes root")
@@ -238,26 +447,56 @@ def replay(catalog, references):
         for row in members:
             raw = _mapped_bytes(data, mappings, row["address"], row["size"])
             require(digest(raw) == row["raw_sha256"], "Private raw body mismatch")
-            norm = row.get("normalization")
-            if not supported(row):
-                continue
-            template = bytearray(raw)
-            for rel in norm["relocations"]:
-                for offset, mask, _ in _field_parts(rel, row["address"]):
-                    word = struct.unpack_from("<I", template, offset)[0]
-                    value = rel["relative_target"] >> 2 if rel["kind"] == "j26" and rel.get("internal") else 0
-                    struct.pack_into("<I", template, offset, (word & ~mask) | (value & mask))
-            template = bytes(template)
-            require(digest(template) == norm.get("template_sha256", norm["signature_sha256"]), "Private template hash mismatch")
-            schema = [{k: v for k, v in rel.items() if k in ("offset", "kind", "high_offset", "low_offset", "lo_mode", "role", "internal", "relative_target")} for rel in norm["relocations"]]
-            signature = digest(b"ee-relocation-template-v1\0" + template + json.dumps(schema, sort_keys=True, separators=(",", ":")).encode())
-            require(signature == norm["signature_sha256"], "Private role signature mismatch")
-            require(reconstruct(template, row["address"], norm["relocations"]) == raw, "Private reconstruction differs")
-            reconstructed += 1
+            bodies[row["id"]] = raw
+    return programs, rows, bodies
+
+
+def replay(catalog, references, wide=None):
+    """Reconstruct every supported template and remeasure the wide relation.
+
+    Returns the private receipt and the relation rebuilt from the bytes.  When a
+    pinned relation is supplied, the rebuilt one must agree exactly: an asset-free
+    export can only pin metadata, so this is where the published relation is
+    checked against the reference images.
+    """
+    from unique_code_report import validate_catalog
+    from relocation_identity import _field_parts, reconstruct, NORMALIZER_SHA256
+    require(catalog["normalizer"]["sha256"] == NORMALIZER_SHA256, "Private replay normalizer drift")
+    programs, rows, bodies = pinned_bodies(catalog, references)
+    records, reconstructed = [], 0
+    for row in sorted(rows, key=lambda r: (r["program"], r["address"], r["id"])):
+        raw = bodies[row["id"]]
+        norm = row.get("normalization")
+        if not supported(row):
+            continue
+        template = bytearray(raw)
+        for rel in norm["relocations"]:
+            for offset, mask, _ in _field_parts(rel, row["address"]):
+                word = struct.unpack_from("<I", template, offset)[0]
+                value = rel["relative_target"] >> 2 if rel["kind"] == "j26" and rel.get("internal") else 0
+                struct.pack_into("<I", template, offset, (word & ~mask) | (value & mask))
+        template = bytes(template)
+        require(digest(template) == norm.get("template_sha256", norm["signature_sha256"]), "Private template hash mismatch")
+        schema = [{k: v for k, v in rel.items() if k in ("offset", "kind", "high_offset", "low_offset", "lo_mode", "role", "internal", "relative_target")} for rel in norm["relocations"]]
+        signature = digest(b"ee-relocation-template-v1\0" + template + json.dumps(schema, sort_keys=True, separators=(",", ":")).encode())
+        require(signature == norm["signature_sha256"], "Private role signature mismatch")
+        require(reconstruct(template, row["address"], norm["relocations"]) == raw, "Private reconstruction differs")
+        reconstructed += 1
+        records.append({"id": row["id"], "size": row["size"], "narrow": template,
+                        "classes": wide_classed(raw),
+                        "covered": narrow_covered(norm["relocations"], row["address"]),
+                        "family": digest(encoded(template_key(row)))})
+    measured = wide_relation(records)
+    if wide is not None:
+        require(encoded(measured) == encoded(wide),
+                "Measured wide relation differs from the pinned receipt")
     return {"state": "all_raw_rows_and_supported_template_reconstructions_exact",
             "scope": "raw reference/template/role-signature/reconstruction replay; supplied address roles not reclassified",
             "fresh_address_role_classification_performed": False, "raw_rows": len(rows),
-            "supported_reconstructed_rows": reconstructed, "catalogue_reference_pins": {p: v["reference_sha256"] for p, v in sorted(programs.items())}}
+            "supported_reconstructed_rows": reconstructed,
+            "wide_merge_groups_remeasured": len(measured["groups"]),
+            "wide_relation_matches_pinned_receipt": wide is not None,
+            "catalogue_reference_pins": {p: v["reference_sha256"] for p, v in sorted(programs.items())}}, measured
 
 
 def snapshot(repo, catalog_path, catalog):
@@ -265,7 +504,7 @@ def snapshot(repo, catalog_path, catalog):
     inputs = {p["path"]: p["sha256"] for p in catalog["input_pins"]}
     manifest = json.loads((repo / "config/source-layout.json").read_bytes())
     paths = {"config/source-layout.json", "scripts/source_layout.py", "scripts/unique_code_report.py",
-             "scripts/relocation_identity.py", "scripts/boot_sdk_unit.py"}
+             "scripts/relocation_identity.py", "scripts/boot_sdk_unit.py", WIDE_RECEIPT}
     paths.update(manifest["recipes"])
     paths.update(p["fragment"] for r in manifest["recipes"].values() for p in r["pieces"])
     for path in paths:
@@ -288,27 +527,41 @@ def main(argv=None):
     parser.add_argument("--families-output", type=Path, required=True)
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--references", type=Path, help="Private pinned reference root; optional full raw replay")
+    parser.add_argument("--wide-output", type=Path,
+        help="Private regeneration of the measured wide relation; requires --references")
     args = parser.parse_args(argv)
+    require(args.wide_output is None or args.references is not None,
+            "Wide-relation regeneration requires pinned references")
     repo = args.repo.resolve(); sys.path.insert(0, str(repo / "scripts"))
     import unique_code_report as uq
     catalog, catalog_bytes = uq.read_catalog(args.catalog)
     credit = uq.load_current_credit(repo, catalog)
     primary = uq.generate(catalog, credit, uq.current_boot_binding(repo, catalog))
-    summary, details = generate(catalog, credit, primary)
+    # --wide-output regenerates the relation from the pinned references instead of
+    # reading it, so a first bootstrap does not need an existing receipt.
+    wide, private_replay = (None, None) if args.wide_output else (wide_groups(repo), None)
+    if args.references:
+        private_replay, measured = replay(catalog, args.references, None if args.wide_output else wide)
+        if args.wide_output:
+            wide = measured
+            data = wide_bytes(measured)
+            if args.check:
+                require(args.wide_output.read_bytes() == data, "Stale measured wide-family relation")
+            else:
+                args.wide_output.parent.mkdir(parents=True, exist_ok=True)
+                args.wide_output.write_bytes(data)
+    summary, details = generate(catalog, credit, primary, wide)
     authored, authored_details = authored_subset(repo, credit)
     summary["authored_C_reuse_subset"] = authored
     summary["catalog_sha256"] = digest(catalog_bytes)
     summary["input_sha256"] = snapshot(repo, args.catalog, catalog)
+    summary["wide_group_reference"] = wide_reference(wide)
     if args.references:
-        summary["private_raw_replay"] = replay(catalog, args.references)
+        summary["private_raw_replay"] = private_replay
         summary["quality"]["private_raw_replay_performed"] = True
-    payload = encoded({"schema": 1, "policy": POLICY, "template_families": details,
-                       "authored_C_fragment_families": authored_details})
+    payload = encoded(families_payload(details, authored_details, wide))
     if args.families_output.suffix == ".gz":
-        buffer = io.BytesIO()
-        with gzip.GzipFile(fileobj=buffer, mode="wb", filename="", mtime=0) as stream:
-            stream.write(payload)
-        payload = buffer.getvalue()
+        payload = compressed(payload)
     summary["families_sha256"] = digest(payload)
     for path, data in [(args.output, encoded(summary)), (args.families_output, payload)]:
         if args.check:

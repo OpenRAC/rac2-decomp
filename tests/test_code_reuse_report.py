@@ -33,9 +33,16 @@ def catalog():
         "functions": [row("a", "boot", 256), row("b", "levels/a", 512)]}
 
 
-def run_report(c, credit=None):
+EMPTY_WIDE = {"schema": 1, "policy": reuse.WIDE_POLICY, "mask": reuse.WIDE_MASK, "frontier": reuse.WIDE_FRONTIER,
+    "controls": {"narrow_families": 0, "narrow_multi_member_families": 0,
+                 "wide_families_including_singletons": 0, "wide_multi_member_families": 0},
+    "counts": {"groups": 0, "retained_groups": 0, "families": 0, "placements": 0, "retained_families": 0,
+               "retained_placements": 0, "merged_bytes": 0, "retained_bytes": 0}, "groups": []}
+
+
+def run_report(c, credit=None, wide=EMPTY_WIDE):
     credit = credit or {}
-    return reuse.generate(c, credit, uq.generate(c, credit))
+    return reuse.generate(c, credit, uq.generate(c, credit), wide)
 
 
 class ReuseTests(unittest.TestCase):
@@ -137,13 +144,13 @@ class ReuseTests(unittest.TestCase):
         c = catalog(); primary = uq.generate(c, {})
         primary["groups"] = [{"id": "p1", "members": ["a"]}, {"id": "p2", "members": ["b"]}]
         primary["metrics"]["unique_total_bytes"] = 64
-        r, details = reuse.generate(c, {}, primary)
+        r, details = reuse.generate(c, {}, primary, EMPTY_WIDE)
         self.assertEqual(r["metrics"]["template_total_bytes"], 48)
         self.assertEqual(r["primary_reference"]["metrics"]["unique_total_bytes"], 64)
         self.assertEqual(details[0]["conservative_class_count"], 2)
         primary["groups"][1]["members"] = ["a"]
         with self.assertRaises(ValueError):
-            reuse.generate(c, {}, primary)
+            reuse.generate(c, {}, primary, EMPTY_WIDE)
 
     def test_ordering_is_deterministic_and_no_external_estimate_input(self):
         c = catalog(); first = run_report(c)
@@ -163,7 +170,7 @@ class ReuseTests(unittest.TestCase):
             primary_groups.append({"id": str(i), "members": [str(i)]})
         primary = uq.generate(c, credit); primary["groups"] = primary_groups
         primary["metrics"]["unique_total_bytes"] = 2052
-        summary, details = reuse.generate(c, credit, primary)
+        summary, details = reuse.generate(c, credit, primary, EMPTY_WIDE)
         self.assertEqual(summary["metrics"]["template_total_bytes"], 76)
         self.assertEqual(summary["metrics"]["template_all_c_bytes"], 76)
         self.assertEqual(details[0]["placements"], 27)
@@ -186,6 +193,7 @@ class ReuseTests(unittest.TestCase):
             with patch.object(uq, "read_catalog", return_value=(c, b"catalog")), \
                     patch.object(uq, "load_current_credit", return_value={}), \
                     patch.object(uq, "current_boot_binding", return_value=None), \
+                    patch.object(reuse, "wide_groups", return_value=EMPTY_WIDE), \
                     patch.object(reuse, "authored_subset", return_value=({"known_sources": 0}, [])), \
                     patch.object(reuse, "snapshot", return_value={"logical-input": H}) as snap, \
                     contextlib.redirect_stdout(io.StringIO()):
@@ -236,6 +244,119 @@ class ReuseTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     reuse.authored_subset(root, credit)
 
+    def test_wide_mask_keeps_folded_halves_and_branches_clear_provenance(self):
+        LUI = struct.pack("<I", 0x3C081234)                    # lui $8, 0x1234
+        LOAD = struct.pack("<I", 0x8D090010)                   # lw  $9, 0x10($8)
+        ADD = struct.pack("<I", 0x25080020)                    # addiu $8, $8, 0x20
+        GP = struct.pack("<I", 0x8F890010)                     # lw  $9, 0x10($gp)
+        BEQ = struct.pack("<I", 0x10000001)                    # beq $0, $0, +1
+        self.assertEqual(reuse.wide_classed(LUI + LOAD), {0: frozenset({"mem_folded"}), 1: frozenset({"mem_folded"})})
+        self.assertEqual(reuse.wide_classed(LUI + ADD), {0: frozenset({"reg"}), 1: frozenset({"reg"})})
+        self.assertEqual(reuse.wide_classed(GP), {0: frozenset({"gp"})})
+        self.assertEqual(reuse.wide_classed(LUI + ADD + LOAD),
+                         {0: frozenset({"reg"}), 1: frozenset({"reg", "reg_chained_mem"}), 2: frozenset({"reg_chained_mem"})})
+        self.assertEqual(reuse.wide_classed(LUI + BEQ + LOAD), {})
+        wide = reuse.wide_template(LUI + LOAD, reuse.wide_classed(LUI + LOAD))
+        self.assertEqual(wide[:4], struct.pack("<I", 0x3C080000))
+        self.assertEqual(wide[4:8], struct.pack("<I", 0x8D090000))
+
+    def test_wide_relation_publishes_only_merges_and_keeps_the_frontier_verdict(self):
+        def record(identity, family, narrow, classes, covered=None):
+            return {"id": identity, "size": 16, "narrow": narrow, "family": family,
+                    "classes": classes, "covered": covered or {}}
+        folded = struct.pack("<I", 0x3C081234) + struct.pack("<I", 0x8D090010)
+        other = struct.pack("<I", 0x3C085678) + struct.pack("<I", 0x8D090010)
+        classes = {0: frozenset({"mem_folded"}), 1: frozenset({"mem_folded"})}
+        relation = reuse.wide_relation([record("a", "f1", folded, classes), record("b", "f2", other, classes),
+                                        record("c", "f3", other, classes), record("d", "f2", other, classes)])
+        self.assertEqual(list(relation["controls"].items()),
+                         [("narrow_families", 3), ("narrow_multi_member_families", 1),
+                          ("wide_families_including_singletons", 1), ("wide_multi_member_families", 1)])
+        self.assertEqual(len(relation["groups"]), 1)
+        group = relation["groups"][0]
+        self.assertEqual((group["families"], group["placements"], group["variable_positions"]),
+                         (["f1", "f2", "f3"], 4, [0]))
+        self.assertEqual(group["variable_classes"], {"mem_folded": 4})
+        self.assertTrue(group["retained"])
+        self.assertEqual((relation["counts"]["groups"], relation["counts"]["retained_groups"],
+                          relation["counts"]["families"], relation["counts"]["merged_bytes"],
+                          relation["counts"]["retained_bytes"]), (1, 1, 3, 64, 64))
+        materialised = {0: frozenset({"reg"}), 1: frozenset({"mem_folded"})}
+        rejected = reuse.wide_relation([record("a", "f1", folded, materialised),
+                                        record("b", "f2", other, materialised)])
+        self.assertFalse(rejected["groups"][0]["retained"])
+        self.assertEqual(rejected["groups"][0]["variable_classes"], {"reg": 2})
+        # A half already covered by the maintained mask is not a new freedom.
+        covered = reuse.wide_relation([record("a", "f1", folded, classes, {0: 0xFFFF}),
+                                       record("b", "f2", other, classes, {0: 0xFFFF})])
+        self.assertEqual(covered["groups"][0]["variable_positions"], [])
+        self.assertTrue(covered["groups"][0]["retained"])
+
+    def test_pinned_wide_relation_is_loaded_validated_and_referenced(self):
+        def group(identity="a" * 16, size=16, placements=2, retained=True, families=("b" * 64, "c" * 64),
+                  variable_positions=(0,), variable_classes=None):
+            return {"id": identity, "sha256": identity + "0" * 48, "size": size, "placements": placements,
+                    "retained": retained, "variable_positions": list(variable_positions),
+                    "variable_classes": {"mem_folded": placements} if variable_classes is None else variable_classes,
+                    "families": sorted(families)}
+        counts = lambda groups: {"groups": len(groups), "retained_groups": sum(g["retained"] for g in groups),
+            "families": sum(len(g["families"]) for g in groups), "placements": sum(g["placements"] for g in groups),
+            "retained_families": sum(len(g["families"]) for g in groups if g["retained"]),
+            "retained_placements": sum(g["placements"] for g in groups if g["retained"]),
+            "merged_bytes": sum(g["size"] * g["placements"] for g in groups),
+            "retained_bytes": sum(g["size"] * g["placements"] for g in groups if g["retained"])}
+        document = dict(EMPTY_WIDE, counts=counts([group()]), groups=[group()])
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp); (repo / "progress").mkdir()
+            receipt = repo / reuse.WIDE_RECEIPT
+            receipt.write_bytes(reuse.wide_bytes(document))
+            self.assertEqual(reuse.wide_groups(repo), document)
+            def refused(value):
+                receipt.write_bytes(reuse.wide_bytes(value))
+                with self.assertRaises(ValueError):
+                    reuse.wide_groups(repo)
+            receipt.unlink()
+            with self.assertRaisesRegex(ValueError, "Missing measured wide-family relation"):
+                reuse.wide_groups(repo)
+            broken = copy.deepcopy(document); broken["groups"][0]["sha256"] = "d" * 64
+            refused(broken)
+            broken = copy.deepcopy(document); broken["groups"][0]["families"] = ["b" * 64]
+            refused(broken)
+            broken = copy.deepcopy(document); broken["counts"]["groups"] = 5
+            refused(broken)
+            broken = copy.deepcopy(document); broken["groups"][0]["variable_classes"] = {"reg": 2}
+            refused(broken)
+            broken = copy.deepcopy(document); broken["policy"] = "maximal-mask"
+            refused(broken)
+            receipt.write_bytes(reuse.wide_bytes(document))
+            # Every named family must still exist in the current narrow partition,
+            # at the measured size, or the published relation is refused.
+            c = catalog()
+            c["functions"][1] = row("b", "levels/a", 512, signature="4" * 64)
+            names = sorted(reuse.digest(reuse.encoded(reuse.template_key(r))) for r in c["functions"])
+            self.assertNotEqual(names[0], names[1])
+            current = copy.deepcopy(document); current["groups"][0]["families"] = names
+            self.assertEqual(reuse.generate(c, {}, uq.generate(c, {}), current)[1], [])
+            unknown = copy.deepcopy(current)
+            unknown["groups"][0]["families"] = sorted(["d" * 64, "e" * 64])
+            with self.assertRaisesRegex(ValueError, "unknown narrow family"):
+                reuse.generate(c, {}, uq.generate(c, {}), unknown)
+            wrong_size = copy.deepcopy(current); wrong_size["groups"][0]["size"] = 32
+            with self.assertRaisesRegex(ValueError, "size differs"):
+                reuse.generate(c, {}, uq.generate(c, {}), wrong_size)
+
+    def test_families_payload_adds_the_relation_beside_the_narrow_partition(self):
+        c = catalog(); summary, details = run_report(c, {("boot", 256, 16): H})
+        payload = reuse.families_payload(details, [], EMPTY_WIDE)
+        self.assertEqual(sorted(payload), ["authored_C_fragment_families", "policy", "schema",
+                                           "template_families", "wide_groups"])
+        self.assertEqual(payload["template_families"], details)
+        self.assertIs(payload["wide_groups"], EMPTY_WIDE)
+        self.assertEqual(reuse.wide_reference(EMPTY_WIDE),
+                         {"policy": reuse.WIDE_POLICY, "receipt": reuse.WIDE_RECEIPT, "groups": 0,
+                          "retained_groups": 0, "narrow_families_in_a_group": 0})
+        self.assertEqual(summary["counts"]["multi_member_families"], 1)
+
     def test_private_replay_detects_opcode_register_constant_changes_without_assets(self):
         from relocation_identity import reconstruct, NORMALIZER_SHA256
         c = catalog(); c["normalizer"]["sha256"] = NORMALIZER_SHA256
@@ -255,8 +376,17 @@ class ReuseTests(unittest.TestCase):
                 path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(body)
                 p["reference_sha256"] = reuse.digest(body)
             with patch("elf_tools.read_elf", return_value={}), patch("elf_tools._mappings", return_value=[]), patch("elf_tools._mapped_bytes", side_effect=lambda data, mappings, a, s: data):
-                result = reuse.replay(c, root)
+                result, measured = reuse.replay(c, root)
                 self.assertEqual(result["supported_reconstructed_rows"], 2)
+                self.assertFalse(result["wide_relation_matches_pinned_receipt"])
+                self.assertEqual(measured["groups"], [])
+                # A pinned relation rebuilt from the bytes must agree exactly.
+                agreeing = reuse.replay(c, root, measured)[0]
+                self.assertTrue(agreeing["wide_relation_matches_pinned_receipt"])
+                diverging = copy.deepcopy(measured)
+                diverging["counts"]["groups"] = 1
+                with self.assertRaisesRegex(ValueError, "pinned receipt"):
+                    reuse.replay(c, root, diverging)
                 # Restoring a fake scalar-as-address field can roundtrip, but
                 # injecting it under the original trusted receipt must fail.
                 forged = copy.deepcopy(c)

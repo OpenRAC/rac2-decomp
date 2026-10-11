@@ -104,6 +104,26 @@ class NativeTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "compiler flags"):
                     self.load()
 
+    def test_external_addresses_keep_their_range_and_type_but_not_alignment(self):
+        # The linker script binds an external as an absolute symbol
+        # (`NAME = 0xADDR;`), which carries no alignment requirement, so a
+        # byte-sized data flag is a legal target: the measured families
+        # c558ca7050ec6154 and b7feb89380591f87 reach 0x1A7B95 and 0x1A7BB2.
+        self.catalog["externals"] = {"Flag": 0x1A7B95, "Neighbour": 0x1A7BB2}
+        self.write(self.catalog_path, self.catalog)
+        self.assertEqual(self.load()["externals"], {"Flag": 0x1A7B95, "Neighbour": 0x1A7BB2})
+        for address in (0x100000000, -4, 4.0, "0x1A7B95", None, True):
+            self.catalog["externals"] = {"Flag": address}
+            self.write(self.catalog_path, self.catalog)
+            with self.subTest(address=address), self.assertRaisesRegex(ValueError, "external identity"):
+                self.load()
+
+    def test_external_may_not_shadow_an_integrated_definition(self):
+        self.catalog["externals"] = {self.fn["symbol"]: 0x1A7B95}
+        self.write(self.catalog_path, self.catalog)
+        with self.assertRaisesRegex(ValueError, "external identity"):
+            self.load()
+
     def test_wrong_program_and_boot_catalog_rejected(self):
         for field, value in (("program", "boot"), ("kind", "boot-catalog"), ("reference_sha256", "d" * 64)):
             with self.subTest(field=field):

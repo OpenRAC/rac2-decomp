@@ -6,11 +6,11 @@
   "reference_sha256": "c6cf24ac0591c78ae6a5320a333b4465f54969ab91e0f42f52fcb7fc95f2f00e",
   "reference_entry": 2870792,
   "candidate_source": "candidates/levels/11_joba.c",
-  "source_sha256": "ec3f3e81b5774cd65c73ad3f63795a43605ec55f29f2684c8046e13711752e99",
-  "catalog_sha256": "da76510a8f388a66d999fb4fada24b956696429593b4286225eeef5a06d1cc8f",
-  "object_sha256": "183d670a238e64f981662b9707ab056b817d8dc01f868d0baf8cefc432a3f537",
-  "candidate_elf_sha256": "6638cf89ad94a4a79bf105a8fba47e46d517f06a13f88ce012e862b0dc6a5c2c",
-  "checker_sha256": "bfc3a7714e257ed26ff1d8fb68346df89c1d2eaa01651849db022ac871ac30f5",
+  "source_sha256": "b8b9f0127fc933514af02ffd9712eee8bf3b1fdb478ccf0ba1f282d5902661c3",
+  "catalog_sha256": "a222ca9d0474bf38621377a355e99167886abba99d7b0fd0d8ce8489cffef28e",
+  "object_sha256": "f2632b11e9f62442849303d039ae859368d6da15cad601b62ccf83c07855027d",
+  "candidate_elf_sha256": "be98a23965ad199ba0d62777796b27bbde2ee9e6c63b7b734b694668a9f8e3f3",
+  "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
     "cpp": "2ac3d8d3ca177e6705ac2cbdd1bd9e9a7181ac3e40f6230dea6875c3218ec155",
@@ -960,6 +960,17 @@
       "produced_size": 112
     },
     {
+      "symbol": "LVL_11_JOBA_FUN_00322CE0",
+      "address": 3288288,
+      "size": 412,
+      "matched": true,
+      "reference_sha256": "6d413494ebc131ac0e874e76734ad43bff5124441c3f086e70562f2f5af4d631",
+      "candidate_sha256": "6d413494ebc131ac0e874e76734ad43bff5124441c3f086e70562f2f5af4d631",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 412
+    },
+    {
       "symbol": "LVL_11_JOBA_FUN_00323720",
       "address": 3290912,
       "size": 84,
@@ -1090,6 +1101,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 88
+    },
+    {
+      "symbol": "LVL_11_JOBA_FUN_00338528",
+      "address": 3376424,
+      "size": 428,
+      "matched": true,
+      "reference_sha256": "afb74a0cdc8c16484a31009d6e030b951449af69f477bcbb2d3bed40fa20b79f",
+      "candidate_sha256": "afb74a0cdc8c16484a31009d6e030b951449af69f477bcbb2d3bed40fa20b79f",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 428
     },
     {
       "symbol": "LVL_11_JOBA_FUN_00338DF0",
@@ -1697,6 +1719,17 @@
       "produced_size": 300
     },
     {
+      "symbol": "LVL_11_JOBA_FUN_00396640",
+      "address": 3761728,
+      "size": 412,
+      "matched": true,
+      "reference_sha256": "fe9daa3afda1f2b6d22a7453220d18de896df17a249d2bd4b22df2c93797f628",
+      "candidate_sha256": "fe9daa3afda1f2b6d22a7453220d18de896df17a249d2bd4b22df2c93797f628",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 412
+    },
+    {
       "symbol": "LVL_11_JOBA_FUN_003967E0",
       "address": 3762144,
       "size": 8,
@@ -2036,6 +2069,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 104
+    },
+    {
+      "symbol": "LVL_11_JOBA_FUN_003DFCC8",
+      "address": 4062408,
+      "size": 412,
+      "matched": true,
+      "reference_sha256": "b06a873c67da4bd0ab8b3de5925bd96637ec05d47d87c88a0c084dec43be46f1",
+      "candidate_sha256": "b06a873c67da4bd0ab8b3de5925bd96637ec05d47d87c88a0c084dec43be46f1",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 412
     },
     {
       "symbol": "LVL_11_JOBA_FUN_003E0510",
@@ -3050,6 +3094,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_11_JOBA_FUN_00493DA0",
+      "address": 4799904,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "4f09e9cd8fcf28376e98486d1f602b5f9b3c6f9336bf8995318c2de3297be48c",
+      "candidate_sha256": "4f09e9cd8fcf28376e98486d1f602b5f9b3c6f9336bf8995318c2de3297be48c",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
+    },
+    {
       "symbol": "LVL_11_JOBA_FUN_004946C8",
       "address": 4802248,
       "size": 44,
@@ -3072,6 +3127,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_11_JOBA_FUN_00494AF0",
+      "address": 4803312,
+      "size": 260,
+      "matched": true,
+      "reference_sha256": "3fe0c22c3eb67428c1dee8d9b3fe38047bf915eb8d57dfd665b4f591abd826b4",
+      "candidate_sha256": "3fe0c22c3eb67428c1dee8d9b3fe38047bf915eb8d57dfd665b4f591abd826b4",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 260
+    },
+    {
       "symbol": "LVL_11_JOBA_FUN_00494D58",
       "address": 4803928,
       "size": 44,
@@ -3081,6 +3147,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 44
+    },
+    {
+      "symbol": "LVL_11_JOBA_FUN_00494EB8",
+      "address": 4804280,
+      "size": 152,
+      "matched": true,
+      "reference_sha256": "0a650aa91181f6935f4b0b6fb82b9026fd807d5270e337b2bdaa4b419b3ae9b9",
+      "candidate_sha256": "0a650aa91181f6935f4b0b6fb82b9026fd807d5270e337b2bdaa4b419b3ae9b9",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 152
     },
     {
       "symbol": "LVL_11_JOBA_FUN_00495008",
@@ -3094,6 +3171,17 @@
       "produced_size": 44
     },
     {
+      "symbol": "LVL_11_JOBA_FUN_00495168",
+      "address": 4804968,
+      "size": 152,
+      "matched": true,
+      "reference_sha256": "0a650aa91181f6935f4b0b6fb82b9026fd807d5270e337b2bdaa4b419b3ae9b9",
+      "candidate_sha256": "0a650aa91181f6935f4b0b6fb82b9026fd807d5270e337b2bdaa4b419b3ae9b9",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 152
+    },
+    {
       "symbol": "LVL_11_JOBA_FUN_00495200",
       "address": 4805120,
       "size": 44,
@@ -3103,6 +3191,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 44
+    },
+    {
+      "symbol": "LVL_11_JOBA_FUN_00495360",
+      "address": 4805472,
+      "size": 152,
+      "matched": true,
+      "reference_sha256": "0a650aa91181f6935f4b0b6fb82b9026fd807d5270e337b2bdaa4b419b3ae9b9",
+      "candidate_sha256": "0a650aa91181f6935f4b0b6fb82b9026fd807d5270e337b2bdaa4b419b3ae9b9",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 152
     },
     {
       "symbol": "LVL_11_JOBA_FUN_004953F8",
@@ -3568,5 +3667,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 39480
+  "matched_code_bytes": 42120
 }

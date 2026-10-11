@@ -110,7 +110,8 @@
     "LVL_2_MAKTAR_NEBULA_QWEN_538934d89776_AT002DA4A8_ROLE000": 1738972,
     "LVL_2_MAKTAR_NEBULA_QWEN_538934d89776_AT002DA4A8_ROLE001": 1735600,
     "LVL_2_MAKTAR_NEBULA_QWEN_538934d89776_AT002DA4A8_ROLE002": 2990200,
-    "LVL_2_MAKTAR_NEBULA_QWEN_538934d89776_AT002DA4A8_ROLE003": 1278336
+    "LVL_2_MAKTAR_NEBULA_QWEN_538934d89776_AT002DA4A8_ROLE003": 1278336,
+    "D_001AA430": 1745968
   },
   "flags": [
     "-O2",
@@ -417,6 +418,12 @@
       "meaning": "Call the measured delay helper while the backed signed flag word intersects the supplied 64-bit mask.",
       "size": 76,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00382B18"
+    },
+    {
+      "address": 3345768,
+      "meaning": "Store the input's raw 32-bit value in the GP-relative cell; original owner and semantic meaning are unknown.",
+      "size": 8,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00330D68"
     }
   ],
   "gp": 1765360,

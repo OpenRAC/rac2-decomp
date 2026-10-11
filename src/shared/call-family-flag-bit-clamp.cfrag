@@ -1,0 +1,21 @@
+extern void @@ROLE_0_00@@(char *p);
+extern void @@ROLE_1_00@@(char *p, float x, float y);
+extern int @@ROLE_2_00@@(int a, int b, int c);
+extern volatile unsigned char @@BIND_G_1A7BB2_00@@ __attribute__((sda));
+
+int @@FUNCTION@@(char *object, int flags)
+{
+    float *vec;
+
+    @@ROLE_0_01@@(object + 8);
+    vec = *(float **)(object + 684);
+    @@ROLE_1_01@@(object + 8, vec[0], vec[1]);
+
+    if ((flags & 0x40) && *(int *)(object + 680) == 0) {
+        int discarded = @@ROLE_2_01@@(4, 0, 0);
+        (void)discarded;
+        @@BIND_G_1A7BB2_01@@ = (@@BIND_G_1A7BB2_02@@ < 1);
+    }
+
+    return (flags >> 6) & 1;
+}

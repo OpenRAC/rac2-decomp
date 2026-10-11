@@ -34,8 +34,49 @@ class PolicyTests(unittest.TestCase):
         self.event = {"repository": self.repo, "number": 10, "pull_request": copy.deepcopy(self.pr)}
         self.api = Api({"pulls/10": self.pr})
 
-    def test_primary_maintainer_exact_head_can_use_focused_pr_tests(self):
-        self.assertEqual(policy.select("pull_request", self.event, self.sha, self.api)["mode"], "targeted")
+    def test_primary_maintainer_exact_head_trusts_local_pr_tests(self):
+        self.assertEqual(policy.select("pull_request", self.event, self.sha, self.api)["mode"], "local")
+
+    def owner_push(self):
+        return {"repository": self.repo, "sender": self.user, "ref": "refs/heads/RAC2", "after": self.sha}
+
+    def test_owner_push_never_queries_or_waits_for_commit_association(self):
+        api = Api({})
+        wait = unittest.mock.Mock()
+        result = policy.select_with_retry("push", self.owner_push(), self.sha, api, wait, lambda: 0)
+        self.assertEqual(result["mode"], "local")
+        self.assertTrue(result["local_validation_trusted"])
+        self.assertFalse(result["remote_full_validation"])
+        self.assertEqual(api.calls, [])
+        wait.assert_not_called()
+
+    def test_invalid_owner_push_identity_repository_or_sha_cannot_select_local(self):
+        mutations = [("sender", "id", 1), ("sender", "login", "someone"),
+                     ("repository", "id", 1), ("repository", "full_name", "fork/project"),
+                     (None, "after", "b" * 40), (None, "ref", "refs/heads/topic"), (None, "deleted", True)]
+        for path, key, value in mutations:
+            with self.subTest(path=path, key=key):
+                event = copy.deepcopy(self.owner_push())
+                target = event[path] if path else event
+                target[key] = value
+                api = Api({"commits/" + self.sha + "/pulls?per_page=100": []})
+                self.assertEqual(policy.select("push", event, self.sha, api)["mode"], "full")
+        for bad in (None, "", "bad", "A" * 40, "0" * 39):
+            event = copy.deepcopy(self.owner_push()); event["after"] = bad
+            self.assertEqual(policy.select("push", event, bad, Api({}))["mode"], "full")
+
+    def test_invalid_pr_head_and_base_hashes_are_full_even_when_api_matches(self):
+        for part in ("head", "base"):
+            for bad in (None, "", "invalid", "B" * 40):
+                with self.subTest(part=part, bad=bad):
+                    pr = copy.deepcopy(self.pr); pr[part]["sha"] = bad
+                    event = copy.deepcopy(self.event); event["pull_request"] = copy.deepcopy(pr)
+                    self.assertEqual(policy.select("pull_request", event, self.sha, Api({"pulls/10": pr}))["mode"], "full")
+
+    def test_owner_sender_does_not_make_foreign_pr_local(self):
+        event = copy.deepcopy(self.event); event["sender"] = copy.deepcopy(self.user)
+        pr = copy.deepcopy(self.pr); pr["user"]["id"] = 1
+        self.assertEqual(policy.select("pull_request", event, self.sha, Api({"pulls/10": pr}))["mode"], "full")
 
     def test_spoofed_login_id_fork_base_and_stale_heads_are_not_trusted(self):
         mutations = [("user", "id", 1), ("user", "login", "someone"),

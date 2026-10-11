@@ -795,6 +795,17 @@ class FinalizeTests(unittest.TestCase):
             self.finish()
         self.assertFalse(self.output.exists())
 
+    def test_measured_wide_relation_is_a_snapshotted_compressed_input(self):
+        name = "progress/code-reuse-families-wide-groups.json.gz"
+        value = finalize._compress(b'{"schema": 1}\n')
+        write(self.repo / name, value)
+        self.assertIn(name, finalize._inventory(self.repo))
+        self.finish(apply=True)
+        self.assertEqual((self.output / "snapshot" / name).read_bytes(), value)
+        plan = json.loads((self.output / "plan.json").read_bytes())
+        self.assertEqual(plan["before"][name], sha(value))
+        self.assertNotIn(name, {row["path"] for row in plan["changes"]})
+
     def test_changed_verification_input_cannot_be_proposed_for_publication(self):
         values = self.add_verification_metadata()
         original = self.runner

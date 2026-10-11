@@ -81,6 +81,12 @@
     "LVL_7_SIBERIUS_F1fa78648_FUN_002E5318": 3035928,
     "LVL_7_SIBERIUS_F1fa78648_FUN_00320648": 3278408,
     "LVL_7_SIBERIUS_F1fa78648_FUN_00320678": 3278456,
+    "LVL_7_SIBERIUS_F213135aa_FUN_002E4340": 3031872,
+    "LVL_7_SIBERIUS_F213135aa_FUN_002E4440": 3032128,
+    "LVL_7_SIBERIUS_F213135aa_FUN_002E45F0": 3032560,
+    "LVL_7_SIBERIUS_F213135aa_FUN_002E4B70": 3033968,
+    "LVL_7_SIBERIUS_F213135aa_FUN_00310B30": 3214128,
+    "LVL_7_SIBERIUS_F213135aa_FUN_00315158": 3232088,
     "LVL_7_SIBERIUS_F250fbfa4_FUN_002E3FB0": 3030960,
     "LVL_7_SIBERIUS_F250fbfa4_FUN_002E4310": 3031824,
     "LVL_7_SIBERIUS_F250fbfa4_FUN_003263C0": 3302336,
@@ -177,6 +183,12 @@
     "LVL_7_SIBERIUS_F55a1acb8_D_001A63AC": 1729452,
     "LVL_7_SIBERIUS_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_7_SIBERIUS_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_7_SIBERIUS_F5a19df7a_FUN_00310AD8": 3214040,
+    "LVL_7_SIBERIUS_F5a19df7a_FUN_00310BF8": 3214328,
+    "LVL_7_SIBERIUS_F5a19df7a_FUN_003715E0": 3610080,
+    "LVL_7_SIBERIUS_F5a19df7a_FUN_003C0100": 3932416,
+    "LVL_7_SIBERIUS_F5a19df7a_FUN_003C04D8": 3933400,
+    "LVL_7_SIBERIUS_F5a19df7a_FUN_003C0D00": 3935488,
     "LVL_7_SIBERIUS_F5a9e4f98_FUN_00427668": 4355688,
     "LVL_7_SIBERIUS_F5a9e4f98_FUN_00427890": 4356240,
     "LVL_7_SIBERIUS_F5a9e4f98_FUN_00427B90": 4357008,
@@ -332,6 +344,18 @@
     "LVL_7_SIBERIUS_Fb1b523716b470b36_AT0037D3B0_ROLE01": 3031872,
     "LVL_7_SIBERIUS_Fb1b523716b470b36_AT0037FE58_ROLE00": 3031824,
     "LVL_7_SIBERIUS_Fb1b523716b470b36_AT0037FE58_ROLE01": 3031872,
+    "LVL_7_SIBERIUS_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_7_SIBERIUS_Fb1bbe20c_FUN_003555E8": 3495400,
+    "LVL_7_SIBERIUS_Fb1bbe20c_FUN_0042C2F0": 4375280,
+    "LVL_7_SIBERIUS_Fb1bbe20c_FUN_0042C4E0": 4375776,
+    "LVL_7_SIBERIUS_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_7_SIBERIUS_Fb1c9893c_FUN_002D1A48": 2955848,
+    "LVL_7_SIBERIUS_Fb1c9893c_FUN_002E4310": 3031824,
+    "LVL_7_SIBERIUS_Fb1c9893c_FUN_002E47D0": 3033040,
+    "LVL_7_SIBERIUS_Fb1c9893c_FUN_002E4900": 3033344,
+    "LVL_7_SIBERIUS_Fb1c9893c_FUN_002E4918": 3033368,
+    "LVL_7_SIBERIUS_Fb1c9893c_FUN_00310B30": 3214128,
+    "LVL_7_SIBERIUS_Fb1c9893c_FUN_00310BF8": 3214328,
     "LVL_7_SIBERIUS_Fb342d477_D_0011AC40": 1158208,
     "LVL_7_SIBERIUS_Fb342d477_D_0011AC60": 1158240,
     "LVL_7_SIBERIUS_Fb342d477_FUN_00441C70": 4463728,
@@ -339,6 +363,11 @@
     "LVL_7_SIBERIUS_Fb4cfb7e0_FUN_00310A98": 3213976,
     "LVL_7_SIBERIUS_Fb77d67f1_FUN_002E3F80": 3030912,
     "LVL_7_SIBERIUS_Fb77d67f1_FUN_003263C0": 3302336,
+    "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB2": 1735602,
+    "LVL_7_SIBERIUS_Fb7feb893_D_001A7BB3": 1735603,
+    "LVL_7_SIBERIUS_Fb7feb893_FUN_003555E8": 3495400,
+    "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C2F0": 4375280,
+    "LVL_7_SIBERIUS_Fb7feb893_FUN_0042C4E0": 4375776,
     "LVL_7_SIBERIUS_Fbbb7bee1_FUN_002E4070": 3031152,
     "LVL_7_SIBERIUS_Fbdd4a4aa_FUN_002E4310": 3031824,
     "LVL_7_SIBERIUS_Fbdd4a4aa_FUN_002E4398": 3031960,
@@ -361,6 +390,11 @@
     "LVL_7_SIBERIUS_Fc3cb9262_FUN_002E4310": 3031824,
     "LVL_7_SIBERIUS_Fc3cb9262_FUN_002E5470": 3036272,
     "LVL_7_SIBERIUS_Fc3cb9262_FUN_003263C0": 3302336,
+    "LVL_7_SIBERIUS_Fc558ca70_D_001A7B94": 1735572,
+    "LVL_7_SIBERIUS_Fc558ca70_D_001A7B95": 1735573,
+    "LVL_7_SIBERIUS_Fc558ca70_FUN_003555E8": 3495400,
+    "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C2F0": 4375280,
+    "LVL_7_SIBERIUS_Fc558ca70_FUN_0042C4E0": 4375776,
     "LVL_7_SIBERIUS_Fc68ad20a_D_0018C2B8": 1622712,
     "LVL_7_SIBERIUS_Fc895cb79_D_001D1D00": 1907968,
     "LVL_7_SIBERIUS_Fc936841d_FUN_002E4310": 3031824,
@@ -428,6 +462,13 @@
     "LVL_7_SIBERIUS_Ff26f272a_FUN_002E4B90": 3034000,
     "LVL_7_SIBERIUS_Ff26f272a_FUN_002E4DF8": 3034616,
     "LVL_7_SIBERIUS_Ff26f272a_FUN_002E5318": 3035928,
+    "LVL_7_SIBERIUS_Ff2d8e5ad_FUN_002E4310": 3031824,
+    "LVL_7_SIBERIUS_Ff2d8e5ad_FUN_002E4398": 3031960,
+    "LVL_7_SIBERIUS_Ff2d8e5ad_FUN_002E44D0": 3032272,
+    "LVL_7_SIBERIUS_Ff2d8e5ad_FUN_002E47D0": 3033040,
+    "LVL_7_SIBERIUS_Ff2d8e5ad_FUN_002E47F8": 3033080,
+    "LVL_7_SIBERIUS_Ff2d8e5ad_FUN_002E4868": 3033192,
+    "LVL_7_SIBERIUS_Ff2d8e5ad_FUN_0030B908": 3193096,
     "LVL_7_SIBERIUS_Ff4dd22f3_FUN_002E3FB0": 3030960,
     "LVL_7_SIBERIUS_Ff4dd22f3_FUN_002E4310": 3031824,
     "LVL_7_SIBERIUS_Ff4dd22f3_FUN_003263C0": 3302336,
@@ -955,6 +996,12 @@
       "symbol": "LVL_7_SIBERIUS_FUN_00306858"
     },
     {
+      "address": 3173576,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_7_SIBERIUS_FUN_00306CC8"
+    },
+    {
       "address": 3174280,
       "meaning": "shared native body of family 4615e05e7f21cb33",
       "size": 192,
@@ -1024,6 +1071,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_7_SIBERIUS_FUN_0031B668"
+    },
+    {
+      "address": 3263512,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_7_SIBERIUS_FUN_0031CC18"
     },
     {
       "address": 3264744,
@@ -1339,6 +1392,12 @@
       "symbol": "LVL_7_SIBERIUS_FUN_00376220"
     },
     {
+      "address": 3636912,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_7_SIBERIUS_FUN_00377EB0"
+    },
+    {
       "address": 3637328,
       "size": 8,
       "symbol": "LVL_7_SIBERIUS_FUN_00378050"
@@ -1516,6 +1575,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_7_SIBERIUS_FUN_003C0AF8"
+    },
+    {
+      "address": 3935072,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_7_SIBERIUS_FUN_003C0B60"
     },
     {
       "address": 3937192,
@@ -1985,6 +2050,12 @@
       "symbol": "LVL_7_SIBERIUS_FUN_0042DE80"
     },
     {
+      "address": 4382688,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_7_SIBERIUS_FUN_0042DFE0"
+    },
+    {
       "address": 4385032,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
@@ -1997,10 +2068,22 @@
       "symbol": "LVL_7_SIBERIUS_FUN_0042EBD0"
     },
     {
+      "address": 4386096,
+      "meaning": "makes two float-binding calls, then toggles one of two global flag bytes selected by an object field and returns bit 6 of the flag word",
+      "size": 260,
+      "symbol": "LVL_7_SIBERIUS_FUN_0042ED30"
+    },
+    {
       "address": 4386712,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_7_SIBERIUS_FUN_0042EF98"
+    },
+    {
+      "address": 4387064,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_7_SIBERIUS_FUN_0042F0F8"
     },
     {
       "address": 4387400,
@@ -2009,10 +2092,22 @@
       "symbol": "LVL_7_SIBERIUS_FUN_0042F248"
     },
     {
+      "address": 4387752,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_7_SIBERIUS_FUN_0042F3A8"
+    },
+    {
       "address": 4387904,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_7_SIBERIUS_FUN_0042F440"
+    },
+    {
+      "address": 4388256,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_7_SIBERIUS_FUN_0042F5A0"
     },
     {
       "address": 4388408,

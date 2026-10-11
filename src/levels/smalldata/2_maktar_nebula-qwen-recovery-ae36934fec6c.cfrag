@@ -906,3 +906,12 @@ void LVL_2_MAKTAR_NEBULA_FUN_00382B18(QwenRecovery_339fe89f21bc_WrapperWaitMaskU
         LVL_2_MAKTAR_NEBULA_QWEN_339fe89f21bc_AT00382B18_ROLE000(0x400);
 }
 
+
+/* Store the observed raw 32-bit input in the GP-relative cell.
+   The original owner and semantic value remain unknown. */
+extern unsigned int D_001AA430;
+
+void LVL_2_MAKTAR_NEBULA_FUN_00330D68(unsigned int value)
+{
+    D_001AA430 = value;
+}
