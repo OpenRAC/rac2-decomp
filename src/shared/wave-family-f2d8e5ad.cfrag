@@ -1,0 +1,52 @@
+extern void @@ROLE_0_00@@(unsigned char *a, int b, unsigned char *c);
+extern void @@ROLE_1_00@@(unsigned char *a, long long v);
+extern void @@ROLE_2_00@@(unsigned char *a, long long v);
+extern void @@ROLE_3_00@@(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void @@ROLE_4_00@@(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void @@ROLE_5_00@@(unsigned char *a, unsigned char *b, float f);
+extern void @@ROLE_6_00@@(unsigned char *a, unsigned char *b, float f);
+extern void @@ROLE_7_00@@(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void @@ROLE_8_00@@(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void @@ROLE_9_00@@(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void @@ROLE_10_00@@(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void @@ROLE_11_00@@(unsigned char *a, unsigned char *b, unsigned char *c);
+extern void @@ROLE_12_00@@(unsigned char *a, unsigned char *b, float f);
+extern float @@ROLE_13_00@@(unsigned char *a, unsigned char *b);
+
+void @@FUNCTION@@(
+    unsigned char *obj, unsigned int index, unsigned char *dest)
+{
+    unsigned char m0[16];
+    unsigned char m1[16];
+    unsigned char *base;
+    unsigned char *p;
+    short n;
+
+    base = *(unsigned char **)(obj + 36);
+    p = base + ((unsigned int)*(unsigned char *)(base + 44) << 4);
+    p = p + ((index << 4) + 64u);
+    n = *(short *)(p + 6);
+    if (n < *(short *)(p + 14))
+        n = *(short *)(p + 14);
+    if (n >= 0)
+        @@ROLE_0_01@@(obj, n + 1, (unsigned char *)0x80000000u);
+    @@ROLE_1_01@@(m0, *(long long *)(p));
+    @@ROLE_2_01@@(m1, *(long long *)(p + 8));
+    *(float *)(m0 + 12) = 1.0f;
+    *(float *)(m1 + 12) = 1.0f;
+    if (n >= 0) {
+        @@ROLE_3_01@@(m0, m0, (unsigned char *)
+            (((unsigned int)*(short *)(p + 6) << 6) + 0x70000000u));
+        @@ROLE_4_01@@(m1, m1, (unsigned char *)
+            (((unsigned int)*(short *)(p + 14) << 6) + 0x70000000u));
+    }
+    @@ROLE_5_01@@(m0, m0, *(float *)(obj + 44) * 0.0009765625f);
+    @@ROLE_6_01@@(m1, m1, *(float *)(obj + 44) * 0.0009765625f);
+    @@ROLE_7_01@@(m0, m0, obj + 192);
+    @@ROLE_8_01@@(m1, m1, obj + 192);
+    @@ROLE_9_01@@(m0, m0, obj + 16);
+    @@ROLE_10_01@@(m1, m1, obj + 16);
+    @@ROLE_11_01@@(dest, m0, m1);
+    @@ROLE_12_01@@(dest, dest, 0.5f);
+    *(float *)(dest + 12) = @@ROLE_13_01@@(dest, m0);
+}

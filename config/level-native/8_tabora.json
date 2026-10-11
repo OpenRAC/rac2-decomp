@@ -74,6 +74,12 @@
     "LVL_8_TABORA_F1fa78648_FUN_002FADE0": 3124704,
     "LVL_8_TABORA_F1fa78648_FUN_00338508": 3376392,
     "LVL_8_TABORA_F1fa78648_FUN_00338538": 3376440,
+    "LVL_8_TABORA_F213135aa_FUN_002F9E20": 3120672,
+    "LVL_8_TABORA_F213135aa_FUN_002F9F08": 3120904,
+    "LVL_8_TABORA_F213135aa_FUN_002FA0B8": 3121336,
+    "LVL_8_TABORA_F213135aa_FUN_002FA638": 3122744,
+    "LVL_8_TABORA_F213135aa_FUN_003278F0": 3307760,
+    "LVL_8_TABORA_F213135aa_FUN_0032CD40": 3329344,
     "LVL_8_TABORA_F250fbfa4_FUN_002F9A90": 3119760,
     "LVL_8_TABORA_F250fbfa4_FUN_002F9DF0": 3120624,
     "LVL_8_TABORA_F250fbfa4_FUN_0033E208": 3400200,
@@ -163,6 +169,12 @@
     "LVL_8_TABORA_F55a1acb8_D_001A63AC": 1729452,
     "LVL_8_TABORA_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_8_TABORA_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_8_TABORA_F5a19df7a_FUN_00327898": 3307672,
+    "LVL_8_TABORA_F5a19df7a_FUN_003279B8": 3307960,
+    "LVL_8_TABORA_F5a19df7a_FUN_00389AB0": 3709616,
+    "LVL_8_TABORA_F5a19df7a_FUN_003E3E90": 4079248,
+    "LVL_8_TABORA_F5a19df7a_FUN_003E4268": 4080232,
+    "LVL_8_TABORA_F5a19df7a_FUN_003E4A90": 4082320,
     "LVL_8_TABORA_F5a9e4f98_FUN_004479C0": 4487616,
     "LVL_8_TABORA_F5a9e4f98_FUN_00447BE8": 4488168,
     "LVL_8_TABORA_F5a9e4f98_FUN_00447EE8": 4488936,
@@ -335,6 +347,18 @@
     "LVL_8_TABORA_Fb1b523716b470b36_AT00396AD8_ROLE01": 3120672,
     "LVL_8_TABORA_Fb1b523716b470b36_AT00399580_ROLE00": 3120624,
     "LVL_8_TABORA_Fb1b523716b470b36_AT00399580_ROLE01": 3120672,
+    "LVL_8_TABORA_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_8_TABORA_Fb1bbe20c_FUN_0036DA40": 3594816,
+    "LVL_8_TABORA_Fb1bbe20c_FUN_0044C648": 4507208,
+    "LVL_8_TABORA_Fb1bbe20c_FUN_0044C838": 4507704,
+    "LVL_8_TABORA_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_8_TABORA_Fb1c9893c_FUN_002E7838": 3045432,
+    "LVL_8_TABORA_Fb1c9893c_FUN_002F9DF0": 3120624,
+    "LVL_8_TABORA_Fb1c9893c_FUN_002FA298": 3121816,
+    "LVL_8_TABORA_Fb1c9893c_FUN_002FA3C8": 3122120,
+    "LVL_8_TABORA_Fb1c9893c_FUN_002FA3E0": 3122144,
+    "LVL_8_TABORA_Fb1c9893c_FUN_003278F0": 3307760,
+    "LVL_8_TABORA_Fb1c9893c_FUN_003279B8": 3307960,
     "LVL_8_TABORA_Fb342d477_D_0011AC40": 1158208,
     "LVL_8_TABORA_Fb342d477_D_0011AC60": 1158240,
     "LVL_8_TABORA_Fb342d477_FUN_00461FC8": 4595656,
@@ -452,6 +476,13 @@
     "LVL_8_TABORA_Ff26f272a_FUN_002FA658": 3122776,
     "LVL_8_TABORA_Ff26f272a_FUN_002FA8C0": 3123392,
     "LVL_8_TABORA_Ff26f272a_FUN_002FADE0": 3124704,
+    "LVL_8_TABORA_Ff2d8e5ad_FUN_002F9DF0": 3120624,
+    "LVL_8_TABORA_Ff2d8e5ad_FUN_002F9E60": 3120736,
+    "LVL_8_TABORA_Ff2d8e5ad_FUN_002F9F98": 3121048,
+    "LVL_8_TABORA_Ff2d8e5ad_FUN_002FA298": 3121816,
+    "LVL_8_TABORA_Ff2d8e5ad_FUN_002FA2C0": 3121856,
+    "LVL_8_TABORA_Ff2d8e5ad_FUN_002FA330": 3121968,
+    "LVL_8_TABORA_Ff2d8e5ad_FUN_00322698": 3286680,
     "LVL_8_TABORA_Ff4dd22f3_FUN_002F9A90": 3119760,
     "LVL_8_TABORA_Ff4dd22f3_FUN_002F9DF0": 3120624,
     "LVL_8_TABORA_Ff4dd22f3_FUN_0033E208": 3400200,
@@ -1000,6 +1031,12 @@
       "symbol": "LVL_8_TABORA_FUN_0031BFB8"
     },
     {
+      "address": 3267080,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_8_TABORA_FUN_0031DA08"
+    },
+    {
       "address": 3267784,
       "meaning": "shared native body of family 6251b968321f4f37",
       "size": 192,
@@ -1069,6 +1106,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_8_TABORA_FUN_00333F38"
+    },
+    {
+      "address": 3361712,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_8_TABORA_FUN_00334BB0"
     },
     {
       "address": 3364552,
@@ -1402,6 +1445,12 @@
       "symbol": "LVL_8_TABORA_FUN_00390AB8"
     },
     {
+      "address": 3745608,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_8_TABORA_FUN_00392748"
+    },
+    {
       "address": 3746024,
       "size": 8,
       "symbol": "LVL_8_TABORA_FUN_003928E8"
@@ -1579,6 +1628,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_8_TABORA_FUN_003E4888"
+    },
+    {
+      "address": 4081904,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_8_TABORA_FUN_003E48F0"
     },
     {
       "address": 4084024,
@@ -2055,16 +2110,34 @@
       "symbol": "LVL_8_TABORA_FUN_0044F2F0"
     },
     {
+      "address": 4518992,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_8_TABORA_FUN_0044F450"
+    },
+    {
       "address": 4519328,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_8_TABORA_FUN_0044F5A0"
     },
     {
+      "address": 4519680,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_8_TABORA_FUN_0044F700"
+    },
+    {
       "address": 4519832,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_8_TABORA_FUN_0044F798"
+    },
+    {
+      "address": 4520184,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_8_TABORA_FUN_0044F8F8"
     },
     {
       "address": 4520336,

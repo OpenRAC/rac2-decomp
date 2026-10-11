@@ -77,6 +77,12 @@
     "LVL_16_SNIVELAK_F1fa78648_FUN_002E84F0": 3048688,
     "LVL_16_SNIVELAK_F1fa78648_FUN_00322518": 3286296,
     "LVL_16_SNIVELAK_F1fa78648_FUN_00322548": 3286344,
+    "LVL_16_SNIVELAK_F213135aa_FUN_002E74B8": 3044536,
+    "LVL_16_SNIVELAK_F213135aa_FUN_002E75B8": 3044792,
+    "LVL_16_SNIVELAK_F213135aa_FUN_002E7788": 3045256,
+    "LVL_16_SNIVELAK_F213135aa_FUN_002E7D08": 3046664,
+    "LVL_16_SNIVELAK_F213135aa_FUN_00313F38": 3227448,
+    "LVL_16_SNIVELAK_F213135aa_FUN_00318538": 3245368,
     "LVL_16_SNIVELAK_F250fbfa4_FUN_002E7128": 3043624,
     "LVL_16_SNIVELAK_F250fbfa4_FUN_002E7488": 3044488,
     "LVL_16_SNIVELAK_F250fbfa4_FUN_00327D48": 3308872,
@@ -162,6 +168,12 @@
     "LVL_16_SNIVELAK_F55a1acb8_D_001A63AC": 1729452,
     "LVL_16_SNIVELAK_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_16_SNIVELAK_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_16_SNIVELAK_F5a19df7a_FUN_00313EE0": 3227360,
+    "LVL_16_SNIVELAK_F5a19df7a_FUN_00314000": 3227648,
+    "LVL_16_SNIVELAK_F5a19df7a_FUN_003731D0": 3617232,
+    "LVL_16_SNIVELAK_F5a19df7a_FUN_003C55E8": 3954152,
+    "LVL_16_SNIVELAK_F5a19df7a_FUN_003C59C0": 3955136,
+    "LVL_16_SNIVELAK_F5a19df7a_FUN_003C61E8": 3957224,
     "LVL_16_SNIVELAK_F5a9e4f98_FUN_00437518": 4420888,
     "LVL_16_SNIVELAK_F5a9e4f98_FUN_00437740": 4421440,
     "LVL_16_SNIVELAK_F5a9e4f98_FUN_00437A40": 4422208,
@@ -334,6 +346,18 @@
     "LVL_16_SNIVELAK_Fb1b523716b470b36_AT00380F60_ROLE01": 3044536,
     "LVL_16_SNIVELAK_Fb1b523716b470b36_AT00383A08_ROLE00": 3044488,
     "LVL_16_SNIVELAK_Fb1b523716b470b36_AT00383A08_ROLE01": 3044536,
+    "LVL_16_SNIVELAK_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_16_SNIVELAK_Fb1bbe20c_FUN_003573E8": 3503080,
+    "LVL_16_SNIVELAK_Fb1bbe20c_FUN_0043C1A0": 4440480,
+    "LVL_16_SNIVELAK_Fb1bbe20c_FUN_0043C390": 4440976,
+    "LVL_16_SNIVELAK_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_16_SNIVELAK_Fb1c9893c_FUN_002D4CC8": 2968776,
+    "LVL_16_SNIVELAK_Fb1c9893c_FUN_002E7488": 3044488,
+    "LVL_16_SNIVELAK_Fb1c9893c_FUN_002E7968": 3045736,
+    "LVL_16_SNIVELAK_Fb1c9893c_FUN_002E7A98": 3046040,
+    "LVL_16_SNIVELAK_Fb1c9893c_FUN_002E7AB0": 3046064,
+    "LVL_16_SNIVELAK_Fb1c9893c_FUN_00313F38": 3227448,
+    "LVL_16_SNIVELAK_Fb1c9893c_FUN_00314000": 3227648,
     "LVL_16_SNIVELAK_Fb342d477_D_0011AC40": 1158208,
     "LVL_16_SNIVELAK_Fb342d477_D_0011AC60": 1158240,
     "LVL_16_SNIVELAK_Fb342d477_FUN_00451B20": 4528928,
@@ -446,6 +470,13 @@
     "LVL_16_SNIVELAK_Ff26f272a_FUN_002E7D28": 3046696,
     "LVL_16_SNIVELAK_Ff26f272a_FUN_002E7F90": 3047312,
     "LVL_16_SNIVELAK_Ff26f272a_FUN_002E84F0": 3048688,
+    "LVL_16_SNIVELAK_Ff2d8e5ad_FUN_002E7488": 3044488,
+    "LVL_16_SNIVELAK_Ff2d8e5ad_FUN_002E7510": 3044624,
+    "LVL_16_SNIVELAK_Ff2d8e5ad_FUN_002E7648": 3044936,
+    "LVL_16_SNIVELAK_Ff2d8e5ad_FUN_002E7968": 3045736,
+    "LVL_16_SNIVELAK_Ff2d8e5ad_FUN_002E7990": 3045776,
+    "LVL_16_SNIVELAK_Ff2d8e5ad_FUN_002E7A00": 3045888,
+    "LVL_16_SNIVELAK_Ff2d8e5ad_FUN_0030ED10": 3206416,
     "LVL_16_SNIVELAK_Ff4dd22f3_FUN_002E7128": 3043624,
     "LVL_16_SNIVELAK_Ff4dd22f3_FUN_002E7488": 3044488,
     "LVL_16_SNIVELAK_Ff4dd22f3_FUN_00327D48": 3308872,
@@ -970,6 +1001,12 @@
       "symbol": "LVL_16_SNIVELAK_FUN_00308680"
     },
     {
+      "address": 3186896,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_16_SNIVELAK_FUN_0030A0D0"
+    },
+    {
       "address": 3187600,
       "meaning": "shared native body of family 6251b968321f4f37",
       "size": 192,
@@ -1039,6 +1076,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_16_SNIVELAK_FUN_0031DD50"
+    },
+    {
+      "address": 3271224,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_16_SNIVELAK_FUN_0031EA38"
     },
     {
       "address": 3272632,
@@ -1372,6 +1415,12 @@
       "symbol": "LVL_16_SNIVELAK_FUN_00377EA8"
     },
     {
+      "address": 3644216,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_16_SNIVELAK_FUN_00379B38"
+    },
+    {
       "address": 3644632,
       "size": 8,
       "symbol": "LVL_16_SNIVELAK_FUN_00379CD8"
@@ -1561,6 +1610,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_16_SNIVELAK_FUN_003C5FE0"
+    },
+    {
+      "address": 3956808,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_16_SNIVELAK_FUN_003C6048"
     },
     {
       "address": 3958928,
@@ -2091,16 +2146,34 @@
       "symbol": "LVL_16_SNIVELAK_FUN_0043EE48"
     },
     {
+      "address": 4452264,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_16_SNIVELAK_FUN_0043EFA8"
+    },
+    {
       "address": 4452600,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_16_SNIVELAK_FUN_0043F0F8"
     },
     {
+      "address": 4452952,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_16_SNIVELAK_FUN_0043F258"
+    },
+    {
       "address": 4453104,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_16_SNIVELAK_FUN_0043F2F0"
+    },
+    {
+      "address": 4453456,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_16_SNIVELAK_FUN_0043F450"
     },
     {
       "address": 4453608,

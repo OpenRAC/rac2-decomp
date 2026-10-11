@@ -78,6 +78,12 @@
     "LVL_22_DOBBO_ORBIT_F1fa78648_FUN_002F4A88": 3099272,
     "LVL_22_DOBBO_ORBIT_F1fa78648_FUN_0032E1B0": 3334576,
     "LVL_22_DOBBO_ORBIT_F1fa78648_FUN_0032E1E0": 3334624,
+    "LVL_22_DOBBO_ORBIT_F213135aa_FUN_002F3AB0": 3095216,
+    "LVL_22_DOBBO_ORBIT_F213135aa_FUN_002F3BB0": 3095472,
+    "LVL_22_DOBBO_ORBIT_F213135aa_FUN_002F3D60": 3095904,
+    "LVL_22_DOBBO_ORBIT_F213135aa_FUN_002F42E0": 3097312,
+    "LVL_22_DOBBO_ORBIT_F213135aa_FUN_0031FD20": 3276064,
+    "LVL_22_DOBBO_ORBIT_F213135aa_FUN_003240F8": 3293432,
     "LVL_22_DOBBO_ORBIT_F250fbfa4_FUN_002F3720": 3094304,
     "LVL_22_DOBBO_ORBIT_F250fbfa4_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_F250fbfa4_FUN_003330A8": 3354792,
@@ -165,6 +171,12 @@
     "LVL_22_DOBBO_ORBIT_F55a1acb8_D_001A63AC": 1729452,
     "LVL_22_DOBBO_ORBIT_F55a1acb8_FUN_0011AEA0": 1158816,
     "LVL_22_DOBBO_ORBIT_F55a1acb8_FUN_00133688": 1259144,
+    "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_0031FCC8": 3275976,
+    "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_0031FDE8": 3276264,
+    "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_0037EC88": 3665032,
+    "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_003D25F8": 4007416,
+    "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_003D29D0": 4008400,
+    "LVL_22_DOBBO_ORBIT_F5a19df7a_FUN_003D31F8": 4010488,
     "LVL_22_DOBBO_ORBIT_F5a9e4f98_FUN_0042C4D0": 4375760,
     "LVL_22_DOBBO_ORBIT_F5a9e4f98_FUN_0042C6F8": 4376312,
     "LVL_22_DOBBO_ORBIT_F5a9e4f98_FUN_0042C9F8": 4377080,
@@ -320,6 +332,18 @@
     "LVL_22_DOBBO_ORBIT_Fb1b523716b470b36_AT003899A8_ROLE01": 3095216,
     "LVL_22_DOBBO_ORBIT_Fb1b523716b470b36_AT0038C450_ROLE00": 3095168,
     "LVL_22_DOBBO_ORBIT_Fb1b523716b470b36_AT0038C450_ROLE01": 3095216,
+    "LVL_22_DOBBO_ORBIT_Fb1bbe20c_D_001A7BB2": 1735602,
+    "LVL_22_DOBBO_ORBIT_Fb1bbe20c_FUN_00362E98": 3550872,
+    "LVL_22_DOBBO_ORBIT_Fb1bbe20c_FUN_00431158": 4395352,
+    "LVL_22_DOBBO_ORBIT_Fb1bbe20c_FUN_00431348": 4395848,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_D_001A8FF0": 1740784,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_FUN_002E1C40": 3021888,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_FUN_002F3A80": 3095168,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_FUN_002F3F40": 3096384,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_FUN_002F4070": 3096688,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_FUN_002F4088": 3096712,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_FUN_0031FD20": 3276064,
+    "LVL_22_DOBBO_ORBIT_Fb1c9893c_FUN_0031FDE8": 3276264,
     "LVL_22_DOBBO_ORBIT_Fb342d477_D_0011AC40": 1158208,
     "LVL_22_DOBBO_ORBIT_Fb342d477_D_0011AC60": 1158240,
     "LVL_22_DOBBO_ORBIT_Fb342d477_FUN_00446AD8": 4483800,
@@ -429,6 +453,13 @@
     "LVL_22_DOBBO_ORBIT_Ff26f272a_FUN_002F4300": 3097344,
     "LVL_22_DOBBO_ORBIT_Ff26f272a_FUN_002F4568": 3097960,
     "LVL_22_DOBBO_ORBIT_Ff26f272a_FUN_002F4A88": 3099272,
+    "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3A80": 3095168,
+    "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3AF0": 3095280,
+    "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3C40": 3095616,
+    "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3F40": 3096384,
+    "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3F68": 3096424,
+    "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_002F3FD8": 3096536,
+    "LVL_22_DOBBO_ORBIT_Ff2d8e5ad_FUN_0031AAF8": 3255032,
     "LVL_22_DOBBO_ORBIT_Ff4dd22f3_FUN_002F3720": 3094304,
     "LVL_22_DOBBO_ORBIT_Ff4dd22f3_FUN_002F3A80": 3095168,
     "LVL_22_DOBBO_ORBIT_Ff4dd22f3_FUN_003330A8": 3354792,
@@ -972,6 +1003,12 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00314468"
     },
     {
+      "address": 3235512,
+      "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
+      "size": 412,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00315EB8"
+    },
+    {
       "address": 3238136,
       "meaning": "Reserve or reuse an object slot, reset its associated state and return signed slot index",
       "size": 84,
@@ -1029,6 +1066,12 @@
       "meaning": "Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result.",
       "size": 88,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_0032A5A0"
+    },
+    {
+      "address": 3321552,
+      "meaning": "Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit.",
+      "size": 428,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_0032AED0"
     },
     {
       "address": 3322784,
@@ -1344,6 +1387,12 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_003838C8"
     },
     {
+      "address": 3691864,
+      "meaning": "Initializes or refreshes one 48-byte entry: zero x/y inputs are replaced by helper-generated values scaled by pi/180, nonzero inputs pass through, related pointers and transforms are stored, and state is marked 4.",
+      "size": 412,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00385558"
+    },
+    {
       "address": 3692280,
       "size": 8,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_003856F8"
@@ -1527,6 +1576,12 @@
       "meaning": "Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper.",
       "size": 104,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_003D2FF0"
+    },
+    {
+      "address": 4010072,
+      "meaning": "Brackets and emits four scaled command records using the object stored scale and destination list.",
+      "size": 412,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_003D3058"
     },
     {
       "address": 4012192,
@@ -1997,16 +2052,34 @@
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_00433E00"
     },
     {
+      "address": 4407136,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00433F60"
+    },
+    {
       "address": 4407472,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_004340B0"
     },
     {
+      "address": 4407824,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00434210"
+    },
+    {
       "address": 4407976,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "size": 44,
       "symbol": "LVL_22_DOBBO_ORBIT_FUN_004342A8"
+    },
+    {
+      "address": 4408328,
+      "meaning": "Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6.",
+      "size": 152,
+      "symbol": "LVL_22_DOBBO_ORBIT_FUN_00434408"
     },
     {
       "address": 4408480,

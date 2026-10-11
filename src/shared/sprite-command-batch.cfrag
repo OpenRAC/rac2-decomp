@@ -1,0 +1,47 @@
+extern void @@ROLE_0_00@@(unsigned int a, unsigned long b);
+extern void @@ROLE_1_00@@(char *p);
+extern void @@ROLE_2_00@@(char *p);
+extern char *@@ROLE_3_00@@(int a, int b);
+extern float @@ROLE_4_00@@(void);
+extern void @@ROLE_5_00@@(char *a, int b, float e, char *c, float f, int d, int g);
+
+void @@FUNCTION@@(char *p)
+{
+    char *q;
+    char *o;
+    char *r;
+    float v;
+    float w;
+
+    q = p + 16;
+    o = *(char **)(p + 104);
+    @@ROLE_0_01@@(0x47, 0x53001UL);
+    @@ROLE_1_01@@(p);
+    @@ROLE_2_01@@(p);
+
+    v = *(float *)(o + 24);
+    v = v * 0.5f;
+    r = @@ROLE_3_01@@(80, 96);
+    w = @@ROLE_4_01@@();
+    @@ROLE_5_01@@(q, 0x103080, v, r, w, 49, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 3.00000011920928955078125e-01f;
+    r = @@ROLE_3_02@@(80, 96);
+    w = @@ROLE_4_02@@();
+    @@ROLE_5_02@@(q, 0xFFFFFF, v, r, w, 49, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 6.99999988079071044921875e-01f;
+    r = @@ROLE_3_03@@(8, 22);
+    w = @@ROLE_4_03@@();
+    @@ROLE_5_03@@(q, 0x803010, v, r, w, 11, 2);
+
+    v = *(float *)(o + 24);
+    v = v * 4.49999988079071044921875e-01f;
+    r = @@ROLE_3_04@@(32, 64);
+    w = @@ROLE_4_04@@();
+    @@ROLE_5_04@@(q, 0x803010, v, r, w, 11, 2);
+
+    @@ROLE_0_02@@(0x47, 0x5360bUL);
+}

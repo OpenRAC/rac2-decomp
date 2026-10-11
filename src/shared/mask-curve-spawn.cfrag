@@ -1,0 +1,39 @@
+extern float @@ROLE_0_00@@(void);
+extern float @@ROLE_1_00@@(float, float);
+extern float @@ROLE_2_00@@(float);
+extern float @@ROLE_3_00@@(float);
+extern void @@ROLE_5_00@@(float *dst, float *src, char *table);
+extern void @@ROLE_6_00@@(float *dst, float *src, int arg);
+extern int @@BIND_DATA0_00@@ __attribute__((sda));
+extern void @@ROLE_9_00@@(char *self, int a1, int a2, int a3, char *p4, char *p5,
+                    float *buf, int b3, float fa, float fb);
+
+void @@FUNCTION@@(char *self, int mask, int arg2,
+                                        unsigned char arg3,
+                                        float f0, float f1, float f2, float f3)
+{
+    float buf[3];
+    float v;
+    float k;
+    float fa;
+    float fb;
+    int i;
+
+    for (i = 0; i < 15; i++) {
+        if (((mask >> i) ^ 1) & 1)
+            continue;
+        v = @@ROLE_0_01@@();
+        k = @@ROLE_1_01@@(f0, f1) * (1.0f / 60.0f);
+        buf[0] = @@ROLE_2_01@@(v) * k;
+        buf[1] = @@ROLE_3_01@@(v) * k;
+        buf[2] = 0.0f;
+        buf[2] = @@ROLE_1_02@@(f2, f3) * (1.0f / 60.0f);
+        if (@@BIND_DATA0_01@@ != 0)
+            @@ROLE_5_01@@(buf, buf, self + 192);
+        @@ROLE_6_01@@(buf, buf, arg2);
+        fa = @@ROLE_1_03@@(90.0f, 270.0f);
+        fb = @@ROLE_1_04@@(10.0f, 20.0f);
+        @@ROLE_9_01@@(self, 2, *(short *)(self + 170), i, self + 16, self + 240,
+                buf, arg3, fa, fb);
+    }
+}
