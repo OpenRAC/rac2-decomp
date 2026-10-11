@@ -774,11 +774,16 @@
       "boundary_evidence": "authoritative contiguous source fragment; not an original object boundary",
       "fragment": "src/shared/lot6-f67aa9dff0edd370.cfrag",
       "name": "lot6-f67aa9dff0edd370"
+    },
+    {
+      "boundary_evidence": "authoritative contiguous source fragment; not an original object boundary",
+      "fragment": "src/boot/19-second-argument-forwarder.cfrag",
+      "name": "19-second-argument-forwarder"
     }
   ],
   "generator_sha256": "2df65a61fe2b3678790a98a91e94d7c99a9768f07a39cbad6abfb9a66082d3d7",
   "input_sha256": {
-    "candidates/boot.c": "1dc14d367f3282da95748dcd99532d46f13e03b44c2fbd3408208b5f60e972b2",
+    "candidates/boot.c": "95d0e59ef3c6ace619eb06423518797623765b9d51cf0b890ed723a0496a0ef2",
     "candidates/levels/0_aranos_tutorial-g8.c": "2b2a91791c68383dded5258753d82276695ac0abf0d9681e41a47ea7c0509c08",
     "candidates/levels/0_aranos_tutorial.c": "f0f3ae6d240e5cafe903fb101f343e9b1da581058fce623ef4cd155e4ca425df",
     "candidates/levels/10_hrugis_cloud-g8.c": "c5ae367859c70d7ea5247534395033888c68104ea073b652abb29805a8aa657c",
@@ -839,7 +844,7 @@
     "config/boot-units/sdk-cpr8.json": "d3b35d02f2ab660e84aeedf65aabde12b89286d97ba012bc27fa8fd5291175c5",
     "config/boot-units/sdk-ipu-restart-dma.json": "186e6faca67f024ca46baf69e37b0625cbaae33cc143df3204d9d01332175c31",
     "config/boot-units/sdk-sysbit-flush.json": "8997e4370cf6c1a4aaf13d44c4234d78b0226618a7895319ecc1618d93e1d031",
-    "config/candidate-catalog.json": "0bce2d90e9e17e8c6f0fe73f2694999860aa129a854b610fdce4f73c2e86d216",
+    "config/candidate-catalog.json": "8843ff8f5bc5f017401cb903d6b91f60b551e658d72f1ef90b35a4659459598c",
     "config/compiler-profiles/owned-sdk-b9-single-text-controls-v1.json": "b6274a824c321458200375da3012c3cd35163f1994402caf6f9c78bfb71023b6",
     "config/level-g8/0_aranos_tutorial.json": "c34bad8c07d55a46fe687f10265d4c6646bdd25b6cd6f90e484fedff174d0903",
     "config/level-g8/10_hrugis_cloud.json": "48373fa338fe82e3806b617dc5ecfba742b5b523a62350f6acc74937b8488d33",
@@ -903,8 +908,8 @@
   },
   "machine_proof_status": "unverified after authoring; regenerate all affected reviews and loaded-byte gates",
   "metrics": {
-    "boot_authored_functions": 373,
-    "boot_catalogued_machine_bytes": 28960,
+    "boot_authored_functions": 374,
+    "boot_catalogued_machine_bytes": 28968,
     "identity_basis": "catalogued definitions compared as exact source bytes after recorded symbol-only substitutions; not a new machine proof",
     "native_authored_variant_catalogued_bytes_upper_bound": 816920,
     "native_base_family_placements": 1636,
@@ -923,7 +928,7 @@
     "sdk_authored_functions": 3,
     "sdk_catalogued_machine_bytes": 1144,
     "shared_native_prelude_variants": 29,
-    "total_unique_authored_source_variants_in_scope": 7040,
+    "total_unique_authored_source_variants_in_scope": 7041,
     "warning": "Representative catalogued bytes are an organization metric, not loaded-byte progress or a new accepted match. Do not add this numerator to the public report."
   },
   "native_source_families": [
@@ -132836,10 +132841,15 @@
           },
           "sha256": "3c05c394b20c5f1f6002299c110594f24dbe037f73767c0ca205937a1ac0ea67",
           "source_text_bytes": 876
+        },
+        {
+          "fragment": "src/boot/19-second-argument-forwarder.cfrag",
+          "sha256": "089cc5f4a2891ba3ef0a4231619cf8ba8b28acf15383c9fb060d0da1f7a58d2c",
+          "source_text_bytes": 79
         }
       ],
-      "sha256": "1dc14d367f3282da95748dcd99532d46f13e03b44c2fbd3408208b5f60e972b2",
-      "source_text_bytes": 157787
+      "sha256": "95d0e59ef3c6ace619eb06423518797623765b9d51cf0b890ed723a0496a0ef2",
+      "source_text_bytes": 157866
     },
     "candidates/levels/0_aranos_tutorial-g8.c": {
       "pieces": [

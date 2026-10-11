@@ -1050,13 +1050,20 @@ Reopen condition: Measured original source or callee ABI evidence addressing the
 
 ## boot-fun_00351578
 
-State: `stopped`. Kind: `research`.
+State: `queued`. Kind: `research`.
 
-Inspect current Ghidra ABI and call boundaries, then plan one complete-unit C trial.
+Prepare a fresh private cross-program candidate bank from the measured ABI, caller, division, loop, and field evidence. Record a separate candidate task and compare the complete 420-byte symbol against each reserved boot/overlay placement using the current qualified profile; preserve all prior mismatches. Run full integration gates only if every selected body is exact.
 
 Reopen condition: Measured division guard, loop CFG or original type evidence addressing the remaining complete-size refusal
 
 - `config/candidate-catalog.json`
+- `runtime:analysis/survey-7223c789-20261011/boot-exact-body-reopen-scope-review.json`
+- `runtime:analysis/survey-7223c789-20261011/static-report.json`
+- `runtime:analysis/survey-7223c789-20261011/static-review-supplement.json`
+- `runtime:analysis/survey-7223c789-20261011/review.txt`
+- `runtime:analysis/survey-7223c789-20261011/caller-family.txt`
+- `runtime:analysis/survey-7223c789-20261011/target-0_aranos_tutorial-00446eb8.asm`
+- `runtime:analysis/survey-7223c789-20261011/caller-0_aranos_tutorial-004476d8.asm`
 
 ## boot-once-registration164-v1-20261006
 
@@ -30179,6 +30186,32 @@ State: `integrated`. Kind: `candidate`.
 Compare all complete native symbols and declared read-only sections; retain every refusal, then require boot and all 27 complete loaded-image gates before integration.
 
 Reopen condition: Independent measured ABI/layout/compiler-context evidence; no flag cycling or partial/masked acceptance.
+
+## pointer-forwarder-family-g0-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Run guarded finalization for full-image integration action 71bd61cab65b49348f7dec0aa6f76ced, then verify that the published strict proofs close every listed placement.
+
+Reopen condition: Retain any mismatch. Reopen only with new measured ABI, type, boundary, or qualified-lowering evidence; do not cycle casts or equivalent expressions.
+
+- `progress/code-reuse-families.json.gz`
+- `progress/report.json`
+- `Runtime/work/pointer-forwarder-20261011/static-review.md`
+- `Runtime/work/reservation-pointer-family-20261011.json`
+
+## pointer-forwarder-family-g8-20261011
+
+State: `integrated`. Kind: `candidate`.
+
+Run guarded finalization for full-image integration action 71bd61cab65b49348f7dec0aa6f76ced, then verify that the published strict proofs close every listed placement.
+
+Reopen condition: Retain any mismatch. Reopen only with new measured ABI, type, boundary, or qualified-lowering evidence; do not cycle casts or equivalent expressions.
+
+- `progress/code-reuse-families.json.gz`
+- `progress/report.json`
+- `Runtime/work/pointer-forwarder-20261011/static-review.md`
+- `Runtime/work/reservation-pointer-family-20261011.json`
 
 ## pr54-liolu-boot-fun_0011b0a0
 

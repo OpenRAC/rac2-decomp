@@ -6195,3 +6195,4 @@ void FUN_0027EAE8(int i0, int i1, int i2, int i3, int tag, void *x)
          | ((long long)tag << 32);
     Ff67aa9df_FUN_0027EA28(v, x);
 }
+void *FUN_00336DA8(void *first, void *second) { (void) first; return second; }

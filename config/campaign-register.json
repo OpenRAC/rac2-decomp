@@ -827,6 +827,19 @@
       "returncode": 0,
       "state": "passed"
     },
+    "71bd61cab65b49348f7dec0aa6f76ced": {
+      "action_manifest_sha256": "c8d39b46402ce3c232be9cc89b6f17b7542d12276fdbd881d6f29e3eee97e2de",
+      "action_outcome_sha256": "080a904f50b2e5ae67beeee03efbdd2c8d64266eefd0332f7c8c1229d36432bd",
+      "artifact": "runtime:runs/20261008T134500Z-a6a86dcc/builds/campaign-71bd61cab65b49348f7dec0aa6f76ced/report.json",
+      "artifact_sha256": "68042a23174f3e70eb8105cb8484b4318db42c01ee299552b9980fef900e5620",
+      "directory": "runtime:actions/71bd61cab65b49348f7dec0aa6f76ced",
+      "finished": "2026-10-11T04:29:44.885713+00:00",
+      "id": "71bd61cab65b49348f7dec0aa6f76ced",
+      "integration_credit": 0,
+      "kind": "integrate",
+      "returncode": 0,
+      "state": "passed"
+    },
     "71d74d712eaa41899be6ec8178555944": {
       "artifact": "prepared-run:builds/campaign-71d74d712eaa41899be6ec8178555944/report.json",
       "artifact_sha256": "cc56456c73c7b26fca04b2c55608162c931ccf9d5e3ad432c2a2edc8e7d1c235",
@@ -1399,6 +1412,19 @@
       "directory": "runtime:actions/bf994c3d821045ae98e26e8d336e8c3d",
       "finished": "2026-10-04T12:35:40.063671+00:00",
       "id": "bf994c3d821045ae98e26e8d336e8c3d",
+      "integration_credit": 0,
+      "kind": "integrate",
+      "returncode": 0,
+      "state": "passed"
+    },
+    "c0656d3a09f145928231b26e6b94bdfe": {
+      "action_manifest_sha256": "32e58bfd1aa78c8a72f1b13e691bbb8912d80fe1f654a292b3d588c8049a694d",
+      "action_outcome_sha256": "679e038977934d2eb28acaac21010e38f414faa527f477a539efbcbb0859aff3",
+      "artifact": "runtime:runs/20261008T134500Z-a6a86dcc/builds/campaign-c0656d3a09f145928231b26e6b94bdfe/report.json",
+      "artifact_sha256": "800490e1628406f689b409bf7eeb2ff1c15376ff4a91ddfeff5aaa7cf8428c95",
+      "directory": "runtime:actions/c0656d3a09f145928231b26e6b94bdfe",
+      "finished": "2026-10-11T04:40:51.855333+00:00",
+      "id": "c0656d3a09f145928231b26e6b94bdfe",
       "integration_credit": 0,
       "kind": "integrate",
       "returncode": 0,
@@ -5259,7 +5285,7 @@
       "validity": "historical_unverified"
     }
   },
-  "revision": 13380,
+  "revision": 13400,
   "schema": 1,
   "tasks": {
     "24_ship_shack-fun_002a3e18": {
@@ -9229,6 +9255,7 @@
       ]
     },
     "boot-fun_00351578": {
+      "abi": "Measured live inputs are a0 and a1; a0 is a context pointer and a1 points to two 64-bit output slots. a2 is first used as the destination of three-operand MULT; a3 is initialized before use. The direct caller ignores v0. The 27 overlay copies have one direct static caller each and no interior xrefs.",
       "address": 3478904,
       "amendments": [
         {
@@ -9265,27 +9292,78 @@
             }
           },
           "reason": "Align the queued packet with the documented Ghidra boot program identity and private environment sheet"
+        },
+        {
+          "at": "2026-10-11T04:03:17.113736+00:00",
+          "before": {
+            "abi": null,
+            "context": {
+              "ghidra_program": "/SCUS_972.68",
+              "program": "boot",
+              "reference_sha256": "36d5814d8d95328d5839612ccdf7a2e7ecac0b6f868d3ad4bb2e98411f734b4a",
+              "source_context": "Ordered src/boot fragments preserve current shared declarations. Confirm live Ghidra executable identity against the pin before analyzing ABI."
+            },
+            "hypothesis": "",
+            "next_action": "Inspect current Ghidra ABI and call boundaries, then plan one complete-unit C trial.",
+            "pointers": [
+              "config/candidate-catalog.json"
+            ],
+            "remaining_difference": null,
+            "types": null
+          },
+          "changes": {
+            "abi": "Measured live inputs are a0 and a1; a0 is a context pointer and a1 points to two 64-bit output slots. a2 is first used as the destination of three-operand MULT; a3 is initialized before use. The direct caller ignores v0. The 27 overlay copies have one direct static caller each and no interior xrefs.",
+            "context": {
+              "ghidra_program": "/SCUS_972.68",
+              "program": "boot",
+              "reference_sha256": "36d5814d8d95328d5839612ccdf7a2e7ecac0b6f868d3ad4bb2e98411f734b4a",
+              "source_context": "Pinned read-only boot and overlay evidence is recorded in runtime:analysis/survey-7223c789-20261011; all 28 spans must still pass their own complete-symbol and full-image checks."
+            },
+            "hypothesis": "New measured division guards, loop control flow, and context layout directly address the research task's recorded reopening condition. The complete 420-byte body is identical across boot and 27 overlays; that shared body is evidence of a candidate family, not proof of original source or ABI equivalence. Any compiler attempt must use a new ordinary-C source hypothesis and retain the v1/v2 refusals.",
+            "next_action": "Prepare a fresh private cross-program candidate bank from the measured ABI, caller, division, loop, and field evidence. Record a separate candidate task and compare the complete 420-byte symbol against each reserved boot/overlay placement using the current qualified profile; preserve all prior mismatches. Run full integration gates only if every selected body is exact.",
+            "pointers": [
+              "config/candidate-catalog.json",
+              "runtime:analysis/survey-7223c789-20261011/boot-exact-body-reopen-scope-review.json",
+              "runtime:analysis/survey-7223c789-20261011/static-report.json",
+              "runtime:analysis/survey-7223c789-20261011/static-review-supplement.json",
+              "runtime:analysis/survey-7223c789-20261011/review.txt",
+              "runtime:analysis/survey-7223c789-20261011/caller-family.txt",
+              "runtime:analysis/survey-7223c789-20261011/target-0_aranos_tutorial-00446eb8.asm",
+              "runtime:analysis/survey-7223c789-20261011/caller-0_aranos_tutorial-004476d8.asm"
+            ],
+            "remaining_difference": "Prior v1/v2 candidates measured 444 and 440 bytes versus the complete 420-byte reference body. The new survey supplies measured guard, loop-CFG, caller, and layout evidence; no fresh C candidate or compiler result exists yet. The catalog boundary remains flow-supported inferred, not STT_FUNC-proven.",
+            "types": "Measured context accesses are 32-bit at +0,+8,+0x38,+0x40,+0x50,+0x54,+0x58,+0x5c. The +0x50 field points to 24-byte records containing qwords at +0/+8 and words at +0x10/+0x14. The +0x58 field is conditionally updated as a 32-bit value. Signed DIV and unsigned DIVU both occur behind measured zero-divisor guards."
+          },
+          "reason": "2026-10-11 read-only survey meets the recorded reopen predicate with measured BEQL division guards, a closed reachable loop CFG, context field layout, direct caller ABI, and exact 420-byte boot-to-27-overlay body corroboration; no compiler run or source hypothesis was reused."
         }
       ],
       "context": {
         "ghidra_program": "/SCUS_972.68",
         "program": "boot",
         "reference_sha256": "36d5814d8d95328d5839612ccdf7a2e7ecac0b6f868d3ad4bb2e98411f734b4a",
-        "source_context": "Ordered src/boot fragments preserve current shared declarations. Confirm live Ghidra executable identity against the pin before analyzing ABI."
+        "source_context": "Pinned read-only boot and overlay evidence is recorded in runtime:analysis/survey-7223c789-20261011; all 28 spans must still pass their own complete-symbol and full-image checks."
       },
       "created": "2026-10-04T01:19:03.942935+00:00",
-      "hypothesis": "",
+      "hypothesis": "New measured division guards, loop control flow, and context layout directly address the research task's recorded reopening condition. The complete 420-byte body is identical across boot and 27 overlays; that shared body is evidence of a candidate family, not proof of original source or ABI equivalence. Any compiler attempt must use a new ordinary-C source hypothesis and retain the v1/v2 refusals.",
       "id": "boot-fun_00351578",
       "kind": "research",
-      "next_action": "Inspect current Ghidra ABI and call boundaries, then plan one complete-unit C trial.",
+      "next_action": "Prepare a fresh private cross-program candidate bank from the measured ABI, caller, division, loop, and field evidence. Record a separate candidate task and compare the complete 420-byte symbol against each reserved boot/overlay placement using the current qualified profile; preserve all prior mismatches. Run full integration gates only if every selected body is exact.",
       "pointers": [
-        "config/candidate-catalog.json"
+        "config/candidate-catalog.json",
+        "runtime:analysis/survey-7223c789-20261011/boot-exact-body-reopen-scope-review.json",
+        "runtime:analysis/survey-7223c789-20261011/static-report.json",
+        "runtime:analysis/survey-7223c789-20261011/static-review-supplement.json",
+        "runtime:analysis/survey-7223c789-20261011/review.txt",
+        "runtime:analysis/survey-7223c789-20261011/caller-family.txt",
+        "runtime:analysis/survey-7223c789-20261011/target-0_aranos_tutorial-00446eb8.asm",
+        "runtime:analysis/survey-7223c789-20261011/caller-0_aranos_tutorial-004476d8.asm"
       ],
       "priority": 40,
       "program": "boot",
+      "remaining_difference": "Prior v1/v2 candidates measured 444 and 440 bytes versus the complete 420-byte reference body. The new survey supplies measured guard, loop-CFG, caller, and layout evidence; no fresh C candidate or compiler result exists yet. The catalog boundary remains flow-supported inferred, not STT_FUNC-proven.",
       "reopen_condition": "Measured division guard, loop CFG or original type evidence addressing the remaining complete-size refusal",
       "size": 420,
-      "state": "stopped",
+      "state": "queued",
       "symbols": [
         "FUN_00351578"
       ],
@@ -9296,8 +9374,16 @@
           "reason": "Two fresh full-context trials produce 444 and 440 bytes against the pinned 420-byte body; each retains 178 exact controls. Index-lifetime correction alone is insufficient.",
           "reopen_condition": "Measured division guard, loop CFG or original type evidence addressing the remaining complete-size refusal",
           "to": "stopped"
+        },
+        {
+          "at": "2026-10-11T04:04:18.982696+00:00",
+          "from": "stopped",
+          "reason": "2026-10-11 static survey meets the recorded reopen predicate with measured division guards, loop CFG, context layout, caller ABI, and exact family body corroboration.",
+          "reopen_condition": "",
+          "to": "queued"
         }
-      ]
+      ],
+      "types": "Measured context accesses are 32-bit at +0,+8,+0x38,+0x40,+0x50,+0x54,+0x58,+0x5c. The +0x50 field points to 24-byte records containing qwords at +0/+8 and words at +0x10/+0x14. The +0x58 field is conditionally updated as a 32-bit value. Signed DIV and unsigned DIVU both occur behind measured zero-divisor guards."
     },
     "boot-once-registration164-v1-20261006": {
       "address": 2807736,
@@ -203977,6 +204063,624 @@
         }
       ]
     },
+    "pointer-forwarder-family-g0-20261011": {
+      "abi": "Callers pass the pointer-like second value in a1 and consume v0 as a pointer; the body returns a1. Full family span and caller evidence are linked below.",
+      "amendments": [
+        {
+          "at": "2026-10-11T04:30:58.086570+00:00",
+          "before": {
+            "next_action": "Run one fresh G0 campaign trial and compare the complete 8-byte function at every same-profile placement in this family.",
+            "remaining_difference": "No fresh compiler measurement yet. Exact private trial is not integration credit; each selected span still needs admitted source placement and all affected full-image gates.",
+            "targets": [
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/boot_00336DA8.json",
+                "id": "boot_00336DA8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/boot.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_0_aranos_tutorial_0042C6D0.json",
+                "id": "levels_0_aranos_tutorial_0042C6D0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/0_aranos_tutorial/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_10_hrugis_cloud_00449988.json",
+                "id": "levels_10_hrugis_cloud_00449988",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/10_hrugis_cloud/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_11_joba_0048E028.json",
+                "id": "levels_11_joba_0048E028",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/11_joba/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_12_todano_00442E70.json",
+                "id": "levels_12_todano_00442E70",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/12_todano/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_13_boldan_004407C8.json",
+                "id": "levels_13_boldan_004407C8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/13_boldan/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_14_aranos_prison_0044A9C0.json",
+                "id": "levels_14_aranos_prison_0044A9C0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/14_aranos_prison/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_15_gorn_00454A48.json",
+                "id": "levels_15_gorn_00454A48",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/15_gorn/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_16_snivelak_00438118.json",
+                "id": "levels_16_snivelak_00438118",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/16_snivelak/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_17_smolg_004391A0.json",
+                "id": "levels_17_smolg_004391A0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/17_smolg/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_18_damosel_00459E98.json",
+                "id": "levels_18_damosel_00459E98",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/18_damosel/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_19_grelbin_0043DA78.json",
+                "id": "levels_19_grelbin_0043DA78",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/19_grelbin/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_1_oozla_0042F6D8.json",
+                "id": "levels_1_oozla_0042F6D8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/1_oozla/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_20_yeedil_00463840.json",
+                "id": "levels_20_yeedil_00463840",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/20_yeedil/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_22_dobbo_orbit_0042D0D0.json",
+                "id": "levels_22_dobbo_orbit_0042D0D0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/22_dobbo_orbit/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_23_damosel_orbit_00442708.json",
+                "id": "levels_23_damosel_orbit_00442708",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/23_damosel_orbit/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_24_ship_shack_0040B5B8.json",
+                "id": "levels_24_ship_shack_0040B5B8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/24_ship_shack/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_25_wupash_nebula_00438D50.json",
+                "id": "levels_25_wupash_nebula_00438D50",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/25_wupash_nebula/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_26_jamming_array_0041EC68.json",
+                "id": "levels_26_jamming_array_0041EC68",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/26_jamming_array/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_2_maktar_nebula_00457B08.json",
+                "id": "levels_2_maktar_nebula_00457B08",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/2_maktar_nebula/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_30_insomniac_museum_004302A8.json",
+                "id": "levels_30_insomniac_museum_004302A8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/30_insomniac_museum/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_3_endako_0043D640.json",
+                "id": "levels_3_endako_0043D640",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/3_endako/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_5_feltzin_system_00447DC8.json",
+                "id": "levels_5_feltzin_system_00447DC8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/5_feltzin_system/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_6_notak_0047E330.json",
+                "id": "levels_6_notak_0047E330",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/6_notak/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_7_siberius_00428268.json",
+                "id": "levels_7_siberius_00428268",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/7_siberius/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_8_tabora_004485C0.json",
+                "id": "levels_8_tabora_004485C0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/8_tabora/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_9_dobbo_0043B3B8.json",
+                "id": "levels_9_dobbo_0043B3B8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/9_dobbo/overlay.elf"
+              }
+            ]
+          },
+          "changes": {
+            "next_action": "Run guarded finalization for full-image integration action 71bd61cab65b49348f7dec0aa6f76ced, then verify that the published strict proofs close every listed placement.",
+            "remaining_difference": "Fresh private G0 (27/27) and G8 (1/1) compiler trials matched; boot and all 27 overlay whole-image gates passed in action 71bd61cab65b49348f7dec0aa6f76ced. Matching credit remains zero until guarded finalization publishes the strict proofs.",
+            "targets": [
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/boot_00336DA8.json",
+                "id": "boot_00336DA8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/boot.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_0_aranos_tutorial_0042C6D0.json",
+                "id": "levels_0_aranos_tutorial_0042C6D0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/0_aranos_tutorial/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_10_hrugis_cloud_00449988.json",
+                "id": "levels_10_hrugis_cloud_00449988",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/10_hrugis_cloud/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_11_joba_0048E028.json",
+                "id": "levels_11_joba_0048E028",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/11_joba/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_12_todano_00442E70.json",
+                "id": "levels_12_todano_00442E70",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/12_todano/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_13_boldan_004407C8.json",
+                "id": "levels_13_boldan_004407C8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/13_boldan/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_14_aranos_prison_0044A9C0.json",
+                "id": "levels_14_aranos_prison_0044A9C0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/14_aranos_prison/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_15_gorn_00454A48.json",
+                "id": "levels_15_gorn_00454A48",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/15_gorn/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_16_snivelak_00438118.json",
+                "id": "levels_16_snivelak_00438118",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/16_snivelak/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_17_smolg_004391A0.json",
+                "id": "levels_17_smolg_004391A0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/17_smolg/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_18_damosel_00459E98.json",
+                "id": "levels_18_damosel_00459E98",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/18_damosel/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_19_grelbin_0043DA78.json",
+                "id": "levels_19_grelbin_0043DA78",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/19_grelbin/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_1_oozla_0042F6D8.json",
+                "id": "levels_1_oozla_0042F6D8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/1_oozla/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_20_yeedil_00463840.json",
+                "id": "levels_20_yeedil_00463840",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/20_yeedil/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_22_dobbo_orbit_0042D0D0.json",
+                "id": "levels_22_dobbo_orbit_0042D0D0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/22_dobbo_orbit/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_23_damosel_orbit_00442708.json",
+                "id": "levels_23_damosel_orbit_00442708",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/23_damosel_orbit/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_24_ship_shack_0040B5B8.json",
+                "id": "levels_24_ship_shack_0040B5B8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/24_ship_shack/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_25_wupash_nebula_00438D50.json",
+                "id": "levels_25_wupash_nebula_00438D50",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/25_wupash_nebula/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_26_jamming_array_0041EC68.json",
+                "id": "levels_26_jamming_array_0041EC68",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/26_jamming_array/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_2_maktar_nebula_00457B08.json",
+                "id": "levels_2_maktar_nebula_00457B08",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/2_maktar_nebula/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_30_insomniac_museum_004302A8.json",
+                "id": "levels_30_insomniac_museum_004302A8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/30_insomniac_museum/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_3_endako_0043D640.json",
+                "id": "levels_3_endako_0043D640",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/3_endako/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_5_feltzin_system_00447DC8.json",
+                "id": "levels_5_feltzin_system_00447DC8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/5_feltzin_system/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_6_notak_0047E330.json",
+                "id": "levels_6_notak_0047E330",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/6_notak/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_7_siberius_00428268.json",
+                "id": "levels_7_siberius_00428268",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/7_siberius/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_8_tabora_004485C0.json",
+                "id": "levels_8_tabora_004485C0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/8_tabora/overlay.elf"
+              },
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_9_dobbo_0043B3B8.json",
+                "id": "levels_9_dobbo_0043B3B8",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/9_dobbo/overlay.elf"
+              }
+            ]
+          },
+          "reason": "Fresh G0 and full-image integration now provide exact program-qualified symbols and current strict proof targets; preserve the immutable trial catalogs and point closure at the published identity."
+        }
+      ],
+      "budget": 1,
+      "context": "The source is a standalone ordinary-C private hypothesis. Family membership is byte corroboration, not proof of an original source object.",
+      "created": "2026-10-11T04:13:13.276953+00:00",
+      "hypothesis": "Ordinary C with two pointer arguments returns the measured second argument in v0; the private family body is the same eight-byte jr-ra/daddu sequence at every placement.",
+      "id": "pointer-forwarder-family-g0-20261011",
+      "kind": "candidate",
+      "last_trial": "23a4b408a1314053915dbb3d2229f79d",
+      "next_action": "Run guarded finalization for full-image integration action 71bd61cab65b49348f7dec0aa6f76ced, then verify that the published strict proofs close every listed placement.",
+      "pointers": [
+        "progress/code-reuse-families.json.gz",
+        "progress/report.json",
+        "Runtime/work/pointer-forwarder-20261011/static-review.md",
+        "Runtime/work/reservation-pointer-family-20261011.json"
+      ],
+      "program": "boot plus 27-placement template family",
+      "remaining_difference": "Fresh private G0 (27/27) and G8 (1/1) compiler trials matched; boot and all 27 overlay whole-image gates passed in action 71bd61cab65b49348f7dec0aa6f76ced. Matching credit remains zero until guarded finalization publishes the strict proofs.",
+      "reopen_condition": "Retain any mismatch. Reopen only with new measured ABI, type, boundary, or qualified-lowering evidence; do not cycle casts or equivalent expressions.",
+      "source": "runtime:work/pointer-forwarder-20261011/forwarder.c",
+      "state": "integrated",
+      "symbols": [
+        "ForwardSecond"
+      ],
+      "targets": [
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/boot_00336DA8.json",
+          "id": "boot_00336DA8",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/boot.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_0_aranos_tutorial_0042C6D0.json",
+          "id": "levels_0_aranos_tutorial_0042C6D0",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/0_aranos_tutorial/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_10_hrugis_cloud_00449988.json",
+          "id": "levels_10_hrugis_cloud_00449988",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/10_hrugis_cloud/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_11_joba_0048E028.json",
+          "id": "levels_11_joba_0048E028",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/11_joba/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_12_todano_00442E70.json",
+          "id": "levels_12_todano_00442E70",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/12_todano/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_13_boldan_004407C8.json",
+          "id": "levels_13_boldan_004407C8",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/13_boldan/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_14_aranos_prison_0044A9C0.json",
+          "id": "levels_14_aranos_prison_0044A9C0",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/14_aranos_prison/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_15_gorn_00454A48.json",
+          "id": "levels_15_gorn_00454A48",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/15_gorn/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_16_snivelak_00438118.json",
+          "id": "levels_16_snivelak_00438118",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/16_snivelak/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_17_smolg_004391A0.json",
+          "id": "levels_17_smolg_004391A0",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/17_smolg/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_18_damosel_00459E98.json",
+          "id": "levels_18_damosel_00459E98",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/18_damosel/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_19_grelbin_0043DA78.json",
+          "id": "levels_19_grelbin_0043DA78",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/19_grelbin/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_1_oozla_0042F6D8.json",
+          "id": "levels_1_oozla_0042F6D8",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/1_oozla/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_20_yeedil_00463840.json",
+          "id": "levels_20_yeedil_00463840",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/20_yeedil/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_22_dobbo_orbit_0042D0D0.json",
+          "id": "levels_22_dobbo_orbit_0042D0D0",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/22_dobbo_orbit/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_23_damosel_orbit_00442708.json",
+          "id": "levels_23_damosel_orbit_00442708",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/23_damosel_orbit/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_24_ship_shack_0040B5B8.json",
+          "id": "levels_24_ship_shack_0040B5B8",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/24_ship_shack/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_25_wupash_nebula_00438D50.json",
+          "id": "levels_25_wupash_nebula_00438D50",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/25_wupash_nebula/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_26_jamming_array_0041EC68.json",
+          "id": "levels_26_jamming_array_0041EC68",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/26_jamming_array/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_2_maktar_nebula_00457B08.json",
+          "id": "levels_2_maktar_nebula_00457B08",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/2_maktar_nebula/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_30_insomniac_museum_004302A8.json",
+          "id": "levels_30_insomniac_museum_004302A8",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/30_insomniac_museum/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_3_endako_0043D640.json",
+          "id": "levels_3_endako_0043D640",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/3_endako/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_5_feltzin_system_00447DC8.json",
+          "id": "levels_5_feltzin_system_00447DC8",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/5_feltzin_system/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_6_notak_0047E330.json",
+          "id": "levels_6_notak_0047E330",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/6_notak/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_7_siberius_00428268.json",
+          "id": "levels_7_siberius_00428268",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/7_siberius/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_8_tabora_004485C0.json",
+          "id": "levels_8_tabora_004485C0",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/8_tabora/overlay.elf"
+        },
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_9_dobbo_0043B3B8.json",
+          "id": "levels_9_dobbo_0043B3B8",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/9_dobbo/overlay.elf"
+        }
+      ],
+      "transitions": [
+        {
+          "at": "2026-10-11T04:13:31.044685+00:00",
+          "from": "queued",
+          "reason": "exact_private",
+          "to": "exact_private",
+          "trial": "23a4b408a1314053915dbb3d2229f79d"
+        },
+        {
+          "at": "2026-10-11T04:30:58.086570+00:00",
+          "from": "exact_private",
+          "reason": "Fresh G0 and full-image integration now provide exact program-qualified symbols and current strict proof targets; preserve the immutable trial catalogs and point closure at the published identity.",
+          "to": "stopped"
+        },
+        {
+          "at": "2026-10-11T04:49:25.914732+00:00",
+          "from": "stopped",
+          "proof_sha256": {
+            "progress/candidates.json": "1bc4bfc38b0502f9eeb0b4e82d4ee3a1a94a241685cddc14fac33467ccd7f0ad",
+            "progress/integration.json": "49dfb0c0bbafc2f13457db68dbb82c67e342e93d384905d112342fca65873a8c",
+            "progress/levels/0_aranos_tutorial.json": "a1f503c2af952df49b98fc5de669e6f2d4c3ae8719a18a341cd22720fbbb5120",
+            "progress/levels/10_hrugis_cloud.json": "132310782999b4ae9abd8897fe8b10b1bce9faa49de85e3f019f53f10043ecbe",
+            "progress/levels/11_joba.json": "367054e7ee9e72f2b5182dfb825d55317ac28fc7d8d7b8219a56c4703beb6270",
+            "progress/levels/12_todano.json": "10bf34bee20eceb4b6b253316766e2101fd424fe49f44b7f0d3c6858a9bee872",
+            "progress/levels/13_boldan.json": "7082950d6fbac96c99aa027ee1214d11993018f5997ac7795de33bbd41fc079b",
+            "progress/levels/14_aranos_prison.json": "18e6b3cfb8cc7fc995498de8fe344494a35e24f50079aae12dac6eaacb4be775",
+            "progress/levels/15_gorn.json": "5a3889c8deb0bac757296346bf6b59b06b2ad1e1e21e8925a0fc5d8a861031ec",
+            "progress/levels/16_snivelak.json": "6b36c0dfcbcc2117232f07e30f67e1db3db2f48222de79472082e53db9404e2c",
+            "progress/levels/17_smolg.json": "62bd5a52ce5faa98953c00c3d370598f6ec5b6a5eb4ecfb74d598a3c2c1a5657",
+            "progress/levels/18_damosel.json": "8632ad7c691b0ebcba9292519b0cf640f898c9e8a64befc94c75a733de034b7f",
+            "progress/levels/19_grelbin.json": "d95703a132693e8a8456859a22efb44c6a5ace34a49957519ba027944626315e",
+            "progress/levels/1_oozla.json": "e74b19831090f77b9e3b6ac3377fd6723d6f162b0e86fedda2f3a2f8ff091a4b",
+            "progress/levels/20_yeedil.json": "a94a435e6c22989d293e04aaf32d9d52ba8499ec7101c5c5b3a950435221b82e",
+            "progress/levels/22_dobbo_orbit.json": "890fc353d71f8debb5e2d9a68998acc9f702eb2158efba6a2a3fd0b8115a3724",
+            "progress/levels/23_damosel_orbit.json": "f75bef3b24ef4149629ed27e93a70097a3bc28bc89d5fee1651e7d6a8b21a02d",
+            "progress/levels/24_ship_shack.json": "02dc1b1aa984482a408156d4c902b66cffba5b1da96f8d3ac93786cbd4d1fb8c",
+            "progress/levels/25_wupash_nebula.json": "402c2cbbb81104e9a5b75badbf0d4b98a292887f2565f5a5d589e4057f61b13b",
+            "progress/levels/26_jamming_array.json": "102a354fbc2e0e18061e13dc98bd4bc01a6b5e435b2ef25c25dc22f72c9c5392",
+            "progress/levels/2_maktar_nebula.json": "050df07cbac33ee3f28bc85446d2d746aee41c16c16c9c28703c331ffb72d358",
+            "progress/levels/30_insomniac_museum.json": "70823d00835beea5b3770d91ba606648e6eee025957dff2ac0efc7743a54826b",
+            "progress/levels/3_endako.json": "0744b364e81858c7f5c0527e6564168df4f8e87dc629a595af0fdfa5a5862245",
+            "progress/levels/4_barlow.json": "42343a9d775d4fa9f2b9a2e2bda88beb7f0f0d71b2a5186f6b878c4dda60f87f",
+            "progress/levels/5_feltzin_system.json": "ec219ceba37a9bfabea89a819284ca4dc0c38c4a07fc1db3fc976a32cd090460",
+            "progress/levels/6_notak.json": "349f6136690e569c8c1cf28e2f62b83093bbe6e8702ec8a6310535ff61e44782",
+            "progress/levels/7_siberius.json": "9a7a8aa25eb276fcdb17303b91cf5f83e26cbca8f5f11319d44e2d319bb3c43a",
+            "progress/levels/8_tabora.json": "e2839f662aeacf7a7500b82ef3ddeea116f64354d8b85060f1a34697a2bf12da",
+            "progress/levels/9_dobbo.json": "708628194b2c4a2c05c795792b0317f204b3329888865ae0089dbb18c4515c61",
+            "progress/report.json": "e1cbe67578013f5b154c4a16d86dfcbb12e46e47a54bb92e042e64664085dfa0"
+          },
+          "reason": "Current published source/object/full-image proofs validated",
+          "to": "integrated"
+        }
+      ],
+      "types": "void pointer parameters and return are the first measured type hypothesis; target boundary remains flow_supported_inferred."
+    },
+    "pointer-forwarder-family-g8-20261011": {
+      "abi": "Callers pass the pointer-like second value in a1 and consume v0 as a pointer; the body returns a1. Full family span and caller evidence are linked below.",
+      "amendments": [
+        {
+          "at": "2026-10-11T04:30:58.460393+00:00",
+          "before": {
+            "next_action": "Run one fresh G8 campaign trial and compare the complete 8-byte function at every same-profile placement in this family.",
+            "remaining_difference": "No fresh compiler measurement yet. Exact private trial is not integration credit; each selected span still needs admitted source placement and all affected full-image gates.",
+            "targets": [
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/catalogs/levels_4_barlow_0046FDA0.json",
+                "id": "levels_4_barlow_0046FDA0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/4_barlow/overlay.elf"
+              }
+            ]
+          },
+          "changes": {
+            "next_action": "Run guarded finalization for full-image integration action 71bd61cab65b49348f7dec0aa6f76ced, then verify that the published strict proofs close every listed placement.",
+            "remaining_difference": "Fresh private G0 (27/27) and G8 (1/1) compiler trials matched; boot and all 27 overlay whole-image gates passed in action 71bd61cab65b49348f7dec0aa6f76ced. Matching credit remains zero until guarded finalization publishes the strict proofs.",
+            "targets": [
+              {
+                "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_4_barlow_0046FDA0.json",
+                "id": "levels_4_barlow_0046FDA0",
+                "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/4_barlow/overlay.elf"
+              }
+            ]
+          },
+          "reason": "Fresh G8 and full-image integration now provide the program-qualified symbol and current strict proof target; preserve the immutable trial catalog and point closure at the published identity."
+        }
+      ],
+      "budget": 1,
+      "context": "The source is a standalone ordinary-C private hypothesis. Family membership is byte corroboration, not proof of an original source object.",
+      "created": "2026-10-11T04:13:13.276953+00:00",
+      "hypothesis": "Ordinary C with two pointer arguments returns the measured second argument in v0; the private family body is the same eight-byte jr-ra/daddu sequence at every placement.",
+      "id": "pointer-forwarder-family-g8-20261011",
+      "kind": "candidate",
+      "last_trial": "799e0720aab440deb852274f4d817e87",
+      "next_action": "Run guarded finalization for full-image integration action 71bd61cab65b49348f7dec0aa6f76ced, then verify that the published strict proofs close every listed placement.",
+      "pointers": [
+        "progress/code-reuse-families.json.gz",
+        "progress/report.json",
+        "Runtime/work/pointer-forwarder-20261011/static-review.md",
+        "Runtime/work/reservation-pointer-family-20261011.json"
+      ],
+      "program": "boot plus 27-placement template family",
+      "remaining_difference": "Fresh private G0 (27/27) and G8 (1/1) compiler trials matched; boot and all 27 overlay whole-image gates passed in action 71bd61cab65b49348f7dec0aa6f76ced. Matching credit remains zero until guarded finalization publishes the strict proofs.",
+      "reopen_condition": "Retain any mismatch. Reopen only with new measured ABI, type, boundary, or qualified-lowering evidence; do not cycle casts or equivalent expressions.",
+      "source": "runtime:work/pointer-forwarder-20261011/forwarder.c",
+      "state": "integrated",
+      "symbols": [
+        "ForwardSecond"
+      ],
+      "targets": [
+        {
+          "catalog": "runtime:work/pointer-forwarder-20261011/integration-catalogs/levels_4_barlow_0046FDA0.json",
+          "id": "levels_4_barlow_0046FDA0",
+          "reference": "runtime:runs/20261008T134500Z-a6a86dcc/reference/levels/4_barlow/overlay.elf"
+        }
+      ],
+      "transitions": [
+        {
+          "at": "2026-10-11T04:13:41.631574+00:00",
+          "from": "queued",
+          "reason": "exact_private",
+          "to": "exact_private",
+          "trial": "799e0720aab440deb852274f4d817e87"
+        },
+        {
+          "at": "2026-10-11T04:30:58.460393+00:00",
+          "from": "exact_private",
+          "reason": "Fresh G8 and full-image integration now provide the program-qualified symbol and current strict proof target; preserve the immutable trial catalog and point closure at the published identity.",
+          "to": "stopped"
+        },
+        {
+          "at": "2026-10-11T04:49:27.542413+00:00",
+          "from": "stopped",
+          "proof_sha256": {
+            "progress/candidates.json": "1bc4bfc38b0502f9eeb0b4e82d4ee3a1a94a241685cddc14fac33467ccd7f0ad",
+            "progress/integration.json": "49dfb0c0bbafc2f13457db68dbb82c67e342e93d384905d112342fca65873a8c",
+            "progress/levels/0_aranos_tutorial.json": "a1f503c2af952df49b98fc5de669e6f2d4c3ae8719a18a341cd22720fbbb5120",
+            "progress/levels/10_hrugis_cloud.json": "132310782999b4ae9abd8897fe8b10b1bce9faa49de85e3f019f53f10043ecbe",
+            "progress/levels/11_joba.json": "367054e7ee9e72f2b5182dfb825d55317ac28fc7d8d7b8219a56c4703beb6270",
+            "progress/levels/12_todano.json": "10bf34bee20eceb4b6b253316766e2101fd424fe49f44b7f0d3c6858a9bee872",
+            "progress/levels/13_boldan.json": "7082950d6fbac96c99aa027ee1214d11993018f5997ac7795de33bbd41fc079b",
+            "progress/levels/14_aranos_prison.json": "18e6b3cfb8cc7fc995498de8fe344494a35e24f50079aae12dac6eaacb4be775",
+            "progress/levels/15_gorn.json": "5a3889c8deb0bac757296346bf6b59b06b2ad1e1e21e8925a0fc5d8a861031ec",
+            "progress/levels/16_snivelak.json": "6b36c0dfcbcc2117232f07e30f67e1db3db2f48222de79472082e53db9404e2c",
+            "progress/levels/17_smolg.json": "62bd5a52ce5faa98953c00c3d370598f6ec5b6a5eb4ecfb74d598a3c2c1a5657",
+            "progress/levels/18_damosel.json": "8632ad7c691b0ebcba9292519b0cf640f898c9e8a64befc94c75a733de034b7f",
+            "progress/levels/19_grelbin.json": "d95703a132693e8a8456859a22efb44c6a5ace34a49957519ba027944626315e",
+            "progress/levels/1_oozla.json": "e74b19831090f77b9e3b6ac3377fd6723d6f162b0e86fedda2f3a2f8ff091a4b",
+            "progress/levels/20_yeedil.json": "a94a435e6c22989d293e04aaf32d9d52ba8499ec7101c5c5b3a950435221b82e",
+            "progress/levels/22_dobbo_orbit.json": "890fc353d71f8debb5e2d9a68998acc9f702eb2158efba6a2a3fd0b8115a3724",
+            "progress/levels/23_damosel_orbit.json": "f75bef3b24ef4149629ed27e93a70097a3bc28bc89d5fee1651e7d6a8b21a02d",
+            "progress/levels/24_ship_shack.json": "02dc1b1aa984482a408156d4c902b66cffba5b1da96f8d3ac93786cbd4d1fb8c",
+            "progress/levels/25_wupash_nebula.json": "402c2cbbb81104e9a5b75badbf0d4b98a292887f2565f5a5d589e4057f61b13b",
+            "progress/levels/26_jamming_array.json": "102a354fbc2e0e18061e13dc98bd4bc01a6b5e435b2ef25c25dc22f72c9c5392",
+            "progress/levels/2_maktar_nebula.json": "050df07cbac33ee3f28bc85446d2d746aee41c16c16c9c28703c331ffb72d358",
+            "progress/levels/30_insomniac_museum.json": "70823d00835beea5b3770d91ba606648e6eee025957dff2ac0efc7743a54826b",
+            "progress/levels/3_endako.json": "0744b364e81858c7f5c0527e6564168df4f8e87dc629a595af0fdfa5a5862245",
+            "progress/levels/4_barlow.json": "42343a9d775d4fa9f2b9a2e2bda88beb7f0f0d71b2a5186f6b878c4dda60f87f",
+            "progress/levels/5_feltzin_system.json": "ec219ceba37a9bfabea89a819284ca4dc0c38c4a07fc1db3fc976a32cd090460",
+            "progress/levels/6_notak.json": "349f6136690e569c8c1cf28e2f62b83093bbe6e8702ec8a6310535ff61e44782",
+            "progress/levels/7_siberius.json": "9a7a8aa25eb276fcdb17303b91cf5f83e26cbca8f5f11319d44e2d319bb3c43a",
+            "progress/levels/8_tabora.json": "e2839f662aeacf7a7500b82ef3ddeea116f64354d8b85060f1a34697a2bf12da",
+            "progress/levels/9_dobbo.json": "708628194b2c4a2c05c795792b0317f204b3329888865ae0089dbb18c4515c61",
+            "progress/report.json": "e1cbe67578013f5b154c4a16d86dfcbb12e46e47a54bb92e042e64664085dfa0"
+          },
+          "reason": "Current published source/object/full-image proofs validated",
+          "to": "integrated"
+        }
+      ],
+      "types": "void pointer parameters and return are the first measured type hypothesis; target boundary remains flow_supported_inferred."
+    },
     "pr54-liolu-boot-fun_0011b0a0": {
       "budget": 2,
       "created": "2026-10-08T22:18:51.952306+00:00",
@@ -296474,6 +297178,19 @@
       "state": "exact_private",
       "task": "orbital-pair-lookup-family-20261004-7_siberius"
     },
+    "23a4b408a1314053915dbb3d2229f79d": {
+      "compile_attempted": true,
+      "directory": "runtime:trials/23a4b408a1314053915dbb3d2229f79d",
+      "finished": "2026-10-11T04:13:30.958283+00:00",
+      "id": "23a4b408a1314053915dbb3d2229f79d",
+      "manifest_sha256": "6f30087777e5f054890c9fc08b8c194e16830b0027186b86a19796d07d503c76",
+      "measured_functions": 27,
+      "outcome_sha256": "ceb9d66cf5b70f32336c189db86f69b4fb809d7df52694fd8185d7a3d205dac1",
+      "semantic_key": "f79233ea515a00fd5fafb6a07fb7e92d59d2ef86b4be18435924d42ecad54cd8",
+      "started": "2026-10-11T04:13:29.828184+00:00",
+      "state": "exact_private",
+      "task": "pointer-forwarder-family-g0-20261011"
+    },
     "23abe27810ec4978a272d0857a20b5a4": {
       "compile_attempted": true,
       "directory": "runtime:trials/23abe27810ec4978a272d0857a20b5a4",
@@ -315369,6 +316086,19 @@
       "started": "2026-10-08T14:14:49.444651+00:00",
       "state": "mismatch",
       "task": "parent-20261008-getter96-a1-absolute-getter96-g0-s2-seed"
+    },
+    "799e0720aab440deb852274f4d817e87": {
+      "compile_attempted": true,
+      "directory": "runtime:trials/799e0720aab440deb852274f4d817e87",
+      "finished": "2026-10-11T04:13:41.558028+00:00",
+      "id": "799e0720aab440deb852274f4d817e87",
+      "manifest_sha256": "038f1ec079bb1f92504a49b1dba8587df5722da5b7198db2de1e5b2661a7c746",
+      "measured_functions": 1,
+      "outcome_sha256": "d6dd78bd636219439ddf52bf6eb545e4b56fa9d5e0cc325c48cac69da0c2cf99",
+      "semantic_key": "e4114a19f925ad8d78a0eb7b24d2c676e6fd4a250c09c5340d452822681c72f0",
+      "started": "2026-10-11T04:13:41.084491+00:00",
+      "state": "exact_private",
+      "task": "pointer-forwarder-family-g8-20261011"
     },
     "79a08a4434bb4b0fb0fb3aa858740ece": {
       "compile_attempted": true,
@@ -345564,6 +346294,6 @@
   },
   "view_sha256": {
     "docs/C-NATIVE-EXPERIMENT-REGISTER.md": "5ba16b5c7f8b20b910187dd4810726cdadd2d765cae39365c07e09ea14caee21",
-    "docs/CAMPAIGN-QUEUE.md": "3579edeaff28b69293a261fb181966dcb53d6b23e24d2b0c102bb08337442ffb"
+    "docs/CAMPAIGN-QUEUE.md": "2ebd9057b7298efdf26123e4263ca511d59613cda56fcdcbc1dd4c8c782ecf5a"
   }
 }

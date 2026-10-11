@@ -2016,6 +2016,12 @@
       "symbol": "FUN_00336DA0"
     },
     {
+      "address": 3370408,
+      "meaning": "Return the supplied second pointer argument unchanged.",
+      "size": 8,
+      "symbol": "FUN_00336DA8"
+    },
+    {
       "address": 3370704,
       "meaning": "push at the head of the list and decrement the count; byte-identical body in all 27 levels",
       "ranges": 1,
