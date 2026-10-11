@@ -1,0 +1,49 @@
+name: Report
+
+# Publishes the heuristic deduplicated estimate for the accepted USA v1.01 target (no new credit). Runs beside the maintainer's
+# validation workflows and never replaces them.
+on:
+  push:
+    branches: [RAC2]
+  pull_request:
+    branches: [RAC2]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: SCUS_972.68 deduplicated estimate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: No game data, assets or disassembly in Git
+        run: python scripts/legal_check.py
+      - name: Build the deduplicated USA v1.01 estimate from the committed catalogue
+        run: python scripts/unique_estimate.py report --output build/decomp/unique-estimate-report.json
+      - name: Validate the reports with objdiff
+        # decomp.dev parses this artifact with objdiff; the release binary is pinned by version and SHA-256.
+        run: |
+          curl --fail --location --retry 3 -o "$RUNNER_TEMP/objdiff-cli" \
+            https://github.com/encounter/objdiff/releases/download/v3.8.1/objdiff-cli-linux-x86_64
+          echo "c8290281e82114bcc1a06ff73061110d3902a177822e750337de2537188e358f  $RUNNER_TEMP/objdiff-cli" | sha256sum --check
+          chmod +x "$RUNNER_TEMP/objdiff-cli"
+          "$RUNNER_TEMP/objdiff-cli" report changes build/decomp/unique-estimate-report.json build/decomp/unique-estimate-report.json \
+            -o "$RUNNER_TEMP/objdiff-validation-estimate.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SCUS_972.68_unique_estimate
+          path: build/decomp/unique-estimate-report.json
+          if-no-files-found: error
+      - name: Job summary
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          e = json.load(open("build/decomp/unique-estimate-report.json"))["measures"]
+          print("### USA v1.01 deduplicated estimate (heuristic, no new credit)")
+          print(f"Credited distinct code: {int(e['matchedCode']):,} / {int(e['totalCode']):,} bytes ({e['matchedCodePercent']:.4f}%)")
+          PY
