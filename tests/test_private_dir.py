@@ -1,7 +1,9 @@
 """Private working data may live outside the repository or in its git-ignored extracted/ folder only."""
 import sys
+import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -14,7 +16,14 @@ class PrivateDirTests(unittest.TestCase):
             self.assertTrue(private_dir.allowed(Path(tmp)))
 
     def test_ignored_extracted_folder_is_allowed(self):
-        self.assertTrue(private_dir.allowed(private_dir.EXTRACTED / "v101"))
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            subprocess.run(["git", "init", "--quiet", str(repo)], check=True)
+            (repo / ".gitignore").write_text("extracted/\n", encoding="utf-8")
+            with patch.object(private_dir, "ROOT", repo), \
+                    patch.object(private_dir, "EXTRACTED", repo / "extracted"):
+                self.assertTrue(private_dir.allowed(repo / "extracted" / "v101"))
+                self.assertTrue(private_dir.allowed(repo / "extracted"))
 
     def test_other_repository_paths_are_rejected(self):
         for name in ("progress", "src", "build", "extracted-not"):
