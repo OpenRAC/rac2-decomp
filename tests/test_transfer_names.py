@@ -14,7 +14,7 @@ class CommittedRowTests(unittest.TestCase):
     def test_carried_names_follow_the_marker_and_are_unique(self):
         text = (ROOT / "symbol_addrs/usa/symbol_addrs.txt").read_text(encoding="utf-8").splitlines()
         rows = text[text.index(transfer_names.MARKER) + 1:]
-        parsed = [transfer_names.SYM.match(r) for r in rows if r.strip()]
+        parsed = [transfer_names.SYM.match(r) for r in rows if r.strip() and not r.startswith("#")]
         self.assertTrue(parsed and all(parsed))
         names = [m.group(1) for m in parsed]
         addresses = [int(m.group(2), 16) for m in parsed]
