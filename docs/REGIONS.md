@@ -1,13 +1,19 @@
 # Game regions
 
-The matching target remains USA v1.01, `SCUS_972.68`. The European PAL release,
+New work targets **USA v2.00** (`ntsc-u-v2`, same serial `SCUS_972.68`). The existing C catalogues,
+reviews and progress proofs were measured on USA v1.01 (`ntsc-u`) and stay attached to it until
+the v2.00 overlays are measured and the proofs regenerated. `by_serial` resolves a shared serial
+to the matching region.
+
+The matching target is still USA v1.01 for those proofs. The European PAL release,
 `SCES_516.07`, is registered as a second region so the preparation and
 reconstruction tools can measure and round-trip it. It has no C catalogues,
 reviews or progress proofs, and it adds nothing to the README progress.
 
 | Region | Serial | Identity files | State |
 | --- | --- | --- | --- |
-| `ntsc-u` (aliases `ntsc`, `usa`; default) | `SCUS_972.68` | [target](../config/target.json), [overlays](../config/overlays.json) | pinned; matching proofs |
+| `ntsc-u` (aliases `ntsc`, `usa`, `v1.01`; registry default) | `SCUS_972.68` | [target](../config/target.json), [overlays](../config/overlays.json) | pinned; matching proofs |
+| `ntsc-u-v2` (aliases `v2`, `usa-v2`) | `SCUS_972.68` | [target](../config/regions/ntsc-u-v2/target.json) | fully pinned (disc, boot, 27 overlays); no C catalogues or proofs yet. Symbols: `symbol_addrs/usa-v2/` |
 | `pal` (alias `europe`) | `SCES_516.07` | [target](../config/regions/pal/target.json); overlays not yet recorded | unmeasured; no catalogues |
 
 [`config/regions.json`](../config/regions.json) is the registry and

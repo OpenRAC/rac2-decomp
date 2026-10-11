@@ -125,6 +125,8 @@ def load(name: str | None = None, root: Path = ROOT) -> Region:
 
 def by_serial(serial: object, root: Path = ROOT) -> Region:
     matches = [name for name, entry in registry(root)["regions"].items() if entry["serial"] == serial]
+    if len(matches) > 1:  # several releases share a serial: catalogues and proofs belong to the matching one
+        matches = [name for name in matches if registry(root)["regions"][name].get("matching") is True]
     if len(matches) != 1:
         raise ValueError(f"No registered region owns target {serial!r}")
     return load(matches[0], root)
