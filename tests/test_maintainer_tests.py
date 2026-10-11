@@ -97,6 +97,29 @@ class MaintainerTests(unittest.TestCase):
             tests.authenticate(self.repo)
         api.assert_not_called()
 
+    def test_delegated_authentication_requires_explicit_owner_local_and_write_role(self):
+        actor = {"id": 29800182, "login": "ThorpenCodes"}
+        reply = lambda value: subprocess.CompletedProcess([], 0, json.dumps(value), "")
+        with patch.object(tests.subprocess, "check_output", return_value="https://github.com/" + policy.REPOSITORY + ".git\n"), \
+                patch.object(tests.subprocess, "run", side_effect=[reply(actor), reply({"user": actor, "permission": "write"})]) as api:
+            self.assertEqual(tests.authenticate(self.repo, owner_local=True), actor)
+        self.assertEqual(api.call_args_list[1].args[0][-1],
+                         "repos/OpenRAC/rac2-gc-decomp/collaborators/ThorpenCodes/permission")
+        with patch.object(tests.subprocess, "check_output", return_value="https://github.com/" + policy.REPOSITORY + ".git\n"), \
+                patch.object(tests.subprocess, "run", return_value=reply(actor)) as api, self.assertRaises(ValueError):
+            tests.authenticate(self.repo)
+        self.assertEqual(api.call_count, 1)
+
+    def test_delegated_read_role_or_permission_api_error_is_refused(self):
+        actor = {"id": 29800182, "login": "ThorpenCodes"}
+        user = subprocess.CompletedProcess([], 0, json.dumps(actor), "")
+        for permission in (subprocess.CompletedProcess([], 0, json.dumps({"user": actor, "permission": "read"}), ""),
+                           subprocess.CompletedProcess([], 1, "", "private token error")):
+            with patch.object(tests.subprocess, "check_output", return_value="https://github.com/" + policy.REPOSITORY + ".git\n"), \
+                    patch.object(tests.subprocess, "run", side_effect=[user, permission]), self.assertRaises(ValueError) as error:
+                tests.authenticate(self.repo, owner_local=True)
+            self.assertNotIn("private token error", str(error.exception))
+
     def test_full_fallback_is_discovery_and_targeted_is_explicit(self):
         suite = lambda: unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
         with patch.object(tests.unittest.defaultTestLoader, "discover", return_value=suite()) as discover:

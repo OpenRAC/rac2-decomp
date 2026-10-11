@@ -1005,7 +1005,8 @@ def finalize(store, repo, action_id, *, manifest, output, tasks=(), apply=False,
         if type(maintainer_jobs) is not int or maintainer_jobs < 0:
             raise ValueError("Maintainer test jobs must be zero or a positive integer")
         jobs = min(maintainer_jobs or min(4, os.cpu_count() or 1), len(modules))
-        test_policy = {"mode": "targeted", "actor": authenticate(repo), "modules": modules,
+        actor = authenticate(repo, owner_local=True) if owner_local else authenticate(repo)
+        test_policy = {"mode": "targeted", "actor": actor, "modules": modules,
                        "owner_local": bool(owner_local), "jobs": jobs,
                        "full_merge_queue_suite_required": not owner_local,
                        "owner_local_full_suite_waived": bool(owner_local),

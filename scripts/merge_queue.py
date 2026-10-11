@@ -1,9 +1,10 @@
-"""Enqueue a pinned RAC2 PR through GitHub's native queue; never merge directly."""
+"""Enqueue a pinned RAC2 PR, or explicitly select the approved --owner-local route."""
 import argparse
 import json
 import re
 import subprocess
 import sys
+import local_validation_policy
 
 REPOSITORY = "OpenRAC/rac2-gc-decomp"
 MUTATION = """mutation($pr:ID!,$head:GitObjectID!) {
@@ -47,12 +48,11 @@ def enqueue(number, expected_head):
 
 
 def merge_owner_local(number, expected_head):
-    """Explicit local-validation route; only the authenticated owner can use it."""
+    """Explicit approved local-validation route; GitHub retains permission checks."""
     if type(number) is not int or number < 1 or not re.fullmatch(r"[0-9a-f]{40}", expected_head):
         raise ValueError("A positive PR number and its exact 40-character head SHA are required")
     actor = gh_api("GET", "user")
-    if actor.get("id") != 191315338 or actor.get("login") != "llesieur99":
-        raise ValueError("The owner-local route requires the authenticated primary maintainer")
+    local_validation_policy.approve(actor, lambda endpoint: gh_api("GET", endpoint))
     pr = gh_api("GET", f"repos/{REPOSITORY}/pulls/{number}")
     if (pr["number"] != number or pr["state"] != "open" or pr["draft"] is not False
             or pr["base"]["ref"] != "RAC2" or pr["base"]["repo"]["full_name"] != REPOSITORY
@@ -71,7 +71,7 @@ def main():
     parser.add_argument("pr", type=int)
     parser.add_argument("--expected-head", required=True)
     parser.add_argument("--owner-local", action="store_true",
-                        help="Owner only: merge this exact head after completed local validation")
+                        help="Approved users only: merge this exact head after completed local validation; GitHub rules still apply")
     args = parser.parse_args()
     try:
         print(json.dumps(merge_owner_local(args.pr, args.expected_head) if args.owner_local

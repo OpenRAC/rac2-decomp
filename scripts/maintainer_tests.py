@@ -15,18 +15,27 @@ import sys
 import unittest
 
 from maintainer_test_policy import identity, REPOSITORY
+import local_validation_policy
 
 
-def authenticate(repo):
+def authenticate(repo, *, owner_local=False):
     """Use GitHub's immutable authenticated user ID, not local Git names."""
     remote = subprocess.check_output(["git", "-C", str(repo), "remote", "get-url", "origin"], text=True).strip()
     if remote not in {"https://github.com/" + REPOSITORY + ".git", "https://github.com/" + REPOSITORY,
                       "git@github.com:" + REPOSITORY + ".git"}:
         raise ValueError("Maintainer testing requires the maintained GitHub repository")
-    result = subprocess.run(["gh", "api", "--hostname", "github.com", "user"], capture_output=True, text=True)
-    if result.returncode or not identity(json.loads(result.stdout)):
+    def get(endpoint):
+        result = subprocess.run(["gh", "api", "--hostname", "github.com", endpoint],
+                                capture_output=True, text=True, timeout=60)
+        if result.returncode:
+            raise ValueError("GitHub authentication/permission metadata could not be verified; check token access")
+        return json.loads(result.stdout)
+
+    user = get("user")
+    if owner_local:
+        return local_validation_policy.approve(user, get)
+    if not identity(user):
         raise ValueError("Maintainer testing requires the authenticated primary maintainer")
-    user = json.loads(result.stdout)
     return {"id": user["id"], "login": user["login"]}
 
 

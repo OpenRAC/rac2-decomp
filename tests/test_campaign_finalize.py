@@ -243,6 +243,31 @@ class FinalizeTests(unittest.TestCase):
             self.finish(maintainer_jobs=2)
         self.assertFalse(self.output.exists())
 
+    def test_delegated_owner_local_authenticates_role_before_preparation(self):
+        for name in ("test_campaign_finalize", "test_decomp_report", "test_maintainer_tests", "test_maintainer_test_policy"):
+            write(self.repo / "tests" / (name + ".py"), b"# targeted fixture\n")
+        actor = {"id": 29800182, "login": "ThorpenCodes"}
+        reply = lambda value: subprocess.CompletedProcess([], 0, json.dumps(value), "")
+        with patch("maintainer_tests.subprocess.check_output", return_value="https://github.com/OpenRAC/rac2-gc-decomp.git\n"), \
+                patch("maintainer_tests.subprocess.run", side_effect=[reply(actor), reply({"user": actor, "permission": "write"})]) as api:
+            result = self.finish(owner_local=True, maintainer_jobs=2)
+        self.assertEqual(result["local_test_policy"]["actor"], actor)
+        self.assertTrue(result["local_test_policy"]["owner_local"])
+        self.assertTrue(result["local_test_policy"]["matching_gates_unchanged"])
+        self.assertEqual(api.call_count, 2)
+
+    def test_delegated_read_only_finalizer_stops_before_output(self):
+        for name in ("test_campaign_finalize", "test_decomp_report", "test_maintainer_tests", "test_maintainer_test_policy"):
+            write(self.repo / "tests" / (name + ".py"), b"# targeted fixture\n")
+        actor = {"id": 29800182, "login": "ThorpenCodes"}
+        replies = [subprocess.CompletedProcess([], 0, json.dumps(value), "")
+                   for value in (actor, {"user": actor, "permission": "read"})]
+        with patch("maintainer_tests.subprocess.check_output", return_value="https://github.com/OpenRAC/rac2-gc-decomp.git\n"), \
+                patch("maintainer_tests.subprocess.run", side_effect=replies), self.assertRaisesRegex(ValueError, "repository role"):
+            self.finish(owner_local=True)
+        self.assertFalse(self.output.exists())
+        self.assertEqual(self.calls, [])
+
     def test_targeted_finalizer_auth_failure_does_not_create_output(self):
         for name in ("test_campaign_finalize", "test_maintainer_tests", "test_maintainer_test_policy"):
             write(self.repo / "tests" / (name + ".py"), b"# targeted fixture\n")

@@ -68,7 +68,8 @@ Refresh source inventory, register views and the README bar when their inputs
 change. Use detailed English commits, explicit staging and a normal push, then
 verify the remote SHA and CI. Never force-push or include private runtime data.
 
-For LP's authenticated primary-maintainer publication path, pass
+For LP's explicitly approved local publication path (`llesieur99` or
+`ThorpenCodes`, with Thorpen's current repository write role verified), pass
 `--owner-local` to `campaign.py finalize`. It keeps the complete matching and
 freshness gates while selecting the bounded report/finalizer/policy tests and
 running isolated test-case shards on multiple workers. The exhaustive default remains
