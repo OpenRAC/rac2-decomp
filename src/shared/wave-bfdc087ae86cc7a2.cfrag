@@ -1,0 +1,40 @@
+#ifndef RAC2_T_V4_FBFDC087A
+#define RAC2_T_V4_FBFDC087A
+typedef int V4_Fbfdc087a __attribute__((mode(TI)));
+#endif
+
+
+extern char @@BIND_DATA0_00@@[];
+extern void @@ROLE_0_00@@(float *m, char *p);
+extern void @@ROLE_1_00@@(float *dst, float *src, float *m);
+extern void @@ROLE_2_00@@(float *m, char *p);
+extern void @@ROLE_3_00@@(float *m, float *m2, float *e);
+extern void @@ROLE_4_00@@(float *dst, float *src, float *m);
+extern void @@ROLE_5_00@@(float *c, float *a, float *b);
+extern void @@ROLE_6_00@@(char *a, char *b, float *c);
+extern void @@ROLE_7_00@@(float *m, char *p);
+
+void @@FUNCTION@@(V4_Fbfdc087a *src, float x, float y, float z)
+{
+    char *p = @@BIND_DATA0_01@@;
+    float q[4];
+    float a[4];
+    float b[4];
+    float c[4];
+    float m[16];
+    float e[16];
+    float v[4];
+
+    *(V4_Fbfdc087a *)q = *src;
+    @@ROLE_0_01@@(m, p);
+    @@ROLE_1_01@@(a, q, m);
+    v[0] = x;
+    v[1] = y;
+    v[2] = z;
+    @@ROLE_2_01@@(e, v);
+    @@ROLE_3_01@@(m, m, e);
+    @@ROLE_4_01@@(b, q, m);
+    @@ROLE_5_01@@(c, a, b);
+    @@ROLE_6_01@@(p - 16, p - 16, c);
+    @@ROLE_7_01@@(m, p);
+}

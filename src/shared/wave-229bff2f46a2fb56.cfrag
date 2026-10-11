@@ -1,0 +1,25 @@
+extern float @@ROLE_0_00@@(float t);
+
+float @@FUNCTION@@(float *p, float a, float b, float c, float d, float lim)
+{
+    float t = b - a;
+    float x = *p;
+    float r;
+
+    x += c * t - d * x;
+    *p = x;
+    if (lim != 0.0f) {
+        if (x > lim) *p = lim;
+        else if (x < -lim) *p = -lim;
+    }
+    r = @@ROLE_0_01@@(t);
+    if (r < *p) {
+        *p = @@ROLE_0_02@@(t);
+    } else {
+        float s = -@@ROLE_0_03@@(t);
+        if (*p < s) {
+            *p = -@@ROLE_0_04@@(t);
+        }
+    }
+    return a + *p;
+}

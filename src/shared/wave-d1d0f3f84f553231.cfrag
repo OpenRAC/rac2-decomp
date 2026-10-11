@@ -1,0 +1,15 @@
+extern int @@ROLE_0_00@@(char *, int);
+
+void @@FUNCTION@@(char *p, int a1, int a2, float f12, float f13)
+{
+    char *q = p + 168;
+
+    *(float *)(*(int *)p) = f12;
+    *(float *)(*(int *)p + 4) = f13;
+    p[423] = 0;
+    *(int *)(p + 440) = a2;
+    *(int *)(p + 472) = (int)q;
+    *(int *)(p + 468) = @@ROLE_0_01@@(q, -1);
+    *(int *)(p + 432) = 1;
+    *(float *)(*(int *)(p + 4)) = 1.0f;
+}

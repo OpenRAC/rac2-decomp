@@ -38,12 +38,12 @@ from loaded-byte coverage; the normal matching acceptance rule is unchanged.
 <!-- unique-code-progress:start -->
 | Metric | Matched C bytes | Total code bytes | Progress |
 | --- | ---: | ---: | ---: |
-| Conservative unique EE code (unsupported extents uncollapsed) | 592,336 | 44,400,168 | 1.3341% |
-| Loaded code (boot + 27 overlays) | 1,529,816 | 48,788,176 | 3.1356% |
+| Conservative unique EE code (unsupported extents uncollapsed) | 889,584 | 44,400,168 | 2.0036% |
+| Loaded code (boot + 27 overlays) | 2,176,024 | 48,788,176 | 4.4601% |
 
 Structurally supported function extents cover 40,075,248 loaded EE bytes; 231,732 EE bytes remain unresolved. VU code excluded: 86,368 bytes.
 Provisional representative partition: 37,641,816 bytes (certified: false); no global progress percentage is inferred from this partition.
-Conservative global partition retains unknown extents and gaps without deduplication: 8,626,560 loaded EE bytes have unsupported boundaries. The total follows the stated grouping policy and is not a certified original-source size. Supported subset: 592,336 / 35,773,608 unique bytes.
+Conservative global partition retains unknown extents and gaps without deduplication: 8,626,560 loaded EE bytes have unsupported boundaries. The total follows the stated grouping policy and is not a certified original-source size. Supported subset: 889,584 / 35,773,608 unique bytes.
 
 Shared boot binding: 22,576 static edges in combined pinned reference images. Runtime code preservation is unproved. See [the binding and remaining-duplication audit](docs/BOOT-SHARED-CODE-VERIFICATION.md).
 <!-- unique-code-progress:end -->
@@ -57,10 +57,10 @@ Recorded validation on **11 October 2026**:
 
 | Scope | Integrated C functions / placements | Matched C bytes |
 | --- | ---: | ---: |
-| Boot | 397 functions | 34,636 |
-| 27 level overlays | 14,763 placements | 1,495,180 |
-| Native overlay subset, included above | 10,340 placements | 1,255,028 |
-| **Total C coverage** | **Boot + all 27 overlays** | **1,529,816 / 48,788,176 (3.1356%)** |
+| Boot | 469 functions | 45,564 |
+| 27 level overlays | 18,694 placements | 2,130,460 |
+| Native overlay subset, included above | 14,271 placements | 1,890,308 |
+| **Total C coverage** | **Boot + all 27 overlays** | **2,176,024 / 48,788,176 (4.4601%)** |
 <!-- generated-progress:end -->
 
 The complete boot (**2,521,763 loaded bytes, two PT_LOAD segments**) and all

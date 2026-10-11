@@ -1,0 +1,18 @@
+extern unsigned int @@ROLE_0_00@@(float x);
+extern unsigned int @@ROLE_1_00@@(float x);
+extern unsigned int @@ROLE_2_00@@(float x);
+extern unsigned int @@ROLE_3_00@@(float x);
+
+int @@FUNCTION@@(float r, float g, float b, float a)
+{
+    unsigned int cr = @@ROLE_0_01@@(r * 255.0f) & 0xff;
+    unsigned int cg = @@ROLE_1_01@@(g * 255.0f) & 0xff;
+    unsigned int cb = @@ROLE_2_01@@(b * 255.0f) & 0xff;
+    unsigned int ca = @@ROLE_3_01@@(a * 255.0f) & 0xff;
+    unsigned int packed = cr;
+
+    packed |= cg << 8;
+    packed |= cb << 16;
+    packed |= ca << 24;
+    return packed;
+}

@@ -1,0 +1,19 @@
+extern char @@BIND_DATA0_00@@[];
+extern int @@ROLE_0_00@@(float value);
+extern float @@ROLE_1_00@@(float *buffer, float value);
+float @@FUNCTION@@(float *table, int count)
+{
+    char *base = @@BIND_DATA0_01@@;
+    float buffer[4];
+    float t;
+    int index;
+    int last;
+    int previous;
+    index = @@ROLE_0_01@@(*(float *)(base + 3128));
+    last = count - 1;
+    previous = (index + last) % count;
+    if (*(int *)(base + 3112) & 2)
+        previous = last;
+    t = @@ROLE_1_01@@(buffer, *(float *)(base + 3128));
+    return t * table[index] + (*(float *)(base + 3132) - t) * table[previous];
+}

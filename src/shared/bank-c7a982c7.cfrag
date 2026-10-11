@@ -1,0 +1,46 @@
+extern void @@ROLE_0_00@@(char *arg, int mode, int value);
+extern void @@ROLE_1_00@@(char *arg);
+extern void @@ROLE_2_00@@(char *arg);
+extern float @@ROLE_3_00@@(char *arg, char *table);
+extern float @@ROLE_4_00@@(float value);
+extern void @@ROLE_5_00@@(int arg, int value);
+extern void @@ROLE_6_00@@(int arg);
+extern void @@ROLE_7_00@@(int arg);
+extern void @@ROLE_8_00@@(char *arg);
+extern char @@BIND_DATA0_00@@[];
+extern unsigned char @@BIND_LVL_0_ARANOS_TUTORIAL_D_001A7B2E_00@@ __attribute__((sda));
+void @@FUNCTION@@(char *arg)
+{
+    int *object = *(int **)(arg + 104);
+    unsigned char state = *(unsigned char *)(arg + 32);
+
+    switch (state) {
+    case 0:
+        *(unsigned char *)(arg + 48) = 255;
+        if (@@BIND_LVL_0_ARANOS_TUTORIAL_D_001A7B2E_01@@ != 0 && object[17] != 0) {
+            @@ROLE_8_01@@((char *)object[17]);
+            @@ROLE_8_02@@(arg);
+            return;
+        } else {
+            @@ROLE_0_01@@(arg, 1, -1);
+            @@ROLE_1_01@@(arg);
+        }
+        break;
+    case 1:
+        @@ROLE_2_01@@(arg);
+        if (@@ROLE_3_01@@(arg + 16, @@BIND_DATA0_01@@) < 2.0f) {
+            if (@@ROLE_4_01@@(*(float *)(arg + 24) - *(float *)(@@BIND_DATA0_02@@ + 8)) < 2.0f) {
+                @@ROLE_5_01@@(4658, -1);
+                @@ROLE_6_01@@(54);
+                @@ROLE_7_01@@(54);
+                if (object[17] != 0) {
+                    @@ROLE_8_03@@((char *)object[17]);
+                    @@ROLE_8_04@@(arg);
+                    return;
+                }
+                object[16] = 120;
+            }
+        }
+        break;
+    }
+}

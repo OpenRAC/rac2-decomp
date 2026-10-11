@@ -1,0 +1,15 @@
+extern int @@ROLE_0_00@@(void);
+extern int @@BIND_DATA0_00@@;
+
+int @@FUNCTION@@(void)
+{
+    int result = 0;
+    int mode;
+    if (@@ROLE_0_01@@() != 0) goto out;
+    if (@@BIND_DATA0_01@@ != 49) goto out;
+    mode = *(int *)0x001A79F0;
+    if (mode != 4 && mode != 11) goto out;
+    result = 1;
+out:
+    return result;
+}

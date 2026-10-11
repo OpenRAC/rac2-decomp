@@ -1,0 +1,37 @@
+
+
+
+#ifndef RAC2_T_V4_F6B9E759F
+#define RAC2_T_V4_F6B9E759F
+typedef struct {
+    f32 x, y, z, w;
+} V4_F6b9e759f;
+#endif
+
+
+#ifndef RAC2_T_M4_F6B9E759F
+#define RAC2_T_M4_F6B9E759F
+typedef struct {
+    V4_F6b9e759f r[4];
+} M4_F6b9e759f;
+#endif
+
+
+extern V4_F6b9e759f @@BIND_DATA0_00@@[];
+
+extern void @@ROLE_0_00@@(M4_F6b9e759f *, V4_F6b9e759f *);
+extern void @@ROLE_2_00@@(M4_F6b9e759f *, M4_F6b9e759f *, V4_F6b9e759f *);
+extern void @@ROLE_3_00@@(M4_F6b9e759f *, V4_F6b9e759f *);
+
+void @@FUNCTION@@(f32 a1, f32 a2, f32 a3) {
+    V4_F6b9e759f in;
+    M4_F6b9e759f m1;
+    M4_F6b9e759f m2;
+    in.x = a1;
+    in.y = a2;
+    in.z = a3;
+    @@ROLE_0_01@@(&m1, &in);
+    @@ROLE_0_02@@(&m2, &@@BIND_DATA0_01@@[1]);
+    @@ROLE_2_01@@(&m2, &m2, &m1);
+    @@ROLE_3_01@@(&m2, &@@BIND_DATA0_02@@[1]);
+}

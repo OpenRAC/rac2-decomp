@@ -1,0 +1,11 @@
+extern float @@ROLE_0_00@@(int *dst, float a, float b, float c, float d, float e);
+
+void @@FUNCTION@@(char *a0, float *a1, float *a2,
+                                        float f12, float f13, float f14)
+{
+    int *p = *(int **)(a0 + 112);
+
+    a1[0] = @@ROLE_0_01@@(p + 64, a1[0], a2[0], f12, f13, f14);
+    a1[1] = @@ROLE_0_02@@(p + 65, a1[1], a2[1], f12, f13, f14);
+    a1[2] = @@ROLE_0_03@@(p + 66, a1[2], a2[2], f12, f13, f14);
+}

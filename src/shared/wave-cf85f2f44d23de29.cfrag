@@ -1,0 +1,25 @@
+extern int @@ROLE_0_00@@(short *);
+extern void @@ROLE_1_00@@(char *);
+extern float @@ROLE_2_00@@(int);
+extern int @@ROLE_3_00@@(int, int, float);
+
+struct T {
+    float a;
+    float b;
+    int c;
+    int d;
+    float e;
+};
+
+void @@FUNCTION@@(char *p)
+{
+    if (@@ROLE_0_01@@((short *)(p + 10)) != 0) {
+        @@ROLE_1_01@@(p);
+    } else {
+        struct T *t = (struct T *)(p + 32);
+        float k = @@ROLE_2_01@@(*(short *)(p + 10)) * t->e;
+
+        *(int *)(p + 4) = @@ROLE_3_01@@(t->d, t->c, k);
+        *(float *)(p + 12) = ((t->a - t->b) * k + t->b) * 210000.0f;
+    }
+}

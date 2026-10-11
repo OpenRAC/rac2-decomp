@@ -1,0 +1,19 @@
+extern void @@ROLE_0_00@@(char *);
+extern void @@ROLE_1_00@@(char *, char *, float);
+extern void @@ROLE_2_00@@(char *, char *, char *);
+extern void @@ROLE_3_00@@(char *, char *, char *);
+
+void @@FUNCTION@@(char *p1, int n, char *p3, char *p4)
+{
+    float f = *(float *)(p1 + 44) * 0.0009765625f;
+
+    @@ROLE_0_01@@(p1);
+    if (n > 0) {
+        do {
+            @@ROLE_1_01@@(p4, p4, f);
+            @@ROLE_2_01@@(p4, p4, p1 + 192);
+            @@ROLE_3_01@@(p4, p4, p1 + 16);
+            p4 += 16;
+        } while (--n != 0);
+    }
+}

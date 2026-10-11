@@ -1,0 +1,15 @@
+extern void @@ROLE_0_00@@(char *a, char *b);
+extern void @@ROLE_1_00@@(char *a, char *b, char *c);
+extern void @@ROLE_2_00@@(char *a, char *b, char *c);
+
+void @@FUNCTION@@(char *a0, char *a1, char *a2, char *a3)
+{
+    char buf[64];
+
+    if (a3 == 0) {
+        @@ROLE_0_01@@(buf, a0 + 192);
+        @@ROLE_1_01@@(a1, a2, buf);
+    } else {
+        @@ROLE_2_01@@(a1, a2, a3);
+    }
+}

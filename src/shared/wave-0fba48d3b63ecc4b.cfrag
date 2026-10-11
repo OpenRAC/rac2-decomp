@@ -1,0 +1,30 @@
+#ifndef RAC2_T_V4_F0FBA48D3
+#define RAC2_T_V4_F0FBA48D3
+typedef int V4_F0fba48d3 __attribute__((mode(TI)));
+#endif
+
+
+extern void @@ROLE_0_00@@(void *b, void *c, void *d);
+extern void @@ROLE_1_00@@(void *dst, void *src, float x);
+extern void @@ROLE_2_00@@(void *c, void *c2, void *s);
+extern void @@ROLE_3_00@@(void *b, void *c, void *p);
+extern void @@ROLE_4_00@@(void *dst, void *src, float y);
+extern void @@ROLE_5_00@@(void *b, void *p, void *s);
+extern void @@ROLE_6_00@@(void *b, void *s, void *e);
+
+void @@FUNCTION@@(char *a0, void *a1, void *a2, void *a3,
+                                      void *a4, float t0, float t1)
+{
+    V4_F0fba48d3 b0, b1, b2, b3;
+    void *p = (void *)(*(int *)(a0 + 112));
+
+    p = (void *)((int)p + 176);
+
+    @@ROLE_0_01@@(&b0, a2, a3);
+    @@ROLE_1_01@@(&b1, &b0, t0);
+    @@ROLE_2_01@@(a2, a2, &b1);
+    @@ROLE_3_01@@(&b2, a2, p);
+    @@ROLE_4_01@@(&b2, &b2, t1);
+    @@ROLE_5_01@@(&b3, p, &b2);
+    @@ROLE_6_01@@(a1, &b3, a4);
+}

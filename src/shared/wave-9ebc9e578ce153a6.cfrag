@@ -1,0 +1,23 @@
+extern void @@ROLE_0_00@@ (char *node, int zero, int size);
+
+void @@FUNCTION@@ (char *list, char *node)
+{
+  char *cur;
+
+  if (node == 0)
+    return;
+
+  if (*(char **) (list + 84) == node)
+    {
+      *(char **) (list + 84) = *(char **) (node + 8);
+    }
+  else if (*(char **) (list + 84) != 0)
+    {
+      cur = *(char **) (list + 84);
+      while (*(char **) (cur + 8) != 0 && *(char **) (cur + 8) != node)
+        cur = *(char **) (cur + 8);
+      if (*(char **) (cur + 8) == node)
+        *(char **) (cur + 8) = *(char **) (node + 8);
+    }
+  @@ROLE_0_01@@ (node, 0, 64);
+}

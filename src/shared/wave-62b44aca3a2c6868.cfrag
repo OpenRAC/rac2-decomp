@@ -1,0 +1,17 @@
+extern void @@ROLE_0_00@@(void *);
+extern void @@ROLE_1_00@@(void *, float, float, float);
+extern unsigned char @@BIND_DATA0_00@@[];
+
+void @@FUNCTION@@(float a, float b, float c)
+{
+    float buf[4];
+
+    @@ROLE_0_01@@(buf);
+
+    if (@@BIND_DATA0_01@@[0] == 1)
+        buf[2] = 0.35f;
+    else
+        buf[2] = 0.6f;
+
+    @@ROLE_1_01@@(buf, a, b, c);
+}

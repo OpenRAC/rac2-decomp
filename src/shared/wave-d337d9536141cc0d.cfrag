@@ -1,0 +1,27 @@
+extern char @@BIND_DATA0_00@@[];
+extern void @@ROLE_0_00@@(char *dst, char *src, char *extra);
+
+#ifndef RAC2_T_V4_FD337D953
+#define RAC2_T_V4_FD337D953
+typedef int V4_Fd337d953 __attribute__((mode(TI)));
+#endif
+
+
+void @@FUNCTION@@(char *dst, char *src, float k)
+{
+    char *base = @@BIND_DATA0_01@@;
+    int flag = *(unsigned char *)(base + 8899);
+
+    if (flag == 0) {
+        *(V4_Fd337d953 *)dst = *(V4_Fd337d953 *)src;
+        *(float *)(dst + 8) = *(float *)(dst + 8) * k;
+        return;
+    }
+    if (flag < 0)
+        return;
+    if (flag >= 3)
+        return;
+    @@ROLE_0_01@@(dst, src, base + 64);
+    *(float *)(dst + 8) = *(float *)(dst + 8) * k;
+    @@ROLE_0_02@@(dst, dst, base);
+}

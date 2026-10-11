@@ -31,6 +31,9 @@
     "LVL_7_SIBERIUS_F60904fd170c92806_AT002FFDF0_ROLE01": 1733668,
     "LVL_7_SIBERIUS_F60904fd170c92806_AT002FFDF0_ROLE02": 1733664,
     "LVL_7_SIBERIUS_F61acb1f304b382c7_AT002E96B0_ROLE00": 1740212,
+    "LVL_7_SIBERIUS_F65feeb52_D_001A79F0": 1735152,
+    "LVL_7_SIBERIUS_F65feeb52_D_001A7A0A": 1735178,
+    "LVL_7_SIBERIUS_F65feeb52_FUN_002D9AF0": 2988784,
     "LVL_7_SIBERIUS_F6fc8969f33895bc4_AT002F2558_ROLE00": 1741672,
     "LVL_7_SIBERIUS_F715e9b46a377ec8c_AT002FFB58_ROLE00": 1733668,
     "LVL_7_SIBERIUS_F715e9b46a377ec8c_AT002FFB58_ROLE01": 1283040,
@@ -46,6 +49,19 @@
     "LVL_7_SIBERIUS_F83cf4a65b6159c6c_AT003000E0_ROLE00": 1733668,
     "LVL_7_SIBERIUS_F83cf4a65b6159c6c_AT003000E0_ROLE01": 1283040,
     "LVL_7_SIBERIUS_F83cf4a65b6159c6c_AT003000E0_ROLE02": 1733664,
+    "LVL_7_SIBERIUS_F8c659bbc_D_001A8E30": 1740336,
+    "LVL_7_SIBERIUS_F8c659bbc_D_001B1F50": 1777488,
+    "LVL_7_SIBERIUS_F8c659bbc_D_001B9200": 1806848,
+    "LVL_7_SIBERIUS_F8c659bbc_D_001B9430": 1807408,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_002E4340": 3031872,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_002E4440": 3032128,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_002E4458": 3032152,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_002E45F0": 3032560,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_002E4B70": 3033968,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_002E4EB8": 3034808,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_002E50D8": 3035352,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_00314770": 3229552,
+    "LVL_7_SIBERIUS_F8c659bbc_FUN_00316B68": 3238760,
     "LVL_7_SIBERIUS_F94af54270be5f5c3_AT002E9678_ROLE00": 1740208,
     "LVL_7_SIBERIUS_F967caba148c0b35c_AT002DB688_ROLE00": 1777032,
     "LVL_7_SIBERIUS_F967caba148c0b35c_AT002DB688_ROLE01": 1777040,
@@ -144,6 +160,12 @@
       "symbol": "LVL_7_SIBERIUS_FUN_002CD8E8"
     },
     {
+      "address": 2988952,
+      "meaning": "Reads an unsigned byte from a global; if it is zero, divides a helper result (called with a gp-relative global and the argument) by 100 and returns 3 minus that quotient when it exceeds the byte, else 1; otherwise returns 3.",
+      "size": 104,
+      "symbol": "LVL_7_SIBERIUS_FUN_002D9B98"
+    },
+    {
       "address": 2995848,
       "meaning": "Reset the sixteen observed 32-bit state cells to zero. The original game role is unknown.",
       "size": 116,
@@ -178,6 +200,12 @@
       "meaning": "Store four incoming integer words into four consecutive measured GP cells in argument order. The original game role is unknown.",
       "size": 20,
       "symbol": "LVL_7_SIBERIUS_FUN_002E7040"
+    },
+    {
+      "address": 3052528,
+      "meaning": "runs a fixed pipeline of helper calls on five stack scratch objects, then either negates a half-scaled helper result or calls a scalar helper with two literal scales and negates the first float of the incoming object, ending with two more helper calls",
+      "size": 324,
+      "symbol": "LVL_7_SIBERIUS_FUN_002E93F0"
     },
     {
       "address": 3053176,

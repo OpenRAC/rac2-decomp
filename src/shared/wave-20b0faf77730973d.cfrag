@@ -1,0 +1,15 @@
+extern void @@ROLE_0_00@@(int, int);
+extern void @@ROLE_1_00@@(int, int, float);
+extern void @@ROLE_2_00@@(int, int);
+extern void @@ROLE_3_00@@(int, int, float);
+
+void @@FUNCTION@@(int a, int b, float x, float y)
+{
+    if (b != 0) {
+        @@ROLE_0_01@@(a, a);
+        @@ROLE_1_01@@(a, a, y);
+    } else {
+        @@ROLE_2_01@@(a, a);
+        @@ROLE_3_01@@(a, a, y);
+    }
+}

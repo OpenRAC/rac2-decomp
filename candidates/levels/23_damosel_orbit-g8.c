@@ -1028,3 +1028,516 @@ void LVL_23_DAMOSEL_ORBIT_FUN_0036EF90(u32_Fe8672ea5 object)
     LVL_23_DAMOSEL_ORBIT_Fe8672ea5_D_001AC190 = 1.0f;
     LVL_23_DAMOSEL_ORBIT_Fe8672ea5_FUN_002F8128(LVL_23_DAMOSEL_ORBIT_Fe8672ea5_D_001B2DB0);
 }
+/* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
+
+#ifndef RAC2_T_BLOCK48_F8C659BBC
+#define RAC2_T_BLOCK48_F8C659BBC
+typedef struct { char pad[48]; } Block48_F8c659bbc;
+#endif
+
+#ifndef RAC2_T_BLOCK16_F8C659BBC
+#define RAC2_T_BLOCK16_F8C659BBC
+typedef struct { char pad[16]; } Block16_F8c659bbc;
+#endif
+
+
+extern char LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001B2410[] __attribute__((sda));
+extern char LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001BA640[];
+extern char LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001BA870[];
+extern char LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001A8E30 __attribute__((sda));
+
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8190(char *a, char *b, char *c);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8440(char *a, char *b, float f);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F89C0(char *a, char *b);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8D48(char *a, char *b, char *c);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8290(char *a, char *b, char *c);
+extern float LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F82A8(char *a);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_0032A220(char *a, char *b, float f);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_00327E28(char *a, float f1, float f2, float f3, float f4);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_0032A220(char *a, char *b, float f);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8F68(char *a, char *b);
+extern void LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8D48(char *a, char *b, char *c);
+
+void LVL_23_DAMOSEL_ORBIT_FUN_002FD280(char *arg0, int arg1)
+{
+    Block48_F8c659bbc a;
+    Block48_F8c659bbc b;
+    Block48_F8c659bbc c;
+    Block16_F8c659bbc d;
+    Block16_F8c659bbc e;
+    float v;
+
+    LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8190((char *)&e, LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001BA640, LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001B2410);
+    LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8440((char *)&e, (char *)&e, 1.0f);
+    LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F89C0((char *)&c, (char *)&LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001A8E30);
+    LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8D48((char *)&b, LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001BA640 + 560, (char *)&c);
+    LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8290((char *)&d, (char *)&b, (char *)&e);
+    v = LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F82A8((char *)&d) * 0.5f;
+    if (arg1 != 0) {
+        LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_0032A220((char *)&d, (char *)&d, -v);
+    } else {
+        LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_00327E28(arg0, v, 5.8177649043500423431396e-04f,
+                5.8177649043500423431396e-04f,
+                5.2359886467456817626953e-02f);
+        LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_0032A220((char *)&d, (char *)&d, -*(float *)arg0);
+    }
+    LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8F68((char *)&d, (char *)&a);
+    LVL_23_DAMOSEL_ORBIT_F8c659bbc_FUN_002F8D48(LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001BA870, (char *)&a, LVL_23_DAMOSEL_ORBIT_F8c659bbc_D_001BA870);
+}
+#ifndef RAC2_T_F32_F7036EF03
+#define RAC2_T_F32_F7036EF03
+typedef float f32_F7036ef03;
+#endif
+
+
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4A8 __attribute__((sda));
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4B0 __attribute__((sda));
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4B8 __attribute__((sda));
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4C0 __attribute__((sda));
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4C8 __attribute__((sda));
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4AC;
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4B4;
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4BC;
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4C4;
+extern f32_F7036ef03 LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4CC;
+
+extern void LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044E9A8(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2);
+extern void LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044EFA0(void *a0);
+extern void LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044EF30(void *a0);
+extern int LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044E2E0(void *a0, int a1);
+
+void LVL_23_DAMOSEL_ORBIT_FUN_0044F100(char *self, int arg)
+{
+    f32_F7036ef03 *v;
+    char *sub = self + 664;
+
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(self, LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4A8 + v[0], LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4AC + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(self + 76, LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4B0 + v[0], LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4B4 + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(self + 152, LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4B8 + v[0], LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4BC + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_00441798(self + 576, LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4C0 + v[0], LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4C4 + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044E9A8(sub, LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4C8 + v[0], LVL_23_DAMOSEL_ORBIT_F7036ef03_D_001AE4CC + v[1]);
+    LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044EFA0(self);
+    LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044EF30(self);
+    *(int *)(self + 416) = LVL_23_DAMOSEL_ORBIT_F7036ef03_FUN_0044E2E0(sub, arg);
+}
+extern int LVL_23_DAMOSEL_ORBIT_F27b8017b_D_001ADC6C __attribute__((sda));
+extern int LVL_23_DAMOSEL_ORBIT_F27b8017b_D_001ADC70 __attribute__((sda));
+extern int LVL_23_DAMOSEL_ORBIT_F27b8017b_FUN_00303F28(int a, int b);
+extern int LVL_23_DAMOSEL_ORBIT_F27b8017b_FUN_003043F8(int a, int b, int c, int d, int e, int *p);
+
+void LVL_23_DAMOSEL_ORBIT_FUN_00442188(int *obj)
+{
+    int tmp[4];
+    float f;
+
+    f = *(float *)obj[4];
+    if (f == 0.0f)
+        return;
+    if (LVL_23_DAMOSEL_ORBIT_F27b8017b_D_001ADC6C != 0)
+        *(int *)obj[3] = (*(int *)obj[3] & 0xff000000) | (LVL_23_DAMOSEL_ORBIT_F27b8017b_D_001ADC70 & 0x00ffffff);
+    tmp[0] = *(int *)obj[3];
+    tmp[1] = *(int *)obj[3];
+    tmp[2] = *(int *)obj[3];
+    tmp[3] = *(int *)obj[3];
+    LVL_23_DAMOSEL_ORBIT_F27b8017b_FUN_003043F8(LVL_23_DAMOSEL_ORBIT_F27b8017b_FUN_00303F28((int)((float *)obj[13])[0], (int)((float *)obj[13])[1]),
+             (int)((float *)obj[0])[0], (int)((float *)obj[0])[1],
+             (int)((float *)obj[1])[0], (int)((float *)obj[1])[1], tmp);
+}
+extern void LVL_23_DAMOSEL_ORBIT_F67cf9b36_FUN_00441798(char *p, float x, float y, float zero, float zero2);
+
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1E0 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1E8 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1F0 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1F8 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1E4;
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1EC;
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1F4;
+extern float LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1FC;
+
+struct pos {
+    float x;
+    float y;
+};
+
+void LVL_23_DAMOSEL_ORBIT_FUN_0044A600(char *self)
+{
+    float zero = 0.0f;
+
+    LVL_23_DAMOSEL_ORBIT_F67cf9b36_FUN_00441798(self + 1256, LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1F8 + (*(struct pos **)(self + 680))->x,
+            LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1FC + (*(struct pos **)(self + 680))->y, zero, zero);
+    LVL_23_DAMOSEL_ORBIT_F67cf9b36_FUN_00441798(self + 1040, LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1E0 + (*(struct pos **)(self + 680))->x,
+            LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1E4 + (*(struct pos **)(self + 680))->y, zero, zero);
+    LVL_23_DAMOSEL_ORBIT_F67cf9b36_FUN_00441798(self + 1112, LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1E8 + (*(struct pos **)(self + 680))->x,
+            LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1EC + (*(struct pos **)(self + 680))->y, zero, zero);
+    LVL_23_DAMOSEL_ORBIT_F67cf9b36_FUN_00441798(self + 1184, LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1F0 + (*(struct pos **)(self + 680))->x,
+            LVL_23_DAMOSEL_ORBIT_F67cf9b36_D_001AE1F4 + (*(struct pos **)(self + 680))->y, zero, zero);
+}
+extern float LVL_23_DAMOSEL_ORBIT_Ff0e326aa_D_001AE440 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_Ff0e326aa_D_001AE444;
+extern float LVL_23_DAMOSEL_ORBIT_Ff0e326aa_D_001AE448 __attribute__((sda));
+extern void LVL_23_DAMOSEL_ORBIT_Ff0e326aa_FUN_00441798(void *, float, float, float, float);
+extern void LVL_23_DAMOSEL_ORBIT_Ff0e326aa_FUN_00442280(void *, int, int);
+extern void LVL_23_DAMOSEL_ORBIT_Ff0e326aa_FUN_00442188(void *);
+
+void LVL_23_DAMOSEL_ORBIT_FUN_0044DFD0(int *p)
+{
+    int i;
+
+    for (i = 0; i < p[95]; i++) {
+        float *q = (float *)p[96];
+        int v;
+
+        LVL_23_DAMOSEL_ORBIT_Ff0e326aa_FUN_00441798(p + 76, q[0] + LVL_23_DAMOSEL_ORBIT_Ff0e326aa_D_001AE440,
+                (q[1] + LVL_23_DAMOSEL_ORBIT_Ff0e326aa_D_001AE444) + LVL_23_DAMOSEL_ORBIT_Ff0e326aa_D_001AE448 * (float)i, 0.0f, 0.0f);
+        if (i == 3)
+            v = 0xEA9E;
+        else
+            v = 0xEAA6;
+        p[93] = v;
+        LVL_23_DAMOSEL_ORBIT_Ff0e326aa_FUN_00442280(p + 76, v, ((int *)p[94])[i]);
+        LVL_23_DAMOSEL_ORBIT_Ff0e326aa_FUN_00442188(p + 76);
+    }
+}
+#ifndef RAC2_T_F32_FE833F09F
+#define RAC2_T_F32_FE833F09F
+typedef float f32_Fe833f09f;
+#endif
+
+
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE378 __attribute__((sda));
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE388 __attribute__((sda));
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE380 __attribute__((sda));
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE390 __attribute__((sda));
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE398 __attribute__((sda));
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE37C;
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE38C;
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE384;
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE394;
+extern f32_Fe833f09f LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE39C;
+
+extern void LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441798(void *a0, f32_Fe833f09f a1, f32_Fe833f09f a2, f32_Fe833f09f a3, f32_Fe833f09f a4);
+extern void *LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441780(void *a0);
+extern int LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_003265A8(int a0, int a1, int a2, int a3, int a4);
+extern void LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_0044D138(void *a0, int a1);
+extern void LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_0044D0C8(void *a0);
+extern void LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_0044D130(void *a0);
+
+int LVL_23_DAMOSEL_ORBIT_FUN_0044D228(char *self, int arg1)
+{
+    f32_Fe833f09f *v;
+
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441798(self, LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE378 + v[0], LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE37C + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441798(self + 152, LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE388 + v[0], LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE38C + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441798(self + 76, LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE380 + v[0], LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE384 + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441798(self + 228, LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE390 + v[0], LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE394 + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441798(self + 464, LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE398 + v[0], LVL_23_DAMOSEL_ORBIT_Fe833f09f_D_001AE39C + v[1], 0.0f, 0.0f);
+
+    *(int *)LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_00441780(self + 304) = LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_003265A8(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_0044D138(self, arg1);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_0044D0C8(self);
+    LVL_23_DAMOSEL_ORBIT_Fe833f09f_FUN_0044D130(self);
+    return *(int *)(self + (*(int *)(self + 764) << 2) + 440);
+}
+#ifndef RAC2_T_S32_FEE27D7BC
+#define RAC2_T_S32_FEE27D7BC
+typedef int s32_Fee27d7bc;
+#endif
+
+#ifndef RAC2_T_F32_FEE27D7BC
+#define RAC2_T_F32_FEE27D7BC
+typedef float f32_Fee27d7bc;
+#endif
+
+
+extern s32_Fee27d7bc LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_004427A0 (s32_Fee27d7bc, s32_Fee27d7bc);
+extern s32_Fee27d7bc LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00442708 (s32_Fee27d7bc, s32_Fee27d7bc);
+extern void LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00446540 (s32_Fee27d7bc, s32_Fee27d7bc, const void *);
+extern void LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00446998 (s32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc);
+extern void LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00441B40 (s32_Fee27d7bc, const void *, s32_Fee27d7bc);
+extern s32_Fee27d7bc LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00441780 (s32_Fee27d7bc);
+extern void LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00441CF0 (s32_Fee27d7bc, const void *, s32_Fee27d7bc);
+extern void LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00445100 (s32_Fee27d7bc);
+
+extern char LVL_23_DAMOSEL_ORBIT_Fee27d7bc_D_001ADF08[];
+extern s32_Fee27d7bc LVL_23_DAMOSEL_ORBIT_Fee27d7bc_D_001A904C;
+extern s32_Fee27d7bc LVL_23_DAMOSEL_ORBIT_Fee27d7bc_D_001ADEF8 __attribute__ ((sda));
+
+void LVL_23_DAMOSEL_ORBIT_FUN_00444F98 (s32_Fee27d7bc self, s32_Fee27d7bc arg)
+{
+  s32_Fee27d7bc p;
+  *(s32_Fee27d7bc *) self = arg;
+  if (arg != 0)
+    {
+      p = LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00442708 (16, LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_004427A0 (arg, arg));
+      *(s32_Fee27d7bc *) (self + 756) = p;
+      ((s32_Fee27d7bc *) p)[1] = 0;
+      ((s32_Fee27d7bc *) p)[2] = 0;
+      ((s32_Fee27d7bc *) p)[3] = 0;
+      ((s32_Fee27d7bc *) p)[0] = 0;
+    }
+  ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (self + 756))[0] = 256.0f;
+  ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (self + 756))[1] = 212.0f;
+  *(s32_Fee27d7bc *) (self + 760) = 0;
+  LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00446540 (self + 8, arg, &LVL_23_DAMOSEL_ORBIT_Fee27d7bc_D_001ADEF8);
+  LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00446998 (self + 8, 64.0f, -164.0f, 10.0f, 136.0f, 10.0f, 99.0f);
+  LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00441B40 (self + 680, LVL_23_DAMOSEL_ORBIT_Fee27d7bc_D_001ADF08, arg);
+  p = LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00441780 (self + 680);
+  *(s32_Fee27d7bc *) p = 0x70FFFEED;
+  LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00441CF0 (self + 680, LVL_23_DAMOSEL_ORBIT_Fee27d7bc_D_001A904C + 0x8710, 214);
+  LVL_23_DAMOSEL_ORBIT_Fee27d7bc_FUN_00445100 (self);
+  *(s32_Fee27d7bc *) (self + 768) = 0;
+}
+#ifndef RAC2_T_S32_F09F721E0
+#define RAC2_T_S32_F09F721E0
+typedef int s32_F09f721e0;
+#endif
+
+#ifndef RAC2_T_F32_F09F721E0
+#define RAC2_T_F32_F09F721E0
+typedef float f32_F09f721e0;
+#endif
+
+
+extern s32_F09f721e0 LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_004427A0 (s32_F09f721e0, s32_F09f721e0);
+extern s32_F09f721e0 LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00442708 (s32_F09f721e0, s32_F09f721e0);
+extern void LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00446540 (s32_F09f721e0, s32_F09f721e0, const void *);
+extern s32_F09f721e0 LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_002FE718 (s32_F09f721e0);
+extern s32_F09f721e0 LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_002FE718 (s32_F09f721e0);
+extern s32_F09f721e0 LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_002FE718 (s32_F09f721e0);
+extern void LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_004469B8 (s32_F09f721e0, s32_F09f721e0, s32_F09f721e0, s32_F09f721e0);
+extern void LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00446998 (s32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0);
+extern void LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00446A10 (s32_F09f721e0, f32_F09f721e0);
+extern void LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00447800 (s32_F09f721e0, s32_F09f721e0);
+
+extern s32_F09f721e0 LVL_23_DAMOSEL_ORBIT_F09f721e0_D_001AE040 __attribute__ ((sda));
+
+void LVL_23_DAMOSEL_ORBIT_FUN_004476D8 (s32_F09f721e0 self, s32_F09f721e0 arg)
+{
+  s32_F09f721e0 q;
+  s32_F09f721e0 p;
+  s32_F09f721e0 a, b;
+  *(s32_F09f721e0 *) self = arg;
+  if (arg != 0)
+    {
+      p = LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00442708 (16, LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_004427A0 (arg, arg));
+      *(s32_F09f721e0 *) (self + 684) = p;
+      ((s32_F09f721e0 *) p)[1] = 0;
+      ((s32_F09f721e0 *) p)[2] = 0;
+      ((s32_F09f721e0 *) p)[3] = 0;
+      ((s32_F09f721e0 *) p)[0] = 0;
+    }
+  q = self + 8;
+  ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[0] = 255.0f;
+  ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[1] = 195.0f;
+  LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00446540 (q, arg, &LVL_23_DAMOSEL_ORBIT_F09f721e0_D_001AE040);
+  a = LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_002FE718 (12773);
+  b = LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_002FE718 (11598);
+  LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_004469B8 (q, a, b, LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_002FE718 (11599));
+  LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00446998 (q, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+  LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00446A10 (q, 0.65f);
+  *(s32_F09f721e0 *) (self + 680) = 0;
+  *(s32_F09f721e0 *) (q + 668) = 0;
+  LVL_23_DAMOSEL_ORBIT_F09f721e0_FUN_00447800 (self, 0);
+}
+#ifndef RAC2_T_U8_FE9770B1E
+#define RAC2_T_U8_FE9770B1E
+typedef unsigned char u8_Fe9770b1e;
+#endif
+
+#ifndef RAC2_T_S32_FE9770B1E
+#define RAC2_T_S32_FE9770B1E
+typedef int s32_Fe9770b1e;
+#endif
+
+#ifndef RAC2_T_F32_FE9770B1E
+#define RAC2_T_F32_FE9770B1E
+typedef float f32_Fe9770b1e;
+#endif
+
+
+/* Resident shared table reached through $gp (small-data symbol). */
+extern f32_Fe9770b1e LVL_23_DAMOSEL_ORBIT_Fe9770b1e_D_001AE0B8[2] __attribute__((sda));
+
+extern void *LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_004427A0(void *);
+extern void *LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00442708(s32_Fe9770b1e, void *);
+extern void LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00446540(u8_Fe9770b1e *, void *, f32_Fe9770b1e *);
+extern void *LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_002FE718(s32_Fe9770b1e);
+extern void LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_004469B8(u8_Fe9770b1e *, void *, void *, void *);
+extern void LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00446998(u8_Fe9770b1e *, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e);
+extern void LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00446A10(u8_Fe9770b1e *, f32_Fe9770b1e);
+extern void LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00448480(u8_Fe9770b1e *, s32_Fe9770b1e);
+
+void LVL_23_DAMOSEL_ORBIT_FUN_00448358(u8_Fe9770b1e *self, void *arg) {
+    u8_Fe9770b1e *sub;
+    void *first, *second, *third;
+    *(void **)self = arg;
+    if (arg != 0) {
+        void *t = LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_004427A0(arg);
+        void *p = LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00442708(16, t);
+        *(void **)(self + 684) = p;
+        ((s32_Fe9770b1e *)p)[1] = 0;
+        ((s32_Fe9770b1e *)p)[2] = 0;
+        ((s32_Fe9770b1e *)p)[3] = 0;
+        ((s32_Fe9770b1e *)p)[0] = 0;
+    }
+    sub = self + 8;
+    ((f32_Fe9770b1e *)*(void **)(self + 684))[0] = 255.0f;
+    ((f32_Fe9770b1e *)*(void **)(self + 684))[1] = 195.0f;
+    LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00446540(sub, arg, LVL_23_DAMOSEL_ORBIT_Fe9770b1e_D_001AE0B8);
+    first = LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_002FE718(11667);
+    second = LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_002FE718(11598);
+    third = LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_002FE718(11599);
+    LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_004469B8(sub, first, second, third);
+    LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00446998(sub, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00446A10(sub, 0.2f);
+    *(s32_Fe9770b1e *)(self + 680) = 0;
+    LVL_23_DAMOSEL_ORBIT_Fe9770b1e_FUN_00448480(self, 0);
+}
+#ifndef RAC2_T_U8_FF4EB83C9
+#define RAC2_T_U8_FF4EB83C9
+typedef unsigned char u8_Ff4eb83c9;
+#endif
+
+#ifndef RAC2_T_S32_FF4EB83C9
+#define RAC2_T_S32_FF4EB83C9
+typedef int s32_Ff4eb83c9;
+#endif
+
+#ifndef RAC2_T_F32_FF4EB83C9
+#define RAC2_T_F32_FF4EB83C9
+typedef float f32_Ff4eb83c9;
+#endif
+
+
+/* Resident shared table reached through $gp (small-data symbol). */
+extern f32_Ff4eb83c9 LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_D_001AE070[2] __attribute__((sda));
+
+extern void *LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_004427A0(void *);
+extern void *LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00442708(s32_Ff4eb83c9, void *);
+extern void LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00446540(u8_Ff4eb83c9 *, void *, f32_Ff4eb83c9 *);
+extern void *LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_002FE718(s32_Ff4eb83c9);
+extern void LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_004469B8(u8_Ff4eb83c9 *, void *, void *, void *);
+extern void LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00446998(u8_Ff4eb83c9 *, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9);
+extern void LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00446A10(u8_Ff4eb83c9 *, f32_Ff4eb83c9);
+extern void LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00447EF8(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
+
+void LVL_23_DAMOSEL_ORBIT_FUN_00447DD0(u8_Ff4eb83c9 *self, void *arg) {
+    u8_Ff4eb83c9 *sub;
+    void *first, *second, *third;
+    *(void **)self = arg;
+    if (arg != 0) {
+        void *t = LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_004427A0(arg);
+        void *p = LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00442708(16, t);
+        *(void **)(self + 684) = p;
+        ((s32_Ff4eb83c9 *)p)[1] = 0;
+        ((s32_Ff4eb83c9 *)p)[2] = 0;
+        ((s32_Ff4eb83c9 *)p)[3] = 0;
+        ((s32_Ff4eb83c9 *)p)[0] = 0;
+    }
+    sub = self + 8;
+    ((f32_Ff4eb83c9 *)*(void **)(self + 684))[0] = 255.0f;
+    ((f32_Ff4eb83c9 *)*(void **)(self + 684))[1] = 195.0f;
+    LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00446540(sub, arg, LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_D_001AE070);
+    first = LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_002FE718(11672);
+    second = LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_002FE718(11598);
+    third = LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_002FE718(11599);
+    LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_004469B8(sub, first, second, third);
+    LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00446998(sub, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00446A10(sub, 0.65f);
+    *(s32_Ff4eb83c9 *)(self + 680) = 0;
+    LVL_23_DAMOSEL_ORBIT_Ff4eb83c9_FUN_00447EF8(self, 0);
+}
+extern void LVL_23_DAMOSEL_ORBIT_F54dfe946_FUN_00441798(char *p, float x, float y, float zero, float zero2);
+
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE540 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE548 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE550 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE558 __attribute__((sda));
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE544;
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE54C;
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE554;
+extern float LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE55C;
+
+struct pos54dfe946 {
+    float x;
+    float y;
+};
+
+void LVL_23_DAMOSEL_ORBIT_FUN_004501B0(char *self)
+{
+    float zero = 0.0f;
+
+    LVL_23_DAMOSEL_ORBIT_F54dfe946_FUN_00441798(self + 808, LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE540 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE544 + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+    LVL_23_DAMOSEL_ORBIT_F54dfe946_FUN_00441798(self + 880, LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE548 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE54C + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+    LVL_23_DAMOSEL_ORBIT_F54dfe946_FUN_00441798(self + 952, LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE550 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE554 + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+    LVL_23_DAMOSEL_ORBIT_F54dfe946_FUN_00441798(self + 736, LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE558 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_23_DAMOSEL_ORBIT_F54dfe946_D_001AE55C + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+}
+extern int LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_00138344[4];
+extern int LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_001ADF14[4] __attribute__((sda));
+extern int LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_001ADF10 __attribute__((sda));
+extern int LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_001ADF18 __attribute__((sda));
+
+extern void LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00446980(char *, float, float);
+extern void LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00446790(char *);
+extern int LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_003265A8(int, int, int, int, int);
+extern void *LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00441780(char *);
+extern int LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_003265A8(int, int, int, int, int);
+extern void LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00441798(char *, float, float, float, float);
+
+int LVL_23_DAMOSEL_ORBIT_FUN_00445210(char *p)
+{
+    char *a = p + 8;
+    char *b;
+    void *r;
+    float x;
+    float y;
+
+    LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00446980(a, ((float *)(*(int *)(p + 756)))[0], ((float *)(*(int *)(p + 756)))[1]);
+    LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00446790(a);
+    if (LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_00138344[0] & 0x5000)
+        LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_003265A8(0, 0, 1, 0, 1);
+    b = p + 680;
+    r = LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00441780(b);
+    *(int *)r = LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_003265A8(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    x = ((float *)(*(int *)(p + 756)))[0] + (float)LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_001ADF10;
+    y = ((float *)(*(int *)(p + 756)))[1]
+        + (float)(*(int *)(p + 760) * LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_001ADF18);
+    y = y + (float)LVL_23_DAMOSEL_ORBIT_Fa769c0f9_D_001ADF14[0];
+    LVL_23_DAMOSEL_ORBIT_Fa769c0f9_FUN_00441798(b, x, y, 0.0f, 0.0f);
+    return 0;
+}
+extern unsigned char LVL_23_DAMOSEL_ORBIT_F65feeb52_D_001A7A0A;
+extern int LVL_23_DAMOSEL_ORBIT_F65feeb52_D_001A79F0 __attribute__((sda));
+extern int LVL_23_DAMOSEL_ORBIT_F65feeb52_FUN_002EE3C8(int, int);
+
+int LVL_23_DAMOSEL_ORBIT_FUN_002EE470(int x)
+{
+    int b = LVL_23_DAMOSEL_ORBIT_F65feeb52_D_001A7A0A;
+    int q;
+    int v;
+
+    if (b == 0) {
+        q = LVL_23_DAMOSEL_ORBIT_F65feeb52_FUN_002EE3C8(LVL_23_DAMOSEL_ORBIT_F65feeb52_D_001A79F0, x) / 100;
+        v = 3 - q;
+        return b < v ? v : 1;
+    }
+    return 3;
+}

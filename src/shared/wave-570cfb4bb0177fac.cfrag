@@ -1,0 +1,20 @@
+
+#ifndef RAC2_T_S16_F570CFB4B
+#define RAC2_T_S16_F570CFB4B
+typedef short s16_F570cfb4b;
+#endif
+
+
+
+extern void @@ROLE_0_00@@(u8 *);
+
+void @@FUNCTION@@(u8 *a0) {
+    s16_F570cfb4b *p = (s16_F570cfb4b *)(a0 + 10);
+    if (--*p == 0) {
+        *(s32 *)(a0 + 4) += 0xff000000;
+        *p = 2;
+    }
+    if ((*(s32 *)(a0 + 4) & 0xff000000) == 0) {
+        @@ROLE_0_01@@(a0);
+    }
+}

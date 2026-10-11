@@ -1,0 +1,24 @@
+extern void @@ROLE_0_00@@();
+extern void @@ROLE_1_00@@();
+extern void @@ROLE_2_00@@();
+extern void @@ROLE_3_00@@();
+extern void @@ROLE_4_00@@();
+extern void @@ROLE_5_00@@();
+extern void @@ROLE_6_00@@();
+extern void @@ROLE_7_00@@();
+extern void @@ROLE_8_00@@();
+extern void @@ROLE_9_00@@();
+
+void @@FUNCTION@@(char *p)
+{
+    @@ROLE_0_01@@(p + 8);
+    @@ROLE_1_01@@(0);
+    @@ROLE_2_01@@(p + 744);
+    @@ROLE_3_01@@(p + 816);
+    @@ROLE_4_01@@(p + 888);
+    @@ROLE_5_01@@(p + 684);
+    @@ROLE_6_01@@(p + 960);
+    @@ROLE_7_01@@(p + 1400);
+    @@ROLE_8_01@@(p + 1328);
+    @@ROLE_9_01@@(p);
+}

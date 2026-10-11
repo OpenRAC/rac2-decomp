@@ -1,0 +1,24 @@
+extern char @@BIND_DATA0_00@@[];
+
+extern int @@ROLE_0_00@@(int, int *, int *);
+
+void @@FUNCTION@@(void)
+{
+    char *d = @@BIND_DATA0_01@@;
+    int a;
+    int b;
+    int *o;
+
+    if (*(unsigned char *)(d + 8884) != 0)
+        return;
+    if (*(int *)(d + 4916) != 2)
+        return;
+    if (@@ROLE_0_01@@(*(unsigned char *)(*(int *)(d + 8848) + 67), &a, &b) == 0)
+        return;
+    o = (int *)*(int *)(d + 4880);
+    if (o != 0)
+        *(float *)((char *)o + 72) = *(float *)(d + 3104);
+    o = (int *)*(int *)(d + 4884);
+    if (o != 0)
+        *(float *)((char *)o + 72) = *(float *)(d + 3104);
+}

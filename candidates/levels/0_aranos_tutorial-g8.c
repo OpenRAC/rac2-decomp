@@ -930,3 +930,101 @@ int LVL_0_ARANOS_TUTORIAL_FUN_002D64B8(float *a0, float *a1, float *a2)
     }
     return 0;
 }
+/* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
+
+#ifndef RAC2_T_BLOCK48_F8C659BBC
+#define RAC2_T_BLOCK48_F8C659BBC
+typedef struct { char pad[48]; } Block48_F8c659bbc;
+#endif
+
+#ifndef RAC2_T_BLOCK16_F8C659BBC
+#define RAC2_T_BLOCK16_F8C659BBC
+typedef struct { char pad[16]; } Block16_F8c659bbc;
+#endif
+
+
+extern char LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B1B10[] __attribute__((sda));
+extern char LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B8DC0[];
+extern char LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B8FF0[];
+extern char LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001A8E30 __attribute__((sda));
+
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE138(char *a, char *b, char *c);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE3D0(char *a, char *b, float f);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE950(char *a, char *b);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EEC98(char *a, char *b, char *c);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE220(char *a, char *b, char *c);
+extern float LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE238(char *a);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_00320940(char *a, char *b, float f);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_0031E238(char *a, float f1, float f2, float f3, float f4);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_00320940(char *a, char *b, float f);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EEEB8(char *a, char *b);
+extern void LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EEC98(char *a, char *b, char *c);
+
+void LVL_0_ARANOS_TUTORIAL_FUN_002F31D0(char *arg0, int arg1)
+{
+    Block48_F8c659bbc a;
+    Block48_F8c659bbc b;
+    Block48_F8c659bbc c;
+    Block16_F8c659bbc d;
+    Block16_F8c659bbc e;
+    float v;
+
+    LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE138((char *)&e, LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B8DC0, LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B1B10);
+    LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE3D0((char *)&e, (char *)&e, 1.0f);
+    LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE950((char *)&c, (char *)&LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001A8E30);
+    LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EEC98((char *)&b, LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B8DC0 + 560, (char *)&c);
+    LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE220((char *)&d, (char *)&b, (char *)&e);
+    v = LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EE238((char *)&d) * 0.5f;
+    if (arg1 != 0) {
+        LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_00320940((char *)&d, (char *)&d, -v);
+    } else {
+        LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_0031E238(arg0, v, 5.8177649043500423431396e-04f,
+                5.8177649043500423431396e-04f,
+                5.2359886467456817626953e-02f);
+        LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_00320940((char *)&d, (char *)&d, -*(float *)arg0);
+    }
+    LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EEEB8((char *)&d, (char *)&a);
+    LVL_0_ARANOS_TUTORIAL_F8c659bbc_FUN_002EEC98(LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B8FF0, (char *)&a, LVL_0_ARANOS_TUTORIAL_F8c659bbc_D_001B8FF0);
+}
+#ifndef RAC2_T_OBJ_FD7EAF5BF
+#define RAC2_T_OBJ_FD7EAF5BF
+typedef struct {
+    char pad0[170];
+    short kind;
+} OBJ_Fd7eaf5bf;
+#endif
+
+
+extern OBJ_Fd7eaf5bf *LVL_0_ARANOS_TUTORIAL_Fd7eaf5bf_D_001ADB2C __attribute__((sda));
+
+int LVL_0_ARANOS_TUTORIAL_FUN_003800D0(void)
+{
+    OBJ_Fd7eaf5bf *p = LVL_0_ARANOS_TUTORIAL_Fd7eaf5bf_D_001ADB2C;
+
+    if (p) {
+        switch (p->kind) {
+        case 4569: return 0;
+        case 4570: return 1;
+        case 4571: return 2;
+        case 4572: return 3;
+        }
+    }
+    return -1;
+}
+extern unsigned char LVL_0_ARANOS_TUTORIAL_F65feeb52_D_001A7A0A;
+extern int LVL_0_ARANOS_TUTORIAL_F65feeb52_D_001A79F0 __attribute__((sda));
+extern int LVL_0_ARANOS_TUTORIAL_F65feeb52_FUN_002E3A90(int, int);
+
+int LVL_0_ARANOS_TUTORIAL_FUN_002E3B38(int x)
+{
+    int b = LVL_0_ARANOS_TUTORIAL_F65feeb52_D_001A7A0A;
+    int q;
+    int v;
+
+    if (b == 0) {
+        q = LVL_0_ARANOS_TUTORIAL_F65feeb52_FUN_002E3A90(LVL_0_ARANOS_TUTORIAL_F65feeb52_D_001A79F0, x) / 100;
+        v = 3 - q;
+        return b < v ? v : 1;
+    }
+    return 3;
+}

@@ -2651,6 +2651,230 @@ Reopen condition: Independent measured contradictory ABI/field/whole-boundary or
 - `private-work:c-campaign-20261006/gameplay-next-family-proof/camera-activation112-v1/delivery.json`
 - `private-work:c-campaign-20261006/gameplay-next-family-proof/preparation-receipt.json`
 
+## claude-wave-20261011-0_aranos_tutorial
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-10_hrugis_cloud
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-11_joba
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-12_todano
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-13_boldan
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-14_aranos_prison
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-15_gorn
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-16_snivelak
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-17_smolg
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-18_damosel
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-19_grelbin
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-1_oozla
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-20_yeedil
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-22_dobbo_orbit
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-23_damosel_orbit
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-24_ship_shack
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-25_wupash_nebula
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-26_jamming_array
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-2_maktar_nebula
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-30_insomniac_museum
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-3_endako
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-4_barlow
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-5_feltzin_system
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-6_notak
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-7_siberius
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-8_tabora
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-9_dobbo
+
+State: `exact_private`. Kind: `candidate`.
+
+Qualify the complete unit catalogue; then run the full boot and overlay gates.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
+## claude-wave-20261011-boot
+
+State: `exact_private`. Kind: `candidate`.
+
+Re-run the boot trial after removing the colliding external FUN_0033AB50 from config/candidate-catalog.json.
+
+Reopen condition: New measured ABI, type or compiler evidence only.
+
 ## compiler-mtc1-four-exceptions
 
 State: `done`. Kind: `research`.

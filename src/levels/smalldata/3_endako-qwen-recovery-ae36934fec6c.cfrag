@@ -903,3 +903,76 @@ int LVL_3_ENDAKO_FUN_002D6F90(float *a0, float *a1, float *a2)
     }
     return 0;
 }
+/* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
+
+#ifndef RAC2_T_BLOCK48_F8C659BBC
+#define RAC2_T_BLOCK48_F8C659BBC
+typedef struct { char pad[48]; } Block48_F8c659bbc;
+#endif
+
+#ifndef RAC2_T_BLOCK16_F8C659BBC
+#define RAC2_T_BLOCK16_F8C659BBC
+typedef struct { char pad[16]; } Block16_F8c659bbc;
+#endif
+
+
+extern char LVL_3_ENDAKO_F8c659bbc_D_001B2690[] __attribute__((sda));
+extern char LVL_3_ENDAKO_F8c659bbc_D_001B9980[];
+extern char LVL_3_ENDAKO_F8c659bbc_D_001B9BB0[];
+extern char LVL_3_ENDAKO_F8c659bbc_D_001A8E30 __attribute__((sda));
+
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_002EEFE0(char *a, char *b, char *c);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_002EF298(char *a, char *b, float f);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_002EF818(char *a, char *b);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_002EFBA0(char *a, char *b, char *c);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_002EF0C8(char *a, char *b, char *c);
+extern float LVL_3_ENDAKO_F8c659bbc_FUN_002EF0E0(char *a);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_00321CE8(char *a, char *b, float f);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_0031F5E0(char *a, float f1, float f2, float f3, float f4);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_00321CE8(char *a, char *b, float f);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_002EFDC0(char *a, char *b);
+extern void LVL_3_ENDAKO_F8c659bbc_FUN_002EFBA0(char *a, char *b, char *c);
+
+void LVL_3_ENDAKO_FUN_002F40D8(char *arg0, int arg1)
+{
+    Block48_F8c659bbc a;
+    Block48_F8c659bbc b;
+    Block48_F8c659bbc c;
+    Block16_F8c659bbc d;
+    Block16_F8c659bbc e;
+    float v;
+
+    LVL_3_ENDAKO_F8c659bbc_FUN_002EEFE0((char *)&e, LVL_3_ENDAKO_F8c659bbc_D_001B9980, LVL_3_ENDAKO_F8c659bbc_D_001B2690);
+    LVL_3_ENDAKO_F8c659bbc_FUN_002EF298((char *)&e, (char *)&e, 1.0f);
+    LVL_3_ENDAKO_F8c659bbc_FUN_002EF818((char *)&c, (char *)&LVL_3_ENDAKO_F8c659bbc_D_001A8E30);
+    LVL_3_ENDAKO_F8c659bbc_FUN_002EFBA0((char *)&b, LVL_3_ENDAKO_F8c659bbc_D_001B9980 + 560, (char *)&c);
+    LVL_3_ENDAKO_F8c659bbc_FUN_002EF0C8((char *)&d, (char *)&b, (char *)&e);
+    v = LVL_3_ENDAKO_F8c659bbc_FUN_002EF0E0((char *)&d) * 0.5f;
+    if (arg1 != 0) {
+        LVL_3_ENDAKO_F8c659bbc_FUN_00321CE8((char *)&d, (char *)&d, -v);
+    } else {
+        LVL_3_ENDAKO_F8c659bbc_FUN_0031F5E0(arg0, v, 5.8177649043500423431396e-04f,
+                5.8177649043500423431396e-04f,
+                5.2359886467456817626953e-02f);
+        LVL_3_ENDAKO_F8c659bbc_FUN_00321CE8((char *)&d, (char *)&d, -*(float *)arg0);
+    }
+    LVL_3_ENDAKO_F8c659bbc_FUN_002EFDC0((char *)&d, (char *)&a);
+    LVL_3_ENDAKO_F8c659bbc_FUN_002EFBA0(LVL_3_ENDAKO_F8c659bbc_D_001B9BB0, (char *)&a, LVL_3_ENDAKO_F8c659bbc_D_001B9BB0);
+}
+extern unsigned char LVL_3_ENDAKO_F65feeb52_D_001A7A0A;
+extern int LVL_3_ENDAKO_F65feeb52_D_001A79F0 __attribute__((sda));
+extern int LVL_3_ENDAKO_F65feeb52_FUN_002E4618(int, int);
+
+int LVL_3_ENDAKO_FUN_002E46C0(int x)
+{
+    int b = LVL_3_ENDAKO_F65feeb52_D_001A7A0A;
+    int q;
+    int v;
+
+    if (b == 0) {
+        q = LVL_3_ENDAKO_F65feeb52_FUN_002E4618(LVL_3_ENDAKO_F65feeb52_D_001A79F0, x) / 100;
+        v = 3 - q;
+        return b < v ? v : 1;
+    }
+    return 3;
+}

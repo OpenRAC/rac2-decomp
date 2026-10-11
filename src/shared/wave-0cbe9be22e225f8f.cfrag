@@ -1,0 +1,39 @@
+extern void @@ROLE_0_00@@(int arg0, float arg1);
+extern float @@ROLE_1_00@@(char *arg0, int arg1);
+extern float @@ROLE_2_00@@(float arg0, float arg1);
+extern float @@ROLE_3_00@@(float arg0, float arg1);
+extern char @@BIND_DATA0_00@@[];
+
+int @@FUNCTION@@(void)
+{
+    char *p = @@BIND_DATA0_01@@;
+    float value;
+    int result;
+    int state;
+
+    result = 2;
+    if (*(short *)(p + 5204) != 0) {
+        state = *(unsigned char *)(p + 5207);
+        if (state == 0)
+            result = 0;
+        else if (state == 3)
+            result = 3;
+        else if (state == 2)
+            result = 2;
+        else
+            result = 1;
+    } else {
+        @@ROLE_0_01@@(0, 1.0f);
+        if (*(unsigned char *)(p + 8899) != 0)
+            value = @@ROLE_1_01@@(p + 400, 0);
+        else
+            value = @@ROLE_2_01@@(*(float *)(p + 416), *(float *)(p + 152));
+        if (@@ROLE_3_01@@(value, 3.1415929794311523437500e+00f) < 7.8539824485778808593750e-01f)
+            result = 3;
+        else if (@@ROLE_3_02@@(value, -1.5707964897155761718750e+00f) < 7.8539824485778808593750e-01f)
+            result = 1;
+        else if (@@ROLE_3_03@@(value, 1.5707964897155761718750e+00f) < 7.8539824485778808593750e-01f)
+            result = 0;
+    }
+    return result;
+}

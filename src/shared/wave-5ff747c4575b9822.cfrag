@@ -1,0 +1,9 @@
+extern float @@ROLE_0_00@@(int);
+
+float @@FUNCTION@@(int a0, int a1)
+{
+    float r = @@ROLE_0_01@@(a0 % a1);
+    float s = @@ROLE_0_02@@(a1);
+
+    return 2.0f * r * 3.1415927f / s - 3.1415927f;
+}

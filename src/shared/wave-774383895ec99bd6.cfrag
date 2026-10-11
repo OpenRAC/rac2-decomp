@@ -1,0 +1,12 @@
+extern float @@ROLE_0_00@@(float x);
+extern void @@ROLE_1_00@@(void *a0, int a1, float x);
+extern float @@ROLE_2_00@@(float x);
+
+void @@FUNCTION@@(void *a0, int a1, float x)
+{
+    float h = x * 0.5f;
+    float t = @@ROLE_0_01@@(h);
+
+    @@ROLE_1_01@@(a0, a1, t);
+    *(float *)((char *)a0 + 12) = @@ROLE_2_01@@(h);
+}

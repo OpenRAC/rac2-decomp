@@ -1,0 +1,21 @@
+#ifndef RAC2_T_S36_F39E097FB
+#define RAC2_T_S36_F39E097FB
+typedef struct { int w[9]; } S36_F39e097fb;
+#endif
+
+
+extern int @@BIND_DATA0_00@@;
+extern char @@BIND_DATA1_00@@[];
+extern S36_F39e097fb @@BIND_DATA2_00@@;
+
+extern void @@ROLE_0_00@@(int, int, S36_F39e097fb *, char *);
+
+void @@FUNCTION@@(int a0)
+{
+    S36_F39e097fb buf;
+
+    if (a0 == 0)
+        a0 = @@BIND_DATA0_01@@;
+    buf = @@BIND_DATA2_01@@;
+    @@ROLE_0_01@@(a0, 9, &buf, @@BIND_DATA1_01@@);
+}

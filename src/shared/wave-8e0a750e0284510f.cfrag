@@ -1,0 +1,23 @@
+extern void @@ROLE_0_00@@(float *p);
+extern float @@ROLE_1_00@@(float *p);
+extern float @@ROLE_2_00@@(float a, float b);
+extern float @@ROLE_3_00@@(float a, float b);
+extern void @@ROLE_4_00@@(float a, float b);
+extern float @@ROLE_5_00@@(float *p);
+
+int @@FUNCTION@@(float *a0)
+{
+    float local[3];
+    float t;
+
+    @@ROLE_0_01@@(local);
+    a0[1] = @@ROLE_2_01@@(@@ROLE_1_01@@(local), local[2]);
+
+    t = @@ROLE_3_01@@(local[0], local[1]);
+    @@ROLE_4_01@@(t, a0[0]);
+    a0[0] = t;
+
+    a0[2] = @@ROLE_5_01@@(local);
+
+    return 0;
+}

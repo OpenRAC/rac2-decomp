@@ -1,0 +1,13 @@
+extern float @@ROLE_0_00@@(char *, float *);
+extern float @@ROLE_1_00@@(float);
+
+int @@FUNCTION@@(char *p, char *q, float f12, float f13)
+{
+    float v = @@ROLE_0_01@@(q, (float *)(p + 16));
+
+    if (!(v < f12))
+        return 0;
+    if (@@ROLE_1_01@@(*(float *)(q + 8) - *(float *)(p + 24)) < f13)
+        return 1;
+    return 0;
+}

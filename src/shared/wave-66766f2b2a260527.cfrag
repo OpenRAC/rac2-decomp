@@ -1,0 +1,77 @@
+#ifndef RAC2_T_SRC_F66766F2B
+#define RAC2_T_SRC_F66766F2B
+typedef struct {
+    char pad0[35];        /* 0   */
+    unsigned char f35;    /* 35  */
+    char pad36[8];        /* 36  */
+    float f44;            /* 44  */
+    unsigned char f48;    /* 48  */
+    unsigned char f49;    /* 49  */
+    unsigned short f50;   /* 50  */
+    unsigned short f52;   /* 52  */
+    char pad54[2];        /* 54  */
+    long long f56;        /* 56  */
+    char pad64[34];       /* 64  */
+    unsigned char f98;    /* 98  */
+    char pad99[21];       /* 99  */
+    int f120;             /* 120 */
+    unsigned short f124;  /* 124 */
+    char pad126[26];      /* 126 */
+    int f152;             /* 152 */
+    char pad156[14];      /* 156 */
+    short f170;           /* 170 */
+} Src_F66766f2b;
+#endif
+
+
+#ifndef RAC2_T_LIST_F66766F2B
+#define RAC2_T_LIST_F66766F2B
+typedef struct {
+    char pad0[256];       /* 0   */
+    int a[4];             /* 256 */
+    int b[4];             /* 272 */
+    Src_F66766f2b *c[4];            /* 288 */
+    float d[4];           /* 304 */
+    int pad320;           /* 320 */
+    Src_F66766f2b *src;             /* 324 */
+    int count;            /* 328 */
+} List_F66766f2b;
+#endif
+
+
+extern Src_F66766f2b *@@ROLE_0_00@@(short);
+
+void @@FUNCTION@@(List_F66766f2b *obj, int a1, int a2, float v)
+{
+    Src_F66766f2b *q;
+    short n;
+
+    if (obj->count == 4)
+        return;
+    if (a2 >= 9)
+        return;
+
+    q = @@ROLE_0_01@@(obj->src->f170);
+    if (q == 0)
+        return;
+
+    n = q->f170;
+    q->f124 = obj->src->f124;
+    q->f50 = obj->src->f50;
+    q->f56 = obj->src->f56;
+    q->f44 = obj->src->f44;
+    q->f120 = obj->src->f120;
+    q->f49 = 1;
+    q->f52 = 2058;
+    q->f48 = 0;
+    q->f152 = 0;
+    if (n == 0)
+        q->f98 = 0;
+    q->f35 = a1;
+
+    obj->b[obj->count] = a2;
+    obj->a[obj->count] = a1;
+    obj->d[obj->count] = v;
+    obj->c[obj->count] = q;
+    obj->count = obj->count + 1;
+}

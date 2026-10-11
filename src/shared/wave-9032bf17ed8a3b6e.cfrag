@@ -1,0 +1,10 @@
+extern int @@BIND_DATA0_00@@ __attribute__((sda));
+extern void @@ROLE_0_00@@(int *p, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
+
+void @@FUNCTION@@(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
+{
+    int value = @@BIND_DATA0_01@@;
+
+    if (value != 0)
+        @@ROLE_0_01@@((int *)(value + 0x36F28), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+}

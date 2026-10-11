@@ -1,0 +1,76 @@
+#ifndef RAC2_T_NODE16_FE48725C6
+#define RAC2_T_NODE16_FE48725C6
+typedef struct Node16_Fe48725c6 Node16_Fe48725c6;
+#endif
+
+#ifndef RAC2_T_NODE104_FE48725C6
+#define RAC2_T_NODE104_FE48725C6
+typedef struct Node104_Fe48725c6 Node104_Fe48725c6;
+#endif
+
+#ifndef RAC2_T_NODE24_FE48725C6
+#define RAC2_T_NODE24_FE48725C6
+typedef struct Node24_Fe48725c6 Node24_Fe48725c6;
+#endif
+
+
+struct Node16_Fe48725c6 {
+    short h0;
+    unsigned char pad2[2];
+    unsigned char b4;
+    unsigned char b5;
+    unsigned char b6;
+};
+
+struct Node104_Fe48725c6 {
+    unsigned char pad0[16];
+    Node16_Fe48725c6 *p16;
+};
+
+struct Node24_Fe48725c6 {
+    unsigned char pad0[52];
+    unsigned short h52;
+    unsigned char pad54[50];
+    Node104_Fe48725c6 *p104;
+};
+
+#ifndef RAC2_T_OBJ_FE48725C6
+#define RAC2_T_OBJ_FE48725C6
+typedef struct Obj_Fe48725c6 {
+    unsigned char pad0[4];
+    union {
+        int f4;
+        struct {
+            unsigned char b4;
+            unsigned char b5;
+            short h6;
+        } b;
+    } u;
+    unsigned char pad8[12];
+    Node24_Fe48725c6 *f24;
+} Obj_Fe48725c6;
+#endif
+
+
+extern void @@ROLE_0_00@@(Node24_Fe48725c6 *a, unsigned char b, unsigned char c, unsigned char d);
+
+void @@FUNCTION@@(Obj_Fe48725c6 *p)
+{
+    Node24_Fe48725c6 *s;
+    Node16_Fe48725c6 *d;
+    int v;
+
+    @@ROLE_0_01@@(p->f24, p->u.b.b4, p->u.b.b5, p->u.b.h6);
+    s = p->f24;
+    if ((s->h52 & 0x20) == 0)
+        return;
+    d = ((Node104_Fe48725c6 *)s->p104)->p16;
+    if (d == 0)
+        return;
+    if (d->h0 == 0)
+        return;
+    d->b4 = p->u.b.b4;
+    d->b5 = p->u.f4 >> 8;
+    v = p->u.b.h6;
+    d->b6 = v;
+}

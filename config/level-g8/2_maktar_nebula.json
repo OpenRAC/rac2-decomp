@@ -33,6 +33,9 @@
     "LVL_2_MAKTAR_NEBULA_F60904fd170c92806_AT0030DA90_ROLE01": 1733668,
     "LVL_2_MAKTAR_NEBULA_F60904fd170c92806_AT0030DA90_ROLE02": 1733664,
     "LVL_2_MAKTAR_NEBULA_F61acb1f304b382c7_AT002F7398_ROLE00": 1740212,
+    "LVL_2_MAKTAR_NEBULA_F65feeb52_D_001A79F0": 1735152,
+    "LVL_2_MAKTAR_NEBULA_F65feeb52_D_001A7A0A": 1735178,
+    "LVL_2_MAKTAR_NEBULA_F65feeb52_FUN_002E6FA8": 3043240,
     "LVL_2_MAKTAR_NEBULA_F6fc8969f33895bc4_AT00300090_ROLE00": 1741672,
     "LVL_2_MAKTAR_NEBULA_F715e9b46a377ec8c_AT0030D7F8_ROLE00": 1733668,
     "LVL_2_MAKTAR_NEBULA_F715e9b46a377ec8c_AT0030D7F8_ROLE01": 1283040,
@@ -49,6 +52,19 @@
     "LVL_2_MAKTAR_NEBULA_F83cf4a65b6159c6c_AT0030DD80_ROLE00": 1733668,
     "LVL_2_MAKTAR_NEBULA_F83cf4a65b6159c6c_AT0030DD80_ROLE01": 1283040,
     "LVL_2_MAKTAR_NEBULA_F83cf4a65b6159c6c_AT0030DD80_ROLE02": 1733664,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_D_001A8E30": 1740336,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_D_001B3210": 1782288,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_D_001BA500": 1811712,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_D_001BA730": 1812272,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_002F1FA0": 3088288,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_002F20A0": 3088544,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_002F20B8": 3088568,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_002F2270": 3089008,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_002F27F0": 3090416,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_002F2B38": 3091256,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_002F2DC0": 3091904,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_003225B0": 3286448,
+    "LVL_2_MAKTAR_NEBULA_F8c659bbc_FUN_00324CB8": 3296440,
     "LVL_2_MAKTAR_NEBULA_F94af54270be5f5c3_AT002F7360_ROLE00": 1740208,
     "LVL_2_MAKTAR_NEBULA_F967caba148c0b35c_AT002E8B40_ROLE00": 1781832,
     "LVL_2_MAKTAR_NEBULA_F967caba148c0b35c_AT002E8B40_ROLE01": 1781840,
@@ -100,6 +116,7 @@
     "LVL_2_MAKTAR_NEBULA_Fbf55aa2a4d0dd351_AT0032C938_ROLE03": 3287936,
     "LVL_2_MAKTAR_NEBULA_Fce2e52e5b0780004_AT002F4CB0_ROLE00": 1740204,
     "LVL_2_MAKTAR_NEBULA_Fd010ae7fd1640d51_AT00300148_ROLE00": 1741676,
+    "LVL_2_MAKTAR_NEBULA_Fd7eaf5bf_D_001ADB2C": 1760044,
     "LVL_2_MAKTAR_NEBULA_Fde7724c328f7c2d0_AT002F7390_ROLE00": 1740212,
     "LVL_2_MAKTAR_NEBULA_Fef45f15dfb57feb2_AT00300138_ROLE00": 1741676,
     "LVL_2_MAKTAR_NEBULA_Ff0259c87ab6a3193_AT002F73A8_ROLE00": 1740212,
@@ -147,6 +164,12 @@
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_002DAE08"
     },
     {
+      "address": 3043408,
+      "meaning": "Reads an unsigned byte from a global; if it is zero, divides a helper result (called with a gp-relative global and the argument) by 100 and returns 3 minus that quotient when it exceeds the byte, else 1; otherwise returns 3.",
+      "size": 104,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_002E7050"
+    },
+    {
       "address": 3050304,
       "meaning": "Reset the sixteen observed 32-bit state cells to zero. The original game role is unknown.",
       "size": 116,
@@ -181,6 +204,12 @@
       "meaning": "Store four incoming integer words into four consecutive measured GP cells in argument order. The original game role is unknown.",
       "size": 20,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_002F4D28"
+    },
+    {
+      "address": 3109080,
+      "meaning": "runs a fixed pipeline of helper calls on five stack scratch objects, then either negates a half-scaled helper result or calls a scalar helper with two literal scales and negates the first float of the incoming object, ending with two more helper calls",
+      "size": 324,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_002F70D8"
     },
     {
       "address": 3109728,
@@ -433,6 +462,12 @@
       "meaning": "Return the measured GP 32-bit float through FPR0. The original game role is unknown.",
       "size": 8,
       "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00385E18"
+    },
+    {
+      "address": 3700864,
+      "meaning": "returns the state index of an object at a fixed 170-byte offset, -1 when unknown",
+      "size": 120,
+      "symbol": "LVL_2_MAKTAR_NEBULA_FUN_00387880"
     }
   ],
   "gp": 1765360,

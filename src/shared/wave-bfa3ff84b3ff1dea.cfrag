@@ -1,0 +1,26 @@
+extern char @@BIND_DATA0_00@@[];
+
+extern float @@ROLE_0_00@@(void *p);
+extern void @@ROLE_1_00@@(void *a, void *b, float f);
+extern void @@ROLE_2_00@@(void *a, void *b, float f);
+extern void @@ROLE_3_00@@(void *a, void *b, void *c);
+extern void @@ROLE_4_00@@(void *a);
+
+void @@FUNCTION@@(float a0)
+{
+    char *p = @@BIND_DATA0_01@@;
+    float x = a0;
+    float r = @@ROLE_0_01@@(p);
+    float d;
+
+    if (0.001f < r) {
+        @@ROLE_1_01@@(p, p, 0.0f);
+        d = r - x;
+        if (d < 0.0f)
+            d = 0.0f;
+        @@ROLE_2_01@@(p, p, d);
+        @@ROLE_3_01@@(p - 112, p - 112, p);
+    } else {
+        @@ROLE_4_01@@(p);
+    }
+}

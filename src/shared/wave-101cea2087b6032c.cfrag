@@ -1,0 +1,12 @@
+extern float @@ROLE_0_00@@(float, float);
+extern float @@ROLE_1_00@@(float, float);
+extern float @@ROLE_2_00@@(float, float);
+
+void @@FUNCTION@@(float *vector, float scale)
+{
+    float negative = -scale;
+
+    vector[0] = vector[0] + @@ROLE_0_01@@(negative, scale);
+    vector[1] = vector[1] + @@ROLE_1_01@@(negative, scale);
+    vector[2] = vector[2] + @@ROLE_2_01@@(negative, scale);
+}

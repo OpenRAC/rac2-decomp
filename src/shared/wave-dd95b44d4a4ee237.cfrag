@@ -1,0 +1,22 @@
+extern void *@@ROLE_0_00@@(int);
+extern void *@@ROLE_1_00@@(int);
+extern void *@@ROLE_2_00@@(int);
+extern void @@ROLE_3_00@@(void *, void *, void *, void *);
+extern void @@ROLE_4_00@@(void *, float);
+
+void @@FUNCTION@@(int *self)
+{
+    void *a;
+    void *b;
+    void *c;
+    void *sub = (void *)(self + 2);
+
+    a = @@ROLE_0_01@@(11677);
+    b = @@ROLE_1_01@@(11676);
+    c = @@ROLE_2_01@@(11599);
+
+    @@ROLE_3_01@@(sub, a, b, c);
+    @@ROLE_4_01@@(sub, 0.0f);
+
+    self[191] = 1;
+}

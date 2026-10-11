@@ -1,0 +1,16 @@
+extern int @@ROLE_0_00@@(int, int);
+extern void @@ROLE_1_00@@(char *);
+extern void @@ROLE_2_00@@(char *);
+extern void @@ROLE_3_00@@(char *);
+extern void @@ROLE_4_00@@(char *);
+
+void @@FUNCTION@@(char *p)
+{
+    if (@@ROLE_0_01@@(3076, *(short *)(*(int *)(p + 104) + 26)) == 0)
+        @@ROLE_1_01@@(p);
+    else {
+        @@ROLE_2_01@@(p);
+        @@ROLE_3_01@@(p);
+        @@ROLE_4_01@@(p);
+    }
+}

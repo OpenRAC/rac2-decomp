@@ -865,3 +865,157 @@ int LVL_10_HRUGIS_CLOUD_FUN_002F11F0(float *a0, float *a1, float *a2)
     }
     return 0;
 }
+/* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
+
+#ifndef RAC2_T_BLOCK48_F8C659BBC
+#define RAC2_T_BLOCK48_F8C659BBC
+typedef struct { char pad[48]; } Block48_F8c659bbc;
+#endif
+
+#ifndef RAC2_T_BLOCK16_F8C659BBC
+#define RAC2_T_BLOCK16_F8C659BBC
+typedef struct { char pad[16]; } Block16_F8c659bbc;
+#endif
+
+
+extern char LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B2190[] __attribute__((sda));
+extern char LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B9680[];
+extern char LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B98B0[];
+extern char LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001A8E30 __attribute__((sda));
+
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308B60(char *a, char *b, char *c);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308E10(char *a, char *b, float f);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00309390(char *a, char *b);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003096D8(char *a, char *b, char *c);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308C60(char *a, char *b, char *c);
+extern float LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308C78(char *a);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_0033AB98(char *a, char *b, float f);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003388C0(char *a, float f1, float f2, float f3, float f4);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_0033AB98(char *a, char *b, float f);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003098F8(char *a, char *b);
+extern void LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003096D8(char *a, char *b, char *c);
+
+void LVL_10_HRUGIS_CLOUD_FUN_0030DC10(char *arg0, int arg1)
+{
+    Block48_F8c659bbc a;
+    Block48_F8c659bbc b;
+    Block48_F8c659bbc c;
+    Block16_F8c659bbc d;
+    Block16_F8c659bbc e;
+    float v;
+
+    LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308B60((char *)&e, LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B9680, LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B2190);
+    LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308E10((char *)&e, (char *)&e, 1.0f);
+    LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00309390((char *)&c, (char *)&LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001A8E30);
+    LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003096D8((char *)&b, LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B9680 + 560, (char *)&c);
+    LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308C60((char *)&d, (char *)&b, (char *)&e);
+    v = LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_00308C78((char *)&d) * 0.5f;
+    if (arg1 != 0) {
+        LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_0033AB98((char *)&d, (char *)&d, -v);
+    } else {
+        LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003388C0(arg0, v, 5.8177649043500423431396e-04f,
+                5.8177649043500423431396e-04f,
+                5.2359886467456817626953e-02f);
+        LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_0033AB98((char *)&d, (char *)&d, -*(float *)arg0);
+    }
+    LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003098F8((char *)&d, (char *)&a);
+    LVL_10_HRUGIS_CLOUD_F8c659bbc_FUN_003096D8(LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B98B0, (char *)&a, LVL_10_HRUGIS_CLOUD_F8c659bbc_D_001B98B0);
+}
+/* family 9c326e90e1c4dd87, 396 bytes, levels/10_hrugis_cloud 0x00315F90
+   and levels/6_notak 0x0033AA10.  Paired-strip GIF packet emitter with the
+   alternating (flag) path; profile g8: the tail cursor advance lands in the
+   jr delay slot inside gcc's .set nomacro region, where `as` can only encode
+   it as a single %gp_rel store.  Every other access to the cursor stays
+   absolute, which is the retail mix. */
+extern int *LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88;
+extern int LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7354;
+extern int LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7350;
+
+void LVL_10_HRUGIS_CLOUD_FUN_00315F90(int a0, int a1, int a2, int a3,
+                                 long long v5, int flag)
+{
+    int *p;
+
+    *(int *)((char *)LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88 + 0) = 0x10000003;
+    *(int *)((char *)LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88 + 4) = 0;
+    *(int *)((char *)LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88 + 8) = 0;
+    *(int *)((char *)LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88 + 12) = 0x50000003;
+    p = LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88;
+    LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88 = (int *)((char *)p + 16);
+    *(long long *)((char *)p + 16) = 0x4400000000008001LL;
+    *(long long *)((char *)p + 24) = 17424;
+    *(long long *)((char *)p + 32) = 70;
+    *(long long *)((char *)p + 40) = v5;
+    if (flag != 0) {
+        *(long long *)((char *)p + 48) = (long long)(a0 + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7350 - 8)
+            | ((long long)(a1 + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7354 - 8) << 16) | 0xfffff000000000LL;
+        *(long long *)((char *)p + 56) = (long long)(a2 + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7350 - 8)
+            | ((long long)(a3 + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7354 - 8) << 16) | 0xfffff000000000LL;
+    } else {
+        *(long long *)((char *)p + 48) = (long long)((a0 << 4) + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7350 - 16)
+            | ((long long)((a1 << 4) + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7354 - 16) << 16) | 0xfffff000000000LL;
+        *(long long *)((char *)p + 56) = (long long)((a2 << 4) + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7350 - 16)
+            | ((long long)((a3 << 4) + LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001A7354 - 16) << 16) | 0xfffff000000000LL;
+    }
+    LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88 = (int *)((char *)LVL_10_HRUGIS_CLOUD_Fa43bccd3_D_001B2C88 + 48);
+}
+extern unsigned char LVL_10_HRUGIS_CLOUD_F65feeb52_D_001A7A0A;
+extern int LVL_10_HRUGIS_CLOUD_F65feeb52_D_001A79F0 __attribute__((sda));
+extern int LVL_10_HRUGIS_CLOUD_F65feeb52_FUN_002FE730(int, int);
+
+int LVL_10_HRUGIS_CLOUD_FUN_002FE7D8(int x)
+{
+    int b = LVL_10_HRUGIS_CLOUD_F65feeb52_D_001A7A0A;
+    int q;
+    int v;
+
+    if (b == 0) {
+        q = LVL_10_HRUGIS_CLOUD_F65feeb52_FUN_002FE730(LVL_10_HRUGIS_CLOUD_F65feeb52_D_001A79F0, x) / 100;
+        v = 3 - q;
+        return b < v ? v : 1;
+    }
+    return 3;
+}
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FC8;
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FD0;
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FD4;
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FCC;
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FF8;
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FFC;
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001A8F00;
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_001A8F08;
+extern unsigned char LVL_10_HRUGIS_CLOUD_F91654b61_D_0018C0D4[];
+extern int LVL_10_HRUGIS_CLOUD_F91654b61_D_00138320[];
+extern short LVL_10_HRUGIS_CLOUD_F91654b61_D_001B225C;
+extern short LVL_10_HRUGIS_CLOUD_F91654b61_D_001B225E;
+extern short LVL_10_HRUGIS_CLOUD_F91654b61_D_001B2260;
+extern short LVL_10_HRUGIS_CLOUD_F91654b61_D_001B2262;
+extern short LVL_10_HRUGIS_CLOUD_F91654b61_D_001B2264;
+
+void LVL_10_HRUGIS_CLOUD_FUN_003861B0(void)
+{
+    unsigned char mode;
+
+    LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FC8 = 0;
+    mode = LVL_10_HRUGIS_CLOUD_F91654b61_D_0018C0D4[0];
+    LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FD0 = 0;
+    LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FD4 = 0;
+    LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FCC = 0;
+    LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FF8 = 0;
+    LVL_10_HRUGIS_CLOUD_F91654b61_D_001B1FFC = 0;
+
+    if (mode == 1)
+    {
+        if ((LVL_10_HRUGIS_CLOUD_F91654b61_D_00138320[0] & 0x10) == 0)
+        {
+            if (LVL_10_HRUGIS_CLOUD_F91654b61_D_001A8F00 != 4 && LVL_10_HRUGIS_CLOUD_F91654b61_D_001A8F08 != 4)
+            {
+                LVL_10_HRUGIS_CLOUD_F91654b61_D_001B225C = 0;
+                LVL_10_HRUGIS_CLOUD_F91654b61_D_001B225E = 0;
+                LVL_10_HRUGIS_CLOUD_F91654b61_D_001B2260 = 0;
+                LVL_10_HRUGIS_CLOUD_F91654b61_D_001B2262 = 0;
+                LVL_10_HRUGIS_CLOUD_F91654b61_D_001B2264 = 0;
+            }
+        }
+    }
+}

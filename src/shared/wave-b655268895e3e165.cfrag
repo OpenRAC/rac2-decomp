@@ -1,0 +1,24 @@
+#ifndef RAC2_T_V4_FB6552688
+#define RAC2_T_V4_FB6552688
+typedef int V4_Fb6552688 __attribute__((mode(TI)));
+#endif
+
+
+extern char *@@ROLE_0_00@@(char *);
+extern void @@ROLE_1_00@@(V4_Fb6552688 *, char *, float);
+extern void @@ROLE_2_00@@(char *, V4_Fb6552688 *, char *);
+extern void @@ROLE_3_00@@(char *);
+
+void @@FUNCTION@@(char *a0)
+{
+    V4_Fb6552688 buf;
+    char *p;
+
+    p = @@ROLE_0_01@@(a0);
+    if (p == 0)
+        return;
+    @@ROLE_1_01@@(&buf, a0 + 192, 8.0f);
+    @@ROLE_2_01@@(p + 96, &buf, a0 + 16);
+    @@ROLE_3_01@@(a0);
+    *(int *)(p + 304) = 300;
+}

@@ -1,0 +1,20 @@
+extern void @@ROLE_0_00@@(char *p, int one, int *w, char *out);
+extern void @@ROLE_1_00@@(char *a, char *out, float f);
+extern void @@ROLE_2_00@@(char *a, char *b, char *c);
+extern void @@ROLE_3_00@@(char *a, char *b, char *c);
+
+void @@FUNCTION@@(char *p, int v, char *a, char *b)
+{
+    char out0[48];
+    char out48[16];
+    int w;
+    float f;
+
+    f = *(float *)(p + 44) * 0.0009765625f;
+    w = v;
+    @@ROLE_0_01@@(p, 1, &w, out0);
+    @@ROLE_1_01@@(a, out48, f);
+    @@ROLE_2_01@@(a, a, b);
+    @@ROLE_3_01@@(a, a, p + 192);
+    @@ROLE_2_02@@(a, a, p + 16);
+}

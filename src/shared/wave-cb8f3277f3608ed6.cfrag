@@ -1,0 +1,56 @@
+extern float @@ROLE_0_00@@(float, float);
+extern float @@ROLE_1_00@@(float, float);
+extern float @@ROLE_2_00@@(float, float);
+extern void @@ROLE_3_00@@(void *, void *);
+extern void @@ROLE_4_00@@(int, int, void *, int);
+
+struct Sub {
+    float f0;
+    int f4;
+    int p8;
+    int p12;
+    int p16;
+    int f20;
+};
+
+struct Elem {
+    char pad[104];
+    struct Sub *sub;
+    char pad2[140];
+    float f248;
+};
+
+struct G {
+    char pad[192];
+    struct Elem *arr[22];
+    int count;
+};
+
+struct Outer {
+    char pad[104];
+    struct G *g;
+};
+
+void @@FUNCTION@@(struct Outer *p)
+{
+    struct G *g = p->g;
+    int i;
+
+    for (i = 0; i < g->count; i++) {
+        struct Sub *s = g->arr[i]->sub;
+
+        if (s->f4 == 0) {
+            if (s->f0 == 270.0f)
+                s->f0 = -90.0f;
+            if (@@ROLE_0_01@@(g->arr[i]->f248, s->f0 * 1.7453294247388839721680e-02f)
+                < 1.0000000474974513053894e-03f)
+                g->arr[i]->f248 = @@ROLE_1_01@@(g->arr[i]->f248, 1.5707964897155761718750e+00f);
+            else
+                g->arr[i]->f248 = @@ROLE_2_01@@(g->arr[i]->f248, 1.5707964897155761718750e+00f);
+            s->f20 = !s->f20;
+            @@ROLE_3_01@@((char *)g->arr[i] + 192, (char *)g->arr[i] + 240);
+        }
+    }
+    if (g->count != 0)
+        @@ROLE_4_01@@(1, 0, g->arr[0], 2198);
+}

@@ -1,0 +1,16 @@
+extern void @@ROLE_0_00@@(void *, int);
+extern void @@ROLE_1_00@@(void *, int);
+extern void @@ROLE_2_00@@(void *, int);
+extern void @@ROLE_3_00@@(void *, int);
+
+void @@FUNCTION@@(int *self, int value)
+{
+    self[1371] = value;
+    if (self[1372] != 0) {
+        self[1372] = 0;
+        @@ROLE_0_01@@((char *)self + 4596, 0);
+        @@ROLE_1_01@@((char *)self + 4744, 0);
+        @@ROLE_2_01@@((char *)self + 4892, 0);
+        @@ROLE_3_01@@((char *)self + 5040, 0);
+    }
+}

@@ -1,0 +1,9 @@
+extern int @@BIND_DATA0_00@@ __attribute__((sda));
+extern int @@ROLE_0_00@@(int x);
+
+int @@FUNCTION@@(int *obj)
+{
+    if (@@BIND_DATA0_01@@ != 0)
+        obj[13] = @@ROLE_0_01@@(@@BIND_DATA0_02@@ + 0x3BE08);
+    return 0;
+}

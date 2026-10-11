@@ -1,0 +1,15 @@
+
+
+extern void @@ROLE_0_00@@(void *, void *, void *);
+extern s32 @@ROLE_1_00@@(void *);
+extern void @@ROLE_2_00@@(void *);
+
+void @@FUNCTION@@(s32 *self) {
+    s32 *base = (s32 *)((char *)self + 32);
+    s32 *state = (s32 *)((char *)self + 16);
+    @@ROLE_0_01@@(state, state, base);
+    self[1] = (self[1] & 0x00ffffff) + ((base[6] * base[4] / base[5]) << 24);
+    if (@@ROLE_1_01@@((s32 *)((char *)self + 48)) != 0) {
+        @@ROLE_2_01@@(self);
+    }
+}

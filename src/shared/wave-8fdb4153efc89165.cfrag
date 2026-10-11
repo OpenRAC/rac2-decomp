@@ -1,0 +1,13 @@
+extern int @@ROLE_0_00@@(void *a0);
+
+int @@FUNCTION@@(volatile int *a0)
+{
+    int d, n;
+
+    if (@@ROLE_0_01@@((void *)a0) != 0)
+        return 0;
+    d = a0[2] - a0[3];
+    n = a0[4];
+    d = d + n;
+    return a0[1] + (d % n) * 0x138c0;
+}

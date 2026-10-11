@@ -1,0 +1,11 @@
+extern int @@ROLE_0_00@@(int a);
+extern void @@ROLE_1_00@@(char *a, int b);
+
+void @@FUNCTION@@(char *a0, int a1, int *a2)
+{
+    int i;
+
+    *(int *)(a0 + 1092) = a1;
+    for (i = 0; i < a1; i++)
+        @@ROLE_1_01@@(a0 + 536 + i * 72, @@ROLE_0_01@@(a2[i]));
+}

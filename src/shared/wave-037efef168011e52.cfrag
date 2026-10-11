@@ -1,0 +1,11 @@
+
+
+
+extern s32 @@ROLE_0_00@@(s32, s32, f32);
+
+void @@FUNCTION@@(s32 *unused, s32 *dst, s32 *left, s32 *right, f32 scale) {
+    dst[0] = @@ROLE_0_01@@(left[0], right[0], scale);
+    dst[1] = @@ROLE_0_02@@(left[1], right[1], scale);
+    dst[2] = @@ROLE_0_03@@(left[2], right[2], scale);
+    dst[3] = @@ROLE_0_04@@(left[3], right[3], scale);
+}

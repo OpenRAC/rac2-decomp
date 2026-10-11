@@ -1,0 +1,29 @@
+extern char *@@ROLE_0_00@@();
+extern int *@@ROLE_1_00@@();
+
+void @@FUNCTION@@(char *a0)
+{
+	int s1;
+	int v1;
+	int x;
+	int i;
+	int end;
+	short *p;
+
+	s1 = (int)@@ROLE_0_01@@(1483, a0);
+	v1 = *@@ROLE_1_01@@(1483, a0);
+	x = s1 + v1;
+	p = (short *)(s1 + 8866);
+	for (i = 79; i >= 0; i--) {
+		*p = 0;
+		p = p - 56;
+	}
+	s1 = x;
+	end = s1 + 288;
+	do {
+		*(short *)(s1 + 80) = 0;
+		*(int *)(s1 + 84) = 0;
+		*(int *)(s1 + 88) = 0;
+		s1 = s1 + 96;
+	} while (s1 < end);
+}

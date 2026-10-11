@@ -1,0 +1,9 @@
+extern int @@ROLE_0_00@@();
+extern void @@ROLE_1_00@@();
+
+void @@FUNCTION@@(char *p)
+{
+    if (@@ROLE_0_01@@(p + 10)) {
+        @@ROLE_1_01@@(p);
+    }
+}

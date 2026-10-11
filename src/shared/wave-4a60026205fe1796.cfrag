@@ -1,0 +1,36 @@
+extern float @@ROLE_0_00@@(int a);
+extern int @@ROLE_3_00@@(float f);
+extern int @@ROLE_4_00@@(int a, int b, float f);
+extern float @@ROLE_5_00@@(float a, float b);
+extern void @@ROLE_6_00@@(char *a, char *b, char *c);
+extern void @@ROLE_7_00@@(char *a, char *b, float f);
+extern void @@ROLE_8_00@@(char *a, char *b);
+extern void @@ROLE_9_00@@(char *a, char *b);
+extern int @@ROLE_10_00@@(char *p);
+extern void @@ROLE_11_00@@(char *p);
+
+void @@FUNCTION@@(char *p)
+{
+    char *s0 = p + 32;
+    char *s3 = p + 16;
+    float r1, r2, r3, r4;
+    int x, y;
+
+    r1 = @@ROLE_0_01@@(*(short *)(p + 10));
+    r2 = @@ROLE_0_02@@(*(int *)(s0 + 24));
+    r1 = r1 / r2;
+    r3 = @@ROLE_0_03@@(*(int *)(s0 + 16));
+    x = @@ROLE_3_01@@(r3 * r1);
+    y = @@ROLE_4_01@@(0, *(int *)(s0 + 20), r1 * 0.5f);
+    *(char *)(p + 8) = *(unsigned char *)(p + 8) + 1;
+    r4 = @@ROLE_5_01@@(0.004f, 0.012f);
+    *(float *)(p + 12) = *(float *)(p + 12) + r4 * 210000.0f;
+    @@ROLE_6_01@@(s3, s3, s0);
+    @@ROLE_7_01@@(s0, s0, 0.99f);
+    @@ROLE_8_01@@(s3, s3);
+    @@ROLE_9_01@@(s0, s0);
+    *(int *)(p + 4) = y | (x << 24);
+    if (@@ROLE_10_01@@(p + 10) != 0) {
+        @@ROLE_11_01@@(p);
+    }
+}

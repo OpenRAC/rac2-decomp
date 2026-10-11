@@ -1,0 +1,60 @@
+#ifndef RAC2_T_REC_F4EC78016
+#define RAC2_T_REC_F4EC78016
+typedef struct Rec_F4ec78016 {
+    int f0;
+    unsigned char pad4[6];
+    short h10;
+    unsigned char pad12[20];
+    int f32;
+} Rec_F4ec78016;
+#endif
+
+
+#ifndef RAC2_T_SLOT_F4EC78016
+#define RAC2_T_SLOT_F4EC78016
+typedef struct Slot_F4ec78016 {
+    int f0;
+    unsigned char pad4[108];
+} Slot_F4ec78016;
+#endif
+
+
+#ifndef RAC2_T_GLOBALS_F4EC78016
+#define RAC2_T_GLOBALS_F4EC78016
+typedef struct Globals_F4ec78016 {
+    unsigned char pad0[108];
+    short h108;
+    short h110;
+    short h112;
+    unsigned char pad114[18];
+    int f132;
+} Globals_F4ec78016;
+#endif
+
+
+extern Slot_F4ec78016 @@BIND_DATA0_00@@[];
+extern Globals_F4ec78016 @@BIND_DATA1_00@@[];
+
+extern void @@ROLE_0_00@@(int a, int b, int c, int d);
+
+void @@FUNCTION@@(void *a0, long a1)
+{
+    Rec_F4ec78016 *n = (Rec_F4ec78016 *)a1;
+    Slot_F4ec78016 *p;
+    int i;
+
+    if (n == 0)
+        return;
+    n->f0 = (int)a0;
+    i = n->f32;
+    if (i >= 0) {
+        p = @@BIND_DATA0_01@@ + i;
+        *(int *)((char *)p + 112) = (int)a0;
+    }
+    if (a0 != 0) {
+        if (n->h10 == 1)
+            n->h10 = 2;
+    } else {
+        @@ROLE_0_01@@(@@BIND_DATA1_01@@->h108, @@BIND_DATA1_02@@->h112, @@BIND_DATA1_03@@->f132, @@BIND_DATA1_04@@->h110);
+    }
+}

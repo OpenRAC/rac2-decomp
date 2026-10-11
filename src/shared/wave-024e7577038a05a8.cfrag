@@ -1,0 +1,19 @@
+extern char @@BIND_DATA0_00@@[];
+extern float @@ROLE_0_00@@(float *p, float a, float b);
+
+void @@FUNCTION@@(float *a0, float *a1, float f12)
+{
+    char *base = @@BIND_DATA0_01@@;
+    float v[2];
+
+    v[0] = -*(float *)(base + 8112);
+    v[1] = *(float *)(base + 8116);
+    @@ROLE_0_01@@(a1 + 2, v[0], f12);
+    if (a1[2] > 1.0f) a1[2] = 1.0f;
+    if (a1[2] < -1.0f) a1[2] = -1.0f;
+    a0[0] = a1[2];
+    @@ROLE_0_02@@(a1 + 1, v[1], f12);
+    if (a1[1] > 1.0f) a1[1] = 1.0f;
+    if (a1[1] < -1.0f) a1[1] = -1.0f;
+    a0[1] = a1[1];
+}

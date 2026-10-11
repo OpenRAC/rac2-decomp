@@ -1,0 +1,18 @@
+extern void @@ROLE_0_00@@(void *a, void *b, int c);
+extern void @@ROLE_1_00@@(float f, void *a, void *b);
+extern void @@ROLE_2_00@@(char *target, char *first, char *local);
+
+extern int @@BIND_DATA0_00@@ __attribute__((sda));
+
+void @@FUNCTION@@(void *p, float *a1, float *a2, float f)
+{
+    float buf[4];
+
+    if (@@BIND_DATA0_01@@ == 0) {
+        a1[2] = a2[2] - f;
+    } else {
+        @@ROLE_0_01@@(p, buf, 0);
+        @@ROLE_1_01@@(f, buf, buf);
+        @@ROLE_2_01@@((char *)a1, (char *)a2, (char *)buf);
+    }
+}

@@ -1,0 +1,14 @@
+extern int @@ROLE_0_00@@(int a, char *b);
+extern void @@ROLE_1_00@@(int a);
+
+void @@FUNCTION@@(char *a0)
+{
+    int i;
+
+    for (i = 0; i < 56; i++) {
+        if (@@ROLE_0_01@@(i, a0) == 0)
+            continue;
+        if (i != 0)
+            @@ROLE_1_01@@(i);
+    }
+}

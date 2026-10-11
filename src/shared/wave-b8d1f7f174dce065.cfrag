@@ -1,0 +1,19 @@
+extern void *@@ROLE_0_00@@(void *p);
+extern void @@ROLE_1_00@@(void *a, void *b, float f);
+
+extern unsigned char @@BIND_DATA0_00@@[];
+
+void @@FUNCTION@@(void)
+{
+    if (@@BIND_DATA0_01@@[8888] == 0)
+        return;
+    if (*(int *)(@@BIND_DATA0_02@@ + 3736) != 0) {
+        *(int *)(@@BIND_DATA0_03@@ + 3748) = 1;
+    } else if (*(int *)(@@BIND_DATA0_04@@ + 8852) == 0) {
+        if (*(unsigned char *)(*(int *)(@@BIND_DATA0_05@@ + 8848) + 67) == *(int *)(@@BIND_DATA0_06@@ + 9392)) {
+            @@ROLE_1_01@@(@@ROLE_0_01@@(0), 0, -2.0f);
+        }
+    }
+    @@BIND_DATA0_07@@[8888] = 0;
+    @@BIND_DATA0_08@@[8890] = 0;
+}

@@ -1,0 +1,18 @@
+extern char @@BIND_DATA0_00@@[];
+extern short @@BIND_DATA1_00@@[];
+void @@ROLE_0_00@@(int, int, int, int);
+
+void @@FUNCTION@@(int id, int arg)
+{
+    int i;
+    int *p = (int *)@@BIND_DATA0_01@@;
+
+    for (i = 0; i < 48; i++) {
+        if (p[i * 5 + 4816] == id)
+            break;
+    }
+    if (i != 48) {
+        @@BIND_DATA1_01@@[0] = (short)i;
+        @@ROLE_0_01@@(i, -1, arg, 1);
+    }
+}

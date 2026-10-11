@@ -895,3 +895,144 @@ int LVL_8_TABORA_FUN_002E22A0(float *a0, float *a1, float *a2)
     }
     return 0;
 }
+/* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
+
+#ifndef RAC2_T_BLOCK48_F8C659BBC
+#define RAC2_T_BLOCK48_F8C659BBC
+typedef struct { char pad[48]; } Block48_F8c659bbc;
+#endif
+
+#ifndef RAC2_T_BLOCK16_F8C659BBC
+#define RAC2_T_BLOCK16_F8C659BBC
+typedef struct { char pad[16]; } Block16_F8c659bbc;
+#endif
+
+
+extern char LVL_8_TABORA_F8c659bbc_D_001B2650[] __attribute__((sda));
+extern char LVL_8_TABORA_F8c659bbc_D_001B9B00[];
+extern char LVL_8_TABORA_F8c659bbc_D_001B9D30[];
+extern char LVL_8_TABORA_F8c659bbc_D_001A8E30 __attribute__((sda));
+
+extern void LVL_8_TABORA_F8c659bbc_FUN_002F9E20(char *a, char *b, char *c);
+extern void LVL_8_TABORA_F8c659bbc_FUN_002FA0B8(char *a, char *b, float f);
+extern void LVL_8_TABORA_F8c659bbc_FUN_002FA638(char *a, char *b);
+extern void LVL_8_TABORA_F8c659bbc_FUN_002FA980(char *a, char *b, char *c);
+extern void LVL_8_TABORA_F8c659bbc_FUN_002F9F08(char *a, char *b, char *c);
+extern float LVL_8_TABORA_F8c659bbc_FUN_002F9F20(char *a);
+extern void LVL_8_TABORA_F8c659bbc_FUN_0032F090(char *a, char *b, float f);
+extern void LVL_8_TABORA_F8c659bbc_FUN_0032B9E0(char *a, float f1, float f2, float f3, float f4);
+extern void LVL_8_TABORA_F8c659bbc_FUN_0032F090(char *a, char *b, float f);
+extern void LVL_8_TABORA_F8c659bbc_FUN_002FABA0(char *a, char *b);
+extern void LVL_8_TABORA_F8c659bbc_FUN_002FA980(char *a, char *b, char *c);
+
+void LVL_8_TABORA_FUN_002FEEB8(char *arg0, int arg1)
+{
+    Block48_F8c659bbc a;
+    Block48_F8c659bbc b;
+    Block48_F8c659bbc c;
+    Block16_F8c659bbc d;
+    Block16_F8c659bbc e;
+    float v;
+
+    LVL_8_TABORA_F8c659bbc_FUN_002F9E20((char *)&e, LVL_8_TABORA_F8c659bbc_D_001B9B00, LVL_8_TABORA_F8c659bbc_D_001B2650);
+    LVL_8_TABORA_F8c659bbc_FUN_002FA0B8((char *)&e, (char *)&e, 1.0f);
+    LVL_8_TABORA_F8c659bbc_FUN_002FA638((char *)&c, (char *)&LVL_8_TABORA_F8c659bbc_D_001A8E30);
+    LVL_8_TABORA_F8c659bbc_FUN_002FA980((char *)&b, LVL_8_TABORA_F8c659bbc_D_001B9B00 + 560, (char *)&c);
+    LVL_8_TABORA_F8c659bbc_FUN_002F9F08((char *)&d, (char *)&b, (char *)&e);
+    v = LVL_8_TABORA_F8c659bbc_FUN_002F9F20((char *)&d) * 0.5f;
+    if (arg1 != 0) {
+        LVL_8_TABORA_F8c659bbc_FUN_0032F090((char *)&d, (char *)&d, -v);
+    } else {
+        LVL_8_TABORA_F8c659bbc_FUN_0032B9E0(arg0, v, 5.8177649043500423431396e-04f,
+                5.8177649043500423431396e-04f,
+                5.2359886467456817626953e-02f);
+        LVL_8_TABORA_F8c659bbc_FUN_0032F090((char *)&d, (char *)&d, -*(float *)arg0);
+    }
+    LVL_8_TABORA_F8c659bbc_FUN_002FABA0((char *)&d, (char *)&a);
+    LVL_8_TABORA_F8c659bbc_FUN_002FA980(LVL_8_TABORA_F8c659bbc_D_001B9D30, (char *)&a, LVL_8_TABORA_F8c659bbc_D_001B9D30);
+}
+#ifndef RAC2_T_OBJ_FD7EAF5BF
+#define RAC2_T_OBJ_FD7EAF5BF
+typedef struct {
+    char pad0[170];
+    short kind;
+} OBJ_Fd7eaf5bf;
+#endif
+
+
+extern OBJ_Fd7eaf5bf *LVL_8_TABORA_Fd7eaf5bf_D_001ADB2C __attribute__((sda));
+
+int LVL_8_TABORA_FUN_00390A40(void)
+{
+    OBJ_Fd7eaf5bf *p = LVL_8_TABORA_Fd7eaf5bf_D_001ADB2C;
+
+    if (p) {
+        switch (p->kind) {
+        case 4569: return 0;
+        case 4570: return 1;
+        case 4571: return 2;
+        case 4572: return 3;
+        }
+    }
+    return -1;
+}
+extern unsigned char LVL_8_TABORA_F65feeb52_D_001A7A0A;
+extern int LVL_8_TABORA_F65feeb52_D_001A79F0 __attribute__((sda));
+extern int LVL_8_TABORA_F65feeb52_FUN_002EF8E0(int, int);
+
+int LVL_8_TABORA_FUN_002EF988(int x)
+{
+    int b = LVL_8_TABORA_F65feeb52_D_001A7A0A;
+    int q;
+    int v;
+
+    if (b == 0) {
+        q = LVL_8_TABORA_F65feeb52_FUN_002EF8E0(LVL_8_TABORA_F65feeb52_D_001A79F0, x) / 100;
+        v = 3 - q;
+        return b < v ? v : 1;
+    }
+    return 3;
+}
+extern int LVL_8_TABORA_F64995502_D_001B2488;
+extern int LVL_8_TABORA_F64995502_D_001B2490;
+extern int LVL_8_TABORA_F64995502_D_001B2494;
+extern int LVL_8_TABORA_F64995502_D_001B248C;
+extern int LVL_8_TABORA_F64995502_D_001B24B8;
+extern int LVL_8_TABORA_F64995502_D_001B24BC;
+extern int LVL_8_TABORA_F64995502_D_001A8F00;
+extern int LVL_8_TABORA_F64995502_D_001A8F08;
+extern unsigned char LVL_8_TABORA_F64995502_D_0018C0D4[];
+extern int LVL_8_TABORA_F64995502_D_00138320[];
+extern short LVL_8_TABORA_F64995502_D_001B271C;
+extern short LVL_8_TABORA_F64995502_D_001B271E;
+extern short LVL_8_TABORA_F64995502_D_001B2720;
+extern short LVL_8_TABORA_F64995502_D_001B2722;
+extern short LVL_8_TABORA_F64995502_D_001B2724;
+
+void LVL_8_TABORA_FUN_0037D778(void)
+{
+    unsigned char mode;
+
+    LVL_8_TABORA_F64995502_D_001B2488 = 0;
+    mode = LVL_8_TABORA_F64995502_D_0018C0D4[0];
+    LVL_8_TABORA_F64995502_D_001B2490 = 0;
+    LVL_8_TABORA_F64995502_D_001B2494 = 0;
+    LVL_8_TABORA_F64995502_D_001B248C = 0;
+    LVL_8_TABORA_F64995502_D_001B24B8 = 0;
+    LVL_8_TABORA_F64995502_D_001B24BC = 0;
+
+    if (mode == 1)
+    {
+        if ((LVL_8_TABORA_F64995502_D_00138320[0] & 0x10) == 0)
+        {
+            if (LVL_8_TABORA_F64995502_D_001A8F00 != 4 && LVL_8_TABORA_F64995502_D_001A8F08 != 4)
+            {
+                LVL_8_TABORA_F64995502_D_001B271C = 0;
+                LVL_8_TABORA_F64995502_D_001B271E = 0;
+                LVL_8_TABORA_F64995502_D_001B2720 = 0;
+                LVL_8_TABORA_F64995502_D_001B2722 = 0;
+                LVL_8_TABORA_F64995502_D_001B2724 = 0;
+            }
+        }
+    }
+}

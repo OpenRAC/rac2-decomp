@@ -1,0 +1,16 @@
+extern void @@ROLE_0_00@@(char *, char *, float);
+extern void @@ROLE_1_00@@(char *, char *, char *);
+extern void @@ROLE_2_00@@(char *, char *, float);
+extern void @@ROLE_3_00@@(char *, char *, char *);
+
+void @@FUNCTION@@(char *obj, char *arg)
+{
+    char *base = obj + 192;
+    char *other = obj + 208;
+    float one = 1.0f;
+
+    @@ROLE_0_01@@(base, (char *)(*(int *)(obj + 104)), one);
+    @@ROLE_1_01@@(other, base, arg);
+    @@ROLE_2_01@@(other, other, one);
+    @@ROLE_3_01@@(obj + 224, other, base);
+}

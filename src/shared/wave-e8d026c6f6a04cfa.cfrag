@@ -1,0 +1,26 @@
+extern int @@ROLE_0_00@@(int);
+extern int @@ROLE_1_00@@(int);
+extern int @@ROLE_2_00@@(void);
+extern int @@ROLE_3_00@@(void);
+extern int @@ROLE_4_00@@(int);
+extern int @@BIND_GDATA_00@@ __attribute__((sda));
+
+int @@FUNCTION@@(char *a0)
+{
+    int v;
+
+    @@ROLE_0_01@@(1);
+    v = @@ROLE_1_01@@(0);
+    *(int *)(a0 + 76) = 0;
+    *(int *)(a0 + 72) = v;
+    @@ROLE_2_01@@();
+    @@ROLE_3_01@@();
+    v = *(int *)0x1A8FD8;
+    if (v != 0) {
+        v = @@BIND_GDATA_01@@;
+        if (v != 0) {
+            @@ROLE_4_01@@(v + 0x3CAA8);
+        }
+    }
+    return 0;
+}

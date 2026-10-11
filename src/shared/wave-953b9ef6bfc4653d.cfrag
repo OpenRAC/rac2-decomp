@@ -1,0 +1,38 @@
+extern int @@ROLE_0_00@@(void *);
+extern int @@ROLE_1_00@@(int);
+extern void @@ROLE_2_00@@(float, float, float, int, int, int, int, int);
+
+void @@FUNCTION@@(char *o)
+{
+    float f20;
+    int s4;
+    int r;
+    int s2v;
+    char *p0;
+    char *p1;
+
+    if (*(float *)(*(char **)(o + 16)) == 0.0f) {
+        return;
+    }
+    if (*(int *)(o + 64) == 0) {
+        return;
+    }
+    s4 = @@ROLE_0_01@@(o);
+    f20 = *(float *)(*(char **)(o));
+    switch (*(int *)(o + 68)) {
+    case 0:
+        break;
+    case 1:
+        f20 = f20 - (float)(s4 >> 1);
+        break;
+    case 2:
+        f20 = f20 - (float)s4;
+        break;
+    }
+    p0 = *(char **)(o);
+    p1 = *(char **)(o + 4);
+    s2v = *(int *)(*(char **)(o + 12));
+    r = @@ROLE_1_01@@(*(int *)(o + 56));
+    @@ROLE_2_01@@(f20, *(float *)(p0 + 4), *(float *)(p1), s2v, *(int *)(o + 64),
+            s4, r, *(int *)(o + 52));
+}

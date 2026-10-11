@@ -1,0 +1,39 @@
+extern char @@BIND_DATA0_00@@[];
+extern void @@ROLE_0_00@@(int a);
+extern void @@ROLE_1_00@@(int a, int b, long long c, char *d, int e);
+extern int @@ROLE_2_00@@(int a, int b);
+extern int @@ROLE_3_00@@(int a);
+extern void @@ROLE_4_00@@(float f12, float f13, float f14, float f15, float f16, int a, int b, int c);
+extern void @@ROLE_5_00@@(int a, int b, long long c, char *d, int e);
+extern int @@ROLE_6_00@@(int a, int b);
+extern int @@ROLE_7_00@@(int a);
+extern void @@ROLE_8_00@@(float f12, float f13, float f14, float f15, float f16, int a, int b, int c);
+extern void @@ROLE_9_00@@(void);
+
+struct Wave8a447eaPair { signed char a; signed char b; };
+
+int @@FUNCTION@@(int *a0)
+{
+    char buf[16];
+    float f20;
+    int x;
+
+    @@ROLE_0_01@@(0);
+    if (a0[14] != 0) {
+        *(struct Wave8a447eaPair *)buf = *(struct Wave8a447eaPair *)@@BIND_DATA0_01@@;
+        @@ROLE_1_01@@(4, a0[9] / 2 - 8, 0x80FFA888LL, buf, -1);
+        f20 = (float)(a0[9] << 3);
+        x = @@ROLE_2_01@@(0xe99d, 6);
+        x = @@ROLE_3_01@@(x);
+        @@ROLE_4_01@@(640.0f, f20, 128.0f, 256.0f, 0.0f, 32, 16, x);
+    } else {
+        *(struct Wave8a447eaPair *)buf = *(struct Wave8a447eaPair *)(@@BIND_DATA0_02@@ + 8);
+        @@ROLE_5_01@@(a0[8] - 24, a0[9] / 2 - 8, 0x80FFA888LL, buf, -1);
+        f20 = (float)(a0[9] << 3);
+        x = @@ROLE_6_01@@(0xe99d, 6);
+        x = @@ROLE_7_01@@(x);
+        @@ROLE_8_01@@(192.0f, f20, 128.0f, 256.0f, 3.1415927f, 32, 16, x);
+    }
+    @@ROLE_9_01@@();
+    return 2;
+}

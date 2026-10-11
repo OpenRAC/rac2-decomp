@@ -1028,3 +1028,516 @@ void LVL_13_BOLDAN_FUN_00370A20(u32_Fe8672ea5 object)
     LVL_13_BOLDAN_Fe8672ea5_D_001AC190 = 1.0f;
     LVL_13_BOLDAN_Fe8672ea5_FUN_002F8708(LVL_13_BOLDAN_Fe8672ea5_D_001B2F30);
 }
+/* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
+
+#ifndef RAC2_T_BLOCK48_F8C659BBC
+#define RAC2_T_BLOCK48_F8C659BBC
+typedef struct { char pad[48]; } Block48_F8c659bbc;
+#endif
+
+#ifndef RAC2_T_BLOCK16_F8C659BBC
+#define RAC2_T_BLOCK16_F8C659BBC
+typedef struct { char pad[16]; } Block16_F8c659bbc;
+#endif
+
+
+extern char LVL_13_BOLDAN_F8c659bbc_D_001B2590[] __attribute__((sda));
+extern char LVL_13_BOLDAN_F8c659bbc_D_001B98C0[];
+extern char LVL_13_BOLDAN_F8c659bbc_D_001B9AF0[];
+extern char LVL_13_BOLDAN_F8c659bbc_D_001A8E30 __attribute__((sda));
+
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_002F8770(char *a, char *b, char *c);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_002F8A20(char *a, char *b, float f);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_002F8FA0(char *a, char *b);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_002F92E8(char *a, char *b, char *c);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_002F8870(char *a, char *b, char *c);
+extern float LVL_13_BOLDAN_F8c659bbc_FUN_002F8888(char *a);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_0032A830(char *a, char *b, float f);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_00328438(char *a, float f1, float f2, float f3, float f4);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_0032A830(char *a, char *b, float f);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_002F9508(char *a, char *b);
+extern void LVL_13_BOLDAN_F8c659bbc_FUN_002F92E8(char *a, char *b, char *c);
+
+void LVL_13_BOLDAN_FUN_002FD820(char *arg0, int arg1)
+{
+    Block48_F8c659bbc a;
+    Block48_F8c659bbc b;
+    Block48_F8c659bbc c;
+    Block16_F8c659bbc d;
+    Block16_F8c659bbc e;
+    float v;
+
+    LVL_13_BOLDAN_F8c659bbc_FUN_002F8770((char *)&e, LVL_13_BOLDAN_F8c659bbc_D_001B98C0, LVL_13_BOLDAN_F8c659bbc_D_001B2590);
+    LVL_13_BOLDAN_F8c659bbc_FUN_002F8A20((char *)&e, (char *)&e, 1.0f);
+    LVL_13_BOLDAN_F8c659bbc_FUN_002F8FA0((char *)&c, (char *)&LVL_13_BOLDAN_F8c659bbc_D_001A8E30);
+    LVL_13_BOLDAN_F8c659bbc_FUN_002F92E8((char *)&b, LVL_13_BOLDAN_F8c659bbc_D_001B98C0 + 560, (char *)&c);
+    LVL_13_BOLDAN_F8c659bbc_FUN_002F8870((char *)&d, (char *)&b, (char *)&e);
+    v = LVL_13_BOLDAN_F8c659bbc_FUN_002F8888((char *)&d) * 0.5f;
+    if (arg1 != 0) {
+        LVL_13_BOLDAN_F8c659bbc_FUN_0032A830((char *)&d, (char *)&d, -v);
+    } else {
+        LVL_13_BOLDAN_F8c659bbc_FUN_00328438(arg0, v, 5.8177649043500423431396e-04f,
+                5.8177649043500423431396e-04f,
+                5.2359886467456817626953e-02f);
+        LVL_13_BOLDAN_F8c659bbc_FUN_0032A830((char *)&d, (char *)&d, -*(float *)arg0);
+    }
+    LVL_13_BOLDAN_F8c659bbc_FUN_002F9508((char *)&d, (char *)&a);
+    LVL_13_BOLDAN_F8c659bbc_FUN_002F92E8(LVL_13_BOLDAN_F8c659bbc_D_001B9AF0, (char *)&a, LVL_13_BOLDAN_F8c659bbc_D_001B9AF0);
+}
+#ifndef RAC2_T_F32_F7036EF03
+#define RAC2_T_F32_F7036EF03
+typedef float f32_F7036ef03;
+#endif
+
+
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4A8 __attribute__((sda));
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4B0 __attribute__((sda));
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4B8 __attribute__((sda));
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4C0 __attribute__((sda));
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4C8 __attribute__((sda));
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4AC;
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4B4;
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4BC;
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4C4;
+extern f32_F7036ef03 LVL_13_BOLDAN_F7036ef03_D_001AE4CC;
+
+extern void LVL_13_BOLDAN_F7036ef03_FUN_0043F858(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_13_BOLDAN_F7036ef03_FUN_0043F858(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_13_BOLDAN_F7036ef03_FUN_0043F858(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_13_BOLDAN_F7036ef03_FUN_0043F858(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2, f32_F7036ef03 a3, f32_F7036ef03 a4);
+extern void LVL_13_BOLDAN_F7036ef03_FUN_0044CA68(void *a0, f32_F7036ef03 a1, f32_F7036ef03 a2);
+extern void LVL_13_BOLDAN_F7036ef03_FUN_0044D060(void *a0);
+extern void LVL_13_BOLDAN_F7036ef03_FUN_0044CFF0(void *a0);
+extern int LVL_13_BOLDAN_F7036ef03_FUN_0044C3A0(void *a0, int a1);
+
+void LVL_13_BOLDAN_FUN_0044D1C0(char *self, int arg)
+{
+    f32_F7036ef03 *v;
+    char *sub = self + 664;
+
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_13_BOLDAN_F7036ef03_FUN_0043F858(self, LVL_13_BOLDAN_F7036ef03_D_001AE4A8 + v[0], LVL_13_BOLDAN_F7036ef03_D_001AE4AC + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_13_BOLDAN_F7036ef03_FUN_0043F858(self + 76, LVL_13_BOLDAN_F7036ef03_D_001AE4B0 + v[0], LVL_13_BOLDAN_F7036ef03_D_001AE4B4 + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_13_BOLDAN_F7036ef03_FUN_0043F858(self + 152, LVL_13_BOLDAN_F7036ef03_D_001AE4B8 + v[0], LVL_13_BOLDAN_F7036ef03_D_001AE4BC + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_13_BOLDAN_F7036ef03_FUN_0043F858(self + 576, LVL_13_BOLDAN_F7036ef03_D_001AE4C0 + v[0], LVL_13_BOLDAN_F7036ef03_D_001AE4C4 + v[1], 0.0f, 0.0f);
+    v = *(f32_F7036ef03 **)(self + 648);
+    LVL_13_BOLDAN_F7036ef03_FUN_0044CA68(sub, LVL_13_BOLDAN_F7036ef03_D_001AE4C8 + v[0], LVL_13_BOLDAN_F7036ef03_D_001AE4CC + v[1]);
+    LVL_13_BOLDAN_F7036ef03_FUN_0044D060(self);
+    LVL_13_BOLDAN_F7036ef03_FUN_0044CFF0(self);
+    *(int *)(self + 416) = LVL_13_BOLDAN_F7036ef03_FUN_0044C3A0(sub, arg);
+}
+extern int LVL_13_BOLDAN_F27b8017b_D_001ADC6C __attribute__((sda));
+extern int LVL_13_BOLDAN_F27b8017b_D_001ADC70 __attribute__((sda));
+extern int LVL_13_BOLDAN_F27b8017b_FUN_003044C8(int a, int b);
+extern int LVL_13_BOLDAN_F27b8017b_FUN_00304998(int a, int b, int c, int d, int e, int *p);
+
+void LVL_13_BOLDAN_FUN_00440248(int *obj)
+{
+    int tmp[4];
+    float f;
+
+    f = *(float *)obj[4];
+    if (f == 0.0f)
+        return;
+    if (LVL_13_BOLDAN_F27b8017b_D_001ADC6C != 0)
+        *(int *)obj[3] = (*(int *)obj[3] & 0xff000000) | (LVL_13_BOLDAN_F27b8017b_D_001ADC70 & 0x00ffffff);
+    tmp[0] = *(int *)obj[3];
+    tmp[1] = *(int *)obj[3];
+    tmp[2] = *(int *)obj[3];
+    tmp[3] = *(int *)obj[3];
+    LVL_13_BOLDAN_F27b8017b_FUN_00304998(LVL_13_BOLDAN_F27b8017b_FUN_003044C8((int)((float *)obj[13])[0], (int)((float *)obj[13])[1]),
+             (int)((float *)obj[0])[0], (int)((float *)obj[0])[1],
+             (int)((float *)obj[1])[0], (int)((float *)obj[1])[1], tmp);
+}
+extern void LVL_13_BOLDAN_F67cf9b36_FUN_0043F858(char *p, float x, float y, float zero, float zero2);
+
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1E0 __attribute__((sda));
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1E8 __attribute__((sda));
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1F0 __attribute__((sda));
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1F8 __attribute__((sda));
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1E4;
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1EC;
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1F4;
+extern float LVL_13_BOLDAN_F67cf9b36_D_001AE1FC;
+
+struct pos {
+    float x;
+    float y;
+};
+
+void LVL_13_BOLDAN_FUN_004486C0(char *self)
+{
+    float zero = 0.0f;
+
+    LVL_13_BOLDAN_F67cf9b36_FUN_0043F858(self + 1256, LVL_13_BOLDAN_F67cf9b36_D_001AE1F8 + (*(struct pos **)(self + 680))->x,
+            LVL_13_BOLDAN_F67cf9b36_D_001AE1FC + (*(struct pos **)(self + 680))->y, zero, zero);
+    LVL_13_BOLDAN_F67cf9b36_FUN_0043F858(self + 1040, LVL_13_BOLDAN_F67cf9b36_D_001AE1E0 + (*(struct pos **)(self + 680))->x,
+            LVL_13_BOLDAN_F67cf9b36_D_001AE1E4 + (*(struct pos **)(self + 680))->y, zero, zero);
+    LVL_13_BOLDAN_F67cf9b36_FUN_0043F858(self + 1112, LVL_13_BOLDAN_F67cf9b36_D_001AE1E8 + (*(struct pos **)(self + 680))->x,
+            LVL_13_BOLDAN_F67cf9b36_D_001AE1EC + (*(struct pos **)(self + 680))->y, zero, zero);
+    LVL_13_BOLDAN_F67cf9b36_FUN_0043F858(self + 1184, LVL_13_BOLDAN_F67cf9b36_D_001AE1F0 + (*(struct pos **)(self + 680))->x,
+            LVL_13_BOLDAN_F67cf9b36_D_001AE1F4 + (*(struct pos **)(self + 680))->y, zero, zero);
+}
+extern float LVL_13_BOLDAN_Ff0e326aa_D_001AE440 __attribute__((sda));
+extern float LVL_13_BOLDAN_Ff0e326aa_D_001AE444;
+extern float LVL_13_BOLDAN_Ff0e326aa_D_001AE448 __attribute__((sda));
+extern void LVL_13_BOLDAN_Ff0e326aa_FUN_0043F858(void *, float, float, float, float);
+extern void LVL_13_BOLDAN_Ff0e326aa_FUN_00440340(void *, int, int);
+extern void LVL_13_BOLDAN_Ff0e326aa_FUN_00440248(void *);
+
+void LVL_13_BOLDAN_FUN_0044C090(int *p)
+{
+    int i;
+
+    for (i = 0; i < p[95]; i++) {
+        float *q = (float *)p[96];
+        int v;
+
+        LVL_13_BOLDAN_Ff0e326aa_FUN_0043F858(p + 76, q[0] + LVL_13_BOLDAN_Ff0e326aa_D_001AE440,
+                (q[1] + LVL_13_BOLDAN_Ff0e326aa_D_001AE444) + LVL_13_BOLDAN_Ff0e326aa_D_001AE448 * (float)i, 0.0f, 0.0f);
+        if (i == 3)
+            v = 0xEA9E;
+        else
+            v = 0xEAA6;
+        p[93] = v;
+        LVL_13_BOLDAN_Ff0e326aa_FUN_00440340(p + 76, v, ((int *)p[94])[i]);
+        LVL_13_BOLDAN_Ff0e326aa_FUN_00440248(p + 76);
+    }
+}
+#ifndef RAC2_T_F32_FE833F09F
+#define RAC2_T_F32_FE833F09F
+typedef float f32_Fe833f09f;
+#endif
+
+
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE378 __attribute__((sda));
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE388 __attribute__((sda));
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE380 __attribute__((sda));
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE390 __attribute__((sda));
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE398 __attribute__((sda));
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE37C;
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE38C;
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE384;
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE394;
+extern f32_Fe833f09f LVL_13_BOLDAN_Fe833f09f_D_001AE39C;
+
+extern void LVL_13_BOLDAN_Fe833f09f_FUN_0043F858(void *a0, f32_Fe833f09f a1, f32_Fe833f09f a2, f32_Fe833f09f a3, f32_Fe833f09f a4);
+extern void *LVL_13_BOLDAN_Fe833f09f_FUN_0043F840(void *a0);
+extern int LVL_13_BOLDAN_Fe833f09f_FUN_00326BB8(int a0, int a1, int a2, int a3, int a4);
+extern void LVL_13_BOLDAN_Fe833f09f_FUN_0044B1F8(void *a0, int a1);
+extern void LVL_13_BOLDAN_Fe833f09f_FUN_0044B188(void *a0);
+extern void LVL_13_BOLDAN_Fe833f09f_FUN_0044B1F0(void *a0);
+
+int LVL_13_BOLDAN_FUN_0044B2E8(char *self, int arg1)
+{
+    f32_Fe833f09f *v;
+
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0043F858(self, LVL_13_BOLDAN_Fe833f09f_D_001AE378 + v[0], LVL_13_BOLDAN_Fe833f09f_D_001AE37C + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0043F858(self + 152, LVL_13_BOLDAN_Fe833f09f_D_001AE388 + v[0], LVL_13_BOLDAN_Fe833f09f_D_001AE38C + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0043F858(self + 76, LVL_13_BOLDAN_Fe833f09f_D_001AE380 + v[0], LVL_13_BOLDAN_Fe833f09f_D_001AE384 + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0043F858(self + 228, LVL_13_BOLDAN_Fe833f09f_D_001AE390 + v[0], LVL_13_BOLDAN_Fe833f09f_D_001AE394 + v[1], 0.0f, 0.0f);
+    v = *(f32_Fe833f09f **)(self + 536);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0043F858(self + 464, LVL_13_BOLDAN_Fe833f09f_D_001AE398 + v[0], LVL_13_BOLDAN_Fe833f09f_D_001AE39C + v[1], 0.0f, 0.0f);
+
+    *(int *)LVL_13_BOLDAN_Fe833f09f_FUN_0043F840(self + 304) = LVL_13_BOLDAN_Fe833f09f_FUN_00326BB8(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0044B1F8(self, arg1);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0044B188(self);
+    LVL_13_BOLDAN_Fe833f09f_FUN_0044B1F0(self);
+    return *(int *)(self + (*(int *)(self + 764) << 2) + 440);
+}
+#ifndef RAC2_T_S32_FEE27D7BC
+#define RAC2_T_S32_FEE27D7BC
+typedef int s32_Fee27d7bc;
+#endif
+
+#ifndef RAC2_T_F32_FEE27D7BC
+#define RAC2_T_F32_FEE27D7BC
+typedef float f32_Fee27d7bc;
+#endif
+
+
+extern s32_Fee27d7bc LVL_13_BOLDAN_Fee27d7bc_FUN_00440860 (s32_Fee27d7bc, s32_Fee27d7bc);
+extern s32_Fee27d7bc LVL_13_BOLDAN_Fee27d7bc_FUN_004407C8 (s32_Fee27d7bc, s32_Fee27d7bc);
+extern void LVL_13_BOLDAN_Fee27d7bc_FUN_00444600 (s32_Fee27d7bc, s32_Fee27d7bc, const void *);
+extern void LVL_13_BOLDAN_Fee27d7bc_FUN_00444A58 (s32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc);
+extern void LVL_13_BOLDAN_Fee27d7bc_FUN_0043FC00 (s32_Fee27d7bc, const void *, s32_Fee27d7bc);
+extern s32_Fee27d7bc LVL_13_BOLDAN_Fee27d7bc_FUN_0043F840 (s32_Fee27d7bc);
+extern void LVL_13_BOLDAN_Fee27d7bc_FUN_0043FDB0 (s32_Fee27d7bc, const void *, s32_Fee27d7bc);
+extern void LVL_13_BOLDAN_Fee27d7bc_FUN_004431C0 (s32_Fee27d7bc);
+
+extern char LVL_13_BOLDAN_Fee27d7bc_D_001ADF08[];
+extern s32_Fee27d7bc LVL_13_BOLDAN_Fee27d7bc_D_001A904C;
+extern s32_Fee27d7bc LVL_13_BOLDAN_Fee27d7bc_D_001ADEF8 __attribute__ ((sda));
+
+void LVL_13_BOLDAN_FUN_00443058 (s32_Fee27d7bc self, s32_Fee27d7bc arg)
+{
+  s32_Fee27d7bc p;
+  *(s32_Fee27d7bc *) self = arg;
+  if (arg != 0)
+    {
+      p = LVL_13_BOLDAN_Fee27d7bc_FUN_004407C8 (16, LVL_13_BOLDAN_Fee27d7bc_FUN_00440860 (arg, arg));
+      *(s32_Fee27d7bc *) (self + 756) = p;
+      ((s32_Fee27d7bc *) p)[1] = 0;
+      ((s32_Fee27d7bc *) p)[2] = 0;
+      ((s32_Fee27d7bc *) p)[3] = 0;
+      ((s32_Fee27d7bc *) p)[0] = 0;
+    }
+  ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (self + 756))[0] = 256.0f;
+  ((f32_Fee27d7bc *) *(s32_Fee27d7bc *) (self + 756))[1] = 212.0f;
+  *(s32_Fee27d7bc *) (self + 760) = 0;
+  LVL_13_BOLDAN_Fee27d7bc_FUN_00444600 (self + 8, arg, &LVL_13_BOLDAN_Fee27d7bc_D_001ADEF8);
+  LVL_13_BOLDAN_Fee27d7bc_FUN_00444A58 (self + 8, 64.0f, -164.0f, 10.0f, 136.0f, 10.0f, 99.0f);
+  LVL_13_BOLDAN_Fee27d7bc_FUN_0043FC00 (self + 680, LVL_13_BOLDAN_Fee27d7bc_D_001ADF08, arg);
+  p = LVL_13_BOLDAN_Fee27d7bc_FUN_0043F840 (self + 680);
+  *(s32_Fee27d7bc *) p = 0x70FFFEED;
+  LVL_13_BOLDAN_Fee27d7bc_FUN_0043FDB0 (self + 680, LVL_13_BOLDAN_Fee27d7bc_D_001A904C + 0x8710, 214);
+  LVL_13_BOLDAN_Fee27d7bc_FUN_004431C0 (self);
+  *(s32_Fee27d7bc *) (self + 768) = 0;
+}
+#ifndef RAC2_T_S32_F09F721E0
+#define RAC2_T_S32_F09F721E0
+typedef int s32_F09f721e0;
+#endif
+
+#ifndef RAC2_T_F32_F09F721E0
+#define RAC2_T_F32_F09F721E0
+typedef float f32_F09f721e0;
+#endif
+
+
+extern s32_F09f721e0 LVL_13_BOLDAN_F09f721e0_FUN_00440860 (s32_F09f721e0, s32_F09f721e0);
+extern s32_F09f721e0 LVL_13_BOLDAN_F09f721e0_FUN_004407C8 (s32_F09f721e0, s32_F09f721e0);
+extern void LVL_13_BOLDAN_F09f721e0_FUN_00444600 (s32_F09f721e0, s32_F09f721e0, const void *);
+extern s32_F09f721e0 LVL_13_BOLDAN_F09f721e0_FUN_002FECB8 (s32_F09f721e0);
+extern s32_F09f721e0 LVL_13_BOLDAN_F09f721e0_FUN_002FECB8 (s32_F09f721e0);
+extern s32_F09f721e0 LVL_13_BOLDAN_F09f721e0_FUN_002FECB8 (s32_F09f721e0);
+extern void LVL_13_BOLDAN_F09f721e0_FUN_00444A78 (s32_F09f721e0, s32_F09f721e0, s32_F09f721e0, s32_F09f721e0);
+extern void LVL_13_BOLDAN_F09f721e0_FUN_00444A58 (s32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0);
+extern void LVL_13_BOLDAN_F09f721e0_FUN_00444AD0 (s32_F09f721e0, f32_F09f721e0);
+extern void LVL_13_BOLDAN_F09f721e0_FUN_004458C0 (s32_F09f721e0, s32_F09f721e0);
+
+extern s32_F09f721e0 LVL_13_BOLDAN_F09f721e0_D_001AE040 __attribute__ ((sda));
+
+void LVL_13_BOLDAN_FUN_00445798 (s32_F09f721e0 self, s32_F09f721e0 arg)
+{
+  s32_F09f721e0 q;
+  s32_F09f721e0 p;
+  s32_F09f721e0 a, b;
+  *(s32_F09f721e0 *) self = arg;
+  if (arg != 0)
+    {
+      p = LVL_13_BOLDAN_F09f721e0_FUN_004407C8 (16, LVL_13_BOLDAN_F09f721e0_FUN_00440860 (arg, arg));
+      *(s32_F09f721e0 *) (self + 684) = p;
+      ((s32_F09f721e0 *) p)[1] = 0;
+      ((s32_F09f721e0 *) p)[2] = 0;
+      ((s32_F09f721e0 *) p)[3] = 0;
+      ((s32_F09f721e0 *) p)[0] = 0;
+    }
+  q = self + 8;
+  ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[0] = 255.0f;
+  ((f32_F09f721e0 *) *(s32_F09f721e0 *) (self + 684))[1] = 195.0f;
+  LVL_13_BOLDAN_F09f721e0_FUN_00444600 (q, arg, &LVL_13_BOLDAN_F09f721e0_D_001AE040);
+  a = LVL_13_BOLDAN_F09f721e0_FUN_002FECB8 (12773);
+  b = LVL_13_BOLDAN_F09f721e0_FUN_002FECB8 (11598);
+  LVL_13_BOLDAN_F09f721e0_FUN_00444A78 (q, a, b, LVL_13_BOLDAN_F09f721e0_FUN_002FECB8 (11599));
+  LVL_13_BOLDAN_F09f721e0_FUN_00444A58 (q, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+  LVL_13_BOLDAN_F09f721e0_FUN_00444AD0 (q, 0.65f);
+  *(s32_F09f721e0 *) (self + 680) = 0;
+  *(s32_F09f721e0 *) (q + 668) = 0;
+  LVL_13_BOLDAN_F09f721e0_FUN_004458C0 (self, 0);
+}
+#ifndef RAC2_T_U8_FE9770B1E
+#define RAC2_T_U8_FE9770B1E
+typedef unsigned char u8_Fe9770b1e;
+#endif
+
+#ifndef RAC2_T_S32_FE9770B1E
+#define RAC2_T_S32_FE9770B1E
+typedef int s32_Fe9770b1e;
+#endif
+
+#ifndef RAC2_T_F32_FE9770B1E
+#define RAC2_T_F32_FE9770B1E
+typedef float f32_Fe9770b1e;
+#endif
+
+
+/* Resident shared table reached through $gp (small-data symbol). */
+extern f32_Fe9770b1e LVL_13_BOLDAN_Fe9770b1e_D_001AE0B8[2] __attribute__((sda));
+
+extern void *LVL_13_BOLDAN_Fe9770b1e_FUN_00440860(void *);
+extern void *LVL_13_BOLDAN_Fe9770b1e_FUN_004407C8(s32_Fe9770b1e, void *);
+extern void LVL_13_BOLDAN_Fe9770b1e_FUN_00444600(u8_Fe9770b1e *, void *, f32_Fe9770b1e *);
+extern void *LVL_13_BOLDAN_Fe9770b1e_FUN_002FECB8(s32_Fe9770b1e);
+extern void LVL_13_BOLDAN_Fe9770b1e_FUN_00444A78(u8_Fe9770b1e *, void *, void *, void *);
+extern void LVL_13_BOLDAN_Fe9770b1e_FUN_00444A58(u8_Fe9770b1e *, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe9770b1e);
+extern void LVL_13_BOLDAN_Fe9770b1e_FUN_00444AD0(u8_Fe9770b1e *, f32_Fe9770b1e);
+extern void LVL_13_BOLDAN_Fe9770b1e_FUN_00446540(u8_Fe9770b1e *, s32_Fe9770b1e);
+
+void LVL_13_BOLDAN_FUN_00446418(u8_Fe9770b1e *self, void *arg) {
+    u8_Fe9770b1e *sub;
+    void *first, *second, *third;
+    *(void **)self = arg;
+    if (arg != 0) {
+        void *t = LVL_13_BOLDAN_Fe9770b1e_FUN_00440860(arg);
+        void *p = LVL_13_BOLDAN_Fe9770b1e_FUN_004407C8(16, t);
+        *(void **)(self + 684) = p;
+        ((s32_Fe9770b1e *)p)[1] = 0;
+        ((s32_Fe9770b1e *)p)[2] = 0;
+        ((s32_Fe9770b1e *)p)[3] = 0;
+        ((s32_Fe9770b1e *)p)[0] = 0;
+    }
+    sub = self + 8;
+    ((f32_Fe9770b1e *)*(void **)(self + 684))[0] = 255.0f;
+    ((f32_Fe9770b1e *)*(void **)(self + 684))[1] = 195.0f;
+    LVL_13_BOLDAN_Fe9770b1e_FUN_00444600(sub, arg, LVL_13_BOLDAN_Fe9770b1e_D_001AE0B8);
+    first = LVL_13_BOLDAN_Fe9770b1e_FUN_002FECB8(11667);
+    second = LVL_13_BOLDAN_Fe9770b1e_FUN_002FECB8(11598);
+    third = LVL_13_BOLDAN_Fe9770b1e_FUN_002FECB8(11599);
+    LVL_13_BOLDAN_Fe9770b1e_FUN_00444A78(sub, first, second, third);
+    LVL_13_BOLDAN_Fe9770b1e_FUN_00444A58(sub, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    LVL_13_BOLDAN_Fe9770b1e_FUN_00444AD0(sub, 0.2f);
+    *(s32_Fe9770b1e *)(self + 680) = 0;
+    LVL_13_BOLDAN_Fe9770b1e_FUN_00446540(self, 0);
+}
+#ifndef RAC2_T_U8_FF4EB83C9
+#define RAC2_T_U8_FF4EB83C9
+typedef unsigned char u8_Ff4eb83c9;
+#endif
+
+#ifndef RAC2_T_S32_FF4EB83C9
+#define RAC2_T_S32_FF4EB83C9
+typedef int s32_Ff4eb83c9;
+#endif
+
+#ifndef RAC2_T_F32_FF4EB83C9
+#define RAC2_T_F32_FF4EB83C9
+typedef float f32_Ff4eb83c9;
+#endif
+
+
+/* Resident shared table reached through $gp (small-data symbol). */
+extern f32_Ff4eb83c9 LVL_13_BOLDAN_Ff4eb83c9_D_001AE070[2] __attribute__((sda));
+
+extern void *LVL_13_BOLDAN_Ff4eb83c9_FUN_00440860(void *);
+extern void *LVL_13_BOLDAN_Ff4eb83c9_FUN_004407C8(s32_Ff4eb83c9, void *);
+extern void LVL_13_BOLDAN_Ff4eb83c9_FUN_00444600(u8_Ff4eb83c9 *, void *, f32_Ff4eb83c9 *);
+extern void *LVL_13_BOLDAN_Ff4eb83c9_FUN_002FECB8(s32_Ff4eb83c9);
+extern void LVL_13_BOLDAN_Ff4eb83c9_FUN_00444A78(u8_Ff4eb83c9 *, void *, void *, void *);
+extern void LVL_13_BOLDAN_Ff4eb83c9_FUN_00444A58(u8_Ff4eb83c9 *, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9, f32_Ff4eb83c9);
+extern void LVL_13_BOLDAN_Ff4eb83c9_FUN_00444AD0(u8_Ff4eb83c9 *, f32_Ff4eb83c9);
+extern void LVL_13_BOLDAN_Ff4eb83c9_FUN_00445FB8(u8_Ff4eb83c9 *, s32_Ff4eb83c9);
+
+void LVL_13_BOLDAN_FUN_00445E90(u8_Ff4eb83c9 *self, void *arg) {
+    u8_Ff4eb83c9 *sub;
+    void *first, *second, *third;
+    *(void **)self = arg;
+    if (arg != 0) {
+        void *t = LVL_13_BOLDAN_Ff4eb83c9_FUN_00440860(arg);
+        void *p = LVL_13_BOLDAN_Ff4eb83c9_FUN_004407C8(16, t);
+        *(void **)(self + 684) = p;
+        ((s32_Ff4eb83c9 *)p)[1] = 0;
+        ((s32_Ff4eb83c9 *)p)[2] = 0;
+        ((s32_Ff4eb83c9 *)p)[3] = 0;
+        ((s32_Ff4eb83c9 *)p)[0] = 0;
+    }
+    sub = self + 8;
+    ((f32_Ff4eb83c9 *)*(void **)(self + 684))[0] = 255.0f;
+    ((f32_Ff4eb83c9 *)*(void **)(self + 684))[1] = 195.0f;
+    LVL_13_BOLDAN_Ff4eb83c9_FUN_00444600(sub, arg, LVL_13_BOLDAN_Ff4eb83c9_D_001AE070);
+    first = LVL_13_BOLDAN_Ff4eb83c9_FUN_002FECB8(11672);
+    second = LVL_13_BOLDAN_Ff4eb83c9_FUN_002FECB8(11598);
+    third = LVL_13_BOLDAN_Ff4eb83c9_FUN_002FECB8(11599);
+    LVL_13_BOLDAN_Ff4eb83c9_FUN_00444A78(sub, first, second, third);
+    LVL_13_BOLDAN_Ff4eb83c9_FUN_00444A58(sub, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    LVL_13_BOLDAN_Ff4eb83c9_FUN_00444AD0(sub, 0.65f);
+    *(s32_Ff4eb83c9 *)(self + 680) = 0;
+    LVL_13_BOLDAN_Ff4eb83c9_FUN_00445FB8(self, 0);
+}
+extern void LVL_13_BOLDAN_F54dfe946_FUN_0043F858(char *p, float x, float y, float zero, float zero2);
+
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE540 __attribute__((sda));
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE548 __attribute__((sda));
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE550 __attribute__((sda));
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE558 __attribute__((sda));
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE544;
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE54C;
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE554;
+extern float LVL_13_BOLDAN_F54dfe946_D_001AE55C;
+
+struct pos54dfe946 {
+    float x;
+    float y;
+};
+
+void LVL_13_BOLDAN_FUN_0044E270(char *self)
+{
+    float zero = 0.0f;
+
+    LVL_13_BOLDAN_F54dfe946_FUN_0043F858(self + 808, LVL_13_BOLDAN_F54dfe946_D_001AE540 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_13_BOLDAN_F54dfe946_D_001AE544 + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+    LVL_13_BOLDAN_F54dfe946_FUN_0043F858(self + 880, LVL_13_BOLDAN_F54dfe946_D_001AE548 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_13_BOLDAN_F54dfe946_D_001AE54C + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+    LVL_13_BOLDAN_F54dfe946_FUN_0043F858(self + 952, LVL_13_BOLDAN_F54dfe946_D_001AE550 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_13_BOLDAN_F54dfe946_D_001AE554 + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+    LVL_13_BOLDAN_F54dfe946_FUN_0043F858(self + 736, LVL_13_BOLDAN_F54dfe946_D_001AE558 + (*(struct pos54dfe946 **)(self + 1072))->x,
+            LVL_13_BOLDAN_F54dfe946_D_001AE55C + (*(struct pos54dfe946 **)(self + 1072))->y, zero, zero);
+}
+extern int LVL_13_BOLDAN_Fa769c0f9_D_00138344[4];
+extern int LVL_13_BOLDAN_Fa769c0f9_D_001ADF14[4] __attribute__((sda));
+extern int LVL_13_BOLDAN_Fa769c0f9_D_001ADF10 __attribute__((sda));
+extern int LVL_13_BOLDAN_Fa769c0f9_D_001ADF18 __attribute__((sda));
+
+extern void LVL_13_BOLDAN_Fa769c0f9_FUN_00444A40(char *, float, float);
+extern void LVL_13_BOLDAN_Fa769c0f9_FUN_00444850(char *);
+extern int LVL_13_BOLDAN_Fa769c0f9_FUN_00326BB8(int, int, int, int, int);
+extern void *LVL_13_BOLDAN_Fa769c0f9_FUN_0043F840(char *);
+extern int LVL_13_BOLDAN_Fa769c0f9_FUN_00326BB8(int, int, int, int, int);
+extern void LVL_13_BOLDAN_Fa769c0f9_FUN_0043F858(char *, float, float, float, float);
+
+int LVL_13_BOLDAN_FUN_004432D0(char *p)
+{
+    char *a = p + 8;
+    char *b;
+    void *r;
+    float x;
+    float y;
+
+    LVL_13_BOLDAN_Fa769c0f9_FUN_00444A40(a, ((float *)(*(int *)(p + 756)))[0], ((float *)(*(int *)(p + 756)))[1]);
+    LVL_13_BOLDAN_Fa769c0f9_FUN_00444850(a);
+    if (LVL_13_BOLDAN_Fa769c0f9_D_00138344[0] & 0x5000)
+        LVL_13_BOLDAN_Fa769c0f9_FUN_00326BB8(0, 0, 1, 0, 1);
+    b = p + 680;
+    r = LVL_13_BOLDAN_Fa769c0f9_FUN_0043F840(b);
+    *(int *)r = LVL_13_BOLDAN_Fa769c0f9_FUN_00326BB8(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    x = ((float *)(*(int *)(p + 756)))[0] + (float)LVL_13_BOLDAN_Fa769c0f9_D_001ADF10;
+    y = ((float *)(*(int *)(p + 756)))[1]
+        + (float)(*(int *)(p + 760) * LVL_13_BOLDAN_Fa769c0f9_D_001ADF18);
+    y = y + (float)LVL_13_BOLDAN_Fa769c0f9_D_001ADF14[0];
+    LVL_13_BOLDAN_Fa769c0f9_FUN_0043F858(b, x, y, 0.0f, 0.0f);
+    return 0;
+}
+extern unsigned char LVL_13_BOLDAN_F65feeb52_D_001A7A0A;
+extern int LVL_13_BOLDAN_F65feeb52_D_001A79F0 __attribute__((sda));
+extern int LVL_13_BOLDAN_F65feeb52_FUN_002EE580(int, int);
+
+int LVL_13_BOLDAN_FUN_002EE628(int x)
+{
+    int b = LVL_13_BOLDAN_F65feeb52_D_001A7A0A;
+    int q;
+    int v;
+
+    if (b == 0) {
+        q = LVL_13_BOLDAN_F65feeb52_FUN_002EE580(LVL_13_BOLDAN_F65feeb52_D_001A79F0, x) / 100;
+        v = 3 - q;
+        return b < v ? v : 1;
+    }
+    return 3;
+}

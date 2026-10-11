@@ -1,0 +1,11 @@
+extern void @@BIND_SHARED0_00@@(void *, int, int);
+extern void @@ROLE_0_00@@(void *, int, int, float, float);
+
+void @@FUNCTION@@(int object, int value, int count)
+{
+    int limit = (count == -1) ? 180 : count;
+    int inner = object + 7532;
+
+    @@BIND_SHARED0_01@@((void *)(object + 7700), value, 254);
+    @@ROLE_0_01@@((void *)inner, 1, limit, 255.0f, 123.0f);
+}

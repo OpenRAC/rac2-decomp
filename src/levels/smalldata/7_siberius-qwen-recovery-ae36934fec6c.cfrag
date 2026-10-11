@@ -913,3 +913,76 @@ int LVL_7_SIBERIUS_FUN_002CC468(float *a0, float *a1, float *a2)
     }
     return 0;
 }
+/* Family 8c659bbcffcd2ad3 -- 324 bytes, 27 level placements. */
+
+#ifndef RAC2_T_BLOCK48_F8C659BBC
+#define RAC2_T_BLOCK48_F8C659BBC
+typedef struct { char pad[48]; } Block48_F8c659bbc;
+#endif
+
+#ifndef RAC2_T_BLOCK16_F8C659BBC
+#define RAC2_T_BLOCK16_F8C659BBC
+typedef struct { char pad[16]; } Block16_F8c659bbc;
+#endif
+
+
+extern char LVL_7_SIBERIUS_F8c659bbc_D_001B1F50[] __attribute__((sda));
+extern char LVL_7_SIBERIUS_F8c659bbc_D_001B9200[];
+extern char LVL_7_SIBERIUS_F8c659bbc_D_001B9430[];
+extern char LVL_7_SIBERIUS_F8c659bbc_D_001A8E30 __attribute__((sda));
+
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_002E4340(char *a, char *b, char *c);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_002E45F0(char *a, char *b, float f);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_002E4B70(char *a, char *b);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_002E4EB8(char *a, char *b, char *c);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_002E4440(char *a, char *b, char *c);
+extern float LVL_7_SIBERIUS_F8c659bbc_FUN_002E4458(char *a);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_00316B68(char *a, char *b, float f);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_00314770(char *a, float f1, float f2, float f3, float f4);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_00316B68(char *a, char *b, float f);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_002E50D8(char *a, char *b);
+extern void LVL_7_SIBERIUS_F8c659bbc_FUN_002E4EB8(char *a, char *b, char *c);
+
+void LVL_7_SIBERIUS_FUN_002E93F0(char *arg0, int arg1)
+{
+    Block48_F8c659bbc a;
+    Block48_F8c659bbc b;
+    Block48_F8c659bbc c;
+    Block16_F8c659bbc d;
+    Block16_F8c659bbc e;
+    float v;
+
+    LVL_7_SIBERIUS_F8c659bbc_FUN_002E4340((char *)&e, LVL_7_SIBERIUS_F8c659bbc_D_001B9200, LVL_7_SIBERIUS_F8c659bbc_D_001B1F50);
+    LVL_7_SIBERIUS_F8c659bbc_FUN_002E45F0((char *)&e, (char *)&e, 1.0f);
+    LVL_7_SIBERIUS_F8c659bbc_FUN_002E4B70((char *)&c, (char *)&LVL_7_SIBERIUS_F8c659bbc_D_001A8E30);
+    LVL_7_SIBERIUS_F8c659bbc_FUN_002E4EB8((char *)&b, LVL_7_SIBERIUS_F8c659bbc_D_001B9200 + 560, (char *)&c);
+    LVL_7_SIBERIUS_F8c659bbc_FUN_002E4440((char *)&d, (char *)&b, (char *)&e);
+    v = LVL_7_SIBERIUS_F8c659bbc_FUN_002E4458((char *)&d) * 0.5f;
+    if (arg1 != 0) {
+        LVL_7_SIBERIUS_F8c659bbc_FUN_00316B68((char *)&d, (char *)&d, -v);
+    } else {
+        LVL_7_SIBERIUS_F8c659bbc_FUN_00314770(arg0, v, 5.8177649043500423431396e-04f,
+                5.8177649043500423431396e-04f,
+                5.2359886467456817626953e-02f);
+        LVL_7_SIBERIUS_F8c659bbc_FUN_00316B68((char *)&d, (char *)&d, -*(float *)arg0);
+    }
+    LVL_7_SIBERIUS_F8c659bbc_FUN_002E50D8((char *)&d, (char *)&a);
+    LVL_7_SIBERIUS_F8c659bbc_FUN_002E4EB8(LVL_7_SIBERIUS_F8c659bbc_D_001B9430, (char *)&a, LVL_7_SIBERIUS_F8c659bbc_D_001B9430);
+}
+extern unsigned char LVL_7_SIBERIUS_F65feeb52_D_001A7A0A;
+extern int LVL_7_SIBERIUS_F65feeb52_D_001A79F0 __attribute__((sda));
+extern int LVL_7_SIBERIUS_F65feeb52_FUN_002D9AF0(int, int);
+
+int LVL_7_SIBERIUS_FUN_002D9B98(int x)
+{
+    int b = LVL_7_SIBERIUS_F65feeb52_D_001A7A0A;
+    int q;
+    int v;
+
+    if (b == 0) {
+        q = LVL_7_SIBERIUS_F65feeb52_FUN_002D9AF0(LVL_7_SIBERIUS_F65feeb52_D_001A79F0, x) / 100;
+        v = 3 - q;
+        return b < v ? v : 1;
+    }
+    return 3;
+}

@@ -1,0 +1,18 @@
+extern float @@ROLE_0_00@@(float d);
+
+#ifndef RAC2_T_ROW_F3392E4BC
+#define RAC2_T_ROW_F3392E4BC
+typedef float Row_F3392e4bc[4];
+#endif
+
+
+float @@FUNCTION@@(Row_F3392e4bc *a, Row_F3392e4bc *b)
+{
+    float sum = 0.0f;
+    int i, j;
+
+    for (i = 0; i < 3; i++)
+        for (j = 0; j < 3; j++)
+            sum += @@ROLE_0_01@@(a[i][j] - b[i][j]);
+    return sum;
+}

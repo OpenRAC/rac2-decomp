@@ -1,0 +1,39 @@
+#ifndef RAC2_T_TWO_F73AF1964
+#define RAC2_T_TWO_F73AF1964
+typedef struct { signed char a, b; } TWO_F73af1964;
+#endif
+
+
+extern void @@ROLE_0_00@@(int);
+extern void @@ROLE_1_00@@(int, int, long, signed char *, int);
+extern int  @@ROLE_2_00@@(int, int);
+extern int  @@ROLE_3_00@@(int);
+extern void @@ROLE_4_00@@(float, float, float, float, float, int, int, int);
+extern void @@ROLE_5_00@@(int, int, long, signed char *, int);
+extern int  @@ROLE_6_00@@(int, int);
+extern int  @@ROLE_7_00@@(int);
+extern void @@ROLE_8_00@@(float, float, float, float, float, int, int, int);
+extern void @@ROLE_9_00@@(void);
+extern signed char @@BIND_DATA0_00@@[];
+extern signed char @@BIND_DATA1_00@@[];
+
+int @@FUNCTION@@(char *s0)
+{
+    signed char local[16];
+    float y;
+
+    @@ROLE_0_01@@(0);
+    if (*(int *)(s0 + 56) != 0) {
+        *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)@@BIND_DATA0_01@@;
+        @@ROLE_1_01@@(4, *(int *)(s0 + 36) / 2 - 8, 0x80FFA888, local, -1);
+        y = (float)(*(int *)(s0 + 36) * 8);
+        @@ROLE_4_01@@(640.0f, y, 128.0f, 256.0f, 0.0f, 32, 16, @@ROLE_3_01@@(@@ROLE_2_01@@(0xE99D, 6)));
+    } else {
+        *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)@@BIND_DATA1_01@@;
+        @@ROLE_5_01@@(*(int *)(s0 + 32) - 24, *(int *)(s0 + 36) / 2 - 8, 0x80FFA888, local, -1);
+        y = (float)(*(int *)(s0 + 36) * 8);
+        @@ROLE_8_01@@(192.0f, y, 128.0f, 256.0f, 3.1415927f, 32, 16, @@ROLE_7_01@@(@@ROLE_6_01@@(0xE99D, 6)));
+    }
+    @@ROLE_9_01@@();
+    return 2;
+}

@@ -1,0 +1,12 @@
+extern void @@ROLE_0_00@@(int a, int b);
+
+void @@FUNCTION@@(char *a0, int a1)
+{
+    if (a1 != *(int *)(a0 + 4)) {
+        if (*(int *)(a0 + 44) != 0 && *(int *)(a0 + 24) == 0) {
+            @@ROLE_0_01@@(*(int *)(a0 + 44), *(int *)(a0 + 4));
+            *(int *)(a0 + 24) = 1;
+        }
+        *(int *)(a0 + 4) = a1;
+    }
+}

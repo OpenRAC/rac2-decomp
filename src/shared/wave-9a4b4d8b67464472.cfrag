@@ -1,0 +1,49 @@
+extern int @@ROLE_0_00@@(char *);
+extern void @@ROLE_1_00@@(char *);
+extern void @@ROLE_2_00@@(char *, char *, char *);
+extern void @@ROLE_3_00@@(char *, char *);
+
+#ifndef RAC2_T_VEC16_F9A4B4D8B
+#define RAC2_T_VEC16_F9A4B4D8B
+typedef struct {
+    float f[4];
+} Vec16_F9a4b4d8b;
+#endif
+
+
+void @@FUNCTION@@(char *obj)
+{
+    Vec16_F9a4b4d8b local;
+    char *s1;
+    char *s2;
+    int a;
+    int v1;
+
+    if (@@ROLE_0_01@@(obj + 10) != 0) {
+        @@ROLE_1_01@@(obj);
+        return;
+    }
+
+    a = *(int *)(obj + 4);
+    s1 = obj + 32;
+    *(int *)(obj + 4) = (a & 0x00ffffff) | (((a >> 24) + *(unsigned char *)(s1 + 20)) << 24);
+
+    s2 = obj + 16;
+    local.f[0] = *(float *)(obj + 32);
+    local.f[1] = *(float *)(s1 + 4);
+    local.f[2] = *(float *)(s1 + 8);
+    local.f[3] = 0.0f;
+    @@ROLE_2_01@@(s2, s2, (char *)&local);
+
+    *(float *)(s1 + 8) = *(float *)(s1 + 8) - *(float *)(s1 + 12);
+
+    if (*(float *)(obj + 28) != 0.0f) {
+        if (*(float *)(obj + 28) == 2.0f)
+            @@ROLE_3_01@@(s2, s2);
+        *(float *)(obj + 28) = 2.0f;
+    }
+    v1 = *(unsigned char *)(s1 + 21);
+
+    *(unsigned char *)(obj + 8) = *(unsigned char *)(obj + 8) + v1;
+    *(float *)(obj + 12) += *(float *)(s1 + 16);
+}

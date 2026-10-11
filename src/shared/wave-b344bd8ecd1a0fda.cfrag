@@ -1,0 +1,23 @@
+extern void @@ROLE_0_00@@(void *p);
+extern void @@ROLE_1_00@@(void *p);
+extern void @@ROLE_2_00@@(void *p);
+extern void @@ROLE_3_00@@(void *p);
+extern void @@ROLE_4_00@@(void *p);
+extern void @@ROLE_5_00@@(void *p);
+
+unsigned char *@@FUNCTION@@(unsigned char *a0)
+{
+    unsigned char *p;
+    int i;
+
+    for (i = 25, p = a0; i != -1; i--) {
+        @@ROLE_0_01@@(p);
+        p += 72;
+    }
+    @@ROLE_1_01@@(a0 + 1872);
+    @@ROLE_2_01@@(a0 + 1952);
+    @@ROLE_3_01@@(a0 + 7472);
+    @@ROLE_4_01@@(a0 + 7532);
+    @@ROLE_5_01@@(a0 + 8124);
+    return a0;
+}

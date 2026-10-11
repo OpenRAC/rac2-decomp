@@ -6,10 +6,10 @@
   "reference_sha256": "c486f497920118066ed02076f540a5fad6811ce874d014a3a2bb18cb77714d11",
   "reference_entry": 2767752,
   "candidate_source": "candidates/levels/0_aranos_tutorial-g8.c",
-  "source_sha256": "eac0f2bc08962cddbc14feac4abfd10d89620487207cf8256375fa6bc7892518",
-  "catalog_sha256": "347f8c8d1aac943ccd6e56697b98c7d3475c144ccf3d69c21c90b0a16c45c7b3",
-  "object_sha256": "ab8817df2b69418b32193cb8c0fc51c7413a8e15118bcb70fcdbcb8ed96aa251",
-  "candidate_elf_sha256": "ef7f8b8e80a384fcd83b60823896fbf0ce08d084317d59cee536af3c9afbeeac",
+  "source_sha256": "9ec9d3a23b4731f8757ffb391ed79a6e2f5a5b02a9b3ee5c7d4f74c26d6e9b36",
+  "catalog_sha256": "904c708e2485620683ee22979c395e94862b516d636c01365646d25c8ed3a41c",
+  "object_sha256": "4cde1446ca16de9bcf0279dc6571b224d946f3502baf0926a889efdeebef5ace",
+  "candidate_elf_sha256": "02271563488e49084996faa05615d2a5062d6fa55cc39379494d1981dd5aca12",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -67,6 +67,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 8
+    },
+    {
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002E3B38",
+      "address": 3029816,
+      "size": 104,
+      "matched": true,
+      "reference_sha256": "c491a80f2c167da186eaabfcc6a1b346b36fb2e75c018b0845233a5a314dda79",
+      "candidate_sha256": "c491a80f2c167da186eaabfcc6a1b346b36fb2e75c018b0845233a5a314dda79",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 104
     },
     {
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002E56B0",
@@ -133,6 +144,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 20
+    },
+    {
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002F31D0",
+      "address": 3092944,
+      "size": 324,
+      "matched": true,
+      "reference_sha256": "4f78ab57f9ab6373cce9b150a1acb59657b77a469b0415c268e8ac40090f9c99",
+      "candidate_sha256": "4f78ab57f9ab6373cce9b150a1acb59657b77a469b0415c268e8ac40090f9c99",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 324
     },
     {
       "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_002F3458",
@@ -584,8 +606,19 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 92
+    },
+    {
+      "symbol": "LVL_0_ARANOS_TUTORIAL_FUN_003800D0",
+      "address": 3670224,
+      "size": 120,
+      "matched": true,
+      "reference_sha256": "a90eddabf866cca2afd9f24f762046afd1842676c552b893fac5f82cc223e28b",
+      "candidate_sha256": "a90eddabf866cca2afd9f24f762046afd1842676c552b893fac5f82cc223e28b",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 120
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3292
+  "matched_code_bytes": 3840
 }

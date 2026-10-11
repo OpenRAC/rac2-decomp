@@ -1,0 +1,18 @@
+extern void @@ROLE_0_00@@(char *, int);
+
+void @@FUNCTION@@(char *p)
+{
+    int fp;
+
+    @@ROLE_0_01@@(p, *(int *)(p + 32));
+    fp = *(int *)(p + 48);
+    *(int *)(p + 4) = *(int *)(p + 36);
+    *(int *)(p + 20) = *(int *)(p + 52);
+    *(int *)(p + 24) = *(int *)(p + 56);
+    *(int *)(p + 12) = *(int *)(p + 44);
+    *(int *)(p + 8) = *(int *)(p + 40);
+    *(int *)(p + 16) = fp;
+    if (fp != 0)
+        ((void (*)(char *))fp)(p);
+    *(int *)(p + 104) = 0;
+}

@@ -1,0 +1,21 @@
+extern void @@ROLE_0_00@@(char *a, char *b);
+extern void @@ROLE_1_00@@(char *a, int b, int c, char *d);
+extern void @@ROLE_2_00@@(char *a, char *b, char *c);
+extern void @@ROLE_3_00@@(char *a, char *b, float c);
+extern void @@ROLE_4_00@@(char *a, char *b, char *c);
+
+void @@FUNCTION@@(char *a0, int n, int a2, char *a3)
+{
+    char buf[64];
+    float f20;
+    int i;
+
+    f20 = *(float *)(a0 + 44) * 0.0009765625f;
+    @@ROLE_0_01@@(buf, a0 + 192);
+    @@ROLE_1_01@@(a0, n, a2, a3);
+    for (i = 0; i < n; i++) {
+        @@ROLE_2_01@@(a3 + i * 64, buf, a3 + i * 64);
+        @@ROLE_3_01@@(a3 + i * 64 + 48, a3 + i * 64 + 48, f20);
+        @@ROLE_4_01@@(a3 + i * 64 + 48, a3 + i * 64 + 48, a0 + 16);
+    }
+}

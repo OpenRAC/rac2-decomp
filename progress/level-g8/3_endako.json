@@ -6,10 +6,10 @@
   "reference_sha256": "7b2caf2987c29ef7bc86c35bb2991cf0127170bd726ddbb74a7c5506b386d6d3",
   "reference_entry": 2794248,
   "candidate_source": "candidates/levels/3_endako-g8.c",
-  "source_sha256": "7d834e65c2f398a0b87692a643eab354c5c6fbeaf8b5e08f457fcfaa4c9c28a5",
-  "catalog_sha256": "04347313ab4cde719cdea6affb6d8ba488d4126e27fa7d08a683f6e50ea4fd79",
-  "object_sha256": "ce0dc3adfcfcd12b97bb43ba73d1909bd7df562fff66133a586d241982181082",
-  "candidate_elf_sha256": "a970ab758d255dc5e19d5de599a30716841930e9c727f3bf8752320075876d82",
+  "source_sha256": "45f16553a33381242ff63ca926bb10fba7d7772ec6f433b0a2c315df2aaddc03",
+  "catalog_sha256": "431704e850c5f720b8ceee2843fcb6f1b8a8bcd4afc270767fc697c5c46b9c8d",
+  "object_sha256": "0a6f6787f4e5f2792ef4aaaf3df62622c017ae91687060a7f113d7cc62bac636",
+  "candidate_elf_sha256": "d72b3980fa73b2859396ed26c2f8afff8294c931e2e2f97963056f5802daadd4",
   "checker_sha256": "26b3a48171534773d3ae11699fbbfc2333085688d11e3a81d14865c3d27d4adb",
   "tools": {
     "cc1": "37704f483fba7269791576879b3573445cd455ce0473e6d58a3bcceb45105f95",
@@ -69,6 +69,17 @@
       "produced_size": 8
     },
     {
+      "symbol": "LVL_3_ENDAKO_FUN_002E46C0",
+      "address": 3032768,
+      "size": 104,
+      "matched": true,
+      "reference_sha256": "51395d7c11b22988f6cf3a3d4f94825a5752eeb65712f61c992d18e79b16b9d5",
+      "candidate_sha256": "51395d7c11b22988f6cf3a3d4f94825a5752eeb65712f61c992d18e79b16b9d5",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 104
+    },
+    {
       "symbol": "LVL_3_ENDAKO_FUN_002E61B0",
       "address": 3039664,
       "size": 116,
@@ -122,6 +133,17 @@
       "different_bytes": 0,
       "state": "matched_unintegrated",
       "produced_size": 20
+    },
+    {
+      "symbol": "LVL_3_ENDAKO_FUN_002F40D8",
+      "address": 3096792,
+      "size": 324,
+      "matched": true,
+      "reference_sha256": "94956f41a9d3daf79e5d0b25305de723be8022b13acfdef82aa5dc8aef0089bc",
+      "candidate_sha256": "94956f41a9d3daf79e5d0b25305de723be8022b13acfdef82aa5dc8aef0089bc",
+      "different_bytes": 0,
+      "state": "matched_unintegrated",
+      "produced_size": 324
     },
     {
       "symbol": "LVL_3_ENDAKO_FUN_002F4360",
@@ -565,5 +587,5 @@
     }
   ],
   "read_only_sections": [],
-  "matched_code_bytes": 3172
+  "matched_code_bytes": 3600
 }

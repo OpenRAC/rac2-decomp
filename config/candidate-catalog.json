@@ -38,6 +38,8 @@
     "F01bd4546_FUN_00335E68": 3366504,
     "F01bd4546_FUN_00349630": 3446320,
     "F01bd4546_FUN_00349678": 3446392,
+    "F037efef1_FUN_00283D38": 2637112,
+    "F076896f4_FUN_00349AB8": 3447480,
     "F081de6c9_FUN_00335FC8": 3366856,
     "F081de6c9_FUN_00336DA8": 3370408,
     "F081de6c9_FUN_00336E40": 3370560,
@@ -53,39 +55,82 @@
     "F0e7bb6a8_FUN_00283788": 2635656,
     "F0e7bb6a8_FUN_002AB6D8": 2799320,
     "F0e7bb6a8_FUN_002AD0B0": 2805936,
+    "F101cea20_FUN_002A7878": 2783352,
+    "F10bf3d29_FUN_00283098": 2633880,
+    "F10bf3d29_FUN_00283698": 2635416,
+    "F118c2370_FUN_00283180": 2634112,
+    "F118c2370_FUN_00283198": 2634136,
+    "F118c2370_FUN_002A77E0": 2783200,
+    "F118c2370_FUN_002A7820": 2783264,
+    "F118c2370_FUN_002A7878": 2783352,
+    "F118c2370_FUN_002A7940": 2783552,
+    "F118c2370_FUN_002BFB38": 2882360,
     "F15a8b7f0_FUN_00282CC0": 2632896,
     "F15a8b7f0_FUN_00282D30": 2633008,
     "F15a8b7f0_FUN_002B9180": 2855296,
+    "F1b9be9ff_FUN_003361A8": 3367336,
+    "F1b9be9ff_FUN_003366D0": 3368656,
+    "F1b9be9ff_FUN_00336968": 3369320,
+    "F1b9be9ff_FUN_0033AB50": 3386192,
     "F213135aa_FUN_00282CF0": 2632944,
     "F213135aa_FUN_00282DD8": 2633176,
     "F213135aa_FUN_00282F20": 2633504,
     "F213135aa_FUN_002833F0": 2634736,
     "F213135aa_FUN_002A7878": 2783352,
     "F213135aa_FUN_002AB668": 2799208,
+    "F229bff2f_FUN_00282C48": 2632776,
     "F250fbfa4_FUN_00282978": 2632056,
     "F250fbfa4_FUN_00282CC0": 2632896,
     "F250fbfa4_FUN_002B9180": 2855296,
+    "F252d542a_FUN_003361A8": 3367336,
+    "F252d542a_FUN_00336968": 3369320,
     "F27f9be8e_FUN_00282C48": 2632776,
     "F27f9be8e_FUN_00283B98": 2636696,
     "F27f9be8e_FUN_00283BE0": 2636768,
     "F29eece9b_D_00188660": 1607264,
     "F29eece9b_FUN_002E5AD0": 3037904,
+    "F2b6b96d1_FUN_00282CC0": 2632896,
+    "F2b6b96d1_FUN_00282D30": 2633008,
+    "F2b6b96d1_FUN_00283658": 2635352,
+    "F2b6b96d1_FUN_00283788": 2635656,
+    "F2b6b96d1_FUN_002A3F10": 2768656,
     "F2c74c194_FUN_00282D30": 2633008,
     "F2d5993bb_FUN_00282A60": 2632288,
     "F2d5993bb_FUN_00282AB0": 2632368,
     "F2d5993bb_FUN_0029AEB0": 2731696,
+    "F2d77341b_FUN_00282948": 2632008,
+    "F2d77341b_FUN_00282CC0": 2632896,
+    "F2d77341b_FUN_002B9180": 2855296,
+    "F3258c258_FUN_00282CC0": 2632896,
+    "F3258c258_FUN_00282D30": 2633008,
+    "F3258c258_FUN_00283098": 2633880,
+    "F3258c258_FUN_002A3DB8": 2768312,
     "F36efd143_FUN_00335FC8": 3366856,
     "F36efd143_FUN_00336DA8": 3370408,
     "F36efd143_FUN_00336E40": 3370560,
+    "F38a60c3d_FUN_003495D8": 3446232,
+    "F38a60c3d_FUN_00349610": 3446288,
     "F391de845_D_001B5340": 1790784,
     "F391de845_FUN_00282E48": 2633288,
     "F391de845_FUN_002E45C8": 3032520,
+    "F3b16bab7_FUN_00336320": 3367712,
+    "F3b16bab7_FUN_00336A78": 3369592,
     "F3c007b59_FUN_00282978": 2632056,
     "F3c007b59_FUN_00283CF0": 2637040,
     "F3c007b59_FUN_002B9180": 2855296,
+    "F3e5a3249_FUN_00283180": 2634112,
     "F449e2f67_FUN_003361A8": 3367336,
     "F449e2f67_FUN_003366D0": 3368656,
     "F449e2f67_FUN_00336968": 3369320,
+    "F44de46a7_FUN_00282AB0": 2632368,
+    "F44de46a7_FUN_00282C10": 2632720,
+    "F44de46a7_FUN_00282D30": 2633008,
+    "F44de46a7_FUN_00282DD8": 2633176,
+    "F44de46a7_FUN_00282DF0": 2633200,
+    "F44de46a7_FUN_00282F20": 2633504,
+    "F44de46a7_FUN_00283738": 2635576,
+    "F44de46a7_FUN_00283958": 2636120,
+    "F45041a5f_FUN_002DE550": 3007824,
     "F45821cfb_D_001C2740": 1845056,
     "F45821cfb_FUN_00282C88": 2632840,
     "F46b43b72_D_0014B540": 1357120,
@@ -102,6 +147,18 @@
     "F4778f810_FUN_00283738": 2635576,
     "F4778f810_FUN_00283958": 2636120,
     "F4778f810_FUN_002B00D8": 2818264,
+    "F489adc25_FUN_002883E8": 2655208,
+    "F489adc25_FUN_002886C8": 2655944,
+    "F49afcbfe_FUN_00349A70": 3447408,
+    "F4aea17e5_FUN_0027F5B8": 2618808,
+    "F4aea17e5_FUN_0027FA10": 2619920,
+    "F4aea17e5_FUN_00288FB8": 2658232,
+    "F4c55616a_FUN_003361A8": 3367336,
+    "F4c55616a_FUN_003366D0": 3368656,
+    "F4c55616a_FUN_00336968": 3369320,
+    "F4c55616a_FUN_003427B0": 3418032,
+    "F4f96b231_FUN_00288FB8": 2658232,
+    "F4f96b231_FUN_00336A38": 3369528,
     "F500f9762_FUN_00283CE0": 2637024,
     "F500f9762_FUN_00283CF0": 2637040,
     "F500f9762_FUN_002A04B8": 2753720,
@@ -109,6 +166,10 @@
     "F5621621c_FUN_00283198": 2634136,
     "F5621621c_FUN_00283248": 2634312,
     "F5621621c_FUN_002A8E20": 2788896,
+    "F570cfb4b_FUN_002B9180": 2855296,
+    "F5979c03f_FUN_002E5E58": 3038808,
+    "F5979c03f_FUN_0033AE28": 3386920,
+    "F5979c03f_FUN_0033B018": 3387416,
     "F5a19df7a_FUN_002A7820": 2783264,
     "F5a19df7a_FUN_002A7940": 2783552,
     "F5a19df7a_FUN_002FC560": 3130720,
@@ -119,6 +180,15 @@
     "F5a9e4f98_FUN_003363D0": 3367888,
     "F5a9e4f98_FUN_003366D0": 3368656,
     "F5a9e4f98_FUN_00336968": 3369320,
+    "F5ac03a17_FUN_00282978": 2632056,
+    "F5ac03a17_FUN_00282CC0": 2632896,
+    "F5ac03a17_FUN_00282D30": 2633008,
+    "F5ac03a17_FUN_00283CF0": 2637040,
+    "F5ac03a17_FUN_002B9180": 2855296,
+    "F5ff747c4_FUN_00283CE0": 2637024,
+    "F61cc5848_FUN_00288FB8": 2658232,
+    "F61cc5848_FUN_0033B050": 3387472,
+    "F61cc5848_FUN_0033B0A8": 3387560,
     "F624a0727_FUN_00336A78": 3369592,
     "F6402b823_FUN_00335E68": 3366504,
     "F6402b823_FUN_00336320": 3367712,
@@ -128,11 +198,25 @@
     "F6402b823_FUN_00345088": 3428488,
     "F6402b823_FUN_00345178": 3428728,
     "F6402b823_FUN_00345268": 3428968,
+    "F6417c3cd_FUN_00282C48": 2632776,
+    "F6417c3cd_FUN_00283B98": 2636696,
+    "F6417c3cd_FUN_00283BE0": 2636768,
+    "F652b70cf_FUN_003361A8": 3367336,
+    "F652b70cf_FUN_003366D0": 3368656,
+    "F652b70cf_FUN_00336968": 3369320,
+    "F65f0250b_FUN_003361A8": 3367336,
+    "F65f0250b_FUN_003366D0": 3368656,
+    "F65f0250b_FUN_00336968": 3369320,
+    "F65f0250b_FUN_00347EA0": 3440288,
     "F669d6320_D_001BAFC0": 1814464,
     "F669d6320_FUN_002761F8": 2580984,
     "F669d6320_FUN_00282CC0": 2632896,
     "F669d6320_FUN_00282D30": 2633008,
     "F669d6320_FUN_00282F20": 2633504,
+    "F6c3d1d31_FUN_00282948": 2632008,
+    "F6c3d1d31_FUN_00282E48": 2633288,
+    "F6c3d1d31_FUN_002ED688": 3069576,
+    "F6c3d1d31_FUN_002EE6A8": 3073704,
     "F6df9730c_FUN_00282B50": 2632528,
     "F6eb4f363_FUN_00282D30": 2633008,
     "F6eb4f363_FUN_002A77E0": 2783200,
@@ -158,6 +242,15 @@
     "F72a1dff5_FUN_00349AB8": 3447480,
     "F750245c6_D_001A7340": 1733440,
     "F750245c6_FUN_0028FC48": 2686024,
+    "F77438389_FUN_00282D30": 2633008,
+    "F77438389_FUN_00283180": 2634112,
+    "F77438389_FUN_00283198": 2634136,
+    "F79501aca_D_0014B540": 1357120,
+    "F79501aca_D_00152CE4": 1387748,
+    "F79501aca_FUN_002942A0": 2704032,
+    "F7a8d0dad_FUN_00338808": 3377160,
+    "F7a8d0dad_FUN_00338810": 3377168,
+    "F7a8d0dad_FUN_00338A58": 3377752,
     "F7b2f1854_FUN_00335E68": 3366504,
     "F7b2f1854_FUN_00336DA8": 3370408,
     "F7b2f1854_FUN_00336E40": 3370560,
@@ -167,6 +260,10 @@
     "F7cacd225_FUN_002B9180": 2855296,
     "F7cb419c1_D_001F2840": 2041920,
     "F7cb419c1_FUN_002DE618": 3008024,
+    "F7d9c8805_FUN_003361A8": 3367336,
+    "F7d9c8805_FUN_00336968": 3369320,
+    "F7e66fb31_FUN_00282C48": 2632776,
+    "F7e66fb31_FUN_00282E80": 2633344,
     "F8411efa9_FUN_0027C878": 2607224,
     "F8411efa9_FUN_00280B90": 2624400,
     "F8411efa9_FUN_00282E20": 2633248,
@@ -175,6 +272,14 @@
     "F8411efa9_FUN_00283410": 2634768,
     "F8411efa9_FUN_00328CA8": 3312808,
     "F8411efa9_FUN_00328D30": 3312944,
+    "F8629a204_FUN_00283180": 2634112,
+    "F8629a204_FUN_00283198": 2634136,
+    "F8629a204_FUN_00283B98": 2636696,
+    "F876460d6_FUN_00282C88": 2632840,
+    "F876460d6_FUN_00283248": 2634312,
+    "F876460d6_FUN_00283410": 2634768,
+    "F876460d6_FUN_00283430": 2634800,
+    "F876460d6_FUN_00283788": 2635656,
     "F8ad956d6_FUN_00295F60": 2711392,
     "F8ad956d6_FUN_002DAF68": 2994024,
     "F8ad956d6_FUN_002FC560": 3130720,
@@ -183,17 +288,46 @@
     "F8b17817c_FUN_003361A8": 3367336,
     "F8b17817c_FUN_003366D0": 3368656,
     "F8b17817c_FUN_00336968": 3369320,
+    "F8cb0f4c0_FUN_00282C48": 2632776,
+    "F8cb0f4c0_FUN_002AA198": 2793880,
+    "F8e0a750e_FUN_00282CF0": 2632944,
+    "F8e0a750e_FUN_00282DF0": 2633200,
+    "F8e0a750e_FUN_00282E20": 2633248,
+    "F8e0a750e_FUN_00283248": 2634312,
+    "F8e0a750e_FUN_00283BE0": 2636768,
+    "F8fdb4153_FUN_00351F28": 3481384,
     "F904cc63b_FUN_00282CC0": 2632896,
     "F904cc63b_FUN_00282CF0": 2632944,
     "F904cc63b_FUN_00283098": 2633880,
     "F904cc63b_FUN_00283410": 2634768,
     "F904cc63b_FUN_00283698": 2635416,
     "F904cc63b_FUN_002AD0B0": 2805936,
+    "F94baa797_FUN_00283180": 2634112,
+    "F94baa797_FUN_00283198": 2634136,
+    "F953b9ef6_FUN_0027C878": 2607224,
+    "F953b9ef6_FUN_0027F640": 2618944,
+    "F953b9ef6_FUN_00336A40": 3369536,
+    "F95518630_FUN_00283CF0": 2637040,
+    "F981a31f4_FUN_00282CC0": 2632896,
+    "F981a31f4_FUN_00282D30": 2633008,
+    "F981a31f4_FUN_00283098": 2633880,
+    "F981a31f4_FUN_002A3F10": 2768656,
+    "F9a4b4d8b_FUN_00282978": 2632056,
+    "F9a4b4d8b_FUN_00282CC0": 2632896,
+    "F9a4b4d8b_FUN_002B9180": 2855296,
+    "F9a4b4d8b_FUN_00300190": 3146128,
     "F9a90bcc4_FUN_002A77E0": 2783200,
     "F9e2cd219_FUN_002A7798": 2783128,
     "F9e2cd219_FUN_002ACF68": 2805608,
     "F9e2cd219_FUN_00305310": 3166992,
     "F9e2cd219_FUN_00307AD0": 3177168,
+    "F9e73b90d_FUN_002DAF68": 2994024,
+    "F9e73b90d_FUN_00336320": 3367712,
+    "F9e73b90d_FUN_00336828": 3369000,
+    "F9e73b90d_FUN_00336A78": 3369592,
+    "F9e73b90d_FUN_0033AF48": 3387208,
+    "F9e73b90d_FUN_0033ED88": 3403144,
+    "F9ebc9e57_FUN_00282A60": 2632288,
     "FUN_00115484": 1135748,
     "FUN_001163B0": 1139632,
     "FUN_0011AAD0": 1157840,
@@ -243,7 +377,6 @@
     "FUN_002AFFD8": 2818008,
     "FUN_002B50E0": 2838752,
     "FUN_00336968": 3369320,
-    "FUN_0033AB50": 3386192,
     "FUN_00342F70": 3420016,
     "FUN_00348138": 3440952,
     "Fa03721e9_FUN_00282CC0": 2632896,
@@ -260,18 +393,35 @@
     "Fa2d20de7_FUN_00282CF0": 2632944,
     "Fa2d20de7_FUN_00282D30": 2633008,
     "Fa2d20de7_FUN_002A7988": 2783624,
+    "Fa580e594_FUN_00283CE0": 2637024,
     "Fa5914967_FUN_00282F20": 2633504,
     "Faac80289_FUN_003361A8": 3367336,
     "Faac80289_FUN_00336968": 3369320,
+    "Fabac7e02_FUN_003361A8": 3367336,
+    "Fabac7e02_FUN_00336968": 3369320,
+    "Fac2822b7_FUN_00283388": 2634632,
+    "Fac2822b7_FUN_00300AA8": 3148456,
+    "Fac6231ce_FUN_00282CF0": 2632944,
+    "Fac6231ce_FUN_002830C0": 2633920,
+    "Fac6231ce_FUN_00283698": 2635416,
+    "Fac72d004_FUN_00349630": 3446320,
     "Fb1bbe20c_D_001A7BB2": 1735602,
     "Fb1bbe20c_FUN_002E5E58": 3038808,
     "Fb1bbe20c_FUN_0033AE28": 3386920,
     "Fb1bbe20c_FUN_0033B018": 3387416,
+    "Fb344bd8e_FUN_003363D0": 3367888,
+    "Fb344bd8e_FUN_003366D0": 3368656,
+    "Fb344bd8e_FUN_00337BD8": 3374040,
+    "Fb344bd8e_FUN_0034B070": 3453040,
     "Fb5729173_FUN_00282E48": 2633288,
     "Fb5729173_FUN_00282E80": 2633344,
     "Fb5729173_FUN_00283248": 2634312,
     "Fb5729173_FUN_00283C80": 2636928,
     "Fb5729173_FUN_002ABB78": 2800504,
+    "Fb6552688_FUN_00282CC0": 2632896,
+    "Fb6552688_FUN_00282F20": 2633504,
+    "Fb6552688_FUN_002ED688": 3069576,
+    "Fb6552688_FUN_002EE988": 3074440,
     "Fb77d67f1_FUN_00282948": 2632008,
     "Fb77d67f1_FUN_002B9180": 2855296,
     "Fb7feb893_D_001A7BB2": 1735602,
@@ -290,20 +440,43 @@
     "Fc10c1216_FUN_00282CC0": 2632896,
     "Fc10c1216_FUN_00283CF0": 2637040,
     "Fc10c1216_FUN_002B9180": 2855296,
+    "Fc3394786_FUN_00283180": 2634112,
+    "Fc3394786_FUN_00283198": 2634136,
+    "Fc3394786_FUN_002A7878": 2783352,
+    "Fc3394786_FUN_002A7940": 2783552,
     "Fc3cb9262_FUN_00282978": 2632056,
     "Fc3cb9262_FUN_00282CC0": 2632896,
     "Fc3cb9262_FUN_00283CF0": 2637040,
     "Fc3cb9262_FUN_002B9180": 2855296,
+    "Fc40b1162_FUN_00282978": 2632056,
+    "Fc40b1162_FUN_002B9180": 2855296,
     "Fc558ca70_D_001A7B94": 1735572,
     "Fc558ca70_D_001A7B95": 1735573,
     "Fc558ca70_FUN_002E5E58": 3038808,
     "Fc558ca70_FUN_0033AE28": 3386920,
     "Fc558ca70_FUN_0033B018": 3387416,
+    "Fc6bd459e_FUN_00282C48": 2632776,
+    "Fc6bd459e_FUN_00282CC0": 2632896,
+    "Fc6bd459e_FUN_00282CF0": 2632944,
+    "Fc6bd459e_FUN_00282DF0": 2633200,
+    "Fc6bd459e_FUN_00282F20": 2633504,
+    "Fc6bd459e_FUN_002AA198": 2793880,
+    "Fc8641365_FUN_00283198": 2634136,
+    "Fc8641365_FUN_00283B98": 2636696,
     "Fc936841d_FUN_00282CC0": 2632896,
     "Fc936841d_FUN_00282CF0": 2632944,
     "Fccb147a4_FUN_002B9180": 2855296,
     "Fccb147a4_FUN_00300190": 3146128,
     "Fcdb4d905_FUN_0027A0F8": 2597112,
+    "Fce0d9a7a_FUN_00336ED0": 3370704,
+    "Fcf85f2f4_FUN_00282978": 2632056,
+    "Fcf85f2f4_FUN_00283CE0": 2637024,
+    "Fcf85f2f4_FUN_00283D38": 2637112,
+    "Fcf85f2f4_FUN_002B9180": 2855296,
+    "Fd03b762f_FUN_00283CE0": 2637024,
+    "Fd03b762f_FUN_00283CF0": 2637040,
+    "Fd179801d_FUN_002B7B18": 2849560,
+    "Fd179801d_FUN_002B7CE0": 2850016,
     "Fd1c2476b_FUN_00336320": 3367712,
     "Fd1c2476b_FUN_00336A78": 3369592,
     "Fd1c2476b_FUN_003462A8": 3433128,
@@ -312,6 +485,12 @@
     "Fd1c348f5_FUN_00282978": 2632056,
     "Fd1c348f5_FUN_00283CF0": 2637040,
     "Fd1c348f5_FUN_002B9180": 2855296,
+    "Fd1d0f3f8_FUN_0027F178": 2617720,
+    "Fd6e0d08a_FUN_00282E80": 2633344,
+    "Fd6e0d08a_FUN_00283248": 2634312,
+    "Fd6e0d08a_FUN_002B50E0": 2838752,
+    "Fd6e0d08a_FUN_002B5D28": 2841896,
+    "Fd6e0d08a_FUN_002B6228": 2843176,
     "Fd8e166aa_D_001B7F80": 1802112,
     "Fdb046c5d_D_001BAFC0": 1814464,
     "Fdb046c5d_FUN_00274128": 2572584,
@@ -325,6 +504,10 @@
     "Fdb046c5d_FUN_002AFFD8": 2818008,
     "Fdb046c5d_FUN_002E5CF8": 3038456,
     "Fdb046c5d_FUN_002E5F00": 3038976,
+    "Fdd95b44d_FUN_00288FB8": 2658232,
+    "Fdd95b44d_FUN_0033B050": 3387472,
+    "Fdd95b44d_FUN_0033B0A8": 3387560,
+    "Fe2589056_FUN_0028B650": 2668112,
     "Fe524d931_D_001A6480": 1729664,
     "Fe524d931_FUN_00284E40": 2641472,
     "Fe524d931_FUN_002E5E58": 3038808,
@@ -336,6 +519,14 @@
     "Fe617c30b_FUN_00283CE0": 2637024,
     "Fe617c30b_FUN_002A9568": 2790760,
     "Fe617c30b_FUN_002B9180": 2855296,
+    "Fe824cd8c_FUN_00336320": 3367712,
+    "Fe824cd8c_FUN_00336A78": 3369592,
+    "Fe824cd8c_FUN_00341A48": 3414600,
+    "Fe824cd8c_FUN_00341A68": 3414632,
+    "Fe824cd8c_FUN_00341A88": 3414664,
+    "Fe985fe67_FUN_002A7878": 2783352,
+    "Fe985fe67_FUN_002A7940": 2783552,
+    "Fe985fe67_FUN_002AF000": 2813952,
     "Fee2b87d1_D_0014B540": 1357120,
     "Fee2b87d1_D_00152CD0": 1387728,
     "Ff2d8e5ad_FUN_00282CC0": 2632896,
@@ -360,6 +551,16 @@
     "Ffc961fca_FUN_00283698": 2635416,
     "Ffc961fca_FUN_00283738": 2635576,
     "Ffc961fca_FUN_002AD0B0": 2805936,
+    "Ffea5082f_FUN_00282DB0": 2633136,
+    "Ffea5082f_FUN_00282DF0": 2633200,
+    "Ffea5082f_FUN_00282F20": 2633504,
+    "Ffea5082f_FUN_00283028": 2633768,
+    "Ffea5082f_FUN_002AA2E8": 2794216,
+    "Ffee684c2_FUN_00284000": 2637824,
+    "Ffee684c2_FUN_00284268": 2638440,
+    "Ffee684c2_FUN_002FC3C0": 3130304,
+    "Fff49167b_FUN_00283B98": 2636696,
+    "Fff49167b_FUN_002AA738": 2795320,
     "__make_dp": 1192552,
     "__thenan_df": 1415152
   },
@@ -699,6 +900,30 @@
       "xrefs": 0
     },
     {
+      "address": 2556616,
+      "meaning": "Integrates one float field with a spring-damper step, clamps it to a symmetric limit, then lets a helper raise or lower it, returning a bias plus the field.",
+      "ranges": 1,
+      "size": 228,
+      "symbol": "FUN_002702C8",
+      "xrefs": 1
+    },
+    {
+      "address": 2556848,
+      "meaning": "Advances a stored float by a scaled helper result, then clamps it against a positive limit, then clamps it again with a second helper and finally rescales it through a third helper.",
+      "ranges": 1,
+      "size": 284,
+      "symbol": "FUN_002703B0",
+      "xrefs": 1
+    },
+    {
+      "address": 2565456,
+      "meaning": "Fills a three-float local through two setup calls, stores a two-argument float helper result into a field, then stores a second helper result into two more fields and returns zero.",
+      "ranges": 1,
+      "size": 120,
+      "symbol": "FUN_00272550",
+      "xrefs": 1
+    },
+    {
       "address": 2571536,
       "meaning": "Reads a byte at +92 of a structure reached through the pointer at +104 of the argument; for 0 or 1 it tail-calls one of two setup routines, then calls a third and aborts (returns 0) on -1; otherwise i",
       "ranges": 1,
@@ -720,6 +945,14 @@
       "ranges": 1,
       "size": 220,
       "symbol": "FUN_00274208",
+      "xrefs": 1
+    },
+    {
+      "address": 2575272,
+      "meaning": "Keeps the float one helper returns, and when a later helper reports a ratio above 0.7 scales it by a factor with a floor, hands it to a setter through a local, then reports whether the kept value is non-zero.",
+      "ranges": 1,
+      "size": 228,
+      "symbol": "FUN_00274BA8",
       "xrefs": 1
     },
     {
@@ -822,6 +1055,14 @@
       "xrefs": 0
     },
     {
+      "address": 2643896,
+      "meaning": "Calls one callee with 1 and a second with no argument, then tests an absolute global word: when it is set it calls a callee with (512, 416, 640, 448, 0, 0), otherwise (512, 416, 512, 448, 0, 0).",
+      "ranges": 1,
+      "size": 108,
+      "symbol": "FUN_002857B8",
+      "xrefs": 1
+    },
+    {
       "address": 2644032,
       "meaning": "Read the 32-bit word at absolute address 001BACC0; original role and signedness are unknown.",
       "ranges": 1,
@@ -902,6 +1143,14 @@
       "symbol": "FUN_00289AA0"
     },
     {
+      "address": 2667736,
+      "meaning": "Calls a callee with (this, word at +32), copies six words from +36..+56 down to +4..+24, calls the function pointer at +48 with this when non-zero, then clears +104.",
+      "ranges": 1,
+      "size": 104,
+      "symbol": "FUN_0028B4D8",
+      "xrefs": 1
+    },
+    {
       "address": 2668352,
       "meaning": "Ported from RAC1 (src\\overlays\\shared\\gameplay_animation_00235878.c), byte-identical in both games",
       "ranges": 1,
@@ -916,6 +1165,14 @@
       "size": 252,
       "symbol": "FUN_0028B950",
       "xrefs": 0
+    },
+    {
+      "address": 2689600,
+      "meaning": "loops 56 times calling a two-argument helper and, unless the current index is zero, a second one-argument helper with that index.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_00290A40",
+      "xrefs": 1
     },
     {
       "address": 2691824,
@@ -956,6 +1213,14 @@
       "ranges": 1,
       "size": 144,
       "symbol": "FUN_00294630",
+      "xrefs": 1
+    },
+    {
+      "address": 2706376,
+      "meaning": "scans a 48-entry table of 20-byte records for a record whose first word equals an argument, and when the scan succeeds stores the found index into a short counter and calls a helper with (index, -1, second argument, 1).",
+      "ranges": 1,
+      "size": 116,
+      "symbol": "FUN_00294BC8",
       "xrefs": 1
     },
     {
@@ -1010,6 +1275,14 @@
       "xrefs": 1
     },
     {
+      "address": 2749744,
+      "meaning": "Picks one of two pointers held at +88 and +92 of the receiver, choosing +92 when the byte at +66 equals 255, then returns a value derived from the scale word at +68: either a halved table lookup, or a weighted blend of two table lookups plus the scale, or an interpolation between a lookup at +92 and a lookup at +88 weighted by one minus the scale.",
+      "ranges": 1,
+      "size": 244,
+      "symbol": "FUN_0029F530",
+      "xrefs": 1
+    },
+    {
       "address": 2750112,
       "meaning": "Builds or transforms a 16-byte destination value from two halves of an indexed object record, with optional fixed-address transforms selected by two signed record fields.",
       "ranges": 1,
@@ -1024,6 +1297,38 @@
       "size": 120,
       "symbol": "FUN_0029F978",
       "xrefs": 0
+    },
+    {
+      "address": 2750960,
+      "meaning": "unlinks a node from a singly linked list (head case and inner-chain case) and calls a release routine on it; does nothing for a null node",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_0029F9F0",
+      "xrefs": 1
+    },
+    {
+      "address": 2751520,
+      "meaning": "Copies an int argument into a 64-byte stack local, scales the float at offset 44 of the first pointer by 1/1024, and runs five helpers over the two pointers and that local buffer.",
+      "ranges": 1,
+      "size": 160,
+      "symbol": "FUN_0029FC20",
+      "xrefs": 1
+    },
+    {
+      "address": 2751680,
+      "meaning": "scales a float field by 1/1024, stores an int argument in a stack record, and drives four helper calls with frame and object-field pointers",
+      "ranges": 1,
+      "size": 136,
+      "symbol": "FUN_0029FCC0",
+      "xrefs": 1
+    },
+    {
+      "address": 2751816,
+      "meaning": "Loops n times over a 16-byte-strided pointer, scaling the first pointer float at offset 44 by 1/1024 and calling three helpers with that pointer and two offsets of the first argument.",
+      "ranges": 1,
+      "size": 160,
+      "symbol": "FUN_0029FD48",
+      "xrefs": 1
     },
     {
       "address": 2752968,
@@ -1096,12 +1401,36 @@
       "xrefs": 0
     },
     {
+      "address": 2783624,
+      "meaning": "draws two bounded random angles and an interval random value from the two float arguments, then forwards the pointer, the interval draw and both angles to a fourth callee",
+      "ranges": 1,
+      "size": 120,
+      "symbol": "FUN_002A7988",
+      "xrefs": 1
+    },
+    {
+      "address": 2783744,
+      "meaning": "Reads one scalar and two helper results, then stores three products of helper pairs each scaled by the scalar into the three floats of the output buffer.",
+      "ranges": 1,
+      "size": 168,
+      "symbol": "FUN_002A7A00",
+      "xrefs": 1
+    },
+    {
       "address": 2783912,
       "meaning": "Ported from RAC1 (src\\overlays\\shared\\gameplay_entities_00257d78.c), byte-identical in both games",
       "ranges": 1,
       "size": 56,
       "symbol": "FUN_002A7AA8",
       "xrefs": 0
+    },
+    {
+      "address": 2784256,
+      "meaning": "Eased scalar interpolation between a and b: returns a for t==0.0, b for t==1.0, otherwise a + (b-a)*((1-cos(t*pi))*0.5).",
+      "ranges": 1,
+      "size": 148,
+      "symbol": "FUN_002A7C00",
+      "xrefs": 1
     },
     {
       "address": 2784416,
@@ -1168,6 +1497,38 @@
       "xrefs": 1
     },
     {
+      "address": 2794408,
+      "meaning": "Accumulates one float field into another, hands the shortfall to a first callee, scales a forwarded threshold by 0.01f and, when the second callee's result falls below it, snaps the accumulator back and zeroes the threshold holder, returning a float either way.",
+      "ranges": 1,
+      "size": 172,
+      "symbol": "FUN_002AA3A8",
+      "xrefs": 1
+    },
+    {
+      "address": 2794584,
+      "meaning": "shared native family",
+      "ranges": 1,
+      "size": 240,
+      "symbol": "FUN_002AA458",
+      "xrefs": 1
+    },
+    {
+      "address": 2795520,
+      "meaning": "clamps a float read through a pointer to plus/minus the second float argument, passes it through two helpers and stores the result back",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_002AA800",
+      "xrefs": 1
+    },
+    {
+      "address": 2797208,
+      "meaning": "Scales four float arguments by 255, converts each through the same routine, masks each result to a byte and packs the four bytes into one word, low byte first.",
+      "ranges": 1,
+      "size": 164,
+      "symbol": "FUN_002AAE98",
+      "xrefs": 1
+    },
+    {
       "address": 2797376,
       "meaning": "Ported from RAC1 (src\\overlays\\shared\\unclassified_0025bb38.c), byte-identical in both games",
       "ranges": 1,
@@ -1181,6 +1542,14 @@
       "ranges": 1,
       "size": 188,
       "symbol": "FUN_002AB028",
+      "xrefs": 1
+    },
+    {
+      "address": 2797800,
+      "meaning": "Initialises a 96-byte stack workspace, calls one routine on its first window with two of the incoming integers, fills the third window from a second routine, combines the three windows with a third routine, and returns one float of the middle window indexed by the fourth integer.",
+      "ranges": 1,
+      "size": 124,
+      "symbol": "FUN_002AB0E8",
       "xrefs": 1
     },
     {
@@ -1208,11 +1577,35 @@
       "xrefs": 0
     },
     {
+      "address": 2799208,
+      "meaning": "Halves the float argument and calls one helper with it, forwards the second and first arguments plus that helper result to a second helper, and stores a third helper result into the field at offset 12 of the first argument.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_002AB668",
+      "xrefs": 1
+    },
+    {
+      "address": 2799320,
+      "meaning": "Copies 64 bytes of a source record onto the stack, normalises the last element of the copy to 1.0, queries three pairwise float angles from the copy after two scratch-matrix builds, and writes the three angles into the caller's output record.",
+      "ranges": 1,
+      "size": 292,
+      "symbol": "FUN_002AB6D8",
+      "xrefs": 1
+    },
+    {
       "address": 2799616,
       "meaning": "Reads a signed halfword state and a paired halfword; returns when the state is non-zero and the pair is already cleared, otherwise clamps a halfword counter (minimum 1) scaled by state/limit, or asks a helper to fill three bytes when the state is zero.",
       "ranges": 1,
       "size": 192,
       "symbol": "FUN_002AB800",
+      "xrefs": 1
+    },
+    {
+      "address": 2804552,
+      "meaning": "Adds the result of a two-argument helper, called three times with the same arguments, into each of three consecutive floats of a vector.",
+      "ranges": 1,
+      "size": 128,
+      "symbol": "FUN_002ACB48",
       "xrefs": 1
     },
     {
@@ -1240,6 +1633,30 @@
       "xrefs": 1
     },
     {
+      "address": 2813552,
+      "meaning": "Branches on a float argument: when it is positive it rewrites a float in place with a helper result and sets a field at offset 24 to (helper2 * scale) + offset; otherwise it subtracts a float through a third pointer, rewrites that pointer with (helper2 * scale) and adds it back to the field.",
+      "ranges": 1,
+      "size": 184,
+      "symbol": "FUN_002AEE70",
+      "xrefs": 1
+    },
+    {
+      "address": 2813736,
+      "meaning": "Scales two owner words by sampled unit-vector factors derived from two float inputs, then normalises each input in place.",
+      "ranges": 1,
+      "size": 196,
+      "symbol": "FUN_002AEF28",
+      "xrefs": 1
+    },
+    {
+      "address": 2813952,
+      "meaning": "Writes three floats built from two one-float helpers and the three incoming floats: f(b)*a*f(c), g(b)*a*f(c) and g(c)*a.",
+      "ranges": 1,
+      "size": 156,
+      "symbol": "FUN_002AF000",
+      "xrefs": 1
+    },
+    {
       "address": 2814696,
       "meaning": "Computes an adjusted scalar from measured fields, records threshold state through an output byte, and conditionally adds eight after a bound predicate.",
       "ranges": 1,
@@ -1248,10 +1665,34 @@
       "xrefs": 1
     },
     {
+      "address": 2817496,
+      "meaning": "branches on a pointer argument: when it is null, fills a 64-byte stack buffer from the object and calls a helper with the buffer, otherwise calls the same helper with that pointer.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_002AFDD8",
+      "xrefs": 1
+    },
+    {
       "address": 2818224,
       "meaning": "Forward owner+0x 10, the output-vector pointer and the 64-bit mode to the measured helper.",
       "size": 28,
       "symbol": "FUN_002B00B0"
+    },
+    {
+      "address": 2819080,
+      "meaning": "Builds a 4-float value from a unit seed and a 0.5f-scaled blend against a region 32 bytes into the first argument, squares a scalar returned by a fourth callee, stores the negated complement of that square into a fifth word, converts the value into a 48-byte record and copies that record into the third argument when it is non-null.",
+      "ranges": 1,
+      "size": 208,
+      "symbol": "FUN_002B0408",
+      "xrefs": 1
+    },
+    {
+      "address": 2820264,
+      "meaning": "Calls one float-conversion helper on (a0 %% a1) and again on a1, then returns 2*pi times the quotient minus pi.",
+      "ranges": 1,
+      "size": 104,
+      "symbol": "FUN_002B08A8",
+      "xrefs": 1
     },
     {
       "address": 2821472,
@@ -1284,6 +1725,14 @@
       "xrefs": 0
     },
     {
+      "address": 2833184,
+      "meaning": "Calls a callee on (second pointer, first pointer + 16); if the result is not below the first float argument it returns 0, otherwise it evaluates a second callee on (a float at second+8 minus a float at first+24) and returns 1 when that is below the second float argument, else 0.",
+      "ranges": 1,
+      "size": 132,
+      "symbol": "FUN_002B3B20",
+      "xrefs": 1
+    },
+    {
       "address": 2839160,
       "meaning": "Pass owner, owner+0x 10 and the incoming float factor to the measured helper.",
       "size": 28,
@@ -1296,6 +1745,14 @@
       "size": 12,
       "symbol": "FUN_002B5D28",
       "xrefs": 6
+    },
+    {
+      "address": 2842912,
+      "meaning": "Computes the x/y difference between one 16-byte record of the second handle and the record after the first handle's base, dispatches through three helpers and walks a short counter field up or down by one when the last helper's float result stays under a stored threshold.",
+      "ranges": 1,
+      "size": 256,
+      "symbol": "FUN_002B6120",
+      "xrefs": 1
     },
     {
       "address": 2844528,
@@ -1348,6 +1805,14 @@
       "xrefs": 0
     },
     {
+      "address": 2849920,
+      "meaning": "Calls one callee with the argument 1, then a second callee with (first, second, third argument) keeping its result, calls the first callee again with 1, and returns the kept result.",
+      "ranges": 1,
+      "size": 96,
+      "symbol": "FUN_002B7C80",
+      "xrefs": 1
+    },
+    {
       "address": 2850184,
       "meaning": "finalize and call the global callback if the operation is complete; boot only",
       "ranges": 1,
@@ -1396,6 +1861,14 @@
       "xrefs": 1
     },
     {
+      "address": 2866032,
+      "meaning": "decays a float field by 0.04 with a saturating early-out that consults a helper and returns; otherwise adds 12000 to a second field, nudges a third by 0.0484 while it stays below 0.225, merges two 255-scaled byte lanes into a header word, hands a sub-object to two helpers and decrements a byte counter",
+      "ranges": 1,
+      "size": 320,
+      "symbol": "FUN_002BBB70",
+      "xrefs": 1
+    },
+    {
       "address": 2869480,
       "meaning": "Accumulates a byte and two floats into one record, then selects one of three branches on a state word and packs a scaled lookup result into a colour word.",
       "ranges": 1,
@@ -1412,6 +1885,14 @@
       "xrefs": 1
     },
     {
+      "address": 2877736,
+      "meaning": "calls a three-argument helper on the sub-objects at +16 and +32, then packs ((v[6]*v[4])/v[5])<<24 into the low 24 bits of the word at +4 and conditionally calls a second helper on +48 before a final call.",
+      "ranges": 1,
+      "size": 144,
+      "symbol": "FUN_002BE928",
+      "xrefs": 1
+    },
+    {
       "address": 2877880,
       "meaning": "Family c10c12168bf625ba: seed body at LVL_0_ARANOS_TUTORIAL_FUN_00335810.",
       "ranges": 1,
@@ -1420,11 +1901,27 @@
       "xrefs": 1
     },
     {
+      "address": 2881264,
+      "meaning": "Calls a routine on pointer-plus-10 and, when it returns non-zero, calls a second routine with the pointer itself.",
+      "ranges": 1,
+      "size": 56,
+      "symbol": "FUN_002BF6F0",
+      "xrefs": 1
+    },
+    {
       "address": 2891904,
       "meaning": "increments a byte counter at +8, adds a fixed constant to a float at +40, then after a magic-word range test and a predicate call takes one of two continuations; the second integrates a float at +12 toward 210000.0 and bumps the counter",
       "ranges": 1,
       "size": 236,
       "symbol": "FUN_002C2080",
+      "xrefs": 1
+    },
+    {
+      "address": 2892144,
+      "meaning": "Tests the halfword at offset 10 through a helper; on zero it stores a scaled int at offset 4 and a 210000.0f-scaled interpolation of two floats at offset 12, otherwise calls a second helper.",
+      "ranges": 1,
+      "size": 156,
+      "symbol": "FUN_002C2170",
       "xrefs": 1
     },
     {
@@ -1452,11 +1949,27 @@
       "xrefs": 1
     },
     {
+      "address": 2901896,
+      "meaning": "decrements a signed short counter and, at zero, rotates a 24-bit identifier beside it and reloads the counter; calls a helper when the identifier's top byte is clear",
+      "ranges": 1,
+      "size": 96,
+      "symbol": "FUN_002C4788",
+      "xrefs": 1
+    },
+    {
       "address": 2905424,
       "meaning": "Updates three bounded float fields at +16, +20, and +24.",
       "ranges": 1,
       "size": 348,
       "symbol": "FUN_002C5550",
+      "xrefs": 1
+    },
+    {
+      "address": 2910024,
+      "meaning": "If a probe call on a sub-object returns zero, folds a byte counter into the top byte of a packed word, rebuilds a 16-byte vector from two sub-records for a helper, then clamps a running float against a limit and accumulates two sub-record fields into the object.",
+      "ranges": 1,
+      "size": 288,
+      "symbol": "FUN_002C6748",
       "xrefs": 1
     },
     {
@@ -1481,6 +1994,14 @@
       "ranges": 1,
       "size": 204,
       "symbol": "FUN_002C7D58",
+      "xrefs": 1
+    },
+    {
+      "address": 2917848,
+      "meaning": "Calls a routine on pointer-plus-10 and, when it returns non-zero, calls a second routine with the pointer itself.",
+      "ranges": 1,
+      "size": 56,
+      "symbol": "FUN_002C85D8",
       "xrefs": 1
     },
     {
@@ -1514,6 +2035,14 @@
       "size": 60,
       "symbol": "FUN_002C9AD8",
       "xrefs": 0
+    },
+    {
+      "address": 2923400,
+      "meaning": "reads two object fields, forms centre plus and minus half of a third, and issues two five-argument draw calls taking an id-derived value and a fixed 64-bit attribute",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_002C9B88",
+      "xrefs": 1
     },
     {
       "address": 2929896,
@@ -1617,6 +2146,14 @@
       "xrefs": 1
     },
     {
+      "address": 2990648,
+      "meaning": "Re-initialises a state block: clears field 68, builds two sub-records from the flag word at field 52 masked with 0x200, substitutes a default record for any that came back zero, then clears field 92, sets fields 84 and 80 to -1 and returns 0.",
+      "ranges": 1,
+      "size": 148,
+      "symbol": "FUN_002DA238",
+      "xrefs": 1
+    },
+    {
       "address": 3008528,
       "meaning": "initialize six 16-bit values from dimensions and halves",
       "ranges": 1,
@@ -1697,6 +2234,14 @@
       "xrefs": 0
     },
     {
+      "address": 3069304,
+      "meaning": "Decomposes a float returned by a bound producer into hours, minutes and hundredths written through three pointer arguments, rounding each step with a bound helper and clamping the last field at 99.",
+      "ranges": 1,
+      "size": 244,
+      "symbol": "FUN_002ED578",
+      "xrefs": 1
+    },
+    {
       "address": 3069576,
       "meaning": "read indirect field+0x14 under flag0x20",
       "ranges": 1,
@@ -1724,6 +2269,22 @@
       "ranges": 1,
       "size": 40,
       "symbol": "FUN_002EE6A8"
+    },
+    {
+      "address": 3074224,
+      "meaning": "Calls a callee with the object, returns when it fails, otherwise fills a 16-byte workspace from the object at +192 with 8.0f, hands it to a second callee through +96, calls a third, then stores 300 at +304.",
+      "ranges": 1,
+      "size": 108,
+      "symbol": "FUN_002EE8B0",
+      "xrefs": 1
+    },
+    {
+      "address": 3074816,
+      "meaning": "Picks a float threshold (1.0 or 8.0) from a callee status code, compares a probed float against it, and returns a boolean that also latches a trailing probe.",
+      "ranges": 1,
+      "size": 176,
+      "symbol": "FUN_002EEB00",
+      "xrefs": 1
     },
     {
       "address": 3129456,
@@ -1761,6 +2322,14 @@
       "size": 80,
       "symbol": "FUN_00300540",
       "xrefs": 0
+    },
+    {
+      "address": 3148136,
+      "meaning": "scales a float argument by a field of the object into a stack buffer, then calls a second routine with the object, its flags, the buffer and three float arguments",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_00300968",
+      "xrefs": 1
     },
     {
       "address": 3154592,
@@ -1953,6 +2522,14 @@
       "xrefs": 1
     },
     {
+      "address": 3317344,
+      "meaning": "Per frame: scales the value one helper returns by the factor another helper returns, stores both scaled samples and a third sample into a three-float record, and hands the record to a setter with two selector results.",
+      "ranges": 1,
+      "size": 224,
+      "symbol": "FUN_00329E60",
+      "xrefs": 1
+    },
+    {
       "address": 3322608,
       "meaning": "resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order",
       "ranges": 1,
@@ -1982,6 +2559,14 @@
       "ranges": 1,
       "size": 160,
       "symbol": "FUN_003349E8",
+      "xrefs": 1
+    },
+    {
+      "address": 3365760,
+      "meaning": "calls one four-argument helper four times, left[i] and right[i] with the float scale, storing each result into dst[i]; the first pointer parameter is unused.",
+      "ranges": 1,
+      "size": 144,
+      "symbol": "FUN_00335B80",
       "xrefs": 1
     },
     {
@@ -2031,6 +2616,14 @@
       "size": 40,
       "symbol": "FUN_00335E88",
       "xrefs": 0
+    },
+    {
+      "address": 3366576,
+      "meaning": "Compares the second argument with the word at offset 4 of the object; when they differ, and when the word at offset 44 is non-zero while the word at offset 24 is zero, it calls a two-argument helper with those two words, marks offset 24 with 1, and finally writes the second argument into offset 4.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_00335EB0",
+      "xrefs": 1
     },
     {
       "address": 3366792,
@@ -2149,6 +2742,14 @@
       "symbol": "FUN_00336A38"
     },
     {
+      "address": 3369592,
+      "meaning": "Reads a float through a pointer field; returns when it is zero or when a word field is zero, otherwise calls a helper, adjusts a float loaded from another pointer field by half or all of the helper's result depending on a small mode word, and finally calls a second helper with three pointers and three floats taken from the object and from two further pointer fields.",
+      "ranges": 1,
+      "size": 276,
+      "symbol": "FUN_00336A78",
+      "xrefs": 1
+    },
+    {
       "address": 3369872,
       "meaning": "write a word at 0x40",
       "ranges": 1,
@@ -2200,6 +2801,14 @@
       "xrefs": 0
     },
     {
+      "address": 3374640,
+      "meaning": "Initialises an object: two float stores through the pointer at +0, clears byte +423, stores an int at +440, calls a callee with (this+168, -1) storing its result at +468 and the address at +472, sets +432 to 1 and writes 1.0f through the pointer at +4.",
+      "ranges": 1,
+      "size": 104,
+      "symbol": "FUN_00337E30",
+      "xrefs": 1
+    },
+    {
       "address": 3377160,
       "size": 8,
       "symbol": "FUN_00338808"
@@ -2210,9 +2819,33 @@
       "symbol": "FUN_00338A58"
     },
     {
+      "address": 3377760,
+      "meaning": "Returns early when a float field reached through a two-level pointer chain is exactly zero; otherwise dispatches on an integer state (0 or 2 selects one of two callees) and then always calls a third callee with the same object pointer.",
+      "ranges": 1,
+      "size": 120,
+      "symbol": "FUN_00338A60",
+      "xrefs": 1
+    },
+    {
       "address": 3379024,
       "size": 8,
       "symbol": "FUN_00338F50"
+    },
+    {
+      "address": 3379208,
+      "meaning": "Initialises eight sub-objects at byte offsets 8, 84, 160, 236 (step 76) and 312, 384, 456, 528 (step 72) of the argument with two different helpers and returns the argument.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_00339008",
+      "xrefs": 1
+    },
+    {
+      "address": 3380624,
+      "meaning": "early-returns when a 32-bit field is zero, otherwise calls one helper four times and another three times with fixed byte offsets off the argument pointer.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_00339590",
+      "xrefs": 1
     },
     {
       "address": 3381088,
@@ -2237,11 +2870,43 @@
       "xrefs": 0
     },
     {
+      "address": 3381144,
+      "meaning": "Calls a one-argument helper three times with three fixed small integers, passes the three results and a pointer plus 8 to a four-argument helper, calls a two-argument helper with the same address and 0.0f, then clears the word at offset 764.",
+      "ranges": 1,
+      "size": 128,
+      "symbol": "FUN_00339798",
+      "xrefs": 1
+    },
+    {
+      "address": 3381272,
+      "meaning": "looks up three objects by numeric id, runs a four-argument routine and a (pointer,float) routine on a sub-object at self+8, then stores 1 at self+764",
+      "ranges": 1,
+      "size": 132,
+      "symbol": "FUN_00339818",
+      "xrefs": 1
+    },
+    {
+      "address": 3381816,
+      "meaning": "calls two one-argument functions on a sequence of sub-objects of the argument (four at 8..236 stride 76, nine at 312..888 stride 72) and returns the argument",
+      "ranges": 1,
+      "size": 140,
+      "symbol": "FUN_00339A38",
+      "xrefs": 1
+    },
+    {
       "address": 3384288,
       "meaning": "Returns immediately when the word at object+1024 is zero; otherwise clears two sub-blocks, runs two marker calls and two zero-argument helpers, then clears two more sub-blocks and nine further 72-byte strided sub-blocks up to +888.",
       "ranges": 1,
       "size": 192,
       "symbol": "FUN_0033A3E0",
+      "xrefs": 1
+    },
+    {
+      "address": 3384480,
+      "meaning": "walks four 76-byte records calling one function on each, then calls two more functions on later fields and returns its argument",
+      "ranges": 1,
+      "size": 116,
+      "symbol": "FUN_0033A4A0",
       "xrefs": 1
     },
     {
@@ -2275,6 +2940,14 @@
       "size": 8,
       "symbol": "FUN_0033A9F8",
       "xrefs": 0
+    },
+    {
+      "address": 3386192,
+      "meaning": "Walks a five-element array of 76-byte records starting at +12 of the argument, calling one routine on each record, then calls the same second routine on three fixed offsets (+408, +480, +552) and returns the argument.",
+      "ranges": 1,
+      "size": 124,
+      "symbol": "FUN_0033AB50",
+      "xrefs": 1
     },
     {
       "address": 3386904,
@@ -2381,6 +3054,14 @@
       "xrefs": 1
     },
     {
+      "address": 3397024,
+      "meaning": "resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte",
+      "ranges": 1,
+      "size": 152,
+      "symbol": "FUN_0033D5A0",
+      "xrefs": 1
+    },
+    {
       "address": 3397384,
       "meaning": "Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer.",
       "ranges": 1,
@@ -2463,6 +3144,30 @@
       "symbol": "FUN_0033E348"
     },
     {
+      "address": 3401280,
+      "meaning": "Calls twelve sub-object handlers in sequence, each with the object base plus a fixed byte offset (8, 684, 744, 816, 888, 960, 1040, 1112, 1184, 1256, 1328, 1400), then returns the object pointer.",
+      "ranges": 1,
+      "size": 132,
+      "symbol": "FUN_0033E640",
+      "xrefs": 1
+    },
+    {
+      "address": 3403824,
+      "meaning": "Forwards one object pointer, eight pointer-plus-constant arguments and a null to ten calls in a fixed order.",
+      "ranges": 1,
+      "size": 112,
+      "symbol": "FUN_0033F030",
+      "xrefs": 1
+    },
+    {
+      "address": 3412416,
+      "meaning": "initialises eight in-place sub-records of one object by four routines, then returns the object pointer",
+      "ranges": 1,
+      "size": 96,
+      "symbol": "FUN_003411C0",
+      "xrefs": 1
+    },
+    {
       "address": 3413312,
       "meaning": "store three consecutive words; byte-identical body in all 27 levels",
       "ranges": 1,
@@ -2488,6 +3193,14 @@
       "meaning": "Call the measured one-owner routine with owner+0x 228.",
       "size": 28,
       "symbol": "FUN_00341A68"
+    },
+    {
+      "address": 3415072,
+      "meaning": "Reads a word at +544 of the object; returns when it is zero, otherwise calls a repeated callee four times with the object and the objects at +152, +76 and +228, then one callee each with +464, the object, the object and the object.",
+      "ranges": 1,
+      "size": 108,
+      "symbol": "FUN_00341C20",
+      "xrefs": 1
     },
     {
       "address": 3415256,
@@ -2575,6 +3288,14 @@
       "size": 8,
       "symbol": "FUN_00343060",
       "xrefs": 0
+    },
+    {
+      "address": 3420672,
+      "meaning": "initialises eight in-place sub-records of one object by four routines, then returns the object pointer",
+      "ranges": 1,
+      "size": 96,
+      "symbol": "FUN_00343200",
+      "xrefs": 1
     },
     {
       "address": 3421496,
@@ -2759,6 +3480,14 @@
       "xrefs": 0
     },
     {
+      "address": 3442240,
+      "meaning": "stores the count in a field, then loops count times calling one helper on each successive 72-byte slot and passing the result to a second helper.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_00348640",
+      "xrefs": 1
+    },
+    {
       "address": 3445072,
       "meaning": "initialize sixty-four values to minus one and counters to zero",
       "ranges": 1,
@@ -2787,6 +3516,14 @@
       "size": 52,
       "symbol": "FUN_00349498",
       "xrefs": 0
+    },
+    {
+      "address": 3445968,
+      "meaning": "Zeroes six word fields of an object, reads back the first one as a float, calls a helper twice with that float (then with 1.0f) over five float arguments, sets two more int fields, and calls a second helper with two float arguments.",
+      "ranges": 1,
+      "size": 180,
+      "symbol": "FUN_003494D0",
+      "xrefs": 1
     },
     {
       "address": 3446160,
@@ -2849,6 +3586,14 @@
       "xrefs": 0
     },
     {
+      "address": 3447152,
+      "meaning": "Initialises a record of four 1.0 floats, one zero, one small constant and four zero words, then runs the same four-argument setup four times with two selector flags swept over 0 and 1.",
+      "ranges": 1,
+      "size": 228,
+      "symbol": "FUN_00349970",
+      "xrefs": 1
+    },
+    {
       "address": 3447392,
       "meaning": "write a word in an indexed array (index in a0); byte-identical body in all 27 levels",
       "ranges": 1,
@@ -2905,6 +3650,14 @@
       "xrefs": 0
     },
     {
+      "address": 3452928,
+      "meaning": "Stores an argument at +1012; if the word at +1024 is zero it returns, else it clears +1024, sets +12 to 1 and calls one callee four times on this+468/604/740/876 with argument 1.",
+      "ranges": 1,
+      "size": 104,
+      "symbol": "FUN_0034B000",
+      "xrefs": 1
+    },
+    {
       "address": 3459688,
       "meaning": "Call the qualified field accessor with owner offset 358, read its returned encoded address and retain the top byte of the word.",
       "ranges": 1,
@@ -2928,12 +3681,28 @@
       "xrefs": 1
     },
     {
+      "address": 3460648,
+      "meaning": "stores a value into one field and, when a second field is set, clears it and calls the same callee with a zero argument on four sub-objects at a 148-byte stride",
+      "ranges": 1,
+      "size": 96,
+      "symbol": "FUN_0034CE28",
+      "xrefs": 1
+    },
+    {
       "address": 3460760,
       "meaning": "write a word at 0x2bc; byte-identical body in all 27 levels",
       "ranges": 1,
       "size": 8,
       "symbol": "FUN_0034CE98",
       "xrefs": 0
+    },
+    {
+      "address": 3465184,
+      "meaning": "walks 26 consecutive 72-byte records calling one leaf per record, then calls four more leaves on fixed offsets of the same object and returns the object pointer",
+      "ranges": 1,
+      "size": 140,
+      "symbol": "FUN_0034DFE0",
+      "xrefs": 1
     },
     {
       "address": 3465752,
@@ -3255,6 +4024,14 @@
       "size": 12,
       "symbol": "FUN_00351F28",
       "xrefs": 0
+    },
+    {
+      "address": 3481400,
+      "meaning": "Returns zero when a helper reports non-zero, otherwise combines three fields of the pointed-to block (a difference plus a third term, taken modulo that third term) scaled by a constant and added to the first field.",
+      "ranges": 1,
+      "size": 100,
+      "symbol": "FUN_00351F38",
+      "xrefs": 1
     },
     {
       "address": 3481504,

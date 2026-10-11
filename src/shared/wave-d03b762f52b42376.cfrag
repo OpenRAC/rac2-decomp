@@ -1,0 +1,26 @@
+extern float @@ROLE_0_00@@(int a0);
+extern int @@ROLE_1_00@@(float x);
+
+int @@FUNCTION@@(int a0, int *p0, int *p1, int *p2)
+{
+    float t;
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+
+    t = @@ROLE_0_01@@(a0);
+    a = @@ROLE_1_01@@(t * (1.0f / 3600.0f));
+    *p0 = a;
+    b = @@ROLE_1_02@@((float)a * 3600.0f);
+    t = t - (float)b;
+    c = @@ROLE_1_03@@(t * 0.01666667f);
+    *p1 = c;
+    d = @@ROLE_1_04@@((float)c * 60.0f);
+    t = t - (float)d;
+    e = @@ROLE_1_05@@(t * (5.0f / 3.0f));
+    e = e > 99 ? 0 : e;
+    *p2 = e;
+    return e;
+}

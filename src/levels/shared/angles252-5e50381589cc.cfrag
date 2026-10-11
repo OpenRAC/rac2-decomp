@@ -14,7 +14,7 @@ typedef struct {
     NativeAngleState *field68;
 } NativeAngleOwner __attribute__((aligned(16)));
 extern void @@BIND_0@@(f32 *output, const f32 *left, const f32 *right);
-extern void @@BIND_1@@(NativeAngleOwner *owner, f32 *output, const f32 *input, s32 mode);
+extern void @@BIND_1@@();
 extern f32 @@BIND_2@@(f32 x, f32 y);
 extern f32 @@BIND_3@@(const f32 *vector);
 void @@BIND_4@@(NativeAngleOwner *owner) {

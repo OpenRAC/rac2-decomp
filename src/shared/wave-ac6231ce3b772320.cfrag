@@ -1,0 +1,14 @@
+extern void @@ROLE_0_00@@(float *, int, int);
+extern void @@ROLE_1_00@@(float *, int);
+extern void @@ROLE_2_00@@(float *, float *, float *);
+
+float @@FUNCTION@@(int a0, int a1, int a2, int a3)
+{
+	float v[24];
+	float *m = v + 4;
+
+	@@ROLE_0_01@@(v, a2, a0);
+	@@ROLE_1_01@@(v + 8, a1);
+	@@ROLE_2_01@@(m, v, v + 8);
+	return m[a3];
+}

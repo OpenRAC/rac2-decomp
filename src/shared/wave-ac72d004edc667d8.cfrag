@@ -1,0 +1,17 @@
+extern void @@ROLE_0_00@@(char *, int);
+extern void @@ROLE_1_00@@(char *, int);
+extern void @@ROLE_2_00@@(char *, int);
+extern void @@ROLE_3_00@@(char *, int);
+
+void @@FUNCTION@@(char *p, int a1)
+{
+    *(int *)(p + 1012) = a1;
+    if (*(int *)(p + 1024) == 0)
+        return;
+    *(int *)(p + 1024) = 0;
+    *(int *)(p + 12) = 1;
+    @@ROLE_0_01@@(p + 468, 1);
+    @@ROLE_1_01@@(p + 604, 1);
+    @@ROLE_2_01@@(p + 740, 1);
+    @@ROLE_3_01@@(p + 876, 1);
+}

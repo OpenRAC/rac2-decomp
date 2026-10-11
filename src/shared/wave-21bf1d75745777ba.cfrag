@@ -1,0 +1,34 @@
+extern float @@BIND_DATA0_00@@ __attribute__((sda));
+
+extern void @@ROLE_0_00@@(float *out, char *a, char *b);
+extern void @@ROLE_1_00@@(float *out, char *a, char *b, float k);
+extern float @@ROLE_2_00@@(float *v);
+extern void @@ROLE_3_00@@(float *out, float *in, float k);
+
+void @@FUNCTION@@(char *obj)
+{
+    char *p = *(char **)(obj + 112);
+    char *r = p + 496;
+    char *q = p + 352;
+    float buf[4];
+    float a, b, c;
+
+    if (*(short *)(p + 16) <= 0) return;
+    @@ROLE_0_01@@(buf, p, p + 176);
+    @@ROLE_1_01@@((float *)q, q, (char *)buf, @@BIND_DATA0_01@@);
+    a = @@ROLE_2_01@@((float *)q);
+    b = *(float *)(q + 44);
+    if (b < a) {
+        a = b;
+        @@ROLE_3_01@@((float *)q, (float *)q, a);
+        c = *(float *)(q + 44);
+    } else {
+        float d = b - *(float *)(r + 48);
+        if (a < d) {
+            a = d;
+            @@ROLE_3_02@@((float *)q, (float *)q, a);
+        }
+        c = *(float *)(q + 44);
+    }
+    *(float *)(r + 48) = c - a;
+}

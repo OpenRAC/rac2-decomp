@@ -1,0 +1,15 @@
+extern int @@ROLE_0_00@@(int, int, int *);
+extern int @@ROLE_2_00@@(int);
+
+int @@FUNCTION@@(int a0, int a1, int a2, int a3)
+{
+	int r = 0;
+	int a;
+	int b;
+
+	if (@@ROLE_0_01@@(a0, a2, &a)) {
+		if (@@ROLE_0_02@@(a1, a2, &b))
+			r = @@ROLE_2_01@@(a - b) < a3;
+	}
+	return r;
+}

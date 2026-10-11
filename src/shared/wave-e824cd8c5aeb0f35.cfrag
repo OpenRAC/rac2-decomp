@@ -1,0 +1,22 @@
+extern void @@ROLE_0_00@@(char *);
+extern void @@ROLE_1_00@@(char *);
+extern void @@ROLE_2_00@@(char *);
+extern void @@ROLE_3_00@@(char *);
+extern void @@ROLE_4_00@@(char *);
+extern void @@ROLE_5_00@@(char *);
+extern void @@ROLE_6_00@@(char *);
+extern void @@ROLE_7_00@@(char *);
+
+void @@FUNCTION@@(char *a0)
+{
+    if (*(int *)(a0 + 544) == 0)
+        return;
+    @@ROLE_0_01@@(a0);
+    @@ROLE_1_01@@(a0 + 152);
+    @@ROLE_2_01@@(a0 + 76);
+    @@ROLE_3_01@@(a0 + 228);
+    @@ROLE_4_01@@(a0 + 464);
+    @@ROLE_5_01@@(a0);
+    @@ROLE_6_01@@(a0);
+    @@ROLE_7_01@@(a0);
+}

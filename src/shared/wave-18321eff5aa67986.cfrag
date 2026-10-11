@@ -1,0 +1,14 @@
+extern int @@BIND_DATA0_00@@ __attribute__((sda));
+extern int @@ROLE_0_00@@(int);
+int @@FUNCTION@@(void)
+{
+    int v = @@BIND_DATA0_01@@;
+    int r = 0;
+    if (v >= 8) {
+        if (v < 10 || v == 19) {
+            if (@@ROLE_0_01@@(1) != 0 || @@ROLE_0_02@@(2) != 0)
+                r = 1;
+        }
+    }
+    return r;
+}

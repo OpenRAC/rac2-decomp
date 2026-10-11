@@ -1,0 +1,23 @@
+extern int @@ROLE_0_00@@();
+extern int @@ROLE_1_00@@();
+extern float @@ROLE_2_00@@();
+extern int @@ROLE_4_00@@();
+
+int @@FUNCTION@@(int *a0)
+{
+    int s2 = 0;
+    int s1 = @@ROLE_0_01@@(a0);
+    float f20 = 1.0f;
+
+    if (@@ROLE_1_01@@(a0) == 2)
+        f20 = 8.0f;
+
+    if (s1 != 0) {
+        if (@@ROLE_2_01@@((char *)a0 + 16, (char *)s1 + 96) < f20)
+            s2 = @@ROLE_1_02@@(a0) != 8;
+
+        s2 = @@ROLE_4_01@@((char *)s1 + 304) != 0 ? 1 : s2;
+    }
+
+    return s2;
+}

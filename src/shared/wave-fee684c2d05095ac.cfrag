@@ -1,0 +1,14 @@
+extern void @@ROLE_0_00@@(int);
+extern void @@ROLE_1_00@@(void);
+extern void @@ROLE_2_00@@(int, int, int, int, int, int);
+extern void @@ROLE_3_00@@(int, int, int, int, int, int);
+
+void @@FUNCTION@@(void)
+{
+    @@ROLE_0_01@@(1);
+    @@ROLE_1_01@@();
+    if (*(int *)0x001A7BB8 != 0)
+        @@ROLE_2_01@@(512, 416, 640, 448, 0, 0);
+    else
+        @@ROLE_3_01@@(512, 416, 512, 448, 0, 0);
+}

@@ -1,0 +1,20 @@
+extern char *@@ROLE_0_00@@(int);
+
+char *@@FUNCTION@@(char *p)
+{
+    char *o = @@ROLE_0_01@@(167);
+    int *v;
+
+    if (o != 0) {
+        v = *(int **)(o + 104);
+        v[1] = (int)p;
+        v[0] = 0;
+        v[2] = 0;
+        v[3] = 0;
+        *(unsigned char *)(o + 48) = 255;
+        *(short *)(o + 50) = 126;
+        o[49] = 0;
+        o[32] = 0;
+    }
+    return o;
+}

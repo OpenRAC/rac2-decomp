@@ -1,0 +1,26 @@
+extern void @@ROLE_0_00@@(void *, float);
+extern void @@ROLE_1_00@@(void *, void *, void *);
+extern void @@ROLE_2_00@@(void *, void *, float);
+extern float @@ROLE_3_00@@(void *);
+extern float @@ROLE_4_00@@(float);
+extern void @@ROLE_5_00@@(void *, void *);
+extern void @@ROLE_6_00@@(void *, void *, void *);
+extern void @@ROLE_7_00@@(void *, void *, int);
+
+void @@FUNCTION@@(void *a0, void *a1, void *a2)
+{
+    float buf[12];
+    float m[4];
+    float q[4];
+    float x;
+
+    @@ROLE_0_01@@(q, 1.0f);
+    @@ROLE_1_01@@(m, q, (char *)a0 + 32);
+    @@ROLE_2_01@@(m, m, 0.5f);
+    x = @@ROLE_3_01@@(m);
+    m[3] = -@@ROLE_4_01@@(1.0f - x * x);
+    @@ROLE_5_01@@(m, buf);
+    @@ROLE_6_01@@(a0, buf, a0);
+    if (a2 != 0)
+        @@ROLE_7_01@@(a2, buf, 48);
+}

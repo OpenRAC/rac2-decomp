@@ -1,0 +1,16 @@
+extern int @@BIND_DATA0_00@@ __attribute__((sda));
+extern int @@BIND_DATA1_00@@ __attribute__((sda));
+extern void @@ROLE_0_00@@(int *p, int flag);
+extern void @@ROLE_1_00@@(int *p, int flag);
+extern void @@ROLE_2_00@@(int *p);
+extern void @@ROLE_3_00@@(int *p);
+
+void @@FUNCTION@@(int *obj)
+{
+    if (@@BIND_DATA0_01@@ != 0 || @@BIND_DATA1_01@@ != 0 || obj[192] != 0)
+        @@ROLE_0_01@@(obj + 2, 0);
+    if (obj[191] == 1)
+        @@ROLE_1_01@@(obj + 2, 1);
+    @@ROLE_2_01@@(obj + 2);
+    @@ROLE_3_01@@(obj + 170);
+}

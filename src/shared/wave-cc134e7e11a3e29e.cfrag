@@ -1,0 +1,27 @@
+extern char @@BIND_DATA0_00@@[];
+extern void @@ROLE_0_00@@(int);
+
+struct S {
+    char pad[52];
+    unsigned short flags;
+};
+
+void @@FUNCTION@@(void)
+{
+    char *g = @@BIND_DATA0_01@@;
+    int v;
+    struct S *p;
+    struct S *q;
+
+    v = *(int *)(g + 6228);
+    if (v != 0) {
+        @@ROLE_0_01@@(v);
+        *(int *)(g + 6228) = 0;
+    }
+    p = *(struct S **)(g + 4880);
+    if (p != 0)
+        p->flags &= ~0x41;
+    q = *(struct S **)(g + 4884);
+    if (q != 0)
+        q->flags &= ~0x41;
+}

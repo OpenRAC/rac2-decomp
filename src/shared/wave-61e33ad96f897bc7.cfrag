@@ -1,0 +1,33 @@
+#ifndef RAC2_T_V4_F61E33AD9
+#define RAC2_T_V4_F61E33AD9
+typedef int V4_F61e33ad9 __attribute__((mode(TI)));
+#endif
+
+
+extern float @@ROLE_0_00@@(float f);
+extern void @@ROLE_1_00@@(void *a, void *b);
+extern void @@ROLE_2_00@@(void *a, void *b);
+
+void @@FUNCTION@@(void *a0, void *a1, float scale)
+{
+    V4_F61e33ad9 l0;
+    V4_F61e33ad9 l1;
+    float *p0;
+    float *p1;
+    float t;
+    float u;
+
+    l0 = *(V4_F61e33ad9 *)a0;
+    l1 = *(V4_F61e33ad9 *)a1;
+    p0 = (float *)&l0;
+    p1 = (float *)&l1;
+    if (0.0f < scale) {
+        t = p0[2];
+        u = p1[2];
+        if (@@ROLE_0_01@@(t - u) < scale) {
+            @@ROLE_1_01@@(p0, p1);
+            return;
+        }
+    }
+    @@ROLE_2_01@@(p0, p1);
+}

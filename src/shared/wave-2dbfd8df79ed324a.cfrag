@@ -1,0 +1,30 @@
+extern char @@BIND_DATA0_00@@[];
+extern char @@BIND_DATA1_00@@[];
+extern short @@BIND_DATA2_00@@;
+
+extern void @@ROLE_0_00@@();
+extern void @@ROLE_1_00@@();
+extern void @@ROLE_2_00@@();
+extern void @@ROLE_3_00@@();
+
+void @@FUNCTION@@(void)
+{
+    char *p = @@BIND_DATA0_01@@;
+    char *q;
+    unsigned short v;
+
+    if (*(int *)(p + 9420) <= 0) {
+        *(int *)(p + 9420) = 1;
+    }
+    @@ROLE_0_01@@(0);
+
+    q = @@BIND_DATA1_01@@;
+    v = *(unsigned short *)(q + 114);
+    if ((unsigned short)(v - 6) >= 2) {
+        *(unsigned short *)(q + 114) = 5;
+    }
+    @@ROLE_1_01@@();
+    @@ROLE_2_01@@();
+    @@ROLE_3_01@@(0);
+    @@BIND_DATA2_01@@ = 0;
+}

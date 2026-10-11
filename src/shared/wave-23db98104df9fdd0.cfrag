@@ -1,0 +1,54 @@
+extern int @@ROLE_0_00@@(char *);
+extern int @@ROLE_1_00@@(char *);
+extern void @@ROLE_2_00@@(char *, int);
+extern void @@ROLE_3_00@@(char *, int);
+extern int @@ROLE_4_00@@(int, int);
+extern int @@ROLE_5_00@@(char *);
+extern void @@ROLE_6_00@@(char *, int);
+extern void @@ROLE_7_00@@(char *, int);
+extern int @@ROLE_8_00@@(int, int);
+extern int @@BIND_RESIDENT_RAND_00@@(void);
+extern int @@DATA_0_00@@[];
+
+void @@FUNCTION@@(char *obj)
+{
+    char *s;
+
+    s = (char *)@@ROLE_0_01@@(obj);
+    if (s == 0)
+        return;
+    if (*(int *)(s + 288) == 0)
+        return;
+    if (*(int *)(s + 284) != 0) {
+        int *p = @@DATA_0_01@@;
+        int one = 1;
+
+        *(int *)(s + 280) = one;
+        p[3] += one;
+        if (@@ROLE_1_01@@(obj) != 5) {
+            @@ROLE_2_01@@(obj, 4);
+            *(float *)(s + 120) = (@@BIND_RESIDENT_RAND_01@@() & 1) ? -1.0f : 1.0f;
+            if (@@BIND_RESIDENT_RAND_02@@() & 1)
+                *(float *)(s + 116) = -1.0f;
+            else
+                *(float *)(s + 116) = 1.0f;
+            *(int *)(s + 252) = one;
+            *(int *)(s + 112) = 0;
+            *(int *)(s + 124) = 0;
+        } else {
+            @@ROLE_3_01@@(obj, 7);
+        }
+        *(int *)(s + 304) = @@ROLE_4_01@@(120, 500);
+    } else {
+        int *p = @@DATA_0_02@@;
+
+        *(int *)(s + 280) = 1;
+        p[3] += 1;
+        if (@@ROLE_5_01@@(obj) != 5)
+            @@ROLE_6_01@@(obj, 4);
+        else
+            @@ROLE_7_01@@(obj, 7);
+        *(int *)(s + 304) = @@ROLE_8_01@@(120, 500);
+        *(int *)(s + 252) = 0;
+    }
+}

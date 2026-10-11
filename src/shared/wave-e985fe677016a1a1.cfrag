@@ -1,0 +1,13 @@
+
+
+
+extern f32 @@ROLE_0_00@@(void);
+extern f32 @@ROLE_2_00@@(f32, f32);
+extern void @@ROLE_3_00@@(s32, f32, f32, f32);
+
+void @@FUNCTION@@(s32 a0, f32 a1, f32 a2) {
+    f32 x = @@ROLE_0_01@@();
+    f32 y = @@ROLE_0_02@@();
+    f32 z = @@ROLE_2_01@@(a1, a2);
+    @@ROLE_3_01@@(a0, z, x, y);
+}

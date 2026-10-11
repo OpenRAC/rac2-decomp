@@ -1,0 +1,18 @@
+
+
+extern void @@ROLE_0_00@@(u8 *);
+extern void @@ROLE_1_00@@(u8 *);
+extern void @@ROLE_2_00@@(u8 *);
+extern void @@ROLE_3_00@@(u8 *);
+
+u8 *@@FUNCTION@@(u8 *a0) {
+    @@ROLE_0_01@@(a0);
+    @@ROLE_0_02@@(a0 + 76);
+    @@ROLE_0_03@@(a0 + 152);
+    @@ROLE_0_04@@(a0 + 228);
+    @@ROLE_0_05@@(a0 + 304);
+    @@ROLE_1_01@@(a0 + 380);
+    @@ROLE_2_01@@(a0 + 464);
+    @@ROLE_3_01@@(a0 + 552);
+    return a0;
+}

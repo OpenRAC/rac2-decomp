@@ -356,7 +356,7 @@ void FUN_00339770(unsigned char *owner, int value)
 
 void* FUN_0033E170(void* param_1);
 
-extern void FUN_0033AB50(int);
+extern int FUN_0033AB50(int);
 extern unsigned long long FUN_00347EA0(unsigned long long);
 
 void* FUN_0033E170(void* param_1)

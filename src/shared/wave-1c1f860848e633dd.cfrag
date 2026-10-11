@@ -1,0 +1,22 @@
+
+
+extern int @@ROLE_0_00@@(void *, void *, float);
+extern int @@ROLE_1_00@@(void *, void *, void *);
+extern int @@ROLE_2_00@@(void *);
+
+void @@FUNCTION@@(char *a0)
+{
+    char *p = a0;
+    char *q = p + 32;
+    int v;
+
+    @@ROLE_0_01@@(q, q, 0.975f);
+    @@ROLE_1_01@@(p + 16, p + 16, q);
+    *(float *)(p + 12) = *(float *)(p + 12) + 14700.0f;
+    *(u8 *)(p + 8) = *(u8 *)(p + 8) + *(u8 *)(q + 16);
+    v = *(int *)(p + 4) + 0xFE000000;
+    *(int *)(p + 4) = v;
+    if (v < 0) {
+        @@ROLE_2_01@@(p);
+    }
+}

@@ -1,0 +1,15 @@
+extern int @@ROLE_0_00@@(int);
+extern int @@ROLE_1_00@@(int);
+extern int @@ROLE_2_00@@(int);
+extern void @@ROLE_3_00@@(char *, int, int, int);
+extern void @@ROLE_4_00@@(char *, float);
+
+void @@FUNCTION@@(char *p)
+{
+    int first = @@ROLE_0_01@@(11678);
+    int second = @@ROLE_1_01@@(11676);
+
+    @@ROLE_3_01@@(p + 8, first, second, @@ROLE_2_01@@(11599));
+    @@ROLE_4_01@@(p + 8, 0.0f);
+    *(int *)(p + 764) = 0;
+}

@@ -1,0 +1,31 @@
+extern void @@ROLE_0_00@@(char *object);
+extern void @@ROLE_1_00@@(char *object);
+extern void @@ROLE_2_00@@(char *object);
+extern void @@ROLE_3_00@@(char *object);
+extern void @@ROLE_4_00@@(char *object);
+extern void @@ROLE_5_00@@(char *object);
+extern void @@ROLE_6_00@@(char *object);
+extern void @@ROLE_7_00@@(char *object);
+extern void @@ROLE_8_00@@(char *object);
+extern void @@ROLE_9_00@@(char *object);
+extern void @@ROLE_10_00@@(char *object);
+extern void @@ROLE_11_00@@(char *object);
+extern void @@ROLE_12_00@@(char *object);
+
+char *@@FUNCTION@@(char *object)
+{
+    @@ROLE_0_01@@(object + 8);
+    @@ROLE_1_01@@(object + 84);
+    @@ROLE_2_01@@(object + 160);
+    @@ROLE_3_01@@(object + 236);
+    @@ROLE_4_01@@(object + 312);
+    @@ROLE_5_01@@(object + 384);
+    @@ROLE_6_01@@(object + 456);
+    @@ROLE_7_01@@(object + 528);
+    @@ROLE_8_01@@(object + 600);
+    @@ROLE_9_01@@(object + 672);
+    @@ROLE_10_01@@(object + 744);
+    @@ROLE_11_01@@(object + 816);
+    @@ROLE_12_01@@(object + 888);
+    return object;
+}

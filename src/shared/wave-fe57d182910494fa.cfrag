@@ -1,0 +1,29 @@
+extern int @@ROLE_0_00@@(int, void *, void *);
+extern void @@ROLE_1_00@@(void *, int, int, int);
+extern void @@ROLE_2_00@@(void *, int, int, int);
+extern char @@BIND_DATA0_00@@[];
+
+void @@FUNCTION@@(void)
+{
+    char *p = @@BIND_DATA0_01@@;
+    void *s0;
+    void *s1;
+    int buf[2];
+
+    s0 = *(void **)(p + 4880);
+    s1 = *(void **)(p + 4884);
+
+    if (s0 == 0)
+        return;
+    if (s1 == 0)
+        return;
+
+    if (*(unsigned char *)((char *)s0 + 67) != 1)
+        return;
+
+    if (@@ROLE_0_01@@(0, buf, buf + 1) == 0)
+        return;
+
+    @@ROLE_1_01@@(s0, buf[0], 0, 7);
+    @@ROLE_2_01@@(s1, buf[1], 0, 7);
+}

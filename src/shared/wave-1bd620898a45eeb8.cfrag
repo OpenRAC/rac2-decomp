@@ -1,0 +1,12 @@
+extern int @@BIND_DATA0_00@@ __attribute__((sda));
+extern int @@ROLE_0_00@@(int a, int b);
+
+int @@FUNCTION@@(int a0)
+{
+    int v = @@BIND_DATA0_01@@;
+
+    if (v != 0) {
+        return @@ROLE_0_01@@(v + 0x3BE08, a0);
+    }
+    return 0;
+}

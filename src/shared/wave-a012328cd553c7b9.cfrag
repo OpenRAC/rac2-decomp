@@ -1,0 +1,39 @@
+#ifndef RAC2_T_V4_FA012328C
+#define RAC2_T_V4_FA012328C
+typedef int V4_Fa012328c __attribute__((mode(TI)));
+#endif
+
+
+extern char @@BIND_DATA0_00@@[];
+extern char @@BIND_DATA1_00@@[] __attribute__((sda));
+
+extern void @@ROLE_0_00@@(void);
+extern void @@ROLE_1_00@@(void *p);
+extern void @@ROLE_2_00@@(void *p);
+extern void @@ROLE_3_00@@(void *p);
+extern void @@ROLE_4_00@@(void *p);
+extern void @@ROLE_5_00@@(void *p);
+extern void @@ROLE_6_00@@(void *p);
+extern void @@ROLE_7_00@@(void *p);
+extern void @@ROLE_8_00@@(void);
+
+void @@FUNCTION@@(void)
+{
+    char *p;
+
+    *(volatile V4_Fa012328c *)@@BIND_DATA1_01@@ = 0;
+    @@ROLE_0_01@@();
+    p = @@BIND_DATA0_01@@;
+    @@ROLE_1_01@@(p);
+    @@ROLE_2_01@@(p - 16);
+    @@ROLE_3_01@@(p + 16);
+    @@ROLE_4_01@@(p + 32);
+    @@ROLE_5_01@@(p + 48);
+    @@ROLE_6_01@@(p + 96);
+    @@ROLE_7_01@@(p - 96);
+    p = p - 256;
+    *(int *)(p + 420) = 0;
+    *(int *)(p + 376) = 0;
+    *(int *)(p + 368) = 0;
+    @@ROLE_8_01@@();
+}

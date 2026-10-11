@@ -1,0 +1,14 @@
+
+
+extern f32 @@ROLE_0_00@@ (f32);
+
+f32 @@FUNCTION@@ (f32 a, f32 b, f32 t)
+{
+  f32 u;
+  if (t == 0.0f)
+    return a;
+  if (t == 1.0f)
+    return b;
+  u = (1.0f - @@ROLE_0_01@@ (t * 3.1415927f)) * 0.5f;
+  return a + (b - a) * u;
+}

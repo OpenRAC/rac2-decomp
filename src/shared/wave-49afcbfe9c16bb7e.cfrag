@@ -1,0 +1,40 @@
+#ifndef RAC2_T_S_F49AFCBFE
+#define RAC2_T_S_F49AFCBFE
+typedef struct {
+    float f0;
+    float f4;
+    float f8;
+    float f12;
+    float f16;
+    int i20;
+    float f24;
+    int i28;
+    int i32;
+    int i36;
+    int i40;
+} S_F49afcbfe;
+#endif
+
+
+extern void @@ROLE_0_00@@(S_F49afcbfe *x, int a, int b, float p, float q, float r, float s);
+
+void @@FUNCTION@@(S_F49afcbfe *x)
+{
+    float z;
+
+    x->f0 = 1.0f;
+    x->f4 = 1.0f;
+    x->f8 = 1.0f;
+    x->f12 = 1.0f;
+    x->f16 = 0.0f;
+    x->f24 = 6.6665999591350555419922e-02f;
+    x->i28 = 0;
+    x->i32 = 0;
+    x->i36 = 0;
+    x->i40 = 0;
+    z = x->f16;
+    @@ROLE_0_01@@(x, 0, 0, z, z, z, z);
+    @@ROLE_0_02@@(x, 0, 1, z, z, z, z);
+    @@ROLE_0_03@@(x, 1, 0, z, z, z, z);
+    @@ROLE_0_04@@(x, 1, 1, z, z, z, z);
+}
