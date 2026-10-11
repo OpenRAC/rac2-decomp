@@ -8,7 +8,8 @@ This document analyzes the codebase for duplication and provides recommendations
 
 | Category | Count |
 |----------|-------|
-| C/C++ source files | 103 |
+| C/C++ source files (`.c`/`.cpp`/`.h`, excluding `.cfrag`) | 103 |
+| Authored `.cfrag` fragments under `src/` (the maintained sources) | 509 |
 | Documentation (.md) | 85 |
 | Python scripts | ~50+ |
 | Shell scripts | ~10+ |
@@ -18,13 +19,13 @@ This document analyzes the codebase for duplication and provides recommendations
 ## Key Directories
 
 ### Source Code
-- `src/` - Hand-written C source (4 files, 1,374 lines)
+- `src/` - Authored sources: 509 `.cfrag` fragments (the maintained, accepted source) plus 4 `.c` files; counting only `.c` understates it
 - `candidates/` - Generated standalone units (boot.c, 40 level units)
 - `going-decompiled/` - Empty (gitignored per LEGAL.md)
 - `ports/pal-functional/` - External port (8 files)
 
 ### Build/Toolchain
-- `tools/ee/` - Matching build toolchain (15 scripts)
+- `tools/ee/` - Imported reference helpers (15 scripts), not a build route; see `tools/ee/README.md`
 - `scripts/` - Build/test scripts (~50+ Python scripts)
 
 ### Configuration
@@ -61,9 +62,9 @@ This document analyzes the codebase for duplication and provides recommendations
 **Issue:** Potential overlap between `scripts/` and `tools/ee/`
 
 **Recommendation:**
-- `tools/ee/` - Canonical matching build system
-- `scripts/` - Helper scripts, campaign workflow
-- Remove duplicate functionality
+- `scripts/` - Canonical: the acceptance pipeline, campaign workflow and proof consumers
+- `tools/ee/` - Imported reference helpers only; nothing consumes them
+- Do not consolidate or replace anything until every consumer and proof dependency of the `.cfrag` sources and `scripts/` is inventoried
 
 ### 4. Progress Tracking
 
@@ -109,7 +110,7 @@ This document analyzes the codebase for duplication and provides recommendations
 ## Recommendations
 
 1. **Keep as-is:**
-   - `tools/ee/` - Complete matching build toolchain
+   - `tools/ee/` - Imported reference helpers (not canonical)
    - `progress/` - JSON progress tracking (source of truth)
    - `symbol_addrs/` - Manual symbol additions
 

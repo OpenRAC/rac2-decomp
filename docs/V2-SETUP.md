@@ -61,7 +61,7 @@ relocation-free functions (the other 99 need a link to compare).
 
 ```bash
 podman run -d --init --name rac2-gnu --userns=keep-id --security-opt label=disable -v $HOME:$HOME \
-  --tmpfs /rac2tmp:exec,mode=1777 rac2-linux sleep infinity
+  --tmpfs /rac2tmp:exec,mode=1777 rac2-linux:24.04 sleep infinity
 export PYTHONPATH=$PWD/tools/linux RAC2_LINUX_RUNNER="podman exec rac2-gnu bash -c" \
   RAC2_WSL_TOOLS=$HOME/rac2-private/compiler/tools RAC2_WSL_TMP=/rac2tmp
 python scripts/try_function.py trials/usa-v2/IntToFloat.c --address 0x284690 --size 16     # prints MATCH
@@ -76,11 +76,11 @@ Write your function in `trials/usa-v2/`, compare, then iterate on the C shape (s
 structure-only catalogue (`config/regions/ntsc-u-v2/catalog.json`). After a function matches, add `--record` to
 `scripts/try_function.py` to store its proof in `progress/v2/matches.json`, then
 `python scripts/v2_report.py report --output build/decomp/report.json` builds the objdiff report CI uploads to decomp.dev.
-Totals count each unique body once (about 5.27 MB of code), not 27 overlay copies.
+Totals are a heuristic estimate (about 5.27 MB): boot extents are inferred and level code is normalised chunks with relocation fields and immediates erased, so different constants can collapse into one body. They are not comparable to the official loaded-byte or conservative unique-code figures and are never a denominator. Matches recorded here are exploratory candidates and earn no credit in the report.
 
 ## 7. Contribute
 
 Claim a small lot in [`CONTRIBUTOR-RESERVATIONS.md`](CONTRIBUTOR-RESERVATIONS.md) first, open a draft PR against `RAC2`
 as described in [`CONTRIBUTOR-QUICKSTART.md`](CONTRIBUTOR-QUICKSTART.md), and keep matching claims honest:
 a function counts only after the campaign byte gates pass.
-`python scripts/measure_unique.py --reference <runtime>/runs/<run>/reference` estimates unique v2.00 code (about 5.25 MB).
+`python scripts/measure_unique.py --reference <runtime>/runs/<run>/reference` estimates unique v2.00 code (about 5.25 MB, heuristic; see section 6).

@@ -26,7 +26,7 @@ class ReportTests(unittest.TestCase):
         catalog = v2_report.json.loads(v2_report.CATALOG.read_text(encoding="utf-8"))
         matches = v2_report.json.loads(v2_report.MATCHES.read_text(encoding="utf-8"))["matches"]
         report = v2_report.build_report(catalog, matches)
-        self.assertEqual(report["measures"]["matchedCode"], str(sum(m["size"] for m in matches)))
+        self.assertEqual(report["measures"]["matchedCode"], "0")  # candidates never earn credit
         self.assertLess(int(report["measures"]["totalCode"]), 6_000_000)
 
 

@@ -23,7 +23,7 @@ separate runner or queue for each target.
 | You need | Where it comes from | What it unlocks |
 | --- | --- | --- |
 | Python 3.12 + `requirements.txt` | `pip` | tests, report export, everything |
-| **Your own** disc image of the USA **v2.00** release (`--region v2`) (`SCUS_972.68`) | your legally obtained copy | the reference bytes |
+| **Your own** disc image of the USA **v1.01** release (`SCUS_972.68`, default region; v2.00 is the experimental `--region v2` route) | your legally obtained copy | the reference bytes |
 | **SN ProDG 2.0** EE toolchain (`ee/bin/Ps2EeAs.exe`, `ee/bin/ld.exe`) | you supply it | assembly reconstruction, the build gate |
 | **Reconstructed GNU EE 2.9-ee-991111b** `cpp`/`cc1`/`as` profile | locally rebuilt; see [compiler notes](COMPILER-NOTES.md) | current authored-C compilation and assembly |
 | **SN ProDG 3.01** EE toolchain (`ee/bin/ld.exe`; earlier compiler profile `ee-gcc2953`) | you supply it | linking the current C objects; retaining the earlier SN profile |
@@ -31,8 +31,8 @@ separate runner or queue for each target.
 | **Wrench** (`wrenchbuild`) | you supply it | unpacking the 27 level overlays |
 | A runtime directory **outside** this repository | you create it | every generated file lands there |
 
-Each release (v2.00 target, v1.01 legacy proofs, PAL) is a **different target** — the pinned hashes in
-`config/target.json` reject them. The tests and `scripts/decomp_report.py` need **none** of the
+Each release (v1.01 accepted target, experimental v2.00, PAL) is a **different target** — the pinned hashes in
+`config/target.json` (v2.00: `config/regions/ntsc-u-v2/target.json`) reject them. The tests and `scripts/decomp_report.py` need **none** of the
 proprietary entries above; a bare Python 3.12 runs them (that is what CI does).
 
 The current C checker compiles through `scripts/wsl_chain.py` and uses the SN
@@ -196,7 +196,7 @@ The rules are deliberate; each one exists because a wrong result once got throug
 | `C linker ... is missing ee/bin/ld.exe` | the C linker root is incomplete or incorrect | use the root containing `ee/bin/ld.exe`; the old SN frontend is not required |
 | `GNU WSL profile unavailable` or `hash mismatch` | the actual GNU tools are missing or differ from the current qualified hashes | see [toolchain setup](../toolchain/README.md); do not substitute another compiler |
 | `An explicit private SDK runtime binding is required` | current boot C integration needs its separately qualified SDK owners | prepare the authorized tools and private binding, then use `campaign.py integrate -- ... --sdk-binding <binding>` from step 3 |
-| `ISO: wrong size, sha1, …` | not the supported release | USA v2.00 (`--region v2`) or the legacy v1.01 proof target |
+| `ISO: wrong size, sha1, …` | not the supported release | USA v1.01 (default) or the experimental v2.00 (`--region v2`) |
 | `Runtime must be outside the source repository` | your `--runtime` is inside the clone | pick a directory elsewhere |
 | `Wrong RAC2 reference identity` | `--reference` is not the pinned boot | use the `boot.elf` that `setup.py` extracted |
 | `Keep private candidate builds outside sources` | same rule, for the checker | same fix |

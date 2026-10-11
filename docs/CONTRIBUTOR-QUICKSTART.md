@@ -20,7 +20,7 @@ validated contribution to https://github.com/llesieur99/rac2-decomp,
 starting from branch RAC2.
 
 Read AGENTS.md, docs/CONTRIBUTOR-QUICKSTART.md and toolchain/README.md.
-Contribution requires my own legally acquired USA v2.00 ISO (SCUS_972.68; pass `--region v2`)
+Contribution requires my own legally acquired USA v1.01 ISO (SCUS_972.68, the default region; USA v2.00 is the experimental `--region v2` route)
 and the complete qualified tool suite. Help me install public dependencies,
 locate my authorized local tools and verify the required versions/hashes.
 Do not obtain an ISO, BIOS or SDK from an unverified source or upload them.
@@ -52,7 +52,7 @@ maintainer's private paths or open-ended campaign permissions.
 
 | Requirement | What the AI does |
 | --- | --- |
-| Your legally acquired Going Commando USA v2.00 ISO | Verify the pinned size and hashes from `config/target.json` |
+| Your legally acquired Going Commando USA v1.01 ISO (v2.00 only for the experimental `--region v2` route) | Verify the pinned size and hashes from `config/target.json` (v2.00: `config/regions/ntsc-u-v2/target.json`) |
 | GitHub account and coding AI with local access | Guide login; create your fork and task branch |
 | Git, Python 3.12 and pinned Python packages | Reuse the configured interpreter and check required package versions |
 | Wrench `wrenchbuild` | Check the executable used to extract your reference |

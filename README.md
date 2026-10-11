@@ -8,7 +8,7 @@
 [![Progress report](https://github.com/OpenRAC/rac2-gc-decomp/actions/workflows/progress.yml/badge.svg)](https://github.com/OpenRAC/rac2-gc-decomp/actions/workflows/progress.yml)
 [![Code](https://decomp.dev/OpenRAC/rac2-gc-decomp.svg?mode=shield&label=Code&measure=matched_code_percent)](https://decomp.dev/OpenRAC/rac2-gc-decomp)
 
-A work-in-progress **matching decompilation** of *Ratchet & Clank: Going Commando* (Insomniac Games, 2003) for the PlayStation 2 (`SCUS_972.68`, **USA v2.00**), part of the **[OpenRAC](https://openrac.dev)** initiative. The goal is C/C++ that compiles to a byte-identical copy of the retail executable and its 27 level overlays.
+A work-in-progress **matching decompilation** of *Ratchet & Clank: Going Commando* (Insomniac Games, 2003) for the PlayStation 2 (`SCUS_972.68`, accepted target **USA v1.01**; USA v2.00 is an experimental route), part of the **[OpenRAC](https://openrac.dev)** initiative. The goal is C/C++ that compiles to a byte-identical copy of the retail executable and its 27 level overlays.
 
 > [!NOTE]
 > This repository contains **no game assets, retail executables, or disassembly**. You must provide your own legally obtained copy of the game. Read [`LEGAL.md`](LEGAL.md) first; `scripts/legal_check.py` enforces it in CI.
@@ -29,7 +29,7 @@ Recorded validation on **10 October 2026**:
 | **Total C coverage** | **Boot + all 27 overlays** | **1,342,384 / 48,788,176 (2.7515%)** |
 <!-- generated-progress:end -->
 
-Proofs in [`progress/`](progress/) were measured on **USA v1.01** and move to v2.00 once its catalogues are regenerated; v2.00 disc, boot and all 27 overlays are already pinned ([`docs/REGIONS.md`](docs/REGIONS.md)).
+All proofs above are **USA v1.01**, the default region. USA v2.00 is a separate experimental route (`--region v2`): its disc, boot and 27 overlays are pinned ([`docs/REGIONS.md`](docs/REGIONS.md)), but its candidates and its heuristic unique-code estimate add no matching credit and do not replace the figures above.
 
 ![Matched code](progress/decompilation.svg)
 
@@ -48,22 +48,22 @@ Shared boot binding: 22,576 static edges in combined pinned reference images. Ru
 
 ![Unique and loaded code](progress/unique-decompilation.svg)
 
-## Quick Start
+## Quick Start (default: USA v1.01)
 
 1. Clone and install: `git clone https://github.com/OpenRAC/rac2-gc-decomp && pip install -r requirements.txt`
-2. Put `SCUS_972.68` from your own disc in `baserom/` (SHA-1 `4124a79c1e5a1ceb56f514df0dbbc11f072af56f`).
-3. Check your setup: `python scripts/doctor.py --region v2 --iso <your.iso>`
+2. Put `SCUS_972.68` from your own v1.01 disc in `baserom/` (hashes in `config/target.json`).
+3. Check your setup: `python scripts/doctor.py --iso <your.iso>`
 4. Prepare the reference (needs [Wrench](https://github.com/chaoticgd/wrench) `wrenchbuild`):
-   `python scripts/setup.py --region v2 --iso <your.iso> --runtime <private dir> --wrench <wrenchbuild>`
-5. Pick a function: `python scripts/function_size_rank.py --category small --status todo --ascending`
+   `python scripts/setup.py --iso <your.iso> --runtime <private dir> --wrench <wrenchbuild>`
+5. Pick a function: `python scripts/function_size_rank.py --region ntsc-u --category small --status todo --ascending`
+
+**Experimental USA v2.00 route** (candidates only, no matching credit): add `--region v2` to the commands above, SHA-1 `4124a79c1e5a1ceb56f514df0dbbc11f072af56f`; see [`docs/V2-SETUP.md`](docs/V2-SETUP.md).
 
 6. Fetch the legacy SN Systems toolchain and SDK yourself (community mirrors, **not** part of this repository and git-ignored; check their licences before use):
    ```bash
    git clone https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_3.01 toolchain/sn-prodg-3.01
    git clone https://github.com/AngheloAlf/sce_ps2_sdk_24 toolchain/sn-prodg-24
    ```
-
-Linux walkthrough with every command: [`docs/V2-SETUP.md`](docs/V2-SETUP.md).
 
 Compiler and linker requirements are in [`toolchain/README.md`](toolchain/README.md); the full walkthrough is [`docs/START-HERE.md`](docs/START-HERE.md).
 

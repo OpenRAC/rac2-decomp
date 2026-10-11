@@ -275,6 +275,7 @@ if [ -f "$ELFLMA" ]; then
   echo -n "built "; sha1sum "$ROM"  2>/dev/null | awk '{print $1}'
   if cmp -s "$ORIG" "$ROM"; then echo "MATCH: byte-identical .rom"; else
     echo "DIFF: $(cmp -l "$ORIG" "$ROM" 2>/dev/null | wc -l) differing bytes (of $(stat -c%s "$ORIG") )"
+    exit 1  # a differing image must fail the caller, not just print
   fi
 else
   echo "== no ELF produced (link incomplete) =="

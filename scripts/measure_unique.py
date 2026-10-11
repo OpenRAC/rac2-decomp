@@ -3,7 +3,9 @@
 
 Reads the ELFs that ``setup.py`` unpacked into your private runtime. Function bodies are split
 at ``jr ra`` and hashed after masking relocatable fields (jump targets and 16-bit immediates),
-so engine code linked at different addresses in different overlays counts once. Only counts
+so engine code linked at different addresses in different overlays counts once. This is a HEURISTIC
+family estimate: immediates and load/store offsets are erased too, so functions that differ only in
+constants or struct fields share a digest. It is not a progress denominator. Only counts
 are printed; no bytes are written. The split is heuristic: data inside ``.text`` is included.
 
     python scripts/measure_unique.py --reference <runtime>/runs/<run>/reference [--output build/unique-v2.json]

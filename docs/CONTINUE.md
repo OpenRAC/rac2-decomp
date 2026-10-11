@@ -7,11 +7,11 @@ Tool acquisition and setup levels are described in [toolchain/README.md](../tool
 Open this repository's local checkout on branch `RAC2`. A short request to
 continue matching decompilation is sufficient when the repository instructions
 and the private machine environment are available. No long pasted prompt is
-required. The game target is Going Commando USA v2.00 (`--region v2`), `SCUS_972.68`; earlier proofs are v1.01.
+required. The accepted campaign, default region and every proof are USA v1.01 (`config/target.json`). USA v2.00 (`--region v2`, `config/regions/ntsc-u-v2/`) is a separate, experimental route: its results are exploratory candidates and add no matching credit.
 
-## Short request on USA v2.00: "decompile N small functions"
+## Experimental: short request on USA v2.00: "decompile N small functions"
 
-The v1.01 campaign commands below have no v2.00 catalogues. For v2.00 follow this loop; stop and report the first missing prerequisite
+The v1.01 campaign commands below stay the default and have no v2.00 catalogues. For v2.00 follow this loop; stop and report the first missing prerequisite
 (ISO, `baserom/SCUS_972.68`, ProDG 2.0 files, compiler chain, Podman container) instead of substituting another route.
 
 1. `python scripts/doctor.py --region v2 --iso <iso>` and the setup in [V2-SETUP.md](V2-SETUP.md) (steps 1-5). Verify the chain's five

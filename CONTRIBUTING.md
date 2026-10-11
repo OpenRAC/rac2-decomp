@@ -28,8 +28,8 @@ adds matching credit. Keep the claim while your result is under review.
 
 ## The three things this repository cannot ship
 
-1. **Your own copy of the game** — the USA v2.00 disc (`SCUS_972.68`, `--region v2`), verified against the
-   hashes pinned in `config/target.json`. Greatest Hits v2.00 and other regions are
+1. **Your own copy of the game** — the USA v1.01 disc (`SCUS_972.68`, default region), verified against the
+   hashes pinned in `config/target.json`. USA v2.00 is an experimental route (`--region v2`, `config/regions/ntsc-u-v2/target.json`) with no accepted proofs. Greatest Hits v2.00 and other regions are
    *different targets*; do not mix them.
 2. **The local toolchains** — ProDG 2.0 (`ee/bin/Ps2EeAs.exe`, `ee/bin/ld.exe`)
    reconstructs assembly. Authored C uses the qualified GNU EE compiler and
