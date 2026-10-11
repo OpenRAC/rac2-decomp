@@ -2,7 +2,7 @@
 """Name level-overlay functions that equal a named boot function or an SDK library function.
 
 Level overlays carry copies of engine code. A function whose relocation-masked digest equals exactly one named
-boot function (``symbol_addrs/usa/symbol_addrs.txt``) or a single SDK library symbol (your ``toolchain/`` mirror)
+boot function (``symbol_addrs/usa/symbol_addrs.txt``) a single SDK library symbol or a name a diagnostic message spells out (your ``toolchain/`` mirror)
 inherits that name. Copies of boot functions are not listed (they take the boot name). Output is addresses and names only: ``config/datamine/ntsc-u-overlay-names.tsv``.
 
     python scripts/name_overlay_functions.py --reference <runtime>/runs/<run>/reference
@@ -49,6 +49,15 @@ def main() -> int:
                 for _, blob in sdk.members(path.read_bytes()):
                     for name, words, _, _ in sdk.object_functions(blob):
                         known.setdefault(ue.digest(words), set()).add((name, "sdk"))
+    hints = ROOT / "config/datamine/ntsc-u-name-hints-ghidra.tsv"
+    if hints.exists():  # names that a function's own diagnostic spells out (scripts/ghidra_name_hints.py)
+        for line in hints.read_text(encoding="utf-8").splitlines():
+            cols = line.split("\t")
+            if len(cols) == 5 and cols[4] == "named" and cols[0] != "boot":
+                r = ue.code_words((args.reference / "levels" / cols[0] / "overlay.elf").read_bytes())
+                size = dict(ue.extents(r)).get(int(cols[1], 16))
+                if size:
+                    known.setdefault(ue.digest(ue.slice_words(r, int(cols[1], 16), size)), set()).add((cols[2], "message"))
     lines = ["# Level-overlay functions named by an identical named boot function or SDK library function (digest match).",
              "# Columns: level, function start, name, source (boot|sdk). Addresses and names only."]
     total = shared = 0

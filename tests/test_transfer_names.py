@@ -33,3 +33,14 @@ class CommittedRowTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HintRowTests(unittest.TestCase):
+    def test_ghidra_hint_rows_hold_names_not_messages(self):
+        rows = [l.split("\t") for l in (ROOT / "config/datamine/ntsc-u-name-hints-ghidra.tsv").read_text(encoding="utf-8").splitlines()
+                if not l.startswith("#")]
+        self.assertTrue(rows)
+        for program, function, token, string, form in rows:
+            self.assertTrue(function.startswith("0x") and string.startswith("0x"))
+            self.assertRegex(token, r"^[A-Za-z0-9_]+$")
+            self.assertIn(form, ("named", "mention"))

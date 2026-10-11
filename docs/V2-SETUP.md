@@ -134,3 +134,7 @@ functions to your SDK mirror's library objects (196 matches, mostly `libkernl`, 
 `match_sdk_libs.py` also writes `config/datamine/ntsc-u-sdk-objects.tsv` (17 SDK library objects located in the boot; they become `lib_<object>` units).
 `name_overlay_functions.py --reference <reference>` finds no SDK or named function that exists only in an overlay; 66,248 overlay functions are copies of boot functions.
 No newer Sony SDK mirror is public (ps2dev/ps2sdk is a different implementation), so remaining libraries need your own SDK 2.5-era libraries.
+
+`scripts/ghidra_name_hints.py` scans the boot and all 27 overlays (loaded into the Ghidra project with `analyzeHeadless`, then `load_program_from_project` / `switch_program?program=`)
+for class-like names in referenced strings: 608 hints, 46 of them function names a diagnostic spells out (`Camera_CollPrimTest` in 27 overlays, `NPC_showMessage`, `Path_setWtoDist`).
+`name_overlay_functions.py` writes those to `config/datamine/ntsc-u-overlay-names.tsv`, which the report uses for level units.
