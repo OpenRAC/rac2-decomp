@@ -1,5 +1,13 @@
 # Near misses
 
+## Independently authored Forja carry-over in this fork
+
+This branch retains 1,403 additional local source candidates from the boot and the 27 level programs. They are existing research made visible for review, never linked into the build or counted as OpenRAC progress. Functions already present as C in OpenRAC are reused directly rather than copied here.
+
+Files ending in `-forja.c` preserve local experiments, including compiler aids or address assumptions that still need a plain-C port. Their header records that limitation. Entries outside the current catalogue and entries already classified as assembly/linker remnants are retained for review only; they are not new matching functions. Forja's local exact-byte checks do not establish an OpenRAC match. The naming/declaration adaptations are also unverified.
+
+Before promoting any candidate into `src/`, coordinate its reservation in issue #152, remove unsupported local constructs, check every catalogue placement, and require `tools/build.py all` to report all 28 programs OK with the new function actually linked as C. Only those reviewed source changes belong in an upstream pull request. The upstream source/progress files have not been changed by retaining these candidates.
+
 C that compiles close to a function but not to its bytes: a starting point, never linked
 and never counted. Move a file into `src/` once `tools/build.py` places it.
 
