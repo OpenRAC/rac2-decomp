@@ -1,6 +1,8 @@
-/* Exact at every place, but the build refuses it: the switch table travels with the
-   function ("needs .rodata at its place, which is not C"), so it stays assembly. From
-   the wave that matched the rest of its file. */
+/* Exact at every place, but the build refuses it: the function's own bytes are the
+   C's, but the switch table it jumps through (jtbl_002BB020) lives in the level's .data
+   at 0x002BB020, and a C switch makes the compiler emit its own
+   table into a section, where it cannot be placed at that address.  The function
+   stays assembly.  From the wave that matched the rest of its file. */
 
 int func_L11_0043E090(unsigned int index)
 {
