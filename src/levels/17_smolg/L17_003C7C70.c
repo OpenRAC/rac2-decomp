@@ -39,7 +39,45 @@ void func_L17_003C8248(s32 a0)
                                       (func_2EF4E0(ang) + 1.0f) * 0.5f);
 }
 
-INCLUDE_ASM("asm/levels", func_L17_003CC798);
+typedef int TI128 __attribute__((mode(TI)));
+
+/* A 16-byte vector: the engine's helpers take and return these, and the copies between
+   them are quadword moves. */
+typedef union {
+    TI128 q;
+    struct {
+        f32 x;
+        f32 y;
+        f32 z;
+        f32 w;
+    } f;
+} Vec4;
+
+extern void func_00283698(void *, void *);
+extern void func_00282CF0(void *, void *, void *);
+extern void func_002830C0(void *, void *, void *);
+extern f32 func_00282C48(f32);
+
+/* Turns the vector at a1 into the object's frame, then into the world with the matrix at
+   a0 + 0xC0, and reports whether both of the first two coordinates stay below the two
+   bounds. */
+s32 func_L17_003CC798(u8 *a0, TI128 *a1, f32 f1, f32 f2) {
+    Vec4 v[1];
+    Vec4 mat[4];
+    Vec4 w[1];
+    Vec4 out[1];
+
+    v[0].q = *a1;
+    func_00283698(mat, a0 + 0xC0);
+    func_00282CF0(&out[0].q, &v[0].q, a0 + 0x10);
+    w[0].q = out[0].q;
+    func_002830C0(&w[0].q, &w[0].q, mat);
+    if (func_00282C48(w[0].f.x) < f2) {
+        if (func_00282C48(w[0].f.y) < f1)
+            return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/levels", func_L17_003CC850);
 
