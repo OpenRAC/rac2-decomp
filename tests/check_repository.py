@@ -13,6 +13,9 @@
 3. Nothing of the removed system comes back: no gzipped or generated data, no generated sources
    or fragments, no per-level copies, no per-batch or campaign documents, no file over 2.5 MB.
 
+4. nonmatching/functional.tsv (C for the native port only, never counted) lists only functions
+   that are still INCLUDE_ASM in src/, once each, with a file under nonmatching/functional/.
+
 Exits nonzero, listing every problem, on failure.
 """
 import re
@@ -89,9 +92,10 @@ def release_of(name: str) -> str:
     return TAGS.get(m.group(1), "us") if m else "us"
 
 
-def check_sources(known: dict, errors: list) -> None:
-    """KNOWN: version -> the names of its catalogues."""
+def check_sources(known: dict, errors: list) -> set:
+    """KNOWN: version -> the names of its catalogues. Returns the names still INCLUDE_ASM."""
     defined = {}
+    still_asm = set()
     for path in sorted((ROOT / "src").rglob("*.c")):
         text = path.read_text(encoding="utf-8", errors="replace")
         relative = path.relative_to(ROOT).as_posix()
@@ -102,6 +106,8 @@ def check_sources(known: dict, errors: list) -> None:
         for m in re.finditer(rf'^(?:INCLUDE_ASM|ASM_FUNC|LINKER_REMNANT)\("[^"]*",\s*({NAME})\);', text, re.M):
             n = text[:m.start()].count("\n") + 1
             defined.setdefault(m.group(1), []).append(f"{relative}:{n} (asm)")
+            if m.group(0).startswith("INCLUDE_ASM"):
+                still_asm.add(m.group(1))
     for name, where in sorted(defined.items()):
         if len(where) > 1:
             errors.append(f"{name} appears {len(where)} times: {', '.join(where)}")
@@ -118,6 +124,38 @@ def check_sources(known: dict, errors: list) -> None:
             errors.append(f"{name} is in a catalogue of {version} but in no file of src/")
     c = sum(1 for w in defined.values() if not w[0].endswith("(asm)"))
     print(f"{len(defined)} functions in src/: {c} in C, {len(defined) - c} as INCLUDE_ASM")
+    return still_asm
+
+
+def check_functional(still_asm: set, errors: list) -> None:
+    """nonmatching/functional.tsv: name<TAB>file lines. Functional C does what the retail function
+    does without matching its bytes; it is kept out of src/ and out of every count, so a listed
+    function must still be INCLUDE_ASM in src/ (a match replaces the row), and its file must exist
+    under nonmatching/functional/."""
+    table = ROOT / "nonmatching/functional.tsv"
+    if not table.is_file():
+        errors.append("nonmatching/functional.tsv is missing (the slot for functional C)")
+        return
+    seen = {}
+    for n, line in enumerate(table.read_text().splitlines(), 1):
+        if not line.strip() or line.startswith("#"):
+            continue
+        where = f"nonmatching/functional.tsv:{n}"
+        cols = line.split("\t")
+        if len(cols) != 2:
+            errors.append(f"{where}: {len(cols)} columns, expected name<TAB>file")
+            continue
+        name, rel = cols[0].strip(), cols[1].strip()
+        if not re.fullmatch(NAME, name):
+            errors.append(f"{where}: {name!r} is not a function name")
+        if name in seen:
+            errors.append(f"{where}: duplicate {name} (first at line {seen[name]})")
+        seen.setdefault(name, n)
+        if name not in still_asm:
+            errors.append(f"{where}: {name} is not INCLUDE_ASM in src/ (matched or unknown): remove the row")
+        if not rel.startswith("nonmatching/functional/") or not (ROOT / rel).is_file():
+            errors.append(f"{where}: {rel!r} is not a file under nonmatching/functional/")
+    print(f"{len(seen)} functions in nonmatching/functional.tsv")
 
 
 # What the repository must not grow again (AGENTS.md, "Do not bring back what was removed").
@@ -173,7 +211,7 @@ def main() -> int:
         if (ROOT / v["config"] / "boot/functions.tsv").is_file():
             known[version] = check_catalogues(errors, v["config"])
             print(f"{version}: {len(known[version])} catalogue names")
-    check_sources(known, errors)
+    check_functional(check_sources(known, errors), errors)
     if errors:
         print(f"\n{len(errors)} problem(s):", file=sys.stderr)
         for e in errors[:200]:

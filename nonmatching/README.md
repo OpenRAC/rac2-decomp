@@ -15,6 +15,16 @@ Some older game drafts record experiments with the compiler recipe at
 `ace3f7be822bae9e85af0ae9010bd5c0dca91986`. Those residuals are historical observations;
 later dated entries record their own profiles and measurements. Neither is proof
 of semantic correctness or matching credit without a strict linked build.
+
+## Functional C
+
+`functional/` and `functional.tsv` hold C that does what a still-assembly
+function does without matching its bytes, written for the native port (see
+`functional/README.md` and OpenRAC's `docs/port/BACKFILL.md`). It is never
+linked, never counted by `tools/progress.py` (which reads `src/` only), and
+`tests/check_repository.py` checks that each listed function is still
+`INCLUDE_ASM` in `src/`.
+
 | Function | Size | Status and remaining differences |
 | --- | ---: | ---: |
 | [`func_00285030`](game/func_00285030.c) | 680 | 26 October 2026 (xcarry): carried from rac3-decomp func_00392820, whose match uses an empty asm register fence (not allowed here). Without it, as a -g8 unit, the TEX0 build order and the second packet's registers differ (about 25 lines). See source. |
