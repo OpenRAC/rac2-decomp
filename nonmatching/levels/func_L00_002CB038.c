@@ -1,18 +1,76 @@
-/* Not attempted - body read in full, no C written (walled behind the same $gp block as
-   func_L00_002CB2D8): the front-end screen loader at symbol_addrs's `MenuScreenLoad`
-   (0x002CB038, 476 bytes, 27 places).
+/* Retained complete C reconstruction: 468/476 bytes at game -O2 -G0.
+ * US and US2: 0/27 local placements; PAL absent. No strict linked credit.
+ * The historical screen inverted the eligibility guard; retail requires flag
+ * 0x20 set and state !=0x31, after rejecting a negative screen index.
+ * Retail func_L00_002AE888 returns a selected object pointer, not the older
+ * integer declaration; all three GPR and four single-FP arguments are retained.
+ * Named camera/angle lifetimes improve 464 to468 bytes. The narrow
+ * keep-block-order control ties. Early clear-tail sharing, pointer priorities
+ * and mixed absolute/GP counter scheduling still differ. Reopen with genuine
+ * source/block-lifetime evidence, without aliases or volatile steering.
+ */
+#include "common.h"
+extern unsigned char D_00189E20[];
+extern unsigned char D_001A7A80[];
+extern unsigned int D_00138320;
+extern unsigned char D_00138180[];
+extern unsigned int D_001A7390 __attribute__((sda));
+extern int D_001A79F0;
+extern unsigned char D_L00_001B8C80[];
+struct ScreenDropStats {
+    unsigned char prefix[0x1B0];
+    unsigned short count;
+    unsigned short reserved1B2;
+    unsigned int best;
+    unsigned int levels;
+};
+extern struct ScreenDropStats D_0018C750;
+extern float func_00282E48(void *,void *);
+/* Retail returns a selected object pointer from the candidate-object list. */
+extern char *func_L00_002AE888(void *,float,float,float,float,int,int);
 
-   Shape: s0 = 0x00189E20. `if (*(int *)(s0+0x1248) < 0) { *(int *)(s0+0x1450) = 0; return; }`
-   then, when the flag byte at 0x001A7A80 + *(int *)(s0+0x1248) has bit 0x20 AND
-   *(int *)(s0+0x2294) != 0x31, it clears 0x1450 and returns. With a live object at 0x1450 it
-   tests a distance (func_2EE2B0(s0+0x80, obj+0x10) > 30.0f), a 3-valued field at
-   0x00138320, and `*(u16 *)(obj+0x34) & 0x1000` to decide whether to drop the object.
-   The drop path raises the counter block exactly as func_L00_002CB2D8 does
-   (u16 at 0x0018C750+0x1B0 clamped to 0xFFFE against the $gp value at 0x001A7390, an
-   unsigned max on +0x1B4 from the plain absolute 0x001A7390, and
-   `*(int *)(0x0018C750+0x1B8) |= (1 << *(int *)0x001A79F0) | 0x80000000`).
-   The spawn path needs two calls with four float arguments each:
-   func_2AE888(0x001B8FF0, 5, 1, 25.0f, *(float *)(0x001B8C80+0x158), 0x3F1C61AB, 0x3F9C61AB)
-   and, if that returns 0, the same call with (s0, *(float *)(s0+0x98)); the result is
-   stored at 0x1450. Blocking requirements: the $gp counter block (see the 002CB2D8
-   near-miss) and the 0x001B8C80/0x001B8FF0 level data. */
+void func_L00_002CB038(void)
+{
+    unsigned char *hero=D_00189E20;
+    int screen=*(int *)(hero+0x1248);
+    char *object;
+    if(screen<0) {
+        *(int *)(hero+0x1450)=0;
+        return;
+    }
+    if(!(D_001A7A80[screen]&0x20) || *(int *)(hero+0x2294)==0x31) {
+        *(int *)(hero+0x1450)=0;
+        return;
+    }
+    object=*(char **)(hero+0x1450);
+    if(object) {
+        char *position=object+0x10;
+        if(30.0f<func_00282E48(hero+0x80,position))
+            *(int *)(hero+0x1450)=0;
+        if((D_00138320&3)!=3)
+            *(int *)(hero+0x1450)=0;
+        object=*(char **)(hero+0x1450);
+        if(!object || (*(unsigned short *)(object+0x34)&0x1000))
+            return;
+        *(int *)(hero+0x1450)=0;
+        if(D_0018C750.count<=0xFFFE)
+            ++D_0018C750.count;
+        if(D_001A7390>D_0018C750.best)
+            D_0018C750.best=D_001A7390;
+        D_0018C750.levels |= (1u<<D_001A79F0)|0x80000000u;
+        return;
+    }
+    if((*(unsigned int *)(D_00138180+0x1A0)&3)==3 &&
+       (*(unsigned int *)(D_00138180+0x1A4)&3)!=0) {
+        float radius=25.0f;
+        unsigned char *camera=D_L00_001B8C80;
+        float nearAngle=0.6108652949333191f;
+        float farAngle=1.2217305898666382f;
+        float heading=*(float *)(camera+0x158);
+        object=func_L00_002AE888(camera+0x370,radius,heading,nearAngle,farAngle,5,1);
+        *(char **)(hero+0x1450)=object;
+        if(!object)
+            *(char **)(hero+0x1450)=func_L00_002AE888(hero,radius,
+                *(float *)(hero+0x98),nearAngle,farAngle,5,1);
+    }
+}
