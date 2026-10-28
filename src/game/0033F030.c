@@ -177,8 +177,6 @@ INCLUDE_ASM("asm/game", func_00340D68);
 
 INCLUDE_ASM("asm/game", func_00341030);
 
-INCLUDE_ASM("asm/game", func_003411B0);
-
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
 u8 *func_003411C0(u8 *a0) {
     func_L00_0042BAD0_6(a0);

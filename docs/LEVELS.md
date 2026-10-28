@@ -194,6 +194,16 @@ aligned literal pointer, or adjacent `lui` plus low-half construction references
 row. `FUNCTION_RESIDUES` removes only this named 12-byte extent; its normalized
 fingerprint is identical in PAL and US2.
 
+`func_003411B0` (12 bytes) is a two-store fragment in the boot and all 27 levels.
+The preceding 380-byte function returns at `0x003411A4` with its delay slot at
+`0x003411A8`; a nop fills `0x003411AC`. The row stores zero through `$v1` at offset
+`0xC`, has a nop, stores `$f12` through `$a0` at offset `0x1B8`, then has a nop before
+the next function prologue at `0x003411C0`. The same neighborhood appears at every
+level placement. Across all 28 disassemblies, no direct branch or call, aligned
+literal pointer, or adjacent `lui` plus low-half construction references the row.
+`FUNCTION_RESIDUES` removes only this named 12-byte extent; its normalized
+fingerprint is identical in PAL and US2.
+
 `BOOT_RESIDUES` in `tools/levels.py` records these measured extents. The generator
 derives their normalised fingerprints from the private retail input and excludes
 only matching size/fingerprint pairs in the boot and levels. It does not widen

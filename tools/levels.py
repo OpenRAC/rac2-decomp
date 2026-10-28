@@ -739,6 +739,7 @@ FUNCTION_RESIDUES = {
     "func_L23_00423378": 4,
     "func_002702B8": 12,
     "func_0029CF48": 12,
+    "func_003411B0": 12,
 }
 
 
