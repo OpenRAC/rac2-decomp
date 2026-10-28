@@ -89,7 +89,7 @@ void func_L20_004427C8(char *arg0, char *arg1, float f) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L20_004429F0);
+/* func_L20_004429F0 is defined in L20_004429F0-g8.c. */
 
 extern int func_002A7820(int, int);
 
