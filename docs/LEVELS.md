@@ -204,6 +204,15 @@ pointer, or adjacent `lui` plus low-half construction references the row.
 `FUNCTION_RESIDUES` removes only this named 28-byte extent; its normalized
 fingerprint is identical in PAL and US2.
 
+`func_002E3E50` (4 bytes) is a one-instruction extent in the boot and 26 levels.
+The previous function returns at `0x002E3E44` with its delay slot at
+`0x002E3E48`; a nop fills `0x002E3E4C`. The row is `sd $t0,0($t1)` immediately
+before the separate handwritten routine at `0x002E3E54`. Every placement has
+the same return/delay/padding/isolated-store boundary. Across all 27 program
+images, no direct branch or call, aligned literal pointer, or nearby `lui` plus
+low-half construction references the row. `FUNCTION_RESIDUES` removes only
+this named four-byte extent; it leaves the retail word in place.
+
 `func_003411B0` (12 bytes) is a two-store fragment in the boot and all 27 levels.
 The preceding 380-byte function returns at `0x003411A4` with its delay slot at
 `0x003411A8`; a nop fills `0x003411AC`. The row stores zero through `$v1` at offset
