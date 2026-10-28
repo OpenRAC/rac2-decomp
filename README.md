@@ -83,70 +83,93 @@ comparison do not. A near miss belongs in [`nonmatching/`](nonmatching), never i
 
 ## Quick Start
 
-### Prerequisites
+### What you need
 
-- **The disc**: your own copy of *Ratchet & Clank: Going Commando*, USA v1.01, as
-  `baserom/SCUS_972.68.iso` (SHA-256
-  `9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5`). This is the main
-  release. To check a change in all three releases, as a pull request must, also add
-  `baserom/SCES_516.07.iso` (PAL) and `baserom/SCUS_972.68_v2.00.iso` (v2.00); their SHA-256
-  are in [`docs/VERSIONS.md`](docs/VERSIONS.md).
-- **Python 3.12** with the pinned tools: `pip install -r requirements.txt` (splat, spimdisasm,
-  rabbitizer).
-- **SN ProDG 2.0**'s assembler and linker, as
-  `toolchain/sn-prodg-2.0/ee/bin/{Ps2EeAs,ld}.exe`. Proprietary: bring your own, never commit
-  them (`toolchain/` is in `.gitignore`). Check them:
+| What | Notes |
+| --- | --- |
+| Linux x86-64 with 32-bit support (`gcc -m32`) and Wine | or podman/docker, see [Container](#container) |
+| Python 3.12 | `tools/build.py` does not run on 3.11 |
+| Your own disc of the game, USA v1.01 | the main release; PAL and v2.00 are optional |
+| SN ProDG's `ps2eeas.exe` and `ld.exe` | downloaded in step 3; proprietary, never commit them |
 
-  | File | Where it comes from | SHA-256 |
-  | --- | --- | --- |
-  | `Ps2EeAs.exe` | `ps2eeas.exe` in the `eegcc_sn_v2.73a` archive, the one rac1-decomp's setup uses | `c839dd63facabe7b76573c114056be61eaa7b3aa2329dd546930ab8f98898c76` |
-  | `ld.exe` | the SN ProDG 3.01 linker, as rac1-decomp uses it | `80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48` |
-- **A 32-bit capable Linux** (`gcc -m32`) and **Wine** for the SN tools, or the container
-  image that has both (`tools/docker/run.sh`).
+### 1. Get the code and the Python tools
 
-### Setup & Build
+```sh
+git clone https://github.com/OpenRAC/rac2-decomp.git
+cd rac2-decomp
+python3 -m pip install -r requirements.txt     # splat, spimdisasm, rabbitizer (pinned)
+```
 
-1. **Clone the repository:**
-   ```sh
-   git clone https://github.com/OpenRAC/rac2-decomp.git
-   cd rac2-decomp
-   ```
+### 2. Add your discs
 
-2. **Provide your own discs and SN tools:**
-   ```sh
-   cp /path/to/SCUS_972.68.iso baserom/SCUS_972.68.iso
-   cp /path/to/SCES_516.07.iso baserom/SCES_516.07.iso              # optional: PAL
-   cp /path/to/SCUS_972.68_v2.00.iso baserom/SCUS_972.68_v2.00.iso  # optional: v2.00
-   mkdir -p toolchain/sn-prodg-2.0/ee/bin
-   cp /path/to/ps2eeas.exe toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
-   cp /path/to/ld.exe toolchain/sn-prodg-2.0/ee/bin/ld.exe
-   sha256sum baserom/*.iso toolchain/sn-prodg-2.0/ee/bin/*.exe   # compare with the hashes above
-   ```
+```sh
+cp /path/to/SCUS_972.68.iso        baserom/SCUS_972.68.iso          # USA v1.01, required
+cp /path/to/SCES_516.07.iso        baserom/SCES_516.07.iso          # PAL, optional
+cp /path/to/SCUS_972.68_v2.00.iso  baserom/SCUS_972.68_v2.00.iso    # USA v2.00, optional
+sha256sum baserom/SCUS_972.68.iso
+# 9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5
+```
 
-3. **Install the dependencies and build the compilers:**
-   ```sh
-   python3 -m pip install -r requirements.txt
-   tools/compiler/build.sh               # the game's compiler, into build/compiler/tools/
-   python3 tools/compiler/sdk/build.py   # the SDK units' compiler, into build/compiler/sdk/
-   ```
+The hashes of the other two are in [`docs/VERSIONS.md`](docs/VERSIONS.md). A pull request
+must build in all three releases, so add them if you plan to send one.
 
-4. **Dump the discs and build:**
-   ```sh
-   python3 tools/levels.py dump                    # the boot executable and the 27 level programs
-   python3 tools/levels.py dump --version pal      # only if you added the PAL disc
-   python3 tools/levels.py dump --version us2      # only if you added the v2.00 disc
-   python3 tools/build.py all                      # one "OK" per program, or the first byte that differs
-   python3 tools/build.py all --strict --version pal
-   ```
-   `tools/progress.py` writes `progress/report.json` and the table above. Run it to see your
-   own counts, but do not commit what it writes: see [Tracking](#tracking).
+### 3. Download the SN ProDG assembler and linker
 
-`tools/build.py boot`, `tools/build.py level 04` and `tools/build.py levels` build a part of
-it. `tools/check.py func_XXXXXXXX --diff` compiles one function with its file's flags and
-shows its instructions beside the retail ones, in seconds.
+Both come from public mirrors of SN Systems' ProDG for PS2: the assembler from 2.0, the
+linker from 3.01. `toolchain/` is in `.gitignore`.
 
-On macOS, on Windows or on any other host, run the same commands in the build image
-(32-bit Debian with Wine, Python and the build tools):
+```sh
+mkdir -p toolchain/sn-prodg-2.0/ee/bin /tmp/sn
+curl -L -o /tmp/sn/sn20.tar.gz \
+  https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_2.0/releases/download/1/eegcc_sn_v2.73a.tar.gz
+curl -L -o /tmp/sn/sn301.tar.gz \
+  https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_3.01/releases/download/1/eegcc_2.95.3_sn_v1.36.tar.gz
+tar xzf /tmp/sn/sn20.tar.gz  -O ee/bin/ps2eeas.exe > toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
+tar xzf /tmp/sn/sn301.tar.gz -O ee/bin/ld.exe      > toolchain/sn-prodg-2.0/ee/bin/ld.exe
+sha256sum -c <<'EOF'
+c839dd63facabe7b76573c114056be61eaa7b3aa2329dd546930ab8f98898c76  toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
+80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48  toolchain/sn-prodg-2.0/ee/bin/ld.exe
+EOF
+```
+
+Both lines must print `OK`.
+
+### 4. Build the compilers and dump the discs
+
+```sh
+tools/compiler/build.sh                        # the game's compiler, into build/compiler/tools/
+python3 tools/compiler/sdk/build.py            # the SDK units' compiler, into build/compiler/sdk/
+python3 tools/levels.py dump                   # USA v1.01: the boot executable and 27 levels
+python3 tools/levels.py dump --version pal     # only with the PAL disc
+python3 tools/levels.py dump --version us2     # only with the v2.00 disc
+```
+
+### 5. Build and compare
+
+```sh
+python3 tools/build.py all                     # one "OK" per program, or the first byte that differs
+python3 tools/build.py all --strict --version pal
+python3 tools/build.py all --strict --version us2
+```
+
+All 28 programs print `OK` on a clean checkout. `tools/build.py boot`, `level 04` and `levels`
+build a part of it.
+
+### Working on a function
+
+```sh
+python3 tools/todo.py --max 400                # functions still to match, up to 400 bytes
+python3 tools/check.py func_XXXXXXXX --diff    # compile one function, show it beside retail
+```
+
+Reserve your functions in issue #152 first: see [Tracking](#tracking). `tools/progress.py`
+writes `progress/report.json` and the table above; run it for your own counts, but do not
+commit what it writes.
+
+### Container
+
+On macOS, Windows or a host without 32-bit support, run the same commands in the build image
+(32-bit Debian with Wine and the build tools):
 
 ```sh
 bash tools/docker/run.sh tools/compiler/build.sh
@@ -154,17 +177,14 @@ bash tools/docker/run.sh python3 tools/levels.py dump
 bash tools/docker/run.sh python3 tools/build.py all
 ```
 
-Container notes:
-
-- `run.sh` uses podman when it is installed, else docker. It takes a local `rac2-build:latest`
-  image first, then `ghcr.io/openrac/rac2-build`, and builds the image from
-  `tools/docker/Dockerfile` (about 15 minutes) when it cannot pull it.
-- The image is Debian bookworm, whose Python is 3.11. `tools/build.py` needs 3.12
-  (`Path.relative_to(walk_up=True)`), so linked builds fail in it. Until the image has 3.12,
-  run Python on the host and only the tools in the container (the "faster split" in
-  [`docs/BUILDING.md`](docs/BUILDING.md)), or extend the image with Python 3.12.
-- On a host with SELinux (Fedora, RHEL), the mounted repository is not readable in the
-  container. Run the container with `--security-opt label=disable`, or relabel the mount.
+- `run.sh` uses podman if installed, else docker. It uses a local `rac2-build:latest` image,
+  else pulls `ghcr.io/openrac/rac2-build`, else builds `tools/docker/Dockerfile` (about 15
+  minutes).
+- The image has Python 3.11, and `tools/build.py` needs 3.12. Until that is fixed, run Python
+  on the host and only the tools in the container (the "faster split" in
+  [`docs/BUILDING.md`](docs/BUILDING.md)), or add Python 3.12 to the image.
+- With SELinux (Fedora, RHEL) the container cannot read the mounted repository. Add
+  `--security-opt label=disable` to the `run` line, or relabel the mount.
 
 For the details:
 
