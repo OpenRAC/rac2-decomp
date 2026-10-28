@@ -48,7 +48,7 @@ extern int func_L02_002EF388(void *, void *, void *, void *, int);
 extern int func_L09_00329028(void *, int);
 extern int func_L13_00406E30(void *);
 extern int func_L13_00409008(void *);
-extern void func_L13_004095F8(void *, void *);
+extern int func_L13_004095F8(char *, char *);
 extern int func_L13_00409840(void *, void *);
 extern void func_L13_0040A480(void *);
 extern void func_L13_0040A4D0(void *);

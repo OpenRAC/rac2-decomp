@@ -50,7 +50,7 @@ extern u8 *func_L12_00408050(void *, void *, void *, int, float);
 extern void func_002B5258(void *);
 extern int func_002B3890(void *);
 extern void func_0029F338(void *);
-extern void func_L13_004095F8(void *, void *);
+extern int func_L13_004095F8(char *, char *);
 extern int func_L13_00409840(void *, void *);
 extern void func_L13_0040A480(void *);
 

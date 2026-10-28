@@ -185,7 +185,7 @@ void func_L13_004095A8(void *self, void *base, void *arg)
     func_L13_004094D0(self, tmp, arg);
 }
 
-
+/* func_L13_004095F8 lives in L13_004095F8.c. */
 
 extern int func_L13_004094C0(char *, char *);
 
