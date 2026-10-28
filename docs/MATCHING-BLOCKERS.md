@@ -639,6 +639,12 @@ that note, not a C reconstruction, so the observation belongs here instead.
 The `INCLUDE_ASM` marker is unchanged: instruction-set/control-flow review and
 the handwritten-assembly acceptance rule still apply before `ASM_FUNC` credit.
 
+**28 October 2026 evidence:** the 264-byte `func_002F0D00` routine in USA v1.01
+uses `$at` as a working register in the shift at +0x30 and add at +0x38, and a
+trapping `addi` at +0x28. It is catalogued in the boot and at 27 level
+placements. No C attempt was made; retain `INCLUDE_ASM` until a maintainer
+agrees with the handwritten classification.
+
 The wave 8 correction correctly identified 0x700014A9 as por, not mtsa or an undecodable word. The recorded mtsa zero encoding was 0x00000029. A por-plus-sq zero mismatch remains separate from a decoder error (section 17).
 
 lq/sq are not VU0/COP2 and can be emitted from a TImode C assignment. Four targets were nearly misclassified because the reader used a generic instruction category. Use `rabbitizer.Instruction(word, address, rabbitizer.InstrCategory.R5900).disassemble()`; not every generic INVALID word is lq/sq, so decode each exact word. The reviewed qcopy/qzero helpers are also permitted under the updated source-method rule; none of these instructions alone proves a complete match.
