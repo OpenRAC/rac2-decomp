@@ -388,7 +388,7 @@ INCLUDE_ASM("asm/game", func_00297670);
 
 
 
-INCLUDE_ASM("asm/game", func_002977A8);
+/* func_002977A8 is defined in 002977A8.c. */
 
 void func_002979D8(char *dst, unsigned char *src)
 {
