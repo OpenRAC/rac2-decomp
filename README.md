@@ -87,12 +87,20 @@ comparison do not. A near miss belongs in [`nonmatching/`](nonmatching), never i
 
 - **The disc**: your own copy of *Ratchet & Clank: Going Commando*, USA v1.01, as
   `baserom/SCUS_972.68.iso` (SHA-256
-  `9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5`).
+  `9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5`). This is the main
+  release. To check a change in all three releases, as a pull request must, also add
+  `baserom/SCES_516.07.iso` (PAL) and `baserom/SCUS_972.68_v2.00.iso` (v2.00); their SHA-256
+  are in [`docs/VERSIONS.md`](docs/VERSIONS.md).
 - **Python 3.12** with the pinned tools: `pip install -r requirements.txt` (splat, spimdisasm,
   rabbitizer).
 - **SN ProDG 2.0**'s assembler and linker, as
   `toolchain/sn-prodg-2.0/ee/bin/{Ps2EeAs,ld}.exe`. Proprietary: bring your own, never commit
-  them.
+  them (`toolchain/` is in `.gitignore`). Check them:
+
+  | File | Where it comes from | SHA-256 |
+  | --- | --- | --- |
+  | `Ps2EeAs.exe` | `ps2eeas.exe` in the `eegcc_sn_v2.73a` archive, the one rac1-decomp's setup uses | `c839dd63facabe7b76573c114056be61eaa7b3aa2329dd546930ab8f98898c76` |
+  | `ld.exe` | the SN ProDG 3.01 linker, as rac1-decomp uses it | `80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48` |
 - **A 32-bit capable Linux** (`gcc -m32`) and **Wine** for the SN tools, or the container
   image that has both (`tools/docker/run.sh`).
 
@@ -100,15 +108,19 @@ comparison do not. A near miss belongs in [`nonmatching/`](nonmatching), never i
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/OpenRAC/rac2-gc-decomp.git
-   cd rac2-gc-decomp
+   git clone https://github.com/OpenRAC/rac2-decomp.git
+   cd rac2-decomp
    ```
 
-2. **Provide your own disc:**
+2. **Provide your own discs and SN tools:**
    ```sh
    cp /path/to/SCUS_972.68.iso baserom/SCUS_972.68.iso
-   # sha256sum baserom/SCUS_972.68.iso
-   # 9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5
+   cp /path/to/SCES_516.07.iso baserom/SCES_516.07.iso              # optional: PAL
+   cp /path/to/SCUS_972.68_v2.00.iso baserom/SCUS_972.68_v2.00.iso  # optional: v2.00
+   mkdir -p toolchain/sn-prodg-2.0/ee/bin
+   cp /path/to/ps2eeas.exe toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
+   cp /path/to/ld.exe toolchain/sn-prodg-2.0/ee/bin/ld.exe
+   sha256sum baserom/*.iso toolchain/sn-prodg-2.0/ee/bin/*.exe   # compare with the hashes above
    ```
 
 3. **Install the dependencies and build the compilers:**
@@ -118,12 +130,16 @@ comparison do not. A near miss belongs in [`nonmatching/`](nonmatching), never i
    python3 tools/compiler/sdk/build.py   # the SDK units' compiler, into build/compiler/sdk/
    ```
 
-4. **Dump the disc, build and report:**
+4. **Dump the discs and build:**
    ```sh
-   python3 tools/levels.py dump          # the boot executable and the 27 level programs
-   python3 tools/build.py all            # one "OK" per program, or the first byte that differs
-   python3 tools/progress.py             # progress/report.json and the table above
+   python3 tools/levels.py dump                    # the boot executable and the 27 level programs
+   python3 tools/levels.py dump --version pal      # only if you added the PAL disc
+   python3 tools/levels.py dump --version us2      # only if you added the v2.00 disc
+   python3 tools/build.py all                      # one "OK" per program, or the first byte that differs
+   python3 tools/build.py all --strict --version pal
    ```
+   `tools/progress.py` writes `progress/report.json` and the table above. Run it to see your
+   own counts, but do not commit what it writes: see [Tracking](#tracking).
 
 `tools/build.py boot`, `tools/build.py level 04` and `tools/build.py levels` build a part of
 it. `tools/check.py func_XXXXXXXX --diff` compiles one function with its file's flags and
@@ -133,9 +149,22 @@ On macOS, on Windows or on any other host, run the same commands in the build im
 (32-bit Debian with Wine, Python and the build tools):
 
 ```sh
+bash tools/docker/run.sh tools/compiler/build.sh
 bash tools/docker/run.sh python3 tools/levels.py dump
 bash tools/docker/run.sh python3 tools/build.py all
 ```
+
+Container notes:
+
+- `run.sh` uses podman when it is installed, else docker. It takes a local `rac2-build:latest`
+  image first, then `ghcr.io/openrac/rac2-build`, and builds the image from
+  `tools/docker/Dockerfile` (about 15 minutes) when it cannot pull it.
+- The image is Debian bookworm, whose Python is 3.11. `tools/build.py` needs 3.12
+  (`Path.relative_to(walk_up=True)`), so linked builds fail in it. Until the image has 3.12,
+  run Python on the host and only the tools in the container (the "faster split" in
+  [`docs/BUILDING.md`](docs/BUILDING.md)), or extend the image with Python 3.12.
+- On a host with SELinux (Fedora, RHEL), the mounted repository is not readable in the
+  container. Run the container with `--security-opt label=disable`, or relabel the mount.
 
 For the details:
 
@@ -146,6 +175,35 @@ For the details:
 - [`docs/VERSIONS.md`](docs/VERSIONS.md) – the three releases (v1.01, PAL, v2.00): their dumps, catalogues, builds and reports
 
 ---
+
+## Tracking
+
+- **Reservations.** Before you start, reserve the functions, files or levels you will work on
+  in [issue #152](https://github.com/OpenRAC/rac2-decomp/issues/152): one comment per
+  contributor, edited in place, at most 500 unfinished functions. Read the other comments
+  first and do not overlap them. Release what you finish or drop. [`AGENTS.md`](AGENTS.md) has
+  the exact rules.
+- **What is left.** `python3 tools/todo.py` lists the functions still to match by size
+  (`--min`, `--max`, `--kind boot|shared|level`, `--limit`). Before you start one, look for it
+  in [`nonmatching/README.md`](nonmatching/README.md): an earlier near miss and its notes may
+  be there.
+- **Near misses.** C that does not match goes into `nonmatching/` with a row in its README,
+  and the function keeps its `INCLUDE_ASM` marker in `src/`.
+- **The progress report.** `progress/report.json` and the table above are generated. Only a
+  maintainer refreshes them, on `master`, after merging. Leave both out of your pull request;
+  if you ran `tools/progress.py`, undo it with
+  `git checkout origin/master -- progress/report.json README.md`.
+  `python3 tools/progress.py --check` passes while the report is behind and prints how many
+  new functions wait for the refresh.
+- **Before a pull request**, all must pass:
+  ```sh
+  python3 tools/build.py all --strict          # and with --version pal, --version us2
+  python3 -m unittest discover -s tests
+  python3 tests/check_repository.py
+  python3 tools/progress.py --check
+  ```
+  A function that matches in v1.01 but not in another release stays assembly there:
+  `tools/carry.py --version pal --demote` ([`docs/VERSIONS.md`](docs/VERSIONS.md)).
 
 ## How it works
 
@@ -199,7 +257,7 @@ researching engine quirks, or improving documentation:
   `tools/check.py func_XXXXXXXX --diff` shows a draft beside retail in seconds.
 - Everyone can improve the [shared matching blockers](docs/MATCHING-BLOCKERS.md) through a
   pull request, with discussion in the relevant PR. Coordinate scopes in
-  [issue #152](https://github.com/OpenRAC/rac2-gc-decomp/issues/152).
+  [issue #152](https://github.com/OpenRAC/rac2-decomp/issues/152).
 - Join our **[Discord Community](https://discord.gg/Sfd2B54PDG)** to discuss progress, ask
   questions, and collaborate!
 
