@@ -31,7 +31,11 @@ typedef struct {
    0x12001000, or through r1_func_00118F60), when the display is
    interlaced, and 1 otherwise. In the second arm the bit is taken from
    the call's result before the interlace test, as retail does. */
-int func_001261F0(void) {
+/* The libgraph interface carries a 32-bit mode argument. This retail graph011
+   body ignores it; callers pass zero. Independent interface witness:
+   https://github.com/open-goal/jak-project/blob/master/game/graphics/sceGraphicsInterface.h
+   (sceGsSyncV(u32 mode)). Only the signature is used, with no HLE code copied. */
+int func_001261F0(int unused_mode) {
     GsGParam *gp = r1_func_00121D08();
     long csr;
 
