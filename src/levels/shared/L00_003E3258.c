@@ -465,7 +465,7 @@ void func_L00_003E7760(void)
 
 INCLUDE_ASM("asm/levels", func_L00_003E7C88);
 
-INCLUDE_ASM("asm/levels", func_L00_003E7E40);
+/* func_L00_003E7E40 lives in L00_003E7E40-trails.c. */
 
 void func_L00_003E80A8(int index, char *object)
 {

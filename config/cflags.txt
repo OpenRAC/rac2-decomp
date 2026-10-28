@@ -1524,3 +1524,4 @@ src/core/00120F00-unwind.c	sdk -O2 -G2 -ffunction-sections -fexceptions
 # Forward pitch joins land on the measured mtc1 hazard nop.
 src/levels/shared/L04_003FA350.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
 src/game/002977A8.c	-O2 -G0 -ffunction-sections -fno-strength-reduce
+src/levels/shared/L00_003E7E40-trails.c	-O2 -G0 -ffunction-sections -mno-split-addresses
