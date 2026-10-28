@@ -487,8 +487,6 @@ int func_0029CF08(int value) {
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_0029CF48);
-
 INCLUDE_ASM("asm/game", func_0029CF58);
 
 INCLUDE_ASM("asm/game", func_0029CF78);

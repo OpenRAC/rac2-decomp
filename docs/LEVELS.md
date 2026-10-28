@@ -184,6 +184,16 @@ with the five entries above, regeneration
 removes six distinct catalogue rows and 49 level placements, without changing retail
 bytes.
 
+`func_0029CF48` (12 bytes) is another measured residue in the boot and all 27 levels.
+In the boot, the preceding function returns at `0x0029CF3C` with its delay slot at
+`0x0029CF40`; a nop fills `0x0029CF44`. The row stores `$v0` through `$gp`, has a nop,
+then adjusts `$sp` by `0x50` without a function entry or return; a nop follows before
+the next prologue at `0x0029CF58`. All level placements have the same instruction
+pattern and neighborhood. Across all 28 disassemblies, no direct branch or call,
+aligned literal pointer, or adjacent `lui` plus low-half construction references the
+row. `FUNCTION_RESIDUES` removes only this named 12-byte extent; its normalized
+fingerprint is identical in PAL and US2.
+
 `BOOT_RESIDUES` in `tools/levels.py` records these measured extents. The generator
 derives their normalised fingerprints from the private retail input and excludes
 only matching size/fingerprint pairs in the boot and levels. It does not widen
