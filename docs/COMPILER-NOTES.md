@@ -127,7 +127,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Ordinary 8-byte GPR saves | Default game -O2 -G0 -ffunction-sections | func_002889B8 |
 | Missing GP-relative access | Game compiler, -G8 sibling and correct known-size declaration | func_L00_003206B8 |
 | Public SDK/libgcc source differs under game compiler | sdk profile, accurate types and inline declarations | func_00122800, func_00122B00 |
-| libgcc `_eh.o` (L_eh): a call at the end of a non-void function keeps its frame instead of becoming a tail jump | sdk profile with -fexceptions, as GCC's libgcc Makefile builds _eh.o (rac3-decomp builds its copy the same way) | func_00120A30, func_001208E8 |
+| libgcc `_eh.o` (L_eh): preserve the frame at final calls and place the exception-return stub correctly | sdk profile with -fexceptions, as GCC's libgcc Makefile builds _eh.o (rac3-decomp builds its copy the same way) | func_00120A30, func_001208E8; paired throw/rethrow func_00120F00 and func_001210E0 |
 | Whole GPR save area uses sq/lq | -mastra-quad-saves | func_00119BC8, func_00115F28, func_00115C90 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |

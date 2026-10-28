@@ -1410,6 +1410,20 @@ agent's did.
 that counts is `tools/build.py`, not `tools/check.py` in the worker's tree. Where a body's own
 unit cannot hold it, it needs a file of its own.
 
+**Exception-runtime profile, qualified on 28 October 2026:** the historical
+`func_00120F00` near miss was 480/476 bytes, with the exception-return stub in
+the wrong position; thirteen source rewrites had not fixed it. Its paired
+`func_001210E0` was incorrectly screened as geometry code. Both are public
+GNU EE libgcc `L_eh` routines (`__throw` and `__rethrow`). The existing SDK
+`-O2 -G2 -ffunction-sections -fexceptions` profile closes both in isolated units:
+476 and 484 bytes, one boot placement each in USA v1.01, USA v2.00 and PAL.
+Their real `frame_state` objects are each 0x2F0 bytes; the compiler's public
+unwind builtins provide register preservation and exception return.
+[The source change](https://github.com/OpenRAC/rac2-decomp/commit/78e70068441cbc77f608ea2b685e233a682fc8d5)
+passes all 84 strict programs after integration, with 313 unit tests. This is
+the existing runtime profile, not an instruction patch or a general remedy
+for unrelated save-order and register-allocation differences.
+
 **A separate linked-section dependency, verified on 24 October 2026:**
 `func_00306040` passed local checks while its direct same-unit call required
 `.text.func_00305838`, a boot-only catalogue identity. The level programs instead
