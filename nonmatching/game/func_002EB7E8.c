@@ -1,14 +1,17 @@
 /* Nonmatching resource-loader reconstruction, 2026-10-28. No C coverage credit.
- * One truthful-contract US check, 0/28,672/700B with -O2 -G0
- * -ffunction-sections. Frame0x30 matches but the extra retained global high
+ * Four US checks, 0/28, retained672/700B with -O2 -G0
+ * -ffunction-sections. The mode-formal correction and a partial state view
+ * plus narrow unsplit edges remain672B. Broad -fno-gcse is worse668B
+ * with frame0x20 and is rejected. Frame0x30 matches but the extra retained global high
  * half, bit-table scheduling, global scalar loads, poll padding and the
- * observed repeated a0=0 setups before001261F0 differ. Further codegen
- * trials are deferred until the SDK formal-parameter contract is resolved.
+ * poll scheduling still differs. Reopen with independent global high-half
+ * or poll-loop source evidence.
  *
- * Actual RAC2 source001261F0.c and current RAC1 libgraph graph011 donor
- * both define int(void) and read no incoming a0. Retail callers explicitly
- * set a0=0; this reconstruction follows the actual definition and does not
- * invent an int formal solely to reproduce unused argument setup.
+ * Independent sceGsSyncV(u32 mode) interface evidence resolved the ignored
+ * 32-bit mode argument. Canonical001261F0.c now has int(int unused_mode),
+ * checked byte exact in US/US2/PAL. The retail graph011 body ignores mode;
+ * calls here now truthfully pass zero. Interface witness only, no HLE code:
+ * https://github.com/open-goal/jak-project/blob/master/game/graphics/sceGraphicsInterface.h
  * Actual002B7CE0 returns signed halfword stream+4 on all paths, so its
  * ignored result is int, not old externs' void. 002EF010 actual definition
  * returns unsigned long (64-bit ABI); selected explicitly uses signed low32.
@@ -39,7 +42,7 @@ extern void func_0027D330(int);
 extern int func_002B7CE0(int);
 extern int func_002EB158(int);
 extern void func_002EB598(void), func_002ED058(void), func_002E4AC8(void);
-extern int func_001261F0(void), func_002B6D28(void);
+extern int func_001261F0(int), func_002B6D28(void);
 
 void func_002EB7E8(int resource)
 {
@@ -88,7 +91,7 @@ void func_002EB7E8(int resource)
     *(int *)(stream + 0x24) = *(int *)(D_001B8840 + 0x30) + 4000;
     while (*(short *)(stream + 0x72) != 3 || *(short *)(stream + 0x6C) >= 6000) {
         func_002E4AC8();
-        func_001261F0();
+        func_001261F0(0);
     }
     state = D_001B8840;
     *(short *)(state + 0x48) = -3;
@@ -97,7 +100,7 @@ void func_002EB7E8(int resource)
     field = 0;
     if (*(short *)(state + 0x48) < 0) {
         do {
-            func_001261F0();
+            func_001261F0(0);
             field--;
         } while (*(short *)(state + 0x48) < field);
     }
