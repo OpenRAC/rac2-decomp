@@ -209,10 +209,145 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(fcheck.returns("func_1", "extern int func_2(void);\nu16 func_1(void) {\n}"), "int")
 
     def test_scripts_stop_before_a_level_runs(self):
+        # The boot's scripts end before level 00 runs; a level's script says which level it plays.
         self.assertLessEqual(fcheck.SCRIPTS["newgame"]["frames"], 1650)
+        self.assertNotIn("level", fcheck.SCRIPTS["menu"])
+        self.assertNotIn("level", fcheck.SCRIPTS["newgame"])
         for s in fcheck.SCRIPTS.values():
             self.assertEqual(s["phases"], sorted(s["phases"]))
             self.assertTrue(all(int(p.split(":")[0]) < s["frames"] for p in s["presses"]))
+
+
+class LevelTests(unittest.TestCase):
+    """Level placement: a function's place in level 00's program, resident boot functions below
+    LEVEL_BASE, the boot build's values in a level, and which program a state is of."""
+    BOOT_FUNCS = {"func_00150000": (0x00150000, 64),       # resident: below LEVEL_BASE
+                  "func_00200000": (0x00200000, 32),       # replaced by the level; copy at 0x2A0100
+                  "func_00210000": (0x00210000, 16)}       # replaced, no copy in level 00
+    CATALOGUE = {"func_00200000": {0: 0x002A0100, 3: 0x002B0100, -1: 32},
+                 "func_L00_002A0200": {0: 0x002A0200, -1: 8},
+                 "func_L03_002B0300": {3: 0x002B0300, -1: 8}}
+
+    def setUp(self):
+        self.BOOT_FUNCS, self.CATALOGUE = dict(self.BOOT_FUNCS), dict(self.CATALOGUE)   # a test may add to its own
+        fcheck.level_functions.cache_clear()
+        self.patches = [mock.patch.object(fcheck, "boot_functions", lambda: self.BOOT_FUNCS),
+                        mock.patch.object(fcheck, "catalogue", lambda: self.CATALOGUE)]
+        for p in self.patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self.patches:
+            p.stop()
+        fcheck.level_functions.cache_clear()
+
+    def test_level_functions(self):
+        prog = fcheck.Program(0)
+        self.assertEqual(prog.functions(), {"func_00150000": (0x00150000, 64), "func_00200000": (0x002A0100, 32),
+                                            "func_L00_002A0200": (0x002A0200, 8)})
+        self.assertTrue(prog.own("func_00200000") and prog.own("func_L00_002A0200"))
+        self.assertFalse(prog.own("func_00150000") or prog.own("func_L03_002B0300") or prog.own("func_00210000"))
+        self.assertTrue(fcheck.BOOT_PROGRAM.own("func_00200000"))
+        self.assertFalse(fcheck.BOOT_PROGRAM.own("func_L00_002A0200"))
+
+    def test_states_and_capture_lines(self):
+        level = fcheck.Program(0)
+        self.assertEqual(fcheck.script_program("level00"), level)
+        self.assertEqual(fcheck.script_program("menu"), fcheck.BOOT_PROGRAM)
+        self.assertEqual(fcheck.state_program("func_00200000", Path("states/level00/func_00200000.0.snap")), level)
+        self.assertEqual(fcheck.state_program("func_00200000", Path("states/menu/func_00200000.0.snap")), fcheck.BOOT_PROGRAM)
+        # a resident boot function called in the level is the boot's code
+        self.assertEqual(fcheck.state_program("func_00150000", Path("states/level00/func_00150000.0.snap")), fcheck.BOOT_PROGRAM)
+        code = bytes(range(32))
+        with mock.patch.object(fcheck.Program, "retail", lambda self, a, n: code[:n] if a == 0x002A0100 else bytes(n)):
+            line = fcheck.capture_line("func_00200000", level, 1).split()
+            self.assertEqual(line, ["002a0100", "32", f"{fcheck.zlib.crc32(code):08x}", "func_00200000", "1"])
+            self.assertEqual(fcheck.capture_line("func_00150000", level).split()[:2], ["00150000", "64"])
+            self.assertIsNone(fcheck.capture_line("func_00210000", level))
+            self.assertIsNone(fcheck.capture_line("func_L03_002B0300", level))
+
+    def test_level_scripts(self):
+        s = fcheck.SCRIPTS["level00"]
+        self.assertEqual(s["level"], 0)
+        self.assertGreaterEqual(s["phases"][0], 1500)          # level 00 is loaded by then
+        self.assertTrue(all(int(p.split(":")[0]) < s["frames"] for p in s["sticks"]))
+
+    def test_copy_map(self):
+        # func_00200000's level copy is its code with the data it addresses moved: lui/addiu of
+        # 0x00263640 and a lw at 0x00263690 in the boot, of 0x0028C080 and 0x0028C0D0 in the level.
+        LUI_V1, LW_V1 = 0x3C030000, 0x8C620000      # lui $v1, 0; lw $v0, 0($v1)
+        def code(a, b):
+            return words(LUI_V0 | (a + 0x8000) >> 16, ADDIU_V0 | (a & 0xFFFF), LUI_V1 | (b + 0x8000) >> 16,
+                         LW_V1 | (b & 0xFFFF), JR_RA, 0, 0, 0)
+        boot, level = code(0x00263640, 0x00263690), code(0x0028C080, 0x0028C0D0)
+        fcheck.copy_map.cache_clear()
+        with mock.patch.object(fcheck, "retail_bytes", lambda a, n: boot[:n] if a == 0x00200000 else bytes(n)), \
+                mock.patch.object(fcheck.Program, "retail", lambda self, a, n: level[:n] if a == 0x002A0100 else bytes(n)):
+            self.assertEqual(fcheck.copy_map(0), {0x00263640: 0x0028C080, 0x00263690: 0x0028C0D0})
+            self.assertEqual(fcheck.level_address(0, 0x00263640), 0x0028C080)
+            self.assertEqual(fcheck.level_address(0, 0x00263660), 0x0028C0A0)   # between two pairs that agree
+            self.assertIsNone(fcheck.level_address(0, 0x002636A0))              # past the last: not inferred
+        fcheck.copy_map.cache_clear()
+
+    def test_own_copy_pairs_win(self):
+        # func_00200000's level copy stores the address of the level's own variant of a callback
+        # (0x002A0400) where the boot's stores func_00210000: the copy's own pairing gives it,
+        # though the catalogue would not (func_00210000 has no place in level 00).
+        boot = words(LUI_V0 | 0x0021, ADDIU_V0, JR_RA, 0, 0, 0, 0, 0)
+        level = words(LUI_V0 | 0x002A, ADDIU_V0 | 0x0400, JR_RA, 0, 0, 0, 0, 0)
+        fcheck.copy_pairs.cache_clear()
+        fcheck.copy_map.cache_clear()
+        import build
+        placement = build.Placement("00_aranos_tutorial", {"segments": [], "sections": []})
+        with mock.patch.object(fcheck, "retail_bytes", lambda a, n: boot[:n] if a == 0x00200000 else bytes(n)), \
+                mock.patch.object(fcheck.Program, "retail", lambda self, a, n: level[:n] if a == 0x002A0100 else bytes(n)), \
+                mock.patch.object(fcheck, "program_placement", lambda level: placement), \
+                mock.patch.object(fcheck, "program_placed", lambda key: {"values": {}}), \
+                mock.patch.object(fcheck, "placed", lambda: {"values": {}}), \
+                mock.patch.object(fcheck, "aligned_values", lambda *a: {}):
+            self.assertEqual(fcheck.copy_pairs("func_00200000", 0), [(("data", 0x00210000), 0x002A0400)])
+            r = fcheck.Resolver(fcheck.Program(0), "func_00200000", {"symbols": [], "sections": []}, {}, {})
+            self.assertEqual(r.named("func_00210000"), 0x002A0400)
+            self.assertEqual(r.function("func_00210000"), 0x002A0400)
+            # another function's candidate has no such pairing: func_00210000 is not in level 00
+            r = fcheck.Resolver(fcheck.Program(0), "func_L00_002A0200", {"symbols": [], "sections": []}, {}, {})
+            self.assertIsNone(r.named("func_00210000"))
+        fcheck.copy_pairs.cache_clear()
+        fcheck.copy_map.cache_clear()
+
+    def test_resolver_in_a_level(self):
+        import build
+        prog = fcheck.Program(0)
+        placement = build.Placement("00_aranos_tutorial", {"segments": [], "sections": []})
+        level_values = {"D_001B0960": "0x001b2000", "F1234_FUN_x": "0x002a0100"}
+        boot_values = {"D_00140000_x": "0x00140000",         # resident data: kept
+                       "r1_helper": "0x00200000",            # a replaced boot function: its copy
+                       "r1_gone": "0x00210000",              # replaced, no copy: not known in the level
+                       "D_001B0960": "0x001b0960"}           # the level's own value wins
+        with mock.patch.object(fcheck, "program_placement", lambda level: placement), \
+                mock.patch.object(fcheck, "program_placed", lambda key: {"values": level_values}), \
+                mock.patch.object(fcheck, "placed", lambda: {"values": boot_values}), \
+                mock.patch.object(fcheck, "aligned_values", lambda *a: {}), \
+                mock.patch.object(fcheck, "level_address", lambda level, a: 0x0028C080 if a == 0x00263640 else None):
+            r = fcheck.Resolver(prog, "func_L00_002A0200", {"symbols": [], "sections": []}, {}, {})
+            self.assertEqual(r.named("func_00200000"), 0x002A0100)
+            self.assertEqual(r.named("func_00150000"), 0x00150000)
+            self.assertEqual(r.named("D_001B0960"), 0x001B2000)
+            self.assertEqual(r.named("D_00140000_x"), 0x00140000)
+            self.assertEqual(r.named("r1_helper"), 0x002A0100)
+            self.assertIsNone(r.named("r1_gone"))
+            self.assertEqual(r.named("D_L00_001B4000"), 0x001B4000)
+            self.assertIsNone(r.named("D_L03_001B4000"))         # another level's data
+            self.assertIsNone(r.named("D_001B5000"))             # a boot address the level replaces
+            self.assertEqual(r.named("D_00160000"), 0x00160000)  # resident boot data
+            self.assertIsNone(r.named("func_00210000"))          # a boot function not in the level
+            self.assertEqual(r.named("D_00263640"), 0x0028C080)  # boot data the level's copies moved
+            # a name stating a boot function's address that the boot table names otherwise
+            self.BOOT_FUNCS["func_002001F8"] = (0x00200200, 8)
+            self.CATALOGUE["func_002001F8"] = {0: 0x002A0300, -1: 8}
+            fcheck.level_functions.cache_clear()
+            r = fcheck.Resolver(prog, "func_L00_002A0200", {"symbols": [], "sections": []}, {}, {})
+            self.assertEqual(r.named("func_00200200"), 0x002A0300)
 
 
 if __name__ == "__main__":
