@@ -1,4 +1,4 @@
-/* functional: medium. Transcribed from retail branch by branch (52 voice entries of 0x70 bytes from 0x188660, three scratch arrays of 52 words); the call arguments are the retail ones. Risk: a misread offset in the long loops, not the structure. */
+/* functional: high. Transcribed from retail branch by branch (52 voice entries of 0x70 bytes from 0x188660, three scratch arrays of 52 words); the call arguments are the retail ones. The two voice callbacks are passed as named functions (func_002E60E8, func_002E60A0), not literal addresses, which differ per level program. fcheck SAME on boot and level-00 calls. */
 extern char D_00188660[];
 extern char D_00189F70[];
 extern char D_001B5340[];
@@ -37,6 +37,8 @@ extern void func_00132A10(int, int, int, int, int, int, int, int);
 extern void func_002B7578(void);
 extern void func_00133230(void);
 extern void func_00133220(void);
+extern void func_002E60E8(void);
+extern void func_002E60A0(void);
 
 #define I(p, o) (*(int *)((char *)(p) + (o)))
 #define U8(p, o) (*(unsigned char *)((char *)(p) + (o)))
@@ -337,12 +339,12 @@ int func_002E4AC8(void)
             } else {
                 func_00132A70(s2);
                 U8(E, 0x74) = 6;
-                func_00132B58(s2, 0x2E60E8, (int)(B + 0x70 * i + 0x70));
+                func_00132B58(s2, (int)func_002E60E8, (int)(B + 0x70 * i + 0x70));
             }
             continue;
         }
         if (a0 & 0x10) {
-            func_00132B58(s2, 0x2E60E8, (int)(B + 0x70 * i + 0x70));
+            func_00132B58(s2, (int)func_002E60E8, (int)(B + 0x70 * i + 0x70));
             continue;
         }
         {
@@ -364,7 +366,7 @@ int func_002E4AC8(void)
                 s3 -= 0x5F4;
             }
             if (U8(E, 0x74) != 7) {
-                func_00132BC0(s2, s1, arrC[i], s7v, s3, s4, 0x2E60E8, (int)(B + 0x70 * i + 0x70));
+                func_00132BC0(s2, s1, arrC[i], s7v, s3, s4, (int)func_002E60E8, (int)(B + 0x70 * i + 0x70));
             } else {
                 int o = I(E, 0x78);
                 int x;
@@ -380,7 +382,7 @@ int func_002E4AC8(void)
                         U8(E, 0x74) = 0;
                     } else {
                         U8(E, 0x74) = 1;
-                        func_00132A10(x, H(o, 0x1A), arrC[i], s7v, s3, s4, 0x2E60A0, (int)(B + 0x70 * i + 0x70));
+                        func_00132A10(x, H(o, 0x1A), arrC[i], s7v, s3, s4, (int)func_002E60A0, (int)(B + 0x70 * i + 0x70));
                     }
                 }
             }

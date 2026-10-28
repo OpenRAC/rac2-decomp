@@ -1,4 +1,4 @@
-/* functional: medium. fcheck SAME on all captured calls; the draft below is the near miss, differing from retail only in scheduling and register allocation. */
+/* functional: high. fcheck SAME on boot and level-00 calls; the draft below is the near miss, differing from retail only in scheduling and register allocation. func_002E46C0 is called with (entry, entry+0x20) as retail does. */
 /* func_002E5AD0 - 552 bytes.  Worker attempt, 27 October 2026 (draft below).
 
    Not at handoff quality (476 B vs 552). Logic and field offsets decoded
@@ -90,7 +90,7 @@ int func_002E5AD0(Source2E5AD0 *obj, int flags, char *src, char *vec, int arg)
     if (flags & 0x10)
         distance = arg;
     else
-        distance = func_002E46C0((u8 *)SLOT(index) - 0x20, SLOT(index));
+        distance = func_002E46C0(SLOT(index), SLOT(index)->f90);
     if (distance < 0x20)
         return -1;
     SLOT(index)->flags = flags;
