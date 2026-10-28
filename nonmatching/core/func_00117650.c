@@ -1,15 +1,13 @@
 /* Retained floor reconstruction: game -O2 -G2 -mastra-quad-saves,
- * 468/500 bytes in USA. The public fdlibm identity is now established by
- * its 20/52 fraction split, huge+x checks, sign-preserving subunit cases,
- * carry handling and x+x non-finite path. The original object SDK profile
- * also produces468 bytes with sd/ld saves, so it does not supply the missing
- * quad-save or final word-merge shape. The original screen's dtoa-only
- * inference is superseded. Plain/bitfield output unions tie; direct parameter
- * word access is 448 bytes with stack traffic, and no-schedule-insns2 is
- * 456 bytes. The frame, save scheduling and final word merge remain different.
- * All input bits come from the initialized argument and both output words
- * are assigned. No uninitialized accumulator or synthetic mask dependency.
- * Next: independently evidenced original double-word representation/profile.
+ * 472/500 bytes in USA with the current-RAC1/public-fdlibm scoped word
+ * extraction and insertion form. This restores retail's ordered save/read
+ * sequence, but retains a 0x70 frame versus 0x60 and a shorter final word merge.
+ * The earlier named 64-bit view was 468 bytes; direct parameter word access was
+ * 448, no-schedule-insns2 was 456, and the SDK profile was 468 with sd/ld saves.
+ * Full scoped INSERT_WORDS and removing its unused integer union member tie.
+ * No uninitialized accumulator, artificial mask dependency or padding was used.
+ * Both output words are assigned before reading the reconstructed double.
+ * Next: independent evidence for the original output representation/profile.
  */
 /* Adapted from public fdlibm s_floor.c, version 5.1 (1993-09-24):
  * https://github.com/mirror/newlib-cygwin/blob/master/newlib/libm/math/s_floor.c
@@ -28,20 +26,19 @@ extern const double D_0013A3E8[];
 
 typedef union {
     double value;
-    long long bits;
-    struct { unsigned int low; int high; } word;
+    struct { unsigned int low; unsigned int high; } word;
 } FloorDouble;
 
 double func_00117650(double value)
 {
-    FloorDouble input, output;
-    long long bits;
     int high, low, exponent;
     unsigned int mask, carry;
-    input.value = value;
-    bits = input.bits;
-    high = (int)(bits >> 32);
-    low = (int)bits;
+    do {
+        FloorDouble words;
+        words.value = value;
+        high = words.word.high;
+        low = words.word.low;
+    } while (0);
     exponent = ((high >> 20) & 0x7ff) - 0x3ff;
     if (exponent < 20) {
         if (exponent < 0) {
@@ -79,7 +76,11 @@ double func_00117650(double value)
             low &= ~mask;
         }
     }
-    output.word.high = high;
-    output.word.low = low;
-    return output.value;
+    do {
+        FloorDouble words;
+        words.word.high = high;
+        words.word.low = low;
+        value = words.value;
+    } while (0);
+    return value;
 }

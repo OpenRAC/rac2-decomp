@@ -8,6 +8,9 @@
  * allocation differ; one-view explicit bit merge worsens to 396 bytes.
  * The union is initialized before each read and the high-word replacement
  * retains its initialized low word. No false return or synthetic dependency.
+ * Current RAC1 scoped word macros were independently tried:432 bytes. They
+ * restore the initial non-finite label nop but do not resolve saved-register
+ * assignment or the raw-word representation. Best420-byte body retained.
  * Next: independently evidenced original double-word view and local lifetimes.
  */
 /* Adapted from public fdlibm e_log10.c, version 5.1 (1993-09-24):
