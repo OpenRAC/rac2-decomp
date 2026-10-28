@@ -1202,7 +1202,6 @@ of semantic correctness or matching credit without a strict linked build.
 | [`func_L20_00442550`](levels/func_L20_00442550.c) | 496 | the whole body (calls, order, globals, both branches, the tail) is recovered; the only residue is that this cc1 merges the float temporaries into one pseudo crossing three calls - $f20 and a 0x40 frame against the retail's 0x30. |
 | [`func_L20_004429F0`](levels/func_L20_004429F0.c) | 544 | not attempted: the body is recovered (the five guards, the 30-iteration loop, the division); the wall is the -G8 unit and the register allocation. |
 | [`func_L20_004433B0`](levels/func_L20_004433B0.c) | 344 | not attempted: the body is recovered (the walk, the `bgezl`/`beql` pair, the two tests); the wall is the register allocation and the -G8 unit. |
-| [`func_L20_004435A0`](levels/func_L20_004435A0.c) | 492 | Corrected complete C remains unlinked. 500/492 bytes; see source for measured release coverage, residual differences and reopening conditions. |
 | [`func_L20_004448A8`](levels/func_L20_004448A8.c) | 508 | the dispatch and the loop are recovered; left: the inner loop's shape, the branch-likely forms and the frame. |
 | [`func_L20_004450D8`](levels/func_L20_004450D8.c) | 232 | the last test is `bne`+`nop`+`b`+`lhu` where the retail has `beql`+`lhu` (the branch skips two instructions, so the branch-likely does not fire). |
 | [`func_L20_004451C0`](levels/func_L20_004451C0.c) | 1376 | not attempted: the body is recovered; the function has a dynamic frame (an alloca) and eight callee-saved registers. |

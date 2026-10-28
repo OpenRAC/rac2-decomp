@@ -1,3 +1,9 @@
+/* SDATA follow-up: an incomplete count table with SDATA still compiles to
+ * 484/488 bytes under -mno-split-addresses; the default profile gives 468.
+ * An explicit GP alias without the section attribute also remains 484/488.
+ * Address metadata alone does not separate the indexed address from its load.
+ * Reopen with new source-lifetime or compiler address-formation evidence.
+ */
 /* func_00132028 (989snd command pump, rac1 func_0012DDC0 twin), 488 bytes, boot.
  * 26 October 2026 (M32): 484/488 as its own unit src/core/00132028-g8.c with
  * -O2 -G8 -ffunction-sections -mno-split-addresses and the declarations below:

@@ -61,6 +61,16 @@ older claims that the following mechanisms are universally impossible are supers
 These summaries do not award additional matching credit or replace the build. Check current
 source before relying on any older count, profile or pending-PR label in the imported notes.
 
+The SDATA route also closes `func_L20_004435A0` (492 bytes): the unknown-sized vector
+keeps an incomplete declaration, while `func_L20_00442F80` is declared with its
+actual pointer return. Its failure path returns null; its other paths forward the
+child pointers returned by `func_L20_00443328` or `func_L20_004431E0`. This correct
+contract closes the last temporary-register difference. Both USA placements and
+their strict linked builds pass; PAL has no corresponding catalogue identity.
+The same address-alias attempt on `func_00132028` remains 484/488 bytes: metadata
+does not force a separately materialized indexed address. Its retained C records
+that negative result.
+
 ## Topic index
 
 The 52 original section numbers are preserved for existing references. Anyone may improve

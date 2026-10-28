@@ -202,7 +202,7 @@ ret0:
     return 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L20_004435A0);
+/* func_L20_004435A0 is in L20_004435A0-g8.c. */
 
 /* func_L20_00443790 is defined in L20_00443790-helpers-g8.c. */
 

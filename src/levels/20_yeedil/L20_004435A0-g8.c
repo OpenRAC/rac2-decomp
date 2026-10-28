@@ -1,9 +1,3 @@
-/* Nonmatching: 500/492 bytes.
- * Profile: -O2 -G8 -ffunction-sections.
- * Placement checks: US: 0/1; US2: 0/1; PAL absent from catalogue.
- * 500/492 bytes. The prefix and copy lifetimes are recovered, with remaining temporary allocation, FP branch scheduling and absolute address materialization for the incomplete global vector view. Retail uses GP for that vector, but no complete owner extent is established. The destination is initialized on every path, rotation fields are written only when either rotation component is nonzero, F4 is written before83098, and byteBD is set even at counterFFFF.
- * Reopen with independently qualified vector ownership/extent for D_L20_001B20B0 and real conditional/store lifetime evidence; do not declare a guessed small object to force GP.
- */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -20,7 +14,7 @@ extern void func_002AEC48(void *, void *, int, float, float);
 
 extern int func_00282948(void *);
 
-extern void func_L20_00442F80(char *);
+extern void *func_L20_00442F80(char *);
 
 extern void func_00283098(void *, const void *, const void *);
 
@@ -33,7 +27,7 @@ extern void func_002A93B0(void *);
 extern void func_002B0990(void *, float *, float, int, int);
 
 
-extern float D_L20_001B20B0[] __attribute__((sda));
+extern float D_L20_001B20B0[] SDATA(D_L20_001B20B0);
 
 
 extern float D_L20_001B2164 __attribute__((sda));
