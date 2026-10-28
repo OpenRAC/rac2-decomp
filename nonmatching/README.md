@@ -31,16 +31,25 @@ flags; on its own when that does not compile), places it at 0x000A0000 and
 runs OpenRAC's test-only interpreter on call states captured from the US
 disc, comparing memory, the result, the kept registers and device accesses
 with retail. It covers boot functions called in the boot, title, menu pages
-and New Game up to the first level's load; level functions are not covered
-yet. With OpenRAC's interpreter built (`build/interpreter/`) and the
-compiler reachable through `RAC2_LINUX` (on a Mac, `docker run -d --name
-rac2-gate --platform linux/386 -v $HOME:$HOME rac2-build:latest sleep
-infinity`, then `RAC2_LINUX="docker exec rac2-gate"`):
+and New Game up to the first level's load, and level 00 (Aranos, the
+tutorial): New Game into it, played a while (`level00`). A function with a
+place in level 00's program (a `func_L00_` function, or a boot or shared one
+with a `00:` place in `config/levels/functions.tsv`) is checked at that
+place, its symbols resolved at level 00's addresses; a boot function below
+0x1A7C80 stays resident in the level and is checked as the boot's. Other
+levels are not covered yet. With OpenRAC's interpreter built
+(`build/interpreter/`) and the compiler reachable through `RAC2_LINUX` (on a
+Mac, `docker run -d --name rac2-gate --platform linux/386 -v $HOME:$HOME
+rac2-build:latest sleep infinity`, then `RAC2_LINUX="docker exec
+rac2-gate"`):
 
 ```sh
 python3 tools/build.py boot                     # build/boot/placed.json: the values placement uses
-python3 tools/fcheck.py capture LIST            # states of the listed functions (both runs)
+python3 tools/build.py level 00                 # build/00_aranos_tutorial/placed.json, for level 00
+python3 tools/fcheck.py capture LIST            # states of the listed functions (every run)
+python3 tools/fcheck.py capture LIST --script level00   # level 00 only (states about 16 MB each)
 python3 tools/fcheck.py check func_XXXXXXXX nonmatching/functional/func_XXXXXXXX.c
+python3 tools/fcheck.py check func_L00_XXXXXXXX nonmatching/functional/func_L00_XXXXXXXX.c
 ```
 
 The batch form, which writes the verdicts to OpenRAC's
