@@ -1,3 +1,10 @@
+/* Historical screen superseded by src/levels/11_joba/L11_003F3258-g8.c.
+ * The sketch below is not an interface reference: the current reconstruction
+ * preserves the full target-query arguments/result, two FP random arguments,
+ * and the pointer return of the center lookup. Reviewed qcopy plus a narrow
+ * absolute-address profile produces local matches in US, US2 and PAL.
+ * Both local vectors receive complete 16-byte subtraction results before use.
+ */
 /* func_L11_003F3258 (388 bytes, 1 place): NOT ATTEMPTED in this wave; the body is
  * recovered below and the blockers are measured.
  *

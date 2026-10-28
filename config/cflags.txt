@@ -1514,3 +1514,6 @@ src/levels/16_snivelak/L16_00405488-g8.c	-O2 -G8 -ffunction-sections
 src/levels/01_oozla/L01_003DA300-g8.c	-O2 -G8 -ffunction-sections
 src/levels/16_snivelak/L16_00412F48-g8.c	-O2 -G8 -ffunction-sections
 src/levels/03_endako/L03_003D2518.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por
+
+# Joba endpoint selection keeps the absolute fallback address tied to one register.
+src/levels/11_joba/L11_003F3258-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
