@@ -327,6 +327,8 @@ class LevelTests(unittest.TestCase):
         with mock.patch.object(fcheck, "program_placement", lambda level: placement), \
                 mock.patch.object(fcheck, "program_placed", lambda key: {"values": level_values}), \
                 mock.patch.object(fcheck, "placed", lambda: {"values": boot_values}), \
+                mock.patch.object(fcheck, "copy_map", return_value={}), \
+                mock.patch.object(fcheck, "retail_bytes", side_effect=AssertionError("unit fixture must not read retail")), \
                 mock.patch.object(fcheck, "aligned_values", lambda *a: {}), \
                 mock.patch.object(fcheck, "level_address", lambda level, a: 0x0028C080 if a == 0x00263640 else None):
             r = fcheck.Resolver(prog, "func_L00_002A0200", {"symbols": [], "sections": []}, {}, {})
