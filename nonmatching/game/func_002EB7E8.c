@@ -11,7 +11,7 @@
  * invent an int formal solely to reproduce unused argument setup.
  * Actual002B7CE0 returns signed halfword stream+4 on all paths, so its
  * ignored result is int, not old externs' void. 002EF010 actual definition
- * returns unsigned long (64B ABI); selected explicitly uses signed low32.
+ * returns unsigned long (64-bit ABI); selected explicitly uses signed low32.
  * 002EB158 and002B6D28 actual definitions return int. 002ED058/002EB598
  * mutate state and return void. 00282A60 fills32-bit words for the supplied
  * byte length and defines no return register, rather than libc memset.
