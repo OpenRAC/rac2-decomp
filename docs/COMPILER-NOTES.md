@@ -167,6 +167,12 @@ three vectors; `func_00283678` copies three; `func_00283698` reads three and
 writes four. The later `func_00283738` consumes only three vectors from each
 input. Check every producer and consumer before enlarging or shrinking a buffer.
 
+The water context in `func_L20_00447748` is thirteen words (0x34 bytes), not
+the fourteen words suggested by its old stack-layout screen. Its final callback
+field occupies +0x30 and no consumer reads a fourteenth word. Preserve the actual
+callback signatures and initialize the real field groups; extra stack space is
+not a reason to invent another member.
+
 ### Save order and loop padding
 
 The default game profile uses 8-byte GPR slots and ascending GPR save/restore order.
