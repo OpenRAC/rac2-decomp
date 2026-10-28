@@ -1519,3 +1519,6 @@ src/levels/03_endako/L03_003D2518.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-p
 src/levels/11_joba/L11_003F3258-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/core/001210E0-unwind.c	sdk -O2 -G2 -ffunction-sections -fexceptions
 src/core/00120F00-unwind.c	sdk -O2 -G2 -ffunction-sections -fexceptions
+
+# Forward pitch joins land on the measured mtc1 hazard nop.
+src/levels/shared/L04_003FA350.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
