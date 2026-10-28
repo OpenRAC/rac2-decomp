@@ -352,7 +352,7 @@ void func_002FEE50(int index) {
     p[7] = 0;
 }
 
-INCLUDE_ASM("asm/game", func_002FEE70);
+/* func_002FEE70 is defined in 002FEE70.c. */
 
 
 INCLUDE_ASM("asm/game", func_002FF0D8);
