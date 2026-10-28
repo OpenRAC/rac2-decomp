@@ -443,7 +443,7 @@ INCLUDE_ASM("asm/levels", func_L20_004473B0);
 
 INCLUDE_ASM("asm/levels", func_L20_00447640);
 
-INCLUDE_ASM("asm/levels", func_L20_00447748);
+/* func_L20_00447748 is defined in L20_00447748-g8.c. */
 
 extern char D_L20_002AB980[];
 
