@@ -285,7 +285,7 @@ void *func_00120BD0(struct eh_context *eh, void *pc, frame_state *my_udata,
   return handler;
 }
 
-INCLUDE_ASM("asm/core", func_00120F00);
+/* func_00120F00 lives in 00120F00-unwind.c. */
 
-INCLUDE_ASM("asm/core", func_001210E0);
+/* func_001210E0 lives in 001210E0-unwind.c. */
 

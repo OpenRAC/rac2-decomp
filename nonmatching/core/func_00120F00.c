@@ -1,3 +1,8 @@
+/* Current source candidate: src/core/00120F00-unwind.c closes the historical
+ * stub-placement miss with the real SDK -fexceptions profile. The source and
+ * GPL/libgcc-exception provenance below are retained as dated prior evidence;
+ * they do not create separate matching credit. Coordinator linked gates pending.
+ */
 /* from src/core/00120F00.c: 480 bytes against retail's 476, one instruction
  * more, and every instruction but the eh_return stub's placement is retail's.
  *

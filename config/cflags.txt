@@ -1517,3 +1517,5 @@ src/levels/03_endako/L03_003D2518.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-p
 
 # Joba endpoint selection keeps the absolute fallback address tied to one register.
 src/levels/11_joba/L11_003F3258-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/core/001210E0-unwind.c	sdk -O2 -G2 -ffunction-sections -fexceptions
+src/core/00120F00-unwind.c	sdk -O2 -G2 -ffunction-sections -fexceptions
