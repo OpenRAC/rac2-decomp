@@ -151,7 +151,6 @@ INCLUDE_ASM("asm/game", func_002E8368);
 
 INCLUDE_ASM("asm/game", func_002E8BA8);
 
-INCLUDE_ASM("asm/game", func_002E8F80);
 
 
 INCLUDE_ASM("asm/game", func_002E9268);
@@ -225,11 +224,11 @@ int func_002EB158(int index)
 
 INCLUDE_ASM("asm/game", func_002EB1E0);
 
-INCLUDE_ASM("asm/game", func_002EB598);
 
 INCLUDE_ASM("asm/game", func_002EB7E8);
 
 INCLUDE_ASM("asm/game", func_002EBAA8);
+
 
 INCLUDE_ASM("asm/game", func_002EBC70);
 

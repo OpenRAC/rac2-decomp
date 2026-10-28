@@ -36,6 +36,7 @@ void func_L19_00417A00(char *a0)
 
 INCLUDE_ASM("asm/levels", func_L19_00417A58);
 
+
 INCLUDE_ASM("asm/levels", func_L19_00417CA0);
 
 INCLUDE_ASM("asm/levels", func_L19_00417F88);
@@ -201,7 +202,7 @@ INCLUDE_ASM("asm/levels", func_L19_00423270);
 
 INCLUDE_ASM("asm/levels", func_L19_00423548);
 
-INCLUDE_ASM("asm/levels", func_L19_00423A98);
+/* func_L19_00423A98 is in L19_003E9400-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L19_00423CC0);
 

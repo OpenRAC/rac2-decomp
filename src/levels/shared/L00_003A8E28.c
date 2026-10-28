@@ -29,8 +29,6 @@ typedef struct {
 #endif
 
 
-INCLUDE_ASM("asm/levels", func_L00_003A9000);
-
 INCLUDE_ASM("asm/levels", func_L00_003A91A0);
 
 
@@ -89,6 +87,7 @@ INCLUDE_ASM("asm/levels", func_L00_003ADA30);
 
 INCLUDE_ASM("asm/levels", func_L00_003ADCD8);
 
+
 INCLUDE_ASM("asm/levels", func_L00_003ADEA0);
 
 INCLUDE_ASM("asm/levels", func_L00_003AE550);
@@ -98,7 +97,71 @@ INCLUDE_ASM("asm/levels", func_L00_003AE900);
 INCLUDE_ASM("asm/levels", func_L00_003B0A28);
 
 
-INCLUDE_ASM("asm/levels", func_L00_003B0B20);
+typedef struct {
+    char pad0[0xC];
+    int used;
+    int pad10;
+    unsigned char next[8];
+} PathNode;
+
+extern PathNode D_L00_0023BB78[];
+extern void func_002EDE60(void *dst, int value, int size);
+extern void func_002EDEB0(void *dst, void *src, int size);
+
+int func_L00_003B0B20(unsigned char from, unsigned char to, unsigned char *out)
+{
+    unsigned char path[256];
+    unsigned char tried[256];
+    unsigned char cur;
+    unsigned char next;
+    unsigned char len;
+    int best;
+    int done;
+
+    if (D_L00_0023BB78[from].used == 0 || D_L00_0023BB78[to].used == 0)
+        return 0;
+    func_002EDE60(path, 0, 256);
+    len = 0;
+    func_002EDE60(tried, 0, 256);
+    cur = from;
+    done = 0;
+    best = 0;
+    do {
+        while (D_L00_0023BB78[cur].next[tried[cur]] == cur) {
+            tried[cur]++;
+            if (tried[cur] == 8)
+                break;
+        }
+        if (tried[cur] == 8) {
+            if (len == 0) {
+                done = 1;
+            } else {
+                tried[cur] = 0;
+                len--;
+                cur = path[len];
+            }
+        } else {
+            next = D_L00_0023BB78[cur].next[tried[cur]];
+            tried[cur]++;
+            if (next == to) {
+                if (best < len + 2) {
+                    if (out) {
+                        out[0] = from;
+                        func_002EDE60(out, 0, 256);
+                        func_002EDEB0(out + 1, path, len);
+                        out[len + 2] = next;
+                        out[len + 1] = cur;
+                    }
+                    best = len + 3;
+                }
+            } else {
+                path[len++] = cur;
+                cur = next;
+            }
+        }
+    } while (!done);
+    return best;
+}
 
 
 INCLUDE_ASM("asm/levels", func_L00_003B0DA0);

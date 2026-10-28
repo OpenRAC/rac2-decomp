@@ -303,3 +303,144 @@ void func_L09_00405490(u8 *a0) {
         }
     }
 }
+
+extern int func_316A28(int a);
+extern int func_316A68(int a, int b);
+extern void func_31F4D0(char *a0, int a1);
+extern float func_2EB478(float a, float b);
+extern float func_2EAA60(float a);
+extern float func_2EAA78(float a);
+extern int func_2EB5D0(float a);
+extern void func_2EA750(float f12, void *a0, void *a1);
+extern int D_L09_001B15B8 __attribute__((sda));
+extern int D_L09_001B15B8_4[] MACRO_ADDR;
+extern float D_L09_001B15C4 __attribute__((sda));
+extern float D_L09_001B15C0 __attribute__((sda));
+extern int D_L09_001B15B4 __attribute__((sda));
+extern u8 D_L09_001B15B0 __attribute__((sda));
+
+void func_L09_0040B0C8(char *a0) {
+    char *s3 = *(char **)(a0 + 0x68);
+    char *s1;
+    float v[3];
+    int n;
+    float count;
+    int sel;
+    if (func_316A28(7)) {
+        sel = D_L09_001B15B8;
+    } else {
+        sel = D_L09_001B15B8_4[1];
+    }
+    func_31F4D0(a0, sel);
+    s1 = a0 + 0xC0;
+    *(float *)(s3 + 0x10) = func_2EB478(*(float *)(s3 + 0x10), D_L09_001B15C4 * 0.00029088825f);
+    v[0] = func_2EAA60(*(float *)(s3 + 0x10)) * D_L09_001B15C0;
+    v[1] = func_2EAA78(*(float *)(s3 + 0x10)) * D_L09_001B15C0;
+    v[2] = 0;
+    count = (float)D_L09_001B15B4;
+    *(float *)(a0 + 0xF0) = v[0];
+    *(float *)(a0 + 0xF4) = v[1];
+    n = func_2EB5D0(count * (*(float *)s3 + *(float *)(s3 + 4)) * 0.5f);
+    *(u8 *)(a0 + 0x23) = D_L09_001B15B0 + n + func_316A68(-9, 9);
+    *(u16 *)(a0 + 0x34) |= 0x800;
+    func_2EACD0(s1, a0 + 0xF0);
+    func_2EA750(*(float *)s3, s1, s1);
+    func_2EA750(*(float *)(s3 + 4), a0 + 0xD0, a0 + 0xD0);
+}
+
+typedef struct { u8 pad[0x464]; u8 spent[1]; } L09_CellFlags;
+extern L09_CellFlags D_L09_0021E9F0;
+extern u8 D_0019B4A8[];
+extern char *D_L09_001B294C[] __attribute__((sda));
+extern void func_317B40(int a0, int a1, int a2, int a3);
+
+void func_L09_00406E78(char *a0) {
+    char *t1 = *(char **)(a0 + 0x68);
+    char *o;
+    char *a3;
+    int id;
+    int v;
+    s32 idx = *(s32 *)(t1 + 0x64);
+
+    if (idx == -1)
+        return;
+    o = (char *)((idx << 8) + (int)D_L09_001B285C);
+    if (*(u8 *)(o + 0x20) == 0xFE)
+        return;
+    if (*(u8 *)(o + 0x20) == 0xFD)
+        return;
+    a3 = *(char **)(o + 0x68);
+    if (*(s32 *)(a3 + 0x70) == -1)
+        return;
+    if (*(s32 *)(t1 + 0x50) != -1
+        && (id = *(u16 *)((*(s32 *)(t1 + 0x50) << 8) + (int)D_L09_001B285C + 0xB2),
+            D_L09_0021E9F0.spent[(s16)id] != 0
+            || (v = D_0019B4A8[((s16)id >> 1) + (D_001A79F0 << 10)],
+                (id & 1) ? (v >> 4) & 7 : v & 7) != 0)) {
+        *(float *)((*(s32 *)(a3 + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.25f;
+        func_317B40(*(s32 *)(t1 + 0x4C), 1, 1, 1);
+    } else {
+        *(float *)((*(s32 *)(a3 + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.0f;
+        func_317B40(*(s32 *)(t1 + 0x4C), 0, 0, 0);
+    }
+}
+
+extern s32 D_0018C0B4 __attribute__((nosda));
+extern u8 D_0019B278[];
+extern u8 D_001A7A28[] __attribute__((sda));
+extern void func_30C790(char *a0);
+extern void func_L09_00406C90(char *a0);
+
+s32 func_L09_00406CC0(char *a0) {
+    char *s1 = *(char **)(a0 + 0x68);
+    s32 s0;
+    s32 idx;
+    s32 id;
+
+    if (D_0018C0B4 == 0x31)
+        return 0;
+    if (*(s32 *)(s1 + 0x2C) != -1) {
+        char *o = (char *)((*(s32 *)(s1 + 0x2C) << 8) + (s32)D_L09_001B285C);
+        if (*(u8 *)(o + 0x20) != 0xFE) {
+            if (*(u8 *)(o + 0x20) != 0xFD) {
+                if (D_0019B278[*(s32 *)*(char **)(o + 0x68) + (D_001A79F0 << 2)] == 0)
+                    return 0;
+            }
+        }
+    }
+    if (*(s32 *)(s1 + 0x7C) != -1) {
+        char *o = (char *)((*(s32 *)(s1 + 0x7C) << 8) + (s32)D_L09_001B285C);
+        if (*(u8 *)(o + 0x20) != 0xFE) {
+            if (*(u8 *)(o + 0x20) != 0xFD) {
+                if (*(u8 *)(*(s32 *)*(char **)(o + 0x68) + (s32)D_001A7A28) == 0)
+                    return 0;
+            }
+        }
+    }
+    idx = *(s32 *)(s1 + 0x50);
+    if (idx != -1) {
+        id = *(u16 *)((idx << 8) + (s32)D_L09_001B285C + 0xB2);
+        if (D_L09_0021E9F0.spent[(s16)id] == 0) {
+            s32 v = D_0019B4A8[((s16)id >> 1) + (D_001A79F0 << 10)];
+            if (id & 1)
+                v = (v >> 4) & 7;
+            else
+                v = v & 7;
+            if (v == 0)
+                return 0;
+        }
+    }
+    s0 = -1;
+    idx = *(s32 *)(s1 + 0x64);
+    if (idx != s0) {
+        func_30C790((idx << 8) + D_L09_001B285C);
+        *(s32 *)(s1 + 0x64) = s0;
+    }
+    idx = *(s32 *)(s1 + 0x68);
+    if (idx != s0) {
+        func_30C790((idx << 8) + D_L09_001B285C);
+        *(s32 *)(s1 + 0x68) = s0;
+    }
+    func_L09_00406C90(a0);
+    return 1;
+}

@@ -207,7 +207,7 @@ int func_00312E10(unsigned char *p) { return p[0x20] == 1; }
 
 
 
-INCLUDE_ASM("asm/game", func_00312EB0);
+/* func_00312EB0 is defined in 00312EB0-qcopy.c. */
 
 INCLUDE_ASM("asm/game", func_00313210);
 

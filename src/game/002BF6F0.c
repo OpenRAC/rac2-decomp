@@ -325,7 +325,7 @@ void func_002BFFE8(char *self)
 }
 
 
-INCLUDE_ASM("asm/game", func_002C01F8);
+/* func_002C01F8 is in 002BF6F0-c01f8-g8.c. */
 
 /* func_002C02F0 uses the quadword-copy profile in 002C02F0-qcopy.c. */
 
@@ -335,7 +335,6 @@ INCLUDE_ASM("asm/game", func_002C04C0);
 /* func_002C0CC0 uses the quadword-copy profile in 002C0CC0-qcopy.c. */
 
 INCLUDE_ASM("asm/game", func_002C0E50);
-
 
 
 /* Updates one byte-addressed object by packing a converted short-ratio value with three bytes, applying the bound helper sequence to three stored floats, and accumulating one byte and one float. */
@@ -660,9 +659,41 @@ void func_002C29A0(char *p)
 
 INCLUDE_ASM("asm/game", func_002C2C80);
 
-INCLUDE_ASM("asm/game", func_002C2FD8);
 
+extern unsigned char *r1_func_00218928(int);
+extern int r1_func_001FA898(float);
+extern void r1_func_001F9BF0(void *, void *, void *);
 extern char D_00189EA0[];
+extern unsigned char *r1_D_L00_001B2400[];
+
+
+/* rac1-decomp src/overlays/shared/alpha_fade_particle_updates.c: func_002C2FD8 */
+/* spawns particle type 0x3B from a position, colour index and flags */
+unsigned char *func_002C2FD8(float f, void *pos, int a1, unsigned char a2, int idx, int flag, int s, int mode) {
+    unsigned char *r = r1_func_00218928(0x3B);
+    if (r != 0) {
+        char *v = (char *)r + 0x20;
+        *(int *)(v + 0x10) = mode;
+        if (mode == 1) {
+            r1_func_001F9BF0(v, pos, D_00189EA0);
+        }
+        qcopy(r + 0x10, pos);
+        *(int *)(r + 4) = a1;
+        r[9] = r1_func_001FA898(1.0f) + 0x20;
+        if (flag != 0) {
+            r[3] = 0x44;
+        } else {
+            r[3] = 0x48;
+        }
+        r[8] = a2;
+        r[1] = 0;
+        *(float *)(r + 0xC) = f * 210000.0f;
+        r[2] = *r1_D_L00_001B2400[idx];
+        *(short *)(r + 0xA) = s;
+    }
+    return r;
+}
+
 extern void func_00282CC0(char *, char *, char *);
 
 void func_002C30F8(char *self)
@@ -800,7 +831,7 @@ void func_002C4B10(u8 *a0)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002C4B50);
+/* func_002C4B50 is in 002BF6F0-c4b50.c. */
 
 INCLUDE_ASM("asm/game", func_002C4D18);
 
@@ -832,8 +863,6 @@ void func_002C4F08(char *self)
         }
     }
 }
-
-
 
 
 extern float func_00283CE0_2(int v);
@@ -923,7 +952,7 @@ void func_002C64D8(char *s1)
                        + (func_00283CF0(func_00282C48(func_00283CE0(*(int *)(s0 + 0xC)) * t)) << 24);
 }
 
-INCLUDE_ASM("asm/game", func_002C65A0);
+/* func_002C65A0 is in 002BF6F0-c65a0.c. */
 
 /* If a probe call on a sub-object returns zero, folds a byte counter into the top byte of a packed word, rebuilds a 16-byte vector from two sub-records for a helper, then clamps a running float against a limit and accumulates two sub-record fields into the object. */
 void func_002C6748(char *obj)

@@ -69,7 +69,57 @@ extern void func_00350388(char *);
 
 INCLUDE_ASM("asm/levels", func_L06_00458138);
 
-INCLUDE_ASM("asm/levels", func_L06_004583A8);
+extern char *func_0029EFD0(int);
+extern float func_00283B98(float, float);
+extern void func_0029FCC0(void *, int, void *);
+extern void func_002A0F48(char *);
+
+/* Spawns a chained segment from the record at +0x68 and recurses while length remains. */
+char *func_L06_004583A8(char *a0)
+{
+    char *state = *(char **)(a0 + 0x68);
+    char *obj = 0;
+    char *child;
+    float angle;
+    float d;
+    float len;
+
+    if (*(float *)(state + 4) > 0.0f) {
+        obj = func_0029EFD0(0xFE2);
+        if (obj != 0) {
+            *(unsigned char *)(obj + 0x31) = 1;
+            *(unsigned char *)(obj + 0x30) = 0xFF;
+            *(short *)(obj + 0x32) = 0xFF;
+            *(unsigned char *)(obj + 0x20) = 1;
+            child = *(char **)(obj + 0x68);
+            *(float *)(obj + 0x2C) = *(float *)(a0 + 0x2C);
+            *(long *)(obj + 0x38) = *(long *)(a0 + 0x38);
+            *(char **)(child + 0x10) = a0;
+            *(int *)child = *(int *)state;
+            len = *(float *)(state + 0x1C);
+            *(float *)(child + 0x1C) = len;
+            *(float *)(child + 4) = *(float *)(state + 4) - len;
+            angle = func_00283B98(*(float *)(a0 + 0xF8), 3.1415927f);
+            *(float *)(child + 8) = angle;
+            qcopy(obj + 0xF0, a0 + 0xF0);
+            *(float *)(obj + 0xF8) = angle;
+            d = *(float *)(state + 0xC);
+            if (d == 0.0001f)
+                *(float *)(child + 0xC) = 1.0f;
+            else if (d == -0.0001f)
+                *(float *)(child + 0xC) = -1.0f;
+            else if (d == 1.0f)
+                *(float *)(child + 0xC) = -0.0001f;
+            else if (d == -1.0f)
+                *(float *)(child + 0xC) = 0.0001f;
+            func_0029FCC0(*(char **)(child + 0x10), 0, obj + 0x10);
+            func_002A0F48(obj);
+            if (*(float *)(child + 4) > 0.0f)
+                func_L06_004583A8(obj);
+        }
+    }
+    return obj;
+}
 
 INCLUDE_ASM("asm/levels", func_L06_00458568);
 
@@ -147,7 +197,7 @@ void func_L06_00459C38(unsigned char *a0)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L06_00459D08);
+/* func_L06_00459D08 is defined in L06_00458138-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L06_00459EC0);
 

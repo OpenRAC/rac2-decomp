@@ -93,7 +93,7 @@ void func_002B0158(char *object, float *first, float *second, float amount) {
     func_002B00D8(object + 0x10, first, second, amount);
 }
 
-INCLUDE_ASM("asm/game", func_002B0178);
+/* func_002B0178 is defined in 002B0178.c. */
 
 
 /* Returns a scaled length when a global flag is set, otherwise refreshes a bound data object and forwards the raw helper result. */

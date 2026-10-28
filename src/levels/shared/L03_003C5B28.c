@@ -99,7 +99,7 @@ void func_L03_003C5EE8(L03_5EE8Moby *m) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L03_003C9FB8);
+/* func_L03_003C9FB8 lives in L03_003C9FB8.c. */
 
 int func_L03_003CA138(unsigned char *p) { return p[0x20] == 1; }
 
@@ -151,7 +151,7 @@ u32 func_L03_003CAAC8(u8 *a0, u8 *a1) {
 /* func_L03_003CAAF0 lives in the -g8 sibling: its first call reads a float
    constant through $gp at 0x1354. */
 
-INCLUDE_ASM("asm/levels", func_L03_003CAB80);
+/* func_L03_003CAB80 lives in L03_003CAB80.c. */
 
 extern f32 func_00283B98(f32, f32);
 
@@ -164,7 +164,7 @@ void func_L03_003CC1D8(u8 *a0) {
                                         0.04654212296009064f);
 }
 
-INCLUDE_ASM("asm/levels", func_L03_003CC238);
+/* func_L03_003CC238 lives in L03_003CC238.c. */
 
 /* Defined in L03_003CC478.c. */
 
@@ -259,7 +259,7 @@ void func_L03_003E3308(u8 *a0) {
 
 INCLUDE_ASM("asm/levels", func_L03_003E3430);
 
-INCLUDE_ASM("asm/levels", func_L03_003E3678);
+/* func_L03_003E3678 lives in L03_003E3678-g8.c. */
 
 
 INCLUDE_ASM("asm/levels", func_L03_003E3800);
@@ -333,7 +333,7 @@ void func_L03_003E5218(u8 *a0) {
 
 INCLUDE_ASM("asm/levels", func_L03_00409248);
 
-INCLUDE_ASM("asm/levels", func_L03_00409AB0);
+/* func_L03_00409AB0 lives in L03_00409AB0-g8.c. */
 
 
 extern f32 func_00282C48(f32);
@@ -344,7 +344,7 @@ int func_L03_00409D28(u8 *a0) {
     return func_00282C48(*(f32 *)(a0 + 0x18) - *(f32 *)(q + 0x8)) < 0.01f;
 }
 
-INCLUDE_ASM("asm/levels", func_L03_00419578);
+/* func_L03_00419578 lives in L03_00419578-g8.c. */
 
 u32 func_L03_004197A8(u8 *a0) {
     u8 *p = *(u8 **)(a0 + 0x68);

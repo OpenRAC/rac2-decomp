@@ -360,3 +360,40 @@ void func_L11_00454508(char *p)
         func_L11_00454DD8(p);
     func_L11_00454B60(p);
 }
+
+extern unsigned short D_L11_001B1F84 __attribute__((sda));
+extern float func_00283248(float a, float b);
+extern void func_002A0F48(char *p);
+
+/* Initialises a spawned object: clears its state flags, copies the two start vectors and the
+   caller's parameters into the object and its state block, and aims it along the first vector. */
+void func_L11_00458A98(char *self, int a1, int a2, int a3, float f12, float f13, void *t0,
+                       float *t1, int t2)
+{
+    char *s1 = *(char **)(self + 0x68);
+
+    int v;
+
+    *(unsigned short *)(self + 0x34) = (*(unsigned short *)(self + 0x34) & 0xFFBE) | 0x1000;
+    v = *(int *)(*(char **)(self + 0x24) + 0x10);
+    *(unsigned short *)(self + 0x34) &= 0xEFFF;
+    *(int *)(self + 0x98) = v;
+    *(unsigned char *)(self + 0x30) = 0xFF;
+    *(unsigned short *)(self + 0x32) = 0xFF;
+    self[0x20] = 2;
+    *(int *)(s1 + 0x15C) = a1;
+    *(int *)(self + 0xB8) = a2;
+    qcopy(self + 0x10, t0);
+    qcopy(s1 + 0xC0, t1);
+    *(unsigned short *)(s1 + 0x16C) = D_L11_001B1F84;
+    *(int *)(s1 + 0x150) = t2;
+    *(float *)(s1 + 0x4C) = f12;
+    *(unsigned short *)(s1 + 0x16E) = 0;
+    *(int *)(self + 0xF0) = 0;
+    *(int *)(self + 0xF4) = 0;
+    *(float *)(self + 0xF8) = func_00283248(t1[0], t1[1]);
+    *(float *)(s1 + 0x158) = f13;
+    func_002A0F48(self);
+    *(int *)(s1 + 0x164) = a3;
+    *(int *)(self + 0x78) = 0xFF84E643;
+}

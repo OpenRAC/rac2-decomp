@@ -600,7 +600,7 @@ void func_0034A4B0(Rac2Native_79744baad5ad7f65_ScalarChange48Owner *owner, int v
 
 INCLUDE_ASM("asm/game", func_0034A4E0);
 
-INCLUDE_ASM("asm/game", func_0034A808);
+/* func_0034A808 is in 0034A808.c. */
 
 INCLUDE_ASM("asm/game", func_0034AA30);
 

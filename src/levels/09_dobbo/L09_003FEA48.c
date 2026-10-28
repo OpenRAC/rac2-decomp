@@ -1,5 +1,8 @@
 #include "common.h"
 
+typedef int Quadword __attribute__((mode(TI)));
+typedef union EffectVector { Quadword bits; float value[4]; } EffectVector;
+
 extern void func_L08_00328BB0();
 
 extern int func_L01_00321178(char *, char *);
@@ -161,7 +164,46 @@ void func_L09_00404F90(char *a0, char *a1, s32 a2) {
 
 INCLUDE_ASM("asm/levels", func_L09_003FEAE8);
 
-INCLUDE_ASM("asm/levels", func_L09_003FECF0);
+extern float func_2EB5C0(int a0);
+extern int func_2EB698(float *a0, float f12);
+extern float func_316AC0(float lo, float hi);
+extern void func_30D8D0(char *a0, int a1, float *a2);
+extern char *func_32E560(float *a0, float *a1, int a2, int a3, int t0, int t1, int t2, int t3);
+extern int func_2EB5D0(float a);
+
+void func_L09_003FECF0(char *a0) {
+    EffectVector a;
+    EffectVector b;
+    EffectVector c;
+    EffectVector w;
+    int i;
+    int j;
+    char *p;
+
+    qcopy(a.value, a0 + 0x10);
+    a.value[3] = 6.0f;
+    if (func_2EB698(a.value, func_2EB5C0(*(s16 *)(a0 + 0x32))) == -1)
+        return;
+    for (i = 12; i < 14; i++) {
+        w.bits = 0;
+        w.value[2] = -(func_316AC0(3.5f, 4.5f) * 0.016666668f);
+        c.bits = w.bits;
+        for (j = 0; j < 2; j++) {
+            func_30D8D0(a0, i, b.value);
+            b.value[2] += func_2EB5C0(j) * 0.015f + 0.5f;
+            if (j & 1)
+                p = func_32E560(b.value, c.value, 0x77FF0000, 0x00FF0060, 0x13, 200, -100, 1);
+            else
+                p = func_32E560(b.value, c.value, 0x77FF0060, 0x00FF0000, 0x15, 300, -100, 1);
+            if (p)
+                p[9] = ((*(s16 *)(a0 + 0x32) >> 5) << 4) + func_2EB5D0(0.0f);
+            p = func_32E560(b.value, c.value, 0x77FFFFFF, 0x00FF0000, 0xC, 100, -100, 1);
+            if (p)
+                p[9] = ((*(s16 *)(a0 + 0x32) >> 5) << 4) + func_2EB5D0(0.0f);
+        }
+    }
+}
+
 
 INCLUDE_ASM("asm/levels", func_L09_003FEF00);
 
@@ -224,9 +266,9 @@ void func_L09_00406C90(char *a0) {
     *(s32 *)(a1 + 0x5C) = -1;
 }
 
-INCLUDE_ASM("asm/levels", func_L09_00406CC0);
+/* func_L09_00406CC0 is defined in L09_003FEA48-g8.c (it reads the object table through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L09_00406E78);
+/* func_L09_00406E78 is defined in L09_003FEA48-g8.c (it reads the object table through $gp). */
 
 INCLUDE_ASM("asm/levels", func_L09_00406FC8);
 
@@ -300,10 +342,40 @@ INCLUDE_ASM("asm/levels", func_L09_0040A2E8);
 
 INCLUDE_ASM("asm/levels", func_L09_0040AC48);
 
-INCLUDE_ASM("asm/levels", func_L09_0040B0C8);
+/* func_L09_0040B0C8 is defined in L09_003FEA48-g8.c (it reads small data through $gp). */
+
 
 INCLUDE_ASM("asm/levels", func_L09_0041D650);
 
 /* func_L09_00421B80 is in L09_003FEA48-zp-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L09_00421D60);
+extern int func_316A68(int a, int b);
+extern void func_316958(char *a0, int a1, int a2);
+extern int func_2EA0E0(char *p);
+extern void func_2E8450(char *a0, float *a1, float *a2, int a3, int a4, float f12, float f13, float f14, float f15, float f16);
+
+void func_L09_00421D60(char *a0) {
+    char *s2 = *(char **)(a0 + 0x68);
+    switch (*(u8 *)(a0 + 0x20)) {
+    case 0:
+        *(int *)s2 = func_316A68(0, 0xF0);
+        func_316958(a0, 1, -1);
+        break;
+    case 1:
+        if (func_2EA0E0(s2)) {
+            if (*(u8 *)(a0 + 0x31)) {
+                EffectVector a;
+                EffectVector b;
+                a.bits = 0;
+                b.bits = 0;
+                a.value[1] = -0.033333335f;
+                a.value[2] = 0.016666668f;
+                b.value[2] = 2.0f;
+                func_2E8450(a0, b.value, a.value, func_316A68(3, 7), 0, 0.0f, 0.033333335f, 0.7f, 15.0f, 1.0f);
+            }
+            *(int *)s2 = func_316A68(0x78, 0xF0);
+        }
+        break;
+    }
+}
+

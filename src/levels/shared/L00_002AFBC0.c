@@ -387,7 +387,7 @@ void func_L00_002B3EF8(int a0, float x, float y, float z) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_002B3F68);
+/* func_L00_002B3F68 is in L00_002B3F68.c. */
 
 void func_L00_002B41B8(float x, float y) {
     if (D_00189E20.f1B4 < D_00189E20.f1B0)

@@ -161,6 +161,12 @@ Likewise, adjacent GP-relative addresses establish spacing, not the complete siz
 of each external object. A known field prefix does not justify a bounded small-data
 declaration when the owning allocation or remaining consumers are unknown.
 
+The three matrix buffers in `func_L02_003D6EE0` are independently 48, 48 and
+64 bytes, rather than three equal stack-slot guesses. `func_002833F0` writes
+three vectors; `func_00283678` copies three; `func_00283698` reads three and
+writes four. The later `func_00283738` consumes only three vectors from each
+input. Check every producer and consumer before enlarging or shrinking a buffer.
+
 ### Save order and loop padding
 
 The default game profile uses 8-byte GPR slots and ascending GPR save/restore order.
@@ -254,6 +260,12 @@ silently changing neighbouring definitions.
   An omitted FP argument or a float result consumed as an integer is an ABI
   error, even in a retained draft. A wrapper's current C signature can also be
   incomplete: inspect forwarded registers before discarding a caller argument.
+  Already matching bytes can hide such a source defect: `func_L02_00329410`
+  forwards an optional matrix in `$a2` to `func_00283098`, then returns the
+  float result of `func_00283248`. Its former void/two-argument declarations
+  left those registers live accidentally. Explicit matrix forwarding and a
+  float return preserve the bytes while making the C contract accurate; the
+  consumer declarations must agree too.
 - A pointer live across a call can need a saved register and a larger frame.
   Creating it later, or keeping genuinely distinct guard and walk variables,
   can recover the live ranges (`func_L08_00328BB0`).

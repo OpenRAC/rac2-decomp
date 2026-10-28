@@ -130,7 +130,7 @@ INCLUDE_ASM("asm/levels", func_L08_003CCC30);
 
 INCLUDE_ASM("asm/levels", func_L08_003CCD80);
 
-INCLUDE_ASM("asm/levels", func_L08_003CFE68);
+/* func_L08_003CFE68 is in the sibling file L08_002D90C8-g8.c (it uses $gp addresses). */
 
 void func_L08_003CFFE8(void) {
     func_L04_003A21F8(D_L08_002A0D00, 7);

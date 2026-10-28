@@ -18,7 +18,18 @@ float func_L00_0037E668(void)
     return ref_L02_00385E18_00;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_0037E670);
+/* sets the fade value to its default (0) or its raised value (otherwise) and clears the flag */
+void func_L00_0037E670(int raised)
+{
+    float v = 40.0f;
+    if (raised) {
+        v = 100.0f;
+        D_L00_001B26B0 = v;
+    } else {
+        ref_L02_00385E18_00 = v;
+    }
+    ref_L00_0037E670_01 = 0;
+}
 
 /* the reset side: clears the absolute word and the flag */
 void func_L00_0037E698(void)

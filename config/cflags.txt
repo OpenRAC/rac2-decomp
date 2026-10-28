@@ -1,3 +1,12 @@
+src/levels/shared/L04_0043BEE8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/levels/shared/L03_003CC238.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por -g
+src/game/0034A808.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L00_003C58E8-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy
+src/levels/shared/L05_003D0960-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy
+src/levels/shared/L04_0035F3E0-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy
+src/levels/shared/L04_00363690-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy
+src/game/00312EB0-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -ffast-math
+src/game/002AA548.c	-O2 -G0 -ffunction-sections -g
 src/game/0032EB28-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32
 src/game/002BF6F0.c	-O2 -G0 -ffunction-sections -g
 src/game/002AA800.c	-O2 -G0 -ffunction-sections -g -ffast-math
@@ -442,6 +451,7 @@ src/levels/shared/L00_0033E888-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy 
 src/levels/shared/L00_0033C638-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-barrier
 src/levels/shared/L00_003DB0A8.c	-O2 -G0 -ffunction-sections -g
 src/levels/shared/L00_003D4958-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/levels/shared/L00_00378388-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L00_003E5650-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L00_003E9490-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L00_003E7650-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -550,7 +560,7 @@ src/levels/shared/L22_003300E8-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy 
 src/game/0031D3E0.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/game/002EEB00-flags.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/game/0026EA00-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
-src/game/002AA800-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/game/002AA800-qcopy.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels -frac2-qcopy -frac2-qcopy-barrier
 src/game/00291158.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/levels/shared/L03_003E4588-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/shared/L00_002ADD30.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
@@ -1302,3 +1312,23 @@ src/levels/shared/L04_002CC748-pre.c	-O2 -G0 -ffunction-sections -frac2-gcse-uns
 src/levels/shared/L01_002A7248-pre.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/levels/shared/L01_00323310-pre.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/core/00120354.c	sdk -O2 -G2 -ffunction-sections -fexceptions
+
+src/game/002BF6F0-c65a0.c	-O2 -G0 -ffunction-sections -g
+
+src/game/002BF6F0-c4b50.c	-O2 -G0 -ffunction-sections -g -mno-split-addresses
+src/game/002BD9B0-g8.c	-O2 -G8 -ffunction-sections -g
+src/game/002C7970.c	-O2 -G0 -ffunction-sections -g
+src/game/002F8768-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
+src/levels/shared/L00_0040B838-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_00428CE0-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy
+src/game/00335C60-nosplit.c	-O2 -G0 -mno-split-addresses -ffunction-sections
+src/levels/12_todano/L12_0041E3E8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses -g -frac2-zero-ti-por
+src/levels/12_todano/L12_0041E3E8-split-g8.c	-O2 -G8 -ffunction-sections -g -frac2-zero-ti-por
+src/levels/06_notak/L06_00420548-g.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels
+src/levels/14_aranos_prison/L14_003F4F98-zp-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/levels/10_hrugis_cloud/L10_003170D0-zp.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por
+src/levels/shared/L09_003B6550-zp-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/levels/shared/L09_003F65E0-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/levels/12_todano/L12_00414028-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/levels/01_oozla/L01_003D26C0-g8.c	-O2 -G8 -ffunction-sections
+src/levels/shared/L22_003F52D8-g8.c	-O2 -G8 -ffunction-sections -g -frac2-zero-ti-por

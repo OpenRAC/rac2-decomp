@@ -252,7 +252,7 @@ INCLUDE_ASM("asm/game", func_002F0FA0);
 
 ASM_FUNC("asm/game", func_002F1010);
 
-INCLUDE_ASM("asm/game", func_002F1E60);
+ASM_FUNC("asm/game", func_002F1E60);
 
 ASM_FUNC("asm/game", func_002F1E88);
 
@@ -260,15 +260,15 @@ ASM_FUNC("asm/game", func_002F2610);
 
 INCLUDE_ASM("asm/game", func_002F2758);
 
-INCLUDE_ASM("asm/game", func_002F29E4);
+ASM_FUNC("asm/game", func_002F29E4);
 
-INCLUDE_ASM("asm/game", func_002F2A0C);
+ASM_FUNC("asm/game", func_002F2A0C);
 
 ASM_FUNC("asm/game", func_002F2A38);
 
-INCLUDE_ASM("asm/game", func_002F32AC);
+ASM_FUNC("asm/game", func_002F32AC);
 
-INCLUDE_ASM("asm/game", func_002F32D4);
+ASM_FUNC("asm/game", func_002F32D4);
 
 INCLUDE_ASM("asm/game", func_002F3300);
 
@@ -282,7 +282,7 @@ INCLUDE_ASM("asm/game", func_002F3E40);
 
 ASM_FUNC("asm/game", func_002F3E78);
 
-INCLUDE_ASM("asm/game", func_002F4F78);
+ASM_FUNC("asm/game", func_002F4F78);
 
 ASM_FUNC("asm/game", func_002F4FA0);
 

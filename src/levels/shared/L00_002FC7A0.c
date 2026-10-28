@@ -329,10 +329,32 @@ int func_L00_003046D0(int index)
 /* func_L00_00304AE8 is defined in L00_002FC7A0-g8.c (-G8 small data). */
 
 
-
 INCLUDE_ASM("asm/levels", func_L00_003080D0);
 
-INCLUDE_ASM("asm/levels", func_L00_00308408);
+
+extern int r1_func_L00_0024A798(int);
+extern struct { int a, b, c; char *p; } r1_D_L07_001842F0;
+
+
+/* rac1-decomp src/overlays/l07_umbris/menu_cache_entry.c: func_L00_00308408 */
+/* Clears each set bit in a rectangle of a per-row bit grid, notifying for each. */
+void func_L00_00308408(int x, int y0, int w, int h) {
+    int y = y0;
+    for (; y < y0 + h; y++) {
+        int rowbase = (y >> 5) << 4;
+        int i;
+        for (i = x; i < x + w; i++) {
+            unsigned char *p = (unsigned char *)r1_D_L07_001842F0.p + (y << 6) + i / 8;
+            if (*p != 0) {
+                int bit = 1 << (i & 7);
+                if (*p & bit) {
+                    r1_func_L00_0024A798((i >> 5) + rowbase);
+                    *p = *p & ~bit;
+                }
+            }
+        }
+    }
+}
 
 INCLUDE_ASM("asm/levels", func_L00_00308538);
 
@@ -984,7 +1006,6 @@ void func_L00_00310048(void)
         }
     }
 }
-
 
 
 /* rac1-decomp src/overlays/shared/mobyfunc_0024FD50.c: func_L00_0024FFE8 */

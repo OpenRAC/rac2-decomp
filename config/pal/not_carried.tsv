@@ -1,4 +1,5 @@
 # v1.01 function	what tools/build.py said (the first program) -- tools/carry.py --demote
+func_0028E458	00_aranos_tutorial: instruction at +0xa8 differs
 func_0029B720	boot: instruction at +0x1c differs
 func_0029B758	00_aranos_tutorial: instruction at +0x18 differs
 func_0029B780	00_aranos_tutorial: instruction at +0x18 differs

@@ -293,7 +293,68 @@ void func_00328D98(char *pos, int a1, int a2, char *a3, int t0,
 
 INCLUDE_ASM("asm/game", func_003290D0);
 
-INCLUDE_ASM("asm/game", func_00329328);
+typedef struct {
+    float v[4];
+    float f10;
+    float f14;
+    float f18;
+    int f1C;
+    int f20;
+    int f24;
+    int f28;
+    int pad2C;
+    int f30;
+    int f34;
+    void *owner;
+    int pad3C;
+} F328Tail;
+
+typedef struct {
+    float m[4];
+    F328Tail t;
+} F328Particle;
+
+typedef struct {
+    char pad[0x4C];
+    int count;
+} F328Owner;
+
+extern F328Particle D_0022C9A0[300];
+extern float func_00283CE0(int);
+extern int func_00283CF0(float);
+extern int func_00283D38(float, int, int);
+extern float func_00283B98(float, float);
+extern float func_002A7878(float, float);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_00282D30(void *, void *, float);
+extern int func_00282948(void *);
+
+void func_00329328(void *obj) {
+    F328Particle *base = D_0022C9A0;
+    F328Particle *p;
+    F328Owner *o = *(F328Owner **)((char *)obj + 0x68);
+    int i;
+    float scale;
+    float half = 0.5f;
+
+    for (i = 0; i < 300; i++) {
+        p = &base[i];
+        if (p->t.owner != obj)
+            continue;
+        scale = func_00283CE0(p->t.f30);
+        scale /= func_00283CE0(p->t.f34);
+        p->t.f28 = func_00283CF0((float)p->t.f24 * scale);
+        p->t.f20 = func_00283D38(scale * half, 0, p->t.f1C);
+        p->t.f14 = func_00283B98(p->t.f14, p->t.f10);
+        p->t.f18 += func_002A7878(0.001f, 0.003f);
+        func_00282CC0(p, p, &p->t);
+        func_00282D30(&p->t, &p->t, 0.99f);
+        if (func_00282948(&p->t.f30)) {
+            p->t.owner = 0;
+            o->count--;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/game", func_00329488);
 

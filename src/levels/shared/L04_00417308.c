@@ -73,7 +73,7 @@ void func_L04_0043BE40(char *a0)
     func_002A10E8(*(char **)(s0 + 0x48));
 }
 
-INCLUDE_ASM("asm/levels", func_L04_0043BEE8);
+/* func_L04_0043BEE8 is defined in L04_0043BEE8-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L04_00451150);
 

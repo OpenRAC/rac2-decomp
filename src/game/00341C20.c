@@ -77,7 +77,6 @@ long func_00341EE8(char *object, int arg)
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_00341F38);
 
 char *func_003420C8(char *object) {
     extern void func_003361A8(char *);

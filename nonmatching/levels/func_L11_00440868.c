@@ -23,9 +23,17 @@
    - one name for the list and one for the cursor (the shape that matches
      func_L11_00440238): the head still comes out with the guard inverted, the table
      address hoisted out of the loop and the two handler blocks moved before the loop.
-   Next idea: a shape that keeps the guard's sense (retail branches on the null list),
-   keeps the table load inside the loop and keeps the handler blocks inside the loop
-   body, which is where retail has them. */
+   28 October 2026 (DrLegitamate): the table load is solved. Declared as the
+   incomplete-array alias `extern u8 *D_L11_001B359C_base[] __asm__("D_L11_001B359C")
+   __attribute__((sda));` and read as `D_L11_001B359C_base[0]`, it stays inside the loop
+   as retail's `lui $v1,%hi ; lw $v1,%lo($v1)` (the same declaration matched the sibling
+   func_L11_004411C8). With it the body is 268 bytes against 264 and the handler blocks
+   still come out before the loop with the list guard inverted. Not changed by: early
+   `continue` instead of the nested test, `else if` for the second handler, a `for (;;)`
+   loop with the sign test and `break` at the bottom, nor by -frac2-keep-block-order or
+   -frac2-gcse-unsplit-edges (alone or together, in a sibling unit).
+   Next idea: a shape that keeps the guard's sense (retail branches on the null list)
+   and keeps the handler blocks inside the loop body, which is where retail has them. */
 
 typedef int s32;
 typedef unsigned int u32;

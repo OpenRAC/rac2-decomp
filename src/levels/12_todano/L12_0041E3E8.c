@@ -43,9 +43,9 @@ void func_L12_0041E8F8(u8 *a0) {
 
 INCLUDE_ASM("asm/levels", func_L12_0041EA18);
 
-INCLUDE_ASM("asm/levels", func_L12_0041EDB8);
+/* func_L12_0041EDB8 is defined in L12_0041E3E8-split-g8.c (this unit keeps split addresses). */
 
-INCLUDE_ASM("asm/levels", func_L12_00420660);
+/* func_L12_00420660 is defined in L12_0041E3E8-g8.c. */
 
 /* func_L12_00420838 is defined in L12_00420838-flags-g8.c. */
 
@@ -53,13 +53,41 @@ INCLUDE_ASM("asm/levels", func_L12_00420950);
 
 INCLUDE_ASM("asm/levels", func_L12_00420B78);
 
-INCLUDE_ASM("asm/levels", func_L12_00421110);
+/* func_L12_00421110 is defined in L12_0041E3E8-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L12_004212C0);
 
 INCLUDE_ASM("asm/levels", func_L12_00424370);
 
-INCLUDE_ASM("asm/levels", func_L12_00425070);
+typedef int L12_25070Quad __attribute__((mode(TI)));
+
+extern s32 *D_L12_001FEAC0[];
+extern s32 func_002761F8(void *from, void *to, s32 mode, void *self, s32 flags);
+
+/* Picks the first point of the object's list (D_L12_001FEAC0, chosen by the state's +0x298)
+   other than the current one (+0x2B0) that it can see: both ends are raised by 0.5, and a
+   zero result from the sight test means clear. Returns that point's index, or the current
+   one when none is clear. */
+s32 func_L12_00425070(u8 *object)
+{
+    f32 from[4] __attribute__((aligned(16)));
+    f32 to[4] __attribute__((aligned(16)));
+    u8 *state = *(u8 **)(object + 0x68);
+    s32 *list = D_L12_001FEAC0[*(s32 *)(state + 0x298)];
+    s32 i;
+
+    qcopy(from, object + 0x10);
+    from[2] += 0.5f;
+    for (i = 0; i < list[0]; i++) {
+        if (i == *(s32 *)(state + 0x2B0))
+            continue;
+        qcopy(to, (L12_25070Quad *)list + i + 1);
+        to[2] += 0.5f;
+        if (func_002761F8(from, to, 2, object, 0) == 0)
+            return i;
+    }
+    return *(s32 *)(state + 0x2B0);
+}
 
 INCLUDE_ASM("asm/levels", func_L12_00425178);
 
@@ -112,4 +140,4 @@ INCLUDE_ASM("asm/levels", func_L12_004293A0);
 
 INCLUDE_ASM("asm/levels", func_L12_00429610);
 
-INCLUDE_ASM("asm/levels", func_L12_00429868);
+/* func_L12_00429868 is defined in L12_0041E3E8-g8.c. */

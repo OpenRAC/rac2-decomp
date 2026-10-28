@@ -197,7 +197,7 @@ extern f32 D_L07_001B17D8 __attribute__((sda));
 
 extern u8 *D_L07_001B9250 __attribute__((nosda));
 
-extern u8 *D_L07_001ADAAC __attribute__((nosda));
+extern u8 *D_L07_001ADAAC MACRO_ADDR;
 
 extern u8 D_L07_001B31A9;
 
@@ -242,4 +242,110 @@ void func_L07_0040F468(u8 *a0)
     func_3144F0(&t, s1 + 0x1A8, 0.0f, f21, f21, f20, 0);
     *(f32 *)(s2 + 0x1C) = 1.0f;
     *(f32 *)(s2 + 0x14) = -*(f32 *)(s1 + 0x1A8);
+}
+
+extern u8 D_00189E20[];
+extern u32 D_L07_001B1E08 MACRO_ADDR;
+extern void func_002AD470(u8 *a, u8 *b, u8 *c, u8 *d, u8 *e, u8 *f);
+extern f32 func_002A0F48(u8 *a);
+extern f32 func_00282E48(u8 *a, u8 *b);
+
+typedef struct { u8 pad[0xA8]; s32 ids[4]; } Rec;
+
+void func_L07_0040F760(u8 *a0)
+{
+    u8 *s7 = *(u8 **)(a0 + 0x68);
+    u32 frame = ((s32)a0 >> 8) & 7;
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        s32 id = ((Rec *)s7)->ids[i];
+        u8 *o;
+        if (id == -1)
+            continue;
+        o = D_L07_001B22DC + (id << 8);
+        func_002AD470(o, a0, s7 + 0x120 + i * 0x10, s7 + 0x160 + i * 0x10, o + 0x10, o + 0xF0);
+        func_002A0F48(o);
+        if (*(s16 *)(o + 0xAA) == 0x2F6) {
+            u8 *p = D_00189E20;
+            if (*(s32 *)(p + 0x229C) == 13 && *(u8 **)(p + 0xAA4) == o && *(u8 **)(p + 0x3A0) != a0) {
+                if (func_00282E48(p + 0x80, o + 0x10) < 8.0f)
+                    *(u8 **)(p + 0x3A0) = a0;
+                continue;
+            }
+        }
+        if ((D_L07_001B1E08 & 7) == frame && *(s16 *)(o + 0xAA) == 0x2F6) {
+            u8 *q = D_00189E20;
+            if (*(s32 *)(q + 0x229C) != 13) {
+                if (D_L07_001ADAAC == a0)
+                    *(u16 *)(o + 0x34) &= 0xEFFF;
+                else
+                    *(u16 *)(o + 0x34) |= 0x1000;
+            }
+        }
+    }
+}
+
+extern f32 D_L07_001B0FD0 __attribute__((sda));
+extern char D_00189EA0[];
+extern char D_L07_001B9200[];
+extern u8 *D_L07_001C36C0[];
+extern int func_00277F48(void *, float, int, char *, void *);
+extern int func_002E5DA0(int, int, char *, int);
+extern int func_002A8C28(char *, char *, int, float, float, float, int, int, int);
+extern void func_00282CF0(void *, void *, void *);
+extern void func_00282F20(void *, void *, float);
+extern void func_0032DA58(char *, char *, char *, float);
+extern void func_L07_003F6CF0(u8 *a);
+extern void func_L07_003F6DC0(u8 *self, float *target);
+extern void func_L07_003F6F00(u8 *a0);
+
+void func_L07_003F6960(u8 *a0)
+{
+    u8 *state;
+    u8 *p;
+    char *pos;
+    char *tune;
+    f32 dir[4];
+    s32 n, k;
+
+    state = *(u8 **)(a0 + 0x68);
+    if (a0[0x20] != 1)
+        func_L07_003F6CF0(a0);
+    switch (a0[0x20]) {
+    case 2:
+        *(f32 *)(a0 + 0x2C) = *(f32 *)(*(u8 **)(a0 + 0x24) + 0x24) * D_L07_001B0FD0;
+        func_L07_003F6DC0(a0, (float *)D_00189EA0);
+        func_L07_003F6F00(a0);
+        n = func_00277F48(a0 + 0x10, 0.333f, 0, (char *)a0, 0);
+        if (n > 0) {
+            p = (u8 *)D_L07_001C36C0;
+            for (k = n; k != 0; k--, p += 4) {
+                u8 *other = *(u8 **)p;
+                if (other == a0)
+                    continue;
+                if (other != *(u8 **)(a0 + 0xB8))
+                    func_002A7750(a0, 3, -1);
+            }
+        }
+        break;
+    case 3:
+        func_002E5DA0(6, 0, (char *)a0, 0xE5F);
+        pos = (char *)a0 + 0x10;
+        func_002A8C28((char *)a0, pos, 0x10000, 6.0f, 5.0f, 1.0f, 0, 1, 0);
+        func_002A8C28((char *)a0, pos, 1, 4.0f, (f32)state[0x34], 1.0f, 0, 1, 0);
+        func_00282CF0(dir, D_L07_001B9200, pos);
+        func_00282F20(dir, dir, 1.0f);
+        func_0032DA58((char *)a0, pos, (char *)dir, 0.0f);
+        tune = D_L07_001B9200 - 0x140;
+        *(f32 *)(tune + 0x180) = 0.1f;
+        *(s32 *)(tune + 0x188) = 0x5A;
+        *(f32 *)(tune + 0x160) = 0.2f;
+        *(s32 *)(tune + 0x168) = 0x3C;
+        *(s32 *)(tune + 0x16C) = 0;
+        *(s32 *)(a0 + 0x98) = 0;
+        *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
+        func_002A7750(a0, 1, -1);
+        break;
+    }
 }

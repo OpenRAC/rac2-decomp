@@ -4,7 +4,7 @@ typedef int Quad_L02_00332EF0 __attribute__((mode(TI)));
 extern void func_L02_00333300(void *, void *);
 extern float func_00282E48(void *, void *);
 extern u8 D_L02_001B3210[] MACRO_ADDR;
-extern float func_L02_00329410(void *, void *, int);
+extern float func_L02_00329410(void *, void *, const void *);
 extern float func_002AFF38(void *, void *, void *);
 extern void func_002AFD88(void *, void *, float, float, float);
 extern int func_002B63C0(void *, void *);

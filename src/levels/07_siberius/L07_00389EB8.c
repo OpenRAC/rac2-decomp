@@ -83,8 +83,6 @@ unsigned char *func_L07_003E5B70(int group, int *count)
 
 /* func_L07_003E5C78 is defined in L07_003E5C78-helpers.c. */
 
-INCLUDE_ASM("asm/levels", func_L07_003E5D80);
-
 INCLUDE_ASM("asm/levels", func_L07_003E5FA8);
 
 extern void func_002AD0E0(char *, int, char *, char *, char *, char *);

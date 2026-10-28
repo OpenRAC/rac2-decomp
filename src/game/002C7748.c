@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "common.h"
 
 extern int F250fbfa4_FUN_00282978(char *p);
 
@@ -44,9 +45,7 @@ extern BatchA_A10_u8 D_L03_001FF8C0[];
 
 extern BatchA_A10_u8 D_L03_001FFAC0[];
 
-typedef int s32;
 
-typedef unsigned int u32;
 
 extern int func_00288FB8_1 ();
 
@@ -60,7 +59,6 @@ typedef struct { BatchA_A12_s32 a; BatchA_A12_s32 b; } BatchA_A12_BatchA24;
 
 extern BatchA_A12_BatchA24 D_L08_001FF980;
 
-typedef unsigned char u8;
 
 /*
  * Disassembled at 0x002cd220
@@ -109,8 +107,6 @@ extern void func_0027C540(long param_1);
 /* func_002C7748 is a near miss: see nonmatching/game/func_002C7748.c. */
 
 INCLUDE_ASM("asm/game", func_002C7748);
-
-INCLUDE_ASM("asm/game", func_002C7970);
 
 void func_002C7AE8(char *a0)
 {
@@ -362,7 +358,64 @@ INCLUDE_ASM("asm/game", func_002C94C8);
 
 
 
-INCLUDE_ASM("asm/game", func_002C9828);
+extern int func_00283CF0(float);
+extern void func_00282D08(float *out, float *a, float *b, float t);
+extern void func_00282CF0(float *out, float *a, float *b);
+extern float func_00282E20(float *v);
+extern float func_00283248(float y, float x);
+
+void func_002C9828(char *path, int clamp, float *out, float *angles, int flags, float t)
+{
+    float a[4] __attribute__((aligned(16)));
+    float b[4] __attribute__((aligned(16)));
+    float c[4] __attribute__((aligned(16)));
+    float f[4] __attribute__((aligned(16)));
+    float d[4] __attribute__((aligned(16)));
+    float e[4] __attribute__((aligned(16)));
+    int idx = func_00283CF0(t);
+    int hit = 0;
+    int i0;
+    int i1;
+    int i2;
+    int n;
+
+    if (clamp == 0) {
+        if (idx >= *(int *)path - 2) {
+            idx = *(int *)path - 2;
+            hit = 1;
+        }
+    }
+    t -= idx;
+    if (hit) {
+        if (t > 1.0f)
+            t = 1.0f;
+    }
+    n = *(int *)path;
+    i0 = idx;
+    i1 = idx + 1;
+    i2 = idx + 2;
+    if (i2 >= n) {
+        i0 = i0 % n;
+        i1 = i1 % n;
+        i2 = i2 % n;
+    }
+    qcopy(a, path + 0x10 + i0 * 16);
+    qcopy(b, path + 0x10 + i1 * 16);
+    func_00282D08(out, a, b, t);
+    if (flags & 1)
+        return;
+    if (hit) {
+        func_00282CF0(f, b, a);
+    } else {
+        qcopy(c, path + 0x10 + i2 * 16);
+        func_00282CF0(d, b, a);
+        func_00282CF0(e, c, b);
+        func_00282D08(f, d, e, t);
+    }
+    angles[1] = -func_00283248(func_00282E20(f), f[2]);
+    angles[2] = func_00283248(f[0], f[1]);
+    angles[3] = a[3] * (1.0f - t) + b[3] * t;
+}
 
 
 extern int D_001F2A30;

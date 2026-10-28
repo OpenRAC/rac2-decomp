@@ -1,3 +1,4 @@
+#include "common.h"
 #include "include_asm.h"
 
 extern char D_00189EA0[];
@@ -45,6 +46,9 @@ typedef struct {
     float f124;
     float f128;
     float f12C;
+    unsigned char pad2[8];
+    float f138;
+    float f13C;
 } D00138180_View;
 
 extern D00138180_View D_00138180;
@@ -96,7 +100,7 @@ INCLUDE_ASM("asm/levels", func_L30_00383398);
 
 INCLUDE_ASM("asm/levels", func_L30_00383928);
 
-INCLUDE_ASM("asm/levels", func_L30_003840E0);
+/* func_L30_003840E0 uses small data in L30_0032AAF0-g8.c. */
 
 void func_L30_003842E0(char *a0) {
     char *st = *(char **)(a0 + 0x68);
@@ -207,7 +211,7 @@ void func_L30_003B3E60(float *a0, float *a1, float *a2, float *a3) {
 
 INCLUDE_ASM("asm/levels", func_L30_003B3F70);
 
-INCLUDE_ASM("asm/levels", func_L30_003BE478);
+/* func_L30_003BE478 uses small data in L30_0032AAF0-g8.c. */
 
 void func_L30_003BE678(char *a0) {
     char *st = *(char **)(a0 + 0x68);
@@ -245,7 +249,39 @@ INCLUDE_ASM("asm/levels", func_L30_00404608);
 
 INCLUDE_ASM("asm/levels", func_L30_0040AE38);
 
-INCLUDE_ASM("asm/levels", func_L30_0040B4E0);
+extern int D_001A79F0 MACRO_ADDR;
+
+void func_L30_0040B4E0(float *a0, float *a1, float *a2, float *a3, float *a4, float *a5) {
+    int mode;
+
+    *a0 = -D_00189E20.f1FB0;
+    *a2 = -D_00189E20.f1FB4;
+    *a1 = func_321018(D_00138180.f128) - func_321018(D_00138180.f124);
+    mode = D_001A79F0;
+    if (mode == 8 || mode == 0x10 || mode == 0x15 || mode == 0x1E) {
+        *a3 = D_00138180.f12C;
+        *a5 = 0.0f;
+    } else {
+        *a5 = D_00138180.f12C;
+        *a3 = 0.0f;
+    }
+    *a4 = func_321018(D_00138180.f138) - func_321018(D_00138180.f13C);
+    if (*a0 > 1.0f) {
+        *a0 = 1.0f;
+    } else if (*a0 < -1.0f) {
+        *a0 = -1.0f;
+    }
+    if (*a1 > 1.0f) {
+        *a1 = 1.0f;
+    } else if (*a1 < -1.0f) {
+        *a1 = -1.0f;
+    }
+    if (*a4 > 1.0f) {
+        *a4 = 1.0f;
+    } else if (*a4 < -1.0f) {
+        *a4 = -1.0f;
+    }
+}
 
 INCLUDE_ASM("asm/levels", func_L30_0040B6B0);
 

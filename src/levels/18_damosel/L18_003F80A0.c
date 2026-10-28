@@ -57,7 +57,7 @@ INCLUDE_ASM("asm/levels", func_L18_003F90A0);
 
 INCLUDE_ASM("asm/levels", func_L18_003FB308);
 
-INCLUDE_ASM("asm/levels", func_L18_003FB620);
+/* func_L18_003FB620 is in the sibling file L18_003F80A0-g8.c (it reads $gp data). */
 
 INCLUDE_ASM("asm/levels", func_L18_003FD858);
 

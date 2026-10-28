@@ -217,7 +217,57 @@ extern void func_L11_0043AB28(u8 *);
 
 extern void func_L11_003F3098(u8 *);
 
-INCLUDE_ASM("asm/levels", func_L11_004411C8);
+/* The class table base read through an incomplete `sda` array: cc1 emits the one-instruction
+   load, which the assembler expands absolute (`lui $r` / `lw $r,%lo($r)`) and which is not
+   hoisted out of the loop, as retail has it (docs/COMPILER-NOTES.md). */
+extern u8 *D_L11_001B359C_base[] __asm__("D_L11_001B359C") __attribute__((sda));
+
+void func_L11_004411C8(u8 *obj)
+{
+    s32 index = *(s32 *)(*(u8 **)(obj + 0x68) + 0xC0);
+    u16 *p;
+    u8 *list;
+    u8 *entry;
+
+    if (index == 0xFF)
+        return;
+    list = D_L11_001FC420[index];
+    if (list == 0)
+        return;
+    p = (u16 *)list;
+    do {
+        entry = D_L11_001B359C_base[0] + ((*p & 0x7FFF) << 8);
+        switch (*(s16 *)(entry + 0xAA)) {
+        case 0xD98:
+            func_L11_00449878(entry);
+            break;
+        case 0xDCF:
+            func_L11_0044C4F0(entry);
+            break;
+        case 0xDF4:
+            func_L11_00452DF8(entry);
+            break;
+        case 0xDF7:
+            func_L11_00454DD8(entry);
+            break;
+        case 0xDF9:
+            func_L11_00456540(entry);
+            break;
+        case 0xD37:
+            func_L11_00436A78(entry);
+            break;
+        case 0xD4A:
+            func_L11_00439BF0(entry);
+            break;
+        case 0xD4B:
+            func_L11_0043AB28(entry);
+            break;
+        case 0xB3A:
+            func_L11_003F3098(entry);
+            break;
+        }
+    } while (*(s16 *)p++ >= 0);
+}
 
 /* func_L11_00441350 lives below, after the id-list macros it uses. */
 

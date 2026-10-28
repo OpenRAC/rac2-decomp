@@ -770,7 +770,7 @@ float func_002AA458(void *a0, void *a1, void *a2, float f1, float f2, float f3)
     return *(float *)a2;
 }
 
-INCLUDE_ASM("asm/game", func_002AA548);
+/* func_002AA548 is implemented in 002AA548.c. */
 
 extern float func_00283BE0(float, float);
 extern float func_00282C48(float);

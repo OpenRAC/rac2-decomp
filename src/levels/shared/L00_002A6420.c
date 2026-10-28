@@ -400,7 +400,7 @@ void func_L00_002AA478(char *self, int arg1)
    keeps the base's %hi in $s5 and re-materialises it inside the loop. */
 INCLUDE_ASM("asm/levels", func_L00_002AA570);
 
-INCLUDE_ASM("asm/levels", func_L00_002AA750);
+/* func_L00_002AA750 is defined in L00_002AA750.c. */
 
 INCLUDE_ASM("asm/levels", func_L00_002AA938);
 

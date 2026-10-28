@@ -24,7 +24,7 @@ INCLUDE_ASM("asm/levels", func_L12_00389988);
 
 INCLUDE_ASM("asm/levels", func_L12_00389BC0);
 
-INCLUDE_ASM("asm/levels", func_L12_00389F80);
+/* func_L12_00389F80 uses small data in L12_002CF7B0-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L12_00393458);
 

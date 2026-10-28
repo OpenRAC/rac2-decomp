@@ -382,7 +382,7 @@ void func_L09_003AF6B0(char *object)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L09_003B6550);
+/* func_L09_003B6550 is in L09_003B6550-zp-g8.c. */
 
 /* snapshots the object's frame and re-seeds its four steering angles from the new one */
 /* func_L09_003E99E0 is matched in its own unit, src/levels/shared/L09_003E99E0-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
@@ -452,7 +452,7 @@ void func_L09_003EAF60(char *object)
     func_0029F338(object);
 }
 
-INCLUDE_ASM("asm/levels", func_L09_003F65E0);
+/* func_L09_003F65E0 is in L09_003F65E0-g8.c. */
 
 void func_L09_003F7158(char *object)
 {

@@ -1,6 +1,5 @@
 #include "include_asm.h"
-
-typedef float f32;
+#include "common.h"
 
 #ifndef RAC2_T_REC_F4EC78016
 #define RAC2_T_REC_F4EC78016
@@ -38,10 +37,6 @@ extern Slot_F4ec78016 D_00188660_1[];
 extern Globals_F4ec78016 D_001A63A8_4[];
 
 extern void func_002B6958(int a, int b, int c, int d);
-
-typedef unsigned char u8;
-
-typedef int s32;
 
 extern float Fe617c30b_FUN_00283CE0(int a);
 
@@ -318,7 +313,55 @@ INCLUDE_ASM("asm/game", func_002BA048);
 
 INCLUDE_ASM("asm/game", func_002BA0E0);
 
-INCLUDE_ASM("asm/game", func_002BA6A0);
+typedef int TI __attribute__((mode(TI)));
+
+extern void func_002B9180(char *);
+extern void func_00282CC0(char *, char *, char *);
+extern float func_002B0520(TI *pos);
+extern int D_001A79F0 MACRO_ADDR;
+extern float D_001B1DC0[] MACRO_ADDR;
+
+void func_002BA6A0(char *p)
+{
+    float *f = (float *)p;
+    float *s = f + 0xC;
+    float lim = s[3];
+    float tmp[4] __attribute__((aligned(16)));
+    TI c1, c2;
+    int x, y;
+    float h;
+
+    if (D_001A79F0 == 15) {
+        if (f[6] < lim) {
+            func_002B9180(p);
+            return;
+        }
+    } else if (f[6] < lim || f[4] < 0.0f || f[5] < 0.0f || f[4] > 1024.0f || f[5] > 1024.0f) {
+        func_002B9180(p);
+        return;
+    }
+    x = (int)f[8];
+    y = (int)f[9];
+    func_00282CC0((char *)tmp, (char *)s, (char *)D_001B1DC0);
+    func_00282CC0((char *)(f + 8), (char *)(f + 8), (char *)tmp);
+    func_00282CC0((char *)(f + 4), (char *)(f + 4), (char *)tmp);
+    if (*(short *)(p + 0xA) != 2 && (x != (int)f[8] || y != (int)f[9])) {
+        c1 = *(TI *)(f + 8);
+        h = func_002B0520(&c1);
+        if (h >= D_001B1DC0[4]) {
+            c2 = *(TI *)(f + 8);
+            lim = func_002B0520(&c2);
+        } else {
+            lim = D_001B1DC0[4];
+        }
+        if (f[10] < lim) {
+            func_002B9180(p);
+            return;
+        }
+    }
+    s[2] -= 0.0027222223f;
+    s[3] = lim + D_001B1DC0[2];
+}
 
 
 extern unsigned char *D_001F2544;
@@ -568,7 +611,7 @@ void func_002BD500(char *a)
 
 
 
-INCLUDE_ASM("asm/game", func_002BD9B0);
+
 
 
 INCLUDE_ASM("asm/game", func_002BDCE8);
@@ -629,4 +672,48 @@ INCLUDE_ASM("asm/game", func_002BEBC0);
 INCLUDE_ASM("asm/game", func_002BEE70);
 
 
-INCLUDE_ASM("asm/game", func_002BF518);
+extern void func_002B9180(char *);
+extern int func_002AAE98(float a, float b, float c, float d);
+extern int func_00283CF0(float);
+
+void func_002BF518(char *o)
+{
+    float *s;
+    char *parent;
+    float t;
+
+    if (o == 0)
+        return;
+    s = (float *)(o + 0x20);
+    parent = *(char **)s;
+    if (parent == 0 || (*(unsigned char *)(parent + 0x20) & 0xF0) == 0xF0) {
+        func_002B9180(o);
+        return;
+    }
+    qcopy(o + 0x10, parent + 0x10);
+    t = s[1] + s[2];
+    s[1] = t;
+    if (t < 0.0f) {
+        func_002B9180(o);
+        return;
+    }
+    if (t > 0.6f) {
+        s[2] = -s[2];
+        s[1] = t + s[2];
+    }
+    s[4] += -0.0174f;
+    if (s[4] < 0.0f)
+        s[4] = 0.0f;
+    s[5] += -0.01446f;
+    if (s[5] < 0.0f)
+        s[5] = 0.0f;
+    s[6] += -0.0015f;
+    if (s[6] < 0.0f)
+        s[6] = 0.0f;
+    *(int *)(o + 4) = func_002AAE98(s[4], s[5], s[6], s[1]);
+    s[3] += 0.0011f;
+    if (s[3] > 1.0f)
+        s[3] -= 1.0f;
+    *(char *)(o + 8) = func_00283CF0(s[3] * 255.0f);
+    *(float *)(o + 0xC) = (*(float **)(o + 0x20))[0xB] * 3000000.0f + 50000.0f;
+}

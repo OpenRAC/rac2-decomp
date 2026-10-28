@@ -495,7 +495,6 @@ void func_00335B80(s32 *unused, s32 *dst, s32 *left, s32 *right, f32 scale) {
 }
 
 
-INCLUDE_ASM("asm/game", func_00335C60);
 
 /* Interpolate four scalar float components from interleaved endpoint pairs at source offsets 0x08 through 0x24 using (1.0f - factor) * first + factor * second, writing each component to the destination. */
 void func_00335CC0(float factor,

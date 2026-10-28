@@ -220,7 +220,7 @@ extern int func_0012F9B8(void *);
 
 extern void func_00350918(void *);
 extern void func_00351E48(u8 *);
-extern void func_00351B20(void *);
+extern int func_00351B20(void *);
 void func_00351A80(unsigned char *object)
 {
     char *base;
@@ -236,7 +236,48 @@ void func_00351A80(unsigned char *object)
 }
 
 
-INCLUDE_ASM("asm/game", func_00351B20);
+extern void func_0026FEB8();
+extern char D_001AE868[];
+extern char D_001AE880[];
+extern int func_0012F9A8(void *);
+extern void func_0012F9C8(void *);
+extern int func_0012F950(void *, void *, int);
+extern void func_0034F3B8(void);
+extern void func_0034F780(char *);
+extern void *func_00351EE8(char *);
+extern void func_00351E70(u8 *);
+extern void func_0034FE18(void *, void *, int, int, int);
+
+int func_00351B20(void *p)
+{
+    int *object = p;
+    int result = 1;
+    void *packet;
+    int i;
+
+    while (func_0012F9A8(object) == 0) {
+        if (func_003518D8((u8 *)object) == 1) {
+            result = -1;
+            func_0026FEB8(D_001AE868);
+            break;
+        }
+        while ((packet = func_00351EE8(D_001B23CC[0] + 0xD9168)) == 0)
+            func_0034F3B8();
+        if (func_0012F950(object, packet, 0x340) < 0)
+            func_0034F780(D_001AE880);
+        if (object[2] == 0) {
+            int a = object[0];
+            int b = object[1];
+            for (i = 0; i < *(int *)(D_001B23CC[0] + 0xD9178); i++)
+                func_0034FE18(*(char **)(D_001B23CC[0] + 0xD916C) + i * 0x138C0 + 0x40,
+                              *(char **)(D_001B23CC[0] + 0xD9168) + i * 0xD0000, a, b, i);
+        }
+        func_00351E70((u8 *)(D_001B23CC[0] + 0xD9168));
+        func_0034F3B8();
+    }
+    func_0012F9C8(object);
+    return result;
+}
 
 extern char D_001AE8A8[];
 extern void func_0026FEB8(void *, int);

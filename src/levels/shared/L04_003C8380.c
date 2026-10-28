@@ -162,7 +162,7 @@ INCLUDE_ASM("asm/levels", func_L04_003FA7E0);
 
 INCLUDE_ASM("asm/levels", func_L04_003FB990);
 
-INCLUDE_ASM("asm/levels", func_L04_003FBD80);
+/* func_L04_003FBD80 is in the sibling file L04_003C8380-g8.c (it stores through $gp). */
 
 INCLUDE_ASM("asm/levels", func_L04_003FBEF8);
 

@@ -429,7 +429,7 @@ INCLUDE_ASM("asm/levels", func_L01_00326DD8);
 
 INCLUDE_ASM("asm/levels", func_L01_00331CA0);
 
-INCLUDE_ASM("asm/levels", func_L01_00331E08);
+/* func_L01_00331E08 is in L01_00331E08.c. */
 
 /* Averages each 16-byte record of the table the argument points at against the record
    (i + 1) % n, storing the result in the record's own +0xC field and returning the

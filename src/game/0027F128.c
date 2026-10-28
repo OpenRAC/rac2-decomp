@@ -230,7 +230,7 @@ void func_00281DE8(QuadPacket *q, int a1, int a2, int a3) {
 }
 
 
-INCLUDE_ASM("asm/game", func_00281EB8);
+/* func_00281EB8 lives in 00281EB8.c. */
 
 
 /* calls the measured callee with constants 0x47 and 0x513f1 */

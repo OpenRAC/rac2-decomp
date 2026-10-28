@@ -1,11 +1,5 @@
 #include "include_asm.h"
-
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -17,8 +11,8 @@ extern f32 func_2F4088(f32);
 extern void func_2F3A80(void *, void *, void *);
 extern void func_2F3AB0(void *, void *, void *);
 extern void func_2F3AF0(void *, s32, f32);
-extern s32 func_2F4BE0(u32, u8, u8, f32);
-extern f32 func_2F4BD0(s32, s32);
+extern s32 func_2F4BE0(f32);
+extern f32 func_2F4BD0(s32);
 extern void *func_32F2B0(void *);
 extern void func_32F7A8(void *, void *, void *, void *, s32);
 extern void *func_332F58(s32);
@@ -60,7 +54,35 @@ void func_L22_00328220(u8 *a0, u8 *a1, u8 *a2, u8 *a3, f32 f12, f32 f13, f32 f14
 
 /* Defined in L22_003300E8-qcopy.c. */
 
-INCLUDE_ASM("asm/levels", func_L22_00334F78);
+/* Allocates a kind-5 record and fills it: the quadword at the first pointer, a colour word
+   from the three bytes with 0x7F in the top byte, a helper's result less 0x60, a 0x48 byte,
+   the second float, the first byte at D_001FF814 and the handle, then the first float
+   divided by a helper's value for the handle. Does nothing without a handle or when the
+   allocation fails. */
+void func_L22_00334F78(TI128 *source, u8 red, u8 green, u8 blue, s32 handle, f32 scale, f32 value)
+{
+    u8 *record;
+    u8 *pair;
+    u32 colour;
+
+    if (handle == 0)
+        return;
+    record = func_332F58(5);
+    if (record == 0)
+        return;
+    qcopy(record + 0x10, source);
+    pair = record + 0x20;
+    colour = (green << 8) | 0x7F000000;
+    *(u32 *)(record + 0x4) = ((blue << 16) | colour) | red;
+    record[0x9] = func_2F4BE0(4.0f) - 0x60;
+    record[0x3] = 0x48;
+    *(f32 *)(record + 0xC) = value;
+    record[0x1] = 0;
+    record[0x8] = 0;
+    record[0x2] = *D_001FF814;
+    *(s32 *)(record + 0x20) = handle;
+    *(f32 *)(pair + 0x4) = scale / func_2F4BD0(handle);
+}
 
 void func_L22_00335078(u8 *a0)
 {
@@ -83,7 +105,7 @@ void func_L22_00335078(u8 *a0)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L22_003398B8);
+/* func_L22_003398B8 is in the sibling file L22_002D0C98-g8.c (it reads $gp data). */
 
 INCLUDE_ASM("asm/levels", func_L22_0039CDC0);
 

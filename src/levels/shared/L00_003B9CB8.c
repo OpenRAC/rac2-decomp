@@ -510,7 +510,7 @@ INCLUDE_ASM("asm/levels", func_L00_003C4F78);
 
 INCLUDE_ASM("asm/levels", func_L00_003C5310);
 
-INCLUDE_ASM("asm/levels", func_L00_003C58E8);
+/* func_L00_003C58E8 is in L00_003C58E8-qcopy.c. */
 
 /* one float gate followed by five integer gates; every failing gate */
 int func_L00_003C5B18(float f12)

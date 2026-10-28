@@ -427,7 +427,6 @@ INCLUDE_ASM("asm/levels", func_L00_00428588);
 
 INCLUDE_ASM("asm/levels", func_L00_004287E8);
 
-INCLUDE_ASM("asm/levels", func_L00_00428CE0);
 
 /* runs a fixed pair of callees on the same object handle */
 void func_L00_00428EB0(char *a0)
@@ -469,7 +468,34 @@ void func_L00_00429020(int i) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_004290C0);
+extern char * r1_D_L10_001B0C30[];
+extern int r1_func_00215570(void *, int);
+extern int r1_func_L00_00260AB0(void *, int);
+extern int r1_func_L00_00260B68(float *, int);
+extern int r1_func_L00_0025A778(float *, float *, int);
+
+/* rac1-decomp src/overlays/shared/rocket_and_path_camera.c: func_L00_004290C0 */
+/* Adapted from Lombyte's project (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay_vendor_002e3de8.c, FUN_L10_002f5a78. */
+int func_L00_004290C0(char *moby, char *unused)
+{
+    unsigned char *e = *(unsigned char **)(r1_D_L10_0015F050 + *(short *)(moby + 0x84) * 32 + 0x1C);
+
+    if (*(int *)(e + 0x0C) >= 0) {
+        if (r1_func_00215570(D_00189EA0, *(int *)(e + 0x0C))) return 1;
+    } else if (*(int *)(e + 0x10) >= 0) {
+        if (r1_func_L00_00260AB0(D_00189EA0, *(int *)(e + 0x10))) return 1;
+    } else if (*(int *)(e + 0x08) >= 0) {
+        if (r1_func_L00_00260B68((float *)D_00189EA0, *(int *)(e + 0x08))) return 1;
+    } else if (*(int *)(e + 0x14) >= 0) {
+        int i = *(int *)(e + 0x14);
+        if (r1_func_L00_0025A778((float *)D_00189EA0,
+                                  (float *)(r1_D_L10_001B0C30[i] + 0x10),
+                                  *(int *)r1_D_L10_001B0C30[i])) return 1;
+    } else if (e[0x38] != 0 && e[0x39] == 0) {
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/levels", func_L00_004291A0);
 
@@ -570,8 +596,41 @@ INCLUDE_ASM("asm/levels", func_L00_0042AC18);
 
 INCLUDE_ASM("asm/levels", func_L00_0042AD98);
 
-INCLUDE_ASM("asm/levels", func_L00_0042B038);
 
+extern void r1_func_001F9BF0(void *, void *, void *);
+extern void r1_func_001F9EC0(void *, void *, void *);
+extern float r1_func_001F9B88(float);
+extern float r1_func_001FA888(int);
+extern int r1_func_001FA898(float);
+extern void r1_func_L01_002A2C90(int a, int b, int c, int d, int e);
+extern char D_00189003[];
+
+
+/* rac1-decomp src/overlays/shared/music_box_voices.c: func_L00_0042B038 */
+/* reverb box sound update: starts or stops the sound as the listener enters or leaves the box */
+void func_L00_0042B038(char *moby) {
+    float a[4];
+    float b[4];
+    unsigned char *data = *(unsigned char **)(moby + 8);
+    r1_func_001F9BF0(a, D_00189003 + 0xE9D, moby + 0x40);
+    a[3] = 0;
+    r1_func_001F9EC0(b, a, moby + 0x50);
+    if (r1_func_001F9B88(b[0]) <= 1.0f && r1_func_001F9B88(b[1]) <= 1.0f && r1_func_001F9B88(b[2]) <= 1.0f) {
+        float t = (b[0] + 1.0f) * 0.5f;
+        int v = r1_func_001FA898(r1_func_001FA888(*(int *)(data + 4)) * t);
+        int w = *(int *)(data + 4);
+        if (!(w < v)) w = v;
+        r1_func_L01_002A2C90((int)moby, data[0], w, data[1], data[2]);
+        data[3] = 1;
+    } else if (data[3] != 0) {
+        if (b[0] > 0.0f) {
+            r1_func_L01_002A2C90(0, data[0], *(int *)(data + 4), data[1], data[2]);
+        } else {
+            r1_func_L01_002A2C90((int)moby, 0, 0, 0, 0);
+        }
+        data[3] = 0;
+    }
+}
 
 
 /* refreshes the object, installs the block at +0x30 and returns the object. */

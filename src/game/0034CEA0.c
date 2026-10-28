@@ -354,7 +354,60 @@ void func_0034FB20(u8 *a0, s32 a1, s32 a2, s32 a3) {
     func_00133930(a2,a3);
 }
 
-INCLUDE_ASM("asm/game", func_0034FBC8);
+extern s32 D_001B23D4 __attribute__((section(".sdata")));
+extern s32 func_00133960(void);
+
+void func_0034FBC8(void *object) {
+    s32 *o = object;
+    s32 t = 0;
+    s32 next, i, count;
+    u8 *src;
+    u8 *dst;
+
+    switch (o[0]) {
+    case 1:
+        if (o[15] < 0x1000)
+            return;
+        t = 0x1000 - o[20];
+        break;
+    case 2:
+        t = (func_00133960() - o[24]) & 0xFFF;
+        break;
+    case 3:
+        return;
+    default:
+        break;
+    }
+    while (t >= 0x400 && o[15] >= o[6] * 1024) {
+        next = t - 0x400;
+        for (i = 0; i < o[6]; i++) {
+            count = 0;
+            src = (u8 *)o[13] + (o[14] - o[15] + o[16]) % o[16];
+            src += i * o[7];
+            dst = (u8 *)D_001B23D4;
+            do {
+                s32 k;
+                for (k = 0; k < o[7]; k++) {
+                    *dst++ = *src++;
+                    count++;
+                }
+                src += o[7] * (o[6] - 1);
+            } while (count < 0x400);
+            if (o[24] + 0x400 == 0x1000)
+                ((u8 *)D_001B23D4)[0x3F1] = 3;
+            if (o[24] == 0) {
+                u8 *p = (u8 *)D_001B23D4;
+                p[1] = 6;
+                p[0x11] = 2;
+            }
+            func_0034FB20((u8 *)o, D_001B23D4, 0x400, (i << 12) + o[24]);
+        }
+        t = next;
+        o[15] -= o[6] * 1024;
+        o[24] = (o[24] + 0x400) % 0x1000;
+        o[20] += 0x400;
+    }
+}
 
 /* func_0034FE18 is in 0034CEA0-g8.c. */
 

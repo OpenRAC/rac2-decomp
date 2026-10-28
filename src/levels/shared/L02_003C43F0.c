@@ -295,7 +295,7 @@ INCLUDE_ASM("asm/levels", func_L02_003CA280);
 
 INCLUDE_ASM("asm/levels", func_L02_003CC7B0);
 
-INCLUDE_ASM("asm/levels", func_L02_003CCCC8);
+
 
 INCLUDE_ASM("asm/levels", func_L02_003CCEA0);
 
@@ -727,7 +727,7 @@ void func_L02_003D6BC0(char *a0)
 
 /* Defined in L02_003D6DF8-helpers.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_003D6EE0);
+
 
 /* Defined in L02_003D7040-g8.c. */
 

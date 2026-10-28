@@ -1,10 +1,6 @@
 #include "include_asm.h"
+#include "common.h"
 
-typedef unsigned char  u8;
-typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed int     s32;
-typedef float          f32;
 
 /* Quadword copies and clears, the spelling that reaches lq/sq. */
 typedef int TI128 __attribute__((mode(TI)));
@@ -24,13 +20,9 @@ extern s32 func_3120A8(void *a0, u32 a1, u32 a2, u32 a3, u32 a4, u32 a5,
 
 extern s32 func_355780(u32 a0, u32 a1, void *a2);
 
-extern s32 func_2E45B8(f32 a0);
-
-extern void func_3377C8(u32 a0);
-
-extern void func_310060(u8 *a0, s32 a1, s32 a2);
-
-extern void func_310418(u8 *a0, s32 a1, s32 a2);
+extern void func_002A7750(void *a0, s32 a1, s32 a2);
+extern u8 *D_L01_001B255C_sda[] __attribute__((sda));
+extern u8 *D_L01_001FE180[];
 
 extern u8 *D_L01_001B255C;
 
@@ -90,7 +82,55 @@ void func_L01_003CC898(u8 *a0, u32 a1, u32 a2, u8 a3, u8 *a4)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L01_003CDB40);
+extern void func_L01_00323310(s32 a0, s32 a1);
+extern void func_002A7470(void *a0, s32 a1, s32 a2, s32 a3);
+extern s32 func_L01_00337A60(void *a0, void *a1, void *a2, s32 a3);
+
+/* While the owner's kind (+0x95) is 6, serves the two entities whose ids lie at +0xA0 and +0xA4. */
+s32 func_L01_003CDB40(u8 *a0)
+{
+    u8 *s0;
+    u8 *s1;
+    u8 *s2;
+    s32 *ids;
+    s32 i;
+    u8 *tbl;
+    s32 v;
+
+    s0 = *(u8 **)(a0 + 0x68);
+    if (a0[0x95] == 6)
+        return 0;
+    ids = (s32 *)(s0 + 0xA0);
+    for (i = 0; i < 2; i++) {
+        if (ids[i] == -1)
+            continue;
+        s1 = D_L01_001B255C_sda[0] + (ids[i] << 8);
+        s2 = *(u8 **)(s1 + 0x68);
+        if (a0[0x95] == 4 && *(s32 *)(s2 + 0x74) == 1)
+            func_L01_00323310(*(s32 *)(s0 + 0xD0), *(s32 *)(s0 + 0xD8));
+        if (s1[0x95] == 8)
+            continue;
+        v = *(s32 *)(s2 + 0xC0);
+        if (v < *(s32 *)(s0 + 0xBC))
+            v = *(s32 *)(s0 + 0xBC);
+        *(s32 *)(s0 + 0xBC) = v;
+        *(s32 *)(s2 + 0xC0) = v;
+        if (*(f32 *)(s0 + 0x20) <= 0.0f) {
+            if (a0[0x43] != 5)
+                func_002A7470(a0, 5, 0, 10);
+            *(f32 *)(s0 + 0x20) = 0.0f;
+            *(f32 *)(s2 + 0x20) = 0.0f;
+            if (s1[0x43] != 4 && s1[0x42] != 4)
+                func_002A7470(s1, 4, 0, 10);
+            s1[0x95] = 8;
+            func_002A7750(a0, 0, 6);
+        }
+        qcopy(s0 + 0x80, s2 + 0x60);
+        tbl = D_L01_001FE180[*(s32 *)(s0 + 0xA8)];
+        func_L01_00337A60(s0 + 0x70, s2 + 0x60, tbl + 0x10, *(s32 *)tbl);
+    }
+    return *(s32 *)(s0 + 0xBC);
+}
 
 /* Sends the timer string and steps the 0x2E/0x28/0x2A state fields of the owner. */
 INCLUDE_ASM("asm/levels", func_L01_003CDD00);
@@ -111,20 +151,16 @@ void func_L01_003CDE58(u8 *a0)
    assembler makes the loads $gp ones in a branch delay slot); the base takes a second name
    because D_L01_001B255C is declared above with its pointer type. */
 extern s32 D_L01_001B2578[] __attribute__((sda));
-extern u8 *D_L01_001B255C_base[] __asm__("D_L01_001B255C") __attribute__((sda));
 extern u16 *D_L01_001FB020[];
 extern u8 D_00189EA0[];
 
 extern void *func_002A9640(void *, s32, s32);
 extern f32 func_002A96A0(void *, void *);
 extern u8 *func_002AB1F0(u8 *);
-extern void func_002A7470(void *, s32, s32, s32);
-extern void func_002A7750(void *, s32, s32);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_00282F20(void *, void *, f32);
 extern f32 func_00283CE0(s32);
 extern void func_L01_002F14E8(s32, s32, f32);
-extern s32 func_L01_003CDB40(u8 *);
 
 /* While the owner's kind (+0x95) is 5 or 6 and its timer (+0x20) is positive, finds the entity
    func_002A9640 names (only when the state's halfword at +0x26 is below 1) and its distance
@@ -163,7 +199,7 @@ void func_L01_003CDEA8(u8 *a0)
                      a0[0x21] != 0xFF && a0[0x21] <= D_L01_001B2578[0] && p != 0 &&
                      ((p != 0 && (short)p[-1] >= 0) || p == D_L01_001FB020[a0[0x21]]);
                      p++) {
-                    e = D_L01_001B255C_base[0] + ((*p & 0x7FFF) << 8);
+                    e = D_L01_001B255C_sda[0] + ((*p & 0x7FFF) << 8);
                     if (e == 0)
                         break;
                     r = func_002AB1F0(e);
@@ -183,7 +219,7 @@ void func_L01_003CDEA8(u8 *a0)
         a0[0xA8] = 0xFF;
         if (*(f32 *)(state + 0x20) < 0.0f) {
             if (*(s32 *)(state + 0xCC) != -1)
-                func_0029F338(D_L01_001B255C_base[0] + (*(s32 *)(state + 0xCC) << 8));
+                func_0029F338(D_L01_001B255C_sda[0] + (*(s32 *)(state + 0xCC) << 8));
             *(s32 *)(state + 0xCC) = -1;
             if (a0[0x43] != 5)
                 func_002A7470(a0, 5, 0, 10);
@@ -227,7 +263,7 @@ INCLUDE_ASM("asm/levels", func_L01_003D1F40);
 
 INCLUDE_ASM("asm/levels", func_L01_003D25B8);
 
-INCLUDE_ASM("asm/levels", func_L01_003D26C0);
+/* func_L01_003D26C0 is in L01_003D26C0-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L01_003D2890);
 

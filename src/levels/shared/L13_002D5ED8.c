@@ -167,4 +167,44 @@ void func_L13_003ECD48(unsigned char *m)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L13_00406E30);
+/* The level's entity table: 0x100 bytes an entry. */
+extern char *D_L13_001B291C __attribute__((section(".sdata")));
+
+/* Compares the choice (0, 1 or 2) at +0x2CC of the object's state with its opponent's:
+ * the entity the state names at +0x2C8 decides the opponent by its kind at +0xAA (0xEA3
+ * reads the partner state's +0x2CC, 0xEA4 its +0x2C4; any other kind is a draw). Returns
+ * 2 for a draw, 1 when the object's choice wins (0 over 1, 1 over 2, 2 over 0), else 0. */
+int func_L13_00406E30(char *object)
+{
+    char *state = *(char **)(object + 0x68);
+    char *entity = D_L13_001B291C + (*(int *)(state + 0x2C8) << 8);
+    int mine;
+    int other;
+
+    if (*(short *)(entity + 0xAA) == 0xEA3) {
+        mine = *(int *)(state + 0x2CC);
+        other = *(int *)(*(char **)(entity + 0x68) + 0x2CC);
+    } else if (*(short *)(entity + 0xAA) == 0xEA4) {
+        mine = *(int *)(state + 0x2CC);
+        other = *(int *)(*(char **)(entity + 0x68) + 0x2C4);
+    } else {
+        other = *(int *)(state + 0x2CC);
+        mine = other;
+    }
+
+    if (mine == other)
+        return 2;
+    if (mine == 0 && other == 1)
+        return 1;
+    if (mine == 1 && other == 2)
+        return 1;
+    if (mine == 2 && other == 0)
+        return 1;
+    if (mine == 0 && other == 2)
+        return 0;
+    if (mine == 1 && other == 0)
+        return 0;
+    if (mine == 2 && other == 1)
+        return 0;
+    return 2;
+}

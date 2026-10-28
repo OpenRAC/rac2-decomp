@@ -351,7 +351,63 @@ void func_0026FEB8(const char *format,...) {
 INCLUDE_ASM("asm/game", func_0026FEF0);
 
 
-INCLUDE_ASM("asm/game", func_00270018);
+typedef struct {
+    u8 pad[0x3D0];
+    float f3D0;
+    float f3D4;
+    float f3D8;
+    float f3DC;
+    float f3E0;
+    float f3E4;
+    u8 mode;
+    u8 active;
+    short s3EA;
+    float f3EC;
+    float f3F0;
+} F270018Aim;
+
+extern F270018Aim D_001B5200;
+extern float D_001B90F0[];
+extern float func_002703B0(char *, float, float, float, float, float);
+extern float func_00283198(float);
+extern float func_00283180(float);
+extern float func_002A7C00(float, float, float);
+extern float func_00283CE0(int);
+extern int func_00282978(void *);
+extern void func_0027AB40(void);
+
+void func_00270018(void) {
+    float half;
+    float t;
+
+    if (D_001B5200.active == 1) {
+        switch (D_001B5200.mode) {
+        case 0:
+            D_001B5200.f3D8 = D_001B5200.f3D4;
+            D_001B5200.active = 0;
+            break;
+        case 3:
+            D_001B5200.f3D8 = func_002703B0((char *)&D_001B5200.f3D0, D_001B5200.f3D8, D_001B5200.f3D4, D_001B5200.f3DC, D_001B5200.f3E0, D_001B5200.f3E4);
+            if (func_00282C48(D_001B5200.f3D0) < 0.0001f)
+                D_001B5200.active = 0;
+            break;
+        case 1:
+            if (func_00282978(&D_001B5200.s3EA))
+                D_001B5200.active = 0;
+            t = func_00283CE0(D_001B5200.s3EA) * D_001B5200.f3EC;
+            D_001B5200.f3D8 = D_001B5200.f3D4 + (D_001B5200.f3F0 - D_001B5200.f3D4) * t;
+            break;
+        case 2:
+            if (func_00282978(&D_001B5200.s3EA))
+                D_001B5200.active = 0;
+            D_001B5200.f3D8 = func_002A7C00(D_001B5200.f3D4, D_001B5200.f3F0, func_00283CE0(D_001B5200.s3EA) * D_001B5200.f3EC);
+            break;
+        }
+        half = D_001B5200.f3D8 * 0.5f;
+        D_001B90F0[0] = func_00283198(half) / func_00283180(half);
+        func_0027AB40();
+    }
+}
 
 
 extern void func_00282B50(void *, void *, int);
@@ -638,7 +694,6 @@ void func_00272280(void)
     }
 }
 
-INCLUDE_ASM("asm/game", func_00272368);
 
 INCLUDE_ASM("asm/game", func_00272540);
 
@@ -669,7 +724,6 @@ INCLUDE_ASM("asm/game", func_00272CB0);
 
 
 
-INCLUDE_ASM("asm/game", func_00273418);
 
 
 /* Blends the fog preset between the two colours and depth ranges of the camera environment

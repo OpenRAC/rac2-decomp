@@ -145,3 +145,34 @@ void func_00342118(char *object, void *arg)
     *(int *)(object + 0x17C) = 4;
     func_00348118(object + 0x188, *(int *)(object + 0x16C));
 }
+
+extern float D_001AE130 __attribute__((sda));
+extern float D_001AE134 __attribute__((sda));
+extern int D_00138344[];
+extern int func_00341E90(void *);
+extern int *func_00335E20(void *);
+extern void func_00336320(void *);
+extern void func_00348138(void *);
+extern int func_002A9588(int, int, int, int, int);
+
+void func_00341F38(char *self)
+{
+    int count = func_00348130(self + 0x10);
+    int i;
+    int *slot;
+
+    if (D_00138344[0] & 0x5000)
+        func_002A9588(0, 0, 1, 0, 1);
+    for (i = 0; i < count; i++) {
+        float step = (float)i;
+        func_00335E38(self + 0xDC, (*(float **)self)[0] + D_001AE134,
+                      (*(float **)self)[1] + D_001AE130 * step, 0.0f, 0.0f);
+        func_00335E38(self + 0x128, (*(float **)self)[0] + D_001AE134,
+                      (*(float **)self)[1] + D_001AE130 * step, 0.0f, 0.0f);
+        slot = func_00335E20(self + 0x128);
+        *slot = func_00341E90(self) == i ? func_002A9588(0x20FFFEED, 0x70FFFEED, 0x14, 0, 0) : 0x55F0C070;
+        func_00336320(self + 0xDC);
+        func_00336320(self + 0x128);
+    }
+    func_00348138(self + 0x10);
+}

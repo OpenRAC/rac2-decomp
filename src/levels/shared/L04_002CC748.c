@@ -317,7 +317,7 @@ INCLUDE_ASM("asm/levels", func_L04_003524D0);
 INCLUDE_ASM("asm/levels", func_L04_00358868);
 
 
-INCLUDE_ASM("asm/levels", func_L04_0035F3E0);
+/* func_L04_0035F3E0 is defined in L04_0035F3E0-qcopy.c. */
 
 void *func_L04_00362768(void *a0, void *a1, u32 a2, f32 f3) {
     L04Record *p = (L04Record *)(u32)func_002B9030(0x5E);
@@ -409,7 +409,7 @@ void func_L04_00362A50(char *self) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L04_00363690);
+/* func_L04_00363690 is defined in L04_00363690-qcopy.c. */
 
 /* func_L04_00363CA0 is matched in L04_00363CA0.c (built with -frac2-qcopy). */
 

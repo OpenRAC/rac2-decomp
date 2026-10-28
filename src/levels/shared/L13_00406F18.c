@@ -133,7 +133,7 @@ INCLUDE_ASM("asm/levels", func_L13_00409C40);
 
 INCLUDE_ASM("asm/levels", func_L13_00409EE8);
 
-INCLUDE_ASM("asm/levels", func_L13_0040A0A0);
+/* func_L13_0040A0A0 is defined in L13_0040A0A0.c. */
 
 INCLUDE_ASM("asm/levels", func_L13_0040A2C8);
 

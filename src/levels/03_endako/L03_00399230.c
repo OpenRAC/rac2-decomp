@@ -218,6 +218,39 @@ INCLUDE_ASM("asm/levels", func_L03_003D22C8);
 INCLUDE_ASM("asm/levels", func_L03_003D2518);
 
 
-INCLUDE_ASM("asm/levels", func_L03_003E18D8);
+extern void *func_0029EFD0(int);
+extern void func_002A0F48(void *);
+
+/* Spawns a kind-0xB1B object owned by OWNER at POSITION: opaque, a 0.015 rate, its state
+   taking the two vectors, the three floats (in reverse order), a 0x10E word and the
+   three bytes (the last twice). Returns the object, or 0. */
+u8 *func_L03_003E18D8(char *owner, void *position, void *first, void *second,
+                        u8 a, u8 b, u8 c, f32 x, f32 y, f32 z)
+{
+    u8 *object;
+    u8 *state;
+
+    object = func_0029EFD0(0xB1B);
+    if (object != 0) {
+        qcopy(object + 0x10, position);
+        object[0x30] = *(u16 *)(object + 0x32) = 0xFF;
+        *(f32 *)(object + 0x2C) = 0.015f;
+        *(char **)(object + 0xB8) = owner;
+        object[0x20] = 0;
+        state = *(u8 **)(object + 0x68);
+        qcopy(state, first);
+        qcopy(state + 0x10, second);
+        *(f32 *)(state + 0x64) = z;
+        state[0x75] = a;
+        state[0x76] = b;
+        state[0x77] = c;
+        state[0x78] = c;
+        *(f32 *)(state + 0x68) = y;
+        *(f32 *)(state + 0x6C) = x;
+        *(s32 *)(state + 0x70) = 0x10E;
+        func_002A0F48(object);
+    }
+    return object;
+}
 
 INCLUDE_ASM("asm/levels", func_L03_003E1C88);

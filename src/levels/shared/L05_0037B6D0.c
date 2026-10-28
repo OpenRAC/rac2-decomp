@@ -320,7 +320,7 @@ void func_L05_003D08C0(float *a0, char *a1)
     func_306630(a0, a0, a1 + 0x30);
 }
 
-INCLUDE_ASM("asm/levels", func_L05_003D0960);
+/* func_L05_003D0960 is in L05_003D0960-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L05_003D0B20);
 
