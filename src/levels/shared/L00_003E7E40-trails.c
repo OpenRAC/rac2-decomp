@@ -29,7 +29,10 @@ extern float D_L00_001B068C __attribute__((sda));
 extern int D_L00_001B0694 __attribute__((sda));
 
 /* The sampler clamps n to its limit and writes only output[0..n-1]. The
- * constructor consumes all four floats from each trail vector, including w.
+ * constructor consumes all four floats from each endpoint, including size w.
+ * Sampled position w is not guaranteed initialized: the constructor transfers
+ * it, but the family-2 update adds XYZ only and the normal renderer replaces
+ * the output w with zero before consumption. No extra initialization is added.
  * Retail performs the initial zero-z and randomized-w stores before later
  * overwrites; its RNG calls and actual writes are retained without qualifiers.
  * The second radial lower bound is absolute, including at the RNG call site:
