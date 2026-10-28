@@ -262,7 +262,7 @@ INCLUDE_ASM("asm/levels", func_L18_004302B0);
 
 INCLUDE_ASM("asm/levels", func_L18_00432070);
 
-INCLUDE_ASM("asm/levels", func_L18_00432310);
+/* func_L18_00432310 is in L18_00432310.c. */
 
 extern float func_00283248(float, float);
 
