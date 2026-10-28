@@ -34,7 +34,9 @@ extern int ref_L00_00300048_04(int, int);
 
 extern void ref_L00_00300048_05(f32 *, f32 *, int, int, int, int, int, int, f32, f32, f32, f32);
 
-void func_00300048(void)
+/* The carrying USA preview callers supply their object in a0; retail
+ * ignores that input while generating the shared effect. */
+void func_00300048(void *unused_object)
 {
     f32 a[4], b[4], c[4], d[4];
     f32 *p = ref_L00_00300048_00;
