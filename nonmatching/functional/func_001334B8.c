@@ -2,6 +2,9 @@
 extern int D_001A748C __attribute__((sda));
 extern int D_001A7494 __attribute__((sda));
 extern int D_001A7498 __attribute__((sda));
+extern int D_001A7100;
+extern int D_001A7110;
+extern char D_001A713F;
 extern void func_0011B3D0(void *, void *);
 extern int func_001253A8(void);
 extern int func_00133580(int);
@@ -16,9 +19,9 @@ int func_001334B8(int arg0, int arg1, int arg2) {
     if (func_00133580(1) == 1) {
         return 0;
     }
-    *(int *)0x1A7100 = 1;
-    *(int *)0x1A7110 = 0;
-    func_0011B3D0((void *)0x1A7100, (void *)0x1A713F);
+    D_001A7100 = 1;
+    D_001A7110 = 0;
+    func_0011B3D0(&D_001A7100, &D_001A713F);
     payload[0] = arg0;
     payload[1] = arg1;
     payload[2] = arg2;

@@ -2,6 +2,7 @@
 extern float func_00283CE0(int);
 extern float func_00282E20(float *);
 extern float func_00283248(float, float);
+extern unsigned char D_001A7A44;
 extern float func_00283C80(float, float);
 
 void func_002B88F0(char *p, unsigned char *raw, int type) {
@@ -46,7 +47,7 @@ void func_002B88F0(char *p, unsigned char *raw, int type) {
             f[0x100 / 4 + i] = func_00283CE0(raw[2 + i]) * 0.003921569f;
         }
     }
-    if (*(unsigned char *)0x1A7A44 != 0) {
+    if (D_001A7A44 != 0) {
         f[0x108 / 4] = -f[0x108 / 4];
         f[0x100 / 4] = -f[0x100 / 4];
         v = w[0x1A0 / 4];
@@ -96,7 +97,7 @@ void func_002B88F0(char *p, unsigned char *raw, int type) {
     w[0x1A8 / 4] = a1;
     w[0x1C0 / 4] = t0;
     w[0x348 / 4] = t0;
-    if (*(unsigned char *)0x1A7A44 != 0) {
+    if (D_001A7A44 != 0) {
         f[0x148 / 4] = -f[0x148 / 4];
         f[0x140 / 4] = -f[0x140 / 4];
         if (t0 & 0x8000) {

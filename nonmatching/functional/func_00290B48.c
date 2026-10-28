@@ -1,7 +1,9 @@
-/* functional: medium. fcheck SAME on all captured calls; same stores of the same values as retail, only allocation and store order differ. The two program-end references are the constants 0x351FC0 and 0x2000000 read off the retail words (boot build). */
+/* functional: medium. Same stores of the same values as retail, only allocation and store order differ. The program's end and the top of memory are the function's two externals ref_L00_00290B48_00/_01 (in the boot 0x351FC0 and 0x2000000), as in the near miss. */
 extern void *func_00115484(void *, int, int);
 extern char D_001BAEC0[];
 extern int D_001B22B0;
+extern char ref_L00_00290B48_00[];
+extern char ref_L00_00290B48_01[];
 
 void func_00290B48(void)
 {
@@ -10,8 +12,8 @@ void func_00290B48(void)
     unsigned int top, block1, block2, block3, block4, block5;
 
     func_00115484(state, 0, 0x9C);
-    top = 0x2000000u - 0x8000;
-    start = (0x351FC0u + 0x3FFF) & ~0x3FFF;
+    top = (unsigned int)ref_L00_00290B48_01 - 0x8000;
+    start = ((unsigned int)ref_L00_00290B48_00 + 0x3FFF) & ~0x3FFF;
     block1 = top - 0x40000;
     block2 = block1 - 0x64000;
     first = start + D_001B22B0;
