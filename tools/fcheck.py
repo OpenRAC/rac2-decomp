@@ -36,6 +36,13 @@ Placement. Each relocation is resolved against retail's addresses:
   gets its section in the kernel area, which the note says;
 - a read-only section (.rodata: strings, constants, switch jump tables): copied after NAME
   with its own relocations resolved, so a jump table's entries go to the placed code;
+- a variable the candidate defines in a writable section under a name with a retail address
+  (D_XXXXXXXX, an sda one among them, even when the reference names the section, as a static's
+  or an initialised small-data global's does): that address. An sda alias D_XXXXXXXX_sda or
+  D_XXXXXXXX__gp is D_XXXXXXXX;
+- a name none of these places (a near miss's ref_LNN_XXXXXXXX_kk, the kk-th external of a
+  function): the value retail's bytes give it under the candidate's relocations, its
+  instructions aligned to retail's by kind (the note names each value so read);
 - a $gp-relative reference (-G8 units, R_MIPS_GPREL16/LITERAL): the target must be within
   $gp's 64 KB window (retail's $gp, 0x1AEFF0). A read-only constant is used where retail has
   the same bytes there (the unit's own placement, else core.lit / .lit); anything else out of
@@ -283,6 +290,178 @@ def unit_values(unit: Path, name: str) -> tuple[dict[str, int], dict[str, int]]:
     return own, {k: next(iter(v)) for k, v in others.items() if len(v) == 1}
 
 
+def sda_alias(name: str) -> str | None:
+    """The variable an sda alias names: D_XXXXXXXX_sda (a second, $gp-relative declaration of
+    D_XXXXXXXX), or SDATA()'s assembler name D_XXXXXXXX__gp; None for another name."""
+    m = re.fullmatch(r"(\w+?)(?:_sda|__gp)", name)
+    return m.group(1) if m else None
+
+
+# Opcodes whose 16-bit immediate is an address's low half on a base register: addiu, the
+# loads and stores (lq/sq, ldl/ldr, lwc1/swc1, ld/sd and the rest).
+ADDRESS_OPS = {0x09, 0x1A, 0x1B, 0x1E, 0x1F, *range(0x20, 0x30), 0x31, 0x35, 0x37, 0x39, 0x3D, 0x3F}
+LOADS = {0x1A, 0x1B, 0x1E, *range(0x20, 0x28), 0x37}
+
+
+def retail_references(ref: bytes, address: int) -> list[tuple[str, int]]:
+    """The addresses retail's code at ADDRESS forms, in order: ("call", target) for a jal or j,
+    ("data", address) for a %lo-style use of a lui's register or a $gp-based access."""
+    sext = build.sext
+    hi: dict[int, int] = {}
+    out = []
+    for at in range(0, len(ref) - 3, 4):
+        w = struct.unpack_from("<I", ref, at)[0]
+        op, rs, rt, rd = w >> 26, (w >> 21) & 31, (w >> 16) & 31, (w >> 11) & 31
+        if op in (2, 3):
+            out.append(("call", ((address + at + 4) & 0xF0000000) | ((w & 0x3FFFFFF) << 2)))
+            if op == 3:
+                hi.pop(31, None)
+            continue
+        if op == 0x0F:
+            hi[rt] = (w & 0xFFFF) << 16
+            continue
+        if op in ADDRESS_OPS and (rs in hi or rs == 28):
+            out.append(("data", ((GP if rs == 28 else hi[rs]) + sext(w & 0xFFFF)) & 0xFFFFFFFF))
+        # What the instruction writes no longer holds a lui's value.
+        if op in (0, 0x1C):
+            hi.pop(rd, None)
+        elif op in LOADS or 0x08 <= op <= 0x0E or (op == 0x11 and rs in (0, 2)):
+            hi.pop(rt, None)
+    return out
+
+
+def signature(w: int) -> tuple[int, int]:
+    """An instruction's kind, without its registers and immediate: the opcode, and the function
+    field of SPECIAL/MMI ones, the rt field of REGIMM's."""
+    op = w >> 26
+    return op, (w & 0x3F if op in (0, 0x1C) else (w >> 16) & 0x1F if op == 1 else 0)
+
+
+def aligned_by_position(obj: dict, index: int, start: int, end: int, address: int, ref: bytes) -> dict[str, int]:
+    """aligned_values' first pass: the candidate's instructions aligned to retail's by kind (the
+    longest common runs); a relocated one whose retail counterpart is the same instruction (a
+    jump, a lui with the %lo instruction based on the register it loaded, a $gp-based access)
+    gives its symbol a value, kept when every such use agrees."""
+    import difflib
+    data = bytes(obj["sections"][index]["data"])
+    word = lambda blob, at: struct.unpack_from("<I", blob, at)[0]
+    mine = [word(data, a) for a in range(start, end - 3, 4)]
+    theirs = [word(ref, a) for a in range(0, len(ref) - 3, 4)]
+    m = difflib.SequenceMatcher(None, [signature(w) for w in mine], [signature(w) for w in theirs], autojunk=False)
+    at_retail: dict[int, int] = {}
+    for a, b, n in m.get_matching_blocks():
+        for k in range(n):
+            at_retail[start + 4 * (a + k)] = 4 * (b + k)
+    rel = obj["relocations"].get(index, [])
+    sext = build.sext
+    seen: dict[str, set[int]] = {}
+    for k, (at, kind, s) in enumerate(rel):
+        sy = obj["symbols"][s]
+        n = sy["name"]
+        if not n or sy["type"] == STT_SECTION or at not in at_retail:
+            continue
+        w, r = word(data, at), word(ref, at_retail[at])
+        if kind == elf.R_MIPS_26:
+            v = ((address & 0xF0000000) | ((r & 0x3FFFFFF) << 2)) - ((w & 0x3FFFFFF) << 2)
+        elif kind == elf.R_MIPS_HI16:
+            lo = next((o for o, t, ss in rel[k + 1:] if t == elf.R_MIPS_LO16 and ss == s), None)
+            if lo is None or lo not in at_retail or r >> 26 != 0x0F:
+                continue
+            rl = word(ref, at_retail[lo])
+            if (rl >> 21) & 31 != (r >> 16) & 31:
+                continue
+            v = (((r & 0xFFFF) << 16) + sext(rl & 0xFFFF)
+                 - (((w & 0xFFFF) << 16) + sext(word(data, lo) & 0xFFFF)))
+        elif kind == elf.R_MIPS_GPREL16:
+            if (r >> 21) & 31 != 28:
+                continue
+            v = GP + sext(r & 0xFFFF) - sext(w & 0xFFFF)
+        else:
+            continue
+        seen.setdefault(n, set()).add(v & 0xFFFFFFFF)
+    return {n: next(iter(v)) for n, v in seen.items() if len(v) == 1}
+
+
+def aligned_values(obj: dict, name: str, known=lambda n: None) -> dict[str, int]:
+    """Values of the symbols NAME's candidate section refers to that nothing else places (a near
+    miss's `ref_LNN_XXXXXXXX_kk`, the kk-th external of a function: a value of each program, which
+    no matched function of the boot may give), read from retail's bytes as tools/build.py reads
+    them under the relocations, for a candidate that is not byte-identical: its references, in
+    order, are aligned to the addresses retail's code forms (retail_references), the symbols KNOWN
+    or the first pass (aligned_by_position) gives a value anchoring the alignment, and a symbol
+    takes the value every use aligned to retail agrees on."""
+    sym = next((s for s in obj["symbols"] if s["name"] == name and s["type"] == STT_FUNC and 0 < s["section"] < 0xFF00), None)
+    if sym is None or name not in boot_functions():
+        return {}
+    address, size = boot_functions()[name]
+    index = sym["section"]
+    data = bytes(obj["sections"][index]["data"])
+    rel = obj["relocations"].get(index, [])
+    word = lambda at: struct.unpack_from("<I", data, at)[0]
+    sext = build.sext
+    # The candidate's references in address order: (kind, symbol name or None, addend).
+    pairs = {}
+    for k, (at, kind, s) in enumerate(rel):
+        if kind == elf.R_MIPS_HI16:
+            lo = next((o for o, t, ss in rel[k + 1:] if t == elf.R_MIPS_LO16 and ss == s), None)
+            if lo is not None:
+                pairs.setdefault(lo, ((word(at) & 0xFFFF) << 16) + sext(word(lo) & 0xFFFF))
+    mine = []
+    for at, kind, s in sorted(rel):
+        sy = obj["symbols"][s]
+        n = sy["name"] if sy["type"] != STT_SECTION else None
+        if kind == elf.R_MIPS_26:
+            mine.append(("call", n, (word(at) & 0x3FFFFFF) << 2))
+        elif kind == elf.R_MIPS_LO16:
+            mine.append(("data", n, pairs.get(at, sext(word(at) & 0xFFFF))))
+        elif kind == elf.R_MIPS_GPREL16 and n and sy["section"] == 0:
+            mine.append(("data", n, sext(word(at) & 0xFFFF)))
+        elif kind in (elf.R_MIPS_GPREL16, 8):
+            mine.append(("data", None, 0))
+    ref = retail_bytes(address, size)
+    end = min(len(data), sym["value"] + sym["size"]) if sym.get("size") else len(data)
+    first = aligned_by_position(obj, index, sym["value"], end, address, ref)
+    theirs = retail_references(ref, address)
+    value = {}
+    for kind, n, addend in mine:
+        if n and n not in value:
+            v = known(n)
+            v = first.get(n) if v is None else v
+            value[n] = None if v is None else v & 0xFFFFFFFF
+
+    def score(a, b) -> int:
+        (ka, n, addend), (kb, r) = a, b
+        if ka != kb:
+            return -1
+        if n is None or value.get(n) is None:
+            return 1                       # free: a section's or an unknown symbol's use
+        return 3 if (value[n] + addend) & 0xFFFFFFFF == r else -1
+
+    # The best alignment (most agreeing anchors), by dynamic programming.
+    M, N = len(mine), len(theirs)
+    best = [[0] * (N + 1) for _ in range(M + 1)]
+    for i in range(M - 1, -1, -1):
+        for j in range(N - 1, -1, -1):
+            s = score(mine[i], theirs[j])
+            best[i][j] = max(best[i + 1][j], best[i][j + 1], best[i + 1][j + 1] + s if s > 0 else 0)
+    seen: dict[str, set[int]] = {}
+    i = j = 0
+    while i < M and j < N:
+        s = score(mine[i], theirs[j])
+        if s > 0 and best[i][j] == best[i + 1][j + 1] + s:
+            kind, n, addend = mine[i]
+            if n and value.get(n) is None:
+                seen.setdefault(n, set()).add((theirs[j][1] - addend) & 0xFFFFFFFF)
+            i, j = i + 1, j + 1
+        elif best[i][j] == best[i + 1][j]:
+            i += 1
+        else:
+            j += 1
+    out = {n: v for n, v in first.items() if known(n) is None}
+    out.update({n: next(iter(v)) for n, v in seen.items() if len(v) == 1})
+    return out
+
+
 # --- Placing ---------------------------------------------------------------------------------
 
 def gp_literal(data: bytes) -> int | None:
@@ -324,6 +503,10 @@ class Placer:
                     and 0 < s["section"] < 0xFF00), None)
         if sym is None:
             raise Link(f"LINK {name} is not defined by the candidate")
+        # The gp the assembler assumed (.reginfo's last word): a $gp-relative reference to a local
+        # symbol holds its offset less it (S + A + GP0 - GP, as the linker reads it).
+        reginfo = next((s for s in obj["sections"] if s["name"] == ".reginfo" and len(s["data"]) >= 24), None)
+        self.gp0 = struct.unpack_from("<i", bytes(reginfo["data"]), 20)[0] if reginfo else 0
         self.own = sym["section"]
         self.copy(self.own)
         self.entry = self.where[self.own] + sym["value"]
@@ -362,6 +545,23 @@ class Placer:
             self.notes.append(f"{sec['name']} has no retail placement: placed fresh in the kernel area")
         return self.copy(index)
 
+    def target(self, sym: dict, addend: int) -> int:
+        """Where a reference to SYM plus ADDEND goes. Into a writable section of the candidate, a
+        variable it defines there with a retail address (a D_ name, an sda one among them) is
+        at that address, whatever the section's own placement: the reference may name the
+        section (a static, or an initialised small-data global) and not the variable."""
+        index = sym["section"]
+        if sym["type"] == STT_SECTION and 0 < index < 0xFF00:
+            sec = self.obj["sections"][index]
+            if sec.get("flags", 0) & SHF_WRITE or sec["type"] == elf.SHT_NOBITS:
+                for s in self.obj["symbols"]:
+                    if (s["section"] == index and s["type"] != STT_SECTION and s["name"]
+                            and s["value"] <= addend < s["value"] + max(s.get("size", 0), 1)):
+                        v = self.named(s["name"])
+                        if v is not None:
+                            return v + addend - s["value"]
+        return self.value(sym) + addend
+
     def value(self, sym: dict) -> int:
         if sym["type"] == STT_SECTION:
             return self.section(sym["section"])
@@ -376,6 +576,9 @@ class Placer:
             return self.section(sym["section"]) + sym["value"]
         if sym["section"] == SHN_ABS:
             return sym["value"]
+        if n.startswith("ref_"):
+            raise Link(f"LINK {n} has no retail address: no matched function gives it, and its uses do not "
+                       "line up with retail's (name it D_XXXXXXXX)")
         raise Link(f"LINK {n or '?'} has no retail address")
 
     def relocate(self) -> None:
@@ -392,6 +595,14 @@ class Placer:
         word = lambda at: struct.unpack_from("<I", orig, at)[0]
         put = lambda at, v: struct.pack_into("<I", self.image, off + at, v & 0xFFFFFFFF)
         sext = build.sext
+        # Each %hi pairs with the next %lo of its symbol in the object's order, as the linker
+        # does; that %lo's full addend (for a reference into a section) is the pair's.
+        ahl_of_lo: dict[int, int] = {}
+        for k, (at, kind, s) in enumerate(rel):
+            if kind == elf.R_MIPS_HI16:
+                lo = next((o for o, t, ss in rel[k + 1:] if t == elf.R_MIPS_LO16 and ss == s), None)
+                if lo is not None:
+                    ahl_of_lo.setdefault(lo, ((word(at) & 0xFFFF) << 16) + sext(word(lo) & 0xFFFF))
         for k, (at, kind, s) in enumerate(rel):
             sym = obj["symbols"][s]
             w = word(at)
@@ -403,11 +614,10 @@ class Placer:
                                "is outside $gp's window: give the data a retail D_ address")
                 put(at, (w & 0xFFFF0000) | (d & 0xFFFF))
                 continue
-            v = self.value(sym)
             if kind == elf.R_MIPS_32:
-                put(at, w + v)
+                put(at, self.target(sym, w))
             elif kind == elf.R_MIPS_26:
-                target = v + ((w & 0x3FFFFFF) << 2)
+                target = self.target(sym, (w & 0x3FFFFFF) << 2)
                 if (target ^ (self.base + off + at)) & 0xF0000000:
                     raise Link("LINK a jump out of its 256 MB region")
                 put(at, (w & 0xFC000000) | ((target >> 2) & 0x3FFFFFF))
@@ -417,9 +627,11 @@ class Placer:
                 if lo is None:
                     raise Link(f"LINK a %hi at +{at:#x} without its %lo")
                 ahl = ((w & 0xFFFF) << 16) + sext(word(lo) & 0xFFFF)
-                put(at, (w & 0xFFFF0000) | (((v + ahl + 0x8000) >> 16) & 0xFFFF))
+                put(at, (w & 0xFFFF0000) | (((self.target(sym, ahl) + 0x8000) >> 16) & 0xFFFF))
             elif kind == elf.R_MIPS_LO16:
-                put(at, (w & 0xFFFF0000) | ((v + sext(w & 0xFFFF)) & 0xFFFF))
+                lo = sext(w & 0xFFFF)
+                ahl = ahl_of_lo.get(at, lo)
+                put(at, (w & 0xFFFF0000) | ((self.target(sym, ahl) - ahl + lo) & 0xFFFF))
             else:
                 raise Link(f"LINK relocation type {kind} not handled")
 
@@ -428,6 +640,8 @@ class Placer:
         is not reachable from where it is copied: the same bytes in retail's window are used."""
         index = sym["section"]
         sec = self.obj["sections"][index] if 0 < index < 0xFF00 else None
+        if sym["type"] == STT_SECTION or (sym.get("bind", 1) == 0 and sec is not None):
+            addend += self.gp0
         if (sym["type"] == STT_SECTION and sec is not None and not sec["name"].startswith(".text")
                 and not sec.get("flags", 0) & SHF_WRITE and sec["type"] != elf.SHT_NOBITS):
             width = WIDTH.get(ins >> 26, 4)
@@ -436,7 +650,7 @@ class Placer:
             if a is None:
                 raise Link(f"LINK the constant {data.hex()} in {sec['name']} (read $gp-relative) is nowhere in retail's $gp window")
             return a
-        return self.value(sym) + addend
+        return self.target(sym, addend)
 
     def segments(self) -> list[tuple[int, bytes]]:
         return [(self.base, bytes(self.image))]
@@ -510,7 +724,11 @@ def build_candidate(name: str, candidate: Path | None, out: Path, includes: list
     table = boot_functions()
     derived = {k: int(v, 16) for k, v in placed().get("values", {}).items()}
 
+    aligned: dict[str, int] | None = None
+    from_bytes: list[str] = []
+
     def named(n: str) -> int | None:
+        nonlocal aligned
         for d in (own,):
             if n in d:
                 return d[n] & 0xFFFFFFFF
@@ -520,7 +738,22 @@ def build_candidate(name: str, candidate: Path | None, out: Path, includes: list
             return derived[n]
         if n in others:
             return others[n] & 0xFFFFFFFF
-        return build.address_in_name(n)
+        v = build.address_in_name(n)
+        if v is not None:
+            return v
+        if sda_alias(n):
+            v = named(sda_alias(n))
+            if v is not None:
+                return v
+        # Else (a near miss's ref_ name): the value retail's own bytes give it.
+        if aligned is None:
+            aligned = {}          # (no recursion through named while aligning)
+            aligned = aligned_values(obj, name, named)
+        if n in aligned:
+            if n not in from_bytes:
+                from_bytes.append(n)
+            return aligned[n]
+        return None
 
     def function(n: str) -> int | None:
         return table[n][0] if n in table else named(n)
@@ -540,6 +773,9 @@ def build_candidate(name: str, candidate: Path | None, out: Path, includes: list
 
     p = Placer(obj, name, named, function, writable, literal)
     p.relocate()
+    if from_bytes:
+        p.notes.append("read from retail's bytes by alignment: " + ", ".join(
+            f"{n}={aligned[n]:#010x}" for n in from_bytes))
     segs = p.segments()
     files = []
     for i, (a, data) in enumerate(segs):

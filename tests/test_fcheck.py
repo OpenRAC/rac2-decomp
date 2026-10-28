@@ -2,6 +2,7 @@
 import struct
 import sys
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -123,6 +124,44 @@ class PlacerTests(unittest.TestCase):
         bad = dict(obj, relocations={1: [(8, elf.R_MIPS_HI16, 2)]})
         with self.assertRaises(fcheck.Link):
             placer(bad, named=lambda n: 0x0023FFF8)
+
+    def test_named_variables_in_writable_sections_go_to_their_address(self):
+        # An initialised sda global or a static is reached through its section's symbol, its
+        # $gp-relative offset less the object's gp0 (.reginfo): still its named address.
+        gp0 = 0x4000
+        text = words(LW_GP | ((0 - gp0) & 0xFFFF), LW_GP | ((4 - gp0) & 0xFFFF), LUI_V0, ADDIU_V0 | 4, JR_RA, 0)
+        reginfo = words(0, 0, 0, 0, 0, gp0)
+        obj = {"sections": [section(""), section(".text.func_00200000", text, flags=6),
+                            section(".sdata", words(0, 0), flags=3), section(".reginfo", reginfo, flags=2)],
+               "symbols": [sym("", 0), sym("", 2, kind=fcheck.STT_SECTION), sym("func_00200000", 1),
+                           sym("D_001A748C", 2, 0, kind=1, size=4), sym("D_001A7498", 2, 4, kind=1, size=4)],
+               "relocations": {1: [(0, elf.R_MIPS_GPREL16, 1), (4, elf.R_MIPS_GPREL16, 1),
+                                   (8, elf.R_MIPS_HI16, 1), (12, elf.R_MIPS_LO16, 1)]}}
+        names = {"D_001A748C": 0x001A748C, "D_001A7498": 0x001A7498}
+        p, image = placer(obj, named=names.get, writable=lambda s: 0x00238C80)
+        self.assertEqual(word(image, 0) & 0xFFFF, (0x001A748C - GP) & 0xFFFF)
+        self.assertEqual(word(image, 4) & 0xFFFF, (0x001A7498 - GP) & 0xFFFF)
+        self.assertEqual(word(image, 8) & 0xFFFF, 0x001A)
+        self.assertEqual(word(image, 12) & 0xFFFF, 0x7498)
+        self.assertNotIn(2, p.where)          # the section itself was never needed
+        self.assertEqual(fcheck.sda_alias("D_001A7C04_sda"), "D_001A7C04")
+        self.assertEqual(fcheck.sda_alias("D_001A748C__gp"), "D_001A748C")
+        self.assertIsNone(fcheck.sda_alias("D_001A748C"))
+
+    def test_ref_values_read_from_retail_by_alignment(self):
+        # The near miss has an extra instruction; its %hi/%lo of ref_..._00 (plus 0x3FFF) and
+        # its call of ref_..._01 line up with retail's, which give the values.
+        ADDIU_SP, OR_V0 = 0x27BDFFF0, 0x00431025
+        mine = words(ADDIU_SP, LUI_V0, OR_V0, ADDIU_V0 | 0x3FFF, JAL, 0, JR_RA, 0)
+        retail = words(ADDIU_SP, LUI_V0 | 0x0035, ADDIU_V0 | 0x5FBF, JAL | (0x00123450 >> 2), 0, JR_RA, 0)
+        obj = {"sections": [section(""), section(".text.func_00200000", mine, flags=6)],
+               "symbols": [sym("", 0), sym("func_00200000", 1, size=len(mine)),
+                           sym("ref_L00_00200000_00", 0, kind=0), sym("ref_L00_00200000_01", 0, kind=0)],
+               "relocations": {1: [(4, elf.R_MIPS_HI16, 2), (12, elf.R_MIPS_LO16, 2), (16, elf.R_MIPS_26, 3)]}}
+        with mock.patch.object(fcheck, "boot_functions", lambda: {"func_00200000": (0x00200000, len(retail))}), \
+                mock.patch.object(fcheck, "retail_bytes", lambda a, n: retail[:n]):
+            values = fcheck.aligned_values(obj, "func_00200000")
+        self.assertEqual(values, {"ref_L00_00200000_00": 0x00351FC0, "ref_L00_00200000_01": 0x00123450})
 
     def test_missing_function(self):
         obj = {"sections": [section("")], "symbols": [sym("", 0)], "relocations": {}}
