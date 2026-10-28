@@ -118,21 +118,42 @@ must build in all three releases, so add them if you plan to send one.
 Both come from public mirrors of SN Systems' ProDG for PS2: the assembler from 2.0, the
 linker from 3.01. `toolchain/` is in `.gitignore`.
 
+Make the folder:
+
 ```sh
-mkdir -p toolchain/sn-prodg-2.0/ee/bin /tmp/sn
-curl -L -o /tmp/sn/sn20.tar.gz \
-  https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_2.0/releases/download/1/eegcc_sn_v2.73a.tar.gz
-curl -L -o /tmp/sn/sn301.tar.gz \
-  https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_3.01/releases/download/1/eegcc_2.95.3_sn_v1.36.tar.gz
-tar xzf /tmp/sn/sn20.tar.gz  -O ee/bin/ps2eeas.exe > toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
-tar xzf /tmp/sn/sn301.tar.gz -O ee/bin/ld.exe      > toolchain/sn-prodg-2.0/ee/bin/ld.exe
-sha256sum -c <<'EOF'
-c839dd63facabe7b76573c114056be61eaa7b3aa2329dd546930ab8f98898c76  toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
-80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48  toolchain/sn-prodg-2.0/ee/bin/ld.exe
-EOF
+mkdir -p toolchain/sn-prodg-2.0/ee/bin
 ```
 
-Both lines must print `OK`.
+The assembler, `ps2eeas.exe` from ProDG 2.0:
+
+```sh
+curl -L -o /tmp/sn20.tar.gz \
+  https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_2.0/releases/download/1/eegcc_sn_v2.73a.tar.gz
+
+tar xzf /tmp/sn20.tar.gz -O ee/bin/ps2eeas.exe \
+  > toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
+```
+
+The linker, `ld.exe` from ProDG 3.01:
+
+```sh
+curl -L -o /tmp/sn301.tar.gz \
+  https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_3.01/releases/download/1/eegcc_2.95.3_sn_v1.36.tar.gz
+
+tar xzf /tmp/sn301.tar.gz -O ee/bin/ld.exe \
+  > toolchain/sn-prodg-2.0/ee/bin/ld.exe
+```
+
+Check both files:
+
+```sh
+sha256sum toolchain/sn-prodg-2.0/ee/bin/*.exe
+```
+
+| File | SHA-256 |
+| --- | --- |
+| `Ps2EeAs.exe` | `c839dd63facabe7b76573c114056be61eaa7b3aa2329dd546930ab8f98898c76` |
+| `ld.exe` | `80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48` |
 
 ### 4. Build the compilers and dump the discs
 
