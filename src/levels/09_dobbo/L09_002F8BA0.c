@@ -509,7 +509,7 @@ INCLUDE_ASM("asm/levels", func_L09_003FD128);
 
 /* func_L09_003FD460 is defined in L09_002F8BA0-beam-g64.c (a 64-byte table read through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L09_003FD7D0);
+/* func_L09_003FD7D0 lives in L09_003FD7D0-overlay.c. */
 
 
 /* Samples the sub-object through the shared record starter and ramps the
