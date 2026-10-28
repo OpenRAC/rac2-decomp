@@ -328,7 +328,8 @@ class LevelTests(unittest.TestCase):
                 mock.patch.object(fcheck, "program_placed", lambda key: {"values": level_values}), \
                 mock.patch.object(fcheck, "placed", lambda: {"values": boot_values}), \
                 mock.patch.object(fcheck, "aligned_values", lambda *a: {}), \
-                mock.patch.object(fcheck, "level_address", lambda level, a: 0x0028C080 if a == 0x00263640 else None):
+                mock.patch.object(fcheck, "level_address", lambda level, a: 0x0028C080 if a == 0x00263640 else None), \
+                mock.patch.object(fcheck, "copy_map", lambda level, kind="data": {}):
             r = fcheck.Resolver(prog, "func_L00_002A0200", {"symbols": [], "sections": []}, {}, {})
             self.assertEqual(r.named("func_00200000"), 0x002A0100)
             self.assertEqual(r.named("func_00150000"), 0x00150000)
