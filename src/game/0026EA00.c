@@ -457,8 +457,6 @@ char *func_00270280(int a0)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002702B8);
-
 /* Integrates one float field with a spring-damper step, clamps it to a symmetric limit, then lets a helper raise or lower it, returning a bias plus the field. */
 float func_002702C8(float *p, float a, float b, float c, float d, float lim)
 {

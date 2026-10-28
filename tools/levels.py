@@ -716,9 +716,9 @@ def function_extent(name: str, address: int, size: int) -> tuple[int, int]:
     return address + skip, size - skip
 
 
-# Individually checked one-word remnants after completed returns or a tail jump.
-# These names have no incoming reference at any measured placement. Keep the
-# selection named: an identical store in another extent is not evidence to cut it.
+# Individually checked remnants after completed returns or a tail jump. These
+# names have no incoming reference at any measured placement. Keep the selection
+# named: an identical store in another extent is not evidence to cut it.
 FUNCTION_RESIDUES = {
     "func_0011F864": 4,
     "func_00335E60": 4,
@@ -737,6 +737,7 @@ FUNCTION_RESIDUES = {
     "func_L13_0041E170": 4,
     "func_L22_003FDB90": 4,
     "func_L23_00423378": 4,
+    "func_002702B8": 12,
 }
 
 
