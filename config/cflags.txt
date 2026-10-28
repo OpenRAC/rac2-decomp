@@ -1,3 +1,4 @@
+src/levels/12_todano/L12_00429610.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L04_0043BEE8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/shared/L03_003CC238.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por -g
 src/game/0034A808.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
