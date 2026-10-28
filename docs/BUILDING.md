@@ -104,7 +104,7 @@ directory they run in). On x86-64 Linux with Wine and `gcc -m32`, neither is nee
 `.github/workflows/checks.yml` runs the tool tests and the repository check;
 `progress.yml` checks that `progress/report.json` is current (`tools/progress.py --check`),
 validates it with objdiff and uploads it as `SCUS_972.68_report` for ByteMatch
-([bytematch.dev](https://bytematch.dev/OpenRAC/rac2-gc-decomp));
+([bytematch.dev](https://bytematch.dev/OpenRAC/rac2-decomp));
 `docker-publish.yml` publishes the build image. None of them builds the game: CI has no disc and
 no SN tools, so the build is run locally and its result committed.
 
