@@ -194,6 +194,16 @@ aligned literal pointer, or adjacent `lui` plus low-half construction references
 row. `FUNCTION_RESIDUES` removes only this named 12-byte extent; its normalized
 fingerprint is identical in PAL and US2.
 
+`func_002DE7F0` (28 bytes) is an orphan sequence in the boot and all 27 levels.
+The preceding function returns at `0x002DE7E8` with its delay slot at `0x002DE7EC`.
+The row then adjusts `$sp` by `0x70`, assigns `-1` to `$v0`, stores `$v1` through
+`$gp` at offset `-0x3EEC`, and adjusts `$sp` by another `0x10`; it has no entry
+sequence or return and falls into the next catalogue entry's initializer at
+`0x002DE810`. Across all 28 disassemblies, no direct branch or call, aligned literal
+pointer, or adjacent `lui` plus low-half construction references the row.
+`FUNCTION_RESIDUES` removes only this named 28-byte extent; its normalized
+fingerprint is identical in PAL and US2.
+
 `func_003411B0` (12 bytes) is a two-store fragment in the boot and all 27 levels.
 The preceding 380-byte function returns at `0x003411A4` with its delay slot at
 `0x003411A8`; a nop fills `0x003411AC`. The row stores zero through `$v1` at offset

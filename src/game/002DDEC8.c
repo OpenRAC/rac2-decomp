@@ -138,8 +138,6 @@ int func_002DE7A0(int key)
     return 1;
 }
 
-INCLUDE_ASM("asm/game", func_002DE7F0);
-
 void func_002DE810(unsigned short *a0,u8 *a1) {
  a0[0]=0;
  a0[1]=*(unsigned short *)(a1+0x24);
