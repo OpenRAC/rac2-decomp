@@ -15,6 +15,51 @@ Some older game drafts record experiments with the compiler recipe at
 `ace3f7be822bae9e85af0ae9010bd5c0dca91986`. Those residuals are historical observations;
 later dated entries record their own profiles and measurements. Neither is proof
 of semantic correctness or matching credit without a strict linked build.
+
+## Functional C
+
+`functional/` and `functional.tsv` hold C that does what a still-assembly
+function does without matching its bytes, written for the native port (see
+`functional/README.md` and OpenRAC's `docs/port/BACKFILL.md`). It is never
+linked, never counted by `tools/progress.py` (which reads `src/` only), and
+`tests/check_repository.py` checks that each listed function is still
+`INCLUDE_ASM` in `src/`.
+
+A functional file is done only when the gate says SAME: `tools/fcheck.py`
+compiles it in place of the function's `INCLUDE_ASM` line (with the unit's
+flags; on its own when that does not compile), places it at 0x000A0000 and
+runs OpenRAC's test-only interpreter on call states captured from the US
+disc, comparing memory, the result, the kept registers and device accesses
+with retail. It covers boot functions called in the boot, title, menu pages
+and New Game up to the first level's load, and level 00 (Aranos, the
+tutorial): New Game into it, played a while (`level00`). A function with a
+place in level 00's program (a `func_L00_` function, or a boot or shared one
+with a `00:` place in `config/levels/functions.tsv`) is checked at that
+place, its symbols resolved at level 00's addresses; a boot function below
+0x1A7C80 stays resident in the level and is checked as the boot's. Other
+levels are not covered yet. With OpenRAC's interpreter built
+(`build/interpreter/`) and the compiler reachable through `RAC2_LINUX` (on a
+Mac, `docker run -d --name rac2-gate --platform linux/386 -v $HOME:$HOME
+rac2-build:latest sleep infinity`, then `RAC2_LINUX="docker exec
+rac2-gate"`):
+
+```sh
+python3 tools/build.py boot                     # build/boot/placed.json: the values placement uses
+python3 tools/build.py level 00                 # build/00_aranos_tutorial/placed.json, for level 00
+python3 tools/fcheck.py capture LIST            # states of the listed functions (every run)
+python3 tools/fcheck.py capture LIST --script level00   # level 00 only (states about 16 MB each)
+python3 tools/fcheck.py check func_XXXXXXXX nonmatching/functional/func_XXXXXXXX.c
+python3 tools/fcheck.py check func_L00_XXXXXXXX nonmatching/functional/func_L00_XXXXXXXX.c
+```
+
+The batch form, which writes the verdicts to OpenRAC's
+`port/game/rac2-ntsc/fcheck.tsv`, is OpenRAC's `python3 tools/fcheck_gate.py
+run --game rac2` (its `docs/port/BACKFILL.md`, "The gate"). Exit codes and
+the placement rules are in `tools/fcheck.py`'s docstring; its tests are
+`tests/test_fcheck.py`.
+
+## The drafts
+
 | Function | Size | Status and remaining differences |
 | --- | ---: | ---: |
 | [`func_00285030`](game/func_00285030.c) | 680 | 26 October 2026 (xcarry): carried from rac3-decomp func_00392820, whose match uses an empty asm register fence (not allowed here). Without it, as a -g8 unit, the TEX0 build order and the second packet's registers differ (about 25 lines). See source. |
