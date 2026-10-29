@@ -1,4 +1,4 @@
-/* func_L05_0042AFE0: current720B catalogue body starts one instruction late.
+/* func_L05_0042AFE0: suspected missing pre-prologue load in the 720B entry.
  * US05 entry42AFEC begins SP-40 then LWC1 F0,26E8(gp), but +10 addsF1
  * before definingF1. Immediately preceding42AFE8 is LWC1 F1,26E4(gp).
  * Preceding42AFE0/4 are previous epilogue SP+10/NOP. A real pre-prologue

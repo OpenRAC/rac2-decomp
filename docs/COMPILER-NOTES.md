@@ -167,6 +167,14 @@ three vectors; `func_00283678` copies three; `func_00283698` reads three and
 writes four. The later `func_00283738` consumes only three vectors from each
 input. Check every producer and consumer before enlarging or shrinking a buffer.
 
+A full-width transfer does not establish that every lane is interpreted as a
+value. The type-2 particle path used by `func_L00_003E7E40` transfers sampled
+position W, while its normal renderer computes XYZ and replaces output W before
+consumption. The constructor clears the controlling flag and its updater retains
+that state. This permits the observed opaque transfer, not a 12-byte allocation:
+the complete 16-byte storage is still required. Verify the same lifecycle before
+reusing this conclusion, and do not invent a W initialization for matching.
+
 The water context in `func_L20_00447748` is thirteen words (0x34 bytes), not
 the fourteen words suggested by its old stack-layout screen. Its final callback
 field occupies +0x30 and no consumer reads a fourteenth word. Preserve the actual
@@ -249,6 +257,19 @@ silently changing neighbouring definitions.
 - Preserve actual argument count and return width. A value-returning call defines
   `$v0` and can move the next constant to `$v1` (`func_00339F28`, `func_00343A30`).
   Do not invent a void return or an assembler-name alias to steer allocation.
+- An existing reconstructed declaration is evidence to audit, not an oracle.
+  `func_002AE730` writes its packed word through an output pointer; its last
+  packing call also leaves that value in v0. Current RAC1 and 146 direct calls
+  in each RAC2 release support an output-only interface: none consumes that
+  residual result. Correcting the definition and caller declarations together
+  preserves matching bytes. Do not infer a returned value solely from a register
+  left live at the epilogue, or infer void solely because result paths differ.
+- A body that ignores a formal does not prove a zero-argument API.
+  `func_001261F0` retains the real 32-bit `sceGsSyncV` mode argument, supported
+  by the public OpenGOAL interface and the game's zero-valued callers. The
+  matched preview helper `func_00300048` similarly retains its observed unused
+  object argument. Check callers or an independent interface before changing a
+  canonical declaration, and never add a synthetic use of an unused formal.
 - A 64-bit colour/result must keep its ABI width. `func_001175F0` forwards a long
   result; explicit 32-bit truncation adds two instructions.
 - A colour constant's declared argument width selects its materialisation. Through
