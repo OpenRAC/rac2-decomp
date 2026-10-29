@@ -1,3 +1,11 @@
+/* Fresh native-scalar evidence, current retained form: two further checks
+ * (ten total) still676/676 US0/1, absent from US2/PAL. Independently complete
+ * D_001A79F0 uses its canonical MACRO_ADDR, recovering same-destination absolute
+ * load and exact GP delay read without redundant aliases. The remaining early
+ * color-mask/sentinel scheduling and visibility-table pointer priorities do
+ * not close. A false-path-only packed-color snapshot moves the discrepancy
+ * earlier and is rejected. Earlier eight-check measurements follow below.
+ */
 /* Nonmatching: US676/676 bytes, 0/1; absent from US2 and PAL.
  * Eight checks, including one unsupported -fno-if-conversion rejection.
  * Default profile. Measured hero fields recover the full saved-register set;
@@ -29,8 +37,7 @@ extern struct {
     int currentAction;
 } D_00189E20 NOT_SDA;
 extern unsigned char D_0019B4A8[] NOT_SDA;
-extern int D_001A79F0 NOT_SDA;
-extern int D_001A79F0_gp SDATA(D_001A79F0);
+extern int D_001A79F0 MACRO_ADDR;
 extern unsigned char D_L17_0021EBB0[] NOT_SDA;
 extern unsigned char *D_L17_001B2C1C;
 extern unsigned char *D_L17_001B2C1C_gp SDATA(D_L17_001B2C1C);
@@ -81,11 +88,11 @@ void func_L17_0041EAA8(unsigned char *object)
                 {
                     unsigned short flags2=*(unsigned short *)(object+0xB2);
                     if(flags2&1) {
-                        unsigned char *entry=D_0019B4A8+(((short)flags2>>1)+(D_001A79F0_gp<<10));
+                        unsigned char *entry=D_0019B4A8+(((short)flags2>>1)+(D_001A79F0<<10));
                         unsigned char old=*entry;
                         if(((old>>4)&7)!=7) *entry=old+0x10;
                     } else {
-                        unsigned char *entry=D_0019B4A8+(((short)flags2>>1)+(D_001A79F0_gp<<10));
+                        unsigned char *entry=D_0019B4A8+(((short)flags2>>1)+(D_001A79F0<<10));
                         unsigned char old=*entry;
                         if((old&7)!=7) *entry=old+1;
                     }
