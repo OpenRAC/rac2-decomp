@@ -492,7 +492,7 @@ void func_0031C8E0(char *p)
 
 /* func_0031CB78 is in its own unit: func_0031C7A0 has different placements. */
 
-INCLUDE_ASM("asm/game", func_0031CDF8);
+/* func_0031CDF8 is defined in 0031CDF8.c. */
 
 void func_0031D268(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
