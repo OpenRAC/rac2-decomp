@@ -83,7 +83,7 @@ INCLUDE_ASM("asm/levels", func_L00_003ACA60);
 /* func_L00_003ACC88 is defined in L00_003A8E28-g8.c (the scale is read through $gp). */
 
 
-INCLUDE_ASM("asm/levels", func_L00_003AD7C8);
+/* func_L00_003AD7C8 is defined in L00_003AD7C8.c. */
 
 INCLUDE_ASM("asm/levels", func_L00_003ADA30);
 
