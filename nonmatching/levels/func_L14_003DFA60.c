@@ -14,8 +14,9 @@
  * 00283658 initializes all64B matrix bytes, including the vf0 fourth row;
  * 002EFB60 scales all64B, then qcopy replaces the translation row and W=1.
  * Thus the renderer never consumes uninitialized locals or a shortened matrix.
- * Actual 004197A8 returns unsigned32 actor counter. Every other named helper
- * has the documented void or float contract; raw matrix/render extents audited.
+ * Actual 004197A8 returns unsigned32 actor counter. Raw-only matrix/render
+ * void-return hypotheses remain provisional; complete read/write extents
+ * were audited independently. Actual definitions support the other returns.
  * UV tuning allocation is unknown/incomplete. Its two address views correspond
  * to the actual absolute pointer for V and GP pointer for U, not unused aliases.
  */

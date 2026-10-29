@@ -12,8 +12,9 @@
  * Reopen with independent original source/address-expression evidence.
  *
  * Actual 002ED688 returns signed32 owner address, explicitly cast to pointer.
- * 0037B538 returns int even when ignored. 0037B948 and 003D1AB8 complete raw
- * bodies have mutation contracts and no common result. Other helpers checked
+ * 0037B538 returns int even when ignored. The complete raw 0037B948 and
+ * 003D1AB8 mutation bodies were inspected, but their void-return hypotheses
+ * remain provisional. Other helpers checked
  * against actual definitions; 002E5DA0, 0037B888, 0037CE08, 00282948 return int;
  * 002EE6A8 returns unsigned32. The actual callback-table registrar stores
  * four 32-bit integer entries; object/function addresses are explicitly cast

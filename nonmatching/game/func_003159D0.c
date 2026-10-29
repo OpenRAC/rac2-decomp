@@ -11,8 +11,9 @@
  * Contracts: 002AD0B0 is signed-int pointer query (actual source definition),
  * 002761F8 returns int and reads its first two complete vectors; last optional
  * 40-byte packet is null here. 00282F20 reads/writes16B, normalizes XYZ and
- * preserves W. 00282CC0/00282D30/00283028 have void returns, two16B input
- * vectors for add/reflect, one16B input for scale. Actual reflect has either
+ * preserves W. Raw-only void-return hypotheses for the vector helpers
+ * remain provisional. Independently verified memory extents are two16B
+ * input vectors for add/reflect, one16B input for scale. Actual reflect has either
  * full vector load/store or cop2 full store and preserves initialized W.
  * Random is whole-zero initialized before XYZ writes; work is a full copy;
  * normal is fully written before add; random is overwritten by full qcopy

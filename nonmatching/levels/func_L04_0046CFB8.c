@@ -16,9 +16,10 @@
  * and scalar at+0x18. This function has no local memory packet or vector.
  * 002ACBC8 returns int, reads complete16B position; 00283198/00283180 and
  * 002A7878 return float from their actual FP argument banks. 0027AB40 uses
- * no incoming arguments and defines no common scalar result. The complete
- * 0046D250 retail body, and actual0046CD68/0046D6A8 definitions, confirm void
- * actor/camera mutation contracts. No ignored result is falsely declared void.
+ * no observed incoming argument. Its raw-only void/unused-formal interface
+ * and raw0046D250 return interface remain provisional. A missing common
+ * result alone is insufficient proof of void. Actual0046CD68/0046D6A8
+ * definitions confirm their void actor/camera mutation interfaces.
  */
 
 #include "common.h"

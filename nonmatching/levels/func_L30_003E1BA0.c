@@ -11,9 +11,11 @@
  * Contracts audited:002A9640 returns pointer;00273B70 returns int.
  * 003263D0 accepts a0 actor,a1 position,a2 signed count,a3 integer mode,
  * t0 full16B input vector,t1 color,t2 optional16B pointer, and f12..f15
- * four floats. Its complete592B body mutates spawned objects and has no
- * common result. 00273978 consumes actor,a1/a2 signed ints,f12 angle,
- * a3 full16B velocity,t0 full16B quaternion,t1 low8 color and returns void.
+ * four floats. Its complete592B body mutates spawned objects. The raw-only
+ * void-return hypothesis remains provisional. 00273978 consumes
+ * actor,a1/a2 signed ints,f12 angle,
+ * a3 full16B velocity,t0 full16B quaternion,t1 low8 color; its raw-only
+ * void-return hypothesis also remains provisional.
  * All locals are full vectors: subtract/XY normalize fills velocity,
  * 00282C98 writes axis, cross writes rotation, transform/add writes position.
  * Cross/normalize W is not used arithmetically before explicit quaternion W

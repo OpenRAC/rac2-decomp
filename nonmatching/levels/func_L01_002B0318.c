@@ -6,11 +6,13 @@
  * Diagnostic profile -O2 -G0 -ffunction-sections -fno-gcse; no config retained.
  * Reopen with independent original hero/high-part lifetime evidence.
  *
- * Complete callee contracts checked: 002AA2E8 returns float fabsf(target-
- * updated_field) via00282C48; it is not void even though ignored here.
+ * Raw002AA2E8 forwards the float fabsf(target-updated_field) result via
+ * 00282C48. The float-return interface remains provisional without an
+ * actual definition or caller consuming it; this is not a void proof either.
  * 002D4040/002ADEA0 return int. Actual00311080 and00310C88 mutate slot
  * records and return void. Full00310D30 retail body consumes actor and
- * record, mutates animation state and defines no consistent result.
+ * record and mutates animation state; its raw-only void-return hypothesis
+ * remains provisional, since no consistent result alone is insufficient.
  * 00282C88 writes all16B. 00283098 reads one16B vector and48B orientation,
  * then writes16B. All copied global orientation rows have complete16B
  * transfers; the complete translation is initialized before transforming.
@@ -25,7 +27,7 @@ extern int func_L00_002D4040(int), func_L00_002ADEA0(int);
 extern void func_L00_002AF7D0(void);
 extern void func_L00_00311080(void *, void *, int, int, int, int);
 extern void func_L00_00310D30(void *, void *), func_L00_00310C88(void *, void *);
-/* Clamps the field, then returns fabsf(target-updated), via00282C48. */
+/* Clamps the field and forwards fabsf(target-updated); provisional return. */
 extern float func_002AA2E8(float *, float, float);
 extern void func_00282C88(void *), func_00283098(void *, const void *, const void *);
 extern float func_00283B98(float, float);

@@ -8,9 +8,10 @@
  * empty-loop mode load, and snapshot-address allocation differ. Three
  * scoped/narrow trials converge to 596. Reopen with independent lifetime evidence.
  *
- * Callee audit: 002FC980 reads no incoming arguments and defines no return;
- * 002E64A0 consumes a0 actor and has no common result; 00326458 consumes a0
- * actor and has no common result. 00326048 writes actor+0x78 and updates the
+ * Raw-only 002FC980, 002E64A0 and 00326458 return / unused-formal
+ * classifications remain provisional. Lack of a common result is not proof
+ * of void. Their observed reads/effects are separately audited. Actual
+ * 00326048 writes actor+0x78 and updates the
  * float at a1; its one f12 scalar follows a0..a3. 0029FCC0 consumes actor,
  * signed 32-bit joint index and output pointer, writes the complete 16-byte
  * vector through scale/transform/add helpers, and has void return.

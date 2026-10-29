@@ -17,7 +17,8 @@
  * returns unsigned long (64-bit ABI); selected explicitly uses signed low32.
  * 002EB158 and002B6D28 actual definitions return int. 002ED058/002EB598
  * mutate state and return void. 00282A60 fills32-bit words for the supplied
- * byte length and defines no return register, rather than libc memset.
+ * byte length. Its raw-only void-return hypothesis remains provisional;
+ * it is not assumed to be libc memset or to return the destination.
  * Every cleared region extent is the actual argument:0x230,0x1D0 and six
  * 0x40 clears. Globals stay incomplete; no artificial allocation bounds,
  * volatile state fields, aliases, register pins or synthetic accesses.

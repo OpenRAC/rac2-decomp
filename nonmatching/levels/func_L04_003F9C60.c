@@ -17,8 +17,9 @@
  * Both local vectors are fully initialized: whole zero then XYZ writes,
  * whole TI copy, full vector normalization; smoke parameters whole zero
  * then Z/W overwrite. No local padding or unstored fourth component is read.
- * 002B9180 has one actor input and no defined return. Raw callees were
- * checked through their complete extents before choosing these contracts.
+ * 002B9180 has one observed actor input; its raw-only void-return
+ * hypothesis remains provisional, since no common result does not prove
+ * void. Complete read/write extents were checked independently.
  * TI assignment is required for the observed load from SP+0x10 to schedule
  * into the following random call; approved qcopy instead ties it to S0.
  */
