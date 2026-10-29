@@ -108,7 +108,7 @@ int func_0029DE38(void)
 
 INCLUDE_ASM("asm/game", func_0029EFD0);
 
-INCLUDE_ASM("asm/game", func_0029F0C8);
+/* func_0029F0C8 is defined in 0029F0C8.c. */
 
 extern char *D_001B1B60 __attribute__((sda));
 extern int D_001B1688 __attribute__((sda));

@@ -1,4 +1,7 @@
-/* func_0029F0C8 - 624 bytes, 28 places (the boot and every level).
-   Screened in wave 13 (worker g4): 2 call(s), 0 $gp-relative small-data access(es), 0 MMI lq/sq word(s), 4 64-bit daddu copy(ies), 0 float constant(s).
-   624 bytes of straight-line code with 4 pointers copied with daddu $d,$s,$zero, where this cc1 sign-extends with dsll/dsra.
-   Not matched in wave 13 (worker g4): screening only; no C candidate was tested in this wave. */
+/* Historical diagnostic-only screen superseded by the reviewed C candidate in
+ * src/game/0029F0C8.c. The current RAC1 InitMobyInstance donor supplies grounded
+ * actor/class/sequence field views; truthful pointer contracts and ordinary
+ * SDATA scalar addressing recover all 624 bytes at 28 USA and 28 USA2 locations.
+ * The catalogue has no PAL row under this name. Strict linked qualification
+ * remains a maintainer responsibility; no implementation is linked here.
+ */
