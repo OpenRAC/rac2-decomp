@@ -52,10 +52,10 @@ void func_0031CDF8(char *unused, char *pos, float scale, int first, int second)
     packet.state[3] = 0x8000000048ULL;
     dx = D_001B5200.position[0] - *(float *)pos;
     dy = D_001B5200.position[1] - *(float *)(pos + 4);
-    packet.color[3] = first + 0x30000000;
-    packet.color[2] = first + 0x30000000;
-    packet.color[1] = first + 0x30000000;
-    packet.color[0] = first + 0x30000000;
+    packet.color[3] = (u32)first + 0x30000000u;
+    packet.color[2] = (u32)first + 0x30000000u;
+    packet.color[1] = (u32)first + 0x30000000u;
+    packet.color[0] = (u32)first + 0x30000000u;
     euler[3] = 0.0f;
     euler[2] = func_00283248(dx, dy);
     euler[1] = -func_00283248(func_00282E80(pos, D_001B5200.position),
@@ -74,10 +74,10 @@ void func_0031CDF8(char *unused, char *pos, float scale, int first, int second)
     func_00282D30(packet.matrix + 12, packet.matrix + 12, scale);
     func_00280B90(&packet, matrix, 0);
     packet.state[1] = func_0027C878(42);
-    packet.color[3] = second + 0x20000000;
-    packet.color[2] = second + 0x20000000;
-    packet.color[1] = second + 0x20000000;
-    packet.color[0] = second + 0x20000000;
+    packet.color[3] = (u32)second + 0x20000000u;
+    packet.color[2] = (u32)second + 0x20000000u;
+    packet.color[1] = (u32)second + 0x20000000u;
+    packet.color[0] = (u32)second + 0x20000000u;
     func_00282D30(packet.matrix, packet.matrix, 1.0f);
     func_00282D30(packet.matrix + 4, packet.matrix + 4, 1.0f);
     func_00282D30(packet.matrix + 8, packet.matrix + 8, 1.0f);
