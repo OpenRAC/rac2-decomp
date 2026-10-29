@@ -1,13 +1,17 @@
 /* Complete C near miss; not linked and no matching credit.
- * Default -O2 -G8 -ffunction-sections: 584/600 bytes, USA 0/1.
- * This trial retains the current no-argument reset declaration. Retail passes
- * an actor consistently, also independently confirmed in the corresponding
- * qualified sibling caller. A no-argument definition does not prove absence
- * of an original unused formal. Reopen after review of that repeated-caller
- * contract and canonical declaration; never add an input only for allocation.
- * Stored menu callback returns int(void); dispatcher29B3E0 returns int too.
- * No local buffers. Incomplete count/reward arrays keep measured strides and
- * sanctioned dual GP views without artificial small-data bounds.
+ * Default -O2 -G8 -ffunction-sections: 596/600 bytes, USA 0/1.
+ * Independent retail sibling callers consistently pass the actor to the reset,
+ * supporting the genuine unused pointer formal despite a prior void(void)
+ * definition. No synthetic actor read or per-use alias is needed. Actual
+ * callback returns int(void), and dispatcher29B3E0 returns int too.
+ * Snapshotting the mode before the sound-handle reset restores the retail
+ * actor/predicate lifetime. Full array/record strides and incomplete GP views
+ * preserve real footprints; no local buffers or artificial small-data bounds.
+ * Remaining differences: edge-specific mode load, controller mask lifetime,
+ * independent timer store order and conditional completion-state branch.
+ * Fine GCSE-edge/interblock controls, G0 scalar model, no-expensive and first
+ * scheduling control do not close the audited level5 family; no replay needed.
+ * Reopen with new predicate/assembler-address lifetime evidence.
  */
 #include "common.h"
 
@@ -16,7 +20,7 @@ extern u8 D_00188660[];
 extern int D_L10_001A8F00;
 extern int D_L10_001A904C __attribute__((sda));
 extern int D_L10_001B1440 __attribute__((sda));
-extern int D_L10_001B1390[];
+extern int D_L10_001B1390[] MACRO_ADDR;
 extern int D_L10_001B1390_gp[] SDATA(D_L10_001B1390);
 extern int D_L10_001B1448[][3];
 extern int D_L10_001B1448_gp[][3] SDATA(D_L10_001B1448);
@@ -36,7 +40,8 @@ extern int func_L10_004239A0(void);
 extern void func_L10_00425888(void);
 extern int func_0029B3E0(int, int);
 extern void func_L05_00379F48(int);
-extern void func_L10_00423500(void);
+/* Independent sibling retail callers pass the same actor to this reset. */
+extern void func_L10_00423500(void *);
 extern int func_002B49E0(int, int, int, int, u8 *);
 
 void func_L10_00423DC8(u8 *actor, int mission)
@@ -50,9 +55,12 @@ void func_L10_00423DC8(u8 *actor, int mission)
         if (*(u8 **)(record + 0x88) == owner && record[0x74] != 0)
             func_002E59F8(sound);
     }
-    *(int *)(ownerState + 0x270) = -1;
-    if (D_L10_001A8F00 == 2)
-        return;
+    {
+        int mode = D_L10_001A8F00;
+        *(int *)(ownerState + 0x270) = -1;
+        if (mode == 2)
+            return;
+    }
     if (func_00282948(state + 0x58) == 0)
         return;
     if (D_L10_001A904C != 0 && D_L10_001B1440 == 0) {
@@ -78,9 +86,9 @@ void func_L10_00423DC8(u8 *actor, int mission)
         func_0029B3E0(0, -1);
         func_L05_00379F48(1);
     }
-    if (func_00282948(state + 0x40) != 0) {
-        *(int *)(state + 0x40) = 162000;
-    } else if (D_00138324 & 0x40) {
+    if (func_00282948(state + 0x40) == 0) {
+      unsigned int pressed = D_00138324;
+      if (pressed & 0x40) {
         D_L10_001B1440 = 0;
         *(int *)(state + 0x40) = 162000;
         func_0027D330(30);
@@ -92,10 +100,18 @@ void func_L10_00423DC8(u8 *actor, int mission)
             if (second != 0 && D_L10_001B1390[2] != 0)
                 D_L10_001B143C = 3;
             else if (D_L10_001B1390_gp[0] != 0)
-                D_L10_001B143C = second != 0 ? 2 : 1;
+                {
+                int completed = 1;
+                if (second != 0)
+                    completed = 2;
+                D_L10_001B143C = completed;
+            }
         }
-        func_L10_00423500();
-    } else if (D_00138324 & 0x10) {
+        func_L10_00423500(actor);
+      } else if (pressed & 0x10) {
         func_002B49E0(3, 1, 4, 0, 0);
+      }
+    } else {
+        *(int *)(state + 0x40) = 162000;
     }
 }
