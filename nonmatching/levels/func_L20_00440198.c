@@ -1,44 +1,82 @@
-/* func_L20_00440198 (508 bytes, level 20): NOT ATTEMPTED in this wave; the blocker is
- * measured and recorded.
- *
- * The body has one 128-bit copy: `addiu $v1,$s1,0x10 ; lq $v0,0x0($a1) ; sq $v0,0x0($v1)`.
- * The SOURCE is a plain register ($a1, a parameter) and compiles as it is; the
- * DESTINATION is $s1 + 0x10, and this cc1 folds the constant offset into the `sq`
- * (`sq $v0,0x10($s1)`), so the retail's `addiu` is lost and the body is four bytes short.
- *
- * The one escape of that wall that exists (measured in this wave, see
- * nonmatching/levels/func_L20_004499E8.c) is a volatile pointer OBJECT:
- * `TI128 *volatile d = (TI128 *)(s1 + 0x10); *d = *(TI128 *)a1;` gives
- * `sw ; lq ; lw ; sq $v0,0($reg)` - the retail's zero-displacement `sq` - but it costs the
- * stack store and the reload, eight bytes over the retail's single `addiu`. So the body
- * would be 516 bytes against 508.
- *
- * The rest of the body (the table walk with `beql`/`bgez`, the `movz` clamp, the three
- * calls func_0032F1F8, func_0032F5B0, func_0027AD0 and the func_00302260 call) was not
- * written: the 128-bit wall makes the body unmatchable anyway.
+/* Complete C near miss; not linked and no matching credit.
+ * Game -O2 -G0 -ffunction-sections; 508/508 bytes.
+ * USA v1.01 and v2.00: 0/1 each, first mismatch +0x2C; PAL has no row.
+ * Approved qcopy emits the measured register-addressed transfer, withdrawing
+ * the former impossible-copy screen. All local vector buffers are four floats:
+ * 82C98 writes 16 bytes, 82DD8 writes a vector, ACE78 writes four floats, and 73978
+ * initializer copies 16 bytes from each forwarded vector. Its six GPR inputs
+ * and one FP input are retained; A7398/ACE78 real void definitions were read.
+ * Nine trials: typed resident pose and metadata snapshots recover the main
+ * constructor; the initial iterator/pool lifetime and final predicate order
+ * still differ. Fine keep-block-order and gcse-unsplit-edges tie. The opt-in
+ * typed-copy profile adds no useful improvement, so this retains default qcopy.
+ * The qualified group-count sibling suggested an explicit G8 walk; that
+ * separate new-donor trial measured 528/508 bytes and did not close it.
+ * Reopen with measured canonical group-list/actor-pool lifetime evidence.
  */
+#include "common.h"
 
-/* ---- wave 5 (20_yeedil, 2026-10-21, worker 01): the destination side, measured ------
- *
- * The wave's note says the SOURCE of the 16-bit copy is fine (a parameter, a plain
- * register) and that the DESTINATION is the problem: the retail materialises
- * `s1 + 0x10` (`addiu $v1,$s1,0x10 ; lq $v0,0x0($a1) ; sq $v0,0x0($v1)`) while this cc1
- * folds the constant into the `sq` (`sq $v0,0x10($s1)`).
- *
- * MEASURED in this wave, on copies of the unit (the same wall as in
- * func_L20_004424A0, and the same answers):
- *
- *   - `*(TI128 *)(s1 + 0x10) = *(TI128 *)a1;`      -> `sq $v0,0x10($s1)`  (folded)
- *   - `TI128 *p = (TI128 *)(s1 + 0x10); *p = *(TI128 *)a1;`  -> the same
- *   - `TI128 *volatile p = (TI128 *)(s1 + 0x10); *p = *(TI128 *)a1;`
- *     -> `sw ; lq ; lw ; sq $v0,0($reg)` - the retail's zero-displacement `sq` at the
- *        price of the stack round trip (eight bytes over);
- *   - a variable offset, or two branches with different values, give the materialised
- *     form with a register offset or with a `movn` (four instructions).
- *
- * So the 128-bit destination of this copy is the same compiler-side wall as the zero
- * store of func_L20_004424A0: with a runtime base plus a constant, plain C always
- * folds the constant into the displacement.  The function needs a -G8 unit anyway (it
- * reads D_L20_001B2FB8 absolutely in the retail, so it does NOT - that one is absolute
- * in the retail, so the unit can stay -G0).
- */
+extern u16 *D_L20_001FBB20[];
+extern int D_L20_001B2FB8 __attribute__((sda));
+typedef u8 ActorSlot[0x100];
+extern ActorSlot *D_L20_001B2F9C __attribute__((sda));
+typedef struct { u8 prefix[0x80]; float position[4]; } ResidentPoseView;
+extern ResidentPoseView D_00189E20;
+extern float func_00283248(float, float);
+extern void func_002A7398(s8 *, int, int);
+extern void func_002A7750(void *, int, int);
+extern void func_002A0F48(void *);
+extern void func_00282C98(void *);
+extern void func_00282DD8(void *, const void *, const void *);
+extern void func_002ACE78(float *, float *, float);
+extern void func_00273978(void *, int, int, const void *, const void *, int, float);
+
+u8 *func_L20_00440198(int group, const float position[4], const float velocity[4], float lifetime)
+{
+    float delta[4] __attribute__((aligned(16)));
+    float origin[4] __attribute__((aligned(16)));
+    u16 *entry;
+    u8 *actor;
+    u8 *state;
+    u16 flags;
+
+    for (entry = D_L20_001FBB20[group];
+         (u8)group != 0xFF && group <= D_L20_001B2FB8 && entry != 0 &&
+         (entry == D_L20_001FBB20[group] || (s16)entry[-1] >= 0);
+         ++entry) {
+        actor = D_L20_001B2F9C[*entry & 0x7FFF];
+        if (actor == 0)
+            break;
+        if (actor[0x20] == 6) {
+            qcopy(actor + 0x10, position);
+            *(float *)(actor + 0xF8) = func_00283248(
+                D_00189E20.position[0] - *(float *)(actor + 0x10),
+                D_00189E20.position[1] - *(float *)(actor + 0x14));
+            flags = *(u16 *)(actor + 0x34);
+            flags = (flags & 0xFFBE) | 0x1000;
+            *(u16 *)(actor + 0x34) = flags;
+            *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
+            *(u16 *)(actor + 0x34) = flags & 0xEFFF;
+            func_002A7398((s8 *)actor, 7, 0);
+            func_002A7750(actor, 7, 3);
+            func_002A0F48(actor);
+            func_00282C98(origin);
+            func_00282DD8(delta, origin, velocity);
+            func_002ACE78(delta, delta, 0.10471977293491364f);
+            state = *(u8 **)(actor + 0x68);
+            *(u8 **)(actor + 0x68) = state + 0x210;
+            func_00273978(actor, 3, 0, velocity, delta, 0xFF, 15.0f);
+            *(u8 **)(actor + 0x68) = state;
+            *(float *)(state + 0x288) = lifetime;
+            {
+                int cycle = *(int *)(*(u8 **)(actor + 0x24) + 0x10);
+                u16 control = *(u16 *)(actor + 0x34) | 0x1000;
+                *(int *)(actor + 0x9C) = 1;
+                *(int *)(actor + 0x98) = cycle;
+                *(u16 *)(actor + 0x34) = control;
+            }
+            return actor;
+        }
+    }
+    return 0;
+}
