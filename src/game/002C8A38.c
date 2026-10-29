@@ -47,7 +47,7 @@ void func_002C8A38(struct DriftParticle *particle)
     life /= func_00283CE0(parameters->lifetime);
     progress = 1.0f - life;
     if (!(parameters->flags & 1)) {
-        particle->color = func_00283D38(0x103080, (int)parameters->color, progress) | (parameters->alpha << 24);
+        particle->color = func_00283D38(0x103080, (int)parameters->color, progress) | ((u32)parameters->alpha << 24);
         speed += (end_speed - speed) * progress;
         particle->size = parameters->size_start + (parameters->size_end - parameters->size_start) * progress;
     } else {

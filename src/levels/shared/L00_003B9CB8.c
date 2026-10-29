@@ -424,7 +424,7 @@ extern float func_002B04E0(char *a0, float *src, char *third);
 
 /* The four floats are declared before the two other arguments, which sets the order this caller
    evaluates them in (the registers are the same either way). */
-extern void func_002AAA00(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
+extern float func_002AAA00(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
 
 extern void func_002833F0(void *out, void *in);
 

@@ -20,7 +20,7 @@ extern s32 D_001B1598 MACRO_ADDR;
 extern s32 D_001A7344 MACRO_ADDR;
 extern s32 D_001A72D4 __attribute__((sda));
 extern void func_002FC3C0(s32);
-extern void func_001261F0(s32);
+extern int func_001261F0(s32);
 extern void func_00126470(void *, s16, s32, s32, s32, s32, s32, s32);
 extern void func_0011AEA0(s32);
 extern void func_00126730(void *, s32);

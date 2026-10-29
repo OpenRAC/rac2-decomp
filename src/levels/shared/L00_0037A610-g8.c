@@ -64,7 +64,7 @@ extern float D_L00_001B25E0 __attribute__((sda));
 extern int D_L00_001B18D4 MACRO_ADDR;
 extern int D_L00_001B18D8 MACRO_ADDR;
 extern int D_L00_001B2610 __attribute__((sda));
-extern int func_001261F0();
+extern int func_001261F0(int);
 extern void func_L00_002D5000();
 extern int func_00279D18();
 extern void func_0027AB40(void);

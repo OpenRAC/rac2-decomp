@@ -40,7 +40,7 @@ extern void ref_L00_002E73E0_00(int);
 extern int ref_L00_002E73E0_01(void);
 extern void ref_L00_002E73E0_02(void *, int, int);
 
-extern int func_001261F0();
+extern int func_001261F0(int);
 
 void func_L00_002E73E0(void *a0) {
     ref_L00_002E73E0_00(1);

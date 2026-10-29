@@ -1,6 +1,7 @@
 /* Rotate a direction by the effect slot while retaining its length and W lane.
  * This is the same complete 128-slot, 32-byte record table as 002FED90. Every
- * scratch vector is 16 bytes and initialized before a primitive reads it. The
+ * scratch vector spans 16 bytes. Cross-product W is carried opaquely by the
+ * XYZ scale and overwritten before quaternion multiplication. The
  * length/dot/sine/cosine helpers return float; other vector helpers return void.
  * Default -G0 keeps the two flag guards absolute; the single GP view below
  * describes the measured read of that same mode word during weight selection.

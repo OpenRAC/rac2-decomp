@@ -700,7 +700,10 @@ extern int func_00283CF0(float);
    The unit needs "-g -ffast-math": the two max.s words need the fast-math fold of
    the float ternary, and the two nops in front of the division need the line label
    that -g puts before it (config/cflags.txt). */
-int func_002AE730(float *v, int *out)
+/* The packed word is delivered through out, as in RAC1's
+   pack_vector_xyz_with_shared_scale. The final pack call leaves its value
+   in v0, but the observed callers consume the output word, not that register. */
+void func_002AE730(float *v, int *out)
 {
     float a = func_00282C48(v[0]);
     float b = func_00282C48(v[1]);
@@ -723,7 +726,7 @@ int func_002AE730(float *v, int *out)
     t[2] = v[2] * scale + 127.0f;
     r = func_00283108(t);
     *out = r;
-    return r;
+    return;
 }
 
 

@@ -37,7 +37,7 @@ extern void func_00283098(void *,void *,void *);
 extern int D_001B1688[] __attribute__((sda));
 extern int func_00283D38(int,int,float);
 extern float func_00282E48(void *,void *);
-extern void func_002AE730(void *,void *);
+extern void func_002AE730(float *,int *);
 extern void func_002AE838(void *,void *);
 extern void func_00282D08(void *,void *,void *,float);
 extern char D_00189F00[];
@@ -1311,7 +1311,7 @@ void func_002C47E8(char *p) {
  if(f<5.0f && *(float *)(*(char **)(q+24)+8)>0.0f) {
   func_00282CF0(a,*(void **)(q+24),p+16);
   if(func_00282DF0(a)>0.5f) {func_00282F20(a,a,0.1f/f);func_00282CC0(p+16,p+16,(char *)a);}
-  else {func_00282F20(a,a,0.005f);func_002AE730(a,p+36);}
+  else {func_00282F20(a,a,0.005f);func_002AE730(a,(int *)(p+36));}
  }
  f=(2.5f-(f-0.5f))*0.4f;
  if(f>1.0f)f=1.0f;else if(f<0.0f)f=0.0f;

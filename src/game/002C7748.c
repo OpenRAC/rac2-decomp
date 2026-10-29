@@ -462,7 +462,7 @@ void func_002C87B0(char *a0)
     *(float *)(s1 + 12) = *(float *)(s1 + 12) + *(float *)(s0 + 16);
 }
 
-
+/* func_002C8A38 is defined in 002C8A38.c. */
 
 INCLUDE_ASM("asm/game", func_002C8CA0);
 

@@ -28,7 +28,7 @@ typedef struct {
 extern Particle *func_002B9030(int);
 extern int func_00283CF0(float);
 extern float func_002A7878(float, float);
-extern void func_002AE730(float *, void *);
+extern void func_002AE730(float *, int *);
 extern void func_002AE838(void *, void *);
 extern u8 *D_001F2540[];
 extern u8 *D_001F259C;
