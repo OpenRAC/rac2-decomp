@@ -1,7 +1,8 @@
 /* Rotate a direction by the effect slot while retaining its length and W lane.
- * This is the same complete 128-slot, 32-byte record table as 002FED90. Every
- * scratch vector spans 16 bytes. Cross-product W is carried opaquely by the
- * XYZ scale and overwritten before quaternion multiplication. The
+ * This uses the same 32-byte record layout as 002FED90, which scans 128 slots.
+ * The complete external allocation remains unknown and incompletely bounded.
+ * Every scratch vector spans 16 bytes. Cross-product W is carried opaquely by
+ * the XYZ scale and overwritten before quaternion multiplication. The
  * length/dot/sine/cosine helpers return float; other vector helpers return void.
  * Default -G0 keeps the two flag guards absolute; the single GP view below
  * describes the measured read of that same mode word during weight selection.
@@ -19,7 +20,7 @@ typedef struct {
     char reserved34A[0x1F46];
     char *object;
 } SteeringHeroPrefix;
-extern SteeringEffectSlot D_002212E0[128];
+extern SteeringEffectSlot D_002212E0[];
 extern SteeringHeroPrefix D_00189E20;
 extern int D_001A8CA0 MACRO_ADDR;
 extern int D_001A8CA4 MACRO_ADDR;

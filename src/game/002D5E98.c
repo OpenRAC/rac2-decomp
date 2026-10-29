@@ -576,7 +576,7 @@ int func_002DBB78(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_002DBC10);
+/* func_002DBC10 is defined in 002DBC10.c. */
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
 
