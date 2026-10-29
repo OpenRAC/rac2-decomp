@@ -397,7 +397,7 @@ void func_L00_00322AC0(List_F66766f2b *obj, int a1, int a2, float v)
 
 INCLUDE_ASM("asm/levels", func_L00_00322428);
 
-INCLUDE_ASM("asm/levels", func_L00_00322BE0);
+/* func_L00_00322BE0 is defined in L00_00322BE0.c. */
 
 /* When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown. */
 void func_L00_00322EC8(Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *owner)
