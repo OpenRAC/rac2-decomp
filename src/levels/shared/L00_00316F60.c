@@ -322,7 +322,7 @@ int func_L00_0031F2B0(const unsigned char *entity) {
     return *(const signed short *)(entity + 0xAA) == 0x0CDB;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003200F8);
+/* func_L00_003200F8 is defined in L00_003200F8.c. */
 
 
 /* func_L00_003206B8 only matches when this unit is built -G8 (its object table load comes
