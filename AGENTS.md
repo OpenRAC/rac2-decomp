@@ -225,7 +225,14 @@ work in. It was removed on purpose. Do not recreate any of it:
 - Conventional commit subjects with a scope: `feat(src):`, `fix(tools):`, `build(compiler):`,
   `docs:`, `chore:`. The body says what changed and how it was checked: the commands and what
   they printed (e.g. "tools/build.py all: 28 programs OK; 3 functions added").
-- Small, coherent commits: one function or one small family per commit is fine.
+- Prefer coherent batches over many tiny commits. For decompilation work, aim for
+  **at least five related functions per commit** when practical, including batches
+  of retained near misses. Group supporting source, flags and documentation changes
+  with the work they explain; do not commit every successful trial separately.
+- Keep the batch size appropriate to the situation. A smaller commit is justified
+  for an isolated fix, an independent change that needs separate review, or the final
+  remainder of a batch. Do not combine unrelated work or delay a necessary fix just
+  to reach five. Every batch must still pass the required checks before publication.
 - Leave `progress/report.json` and the README table out of your commits (see "The progress
   report").
 

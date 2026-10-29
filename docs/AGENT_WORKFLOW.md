@@ -132,8 +132,9 @@ The lead, for each finished worker:
    in the build;
 3. runs `python3 tools/progress.py`, the tests, `tests/check_repository.py` and
    `tools/progress.py --check`;
-4. commits (one function or one family per commit, the report in its own commit) and opens the
-   pull request as AGENTS.md describes, with the build output in it.
+4. commits coherent batches (prefer at least five related functions when practical;
+   see the [exceptions in AGENTS.md](../AGENTS.md#commits), and keep the report in its
+   own commit) and opens the pull request as AGENTS.md describes, with the build output in it.
 
 Shared blockers, measured attempts and reopening conditions go into
 [MATCHING-BLOCKERS.md](MATCHING-BLOCKERS.md). Every contributor can improve an existing entry
