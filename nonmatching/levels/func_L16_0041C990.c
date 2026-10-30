@@ -1,3 +1,11 @@
+/* 30 October 2026 recheck: -O2 -G8 -ffunction-sections, 412/412 bytes.
+ * USA v1.01, v2.00 and PAL: 0/1 placements each, first mismatch +0x54.
+ * Contrary to the earlier shorthand below, case 2 also keeps its entity pointer
+ * in v0 where retail uses a0. A shared next-state local becomes movz; inverted
+ * nested calls and an explicit state-two label tie the existing branch layout.
+ * Reopen with a real state-selection/source-lifetime witness, not another
+ * equivalent three-way spelling. This remains ordinary C, not ASM_FUNC.
+ */
 /* Mid worker 11 near miss (func_L16_0041C990).
    Profile: -O2 -G8 -ffunction-sections (file named -g8.c).
    Status: jump table, both loops and the gp/lui table accesses match; case 0's three-way selection of the next state lays out its branch tails differently (nop vs addiu in the b delay slot). */

@@ -12,6 +12,10 @@
  * Fine GCSE-edge/interblock controls, G0 scalar model, no-expensive and first
  * scheduling control do not close the audited level5 family; no replay needed.
  * Reopen with new predicate/assembler-address lifetime evidence.
+ * 2026-10-30: a debug-label hypothesis, prompted by the independently measured
+ * Feltzin 00420A88 load-padding remedy, was checked with the same -G8 profile
+ * plus -g. It remains 588/592 bytes, 0/1 USA places, with the same residuals.
+ * That trial adds no match and does not justify repeating the old flag sweep.
  */
 #include "common.h"
 

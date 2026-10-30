@@ -34,6 +34,32 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Complete matrix storage and loop lifetimes
+
+`func_L09_003FEAE8` needs one 64-byte joint matrix, with its position at
++0x30. A detached position variable beside a 48-byte buffer did not represent
+`func_0029FC20`'s output. The complete matrix and the real helper return types
+recover the 520-byte body in both USA releases; PAL has no carried identity.
+
+`func_L16_0041F360` uses 33 complete 16-byte ring points and separate counters
+for generation, collision and final-W updates. Combined with the existing
+`MACRO_ADDR` views and closing-point `qcopy`, these restore the 576-byte body
+in all three releases. Strict linked checks pass in all three carrying programs.
+The 48-byte collision buffer covers the query's 40-byte copy. The constructor
+and caller initialize through +0x23; +0x24..+0x27 is transported to queue field
++0x34 without an identified semantic read in the inspected consumers. Do not
+call it padding or invent zero initialization: other constructors assign that
+field, and the whole indirect consumer graph has not been established. Point W
+is only copied by the XYZ vector addition, then assigned before the next use.
+
+The corrected `func_L07_0040FA90-matrix.c` near miss likewise uses a full
+64-byte matrix and `func_00283658`'s actual two-pointer interface. Its historical
+split storage and false third argument are superseded. The result remains
+444/444 bytes and 0/1 in each release; state/current-pointer allocation differs.
+Equal-size `func_L04_003EC140` and `func_L05_00420A88` drafts also remain near
+misses: respectively six loop-pointer ordering words and four FP-register words
+still differ. Their source headers record the profiles and reopening evidence.
+
 **29 October 2026 cross-release integration:** `func_L15_00434D28` passed its
 local PAL check but failed strict linking because its direct in-unit call needed
 the C section for `func_L15_004351E0`, whose body is not carried into PAL.

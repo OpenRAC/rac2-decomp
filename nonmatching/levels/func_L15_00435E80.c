@@ -1,25 +1,15 @@
-/* func_L15_00435E80 - 524 bytes.  Worker attempt, 28 October 2026 (draft below).
-   Diff-line counts below were measured with a masking that hid offset
-   differences; treat them as optimistic.
-
-   func_L15_00435E80 (524 B), in L15_004328E8.c (needs `#include "common.h"`
-   for qcopy; func_002ED688 is declared `int` there, use a cast). Fully
-   decoded: clear 128 x 0x60-byte slots (D_L15_0026C420[i].f0), list =
-   D_L15_001FB320[a0[0x21]], per id spawn/prime a mob (D_001B261C[0] +
-   id*256), qcopy positions, call chain, `while (*p++ >= 0)`.
-   Draft: 508 B vs 524, ~69 masked lines. D_001B261C read as `extern u8
-   *D_001B261C[] __attribute__((sda))` [0] gives retail's repeated lui/lw
-   reload. Remaining: saved-register numbering (retail s0=idx s1=state s2=row
-   s3=vec s4=ret s5=p s6=a0 s7=table; mine has state/row swapped), and retail
-   shares one reload of D_001B261C (a2) between the qcopy dest and the
-   func_002EE678 call in the second block (qcopy's memory clobber makes mine
-   reload; qcopy_nc made the registers worse), and retail copies the list
-   pointer `daddu $s5,$v1,$zero` after the null test.
-   Tried: indexed vs pointer clear loop (indexed is right), list var + copy
-   (worse, 86), qcopy_nc (worse). */
-
-typedef struct { int f0; u8 pad[0x5C]; } Slot_L15_0026C420;
-extern Slot_L15_0026C420 D_L15_0026C420[128];
+/* 30 October 2026 retained reconstruction, not a match.
+ * Profile: -O2 -G0 -ffunction-sections. USA v1.01: 524/524 bytes, 0/1.
+ * The clear loop addresses offset0x40 of128 records with stride0x60 from D_L15_0026C3E0.
+ * Modeling that real field recovers the retail size and entry loop. List-null-test
+ * allocation and root/state reloads still differ, first at+0x70. A separate list variable
+ * grows to532 bytes.
+ * Older source and trial history remain in Git and the private workspace.
+ */
+#include "common.h"
+extern int func_002ED688(unsigned char *);
+typedef struct { u8 prefix[0x40]; int active; u8 tail[0x1C]; } GornEffectSlot;
+extern GornEffectSlot D_L15_0026C3E0[];
 extern u16 *D_L15_001FB320[];
 extern u8 *D_L15_001FE480[];
 extern u8 *D_001B261C[] __attribute__((sda));
@@ -42,7 +32,7 @@ void func_L15_00435E80(u8 *a0) {
     int n;
 
     for (i = 0; i < 128; i++) {
-        D_L15_0026C420[i].f0 = 0;
+        D_L15_0026C3E0[i].active = 0;
     }
     p = D_L15_001FB320[a0[0x21]];
     if (p == 0) {

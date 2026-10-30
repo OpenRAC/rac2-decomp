@@ -70,7 +70,7 @@ extern void func_2E8450(char *a0, float *a1, float *a2, int a3, int a4, float f1
 
 /* func_L09_003FEA48 is defined in L09_003FEA48-g8.c (this unit has no $gp access for it). */
 
-INCLUDE_ASM("asm/levels", func_L09_003FEAE8);
+/* func_L09_003FEAE8 is defined in L09_003FEAE8-g8.c. */
 
 void func_L09_003FECF0(char *a0) {
     EffectVector a;

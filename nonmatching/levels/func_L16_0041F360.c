@@ -1,3 +1,9 @@
+/* Historical 624-byte form. The new full-vector/cursor source is retained in
+ * src/levels/16_snivelak/L16_0041F360-g8.c. Its local checks pass 1/1 placements
+ * in each of USA v1.01, v2.00 and PAL; strict linked checks now pass in all three carrying programs.
+ * Distinct counters for the three loops restore the retail register lifetimes.
+ * This older reconstruction remains here to preserve its different lowering.
+ */
 /* Nonmatching reconstruction; game compiler, -O2 -G8 -ffunction-sections.
    us: 16_snivelak: 624 bytes, expected 576.
    us2: 16_snivelak: 624 bytes, expected 576.

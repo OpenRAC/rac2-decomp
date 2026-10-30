@@ -1,3 +1,10 @@
+/* Superseded by src/levels/09_dobbo/L09_003FEAE8-g8.c, 30 October 2026.
+ * Current local checks: US 1/1 and US2 1/1; canonical name absent in PAL.
+ * The historical draft below split a 64-byte joint matrix into an undersized
+ * buffer and a detached position. The C source uses the complete matrix and
+ * its actual +0x30 position, canonical helpers and real pointer/int returns.
+ * Keep the older measurement as history; it is not a current blocked claim.
+ */
 /* func_L09_003FEAE8 - 520 bytes.  Worker attempt, 28 October 2026 (draft below).
    Diff-line counts below were measured with a masking that hid offset
    differences; treat them as optimistic.
