@@ -34,6 +34,36 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Ring geometry and path-controller storage
+
+`func_L09_003FD128` uses the public RAC1
+[heavy-interceptor light-ring body](https://github.com/OpenRAC/rac1-decomp/blob/a23a07114bae7547adffb442b0f23fc295a48238/src/overlays/l14_oltanis/heavy_interceptor_and_turrets.c)
+under GPL-3.0. Independent RAC2 frame/table measurements retain its four-row
+matrix, 82 XYZ vertices, 84 colors and complete temporary vector. The texture
+and GS interfaces carry full 64-bit values. Its 824-byte C body qualifies in all
+three releases; equal-looking geometry is not a reason to shorten its buffers.
+
+The two Smolg path controllers `func_L17_003C6CE8` and `func_L17_003C69A8`
+retain complete 16-byte path/working vectors. Their voice-active field and
+sound-bank byte are unsigned; the latter uses an incomplete byte view and only
+reads element zero. The yaw declaration targets the same canonical smoothing
+helper and preserves all three integer-bank arguments, four FP arguments and
+the float result. These source lifetimes recover the 812/828-byte bodies in
+US and US2; their canonical identities are absent from PAL.
+
+`func_L07_003EEE28` keeps the speed cap's actual lifetime and samples each next
+phase/rate before storing the preceding phase. Its final distance result stays
+float. The 832-byte body qualifies in US and US2, with no carried PAL identity.
+All four additions passed the complete 84-program strict build without C
+fallback; the separate entry repair in section 18 adds no matching credit.
+
+`func_L00_003ADCD8` remains deferred. Its historical draft accesses 16 bytes
+through addresses of four-byte pointer-parameter spills. The caller passes
+ordinary object pointers, not vector values. Hardware alignment behavior does
+not make those out-of-bounds C objects valid. A complete object and a truthful
+lowering must be established before reopening it; no handwritten-assembly
+classification follows merely from this failed reconstruction.
+
 **29 October 2026 cross-release integration:** `func_L15_00434D28` passed its
 local PAL check but failed strict linking because its direct in-unit call needed
 the C section for `func_L15_004351E0`, whose body is not carried into PAL.
@@ -1223,13 +1253,36 @@ A start inside a prior epilogue, measured linker filler, or an implausible entry
 
 No jr, two returns, a short size, or a register read before its local definition is not proof by itself. Trap/tail-call bodies may lack jr; ABI-defined live-ins must be considered. A four-byte residue needs its surrounding completed return and reference evidence, not just its size.
 
-**Unresolved pre-prologue hypothesis, `func_L05_0042AFE0`:** the current
-720-byte row uses F1 before defining it. All twelve carrying placements across
-US, US2 and PAL have a preceding GP load into F1. Including that word would
-produce a 724-byte body, but no direct jump/call, absolute pointer or nearby
-address-construction witness has established that entry. Keep the catalogue
-unchanged until entry evidence resolves the hypothesis. The retained diagnostic
-records the offsets; it receives no C or handwritten-assembly credit.
+**Resolved entry, 30 October 2026, `func_L05_0042AFE0`:** callback address
+construction in `func_L05_0042AC30` (US/US2) and the distinct PAL caller
+`func_PAL_L05_00430828` reaches the GP load into F1 before the stack prologue.
+This is verified in levels 5, 10, 15 and 25 of all three releases. The original
+732-byte extent must skip eight bytes, not twelve: the twelve entries move
+back four bytes and grow from 720 to 724, retaining their ends and names.
+For example, USA level 5 changes `0042AFEC` to `0042AFE8` and still ends at
+`0042B2BC`. This supersedes the earlier hypothesis that lacked entry evidence;
+do not invent an F1 formal parameter or discard the live load.
+
+The existing generator accepts only this measured legacy 720-byte form when
+recovering the original span. Synthetic catalogue/carry regressions preserve
+the pre-prologue load, names and ends, reject unexpected sizes and replay
+without changes. The complete retained C now emits the leading load naturally
+and reaches 724 bytes, but remains nonmatching at all twelve places. There is
+no C or handwritten-assembly credit for the boundary repair itself.
+
+Primary regeneration uses `python3 tools/levels.py catalogue --version us`.
+To reproduce only this repair in the other two releases with the existing API:
+
+```sh
+python3 -c "import sys; sys.path.insert(0, 'tools'); import levels, carry; levels.select(sys.argv[1]); levels.FUNCTION_ENTRY_OFFSETS = {'func_L05_0042AFE0': levels.FUNCTION_ENTRY_OFFSETS['func_L05_0042AFE0']}; carry.refresh_entries()" us2
+python3 -c "import sys; sys.path.insert(0, 'tools'); import levels, carry; levels.select(sys.argv[1]); levels.FUNCTION_ENTRY_OFFSETS = {'func_L05_0042AFE0': levels.FUNCTION_ENTRY_OFFSETS['func_L05_0042AFE0']}; carry.refresh_entries()" pal
+```
+
+The unfiltered `carry.py --entries` also exposes an older, unrelated
+`func_00282848` repair in the release catalogues. Those rows are unchanged here;
+they need their own review. The scoped regeneration and its replay change only
+the three AFE0 rows. Always select the intended release explicitly when invoking
+tools from a process that has used `levels.select`, which also sets `RAC2_VERSION`.
 
 **Unresolved extent/entry hypothesis: `func_002D9730` (USA v1.01, PAL, USA v2.00).** Its 100-byte body has the same decoded sequence across the three releases apart from release-specific call targets. At the USA v1.01 start, the preceding function returns at `0x2D9728` with its stack adjustment in the delay slot; the next word clears object offset `0x44`. The target then makes four positive stack adjustments (`+0x10`, `+0x30`, `+0x10`, `+0x130`), each followed by `nop`, before allocating a 16-byte call frame, saving `$ra`, making three calls and returning 8. A direct branch/call scan of USA v1.01 boot text found no target inside the extent; indirect references have not been traced. The retained C draft compiles to 64 bytes under the default game profile and matches 0/28 places in each release. A 96-byte `__builtin_alloca` probe still emitted the compiler's normal frame-pointer/RA prologue before the clear. This does not distinguish a hidden indirect entry from an extent boundary; do not change the catalogue or classify it handwritten. Next: trace indirect references and the incoming stack/argument ABI before another C attempt.
 

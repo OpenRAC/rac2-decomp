@@ -1,3 +1,12 @@
+/* Safety review, 30 October 2026: historical draft below is NOT valid C.
+ * It reads and writes 16 bytes through the addresses of 4-byte pointer
+ * parameters a and b. Their retail stack slots are +0x30 and +0x34; the
+ * two-argument caller passes ordinary moby pointers, not vector values.
+ * Do not compile or promote those out-of-bounds TI dereferences. Retained
+ * solely to preserve the previous experiment. Reopen with an independently
+ * evidenced complete object and valid R5900 lowering for these operations;
+ * register pins, invented padding and fake volatile are not remedies.
+ */
 /* func_L00_003ADCD8 - 456 bytes.  Worker attempt, 27 October 2026 (draft below).
 
    Draft is a whole new file L00_003ADCD8-g8-qcopy-dbg.c; flags line to add to

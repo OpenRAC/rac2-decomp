@@ -1,19 +1,19 @@
-/* func_L09_003EA798 - 564 bytes.  Worker attempt, 28 October 2026 (draft below).
-   Diff-line counts below were measured with a masking that hid offset
-   differences; treat them as optimistic.
-
-   Size matches; 50 masked lines differ, all instruction order and FP/int
-   register numbering (byte store order, f0/f12 roles in the func_002B60B0 arg
-   block). Needs flags -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-
-   barrier. Tried retail store order, args as locals computed before the float
-   stores (this made the arg block land early like retail), K*D operand order. */
-
+/* Retained complete C reconstruction, 30 October 2026. NOT MATCHING.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * us: 09_dobbo: instruction at +0x74 differs; us2: 09_dobbo: instruction at +0x74 differs; pal: ABSENT.
+ * Measured state fields are represented by their true widths and offsets, and func_002B60B0 has
+ * its real pointer result. Modern qcopy keeps all 16-byte transfers. The typed initializer is
+ * retail-sized but differs first at +0x74; measured-order volatile fields grow it to 584 and
+ * were reverted.
+ * Reopen: Independent initializer source-order and FP argument lifetime witness.
+ * Local placement checks only; no strict linked or native-runtime claim.
+ */
 #include "common.h"
 
 typedef int Quadword __attribute__((mode(TI)));
 
 extern int func_00283CF0(float);
-extern void func_002B60B0(char *, float, float, float, float);
+extern void *func_002B60B0(char *, float, float, float, float);
 extern float func_L09_0033E7A0(int);
 extern int func_L09_003EA2D0(char *, int, int);
 extern void func_002A7750(char *, int, int);
@@ -23,10 +23,70 @@ extern float D_L09_001B0C04 __attribute__((sda));
 extern float D_L09_001B0C08 __attribute__((sda));
 extern float D_L09_001B0C0C __attribute__((sda));
 
+typedef struct {
+    char pad0[0x28];
+    unsigned char f28;
+    char pad29[0x6];
+    unsigned char f2F;
+    float f30;
+    char pad34[0x14];
+    unsigned char f48;
+    char pad49[0x1];
+    unsigned char f4A;
+    char pad4B[0x5];
+    float f50;
+    int f54;
+    int f58;
+    int f5C;
+    float f60;
+    char pad64[0x18];
+    int f7C;
+    float f80;
+    char pad84[0x10C];
+    unsigned char f190;
+    unsigned char f191;
+    unsigned char f192;
+    char pad193[0x3];
+    unsigned char f196;
+    unsigned char f197;
+    char pad198[0x4];
+    int f19C;
+    int f1A0;
+    float f1A4;
+    float f1A8;
+    float f1AC;
+    float f1B0;
+    int f1B4;
+    short f1B8;
+    char pad1BA[0x2];
+    float f1BC;
+    char pad1C0[0x8];
+    int f1C8;
+    char pad1CC[0x20];
+    unsigned char f1EC;
+    unsigned char f1ED;
+    unsigned char f1EE;
+    unsigned char f1EF;
+    char pad1F0[0x2];
+    unsigned char f1F2;
+    unsigned char f1F3;
+    char pad1F4[0x2];
+    unsigned char f1F6;
+    char pad1F7[0x159];
+    int f350;
+    int f354;
+    char pad358[0x14];
+    int f36C;
+    char pad370[0x4];
+    int f374;
+    char pad378[0x8];
+    int f380;
+} DobboMoverState;
+
 /* Initialises the state block of a new object: copies its position and heading into the
    block, sets the tuning constants and starts the first animation. */
 void func_L09_003EA798(char *object) {
-    char *state = *(char **)(object + 0x68);
+    DobboMoverState *state = *(DobboMoverState **)(object + 0x68);
     char *pos = object + 0x10;
     int entry;
     float ax;
@@ -34,57 +94,57 @@ void func_L09_003EA798(char *object) {
     float az;
     float aw;
 
-    *(Quadword *)(state + 0x330) = *(Quadword *)pos;
-    *(Quadword *)(state + 0x340) = *(Quadword *)(object + 0xF0);
-    *(unsigned char *)(state + 0x48) = func_00283CF0(25.0f);
-    *(unsigned char *)(state + 0x4A) = func_00283CF0(19.2f);
-    *(unsigned char *)(state + 0x1F2) = 4;
-    *(unsigned char *)(state + 0x1EC) = 4;
-    *(unsigned char *)(state + 0x1EE) = 4;
-    *(unsigned char *)(state + 0x1F3) = 8;
-    *(unsigned char *)(state + 0x1F6) = 1;
-    *(unsigned char *)(state + 0x28) = 3;
-    *(unsigned char *)(state + 0x2F) = 2;
-    *(unsigned char *)(state + 0x191) = 2;
-    *(unsigned char *)(state + 0x192) = 2;
-    *(unsigned char *)(state + 0x196) = 2;
-    *(unsigned char *)(state + 0x197) = 2;
-    *(unsigned char *)(state + 0x1ED) = 8;
-    *(unsigned char *)(state + 0x1EF) = 8;
-    *(unsigned char *)(state + 0x190) = 5;
+    qcopy((char *)state + 0x330, pos);
+    qcopy((char *)state + 0x340, object + 0xF0);
+    state->f48 = func_00283CF0(25.0f);
+    state->f4A = func_00283CF0(19.2f);
+    state->f1F2 = 4;
+    state->f1EC = 4;
+    state->f1EE = 4;
+    state->f1F3 = 8;
+    state->f1F6 = 1;
+    state->f28 = 3;
+    state->f2F = 2;
+    state->f191 = 2;
+    state->f192 = 2;
+    state->f196 = 2;
+    state->f197 = 2;
+    state->f1ED = 8;
+    state->f1EF = 8;
+    state->f190 = 5;
     ax = 0.00027777778f * D_L09_001B0C00;
     ay = 0.016666668f * D_L09_001B0C04;
     az = 4.8481374e-06f * D_L09_001B0C08;
     aw = 0.00029088825f * D_L09_001B0C0C;
-    *(float *)(state + 0x1A8) = 0.0025f;
-    *(float *)(state + 0x1B0) = 1.5f;
-    *(float *)(state + 0x1BC) = 0.4f;
-    *(float *)(state + 0x30) = 1.0f;
-    *(int *)(state + 0x1C8) = 5;
-    *(float *)(state + 0x1AC) = 0.0013888889f;
-    *(int *)(state + 0x19C) = 0;
-    *(int *)(state + 0x1A0) = 0;
-    *(int *)(state + 0x1B4) = 0;
-    *(short *)(state + 0x1B8) = 0;
-    *(int *)(state + 0x54) = 0;
-    *(int *)(state + 0x58) = 0;
-    *(int *)(state + 0x5C) = 0;
-    *(int *)(state + 0x7C) = 0;
-    *(float *)(state + 0x50) = 3.5f;
-    *(float *)(state + 0x60) = 3.1415927f;
-    *(float *)(state + 0x80) = 0.5235988f;
-    *(float *)(state + 0x1A4) = 0.0025f;
+    state->f1A8 = 0.0025f;
+    state->f1B0 = 1.5f;
+    state->f1BC = 0.4f;
+    state->f30 = 1.0f;
+    state->f1C8 = 5;
+    state->f1AC = 0.0013888889f;
+    state->f19C = 0;
+    state->f1A0 = 0;
+    state->f1B4 = 0;
+    state->f1B8 = 0;
+    state->f54 = 0;
+    state->f58 = 0;
+    state->f5C = 0;
+    state->f7C = 0;
+    state->f50 = 3.5f;
+    state->f60 = 3.1415927f;
+    state->f80 = 0.5235988f;
+    state->f1A4 = 0.0025f;
     func_002B60B0(object, ax, ay, az, aw);
-    *(int *)(state + 0x354) = *(int *)(state + 0x374);
-    func_L09_0033E7A0(*(int *)(state + 0x36C));
-    func_L09_0033E7A0(*(int *)(state + 0x350));
-    entry = *(int *)(state + 0x36C);
+    state->f354 = state->f374;
+    func_L09_0033E7A0(state->f36C);
+    func_L09_0033E7A0(state->f350);
+    entry = state->f36C;
     if (entry != -1) {
-        *(Quadword *)pos = *(Quadword *)(D_L09_001FE6C0[entry] + 0x10);
+        qcopy(pos, (char *)D_L09_001FE6C0[entry] + 0x10);
         func_L09_003EA2D0(object, entry, -1);
-        *(int *)(state + 0x380) = 0;
+        state->f380 = 0;
     } else {
-        *(int *)(state + 0x380) = 1;
+        state->f380 = 1;
     }
     func_002A7750(object, 1, 1);
 }

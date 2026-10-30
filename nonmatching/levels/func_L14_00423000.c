@@ -1,16 +1,12 @@
-/* Retained complete C repair, 2026-10-25; not linked or counted.
- * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy.
- * Private placement checks: us: 0/1, us2: 0/1, pal: absent.
- * This partial state view preserves the observed unknown bytes at
- * +0x734..+0x737. The output at +0x200 contains up to 32 actual 32-byte
- * records through +0x600: one 1024-byte array. B60B0 receives the live object
- * pointer and four FP values; its pointer/null result is ignored. Historical
- * screening used incorrect tail offsets and an incomplete callee declaration.
- * Current code is 580/576 bytes. Scheduling/constants and explicit object
- * forwarding still differ. Tail offsets and the actual output range are
- * corrected; this partial view does not claim a whole game-object extent.
+/* Retained reconstruction,30 October2026; not linked and no matching credit.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * 580/576 bytes; us 0/1, us2 0/1, pal absent.
+ * The reviewed qcopy form retains the previous four-byte gap. Keep the actual
+ * pointer-return emitter contract, unknown bytes at +0x734..+0x737, and all32 output
+ * records in the 1024-byte area at+0x200. This is a partial state view, not a
+ * whole-object extent. Reopen on independent initializer scheduling evidence.
  */
-
+#include "common.h"
 typedef int L14_TI128 __attribute__((mode(TI)));
 
 extern void *func_002B60B0(char *, float, float, float, float);
@@ -135,7 +131,7 @@ void func_L14_00423000(char *a0)
     s->i750 = func_L02_0032E508(a0, s->i73C, s->area200, 0x20);
     s->h77C = func_002A77E0(2);
 
-    s->vec710 = *(L14_TI128 *)(a0 + 0x10);
+    qcopy(&s->vec710, a0 + 0x10);
 
     n = s->h774;
     if (n > 0) {

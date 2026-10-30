@@ -1,9 +1,10 @@
-/* Game -O2 -G8 with qcopy and qcopy-barrier: 796/796 bytes.
- * Only the initial angular-velocity/constant schedule and FP allocation differ
- * at +0x90..+0x10c. All later instruction shapes match. In-place velocity
- * multiplication and grouped repeated constants improve allocation;
- * no-schedule-insns and moving the velocity calculation later do not match.
- * Next: establish the original initialization groups or retained field types.
+/* Retained reconstruction,30 October2026; not linked and no matching credit.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * 796/796 bytes; us 0/1, us2 0/1, pal absent.
+ * Reviewed qcopy preserves the complete position transfer without the old copy-profile
+ * requirement. The initial angular-velocity/constants schedule still differs at+0x90,
+ * as in the previous candidate. Reopen with genuine initialization-group or
+ * field-lifetime evidence.
  */
 #include "common.h"
 typedef int PrisonInitQuad __attribute__((mode(TI)));
@@ -50,7 +51,7 @@ int func_L14_004295D0(unsigned char *object)
         H(0x132) = D_L14_001B1950;
         H(0x134) = D_L14_001B1954;
         state[0x2e] = 1;
-        *(PrisonInitQuad *)(state + 0x2e0) = *(PrisonInitQuad *)(object + 0x10);
+        qcopy(state + 0x2e0, object + 0x10);
         I(0x31c) = 1;
         F(0x2b4) = 4.0f;
         func_00325B70(object, state + 0x300, 0, 2);
