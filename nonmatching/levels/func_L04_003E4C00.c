@@ -7,6 +7,8 @@
  * still differ. The five jump-table entries were read independently: event 1
  * falls through, 2/3 select animation 8, and 4/5 select animation 9 and reset.
  * Full 16-byte position transfers and canonical per-program symbols are kept.
+ * The emitter's actual pointer result is declared even though this caller ignores
+ * it; rechecking that corrected declaration retains 1524/1520 bytes in US/US2.
  * Four meaningful transfer/lifetime trials; reopen with independent state-field
  * grouping and initializer scheduling evidence, not register pins or fake uses.
  */
@@ -15,7 +17,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern float func_002A89A8(void *, int, float);
 extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
+extern void *func_002B60B0(void *, float, float, float, float);
 extern int func_002A7820(int, int);
 extern void func_002A7750(void *, int, int);
 extern int func_002A77E0(int);
