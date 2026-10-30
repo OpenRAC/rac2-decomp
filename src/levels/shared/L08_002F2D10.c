@@ -253,7 +253,56 @@ void func_L08_0032A4D0(u8 *a0, f32 *a1, f32 *a2, f32 *a3) {
     *a3 = *a3 * v[2];
 }
 
-INCLUDE_ASM("asm/levels", func_L08_0032C0D8);
+extern float func_00283180(float);
+extern float func_00283198(float);
+extern float func_00283B98(float, float);
+extern int func_002AB1F0(void *);
+extern void func_002A75E0(void *, int, int, int, int);
+extern void func_002A7470(void *, int, int, int);
+struct LaunchState {
+    float direction[4];
+    char gap10[8];
+    float radius, height;
+    char gap20[4];
+    unsigned int flags;
+    char gap28[4];
+    short lifetime;
+    char gap2e[14];
+    unsigned char active;
+    char gap3d;
+    short delay;
+    float heading;
+    int age;
+};
+
+void func_L08_0032C0D8(unsigned char *m, struct LaunchState *p, int animation, int flags, int frames, float angle)
+{
+    int effect;
+    int active;
+    p->direction[0] = func_00283180(angle) * p->radius;
+    p->direction[1] = func_00283198(angle) * p->radius;
+    p->direction[2] = p->height;
+    p->direction[3] = 1.0f;
+    {
+        float heading = func_00283B98(angle, 3.141593f);
+        short lifetime = 300;
+        active = 1;
+        p->age = 0;
+        p->delay = 0;
+        p->heading = heading;
+        p->lifetime = lifetime;
+        p->active = active;
+    }
+    effect = func_002AB1F0(m);
+    if (effect && *(float *)effect == 0.0f) {
+        p->flags |= 0x20;
+        *(int *)(m + 0x98) = 0;
+    }
+    if (p->flags & 2)
+        func_002A75E0(m, animation, frames, flags, active);
+    else
+        func_002A7470(m, animation, frames, flags);
+}
 
 s32 func_L08_003391C0(u8 *p, s32 a1, s32 a2, u8 *out, f32 f1, f32 f2) {
     u8 *q;
