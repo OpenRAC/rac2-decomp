@@ -11,26 +11,28 @@
 
    Near miss, 30 October 2026, USA v1.01, in src/game/0034CEA0.c (-O2 -G0
    -ffunction-sections) with the declarations below in place of its INCLUDE_ASM line:
-   218/220 words, 0/28 places. Everything outside the skip test aligns with retail (189 of
-   220 instructions identical by difflib, the rest relocation fields and the shift).
-   Left: retail loads D_001A7478 into $v1 for the == 3 and == 2 tests and keeps a plain copy
-   in $a1 for the later != 0 test, leaving the delay slots of the mode/held tests as nops.
-   This C computes the != 0 flag with sltu instead; a plain `int mode = D_001A7478` copy is
-   coalesced into one register (then the two `skip = 1` tails cross-jump), and a short/char
-   copy becomes a second, narrower load.
+   218/220 words, 0/28 places; decomp-permuter (rac2/ntsc built natively) scores it 9
+   (it started at 24). The branch layout of the skip test now matches retail, including
+   the likely-branch and movn tails. Left: the %hi of D_001A7A08 is hoisted into the
+   delay slot of the mode == 2 test (retail leaves a nop there), and its value, the %hi
+   of D_001A7478 and the mask take other temporaries than retail's $v0/$v1.
 
-   What it took to get here (each measured): the pad block as a struct global, so direct
-   field accesses rematerialise the base from a shared %hi like retail (a char * local keeps
-   it in one register); `skip = 0` before func_002B9000(); separate count variables with the
-   subtraction before the ring call (it fills the call's delay slot); a char * local for
-   D_00188660 (retail materialises its base for the single + 0x5C load); and if/else skip
-   assignments (the final one becomes retail's addiu/movn), not an || value.
+   Measured steps, in order: the pad block as a struct global, so direct field accesses
+   rematerialise the base from a shared %hi like retail (a char * local keeps it in one
+   register); `skip = 0` before func_002B9000(); separate count variables with the
+   subtraction before the ring call; a char * local for D_00188660; if/else skip
+   assignments (retail's addiu/movn tail), not an || value. Then two reuse patterns,
+   the decisive ones: a `long` copy of D_001A7478 taken before the != 3 test gives
+   retail's daddu $a1,$v1 in that test's delay slot (an int copy is coalesced with the
+   load, a short/char copy becomes a second load, a != 0 flag becomes sltu); and loading
+   D_001A7A08 into an already-used local (w0 here; n or m do the same) keeps the two
+   `skip = 1` tails apart as in retail, where a fresh local is folded away (score 17).
+   The same habit, a reused scratch local, is what matched func_L00_003B69D8.
 
-   Two decomp-permuter runs (OpenRAC tools/permuter, profile rac2/ntsc built natively;
-   170,818 + 174,244 candidates) went from 24 to 13 differing instructions, the notMode0
-   flag being their main find. Lower scores (9-11) all used inline asm barriers or register
-   pins, which AGENTS.md does not allow; the best clean candidates scored 12 with no
-   source-level meaning (e.g. comparing D_001A7478 against a variable holding 3). */
+   Permuter runs (asm passes off): 9 is the best candidate that keeps the meaning; its
+   score-7 candidates all move the D_001A7A08 load so the 0xFFFF0000 test reads the pad
+   word instead, which changes behaviour. Earlier runs with asm passes reached lower
+   scores only through inline asm barriers and register pins, which AGENTS.md forbids. */
 
 typedef struct {
     char pad0[0x1A0];
@@ -75,7 +77,7 @@ int func_0034F048(void *decoder, u8 *ring, s32 *stream)
     u8 *data;
     s32 count;
     int skipped;
-    int notMode0;
+    long notMode0;
     int released = 0;
     int started = 0;
     int left = stream[0];
@@ -98,17 +100,20 @@ int func_0034F048(void *decoder, u8 *ring, s32 *stream)
         if (w0 == 0)
             released = 1;
         if (released) {
+            notMode0 = D_001A7478;
             if (D_001A7478 != 3) {
-                notMode0 = D_001A7478 != 0;
                 if (D_001A7478 == 2 && w0 != 0 && D_00138180.u.w.w1 == 0)
                     skip = 1;
-                else if (((D_001A7A08 & 0xFFFF0000) != 0 || notMode0 || D_001A79F0 <= 0)
-                         && (D_00138180.u.w.w1 & 0x800))
-                    skip = 1;
-                else if ((D_00138180.u.both & 0x8000000000FULL) == 0x8000000000FULL)
-                    skip = 1;
-                else
-                    skip = 0;
+                else {
+                    w0 = D_001A7A08;
+                    if (((w0 & 0xFFFF0000) != 0 || notMode0 || D_001A79F0 <= 0)
+                        && (D_00138180.u.w.w1 & 0x800))
+                        skip = 1;
+                    else if ((D_00138180.u.both & 0x8000000000FULL) == 0x8000000000FULL)
+                        skip = 1;
+                    else
+                        skip = 0;
+                }
             }
         }
         if (skip && !skipped) {
