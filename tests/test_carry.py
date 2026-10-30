@@ -59,6 +59,38 @@ class CrossIdentity(unittest.TestCase):
 
 
 class Carry(unittest.TestCase):
+    def test_legacy_preprologue_entry_refresh_keeps_load_end_and_identity(self):
+        name = "func_L05_0042AFE0"
+        load = (0x31 << 26) | (28 << 21) | (1 << 16) | 0x3456
+        method = code(load, addiu(29,29,-64), addiu(2,0,11))
+        method += bytes(724-len(method)-8) + code(JR_RA,addiu(29,29,64))
+        raw = code(addiu(29,29,16),NOP) + method
+        for release_base in (0x210000,0x310008,0x410010):
+            with self.subTest(release_base=release_base), tempfile.TemporaryDirectory() as d:
+                boot, catalogue = Path(d)/"boot.tsv", Path(d)/"levels.tsv"
+                places = [(n,release_base+i*0x2000) for i,n in enumerate((5,10,15,25))]
+                images = {n:(a,raw) for n,a in places}
+                boot.write_text("# name\taddress\tsize\n")
+                catalogue.write_text("# name\tkind\tsize\tfingerprint\tlevels\tplaces\n" +
+                    f"{name}\tshared\t720\told\t4\t" +
+                    ",".join(f"{n:02d}:{a+12:08X}" for n,a in places) + "\n")
+                with patch.multiple(levels,BOOT_FUNCTIONS=boot,CATALOGUE=catalogue,
+                                    NAMES={n:"test" for n,_ in places}, FUNCTION_RESIDUES={}), \
+                     patch.object(levels,"level_text",side_effect=lambda p: images[int(p.name[:2])]):
+                    carry.refresh_entries()
+                    row, = levels.read_catalogue()
+                    self.assertEqual((row[0],row[1],row[2],row[4]),
+                                     (name,"shared",724,[(n,a+8) for n,a in places]))
+                    self.assertEqual(row[3],levels.fingerprint(method,places[0][1]+8))
+                    self.assertTrue(all(a+8+724 == a+732 for _,a in places))
+                    first = boot.read_bytes(),catalogue.read_bytes()
+                    carry.refresh_entries()
+                    self.assertEqual((boot.read_bytes(),catalogue.read_bytes()),first)
+                    catalogue.write_text(catalogue.read_text().replace("\t724\t","\t728\t"))
+                    before = boot.read_bytes(),catalogue.read_bytes()
+                    with self.assertRaises(ValueError):carry.refresh_entries()
+                    self.assertEqual((boot.read_bytes(),catalogue.read_bytes()),before)
+
     def test_entry_refresh_preserves_identities_removes_only_named_remnants_and_replays(self):
         with tempfile.TemporaryDirectory() as d:
             boot, catalogue = Path(d)/"boot.tsv", Path(d)/"levels.tsv"
