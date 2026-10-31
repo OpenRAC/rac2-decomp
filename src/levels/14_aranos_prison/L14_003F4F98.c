@@ -442,7 +442,7 @@ void func_L14_00423DC0(char *a0, int a1)
     *(float *)(s0 + 0x664) = f;
 }
 
-INCLUDE_ASM("asm/levels", func_L14_00423E50);
+/* func_L14_00423E50 is defined in L14_00423E50-gu.c (it needs -frac2-gcse-unsplit-edges). */
 
 
 INCLUDE_ASM("asm/levels", func_L14_00425CB0);
@@ -505,7 +505,7 @@ extern int func_002ACBC8(void *, int);
 extern void func_L00_002B9D60(void *, void *, int, int);
 extern void func_L14_00426D18(void *);
 extern void func_L00_003294F0(void *, int);
-extern int func_L00_0030DDB0(int, int);
+extern void func_L00_0030DDB0(int, int);
 extern int func_002B3868(void *);
 extern void func_L00_002B2A40(int, int, void *);
 extern void func_L01_00323310(int, int);
@@ -711,7 +711,7 @@ void func_L14_00426DE8(char *a0)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L14_00426F28);
+/* func_L14_00426F28 is defined in L14_003F4F98-g8.c (it reaches data through $gp). */
 
 
 /* func_L14_00427250 lives in the -g8 sibling file (it reaches a global through $gp). */

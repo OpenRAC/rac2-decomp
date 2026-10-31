@@ -1870,6 +1870,7 @@ src/levels/14_aranos_prison/L14_00304190-zp.c	-O2 -G0 -ffunction-sections -frac2
 src/levels/14_aranos_prison/L14_004281D0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/14_aranos_prison/L14_00423000-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy
 src/levels/14_aranos_prison/L14_00422498-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/14_aranos_prison/L14_00423E50-gu.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/levels/shared/L00_002A6420-target-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order -frac2-gcse-unsplit-edges
 src/levels/13_boldan/L13_004067F8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/11_joba/L11_00432628-reset-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
