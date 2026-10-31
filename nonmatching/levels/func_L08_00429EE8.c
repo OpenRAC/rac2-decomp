@@ -1,3 +1,6 @@
+/* Historical interface note: func_002FC560 takes a 64-bit second input.
+   This draft is preserved; func_L08_00429EE8-abi.c has the corrected standalone
+   declarations. Do not copy this draft's 32-bit declaration into src. */
 /* func_L08_00429EE8 - 452 bytes.  Worker attempt, 28 October 2026 (draft below).
    Diff-line counts below were measured with a masking that hid offset
    differences; treat them as optimistic.

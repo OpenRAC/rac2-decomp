@@ -1,5 +1,5 @@
 /*
- * Retained handwritten near miss; historical evidence only.
+ * Retained manually written near miss; historical evidence only.
  * No linked-image equality or complete retail semantics is established.
  * Compiler: game EE-GCC 2.9-ee-991111b (project profile).
  * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por.

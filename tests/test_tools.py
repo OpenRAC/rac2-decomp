@@ -80,6 +80,22 @@ class LevelExtents(unittest.TestCase):
 
 
 class FunctionExtents(unittest.TestCase):
+    def test_preprologue_load_entry_recovers_only_the_known_legacy_extent(self):
+        name = "func_L05_0042AFE0"
+        for base in (0x210000, 0x310008, 0x410010):
+            for displacement in (0, 0x2000, 0x4000, 0x6000):
+                original = base + displacement
+                with self.subTest(address=original):
+                    expected = (original + 8, 724)
+                    self.assertEqual(levels.function_extent(name, original, 732), expected)
+                    self.assertEqual(levels.function_extent(name, original + 12, 720), expected)
+                    self.assertEqual(levels.function_extent(name, *expected), expected)
+                    self.assertEqual(sum(expected), original + 732)
+        for size in (716, 728, 736):
+            with self.subTest(size=size), self.assertRaises(ValueError):
+                levels.function_extent(name, 0x210000, size)
+        self.assertEqual(levels.function_extent("unrelated", 0x21000C, 720), (0x21000C, 720))
+
     def test_named_residues_require_the_measured_size(self):
         for name, size in levels.FUNCTION_RESIDUES.items():
             with self.subTest(name=name):
@@ -213,6 +229,50 @@ class Identity(unittest.TestCase):
 
 
 class Catalogue(unittest.TestCase):
+    def test_legacy_preprologue_load_is_recovered_before_identity_replay(self):
+        name = "func_L05_0042AFE0"
+        # Authored synthetic instructions: filler, a GP FP load before the
+        # prologue, a constant result and a normal return. No retail arrays.
+        load = (0x31 << 26) | (28 << 21) | (1 << 16) | 0x1234
+        method = code(load, addiu(29, 29, -64), addiu(2, 0, 9))
+        method += bytes(724 - len(method) - 8) + code(JR_RA, addiu(29, 29, 64))
+        raw = code(addiu(29, 29, 16), NOP) + method
+        places = [(5, 0x210000), (10, 0x230008), (15, 0x250010), (25, 0x270018)]
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            boot, catalogue, dump = root / "boot.tsv", root / "levels.tsv", root / "dump"
+            boot.write_text("# name\taddress\tsize\nfunc_00001000\t00001000\t8\n")
+            catalogue.write_text("# name\tkind\tsize\tfingerprint\tlevels\tplaces\n" +
+                f"{name}\tshared\t720\told\t4\t" +
+                ",".join(f"{n:02d}:{a+12:08X}" for n, a in places) + "\n")
+            for n, a in places:
+                directory = dump / f"{n:02d}_test"
+                directory.mkdir(parents=True)
+                (directory / "manifest.json").write_text(json.dumps({"sections": [
+                    {"name": "text", "address": a}]}))
+                (directory / "text.bin").write_bytes(raw)
+            with patch.multiple(levels, BOOT_FUNCTIONS=boot, CATALOGUE=catalogue,
+                                LEVELS=root, BOOT_PAIRS=root / "absent.tsv", DUMP=dump,
+                                NAMES={n:"test" for n, _ in places}, BOOT_RESIDUES={},
+                                FUNCTION_RESIDUES={}, FUNCTION_ENTRY_OFFSETS={name:(732,8)}), \
+                 patch.object(levels, "boot_image", return_value=(code(JR_RA,NOP), [(0x1000,0,8)])), \
+                 patch.object(sys, "argv", ["levels.py", "catalogue"]):
+                levels.catalogue()
+                row, = levels.read_catalogue()
+                self.assertEqual((row[0],row[1],row[2],row[4]),
+                                 (name,"shared",724,[(n,a+8) for n,a in places]))
+                self.assertEqual(row[3], levels.fingerprint(method, places[0][1]+8))
+                first = boot.read_bytes(), catalogue.read_bytes()
+                levels.catalogue()
+                self.assertEqual((boot.read_bytes(), catalogue.read_bytes()), first)
+                # A different first FP destination in another copy must fail
+                # before either catalogue is written, rather than hide the load.
+                changed = dump / "10_test" / "text.bin"
+                changed.write_bytes(raw[:8] + code(load ^ (1 << 16)) + raw[12:])
+                with self.assertRaisesRegex(ValueError, "differs after entry correction"):
+                    levels.catalogue()
+                self.assertEqual((boot.read_bytes(), catalogue.read_bytes()), first)
+
     def test_historical_bootstrap_does_not_require_an_existing_catalogue(self):
         raw = code(JR_RA,NOP)
         with tempfile.TemporaryDirectory() as d:

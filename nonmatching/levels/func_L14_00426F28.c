@@ -1,14 +1,15 @@
-/* Game -O2 -G8: 744/744 bytes, 0/1 USA placement.
- * The text helper returns int, the query returns its hit pointer, and the
- * approach helper returns float. With these actual contracts, only the
- * flags temporary at +0x248..+0x268 uses v1 rather than v0. Uint/ushort
- * snapshots tie; a uint64 snapshot grows to 752 bytes. A void text-helper
- * declaration matched but is not the actual source contract and was rejected.
- * Next: an evidenced object-field scope or allocation-lifetime change.
+/* Retained reconstruction,30 October2026; not linked and no matching credit.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * 744/744 bytes; us 0/1, us2 absent, pal absent.
+ * A measured owner-header prefix and canonical sound-helper name retain the real int
+ * return. The flags temporary still differs at+0x248; the typed field view does not
+ * resolve it. A false void return must not be used to obtain a match.
  */
 #include "common.h"
+typedef struct { u8 prefix[0x34]; u16 flags; u8 gap[0x98 - 0x36]; u32 pending; } PrisonHeader;
+
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; void *owner; } PrisonSoundAnchor;
-extern int prisonStartSound(int, int, void *) __asm__("func_002E5CF8");
+extern int func_002E5CF8(int, int, void *);
 extern float func_00283198(float);
 extern void func_002A7750(void *, int, int);
 extern void func_002E59F8(int);
@@ -51,7 +52,7 @@ void func_L14_00426F28(unsigned char *object)
             func_002A7750(object, 2, -1);
         }
         if (((PrisonSoundAnchor *)(D_00188660 + *(int *)(state + 8) * 112))->owner != object || !((PrisonSoundAnchor *)(D_00188660 + *(int *)(state + 8) * 112))->active)
-            *(int *)(state + 8) = prisonStartSound(0, 4, object);
+            *(int *)(state + 8) = func_002E5CF8(0, 4, object);
         break;
     case 2:
         ticks = D_L14_001B20C8;
@@ -72,11 +73,11 @@ void func_L14_00426F28(unsigned char *object)
         *(int *)(state + 8) = -1;
         if (!D_0018C0D4) {
             func_L00_0030DD70(D_L14_001B1800, 240);
-            flags = *(unsigned short *)(object + 0x34);
-            *(int *)(object + 0x98) = 0;
+            flags = ((PrisonHeader *)object)->flags;
+            ((PrisonHeader *)object)->pending = 0;
             flags |= 0x41;
             flags &= 0xefff;
-            *(unsigned short *)(object + 0x34) = flags;
+            ((PrisonHeader *)object)->flags = flags;
             func_002A7750(object, 3, -1);
         }
         break;

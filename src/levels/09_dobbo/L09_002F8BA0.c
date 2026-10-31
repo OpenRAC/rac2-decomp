@@ -720,7 +720,7 @@ INCLUDE_ASM("asm/levels", func_L09_003FC1E8);
 
 /* func_L09_003FCF68 is defined in L09_002F8BA0-beam-g64.c. */
 
-INCLUDE_ASM("asm/levels", func_L09_003FD128);
+/* func_L09_003FD128 is in L09_003FD128-g8.c. */
 
 /* func_L09_003FD460 is defined in L09_002F8BA0-beam-g64.c (a 64-byte table read through $gp). */
 

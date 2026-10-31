@@ -1,5 +1,8 @@
+/* The complete 64-byte contact record includes the opaque +0x34 word.
+ * The bounded consumer audit found no semantic use of that word here; this
+ * is not proof that it is padding or that every indirect consumer ignores it. */
 /*
- * Retained handwritten near miss; historical evidence only.
+ * Retained manually written near miss; historical evidence only.
  * No linked-image equality or complete retail semantics is established.
  * Compiler: game EE-GCC 2.9-ee-991111b (project profile).
  * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-gcse.

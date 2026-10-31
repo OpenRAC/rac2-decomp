@@ -320,7 +320,7 @@ void func_L07_003EEE08(char *arg)
     func_002A7750(arg, 5, -1);
 }
 
-INCLUDE_ASM("asm/levels", func_L07_003EEE28);
+/* func_L07_003EEE28 is defined in L07_003EEE28-g8.c. */
 
 extern float func_002E5460(int);
 

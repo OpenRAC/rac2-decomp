@@ -535,7 +535,9 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_L05_00414F90": (1548, 8),
     "func_L05_00419888": (1084, 16),
     "func_L05_0041A228": (2164, 8),
-    "func_L05_0042AFE0": (732, 12),
+    # The callback registered by 0042AC30 (and its PAL counterpart) starts at
+    # +8, on the F1 load before the stack prologue, in all twelve placements.
+    "func_L05_0042AFE0": (732, 8),
     "func_L05_00441F30": (1128, 8),
     "func_L06_003E1040": (104, 8),
     "func_L06_004012B0": (1388, 8),
@@ -710,6 +712,10 @@ def function_extent(name: str, address: int, size: int) -> tuple[int, int]:
     if name not in FUNCTION_ENTRY_OFFSETS:
         return address, size
     original, skip = FUNCTION_ENTRY_OFFSETS[name]
+    # Earlier catalogues over-trimmed this one entry by four bytes. Recover
+    # only that measured legacy size, retaining its original end and name.
+    if name == "func_L05_0042AFE0" and size == 720:
+        return address - 4, 724
     if size == original - skip:
         return address, size
     if size != original:
@@ -898,8 +904,8 @@ def catalogue() -> None:
 
     def remember_entry(name, a, n, read, kind):
         original, skip = FUNCTION_ENTRY_OFFSETS[name]
-        function_extent(name, a, n)       # validate before writing any output
-        start = a if n == original else a - skip
+        entry, _ = function_extent(name, a, n)   # validate before writing any output
+        start = entry - skip
         key = fingerprint(read(start, original), start), original
         entry_keys.setdefault(key, set()).add(name)
         entry_bodies[name] = (fingerprint(read(start + skip, original - skip), start + skip),
@@ -978,8 +984,12 @@ def catalogue() -> None:
                 # Replay keeps the association established by the original
                 # extent, provided the shortened code still matches its measured
                 # identity. It may now be identical to other methods.
-                if function_extent(original_name, a, n) != (a, n):
-                    raise ValueError(f"{original_name}: level {number} no longer matches its original extent")
+                corrected = function_extent(original_name, a, n)
+                if corrected != (a, n):
+                    if original_name != "func_L05_0042AFE0" or n != 720:
+                        raise ValueError(f"{original_name}: level {number} no longer matches its original extent")
+                    a, n = corrected
+                    body = data[a - base:a - base + n]
                 if entry_bodies[original_name] != (fingerprint(body, a), n):
                     raise ValueError(f"{original_name}: level {number} differs after entry correction")
                 entry_name = original_name

@@ -1,3 +1,7 @@
+/* Historical unsafe draft, preserved for comparison. The measured rate is
+   1/60, not 1/120. func_00282F70 takes one float; the negative acceleration
+   belongs to func_L00_0031CDD0, which takes an optional output pointer and two
+   floats. Use func_L07_003F43E0-ballistic.c for the corrected contracts. */
 /* Mid worker 7: near miss, flags -O2 -G8 -ffunction-sections -frac2-qcopy (own file, 408 B, frame 0xA0 with the
    float[16] local). Calls, arguments, frame and every store match; 15 instructions differ only in float
    load / multiply scheduling: retail loads the $gp scalar 0x1E48 first (f1), then 0x24(obj) -> f0, 0x1E44 (f20),

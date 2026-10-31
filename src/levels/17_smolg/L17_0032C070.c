@@ -498,9 +498,9 @@ void func_L17_003C5E78(char *a2)
 
 INCLUDE_ASM("asm/levels", func_L17_003C6130);
 
-INCLUDE_ASM("asm/levels", func_L17_003C69A8);
+/* func_L17_003C69A8 is defined in its dedicated-g8.c source. */
 
-INCLUDE_ASM("asm/levels", func_L17_003C6CE8);
+/* func_L17_003C6CE8 is defined in its dedicated-g8.c source. */
 
 /* func_L17_003C7018 is defined in L17_0032C070-g8.c (this unit has no $gp access for it). */
 
