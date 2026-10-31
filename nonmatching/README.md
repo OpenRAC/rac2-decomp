@@ -1088,7 +1088,6 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 | [`func_L19_00380918`](levels/func_L19_00380918.c) | 348 | near miss; see the retained draft for measured differences |
 
 
-| [`func_002D53F0`](game/func_002D53F0.c) | 140 | Retained wide-style near miss. PR #365 u32 trials used a false ABI: target unsigned long is 64 bits. Earlier candidate restored; no new match. |
 
 | [func_00290B48](game/func_00290B48.c) | 280 | Default -G0 game profile: four source arrangements plus corrected pointer-return memset prototype / nine checker invocations, no scratch compiles. Initial 276 bytes, retained 280 bytes; 0/28 placements in each of us, pal and us2, first difference +0x3C. State initialization uses inferred relocation-safe boundary references; prologue/epilogue agree while central allocation, immediate construction and store scheduling differ. Needs original state-layout/store-order or matched-equivalent evidence. Marker restored; no strict build performed for this draft. |
 

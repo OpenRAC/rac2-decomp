@@ -1,3 +1,4 @@
+#include "common.h"
 #include "include_asm.h"
 
 /*
@@ -192,7 +193,30 @@ int func_002D5290(char *object) {
 
 /* func_002D52D8 is in the -G8 sibling. */
 
-INCLUDE_ASM("asm/game", func_002D53F0);
+extern float D_001B23A4 MACRO_ADDR;
+extern void func_0029C530(void);
+extern unsigned char *func_00288FB8(int);
+extern int func_0027FAA8(int, int, u64, unsigned char *, int);
+
+/* Draws text 0x2D4F at x 0x1A6 and a row scaled from D_001B23A4. The do { } while (0) around
+   the draw call leaves loop notes in the block, which the scheduler treats as a barrier: the
+   argument setup after func_00288FB8 keeps retail's order and 329.0f lands in $f2 (compare
+   func_002EB7E8 and func_00124818). */
+int func_002D53F0(void)
+{
+    int y;
+    float scale;
+
+    func_0027C540(0);
+    func_0029C530();
+    scale = 329.0f;
+    y = (int)(D_001B23A4 * scale + 0.5f);
+    do {
+        func_0027FAA8(0x1A6, y, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
+    } while (0);
+    func_0027C660();
+    return 0;
+}
 
 extern void func_00287E80(void);
 extern void func_00341540(char *, char *, char *, char *);
