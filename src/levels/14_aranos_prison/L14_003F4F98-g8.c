@@ -26,14 +26,42 @@ extern float D_L14_001B17BC __attribute__((sda));
 
 extern char D_00189EA0[];
 
-extern int func_00282948(void *table);
-
 extern void *func_L00_002D70A0(int size);
 
 extern void func_L00_002D7140(void *block);
 
-/* Rewinds the step timer, then respawns the effect the first live slot names, or frees it. */
-INCLUDE_ASM("asm/levels", func_L14_00426E60);
+extern int func_002ACBC8(void *, int);
+
+typedef struct {
+    float x;
+    float y;
+} EffectPair;
+
+/* Scans the four slot words at state+0x20; at the first one that is set and passes func_002ACBC8,
+   makes sure the pool record at state+0x14 exists and writes D_L14_001B17B8/BC into its first two
+   floats. If none passes, frees the record. */
+void func_L14_00426E60(char *a0)
+{
+    char *state = *(char **)(a0 + 0x68);
+    int *slot = (int *)(state + 0x20);
+    int i;
+
+    for (i = 0; i < 4; i++, slot++) {
+        if (*slot != -1 && func_002ACBC8(D_00189EA0, *slot) != 0) {
+            if (*(EffectPair **)(state + 0x14) == 0) {
+                *(EffectPair **)(state + 0x14) = func_L00_002D70A0(5);
+            }
+            (*(EffectPair **)(state + 0x14))->x = D_L14_001B17B8;
+            (*(EffectPair **)(state + 0x14))->y = D_L14_001B17BC;
+            return;
+        }
+    }
+
+    if (*(EffectPair **)(state + 0x14) != 0) {
+        func_L00_002D7140(*(EffectPair **)(state + 0x14));
+        *(EffectPair **)(state + 0x14) = 0;
+    }
+}
 
 extern float D_L14_001B16B0 __attribute__((sda));
 extern int func_002A9640(char *a0, int a1, int a2);

@@ -30,7 +30,7 @@ void func_L20_004095D0(char *arg0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L20_0039D680);
+/* func_L20_0039D680 is defined in L20_0039D680-g8.c (it reads D_L20_001B2FB8 through $gp, which func_L20_0039E890 here reads absolutely). */
 
 /* func_L20_0039E368 dispatches through the level's own jump table
    jtbl_002B4CA0 and reads D_L20_001AED04 and D_L20_001AED08 through
@@ -179,20 +179,124 @@ end:
     return;
 }
 
-INCLUDE_ASM("asm/levels", func_L20_0039E9F8);
+/* func_L20_0039E9F8 is defined in L20_0039E9F8-g8.c (it reaches D_L20_001B308C by absolute address and needs -mno-split-addresses). */
 
 /* func_L20_0039ED78 reads D_L20_001AEDA8 and D_L20_001AED90 through
-   $gp; its near miss is in nonmatching/levels/func_L20_0039ED78.c
-   and belongs in this -G8 unit. */
-INCLUDE_ASM("asm/levels", func_L20_0039ED78);
+   $gp. Each branch makes its own func_00283D38 call; cross-jumping
+   merges the two identical call tails, which puts the 0.5f add in the
+   jal delay slot as in the retail. */
+extern int func_00282948(void *);
+extern float func_00283B98(float, float);
+extern float func_00283198(float);
+extern int func_00283D38(float, int, int);
+extern float func_00283CE0(int);
+extern void func_L00_002E6CF0(void *, void *);
+extern void func_L20_0039F230(char *);
+
+extern int D_L20_001AEDA8 __attribute__((sda));
+extern int D_L20_001AED90 __attribute__((sda));
+extern int D_L20_001AED94;
+extern int D_L20_001AED98;
+extern int D_L20_001AED9C;
+
+void func_L20_0039ED78(char *arg0) {
+    char *state = *(char **)(arg0 + 0x68);
+
+    if (func_00282948(state) != 0) {
+        func_0029F338(arg0);
+    } else {
+        f32 x = *(f32 *)(state + 0x8);
+        f32 r, s;
+        int v, w, lo, hi;
+
+        if (*(int *)(state + 0xC) != 0) {
+            r = func_00283B98(x, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            *(f32 *)(state + 0x8) = r;
+            s = func_00283198(r);
+            v = func_00283D38(s * 0.5f + 0.5f, D_L20_001AED90, D_L20_001AED94);
+        } else {
+            r = func_00283B98(x, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            *(f32 *)(state + 0x8) = r;
+            s = func_00283198(r);
+            v = func_00283D38(s * s * 0.5f + 0.5f, D_L20_001AED98, D_L20_001AED9C);
+        }
+        w = func_00283D38(0.15f, *(int *)(state + 0x10) | *(int *)(state + 0x4), v);
+        lo = w & 0xFFFFFF;
+        hi = w & 0xFF000000;
+        *(int *)(state + 0x10) = hi;
+        *(int *)(state + 0x4) = lo;
+        *(f32 *)(state + 0x14) = func_00283CE0(hi >> 24) * 0.00390625f;
+        func_L00_002E6CF0(func_L20_0039F230, arg0);
+    }
+}
 
 /* func_L20_003A0320 is in L20_003A0320-g8.c, where its independent
    address materializations use -mno-split-addresses. */
 
-/* func_L20_003BFEB8 reads -0x7600($gp); its near miss is in
-   nonmatching/levels/func_L20_003BFEB8.c and belongs in a -G8 unit
-   of its own, built with -fno-schedule-insns2. */
-INCLUDE_ASM("asm/levels", func_L20_003BFEB8);
+/* func_L20_003BFEB8: the tail is the moby collection record of func_L01_003D8AD0 (RAC1's
+   helga_update tail): the current table's collected[] entry is always written, the
+   checkpoint's when the mission byte is 0xFF, or its group bit is clear in D_L20_001B2DE0
+   and set in the level's D_0019B2E8 row. */
+
+extern int func_002A8508(int, int);
+extern int func_002ACBC8(void *, int);
+extern void func_L02_0031F858(int, int);
+
+extern char D_00189E20[] __attribute__((nosda));
+extern u8 D_0019B2E8[] __attribute__((nosda));
+extern u8 D_L20_001B2DE0[] __attribute__((nosda));
+extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021E340;
+extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021EFB0;
+extern s32 D_001A79F0 __attribute__((sda));
+
+void func_L20_003BFEB8(char *arg0) {
+    char *state = *(char **)(arg0 + 0x68);
+    s32 *p = (s32 *)state;
+    s32 count;
+    s32 c;
+    char *hero;
+
+    for (count = 0; count < 8; count++) {
+        if (*p != -1) {
+            if (func_002A8508(*p, -1) != 0) {
+                return;
+            }
+            p++;
+        }
+    }
+    hero = D_00189E20;
+    if (*(s32 *)(hero + 0x2294) == 0x31) {
+        return;
+    }
+    if (*(s32 *)(state + 0x28) != -1 && func_002ACBC8(hero + 0x80, *(s32 *)(state + 0x28)) == 0) {
+        return;
+    }
+    if (*(s32 *)(state + 0x24) != -1) {
+        *(u8 *)(arg0 + 0xBC) = *(u8 *)(state + 0x24);
+    }
+    c = *(s32 *)(state + 0x20);
+    if (c == 0xFF) {
+        u8 group;
+
+        D_L20_0021E340.collected[*(s16 *)(arg0 + 0xB2)] = *(u8 *)(arg0 + 0xB0) + 2;
+        if (*(u8 *)(arg0 + 0xB0) == 0xFF) {
+            goto record;
+        }
+        group = *(u8 *)(arg0 + 0xB0);
+        if (!(D_L20_001B2DE0[group] & 0x80) && (D_0019B2E8[group + (D_001A79F0 << 4)] & 0x80)) {
+        record:
+            D_L20_0021EFB0.collected[*(s16 *)(arg0 + 0xB2)] = *(u8 *)(arg0 + 0xB0) + 2;
+        }
+        func_0029F338(arg0);
+        return;
+    }
+    if (c != -1) {
+        *(u8 *)(arg0 + 0x20) = *(u8 *)(state + 0x20);
+    }
+    if (*(s32 *)(state + 0x2C) != -1) {
+        func_L02_0031F858(*(s32 *)(state + 0x2C), 1);
+    }
+}
 
 /* func_L20_003C0048 is defined in L20_003C0048-g8.c. */
 
@@ -202,4 +306,4 @@ INCLUDE_ASM("asm/levels", func_L20_00438F98);
 
 /* func_L20_004395B0 reads three floats through $gp; its near miss is in
    nonmatching/levels/func_L20_004395B0.c and belongs in this -G8 unit. */
-INCLUDE_ASM("asm/levels", func_L20_004395B0);
+/* func_L20_004395B0 is defined in L20_004395B0-g8.c (it reads three floats through $gp and uses common.h qcopy, whose typedefs clash with this unit's). */

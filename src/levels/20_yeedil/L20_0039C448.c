@@ -43,7 +43,7 @@ extern char *func_0029EFD0(int);
 
 /* func_L20_0039CF58 is defined in L20_0039CF58.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_0039D340);
+/* func_L20_0039D340 is defined in L20_0039D340-g8.c (it reads data through $gp). */
 
 
 extern int D_L20_001B2AC8 __attribute__((sda));
@@ -98,7 +98,7 @@ void func_L20_0039DB50(char *arg0, int arg1, int arg2, float f12) {
     func_002A7470(*(char **)(state + 0x254), arg1, (int)f12, arg2);
 }
 
-INCLUDE_ASM("asm/levels", func_L20_0039DBC8);
+/* func_L20_0039DBC8 is defined in L20_0039DBC8-g8.c (it needs the -G8 profile). */
 
 extern void func_0029F338(int);
 
@@ -211,7 +211,48 @@ extern char *func_L20_004448A8(char *, char *);
 
 /* func_L20_0039E158 is in L20_0039E158.c with its grouped-copy profile. */
 
-INCLUDE_ASM("asm/levels", func_L20_0039E1E8);
+extern f32 func_002A7878(f32, f32);
+extern f32 func_00283B98(f32, f32);
+extern f32 func_00283180(f32);
+extern f32 func_00283198(f32);
+extern void func_00282CF0(void *, void *, void *);
+extern f32 func_00282DF0(void *);
+extern void func_00282F70(char *, char *, f32);
+extern f32 func_00282E80(void *, void *);
+extern char D_00189E20[];
+extern float D_L20_001B9FD8;
+
+/* func_L20_0039E1E8: picks a point state[0x260] 8 to 12 units (in xy) from a target.
+ * When the target at state[0x200] is the hero's moby (D_00189E20 + 0x2290), the point
+ * is placed around the hero's position (D_00189E20 + 0x80) at an angle within 45
+ * degrees of D_L20_001B9FD8.  Otherwise it is the offset from the target to this
+ * moby, shortened to that distance when longer, added back to the target's position.
+ * state + 0x260 and arg0 + 0x10 are written at each use rather than kept in variables:
+ * that is what gives retail's copy of the pointer in a register live after the if. */
+void func_L20_0039E1E8(char *arg0) {
+    char *state = *(char **)(arg0 + 0x68);
+    f32 dist;
+    f32 angle;
+    char *hero;
+
+    dist = func_002A7878(8.0f, 12.0f);
+    hero = D_00189E20;
+    if (*(char **)(state + 0x200) == *(char **)(hero + 0x2290)) {
+        angle = func_002A7878(-45.0f, 45.0f);
+        angle = func_00283B98(angle * 0.017453294f, D_L20_001B9FD8);
+        *(f32 *)(state + 0x260) = func_00283180(angle) * dist;
+        *(f32 *)(state + 0x264) = func_00283198(angle) * dist;
+        *(int *)(state + 0x268) = 0;
+        func_00282CC0(state + 0x260, state + 0x260, hero + 0x80);
+    } else {
+        func_00282CF0(state + 0x260, arg0 + 0x10, *(char **)(state + 0x200) + 0x10);
+        if (dist < func_00282DF0(state + 0x260)) {
+            func_00282F70(state + 0x260, state + 0x260, dist);
+        }
+        func_00282CC0(state + 0x260, state + 0x260, *(char **)(state + 0x200) + 0x10);
+    }
+    *(f32 *)(state + 0x11C) = func_00282E80(arg0 + 0x10, state + 0x260);
+}
 
 
 /* func_L20_0039E5F0 is defined in L20_0039C448-g8.c (it reaches a global through $gp). */
@@ -220,10 +261,10 @@ INCLUDE_ASM("asm/levels", func_L20_0039E1E8);
 /* func_L20_0039E890 is defined in L20_0039C448-g8.c (it reaches a global through $gp). */
 
 
-INCLUDE_ASM("asm/levels", func_L20_0039EBB8);
+/* func_L20_0039EBB8 is defined in L20_0039EBB8-qcopy.c (it needs the grouped-copy profile with -g). */
 
 
-INCLUDE_ASM("asm/levels", func_L20_0039EEC8);
+/* func_L20_0039EEC8 is defined in L20_0039EEC8-g8-qcopy.c (it reaches data through $gp and needs the qcopy profile with -g). */
 
 /* func_L20_0039F210 is in L20_0039F210.c with its grouped-copy scheduling profile. */
 
@@ -241,7 +282,7 @@ void func_L20_0039F230(char *arg0) {
 
 INCLUDE_ASM("asm/levels", func_L20_0039F268);
 
-INCLUDE_ASM("asm/levels", func_L20_0039F560);
+/* func_L20_0039F560 is defined in L20_0039F560-g8.c (it reaches data through $gp and needs the qcopy profile without interblock scheduling). */
 
 INCLUDE_ASM("asm/levels", func_L20_0039F968);
 

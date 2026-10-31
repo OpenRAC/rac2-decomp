@@ -1,15 +1,11 @@
-/* Retained complete C repair, 2026-10-25; not linked or counted.
- * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy.
- * Private placement checks: us: 0/1, us2: 0/1, pal: absent.
- * This partial state view preserves the observed unknown bytes at
- * +0x734..+0x737. The output at +0x200 contains up to 32 actual 32-byte
- * records through +0x600: one 1024-byte array. B60B0 receives the live object
- * pointer and four FP values; its pointer/null result is ignored. Historical
- * screening used incorrect tail offsets and an incomplete callee declaration.
- * Current code is 580/576 bytes. Scheduling/constants and explicit object
- * forwarding still differ. Tail offsets and the actual output range are
- * corrected; this partial view does not claim a whole game-object extent.
+/* -frac2-qcopy for the 128-bit position copy into +0x710.
+ * The field-store order is the source order sched1 needs: its register-weight
+ * tie-break emits the stores that are a constant's last use first, so the
+ * stores sharing a constant (0x11, 3, 6, 0.5, 0.1, 1/240, 0.4) come first here.
+ * The tail is one call with the type, or 1 when there is no type
+ * (type 3 needs i730 set).
  */
+#include "common.h"
 
 typedef int L14_TI128 __attribute__((mode(TI)));
 
@@ -93,6 +89,15 @@ void func_L14_00423000(char *a0)
     s->b70 = 8;
     s->iA8 = 4;
     s->f80 = 0.06666667014360428f;
+    s->b71 = 0x11;
+    s->f7C = 0.10000000894069672f;
+    s->f84 = 0.004166666883975267f;
+    s->f90 = 0.5f;
+    s->f94 = 0.5f;
+    s->f9C = 0.4000000059604645f;
+    s->bCC = 3;
+    s->bCD = 6;
+    s->bCE = 3;
     s->b76 = 0x12;
     s->f88 = 0.008333333767950535f;
     s->f20 = 16.0f;
@@ -104,24 +109,15 @@ void func_L14_00423000(char *a0)
     s->bD3 = 0x1A;
     s->h24 = 0x10;
     s->b28 = 3;
-    s->b71 = 0x11;
-    s->f7C = 0.10000000894069672f;
-    s->f84 = 0.004166666883975267f;
-    s->f90 = 0.5f;
-    s->f94 = 0.5f;
-    s->f9C = 0.4000000059604645f;
-    s->bCC = 3;
-    s->bCD = 6;
-    s->bCE = 3;
     *(unsigned char *)(a0 + 0x30) = 0xC8;
     *(unsigned short *)(a0 + 0x32) = 0xC8;
     s->f144 = 0.25f;
     s->f110 = 0.4000000059604645f;
+    s->f114 = 0.5f;
+    s->f118 = 0.5f;
     s->f11C = 0.5f;
     s->f140 = 0.2617994248867035f;
     s->f13C = 0.0055555556900799274f;
-    s->f114 = 0.5f;
-    s->f118 = 0.5f;
     s->i14C = -1;
     s->f120 = 3.141590118408203f;
     func_002B60B0(a0, 0.0033333334140479565f, 0.10000000894069672f,
@@ -138,14 +134,8 @@ void func_L14_00423000(char *a0)
     s->vec710 = *(L14_TI128 *)(a0 + 0x10);
 
     n = s->h774;
-    if (n > 0) {
-        if (n != 3)
-            func_002A7750(a0, n, 1);
-        else if (s->i730 != -1)
-            func_002A7750(a0, 3, 1);
-        else
-            func_002A7750(a0, 1, 1);
-    } else {
+    if (n > 0 && (n != 3 || s->i730 != -1))
+        func_002A7750(a0, n, 1);
+    else
         func_002A7750(a0, 1, 1);
-    }
 }

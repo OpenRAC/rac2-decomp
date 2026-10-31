@@ -232,7 +232,62 @@ INCLUDE_ASM("asm/levels", func_L00_003EFA98);
 
 INCLUDE_ASM("asm/levels", func_L00_003EFD00);
 
-INCLUDE_ASM("asm/levels", func_L00_003EFF58);
+typedef int TI128_FF58 __attribute__((mode(TI)));
+typedef struct { TI128_FF58 position, normal, velocity; char *owner; int value, phase; float scale; int first, last; } EffectRecord_FF58;
+extern EffectRecord_FF58 *D_L00_001B2BB4_2[] __attribute__((sda));
+extern void func_00282F20_2(char *, char *, float);
+extern void func_00282CC0_2(char *, char *, char *);
+extern void func_00282DD8_2(char *, char *, char *);
+extern float func_002A7940(void);
+extern void func_L00_003F0198_2(char *, int, float, float, int);
+extern float func_00283B98_4(float, float);
+
+/* The record is reached through three handles (entry for the header and the first trail,
+   shape for the position/velocity block and the second): that is what reproduces retail's
+   saved-register assignment. */
+void func_L00_003EFF58(char *owner, int value, char *direction, char *position, float scale)
+{
+    TI128_FF58 local;
+    EffectRecord_FF58 *base = D_L00_001B2BB4_2[0];
+    EffectRecord_FF58 *record;
+    char *velocity;
+    char *normal;
+    EffectRecord_FF58 *entry;
+    int slot;
+    int step;
+    EffectRecord_FF58 *shape;
+    float angle;
+
+    slot = -1;
+    while (++slot <= 0) {
+        velocity = (char *)&base[slot].velocity;
+        record = base + slot;
+        normal = (char *)&base[slot].normal;
+        entry = record;
+        if (entry->owner != 0)
+            continue;
+        entry->value = value;
+        record->scale = scale;
+        entry->owner = owner;
+        record->phase = 0;
+        shape = record;
+        qcopy(&shape->position, position);
+        qcopy(velocity, direction);
+        ((float *)&shape->velocity)[2] = *(float *)(owner + 0x18);
+        func_00282F20_2((char *)&local, position, 2.0f);
+        func_00282CC0_2((char *)&local, (char *)&local, velocity);
+        func_00282DD8_2(normal, velocity, (char *)&local);
+        angle = func_002A7940();
+        for (step = 99; step >= 0; step--) {
+            func_L00_003F0198_2((char *)entry, 2, angle, 0.0f, 0);
+            func_L00_003F0198_2((char *)shape, 0, angle, 0.0f, 0);
+            angle = func_00283B98_4(angle, 0.06346652f);
+        }
+        entry->first = 0;
+        entry->last = 0;
+        break;
+    }
+}
 
 extern int func_00282948(char *p);
 

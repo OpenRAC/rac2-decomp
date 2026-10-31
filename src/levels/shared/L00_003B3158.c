@@ -122,7 +122,38 @@ INCLUDE_ASM("asm/levels", func_L00_003B5BF8);
 INCLUDE_ASM("asm/levels", func_L00_003B63D8);
 
 
-INCLUDE_ASM("asm/levels", func_L00_003B69D8);
+extern void func_L00_003B6B70();
+extern void func_L00_003B6F88();
+extern void func_00283098(void *, void *, void *);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_002833F0(void *, void *);
+extern void func_002A0F48(void *);
+extern char D_L00_001B8FF0[];
+
+void func_L00_003B69D8(NODE *a0)
+{
+    void **slots;
+    void **p;
+    char *q;
+    char *v;
+    int i;
+
+    slots = a0->f68;
+    func_L00_003B6B70();
+    v = (char *)slots;
+    func_L00_003B6F88(a0);
+    q = v + 0x10;
+    p = slots;
+    for (i = 1; i >= 0; i--) {
+        func_00283098((char *)*p + 0x10, q, D_L00_001B8FF0);
+        q += 0x10;
+        func_00282CC0((char *)*p + 0x10, (char *)*p + 0x10, D_L00_001B8FF0 - 0x230);
+        v = (char *)*p + 0xF0;
+        func_002833F0((char *)*p + 0xC0, v);
+        func_002A0F48(*p);
+        p++;
+    }
+}
 
 void func_L00_003B6A90(NODE *a0)
 {

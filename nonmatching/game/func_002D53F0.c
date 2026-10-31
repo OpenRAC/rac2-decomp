@@ -1,3 +1,11 @@
+/* 31 October 2026: exact (28 of 28 places) with `float scale = 329.0f;` held in a local AND
+ * the func_0027FAA8 call wrapped in a non-empty `do { ... } while (0);`, whose loop notes keep
+ * the argument setup after func_00288FB8 in retail's order and put 329.0f in $f2. Either change
+ * alone gives 0/28. Not landed: that wrapper is the open maintainer question in
+ * docs/MATCHING-BLOCKERS.md ("A non-empty do { ... } while (0) as a block barrier"), the same
+ * shape as func_0033A520's rounding of D_001B23A4 * 300. If the wrapper is accepted, this
+ * function lands with it.
+ */
 /* Maintainer ABI correction, 29 October 2026: the qualified EE compiler
  * measures sizeof(long) == sizeof(long long) == 8 and sizeof(void *) == 4.
  * The PR #365 trials narrowing the style argument to u32 used a false

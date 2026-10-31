@@ -16,16 +16,87 @@ extern void func_00280B90(void *, void *, int);
 extern void func_002FC560(int, long);
 typedef float RibbonVector[4] __attribute__((aligned(16)));
 typedef struct { float v[4]; } RibbonPoint;
+typedef int TI128 __attribute__((mode(TI)));
 typedef struct {
-    char pad[0x48];
-    int coreColor;
-    int haloColor;
+    TI128 pos;          /* 0x00 */
+    TI128 next;         /* 0x10 */
+    float height;       /* 0x20 */
+    int handle;         /* 0x24 */
+    int pad28;          /* 0x28 */
+    int count;          /* 0x2C */
+    int mode;           /* 0x30 */
+    int shape;          /* 0x34 */
+    int row;            /* 0x38 */
+    int dirty;          /* 0x3C */
+    float f40;          /* 0x40 */
+    float f44;          /* 0x44 */
+    int coreColor;      /* 0x48 */
+    int haloColor;      /* 0x4C */
 } RibbonOwnerState;
 typedef struct {
     int color[4];
     float uv[8];
     long primitive, texture, mode, flags;
 } RibbonMaterial;
+
+extern void func_L11_0046BC08(void *self);
+extern void func_L14_00422498(void *self);
+extern void func_L00_002E6EF8(void (*callback)(char *), void *object);
+extern void func_L14_004228C0(char *object);
+extern int func_00291308(float *position, float range, float radius, int color);
+
+extern int D_L14_001B1618 __attribute__((sda));
+extern float D_L14_001B1688 __attribute__((sda));
+extern float D_L14_001B168C __attribute__((sda));
+
+extern char *D_L14_001FE1C0[];
+extern char D_L14_002594F0[][0x280];
+
+/* Moves the ribbon's head to the object's position, eases its height and adds it to the
+   head; when the state is dirty, refreshes the newest four points of the ribbon's row from
+   the shape table and queues the draw callback. On the first update it resets the state. */
+void func_L14_004221D8(char *self)
+{
+    RibbonOwnerState *st = *(RibbonOwnerState **)(self + 0x68);
+    float v[4] __attribute__((aligned(16)));
+    char *src;
+    int count;
+    int i;
+
+    qcopy(&st->pos, self + 0x10);
+    qcopy(&st->next, &st->pos);
+    st->height += (6.0f - st->height) * 0.07f + 12.0f;
+    v[0] = 0;
+    v[1] = st->height;
+    v[2] = 0;
+    func_00282CC0(&st->next, &st->pos, v);
+    /* The new head is copied back into v as well; v is not used again. */
+    qcopy(v, &st->next);
+    D_L14_001B1618 = 20;
+    func_L11_0046BC08(self);
+
+    if (st->dirty != 0) {
+        func_L14_00422498(self);
+        count = D_L14_001B1618;
+        src = D_L14_001FE1C0[st->shape];
+        for (i = count - 4; i < count; i++) {
+            qcopy_nc(&D_L14_002594F0[st->row][i * 16], src + i * 16 + 0x10);
+        }
+        func_L00_002E6EF8(func_L14_004228C0, self);
+    }
+
+    if (*(unsigned char *)(self + 0x20) == 0) {
+        st->dirty = 0;
+        st->handle = func_00291308((float *)&st->pos, 0.0f, 0.0f, 0);
+        *(unsigned char *)(self + 0x20) = 1;
+        st->count = D_L14_001B1618;
+        st->coreColor = D_L14_001B1680;
+        st->haloColor = D_L14_001B1684;
+        st->f40 = D_L14_001B1688;
+        st->f44 = D_L14_001B168C;
+        st->mode = -1;
+    }
+}
 
 /* Draws a scrolled core and a camera-facing halo, with colours from the owner. */
 void func_L14_004229A0(char *object, RibbonPoint *points, int alpha, int outerAlpha, int count, float coreWidth, float haloWidth, float extend)

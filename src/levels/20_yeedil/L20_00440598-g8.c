@@ -1,18 +1,3 @@
-/* Opus big29 handoff, 2026-10-26: func_L20_00440598 (5,920 bytes, level 20, one place).
- * Profile: -O2 -G8 -ffunction-sections. Status: 1477/1480 instructions, about 1460 difflib-aligned
- * (big26: 1144); 29 instructions in about 12 groups left.
- * Left: the entry bne (retail bnel with the lbu 0x20 duplicated); the qzero of sp+0x10 (retail
- * rebuilds the address for the next call; qzero_nc would fix these 3 words, gated on the user's
- * decision); s4 = 1 placement; the D_001B2AD4 macro store lands in the jal slot (gp form) where
- * retail has t0; register choices for the 0x1A8F00 reads; case 24 store/argument order.
- * What helped: the Hero union with a plain D_00189E20 (retail's s1 = s0 - 0x80 related value),
- * one local per s0/tb/v job, the tied lui/lw form via incomplete sda arrays (D_001B2AC8,
- * d_001A8F00, D_001B2FA8, D_001B308C, d_001A8F20), MACRO_ADDR for absolute stores, a float-before-
- * call parameter order for func_L20_0043F318 and func_002AA2E8 (nested-call precompute), the 0xBC
- * reset after the join, the rotated list walk, and taking the func_002B3868 result before the
- * pointer set. d_001A8F00 is the absolute-form second name of D_L20_001A8F00 and needs a proper
- * level name (D_L20_001A8F00 / _sda) before landing; likewise d_001A8F20 and d_001B210C.
- */
 #include "common.h"
 extern int func_00282948(void *);
 extern void func_00282CC0(void *, void *, void *);
@@ -38,9 +23,9 @@ extern int func_002A7820(int, int);
 extern float func_002A7878(float, float);
 extern float func_002A7940(void);
 extern float func_002A89A8(void *, int, float);
-extern void func_002A8C28(s32, s32, s32, f32, f32, f32, s32, s32, s32);
+extern int func_002A8C28(void *, void *, s32, s32, s32, s32, f32, f32, f32);
 extern float func_002AA2E8(float *, float, float);
-extern void func_002AA800(s32, s32, f32, f32);
+extern void func_002AA800(float *, int, f32, f32);
 extern void func_002ACB48(float *, float);
 extern int func_002ACBC8(void *, int);
 extern s32 func_002AEB60(u8 *, f32);
@@ -70,9 +55,8 @@ extern void func_L20_00444088(char *arg0);
 extern void func_L20_00444AA8(char *arg0, float *arg1);
 typedef union { u8 b[0x2600]; s8 c[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; void *ptr[0x980]; s64 d[0x4C0]; } Hero;
 extern u8 D_00189E20[];
-extern u8 D_00189EA0[];
 
-extern void func_L20_00441CB8();
+extern void func_L20_00441CB8(char *);
 extern int func_L20_004421A8(char *);
 extern int func_L20_00442550(char *);
 extern void func_L20_00442F80(char *);
@@ -86,40 +70,42 @@ extern int func_L20_00444018(char *);
 extern void func_L20_004441D8(char *);
 extern int func_L20_00440398(int);
 extern char *func_L20_0039EEC8(char *, char *);
-extern void func_L20_0043F318(char *, void *, int, float, int, void *);
+extern char *func_L20_0043F318(char *, char *, int, float, int, int);
 extern void func_L20_00440570(void);
-extern s32 D_L20_001A8F00 __attribute__((sda));
+extern s32 D_L20_001A8F00[] __attribute__((sda));
+/* The same word, read through $gp in some places and absolutely in others. */
+extern s32 D_L20_001A8F00_gp SDATA(D_L20_001A8F00);
 extern s32 D_L20_001A8F08 __attribute__((sda));
 extern f32 D_L20_001B2030 __attribute__((sda));
 extern f32 D_L20_001B2038 __attribute__((sda));
-extern f32 D_L20_001B2040 __attribute__((sda));
+extern f32 D_L20_001B2040[] SDATA(D_L20_001B2040);
 extern f32 D_L20_001B2054 __attribute__((sda));
-extern f32 D_L20_001B2060 __attribute__((sda));
+extern f32 D_L20_001B2060[] SDATA(D_L20_001B2060);
 extern s32 D_L20_001B2070 __attribute__((sda));
 extern s32 D_L20_001B2074 __attribute__((sda));
 extern f32 D_L20_001B209C __attribute__((sda));
 extern f32 D_L20_001B20A0 __attribute__((sda));
-extern f32 D_L20_001B20B0 __attribute__((sda));
+extern f32 D_L20_001B20B0[] SDATA(D_L20_001B20B0);
 extern s32 D_L20_001B20C4 __attribute__((sda));
 extern s32 D_L20_001B20C8 __attribute__((sda));
-extern f32 D_L20_001B2100 __attribute__((sda));
+extern f32 D_L20_001B2100[] SDATA(D_L20_001B2100);
 extern u8 D_00188660[];
-extern s32 D_001B29C0[] MACRO_ADDR;
-extern s32 D_001B29E0[] MACRO_ADDR;
-extern s32 D_001B2AC8[] __attribute__((sda));
-extern s32 D_001B2AD4[] MACRO_ADDR;
-extern f32 D_001B2BE8[] MACRO_ADDR;
-extern char * D_001B2FA8[] __attribute__((sda));
-extern char * D_001B308C[] __attribute__((sda));
+extern s32 D_L20_001B29C0[] MACRO_ADDR;
+extern s32 D_L20_001B29E0[] MACRO_ADDR;
+extern s32 D_L20_001B2AC8[] __attribute__((sda));
+extern s32 D_L20_001B2AD4[] MACRO_ADDR;
+extern f32 D_L20_001B2BE8[] MACRO_ADDR;
+extern char * D_L20_001B2FA8[] __attribute__((sda));
+extern char * D_L20_001B308C[] __attribute__((sda));
 typedef union { u8 b[0x200]; s32 i[0x80]; f32 f[0x80]; } Blk200;
-extern u8 D_001B9E80[];
-extern s16 D_001C0184[];
-extern u8 D_001C01C0[];
-extern s32 D_001CA540[];
-extern s32 D_0021FC18[];
-extern s32 d_001A8F00[] __attribute__((sda));
-extern s8 d_001A8F20[] __attribute__((sda));
-extern f32 d_001B210C[] MACRO_ADDR;
+extern u8 D_L20_001B9E80[];
+extern s16 D_L20_001C0184[];
+extern u8 D_L20_001C01C0[];
+extern s32 D_L20_001CA540[];
+extern s32 D_L20_0021FC18[];
+extern s8 D_L20_001A8F20[] __attribute__((sda));
+/* Lane 3 of the D_L20_001B2100 vector, read absolutely. */
+extern f32 D_L20_001B210C[] MACRO_ADDR;
 extern char * D_0018C0B0[];
 extern s32 D_0018C0B4[];
 #define AT(T, p, o) (*(T *)((char *)(p) + (o)))
@@ -127,29 +113,28 @@ extern s32 D_0018C0B4[];
 void func_L20_00440598(char *self) {
     float sp[16] __attribute__((aligned(16)));
     char *st;
-    int ctr = D_001CA540[0];
-    int v1, v2, v3, v4, v5, v6;
+    int ctr = D_L20_001CA540[0];
+    int v1, v2, v3, v5, v6;
     int fl;
-    char *s0;
-    char *tb;
     char *s0_1, *s0_2, *s0_3, *s0_4, *s0_5, *s0_6, *s0_7, *tb_1, *tb_2, *tb_3;
 
     if (ctr == 2) {
         st = AT(char *, self, 0x68);
-        func_L20_00441CB8();
+        func_L20_00441CB8(self);
         if (AT(u8, self, 0x95) == 6) {
-            if ((u32)(AT(u8, self, 0x20) - 0x18) < 2U) {
+            if (AT(u8, self, 0x20) == 0x18 || AT(u8, self, 0x20) == 0x19) {
                 if (func_002ACBC8(D_00189E20 + 0x80, AT(s32, st, 0x230)) != 0) {
-                    qcopy(sp, &D_L20_001B2100);
-                    qzero(&sp[4]);
-                    sp[6] = d_001B210C[0];
+                    qcopy(sp, D_L20_001B2100);
+                    qzero_nc(&sp[4]);
+                    sp[6] = D_L20_001B210C[0];
                     func_002DF3F8(sp, &sp[4]);
                     D_L20_001B20A0 = D_L20_001B20A0 + 1.0f;
                     func_002A7750(self, 1, 0);
-                    fl = d_001A8F00[0];
+                    fl = D_L20_001A8F00[0];
                 } else {
-                    fl = D_L20_001A8F00;
+                    fl = D_L20_001A8F00_gp;
                 }
+                /* ctr is 2 here; retail compares against its saved copy. */
                 if (fl == ctr) {
                     AT(s32, self, 0x98) = 0;
                     AT(u16, self, 0x34) = (AT(u16, self, 0x34) | 0x41) & 0xEFFF;
@@ -158,8 +143,8 @@ void func_L20_00440598(char *self) {
                     AT(s32, self, 0x98) = AT(s32, AT(char *, self, 0x24), 0x10);
                 }
             }
-            if (D_001CA540[0] == 2) {
-                D_001B2BE8[0] = AT(f32, self, 0x18) - 2.0f;
+            if (D_L20_001CA540[0] == 2) {
+                D_L20_001B2BE8[0] = AT(f32, self, 0x18) - 2.0f;
             }
         }
         switch (AT(u8, self, 0x20)) {
@@ -186,7 +171,7 @@ void func_L20_00440598(char *self) {
                 AT(s32, st, 0x1854) = func_002E5CF8(1, 4, self);
             }
             if (AT(char *, st, 0x1850) != 0) {
-                func_00283098(sp, &D_L20_001B20B0, self + 0xC0);
+                func_00283098(sp, D_L20_001B20B0, self + 0xC0);
                 func_00282CC0(sp, sp, self + 0x10);
                 func_L20_0039F210(AT(char *, st, 0x1850), (char *)sp, 1);
             }
@@ -215,11 +200,11 @@ void func_L20_00440598(char *self) {
                 }
             }
             if (AT(char *, st, 0x1850) != 0) {
-                func_00283098(sp, &D_L20_001B20B0, self + 0xC0);
+                func_00283098(sp, D_L20_001B20B0, self + 0xC0);
                 func_00282CC0(sp, sp, self + 0x10);
                 func_L20_0039F210(AT(char *, st, 0x1850), (char *)sp, 0);
             }
-            func_002AA800(st + 0x1804, 0, 0.0f, 0.10471977f);
+            func_002AA800((float *)(st + 0x1804), 0, 0.0f, 0.10471977f);
             if (func_L20_00442550(self) != 0) {
                 if (D_0018C0B4[0] != 0x8C && (func_00282948(st + 0x17F8) == 1 || D_L20_001B20C8 != 0)) {
                     if (AT(s32, st, 0x1810) > 0) {
@@ -262,7 +247,7 @@ void func_L20_00440598(char *self) {
                 }
             } else if (func_002AEB60((u8 *)self, 32.0f) != 0) {
                 s0_2 = AT(char *, st, 0x17FC);
-                func_00282D30(sp, &D_L20_001B2040, D_L20_001B2030);
+                func_00282D30(sp, D_L20_001B2040, D_L20_001B2030);
                 func_00283098(sp, sp, self + 0xC0);
                 func_00282CC0(sp, sp, self + 0x10);
                 AT(char *, st, 0x17FC) = func_L20_00443790(s0_2, AT(s16, s0_2, 0xAA), (char *)sp);
@@ -292,30 +277,27 @@ void func_L20_00440598(char *self) {
             break;
         case 7: {
             int n;
-            f32 w;
             if (func_002B3868(self) != 0) {
                 if (AT(u8, self, 0x43) != 0x11) {
                     func_002A7470(self, 0x11, 0, 0x14);
                 }
                 AT(s32, st, 0x180C) = 0;
             }
-            n = 1;
             func_L01_00322288(self, func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - AT(f32, self, 0x14)));
-            AT(s32, st, 0x1808) = D_001B2AC8[0];
-            func_00283098(sp, &D_L20_001B2060, self + 0xC0);
+            AT(s32, st, 0x1808) = D_L20_001B2AC8[0];
+            func_00283098(sp, D_L20_001B2060, self + 0xC0);
             func_00282CC0(sp, sp, self + 0x10);
-            do {
+            for (n = 1; n >= 0; n -= 1) {
                 qcopy(&sp[4], sp);
-                n -= 1;
                 func_002ACB48(&sp[4], 1.5f);
                 sp[2] -= 0.5f;
-                func_002BDBC0((char *)&sp[4], d_001A8F20, 0x60309030, 0x107090, 0x2D, func_002A7878(2.0f, 3.0f) * 210000.0f);
-            } while (n >= 0);
+                func_002BDBC0((char *)&sp[4], D_L20_001A8F20, 0x60309030, 0x107090, 0x2D, func_002A7878(2.0f, 3.0f) * 210000.0f);
+            }
             if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && func_00282948(st + 0x180C) != 0) {
                 AT(s32, st, 0x180C) = D_L20_001B2070;
                 func_L20_00443B60(self, (char *)&sp[4], (char *)&sp[8], &sp[12]);
                 sp[6] += 1.5f;
-                func_L20_0043F318(self, &sp[4], 0x78, (f32)AT(u8, st, 0x35), func_002A77E0(2), st + 0x1808);
+                func_L20_0043F318(self, (char *)&sp[4], 0x78, (f32)AT(u8, st, 0x35), func_002A77E0(2), (int)(st + 0x1808));
             }
             if (D_L20_001B2074 < (s32)AT(u16, self, 0x96)) {
                 func_002A7750(self, 1, -1);
@@ -345,7 +327,7 @@ void func_L20_00440598(char *self) {
                 }
                 AT(s32, st, 0x1840) = func_002A7820(0x1E, 0x32);
             }
-            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (D_001B2AC8[0] & 7) == (((s32)self >> 8) & 7)) {
+            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (D_L20_001B2AC8[0] & 7) == (((s32)self >> 8) & 7)) {
                 func_L20_00443D58(self);
                 func_00282948(st + 0x1840);
             }
@@ -360,7 +342,7 @@ void func_L20_00440598(char *self) {
                 }
                 AT(s32, st, 0x1840) = func_002A7820(0xA, 0x14);
             }
-            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (D_001B2AC8[0] & 0x1F) == (((s32)self >> 8) & 0x1F)) {
+            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (D_L20_001B2AC8[0] & 0x1F) == (((s32)self >> 8) & 0x1F)) {
                 func_L20_00443DF0(self);
                 func_00282948(st + 0x1840);
             }
@@ -375,7 +357,7 @@ void func_L20_00440598(char *self) {
                 }
                 AT(s32, st, 0x1840) = func_002A7820(4, 5);
             }
-            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (D_001B2AC8[0] & 0x1F) == (((s32)self >> 8) & 0x1F)) {
+            if (AT(u8, self, 0x42) == AT(u8, self, 0x43) && (D_L20_001B2AC8[0] & 0x1F) == (((s32)self >> 8) & 0x1F)) {
                 if (func_L20_00444018(self) != 0) {
                     func_00282948(st + 0x1840);
                 } else {
@@ -390,7 +372,7 @@ void func_L20_00440598(char *self) {
             if (func_002B3868(self) != 0 && AT(u8, self, 0x43) != 0x11) {
                 func_002A7470(self, 0x11, 0, 0x14);
             }
-            if ((D_001B2AC8[0] & 7) == (((s32)self >> 8) & 7)) {
+            if ((D_L20_001B2AC8[0] & 7) == (((s32)self >> 8) & 7)) {
                 if (D_L20_001B20C4 != 0) {
                     func_002A7750(self, 0xD, -1);
                 } else if (func_L20_00443CF0(self) == 0 || func_L20_00440398(AT(s32, st, 0x21C)) >= 0x15) {
@@ -479,24 +461,24 @@ void func_L20_00440598(char *self) {
                         if ((AT(u8, self, 0x42) == 8 && dist < 9.0f && dist > 7.0f) || (AT(u8, self, 0x43) == 9 && dist > 25.0f && dist < 30.0f)) {
                             qcopy(sp, self + 0x10);
                             sp[2] += 1.0f;
-                            func_002A8C28(self, sp, 0x10008, 5.5f, (f32)AT(u8, st, 0x34), 2.0f, 0, 1, 0);
+                            func_002A8C28(self, sp, 0x10008, 0, 1, 0, 5.5f, (f32)AT(u8, st, 0x34), 2.0f);
                         }
                     }
                 }
             }
             if (AT(u8, self, 0x42) == 8 && func_002AEB60((u8 *)self, 6.0f) != 0) {
-                ((Blk200 *)D_001B9E80)->i[0x16C / 4] = 0;
-                ((Blk200 *)D_001B9E80)->i[0x188 / 4] = 0x2D;
-                ((Blk200 *)D_001B9E80)->f[0x180 / 4] = 0.05f;
+                ((Blk200 *)D_L20_001B9E80)->i[0x16C / 4] = 0;
+                ((Blk200 *)D_L20_001B9E80)->i[0x188 / 4] = 0x2D;
+                ((Blk200 *)D_L20_001B9E80)->f[0x180 / 4] = 0.05f;
             }
             if (AT(u8, self, 0x42) == 9 && func_002AEB60((u8 *)self, 30.0f) != 0) {
                 if (AT(s32, st, 0x1830) >= 2 || ((Hero *)D_00189E20)->i[0x2294 / 4] == 0x8C) {
                     func_L20_004441D8(self);
                     func_002A7750(self, 3, -1);
                 }
-                ((Blk200 *)D_001B9E80)->f[0x180 / 4] = (f32)(AT(s32, st, 0x1830) + 1) * 0.05f;
-                ((Blk200 *)D_001B9E80)->i[0x16C / 4] = 0;
-                ((Blk200 *)D_001B9E80)->i[0x188 / 4] = 0x2D;
+                ((Blk200 *)D_L20_001B9E80)->f[0x180 / 4] = (f32)(AT(s32, st, 0x1830) + 1) * 0.05f;
+                ((Blk200 *)D_L20_001B9E80)->i[0x16C / 4] = 0;
+                ((Blk200 *)D_L20_001B9E80)->i[0x188 / 4] = 0x2D;
             }
             break;
         }
@@ -505,33 +487,36 @@ void func_L20_00440598(char *self) {
                 if (AT(u8, self, 0x43) != 0x15) {
                     func_002A7470(self, 0x15, 0, 0xA);
                 }
-                s0_6 = D_001B2FA8[0];
-                v3 = D_L20_001A8F00;
+                s0_6 = D_L20_001B2FA8[0];
+                v3 = D_L20_001A8F00_gp;
                 if (s0_6 != 0) {
-                    int c1 = 0xCBC, c2 = 0xFE, c3 = 0xFD, c4 = 0xD0F;
+                    /* Retail keeps these four in saved registers; with literals cc1 folds the two state
+                       tests into one range check. */
+                    int class_removed = 0xCBC, state_dead = 0xFE, state_dying = 0xFD;
+                    int class_reset = 0xD0F;
                     int id;
                     do {
                         id = AT(s16, s0_6, 0xAA);
-                        if (id == c1 && s0_6 != 0) {
+                        if (id == class_removed && s0_6 != 0) {
                             u8 k = AT(u8, s0_6, 0x20);
-                            if (k != c2 && k != c3) {
+                            if (k != state_dead && k != state_dying) {
                                 func_0029F338(s0_6);
                             }
                             id = AT(s16, s0_6, 0xAA);
                         }
-                        if (id == c4 && s0_6 != 0) {
+                        if (id == class_reset && s0_6 != 0) {
                             u8 k = AT(u8, s0_6, 0x20);
-                            if (k != c2 && k != c3 && AT(u8, s0_6, 0x21) == AT(s32, st, 0x21C)) {
+                            if (k != state_dead && k != state_dying && AT(u8, s0_6, 0x21) == AT(s32, st, 0x21C)) {
                                 func_002A6C58(s0_6, 0, 3);
                                 func_L20_0039DE88(s0_6);
                             }
                         }
                         s0_6 = AT(char *, s0_6, 0x28);
                     } while (s0_6 != 0);
-                    v3 = d_001A8F00[0];
+                    v3 = D_L20_001A8F00[0];
                 }
             } else {
-                v3 = d_001A8F00[0];
+                v3 = D_L20_001A8F00[0];
             }
             if (v3 == 2) {
                 AT(s32, self, 0x98) = 0;
@@ -543,36 +528,34 @@ void func_L20_00440598(char *self) {
             break;
         case 18:
             if (func_002B3868(self) != 0) {
-                D_001B29C0[0] = 0;
+                D_L20_001B29C0[0] = 0;
                 func_002B49E0(9, 1, 0, 0, 0);
             }
-            if (d_001A8F00[0] == 0 && D_L20_001A8F08 <= 0 && func_00288AA0(D_001C01C0, 0x1E) != 0) {
-                func_00288BE8(D_001C01C0);
+            if (D_L20_001A8F00[0] == 0 && D_L20_001A8F08 <= 0 && func_00288AA0(D_L20_001C01C0, 0x1E) != 0) {
+                func_00288BE8(D_L20_001C01C0);
                 func_002A7750(self, 0x13, -1);
             }
             break;
         case 19:
-            if (d_001A8F00[0] == 0) {
-                v4 = D_L20_001A8F00;
+            if (D_L20_001A8F00[0] == 0) {
                 if (D_L20_001A8F08 <= 0) {
-                    D_001B2AD4[0] = 1;
+                    D_L20_001B2AD4[0] = 1;
                     func_002B49E0(9, 1, 0, 0, 0);
                     func_002A7750(self, 0x14, -1);
-                    v4 = d_001A8F00[0];
                 }
-                if (v4 == 0) {
+                if (D_L20_001A8F00[0] == 0) {
                     func_L00_002E6EF8(func_L20_00440570, self);
                 }
             }
             break;
         case 20:
-            if (d_001A8F00[0] == 0 && D_L20_001A8F08 <= 0 && func_00288AA0(D_001C01C0, 0x1F) != 0) {
-                func_00288BE8(D_001C01C0);
+            if (D_L20_001A8F00[0] == 0 && D_L20_001A8F08 <= 0 && func_00288AA0(D_L20_001C01C0, 0x1F) != 0) {
+                func_00288BE8(D_L20_001C01C0);
                 func_002A7750(self, 0x15, -1);
             }
             break;
         case 21:
-            if (d_001A8F00[0] == 0 && D_L20_001A8F08 <= 0) {
+            if (D_L20_001A8F00[0] == 0 && D_L20_001A8F08 <= 0) {
                 int a, b;
                 func_002A7750(self, 0x16, -1);
                 a = func_00288FB8(0x325E);
@@ -583,16 +566,16 @@ void func_L20_00440598(char *self) {
             }
             break;
         case 22:
-            D_001B29E0[0] = 0;
-            if (D_001C0184[0] == 1) {
+            D_L20_001B29E0[0] = 0;
+            if (D_L20_001C0184[0] == 1) {
                 func_L20_0036E720();
                 func_002A7750(self, 0x17, -1);
             } else {
                 char *t;
                 func_L00_002F3478();
-                t = D_001B308C[0] + (AT(s32, st, 0x248) << 7);
+                t = D_L20_001B308C[0] + (AT(s32, st, 0x248) << 7);
                 func_002DF3F8(t + 0x30, t + 0x70);
-                D_0021FC18[0] = 0;
+                D_L20_0021FC18[0] = 0;
                 func_L00_002B30E8();
             }
             break;
@@ -602,10 +585,14 @@ void func_L20_00440598(char *self) {
             if (v5 != 0) {
                 f32 mag = func_002A7878(5.0f, 15.0f);
                 f32 ang = func_002A7940();
-                AT(s32, st, 0x17D8) = 0;
+                char *target;
+                f32 y;
                 AT(f32, st, 0x17D0) = func_00283180(ang) * mag;
-                AT(f32, st, 0x17D4) = func_00283198(ang) * mag;
-                func_00282CC0(s0_7, s0_7, D_001B308C[0] + (AT(s32, st, 0x230) << 7) + 0x30);
+                y = func_00283198(ang) * mag;
+                target = D_L20_001B308C[0] + (AT(s32, st, 0x230) << 7);
+                AT(s32, st, 0x17D8) = 0;
+                AT(f32, st, 0x17D4) = y;
+                func_00282CC0(s0_7, s0_7, target + 0x30);
                 if (AT(u8, self, 0x43) != 2) {
                     func_002A7470(self, 2, 0, 0x14);
                 }

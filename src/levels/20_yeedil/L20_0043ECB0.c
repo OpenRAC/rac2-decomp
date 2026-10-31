@@ -8,13 +8,68 @@ INCLUDE_ASM("asm/levels", func_L20_0043ECB0);
 
 /* func_L20_0043F570 is defined in L20_0043F570-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_0043FC70);
+/* func_L20_0043FC70 is defined in L20_0043F570-g8.c (it reaches data through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L20_0043FFF0);
+/* func_L20_0043FFF0 is defined in L20_0043F570-g8.c (it reaches globals through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L20_00440198);
+/* func_L20_00440198 is defined in L20_00440198.c (its slot-table and func_002A7750 declarations conflict with this unit's). */
 
-INCLUDE_ASM("asm/levels", func_L20_00440398);
+extern char *D_L20_001FBB20[];
+
+extern int D_L20_001B2FB8 __attribute__((sda));
+
+extern unsigned int D_L20_001B2F9C __attribute__((sda));
+
+/* Counts the objects of a group whose state byte (object + 0x20) is neither 6 nor negative.
+   D_L20_001FBB20 holds a list of 16-bit object ids per group; the low 15 bits of an id index
+   the 0x100-byte object records at D_L20_001B2F9C, and the last id of a list has its top bit
+   set. The guards on the group and its list come before the walk and again after each record,
+   as in func_L20_0039E0A0. The bound D_L20_001B2FB8 does not change in the loop, so cc1 hoists
+   its repeated test into a register known to be zero, which the loop still tests (retail's
+   `daddu $t0,$zero,$zero` and `bnez $t0`). */
+int func_L20_00440398(int group) {
+    unsigned short *rec = (unsigned short *)D_L20_001FBB20[group];
+    int count = 0;
+
+    if ((group & 0xFF) == 0xFF) {
+        goto end;
+    }
+    if (D_L20_001B2FB8 < group) {
+        goto end;
+    }
+    if (rec == 0) {
+        goto end;
+    }
+    for (;;) {
+        char *object = (char *)D_L20_001B2F9C + ((*rec & 0x7FFF) << 8);
+
+        if (object == 0) {
+            goto end;
+        }
+        if (*(unsigned char *)(object + 0x20) != 6 && *(signed char *)(object + 0x20) >= 0) {
+            count++;
+        }
+        rec++;
+        if ((group & 0xFF) == 0xFF) {
+            goto end;
+        }
+        if (D_L20_001B2FB8 < group) {
+            goto end;
+        }
+        if (rec == 0) {
+            goto end;
+        }
+        if (*(short *)(rec - 1) >= 0) {
+            continue;
+        }
+        if (rec == (unsigned short *)D_L20_001FBB20[group]) {
+            continue;
+        }
+        break;
+    }
+end:
+    return count;
+}
 
 extern void func_002A7750(int, int, int);
 
@@ -54,7 +109,7 @@ void func_L20_00440570(void) {
     func_0027DDC0(0, 0, 0, 0x80);
 }
 
-INCLUDE_ASM("asm/levels", func_L20_00440598);
+/* func_L20_00440598 is defined in L20_00440598-g8.c (it reaches data through $gp and needs -frac2-hazard-labels). */
 
 /* func_L20_00441CB8 is defined in L20_00441CB8-g8.c. */
 
@@ -141,7 +196,7 @@ void func_L20_00442F30(char *arg0) {
 
 /* func_L20_00442F80 is defined in L20_00442F80-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_004431E0);
+/* func_L20_004431E0 is defined in L20_004431E0-g8.c (it reads D_L20_001B2FB8 through $gp and needs -frac2-keep-block-order). */
 /* func_L20_004431E0 reads a global through $gp: its near miss is in
    nonmatching/levels/func_L20_004431E0.c and belongs in the -G8 sibling. */
 
@@ -163,7 +218,7 @@ char *func_L20_00443328(char *arg0, char *arg1) {
     }
     return 0;
 }
-INCLUDE_ASM("asm/levels", func_L20_004433B0);
+/* func_L20_004433B0 is defined in L20_004433B0-g8.c (it reaches a global through $gp). */
 
 extern int func_0033E808(char *, int);
 
@@ -247,7 +302,7 @@ INCLUDE_ASM("asm/levels", func_L20_00443D58);
 
 INCLUDE_ASM("asm/levels", func_L20_00443DF0);
 
-INCLUDE_ASM("asm/levels", func_L20_00444018);
+/* func_L20_00444018 is defined in L20_00444088-g8.c (it needs this unit's -fno-schedule-insns). */
 
 /* func_L20_00444088 is defined in L20_00444088-g8.c (it reaches a global through
    $gp and needs its own -fno-schedule-insns). */
@@ -258,7 +313,7 @@ INCLUDE_ASM("asm/levels", func_L20_00444018);
 
 INCLUDE_ASM("asm/levels", func_L20_004441D8);
 
-INCLUDE_ASM("asm/levels", func_L20_004448A8);
+/* func_L20_004448A8 is defined in L20_004448A8-g8.c (it needs the -G8 profile with split addresses). */
 
 extern float func_00283248(float, float);
 
@@ -294,9 +349,73 @@ INCLUDE_ASM("asm/levels", func_L20_004450D8);
 /* func_L20_004450D8 reads a global through $gp: its near miss is in
    nonmatching/levels/func_L20_004450D8.c and belongs in the -G8 sibling. */
 
-INCLUDE_ASM("asm/levels", func_L20_004451C0);
+/* func_L20_004451C0 is defined in L20_004451C0-g16.c (it reaches two 16-byte vectors through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L20_00445738);
+/* The level's own jump table (the label of the data blob at 0x002B5960). */
+extern void *jtbl_002B5960[];
+
+extern int func_002B3868(char *);
+
+extern int func_002B38B8(char *);
+
+extern void func_002AA548(char *, char *, float, float, float, float);
+
+extern int func_002E5CF8(int, int, char *);
+
+extern unsigned char D_0019B2E8[];
+
+/* The five behaviours the object's state byte selects; the table in the level's data
+   holds the address of each. */
+void func_L20_00445738(char *arg0) {
+    static void * volatile tab[] = { &&c0, &&c1, &&c2, &&c3, &&c4 };
+    char *state;
+    unsigned char sel;
+
+    sel = *(unsigned char *)(arg0 + 0x20);
+    state = *(char **)(arg0 + 0x68);
+    if (sel >= 5) {
+        goto end;
+    }
+    goto *jtbl_002B5960[sel];
+c0:
+    *(float *)(state + 0x10) = *(float *)(arg0 + 0x10);
+    func_002A7750(arg0, 1, -1);
+    goto out;
+c1:
+    if ((D_0019B2E8[((unsigned char *)arg0)[0xB0] + *(int *)0x001A79F0 * 16] & 0x80) == 0) {
+        goto end;
+    }
+    func_002A7750(arg0, 2, -1);
+    goto out;
+c2:
+    if (func_002B3868(arg0) != 0) {
+        *(int *)(state + 0x14) = 0;
+        func_002E5CF8(0, 0, arg0);
+    }
+    func_002AA548(arg0 + 0x10, state + 0x14,
+                  *(float *)(state + 0x10) - *(float *)(state + 0x0),
+                  *(float *)(state + 0x8), *(float *)(state + 0x8),
+                  *(float *)(state + 0xC));
+    goto out;
+c3:
+    if (func_002B38B8(arg0) == 0) {
+        goto end;
+    }
+    func_002A7750(arg0, 4, -1);
+    goto out;
+c4:
+    if (func_002B3868(arg0) != 0) {
+        func_002E5CF8(0, 0, arg0);
+        *(int *)(state + 0x14) = 0;
+    }
+    func_002AA548(arg0 + 0x10, state + 0x14, *(float *)(state + 0x10),
+                  *(float *)(state + 0x8), *(float *)(state + 0x8),
+                  *(float *)(state + 0xC));
+    goto out;
+end:
+out:
+    return;
+}
 
 /* func_L20_00445890 is defined in L20_00445890-g8.c. */
 
@@ -517,7 +636,7 @@ void func_L20_004473B0(char *arg0) {
     func_002AD6F0(state + 0x20, &delta, &rot, arg0 + 0xF0);
 }
 
-INCLUDE_ASM("asm/levels", func_L20_00447640);
+/* func_L20_00447640 is defined in L20_00447640-g8.c (it reads D_L20_001B2FB8 through $gp). */
 
 /* func_L20_00447748 is defined in L20_00447748-g8.c. */
 
@@ -529,9 +648,54 @@ void func_L20_00447908(void) {
     func_L04_003A21F8(D_L20_002AB980, 6);
 }
 
-INCLUDE_ASM("asm/levels", func_L20_00447930);
+/* func_L20_00447930 is defined in L20_00447930-g8.c (it reaches data through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L20_00448858);
+extern float func_00283B98(float, float);
+extern int func_00277258(char *, int, char *, float);
+extern float func_00282DB0(char *, char *);
+extern void func_00282F20(char *, char *, float);
+extern float func_00282DF0(char *);
+
+extern char D_L20_001C0430[];
+
+void func_L20_00448858(char *arg0) {
+    char *state = *(char **)(arg0 + 0x68);
+    float d, f;
+    char v[0x10];
+
+    d = *(float *)(state + 8);
+    *(float *)(state + 8) = d - (d > 0.0f ? *(float *)(state + 0x20) * 4.0f : *(float *)(state + 0x20));
+
+    func_00282CC0(arg0 + 0x10, arg0 + 0x10, state);
+    *(float *)(arg0 + 0xF0) = func_00283B98(*(float *)(arg0 + 0xF0), *(float *)(state + 0x10));
+    *(float *)(arg0 + 0xF4) = func_00283B98(*(float *)(arg0 + 0xF4), *(float *)(state + 0x14));
+    *(float *)(arg0 + 0xF8) = func_00283B98(*(float *)(arg0 + 0xF8), *(float *)(state + 0x18));
+
+    if (func_00277258(arg0 + 0x10, 0, arg0, 1.5f) != 0) {
+        char *p = D_L20_001C0430;
+
+        qcopy(arg0 + 0x10, p);
+        if (func_00282DB0(state, p + 0x10) < 0.0f) {
+            func_00282F20(p + 0x10, p + 0x10, 1.0f);
+            f = func_00282DF0(state);
+            func_00282D30(v, p + 0x10, -func_00282DB0(state, p + 0x10) * 1.25f);
+            func_00282CC0(state, state, v);
+            func_00282F20(state, state, f * 0.5f);
+        }
+        *(int *)(state + 0x24) = 0;
+        if ((unsigned char)arg0[0x23] > 0x60) {
+            arg0[0x23] = 0x60;
+        }
+    }
+
+    if (func_00282948(state + 0x24) != 0) {
+        if ((unsigned char)arg0[0x23] < 5) {
+            func_0029F338(arg0);
+        } else {
+            arg0[0x23] = arg0[0x23] - 4;
+        }
+    }
+}
 
 /* func_L20_00448A18 is defined in L20_00448A18-helpers-g8.c. */
 /* func_L20_00448A18 reaches four globals through $gp: its near miss is in

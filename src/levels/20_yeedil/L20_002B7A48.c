@@ -164,7 +164,7 @@ void func_L20_002C57D0(s32 a0, s32 a1, char *a2)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L20_002C5A48);
+/* func_L20_002C5A48 is defined in L20_002C5A48-qcopy.c (its copies need the grouped-copy profile). */
 
 /* func_L20_002C5D00 is defined in L20_002B7A48-g8.c (it reaches data through $gp). */
 
