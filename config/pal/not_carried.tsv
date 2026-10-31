@@ -101,3 +101,4 @@ func_L00_0034C720	00_aranos_tutorial: instruction at +0x90 differs
 func_L00_0034E6F0	00_aranos_tutorial: instruction at +0x20 differs
 func_L08_00318F90	08_tabora: instruction at +0x38 differs
 func_L20_00446E70	20_yeedil: instruction at +0x64 differs
+func_L20_00445738	20_yeedil: instruction at +0x64 differs
