@@ -761,7 +761,7 @@ void func_L14_004286F8(unsigned char *a0)
 
 /* func_L14_00428E68 is defined in L14_00428E68-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L14_004295D0);
+/* func_L14_004295D0 is defined in L14_004295D0-g8.c (it reaches data through $gp). */
 
 void func_L14_004298F0(unsigned char *self) {
     unsigned char *state = *(unsigned char **)(self + 0x68);
