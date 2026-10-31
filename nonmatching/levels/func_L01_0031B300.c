@@ -5,6 +5,10 @@
  retail's order `addiu $s0,$sp,0x10` before `addiu $s1,g,0x40`.
  Reopen: a spelling that ranks a0 above g in the allocator (g read via the symbol each time, g before the call,
  f20 load elsewhere, local pos pointer, `return 0` for the shared fail label were all worse).
+ 30 October 2026: decomp-permuter (asm passes off) reaches 5/5 only by wrapping the 0xAA load as
+ `if (a0) v1 = *(short *)(p + 0xAA); else v1 = *(short *)(p + 0xAA);`. Without that identical-arm
+ conditional nothing it found matches (splitting `h = g; h += 0x40` alone does not); it is a fake use of
+ a0 that ranks a0 above g, so it is not used. The real source must give a0 an extra reference there.
  */
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;

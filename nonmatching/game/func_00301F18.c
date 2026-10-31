@@ -1,3 +1,10 @@
+/* 31 October 2026: decomp-permuter (asm passes off) matches 28/28 with one change, the else
+   branch's first copy written through the address of `state`:
+       char **slot = &state; qcopy(&position, *slot);
+   Retail keeps `state` in $s2 throughout, so this models no real memory traffic; it is an
+   artefact, not used. Natural spellings measured 0/28: `state + 0`, ParticleVector casts and
+   indexing, a `src` local for both copies, re-reading object + 0x68. The real source must
+   reorder the same allocation; this branch is where to look. */
 /* Retained near miss (M4, 26 October 2026); not linked.
  * Unit: src/game/00301F18-qcopy.c, profile -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
  * 900/900 bytes, 0/28 places: only the &position/&angles address pseudos take $s7/$fp the other way
