@@ -178,7 +178,7 @@ done:
 
 /* func_L20_00442CD8 is defined in L20_00442CD8-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_00442E68);
+/* func_L20_00442E68 is defined in L20_00442E68-g8.c (it reaches data through $gp). */
 
 extern int func_002ABB78(char *);
 
