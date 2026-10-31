@@ -363,6 +363,7 @@ extern void func_002AA548(char *, char *, float, float, float, float);
 extern int func_002E5CF8(int, int, char *);
 
 extern unsigned char D_0019B2E8[];
+extern int D_001A79F0 MACRO_ADDR;
 
 /* The five behaviours the object's state byte selects; the table in the level's data
    holds the address of each. */
@@ -382,7 +383,7 @@ c0:
     func_002A7750(arg0, 1, -1);
     goto out;
 c1:
-    if ((D_0019B2E8[((unsigned char *)arg0)[0xB0] + *(int *)0x001A79F0 * 16] & 0x80) == 0) {
+    if ((D_0019B2E8[((unsigned char *)arg0)[0xB0] + D_001A79F0 * 16] & 0x80) == 0) {
         goto end;
     }
     func_002A7750(arg0, 2, -1);
