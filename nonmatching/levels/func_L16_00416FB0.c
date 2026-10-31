@@ -1,3 +1,11 @@
+/* 30 October 2026 recheck, current game compiler, -O2 -G8 -ffunction-sections.
+ * USA v1.01 and v2.00: 600/604 bytes, 0/1 placements each. PAL identity absent.
+ * The absolute floating macro is still put in the collision call's delay slot,
+ * where the assembler selects the GP form. Full aligned vector locals produce
+ * 588 bytes with a worse frame; disabling first scheduling produces 560 bytes.
+ * Both are rejected. Retain this 600-byte source, without invented accesses or
+ * changed argument banks. Reopen with a call/setup scheduling witness.
+ */
 /* M33 2026-10-26: 600/604 B, one instruction: everything else is retail's once D_L16_001B1AFC is an incomplete MACRO_ADDR float read [0] (retail lui $at; lwc1), the hero pointer is ((Hero *)D_00189E20)->ptr[0x2290/4] (retail keeps %hi in $s5) and the near/far base is one object (D_L16_001B9B00 + 0x230 for 0x1B9D30). Left: cc1 schedules the l.s macro last and reorg puts it in the func_00277F48 jal slot, where gas turns it into the 4-byte $gp form; retail has lui/lwc1 before the jal and a3=0 in the slot. Float-position prototypes, sda-incomplete and -G0 did not move it. In the permuter. */
 #include "common.h"
 /* Nonmatching reconstruction; game compiler, -O2 -G8 -ffunction-sections.

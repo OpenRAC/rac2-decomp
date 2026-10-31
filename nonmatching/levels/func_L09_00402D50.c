@@ -1,8 +1,11 @@
-/* Retained readable C; not matching and no exact-C credit.
- * 2026-10-28 profile: default game profile.
- * 820/816 compiled/retail bytes. Measured typed state gives an exact initial 244-byte prefix. Remaining initializer constant/store ordering adds one word. GP threshold and aligned copies are represented without invented accesses.
- * US object comparison only in this retry; no linked strict-build claim.
- * Reopen with a measured allocation, scheduling or source-interface witness.
+/* Retained C, 30 October 2026; not matching and no exact-C credit.
+ * Profile: game -O2 -G8 -ffunction-sections. US: 820/816 bytes, 0/1.
+ * Corrected func_002B60B0 to its verified pointer return, with one object
+ * pointer and four FP arguments. The typed-state prefix still agrees for
+ * 244 bytes; byte/int constants at +0xC6/+0x98 materialize separate ones,
+ * and initializer stores/constants are reordered. Chained initialization
+ * ties the previous source. No linked-build claim for this candidate.
+ * Next: an independently measured initializer field/lifetime witness.
  */
 #include "common.h"
 extern float D_L09_001B13BC SDATA(D_L09_001B13BC);
@@ -10,7 +13,7 @@ extern unsigned char *D_L09_001FE6C0[];
 extern float func_002A89A8(void *, int, float);
 extern float func_002A78D8(float, float);
 extern int func_00283CF0(float);
-extern void func_002B60B0(void *, float, float, float, float);
+extern void *func_002B60B0(void *, float, float, float, float);
 extern void func_002A7750(void *, int, int);
 extern void func_002A7470(void *, int, int, int);
 struct DobboState {
@@ -116,14 +119,13 @@ void func_L09_00402D50(unsigned char *m)
     p->f84 = D_L09_001B13BC;
     p->f8c = 0.4000000059604645f;
     p->bc3 = -1;
-    p->bc6 = 1;
+    p->i98 = p->bc6 = 1;
     p->f100 = 1.0f;
     p->f104 = 1.100000023841858f;
     p->f10c = 2.799999952316284f;
     p->f110 = 3.1415927410125732f;
     p->f130 = 25.13274383544922f;
     p->f12c = 0.000777777808252722f;
-    p->i98 = 1;
     p->f74 = 0.004166666883975267f;
     p->bbc = -1;
     p->bbd = -1;

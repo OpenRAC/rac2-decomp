@@ -176,6 +176,6 @@ void func_L16_0041F150(char *arg0) {
 
 /* func_L16_0041F1F0 lives in L16_0041F1F0.c. */
 
-INCLUDE_ASM("asm/levels", func_L16_0041F360);
+/* func_L16_0041F360 is defined in L16_0041F360-g8.c. */
 
 

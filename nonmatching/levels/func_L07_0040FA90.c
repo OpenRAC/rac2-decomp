@@ -1,3 +1,6 @@
+/* Historical source only: this draft has a false third matrix-copy argument
+ * and split 48+16-byte storage. Use func_L07_0040FA90-matrix.c for the corrected
+ * two-pointer call and complete 64-byte matrix. Neither version is a match. */
 /* func_L07_0040FA90 - 444 bytes.  Worker attempt, 28 October 2026 (draft below).
    Diff-line counts below were measured with a masking that hid offset
    differences; treat them as optimistic.

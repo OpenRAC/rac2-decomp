@@ -1,3 +1,10 @@
+/* 30 October 2026 recheck: -O2 -G8 -ffunction-sections, 504/504 bytes.
+ * USA v1.01 and v2.00: 0/1 placements each, first mismatch +0x128.
+ * PAL identity absent. A full 16-byte BurstPoint view ties this source.
+ * MACRO_ADDR and -mno-split-addresses hoist the table before the preceding call;
+ * the positive countdown still differs. The preheader's constant/table order
+ * and split-address temporary remain unresolved; no linked match is claimed.
+ */
 /* Opus big44, 26 October 2026: -O2 -G8 -ffunction-sections, 126/126 words, 122 identical.
  * D_L16_001B1BB0 is a plain incomplete array (retail builds it with %hi/%lo after the call;
  * the old sda declaration hoisted it). Left: preheader order only. Retail sets the hoisted
