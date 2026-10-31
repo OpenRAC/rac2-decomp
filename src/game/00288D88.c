@@ -139,7 +139,7 @@ void func_00289AA0(void)
 {
 }
 
-INCLUDE_ASM("asm/game", func_00289AA8);
+/* func_00289AA8 is in 00289AA8.c: its switch table sits after func_00289178's, apart from this file's. */
 
 extern short D_00254EC8[][2];
 
