@@ -179,12 +179,56 @@ end:
     return;
 }
 
-INCLUDE_ASM("asm/levels", func_L20_0039E9F8);
+/* func_L20_0039E9F8 is defined in L20_0039E9F8-g8.c (it reaches D_L20_001B308C by absolute address and needs -mno-split-addresses). */
 
 /* func_L20_0039ED78 reads D_L20_001AEDA8 and D_L20_001AED90 through
-   $gp; its near miss is in nonmatching/levels/func_L20_0039ED78.c
-   and belongs in this -G8 unit. */
-INCLUDE_ASM("asm/levels", func_L20_0039ED78);
+   $gp. Each branch makes its own func_00283D38 call; cross-jumping
+   merges the two identical call tails, which puts the 0.5f add in the
+   jal delay slot as in the retail. */
+extern int func_00282948(void *);
+extern float func_00283B98(float, float);
+extern float func_00283198(float);
+extern int func_00283D38(float, int, int);
+extern float func_00283CE0(int);
+extern void func_L00_002E6CF0(void *, void *);
+extern void func_L20_0039F230(char *);
+
+extern int D_L20_001AEDA8 __attribute__((sda));
+extern int D_L20_001AED90 __attribute__((sda));
+extern int D_L20_001AED94;
+extern int D_L20_001AED98;
+extern int D_L20_001AED9C;
+
+void func_L20_0039ED78(char *arg0) {
+    char *state = *(char **)(arg0 + 0x68);
+
+    if (func_00282948(state) != 0) {
+        func_0029F338(arg0);
+    } else {
+        f32 x = *(f32 *)(state + 0x8);
+        f32 r, s;
+        int v, w, lo, hi;
+
+        if (*(int *)(state + 0xC) != 0) {
+            r = func_00283B98(x, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            *(f32 *)(state + 0x8) = r;
+            s = func_00283198(r);
+            v = func_00283D38(s * 0.5f + 0.5f, D_L20_001AED90, D_L20_001AED94);
+        } else {
+            r = func_00283B98(x, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            *(f32 *)(state + 0x8) = r;
+            s = func_00283198(r);
+            v = func_00283D38(s * s * 0.5f + 0.5f, D_L20_001AED98, D_L20_001AED9C);
+        }
+        w = func_00283D38(0.15f, *(int *)(state + 0x10) | *(int *)(state + 0x4), v);
+        lo = w & 0xFFFFFF;
+        hi = w & 0xFF000000;
+        *(int *)(state + 0x10) = hi;
+        *(int *)(state + 0x4) = lo;
+        *(f32 *)(state + 0x14) = func_00283CE0(hi >> 24) * 0.00390625f;
+        func_L00_002E6CF0(func_L20_0039F230, arg0);
+    }
+}
 
 /* func_L20_003A0320 is in L20_003A0320-g8.c, where its independent
    address materializations use -mno-split-addresses. */
@@ -202,4 +246,4 @@ INCLUDE_ASM("asm/levels", func_L20_00438F98);
 
 /* func_L20_004395B0 reads three floats through $gp; its near miss is in
    nonmatching/levels/func_L20_004395B0.c and belongs in this -G8 unit. */
-INCLUDE_ASM("asm/levels", func_L20_004395B0);
+/* func_L20_004395B0 is defined in L20_004395B0-g8.c (it reads three floats through $gp and uses common.h qcopy, whose typedefs clash with this unit's). */

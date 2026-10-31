@@ -1906,6 +1906,10 @@ src/levels/07_siberius/L07_003EB838.c	-O2 -G0 -ffunction-sections -frac2-qcopy -
 src/levels/07_siberius/L07_003E61E0-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_002D3798-aim-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/20_yeedil/L20_004421A8-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/20_yeedil/L20_0039EEC8-g8-qcopy.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/levels/20_yeedil/L20_0039EBB8-qcopy.c	-O2 -G0 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/levels/20_yeedil/L20_0039E9F8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/levels/20_yeedil/L20_002C5A48-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 
 src/game/002CDD88-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
 

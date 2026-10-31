@@ -1,18 +1,9 @@
-/* Complete C near miss; not linked and no matching credit.
- * Game -O2 -G0 -ffunction-sections; 508/508 bytes.
- * USA v1.01 and v2.00: 0/1 each, first mismatch +0x2C; PAL has no row.
- * Approved qcopy emits the measured register-addressed transfer, withdrawing
- * the former impossible-copy screen. All local vector buffers are four floats:
- * 82C98 writes 16 bytes, 82DD8 writes a vector, ACE78 writes four floats, and 73978
- * initializer copies 16 bytes from each forwarded vector. Its six GPR inputs
- * and one FP input are retained; A7398/ACE78 real void definitions were read.
- * Nine trials: typed resident pose and metadata snapshots recover the main
- * constructor; the initial iterator/pool lifetime and final predicate order
- * still differ. Fine keep-block-order and gcse-unsplit-edges tie. The opt-in
- * typed-copy profile adds no useful improvement, so this retains default qcopy.
- * The qualified group-count sibling suggested an explicit G8 walk; that
- * separate new-donor trial measured 528/508 bytes and did not close it.
- * Reopen with measured canonical group-list/actor-pool lifetime evidence.
+/* Own unit, default game profile (-O2 -G0 -ffunction-sections).  It cannot share
+ * L20_0043ECB0.c: that unit declares D_L20_001B2F9C as an unsigned int and
+ * func_002A7750 with an int first argument, and the unsigned-int spelling of the
+ * slot walk compiles to a different loop (488 bytes).  The group walk's last two
+ * predicates are in retail's order: the previous entry's high bit first, then the
+ * list head.
  */
 #include "common.h"
 
@@ -29,7 +20,7 @@ extern void func_002A0F48(void *);
 extern void func_00282C98(void *);
 extern void func_00282DD8(void *, const void *, const void *);
 extern void func_002ACE78(float *, float *, float);
-extern void func_00273978(void *, int, int, const void *, const void *, int, float);
+extern void func_00273978(void *, int, int, const void *, const void *, unsigned char, float);
 
 u8 *func_L20_00440198(int group, const float position[4], const float velocity[4], float lifetime)
 {
@@ -42,7 +33,7 @@ u8 *func_L20_00440198(int group, const float position[4], const float velocity[4
 
     for (entry = D_L20_001FBB20[group];
          (u8)group != 0xFF && group <= D_L20_001B2FB8 && entry != 0 &&
-         (entry == D_L20_001FBB20[group] || (s16)entry[-1] >= 0);
+         ((s16)entry[-1] >= 0 || entry == D_L20_001FBB20[group]);
          ++entry) {
         actor = D_L20_001B2F9C[*entry & 0x7FFF];
         if (actor == 0)
