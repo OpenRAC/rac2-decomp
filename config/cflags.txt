@@ -1869,6 +1869,10 @@ src/levels/shared/L00_003D37E8-ribbon-g8.c	-O2 -G8 -ffunction-sections -frac2-qc
 
 src/game/002CE5D0-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/14_aranos_prison/L14_003F4F98-ribbon-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/levels/14_aranos_prison/L14_003E4208-g.c	-O2 -G0 -ffunction-sections -g
+src/levels/14_aranos_prison/L14_00304190-zp.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por
+src/levels/14_aranos_prison/L14_004281D0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/levels/14_aranos_prison/L14_00423000-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy
 src/levels/shared/L00_002A6420-target-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order -frac2-gcse-unsplit-edges
 src/levels/13_boldan/L13_004067F8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/11_joba/L11_00432628-reset-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
@@ -1910,6 +1914,10 @@ src/levels/20_yeedil/L20_0039EEC8-g8-qcopy.c	-O2 -G8 -ffunction-sections -g -fra
 src/levels/20_yeedil/L20_0039EBB8-qcopy.c	-O2 -G0 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/levels/20_yeedil/L20_0039E9F8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/20_yeedil/L20_002C5A48-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/20_yeedil/L20_004451C0-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
+src/levels/20_yeedil/L20_0039F560-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-sched-interblock
+src/levels/20_yeedil/L20_004431E0-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/levels/20_yeedil/L20_00440598-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 
 src/game/002CDD88-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
 

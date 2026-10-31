@@ -12,6 +12,22 @@ extern void func_L20_0044B100(char *, char *, char *, char *, int, float, int);
 
 extern void func_00282F20(char *, char *, float);
 
+extern void func_L20_0044AC38(char *, int, TI128 *, TI128 *);
+
+void func_L20_00444018(char *arg0) {
+    TI128 v0;
+    TI128 v1;
+    TI128 *pa = &v0;
+    TI128 *pb = &v1;
+    char *state;
+    float f;
+
+    f = 0.78539824f;
+    state = *(char **)(arg0 + 0x68);
+    func_L20_00443B60(arg0, (char *)pa, (char *)pb, &f);
+    func_L20_0044AC38(arg0, *(int *)(state + 0x240), pa, pb);
+}
+
 void func_L20_00444088(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
     TI128 a;

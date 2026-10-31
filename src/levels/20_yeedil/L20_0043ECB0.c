@@ -10,7 +10,7 @@ INCLUDE_ASM("asm/levels", func_L20_0043ECB0);
 
 /* func_L20_0043FC70 is defined in L20_0043F570-g8.c (it reaches data through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L20_0043FFF0);
+/* func_L20_0043FFF0 is defined in L20_0043F570-g8.c (it reaches globals through $gp). */
 
 /* func_L20_00440198 is defined in L20_00440198.c (its slot-table and func_002A7750 declarations conflict with this unit's). */
 
@@ -109,7 +109,7 @@ void func_L20_00440570(void) {
     func_0027DDC0(0, 0, 0, 0x80);
 }
 
-INCLUDE_ASM("asm/levels", func_L20_00440598);
+/* func_L20_00440598 is defined in L20_00440598-g8.c (it reaches data through $gp and needs -frac2-hazard-labels). */
 
 /* func_L20_00441CB8 is defined in L20_00441CB8-g8.c. */
 
@@ -196,7 +196,7 @@ void func_L20_00442F30(char *arg0) {
 
 /* func_L20_00442F80 is defined in L20_00442F80-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_004431E0);
+/* func_L20_004431E0 is defined in L20_004431E0-g8.c (it reads D_L20_001B2FB8 through $gp and needs -frac2-keep-block-order). */
 /* func_L20_004431E0 reads a global through $gp: its near miss is in
    nonmatching/levels/func_L20_004431E0.c and belongs in the -G8 sibling. */
 
@@ -218,7 +218,7 @@ char *func_L20_00443328(char *arg0, char *arg1) {
     }
     return 0;
 }
-INCLUDE_ASM("asm/levels", func_L20_004433B0);
+/* func_L20_004433B0 is defined in L20_004433B0-g8.c (it reaches a global through $gp). */
 
 extern int func_0033E808(char *, int);
 
@@ -302,7 +302,7 @@ INCLUDE_ASM("asm/levels", func_L20_00443D58);
 
 INCLUDE_ASM("asm/levels", func_L20_00443DF0);
 
-INCLUDE_ASM("asm/levels", func_L20_00444018);
+/* func_L20_00444018 is defined in L20_00444088-g8.c (it needs this unit's -fno-schedule-insns). */
 
 /* func_L20_00444088 is defined in L20_00444088-g8.c (it reaches a global through
    $gp and needs its own -fno-schedule-insns). */
@@ -349,7 +349,7 @@ INCLUDE_ASM("asm/levels", func_L20_004450D8);
 /* func_L20_004450D8 reads a global through $gp: its near miss is in
    nonmatching/levels/func_L20_004450D8.c and belongs in the -G8 sibling. */
 
-INCLUDE_ASM("asm/levels", func_L20_004451C0);
+/* func_L20_004451C0 is defined in L20_004451C0-g16.c (it reaches two 16-byte vectors through $gp). */
 
 /* The level's own jump table (the label of the data blob at 0x002B5960). */
 extern void *jtbl_002B5960[];
@@ -636,7 +636,7 @@ void func_L20_004473B0(char *arg0) {
     func_002AD6F0(state + 0x20, &delta, &rot, arg0 + 0xF0);
 }
 
-INCLUDE_ASM("asm/levels", func_L20_00447640);
+/* func_L20_00447640 is defined in L20_00447640-g8.c (it reads D_L20_001B2FB8 through $gp). */
 
 /* func_L20_00447748 is defined in L20_00447748-g8.c. */
 

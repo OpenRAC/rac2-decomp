@@ -43,7 +43,7 @@ extern char *func_0029EFD0(int);
 
 /* func_L20_0039CF58 is defined in L20_0039CF58.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_0039D340);
+/* func_L20_0039D340 is defined in L20_0039D340-g8.c (it reads data through $gp). */
 
 
 extern int D_L20_001B2AC8 __attribute__((sda));
@@ -282,7 +282,7 @@ void func_L20_0039F230(char *arg0) {
 
 INCLUDE_ASM("asm/levels", func_L20_0039F268);
 
-INCLUDE_ASM("asm/levels", func_L20_0039F560);
+/* func_L20_0039F560 is defined in L20_0039F560-g8.c (it reaches data through $gp and needs the qcopy profile without interblock scheduling). */
 
 INCLUDE_ASM("asm/levels", func_L20_0039F968);
 

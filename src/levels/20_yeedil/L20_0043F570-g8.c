@@ -275,3 +275,41 @@ void func_L20_0043FC70(char *arg0) {
         *(int *)(st + 0x204) = 1;
     }
 }
+
+extern int D_L20_001B2020 __attribute__((sda));
+extern int D_L20_001B2FB8 __attribute__((sda));
+extern unsigned short *D_L20_001FBB20[];
+extern char *D_L20_001B2F9C;
+
+/* Returns 0 when D_L20_001B2020 or more other objects of this object's group (the
+   0x7FFF-masked id list at D_L20_001FBB20[obj[0x21]]) are busy (state +0x280) or are
+   closer to D_00189EA0 than it; 1 otherwise.  The loop is the group-iteration form used
+   by func_00325DA0. */
+int func_L20_0043FFF0(char *obj) {
+    float dist;
+    int closer = 0;
+    int busy = 0;
+    unsigned short *p;
+    char *e;
+
+    dist = func_00282E80(obj + 0x10, D_00189EA0);
+    for (p = D_L20_001FBB20[*(u8 *)(obj + 0x21)];
+         *(u8 *)(obj + 0x21) != 0xFF && *(u8 *)(obj + 0x21) <= D_L20_001B2FB8 && p != 0 &&
+         ((p != 0 && (short)p[-1] >= 0) || p == D_L20_001FBB20[*(u8 *)(obj + 0x21)]);
+         p++) {
+        e = D_L20_001B2F9C + ((*p & 0x7FFF) << 8);
+        if (e == 0)
+            break;
+        if (e != obj && *(u8 *)(e + 0x20) != 6) {
+            if (*(int *)(*(char **)(e + 0x68) + 0x280) != 0)
+                busy++;
+            if (busy >= D_L20_001B2020)
+                return 0;
+            if (dist > func_00282E80(e + 0x10, D_00189EA0))
+                closer++;
+            if (closer >= D_L20_001B2020)
+                return 0;
+        }
+    }
+    return 1;
+}
