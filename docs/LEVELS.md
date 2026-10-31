@@ -122,7 +122,9 @@ leaving an 8-byte `return 0` method that a data pointer in each level reaches.
 One open row is two functions and still needs a split: `func_00115E28` (64 bytes) is
 `abort` at +0 followed by a separate noreturn assert-style printer at `00115E38`, which
 four `jal`s reach. Splitting it adds a boot row and changes the function count, so it
-is left as one row for now.
+is left as one row for now. Both functions have C, newlib's `abort` and `__assert`, in
+`nonmatching/core/func_00115E28.c`: the boot links byte-identical with it, and it can move
+into `src/core/00115200.c` once the row is split into 16 and 48 bytes.
 
 Release-specific rows have their own named corrections. `tools/carry.py --entries`
 repairs established extents while retaining their existing identities and kinds,
