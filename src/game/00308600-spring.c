@@ -1,13 +1,5 @@
-/* M21 2026-10-26: 1052 of 1052 bytes with -O2 -G0 -ffunction-sections -frac2-qcopy
-   -frac2-qcopy-barrier (us, level 00 placement). One word off: the `b` after the second
-   reset (qcopy + 0x4C = 0) jumps to the epilogue's `ld $s0` in retail; here reorg redirects it
-   one insn further because the preceding bc1f slot already holds that `ld $s0`
-   (redundant_insn). Retail must have a CODE_LABEL between that bc1f and the b, so the source
-   shape of the mode == 0 tail differs. Tried: returns, early-return inversion, goto into the
-   first reset, -g, qcopy without barrier. What closed the rest: qcopy for the 16-byte copies,
-   float[4] locals, non-nested dot products before each scale, func_002AA3A8 as
-   (void *, float, void *, float, float, float), func_002A8240 with the int last, the
-   mode != 0 tail as `-=` then a reread, and 0.06666667f. Permuter queued. */
+/* Rests on the redundant-insn rule of docs/COMPILER-NOTES.md (volatile asm): the last jump of the
+   mode == 0 arm lands on the restore of $s0, across a qcopy. */
 
 #include "common.h"
 
