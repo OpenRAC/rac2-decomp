@@ -193,6 +193,7 @@ void func_L30_00418570(char *a0) {
 }
 
 
+INCLUDE_ASM("asm/levels", func_L30_00417120);
 INCLUDE_ASM("asm/levels", func_L30_004186B0);
 
 void func_L30_004191E0(char *obj) {
