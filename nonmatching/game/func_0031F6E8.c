@@ -1,3 +1,9 @@
+/* Closer C3, 1 November 2026: under the default profile (no -fno-gcse, which is not allowed) 1352/1340, 61 rows, and nearly all of
+ * it is one thing: mode spills to the frame, retail keeps it in fp. PRE makes a pseudo for basis[1] (sp+0x30, r232 3 refs/231 live)
+ * which beats mode (3 refs/275 live); retail leaves that pseudo without a register and rematerializes `addiu a2,sp,0x30`
+ * in the loop, and has no spill slot (frame 0xD0). That needs a single set with a frame-address REG_EQUIV and mode ranking above
+ * it. The copy `daddu s7,a1` of D_001B5340's high half shows gcse is on in retail. A pointer local for basis[1] keeps a register.
+ */
 /* sol-high, USA v1.01, game compiler -O2 -G8 -ffunction-sections -fno-gcse.
  * Best check.py: 1340/1340 bytes, 0/28 places, first mismatch +0x10.
  * The 0xD0 frame, mode in fp and main loop register roles now agree.

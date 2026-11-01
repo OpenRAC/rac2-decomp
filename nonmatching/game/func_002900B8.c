@@ -1,3 +1,9 @@
+/* Closer C3, 1 November 2026: the profile below is wrong. Retail has sched1 on: -O2 -G8 -fno-expensive-optimizations
+ * -ffunction-sections. 206.0f, 0x8710, 0.5f are call-crossing pseudos and float up over the calls as in retail; literal args go
+ * straight to hard regs; with that the first 0x128 bytes agree but for the save count. Left: one more saved GPR
+ * and 1.0/0.0 stop just after the y conversion: a pseudo that crosses no call cannot pass the last call (sched_analyze),
+ * yet retail keeps them in f22/f21 for case 0, so what holds them there is not found.
+ */
 /* func_002900B8: retained plain-C near miss (opus-1, Claude Opus 5.5, task v1928, 31 October 2026).
  *
  * Unit: a dedicated *-g8.c file compiled with

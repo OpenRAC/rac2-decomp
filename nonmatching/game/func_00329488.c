@@ -1,3 +1,7 @@
+/* Closer C3, 1 November 2026: this loop has 57 real insns against a threshold near 61; constants of life 1 move because
+ * 61 * 1 >= 57. Over the threshold they stay in the body and only a long-lived 128.0f moves, which would explain retail with a
+ * real for loop; the counter is still reversed though, so something else keeps its use. No real-loop form under 56 rows yet.
+ */
 /* Closer C2, 1 November 2026: 420/420, 3 rows, plain -O2 -G0. Retail's first loop has no loop.c work at all: up
  * counter kept, no reversal, no biv elimination, every constant left in the body (128.0f is a local set before it).
  * Written with labels it matches row for row: for/while/do forms hoist the constants and reverse the counter.

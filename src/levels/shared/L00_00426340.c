@@ -600,7 +600,6 @@ int func_L00_004290C0(char *moby, char *unused)
 
 INCLUDE_ASM("asm/levels", func_L00_004291A0);
 
-INCLUDE_ASM("asm/levels", func_L00_00429568);
 
 extern int D_0018C0BC;
 extern int D_0018C0B4;

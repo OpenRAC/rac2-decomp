@@ -2120,3 +2120,4 @@ src/levels/shared/L00_004266E8-g8-hazard.c	-O2 -G8 -ffunction-sections -frac2-ha
 src/levels/shared/L00_004287E8-movables.c	-O2 -G0 -ffunction-sections -fmove-all-movables
 src/levels/shared/L00_00370408-edges.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/levels/shared/L00_00376600-g.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L00_00429568-g.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels

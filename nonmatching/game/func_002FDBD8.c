@@ -1,3 +1,6 @@
+/* Closer C3, 1 November 2026: priorities in the off variant: n 3*15/268, direction 3*11/157, odd 2*6/70. One more depth-1 read of n
+ * (weight 2) gives 17 refs and floor_log2 4, enough over both; retail shows no such read.
+ */
 /* Closer C, 1 November 2026: 9 rows (arm 2 sets i first). Retail's `sll v1,s0,2` in bnez's plain slot is
  * one value computed before the branch, used as addu v0,v1,fp: `int off = n * 4; ... *(int *)((char *)colors + off)`
  * gives every row of that block, but n then has 15 weighted refs over 268 insns and loses to direction

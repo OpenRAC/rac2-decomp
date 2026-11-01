@@ -672,6 +672,16 @@ Combining both switches affects sched1/sched2 differently and needs its own proo
 - A body with no loop.c work (constants unhoisted, counter neither reversed nor eliminated) matches row for row
   when the loop is written with labels, which leave no loop notes (`func_00329488`, near miss: the alignment nop
   shows retail did have a loop note, so a real loop rejected as invalid is still possible).
+- A value `r` from `if (a || (b && c)) r = 1; else r = 0;` or a helper with `return 1; return 0;` reads
+  `beqz x / r = 0 / r = 1 / beqz r` in retail: reorg steals `r = 0` into each branch slot and the else goes
+  (`func_L00_002D5EB8`, near miss). Flag sets inside a switch or a call stay out of r's life this way.
+- Under `-g` a line label before a division costs the two-word floor. Statements on one source line share a
+  label, so `bb = cos(x); D = aa / bb;` written on one line keeps the locals with no padding, where putting the division
+  in the call's statement changes allocation (`func_L00_00429568`).
+- A branch label on those nops when the division follows a branch group needs `-frac2-hazard-labels`: without it
+  gas moves the label behind the padding (`func_L00_00429568`).
+- `i + 1` written at each use also stops PRE from keeping `(i + 1) << 2`, since each shift then has its own
+  operand pseudo; `i << 2` for the same loop is still kept (`func_L00_00429568`).
 - `x = load; if (flag) x = 0.0f;` differs from a ternary in branch polarity and
   likely slots (`func_L00_0042A460`). Store order affects allocation, but there is
   no universal reversal or permutation rule.
