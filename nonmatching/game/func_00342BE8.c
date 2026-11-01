@@ -1,3 +1,6 @@
+/* 1 November 2026 (closer a3): sched2 keeps sched1's order on ties, so retail's sched1 had x1's store before y1's: its
+ * t3 memory slot stayed empty or y1's li came later, where here 266 goes in at t3. Aggregate initialisers are 32 bytes
+ * longer; -fno-sched-interblock, -g, -frac2-hazard-labels and -fno-sched-spec tie. */
 /* 1 November 2026: 2 words (sw 0x24 / sw 0x2C in the reset block). The colours through a char view
  * (MenuColourQuad stores are MEM_IN_STRUCT, so the D_001B23C0 load passed them): 19 to 2. Retail's sched1
  * issues the flag's constant at t3 ahead of clip.y1's store; all 120 orders of the block tie, also with the flag

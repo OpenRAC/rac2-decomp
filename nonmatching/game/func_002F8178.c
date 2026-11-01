@@ -1,3 +1,8 @@
+/* 1 November 2026 (closer a3): the v / 2 block is local-alloc's fake_birth/fake_death: a qty avoids the registers of
+ * qtys in the adjacent insns. Retail's sum isn't tied to `visible` (combine_regs refused), so it avoids v0: count/sum v1,
+ * sign a0. Here they tie. combine_regs refuses when the output already has a qty, so `visible` looks born earlier in the
+ * block. Tried and tied or worse: block-local count, about a dozen orderings, an inline half, non-void callees before the block.
+ * The mode store's a0: cse picks count's register for the constant 1. */
 /* 1 November 2026: 8 words, 1520/1520 (was 128). Screen size as one 8-byte object (an int under -G8 fills a
  * branch slot from the target thread), store orders from a hill climb. Left: sw $a0 (retail's constant) against
  * $v1 for the mode store at +0x1B0, and the v / 2 block: retail has $v0 taken over the whole load-to-sra range,

@@ -1,3 +1,9 @@
+/* 1 November 2026 (closer a3): 93 words, 1944/1952 with a pointer local for the second table read (no madd). The
+ * colours: `int r = 96;` as the only variable with literal g, b, a gives retail's first loop exactly (hoisted
+ * 0x167F6000 and 0x7F6000, ori 0x60 in the body), 1932 bytes until the rest fits. Retail's second loop: 0x7F006000 and
+ * 0x7F0000 rematerialised and or'd into spill slot 0xC4, then ori 0x60; 0x30 and 0x3F3000 hoisted (BurstColor's
+ * grouping). fp = 0 before the first loop has no use in the output: reload_cse may have dropped it. height + half stays
+ * in the loop in retail (threshold). Texture base stays in the loop too. Unsolved: the second colour's two parts. */
 /* 1 November 2026: with compiler/block-move-quad, tmpl = D_L00_002A26A0 gives retail's lq/sq copy and the
  * prologue: 1944/1952, 105 aligned words (ld/sd and 386 words without that compiler). Left: a madd at the
  * second table read (retail: mult, addu of the low part, lbu 4), the TI zero's register (t1, a1 in retail),
@@ -83,6 +89,7 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
     BurstTemplate tmpl;
     BurstVector delta, projected, shard, random, drift, point;
     float scale, distance, height, ground;
+    BurstWeapon *w;
 
     tmpl = D_L00_002A26A0;
     scale = 1.0f + func_00283CE0(D_L00_00262570[D_00139568[12]].enabled != 0);
@@ -102,8 +109,9 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
             func_00282CC0(&shard, &shard, &projected);
             func_00282F20(&shard, &shard, scale * func_002A7878(3.5f, 6.5f) * (1.0f / 60.0f));
             func_00282CC0(&shard, &shard, velocity);
+            w = &D_L00_00262570[D_00139568[12]];
             func_00308600(object + 0x10, &shard, func_002A7820(60, 120), 0,
-            ((BurstWeapon *)((char *)D_L00_00262570 + D_00139568[12] * 0xE0))->enabled != 0);
+            w->enabled != 0);
         }
     }
     *(float *)(object + 0x18) += 1.0f;
