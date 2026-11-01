@@ -178,7 +178,6 @@ void func_L00_00426680(char *self)
     *(short *)(self + 0x7E) = 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_004266E8);
 
 INCLUDE_ASM("asm/levels", func_L00_00426C78);
 
@@ -528,7 +527,6 @@ void func_L00_00428580(void)
 
 /* func_L00_00428588 is in L00_00428588.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_004287E8);
 
 
 /* runs a fixed pair of callees on the same object handle */

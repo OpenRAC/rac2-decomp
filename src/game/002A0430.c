@@ -89,7 +89,6 @@ ASM_FUNC("asm/game", func_002A6640);
 
 INCLUDE_ASM("asm/game", func_002A677C);
 
-INCLUDE_ASM("asm/game", func_002A68A8);
 
 
 INCLUDE_ASM("asm/game", func_002A6C58);
@@ -147,4 +146,75 @@ void func_002A7470(unsigned char *object, int animation, int frame, int rate)
     object[0x60] &= 0xFD;
     *(float *)(object + 0x4C) = reciprocal;
     object[0x6C] = (*(Model_002A7470 **)(object + 0x24))->anims[animation][0x11];
+}
+
+typedef struct {
+    unsigned char pad0[0x8E];
+    unsigned short count;
+    unsigned char pad90[0x50];
+} Class_2A68A8;
+
+extern unsigned char D_001A7AF8[] __attribute__((sda));
+extern unsigned char D_00139568[];
+extern int D_00139688[];
+extern Class_2A68A8 D_00239BA0[];
+extern int func_002A77E0(int);
+
+int func_002A68A8(int unused, int *out)
+{
+    int i;
+    int j;
+    int k;
+    int sum = 0;
+    int total = 0;
+    int pick;
+    Class_2A68A8 *cls;
+
+    for (i = 0; i < 0x38; i++) {
+        if (D_001A7AF8[i] != 0) {
+            cls = &D_00239BA0[D_00139568[i]];
+            if (cls->count != 0 && i != 0x1F && i != 0x3D && i != 0x2D && i != 0x4D) {
+                total++;
+                if (D_00139688[i] < cls->count)
+                    sum++;
+            }
+        }
+    }
+    if (sum != 0) {
+        pick = func_002A77E0(sum);
+        for (j = 0; j < 0x38; j++) {
+            if (D_001A7AF8[j] != 0) {
+                cls = &D_00239BA0[D_00139568[j]];
+                if (cls->count != 0 && D_00139688[j] < cls->count && j != 0x1F && j != 0x3D) {
+                    if (pick == 0) {
+                        *out = j;
+                        break;
+                    }
+                    pick--;
+                }
+            }
+        }
+    } else {
+        pick = func_002A77E0(total);
+        for (k = 0; k < 0x38; k++) {
+            if (D_001A7AF8[k] != 0) {
+                cls = &D_00239BA0[D_00139568[k]];
+                if (cls->count != 0 && k != 0x1F && k != 0x3D && k != 0x2D && k != 0x4D) {
+                    if (pick == 0) {
+                        *out = k;
+                        break;
+                    }
+                    pick--;
+                }
+            }
+        }
+    }
+    {
+        int roll = func_002A77E0(5);
+        int one;
+        int result = 2;
+        one = 1;
+        if (roll != 0) result = one;
+        return result;
+    }
 }

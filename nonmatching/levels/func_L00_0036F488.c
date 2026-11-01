@@ -1,3 +1,6 @@
+/* Closer C, 1 November 2026: 1500/1500, 36 rows. D_001A7BB3 is D_001A7BB0[3] (sda, nonzero offset). Left: s2/s3 and the
+ * normal path, where retail rebuilds the hero address and 0x1C after func_L00_003266D8.
+ */
 /*
  * Tier: GPT-6.1 Sol, high effort; task v1147, 29 October 2026.
  * USA v1.01, current game -O2 -G8 -ffunction-sections.
@@ -32,7 +35,7 @@
 #include "common.h"
 extern char D_00189E20[], D_00138180[], D_0018C750[];
 extern int D_L00_001A8F00[] MACRO_ADDR, D_L00_001A8FB8[] MACRO_ADDR, D_L00_001A8FF0[] MACRO_ADDR, D_001A7428[] MACRO_ADDR, D_L00_001B19C4[] MACRO_ADDR, D_001A79F0[] MACRO_ADDR, D_001A7390[] MACRO_ADDR, D_L00_001B1AE0[] MACRO_ADDR;
-extern unsigned char D_001A7BB3[] __attribute__((nosda));
+extern unsigned char D_001A7BB0[] __attribute__((sda));
 extern int D_001A7424 __attribute__((sda));
 extern int D_L00_001A8FB4 __attribute__((sda));
 extern int D_L00_001A8FF4 __attribute__((sda));
@@ -102,7 +105,7 @@ void func_L00_0036F488(void)
     {
         if (func_L00_0032EF10(16, D_L00_001A8FB8[0], 0) && D_L00_001B19C4[0] >= 8) {
             char *p = D_00189E20;
-            if (I(p, 0x2294) != 0x6f && B(p, 0x123c) != 2 && I(p, 0x2294) != 0x31 && blocked && I(p, 0x2294) != 0x1c && !D_L00_001A8F00[0] && D_L00_001B18E0 < 0.2f && B(p, 0x22b4) < 2 && !D_L00_001A8FB4 && D_001A7BB3[0]) {
+            if (I(p, 0x2294) != 0x6f && B(p, 0x123c) != 2 && I(p, 0x2294) != 0x31 && blocked && I(p, 0x2294) != 0x1c && !D_L00_001A8F00[0] && D_L00_001B18E0 < 0.2f && B(p, 0x22b4) < 2 && !D_L00_001A8FB4 && D_001A7BB0[3]) {
                 func_00290730();
                 if (func_00290748()) {
                     if (B(p, 0x22b4) != 1) func_L00_002CB218();

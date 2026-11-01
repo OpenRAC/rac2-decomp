@@ -1,3 +1,8 @@
+/* Closer C, 1 November 2026: 9 rows (arm 2 sets i first). Retail's `sll v1,s0,2` in bnez's plain slot is
+ * one value computed before the branch, used as addu v0,v1,fp: `int off = n * 4; ... *(int *)((char *)colors + off)`
+ * gives every row of that block, but n then has 15 weighted refs over 268 insns and loses to direction
+ * (11/157) and odd (6/70), so the three saved registers rotate (23 rows). Next: one more loop-depth read of n.
+ */
 /* GPT-6.1 Sol (low effort), v0552. 868/868 bytes, 0/28 places; first mismatch +0x1bc. Color fill branches differ in shift sharing, branch-likely selection and registers. -O2 -G8 -ffunction-sections -g; physical ABI uses float scale before third integer argument.
    Declarations are included below. Reopen with a pointer-lifetime hypothesis. */
 #include "common.h"
@@ -49,15 +54,10 @@ void func_002FDBD8(float *origin, float *direction, float scale, int *colors)
         func_00283410(transform, angles);
         func_00283788(transform, transform, rotation);
         qcopy(transform + 12, origin);
-        if (!colors) {
-            int color = ref_L00_002FDBD8_02[n];
-            n++;
-            for (i = 3; i >= 0; i--) packet.colors[i] = color;
-        } else {
-            int color = colors[n];
-            int *p = packet.colors;
-            n++;
-            for (i = 3; i >= 0; i--) *p++ = color;
+        if (!colors) { int color; int *p;
+ color = ref_L00_002FDBD8_02[n]; n++; for (i = 3; i >= 0; i--) packet.colors[i] = color;
+        } else { int color; int *p;
+ i = 3; color = colors[n]; n++; p = packet.colors; for (; i >= 0; i--) *p++ = color;
         }
         packet.texture = func_0027C878(odd ? 18 : 17);
         packet.blend = 0xFF9000000260ULL;

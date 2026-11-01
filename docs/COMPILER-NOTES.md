@@ -140,6 +140,8 @@ wrong profile with extra operations or knowingly false prototypes.
 | Nop pair before div.s (float rounding helper) | -g | func_002AEAE0 |
 | Register addresses and grouped 16-byte transfer | -frac2-qcopy | func_L20_0039E158, func_L20_0039F210, func_00305058 (with -g for the pre-div.s nop pair) |
 | Correct copy, wrong motion across it | -frac2-qcopy-barrier, with qcopy | func_002B5E48, func_002EE988, func_L01_003BC490, func_L08_003D3D80 |
+| Loop constants hoisted though the loop is over `threshold` for them | -fmove-all-movables on a file of its own | func_L00_004287E8, func_L16_004117A8 |
+| Hoisted addresses, branch joined with an empty edge block | -frac2-gcse-unsplit-edges | func_L00_00370408 |
 | Float min/max expands into compare and branch | -ffast-math; optimization level still affects allocation | func_L01_003BD560, func_L00_002EE050 |
 
 `-G8` can change allocation even without GP accesses: `func_L17_003BCBC8` puts
@@ -438,6 +440,14 @@ copy profiles where needed, these declarations preserve the earlier instruction
 bytes and relocations and pass every carrying release's placement checks.
 The complete strict builds remain the acceptance gate. This is a reconstruction
 profile, not evidence of the shipping compiler's flags.
+
+A small-data object read at a nonzero offset is the other tied form. cc1 does not split it (the
+symbol carries `SYMBOL_REF_FLAG`), and `simple_memory_operand` rejects the offset, so the insn has
+length 2: it never fills a slot, and the assembler expands it to `lui $r; lw $r,lo($r)` or
+`lui $at; sw`. Declare the block `extern int D[] __attribute__((sda));` at its real start and read
+`D[1]`, or use an incomplete struct array and its fields. `func_L00_004266E8` (`D_001A7BA0[1]`),
+`func_0029D830` (a three-word block at `D_001B1A50`), retained `func_002FF0D8` and
+`func_L00_0036F488`. A bare `D[0]` has length 1 and does fill slots.
 
 The same size rule applies beyond vectors. The particle emitters
 `func_L18_003FCD70` and `func_L18_003FCC48` declare their measured 24-byte
@@ -862,6 +872,14 @@ increments (`n_extra_increment`); that has no retail witness yet and stays on (t
 also changes no matched function). [tests/test_no_recombine_givs.py](../tests/test_no_recombine_givs.py)
 checks the transformer and an authored loop: the digit read stays on the entry pointer
 (`lbu 36(entry)`, not `-1(name + 5)`), and a one-pointer loop is unchanged.
+
+A scalar global read across pointer stores is `fixed_scalar_and_varying_struct_p`: cc1 assumes a
+fixed scalar cannot alias a varying array element, so the load is hoisted or moved over the stores.
+Where retail reloads, declare the global as an array and read `[0]`: `D_L00_001B2B58[0][i] = 0` keeps
+the reload and the integer index in `func_L00_003E4BF0`, and the cursor `D_001B22A8[0]` stays behind
+the `t[]` stores in retained `func_00285030`, with no fence. An integer index that survives inside a
+loop means no loop notes: loop.c reduces every `for` or `do` form, a `goto` loop keeps it (retained
+`func_L00_003769C0`).
 
 ### Compiler control-flow passes
 

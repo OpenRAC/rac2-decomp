@@ -507,7 +507,6 @@ ASM_FUNC("asm/game", func_0029D7A0);
 
 INCLUDE_ASM("asm/game", func_0029D7C0);
 
-INCLUDE_ASM("asm/game", func_0029D830);
 
 extern void *D_0026CA90[];
 extern unsigned char D_001A7BC8[];

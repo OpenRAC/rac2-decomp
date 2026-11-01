@@ -1,24 +1,5 @@
-/* Tier: sol-high, task v1121 (2026-10-29).
- * USA v1.01: 1420 compiled bytes / 1424 retail, 0/27 places.
- * Profile: -O2 -G8 -ffunction-sections -frac2-hazard-labels.
- * The hazard-label option fixes both fallback branch targets at retail
- * 004267AC and 004268BC. Remaining difference: the D_001A7BA4 invert-setting
- * load is split: lui v0 occupies the prior branch delay slot, then lw v1
- * and beql v1 replace retail's nop; mtc1; lui v0; lw v0; beql v0 sequence.
- * All subsequent instructions align after accounting for the missing word.
- * -mno-split-addresses repairs this load but alters other object bases and
- * allocations (1416 bytes); adding -fno-force-mem gives 1412 bytes.
- * -fno-sched-spec / -fno-sched-interblock leave the best result unchanged.
- * An incomplete sda array moves the load into the prior delay slot and
- * emits a GP load (1416 bytes). -Wa,-G0 does not repair that delay slot and
- * expands the other small-data accesses (1460 bytes). -G0 -Wa,-G8 gives
- * 1456 bytes; disabling pre-reload scheduling also regresses allocation.
- * Next: find a truthful declaration/profile preserving only this absolute
- * load as an indivisible macro without changing the other split addresses.
- * Required declarations are retained below. Relocation bindings across all
- * placements are unverified because check.py stops at the size mismatch.
- */
 #include "common.h"
+
 typedef struct { float f[4]; } __attribute__((aligned(16))) V;
 typedef struct { float a, va, b, vb, ang, z, vz; } S_9f38;
 typedef struct { u8 p0[0x15C]; float f15C; u8 p1[0x348-0x160]; short s348; u8 p2[0x2290-0x34A]; u8 *p2290; u8 p3[0x22A0-0x2294]; int i22A0; u8 p4[0x22B5-0x22A4]; u8 b22B5; } HeroInput;
@@ -28,7 +9,7 @@ extern Controller D_00138180;
 typedef struct { u8 pad[0x290]; short phase; } CamGlobal;
 extern CamGlobal D_L00_001B8C80_1;
 extern char *D_L00_001B1844;
-extern int D_001A7BA4 NOT_SDA;
+extern int D_001A7BA0[] __attribute__((sda));
 extern int D_001A8FF0 __attribute__((sda));
 extern float D_L00_001B15C8 __attribute__((sda));
 extern float D_L00_001B15CC __attribute__((sda));
@@ -76,7 +57,7 @@ void func_L00_004266E8(u8 *o) {
     if (t == 0.0f) t = -func_00283CE0((D_00138180.i1A0 >> 14) & 1);
     if (D_L00_001B8C80_1.phase != 0 && D_00189E20.i22A0 == 2) t = 0.0f;
     if (*(short *)(params + 0x26)) t = 0.0f;
-    if (D_001A7BA4 == 0) t = -t;
+    if (D_001A7BA0[1] == 0) t = -t;
     r = func_00282C48(st->b);
     k = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * r;
     st->b = func_002702C8(st->b, t, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &st->vb);

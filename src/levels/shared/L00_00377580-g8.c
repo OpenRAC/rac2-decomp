@@ -1,19 +1,4 @@
-/*
- * High-effort worker, task v0902, 29 October 2026.
- * Current pinned game compiler: -O2 -G8 -ffunction-sections.
- * Best check.py: 876/876 bytes, 0/27 USA v1.01 placements.
- * Eighteen instructions differ, all within +0x0C through +0x90: opening
- * slot/group address allocation, load order and localization-table setup.
- * The remaining body and 0x250 frame agree after relocated fields are ignored;
- * this is a diagnostic comparison, not a linked match.
- * Formats have measured extents 10/9/9 and ordinary absolute declarations.
- * Nesting localization calls in sprintf preserves their format-pointer lifetimes.
- * Typed global model views and raw class-byte indexing recover address ordering.
- * The wide byte-mask idiom follows matched func_002CF340.
- * Named mask/table-base locals tied. Next useful evidence: initial slot/group
- * lifetimes and the localization-table base. Do not repeat tied variants.
- * Required declarations are included below. Other releases and linking untested.
- */
+#include "common.h"
 
 /* Partial model and class layouts measured from the item fields. */
 typedef struct { int group; int pad[3]; } UpgradeGroup;
@@ -27,7 +12,7 @@ typedef union {
 } UpgradeModel;
 extern UpgradeModel D_L00_0022F7C0;
 extern unsigned char D_001A7A80[] __attribute__((sda));
-extern int D_L00_001A8E40[];
+extern int D_L00_001A8E40[] __attribute__((sda));
 extern unsigned char D_00139568[];
 typedef struct { char prefix[8]; int name; char tail[0xE0-12]; } UpgradeInfo;
 extern UpgradeInfo D_L00_00262570[];
@@ -56,8 +41,8 @@ void func_L00_00377580(void) {
     char second[256];
     unsigned int colors[4];
     char *model = (char *)&D_L00_0022F7C0;
-    int slot = D_L00_0022F7C0.slots.rows[*(int *)(model + 0x80)].group;
     int group = D_L00_0022F7C0.groups.rows[*(int *)(model + 0x80)].group;
+    int slot = D_L00_0022F7C0.slots.rows[*(int *)(model + 0x80)].group;
     int handle;
     int width;
     if (((unsigned long)D_001A7A80[group] & ((1U << (slot * 2)) & 255UL)) != 0) return;

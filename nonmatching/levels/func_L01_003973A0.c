@@ -1,3 +1,6 @@
+/* Closer C, 1 November 2026: -O2 -G8 -ffunction-sections -g -frac2-hazard-labels, 3 rows off:
+ * retail mul x,y,z then stores x,y,z; here mul y,z,x and stores y,z,x. Registers and loads now agree.
+ */
 /*
  * GPT-6.1 Sol high, task v0752, USA v1.01: 1232/1232 bytes, 0/20 places.
  * Profile: -O2 -G8 -ffunction-sections -g -frac2-hazard-labels.
@@ -61,11 +64,14 @@ void func_L01_003973A0(unsigned char *m)
             *(float *)(m+0xF4)=func_002A7940();
             *(float *)(m+0xF8)=func_002A7940();
             {
-                float phase=func_002A7940();
-                float x=D_L01_001AF51C * 0.0002908882452175021f;
-                float y=D_L01_001AF520 * 0.0002908882452175021f;
-                float z=D_L01_001AF524 * 0.0002908882452175021f;
-                *(float *)(m+0xFC)=phase;
+                float a=func_002A7940();
+                float x=D_L01_001AF51C;
+                float y=D_L01_001AF520;
+                float z=D_L01_001AF524;
+                *(float *)(m+0xFC)=a;
+                z*=0.0002908882452175021f;
+                x*=0.0002908882452175021f;
+                y*=0.0002908882452175021f;
                 *(float *)(p+0x68)=x;
                 *(float *)(p+0x64)=y;
                 *(float *)(p+0x60)=z;

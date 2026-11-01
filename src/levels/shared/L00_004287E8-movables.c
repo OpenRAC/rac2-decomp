@@ -1,19 +1,5 @@
-/* sol-high worker, USA v1.01, pinned v2 toolchain.
- * Best: 1272/1272 bytes, 0 of 27 places match. Dedicated unit profile:
- * -O2 -G0 -ffunction-sections -fmove-all-movables.
- * Two instruction words remain swapped: +0x35C moves the spring pointer to a0
- * instead of the atan2 result to f13; +0x370 has the converse move.
- * Three source forms (nested atan2, named result, ABI-preserving FP/integer
- * argument interleaving) retained exactly those differences. No linked build.
- * Typed hero/camera globals preserve base addresses; moving turn initialization
- * before best initialization gets turn in fp and the hero pointer in s7.
- * -fmove-all-movables hoists the zero and 10.0f loop constants as retail does;
- * default, -g and G8 profiles did not. The source also corrects the prior
- * level/swing condition against retail and RAC1's target-tracking camera.
- * All required declarations are included below. Reopen with new evidence for
- * the spring-call argument scheduling; do not repeat the tied wordings.
- */
 #include "common.h"
+
 typedef struct Hero_4287E8 {
  char pad0[0x88]; float z;
  char pad8c[0xC]; float yaw;
@@ -25,7 +11,8 @@ extern Hero_4287E8 D_00189E20_6;
 typedef struct CameraGlobals_4287E8 {char pad[0x190];char *follow;} CameraGlobals_4287E8;
 extern CameraGlobals_4287E8 D_L00_001B8C80_1;
 extern char D_00189EA0[];
-extern float func_002703B0(char *, float, float, float, float, float);
+/* Bank order as the callers set it up: the object pointer travels in a0 either way. */
+extern float func_002703B0(float, float, char *, float, float, float);
 extern void func_00282CC0_4(char *, char *, char *);
 extern void func_002AA2E8(char *,float,float);
 extern void func_00282CF0(char *,char *,char *);
@@ -61,7 +48,7 @@ void func_L00_004287E8(char *a)
  func_002AA2E8(*(char **)(D_L00_001B8C80_1.follow+0x70)+0x8C,dist-0.5f,0.13333334f);
  if(D_00189E20_6.state==0x2B) {
   if((D_001A79F0!=14 && D_001A79F0!=7 && D_001A79F0!=9) || (D_00189E20_6.swing && *(unsigned char *)(D_00189E20_6.swing+0x21)==255)) {
-   *(float *)angle=func_002703B0(angle+4,*(float *)angle,D_00189E20_6.yaw,0.00125f,0.175f,0.0f);
+   *(float *)angle=func_002703B0(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
   } else {
    turn=angle+4; best=0; closest=1000.0f;
    p=D_00189E20_6.swing;
@@ -79,17 +66,17 @@ void func_L00_004287E8(char *a)
    } while(*list++>=0);
    if(best) {
     func_00282CF0(diff,best+0x10,p+0x10);
-    *(float *)angle=func_002703B0(turn,*(float *)angle,func_00283248(*(float *)diff,*(float *)(diff+4)),0.00125f,0.175f,0.0f);
+    *(float *)angle=func_002703B0(*(float *)angle,func_00283248(*(float *)diff,*(float *)(diff+4)),turn,0.00125f,0.175f,0.0f);
    } else if(*(int *)(part+0x40)==1)
-    *(float *)angle=func_002703B0(turn,*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),0.00125f,0.175f,0.0f);
+    *(float *)angle=func_002703B0(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),turn,0.00125f,0.175f,0.0f);
    else
-    *(float *)angle=func_002703B0(turn,*(float *)angle,D_00189E20_6.yaw,0.00125f,0.175f,0.0f);
+    *(float *)angle=func_002703B0(*(float *)angle,D_00189E20_6.yaw,turn,0.00125f,0.175f,0.0f);
   }
  } else if(D_00189E20_6.state==0x24) {
   if(*(int *)(part+0x40)==1)
-   *(float *)angle=func_002703B0(angle+4,*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),0.00125f,0.175f,0.0f);
+   *(float *)angle=func_002703B0(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),angle+4,0.00125f,0.175f,0.0f);
   else
-   *(float *)angle=func_002703B0(angle+4,*(float *)angle,D_00189E20_6.yaw,0.00125f,0.175f,0.0f);
+   *(float *)angle=func_002703B0(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
  }
  *(float *)(part+0x30)=func_00283180(*(float *)angle);
  *(float *)(part+0x34)=func_00283198(*(float *)angle);

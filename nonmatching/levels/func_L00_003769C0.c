@@ -1,3 +1,7 @@
+/* Closer C, 1 November 2026: -O2 -G0 -ffunction-sections -fmove-all-movables, 1212/1216, 43 rows. Retail's search keeps
+ * its integer index, so it is a goto loop: loop.c reduces every do/while or for form. Left: retail recomputes the
+ * entry address for the colour (addu v0,a1,a0; lw 4(v0)), idx/colour take s2/s3 the other way, i+1/y+56 swapped.
+ */
 #include "common.h"
 /* sol-high; USA v1.01, -O2 -G0 -ffunction-sections.
  * Best check: 1212/1216 bytes, 0 of 27 places match; no linked match.
@@ -67,11 +71,16 @@ void func_L00_003769C0(void)
         if(*(int *)row==0) {
             int j=0;
             char *label;
-            do {
-                MenuColor *entry = &D_L00_0028E9F0[j++];
-                if(!entry->key) break;
-                if(*(int *)((char *)D_L00_0022F7C0+0x158+idx*28)==entry->key) {color=entry->color;break;}
-            } while(1);
+            int key;
+            int off;
+        top:
+            off=j*8;
+            key=((MenuColor *)((char *)D_L00_0028E9F0+off))->key;
+            if(key) {
+                j++;
+                if(*(int *)((char *)D_L00_0022F7C0+0x158+idx*28)!=key) goto top;
+                color=((MenuColor *)((char *)D_L00_0028E9F0+off))->color;
+            }
             label=func_0028E588(0xea97,1);
             colors[2]=colors[0]=a|color;
             colors[3]=colors[1]=b|color;
