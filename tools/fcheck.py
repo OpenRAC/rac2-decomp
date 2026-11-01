@@ -469,6 +469,11 @@ def compile_text(text: str, unit: Path, obj: Path, includes: list[Path] | None =
     copy.write_text(text)
     flags = build.flags_for(unit)
     cargs, aargs = build.split_flags(flags)
+    # $RAC2_FCHECK_OPT: another -O for a candidate too large for cc1's 32-bit address space at the
+    # unit's level (a whole hand-written kernel in hostgen's console form). It changes the code, not
+    # what the code does, and fcheck compares what it does.
+    if os.environ.get("RAC2_FCHECK_OPT"):
+        cargs = [os.environ["RAC2_FCHECK_OPT"] if a.startswith("-O") else a for a in cargs]
     C, S = build.COMPILER, build.SDK_COMPILER
     inc = " ".join(f"-I'{d}'" for d in [unit.parent, *(includes or [])])
     assemble = shlex.join([str(C / "as"), *aargs, "-o", "x.o", "x.s"])
@@ -483,7 +488,34 @@ def compile_text(text: str, unit: Path, obj: Path, includes: list[Path] | None =
         obj.unlink()
     runner = shlex.split(os.environ.get("RAC2_LINUX", ""))
     r = subprocess.run([*runner, "bash", "-c", script], capture_output=True, text=True)
+    for _ in range(4):
+        far = [int(n) for n in re.findall(r"x\.s:(\d+): Error: Branch out of range", r.stdout + r.stderr)]
+        if not far or not obj.with_suffix(".s").is_file():
+            break
+        r = assemble_far(obj, far, aargs, runner, C)
     return r.returncode == 0 and obj.is_file(), (r.stdout + r.stderr)[-4000:]
+
+
+def assemble_far(obj: Path, far: list[int], aargs: list[str], runner: list[str], C: Path):
+    """The assembler does not relax branches: a candidate too long for them (a kernel in hostgen's
+    console form, see $RAC2_FCHECK_OPT) gets each one at the lines FAR through a jump of its own.
+    Only the candidate's test copy: the matching build never comes here."""
+    path = obj.with_suffix(".s")
+    lines = path.read_text().split("\n")
+    for k in sorted(far, reverse=True):
+        at = k - 1
+        m = re.fullmatch(r"(\s*)(b\w*)(\s+)(.*?)(\$L\d+)", lines[at])
+        if m is None:
+            continue
+        if m.group(2) == "b":
+            lines[at] = f"\tj\t{m.group(5)}"
+            continue
+        near, skip = f"$LF{k}a", f"$LF{k}b"
+        lines[at] = f"{m.group(1)}{m.group(2)}{m.group(3)}{m.group(4)}{near}"
+        lines[at + 2:at + 2] = [f"\tb\t{skip}", "\tnop", f"{near}:", f"\tj\t{m.group(5)}", "\tnop", f"{skip}:"]
+    path.write_text("\n".join(lines))
+    script = f"set -e; cd '{path.parent}'; {shlex.join([str(C / 'as'), *aargs, '-o', obj.name, path.name])}"
+    return subprocess.run([*runner, "bash", "-c", script], capture_output=True, text=True)
 
 
 def derived_values(obj: dict, name: str, prog: Program = BOOT_PROGRAM) -> dict[str, int] | None:
