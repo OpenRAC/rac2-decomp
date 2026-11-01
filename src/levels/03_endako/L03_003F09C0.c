@@ -263,8 +263,6 @@ void func_L03_003F71E0(u8 *a0, s32 a1) {
 
 /* func_L03_00419CA0 is in L03_00419CA0-effects.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_0041A090);
-
 /* func_L03_0041A570 is in L03_0041A570-g8.c. */
 
 /* func_L03_0041BE50 is in L03_0041BE50-g8.c. */

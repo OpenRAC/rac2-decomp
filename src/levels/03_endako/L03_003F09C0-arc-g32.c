@@ -1,6 +1,4 @@
-/* Tier: sol-high (v1040). 1244/1244 bytes; 0/1 places. Only non-relocation differences are the two X stores at +0x438/+0x44C, whose order is reversed. Pinned v2 toolchain reproduces this baseline. Separate stores, chained assignments, and grouping c/d into a struct all tie at the same two stores; stop on the measured tie. Profile: -O2 -G32 -ffunction-sections -Wa,-G32. Typed integer/FP interleaving of func_L00_003263D0 preserves both physical register banks and removes its three-move scheduling difference.
- * Required declarations follow; this draft is not linked.
- */
+
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
@@ -59,8 +57,8 @@ void func_L03_0041A090(u8 *e) {
         d.f[0]=12; d.f[1]=-12; d.f[2]=20;
         f.f[0]=-1.5f; f.f[1]=-5; f.f[2]=-1.5f;
         g.f[0]=1.5f; g.f[1]=-15; g.f[2]=1.5f;
-        func_L03_002ECF08(e,&c,&d,&f,&g,15,0);
-        d.f[0]=-12; c.f[0]=-12;
+        func_L03_002ECF08(e,&c,&d,&f,&g,15,0); c.f[0]=-12;
+        d.f[0]=-12;
         func_L03_002ECF08(e,&c,&d,&f,&g,15,0);
         if(D_L03_001B1B10>=0) {
             *(u16 *)(e+0x7c)=(1<<D_L03_001B1B10)|0x8000;

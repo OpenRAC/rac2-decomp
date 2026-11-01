@@ -1,22 +1,3 @@
-/* GPT-6.1 Sol (high), 29 October 2026: retained near miss, not linked.
- * USA v1.01, -O2 -G8 -ffunction-sections: 872/872 bytes, 0/19 places.
- * First difference +0x188; three non-relocation instruction differences remain:
- * +0x188 addu v0,v1,v0, +0x284 addu v0,a0,v0, +0x2A4 addu v1,v0,v1.
- * Retail has the two source operands reversed in each of those additions.
- * All required declarations are below. Ordinary array declarations preserve
- * the table field displacement 0x464; separate local table pointers recover
- * destination allocation. Ordinary resident arrays restore split scheduling.
- * Explicit activation/inactive branches recover the odd/even control flow.
- * A signed 32-bit flag load widened to a 64-bit local retains the real flag
- * copy; an unsigned-byte local does not express that contract.
- * Mask into an int local, conditionally replace it, then store: this gives
- * retail's movn rather than conditional byte stores. Scope the first trigger
- * ID separately from the post-activation ID to recover allocation.
- * Pointer +=, explicit 32-bit integer addition and widened integer addition
- * tie at the same three reversed operands. MACRO_ADDR on the level tables
- * worsens scheduling. Stop on this tie; reopen with a new address-expansion
- * mechanism, not instruction rewriting or another equivalent addition.
- */
 #include "common.h"
 extern int D_L00_001B19C8;
 extern unsigned char D_0018C0D4 NOT_SDA;
@@ -24,7 +5,8 @@ extern u32 D_0018C0BC NOT_SDA;
 extern int D_0018C0B4 NOT_SDA;
 extern int D_001A79F0;
 extern unsigned char D_0019B2E8[], D_0019B4A8[];
-extern u8 D_L00_0021D140[], D_L00_0021DDB0[];
+typedef struct { char pad[0x464]; u8 disabled[1]; } TriggerTable;
+extern TriggerTable D_L00_0021D140, D_L00_0021DDB0;
 extern float D_00189EA0[4];
 extern char *D_L00_001AF440 __attribute__((sda));
 extern void func_L00_0042A500(int arg0);
@@ -33,7 +15,7 @@ extern void func_002A0430(unsigned int);
 extern float func_002A89A8(void *, int, float), func_00282C48(float);
 extern void func_002DF3F8(void *, void *), func_002B0A18(int, int);
 /* Applies a regional activation trigger and records its checkpoint flags. */
-void func_L00_0039E7A8(char *actor) {
+void func_US2_L00_0039FBD8(char *actor) {
     int *state = *(int **)(actor + 0x68);
     unsigned long long flags;
     unsigned short id;
@@ -65,9 +47,7 @@ void func_L00_0039E7A8(char *actor) {
     if (active) goto activate;
     {
         unsigned short triggerId = *(u16 *)(actor + 0xB2);
-        u8 *triggerTable = D_L00_0021DDB0;
-        triggerTable += (short)triggerId;
-        if (triggerTable[0x464]) goto activate;
+        if (D_L00_0021DDB0.disabled[(short)triggerId]) goto activate;
         bits = D_0019B4A8[((short)triggerId >> 1) + D_001A79F0 * 0x400];
         if (triggerId & 1) {
             if ((bits >> 4) & 7) goto activate;
@@ -84,16 +64,8 @@ activate:
         point[2] = func_002A89A8(point, 0, 0.5f);
         if (func_00282C48(*(float *)(actor + 0x18) - point[2]) > 2.0f) point[2] = *(float *)(actor + 0x18);
         func_002DF3F8(point, actor + 0xF0);
-        {
-            u8 *table = D_L00_0021D140;
-            table += *(short *)(actor + 0xB2);
-            table[0x464] = 0;
-        }
-        {
-            u8 *table = D_L00_0021DDB0;
-            table += *(short *)(actor + 0xB2);
-            table[0x464] = 0;
-        }
+        D_L00_0021D140.disabled[*(short *)(actor + 0xB2)] = 0;
+        D_L00_0021DDB0.disabled[*(short *)(actor + 0xB2)] = 0;
         id = *(u16 *)(actor + 0xB2);
         {
             int index = (short)id >> 1;
@@ -107,7 +79,7 @@ activate:
             *packed = value;
         }
         if (state[9] && D_L00_001AF440 != actor) {
-            func_002B0A18(0x2F36, 90);
+            func_002B0A18(0x2DCC, 90);
             D_L00_001AF440 = actor;
         }
         state[8] = 900;
