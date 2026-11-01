@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/game", func_PAL_00305348);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00305470);
 
 
 extern int F6eb4f363_FUN_002A77E0(int mode);

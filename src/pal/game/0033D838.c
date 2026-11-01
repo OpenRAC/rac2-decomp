@@ -224,7 +224,6 @@ INCLUDE_ASM("asm/pal/game", func_PAL_0033F738);
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033F840);
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 

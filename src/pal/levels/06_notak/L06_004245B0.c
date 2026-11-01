@@ -4,7 +4,6 @@ INCLUDE_ASM("asm/pal/levels", func_PAL_L06_004245B0);
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_00424E88);
 
 #include "common.h"
 extern void func_002A8598(int, int);

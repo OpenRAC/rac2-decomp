@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002DBEA8);
 
 typedef struct { short s[12]; } FontWindow;
 struct CheatMenuEntry { int text_id; unsigned char *enabled_flag; int enabled_text_id, disabled_text_id, reserved10; };

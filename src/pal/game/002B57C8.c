@@ -1,6 +1,12 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002B57C8);
+extern int D_001A8A5C __attribute__((sda));
+extern int D_PAL_001A8C64 __attribute__((sda));
+
+int func_PAL_002B57C8(void) {
+    return D_PAL_001A8C64;
+}
+
 
 
 extern float func_00283248(float, float);

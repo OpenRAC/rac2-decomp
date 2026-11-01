@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002B1A50);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002B1EE8);
 
 typedef unsigned char u8;
 extern u8 D_00139648;

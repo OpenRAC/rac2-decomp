@@ -4,9 +4,7 @@
 INCLUDE_ASM("asm/pal/game", func_PAL_003469E8);
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00347168);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00347258);
 
 
 extern void F6402b823_FUN_00336320(char *a);

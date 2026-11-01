@@ -41,5 +41,31 @@ extern float func_00283B98(float, float);
 extern int func_002A77E0(int);
 extern void func_PAL_L01_0041C0D8(Obj_397870 *);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L01_0041BF10);
+extern float D_PAL_001B1A48 __attribute__((sda));
+extern float D_PAL_001B1A4C __attribute__((sda));
+extern float D_PAL_001B1A50 __attribute__((sda));
+extern float D_PAL_001B1A64 __attribute__((sda));
+extern int D_PAL_001B1A88 __attribute__((sda));
+
+void func_PAL_L01_0041BF10(Obj_397870 *a0)
+{
+    State_397870 *s1 = a0->st;
+    float f;
+
+    a0->f2C = a0->cls->f24 * D_PAL_001B1A48;
+
+    if (a0->b20 == 1) {
+        f = func_00283198(a0->fFC);
+        a0->f18 = s1->f18 + D_PAL_001B1A4C + D_PAL_001B1A50 * f;
+        a0->fF0 = func_00283B98(a0->fF0, s1->f68);
+        a0->fF4 = func_00283B98(a0->fF4, s1->f64);
+        a0->fF8 = func_00283B98(a0->fF8, s1->f60);
+        a0->fFC = func_00283B98(a0->fFC, 0.0003490659f * D_PAL_001B1A64);
+    }
+
+    func_PAL_L01_0041C0D8(a0);
+    if (func_002A77E0(D_PAL_001B1A88) == 0)
+        func_PAL_L01_0041C560(a0);
+}
+
 

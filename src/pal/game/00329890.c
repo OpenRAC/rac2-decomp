@@ -59,5 +59,4 @@ Moby_3280C8 *func_PAL_00329890(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unus
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_003299B8);
 

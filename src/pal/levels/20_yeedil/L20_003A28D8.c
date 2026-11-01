@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L20_003A28D8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_003A328C);
 
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));

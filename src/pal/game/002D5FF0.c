@@ -68,7 +68,17 @@ int func_PAL_002D6448(void)
 extern void func_003423A8(char *, int);
 extern void func_PAL_003443E8(char *, char *);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002D6478);
+extern char D_PAL_00261330[];
+
+int func_PAL_002D6478(void)
+{
+    if (D_001A8CFC[0] != 0) {
+        func_003423A8(D_001A8CFC[0] + 0x3E810, 1);
+        func_PAL_003443E8(D_001A8CFC[0] + 0x3E810, D_PAL_00261330);
+    }
+    return 0;
+}
+
 
 
 

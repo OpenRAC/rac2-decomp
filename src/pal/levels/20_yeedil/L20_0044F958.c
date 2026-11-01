@@ -19,7 +19,6 @@ void func_PAL_L20_0044FD80(char *arg0, char *arg1) {
     func_0029F338(arg0);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0044FE40);
 
 
 

@@ -1,6 +1,35 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002BC58C);
+extern float func_00283CE0(int a);
+extern void func_00282CC0(char *p, char *q, char *r);
+extern int func_00283D38(int, int, float);
+extern unsigned char *D_001F2560;
+
+/* blends a sub-object into a position, adds a float field, stores an interpolated value in the
+   word at +4 and scales the frame count into a byte table at +2 */
+void func_PAL_002BC58C(char *a0)
+{
+    char *s0 = a0;
+    char *s1 = a0 + 32;
+    unsigned int r;
+    float f;
+
+    func_00282CC0(s0 + 16, s0 + 16, s1);
+    if (func_00282978(s0 + 10) != 0) {
+        func_002B9180(s0);
+        return;
+    }
+    *(float *)(s0 + 12) = *(float *)(s0 + 12) + *(float *)(s1 + 0x1C);
+    f = func_00283CE0(*(int *)(s1 + 0x18));
+    r = func_00283D38(*(int *)(s1 + 0x14), *(int *)(s1 + 0x10),
+                      (float)*(short *)(s0 + 0xA) / f);
+    *(int *)(s0 + 4) = r;
+    if (*(short *)(s0 + 0xA) < 5) {
+        *(int *)(s0 + 4) = (r & 0xFFFFFF) | (((int)(*(short *)(s0 + 0xA) * (r >> 24))) / 5 << 24);
+    }
+    *(unsigned char *)(s0 + 2) = D_001F2560[((*(int *)(s1 + 0x18) - *(short *)(s0 + 0xA)) * 10) / *(int *)(s1 + 0x18)];
+}
+
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002BC6A0);
 
