@@ -222,7 +222,6 @@ void func_L00_003EF550(void)
     D_L00_001B0838 = 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003EF560);
 
 extern int func_00283DB8(char *local, float value);
 

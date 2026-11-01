@@ -26,6 +26,9 @@
  * combined active initialization guards also tie. No linked match claimed.
  * Next: investigate state-object access forms that retain retail's separate
  * address lifetimes and join layout; do not repeat these variants unchanged.
+  * 2026-11-01 (closer B): `$fp` holds D_00189E20 for the 0x22BB reads and the 0x2290 reads at the arm ends, while
+ * 0x22BF, the enabled arm, the fade arm and the block after the join rebuild it with lui/addiu. One name hoists
+ * all of them to one register; a pointer local set at the top is rematerialised at every use. Unsolved.
  */
 #include "include_asm.h"
 typedef struct SlotAED68 {
