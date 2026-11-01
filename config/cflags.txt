@@ -2969,6 +2969,7 @@ src/game/00334A88-pivot-g8.c	-O2 -G8 -ffunction-sections
 src/levels/08_tabora/L08_0042A0B0-ribbon.c	-O2 -G0 -ffunction-sections -g
 src/levels/30_insomniac_museum/L30_00417120-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L12_00429ED8-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_003E64F8-nosplit.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/levels/shared/L22_002A8B98-timers-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
 src/levels/20_yeedil/L20_002D6488-timers-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
 src/levels/shared/L01_003B9798-lift-pre.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-gcse-unsplit-edges
