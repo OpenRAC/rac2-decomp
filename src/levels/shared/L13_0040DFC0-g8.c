@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern unsigned int D_L13_001B1300 __attribute__((sda));
-extern unsigned int D_L13_001B1304 __attribute__((sda));
+extern unsigned int ref_L13_0040DFC0_01 __attribute__((sda));
+extern unsigned int ref_L13_0040DFC0_02 __attribute__((sda));
 extern float D_L13_001B12FC __attribute__((sda));
 extern unsigned int D_L13_001B1318 __attribute__((sda));
 extern unsigned int D_L13_001B131C __attribute__((sda));
@@ -53,7 +53,7 @@ void func_L13_0040DFC0(u8 *unused, int ua, float uf, int ub, int uc,
     float random;
 
     ref_L13_0040DFC0_00(&packet);
-    func_00281DE8(&packet, D_L13_001B1300, 0, 128);
+    func_00281DE8(&packet, ref_L13_0040DFC0_01, 0, 128);
     {
         unsigned alpha = (D_L13_001B1324 << 24);
         unsigned alphaBlue = alpha | (D_L13_001B1320 << 16);
@@ -106,7 +106,7 @@ void func_L13_0040DFC0(u8 *unused, int ua, float uf, int ub, int uc,
     func_00282CC0(packet.v[2], packet.v[2], beamStep);
     func_00282CC0(packet.v[3], packet.v[3], beamStep);
     func_00280B90(&packet, 0, 0);
-    func_00281DE8(&packet, D_L13_001B1304, 1, 128);
+    func_00281DE8(&packet, ref_L13_0040DFC0_02, 1, 128);
     {
         unsigned alpha = (D_L13_001B1344 << 24);
         unsigned alphaBlue = alpha | (D_L13_001B1340 << 16);

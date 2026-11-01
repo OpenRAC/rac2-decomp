@@ -47,6 +47,11 @@
  * - Untested idea: 0.5 and 1 may be real locals rather than cse results. A local crosses a
  *   join without cse, which would remove the one-armed requirement argued in the sibling drafts.
  *   That still needs a real tested value for the join. tex1 being s3 rather than s2 is unexplained.
+ *
+ * closer D: the block boundary is a sched barrier, not a block. A loop note in the middle of a block makes the next
+ * insn depend on everything before it (sched_analyze_insn), which is why do { } while (0) gave the argument order
+ * here. A macro with do/while in retail would explain func_L22_003A5018 and func_L05_0041DF58 too; that spelling is
+ * refused, so this stays open.
  */
 #include "common.h"
 

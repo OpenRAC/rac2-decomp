@@ -1,20 +1,3 @@
-/* GPT-6.1 Sol high, task v1055, pinned upstream compiler, USA v1.01.
- * Best: 1280/1296 bytes, 0/2 places (levels 09 and 20), frame 0x80.
- * Profile: -O2 -G8 -ffunction-sections -g. All declarations follow.
- * Reloading the second scan entry after IsPointInCuboid recovers its early
- * success block and avoids keeping an index alive across that call.
- * The incomplete non-SDA mode-word array recovers the retail prologue;
- * explicit SDATA history/scale views and MACRO_ADDR height scalars recover
- * their measured address forms. A separate numerator/denominator/division
- * statement with -g recovers the two pre-div.s nops and operand registers.
- * Remaining: scan/base lifetimes, UV member bases and reloads, scheduling,
- * and allocation; the body is still four words short, not a local match.
- * Independent raw-byte/member-array views and explicit induction pointers
- * did not fix those differences; -fno-strict-aliasing was object-neutral.
- * A diagnostic fully volatile UV declaration was worse and is not retained.
- * Next useful evidence: UV storage/alias model and scan pointer lifetimes.
- * No linked build claimed. Earlier 1256-byte draft is superseded.
- */
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
@@ -29,10 +12,10 @@ extern int D_L09_001C9F80[];
 extern Quad D_L09_001B3100 SDATA(D_L09_001B3100);
 extern u8 D_L09_001B9A00[];
 extern u8 *D_L09_001B294C;
-extern ScrollLayer D_L09_001B3110[];
+extern ScrollLayer D_L09_001B3110[] MACRO_ADDR;
 extern float D_L09_001AEC38[] SDATA(D_L09_001AEC38);
 extern float D_L09_001AEC48[] SDATA(D_L09_001AEC48);
-extern float D_L09_001AEC4C[];
+extern float D_L09_001AEC4C[] MACRO_ADDR;
 extern float D_L09_001B3120 MACRO_ADDR;
 extern float D_L09_001B3124 MACRO_ADDR;
 extern int D_L09_001B2388;
@@ -53,6 +36,7 @@ void func_L09_003806A0(u8 *object)
     float scaled[4] __attribute__((aligned(16)));
     int i, index;
     int found;
+    int *scan;
 
     if (D_L09_001C9F80[0] != I32(state, 0x30))
         return;
@@ -60,11 +44,9 @@ void func_L09_003806A0(u8 *object)
         object[0x20] = 1;
         object[0x30] = 255;
         {
-            float *u = &D_L09_001B3110[0].u;
-            float *v = &D_L09_001B3110[0].v;
-            for (i = 1; i >= 0; i--, u += 2, v += 2) {
-                *u = 0.0f;
-                *v = 0.0f;
+            for (i = 0; i < 2; i++) {
+                D_L09_001B3110[i].u = 0.0f;
+                D_L09_001B3110[i].v = 0.0f;
             }
         }
         qcopy(&D_L09_001B3100, D_L09_001B9A00);
@@ -76,7 +58,7 @@ void func_L09_003806A0(u8 *object)
         if (I32(state, 0x40 + i * 4) == -1)
             continue;
         if (func_002ACBC8(D_00189EA0, I32(state, 0x40 + i * 4))) {
-            S16(D_00189E20, 0x1FE) = 0;
+            { u8 *h = D_00189E20; S16(h, 0x1FE) = 0; }
             found = 1;
             break;
         }
@@ -84,15 +66,16 @@ void func_L09_003806A0(u8 *object)
     if (found)
         return;
     D_L09_001B3124 = F32(state, 0x14);
+    scan = (int *)(state + 0x50);
     for (i = 0; i < 4; i++) {
-        if (I32(state, 0x50 + i * 4) == -1)
+        if (scan[i] == -1)
             continue;
-        if (func_002ACBC8(D_00189EA0, I32(state, 0x50 + i * 4))) {
-            D_L09_001B3124 = F32(D_L09_001B294C + I32(state, 0x50 + i * 4) * 128, 0x38) + 0.15f;
+        if (func_002ACBC8(D_00189EA0, scan[i])) {
+            D_L09_001B3124 = F32(D_L09_001B294C + scan[i] * 128, 0x38) + 0.15f;
             break;
         }
     }
-    S16(D_00189E20, 0x1FE) = 2;
+    { u8 *h = D_00189E20; S16(h, 0x1FE) = 2; }
     func_00282CF0(delta, D_L09_001B9A00, &D_L09_001B3100);
     qcopy(&D_L09_001B3100, D_L09_001B9A00);
     if (!(F32(state, 0x20) < F32(D_L09_001B9A00, 8)))

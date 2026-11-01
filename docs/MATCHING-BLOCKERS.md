@@ -2323,6 +2323,8 @@ Historical examples, to requalify in the final unit:
 - An int under -G8 can fill a branch slot from the target thread. If retail has the two-word form there, it is part of a larger object: func_002F8178's screen size as one 8-byte struct, 66 words to 33.
 - A hill climb over statement order (48 orders a round, 1 to 3 moves each, on box2) closed func_002F8178's store blocks where 18 statements are too many to enumerate: 33 words to 8.
 
+**Update, 1 November 2026 (closer D).** Before tuning a near miss, walk its branch targets against retail's: `func_L02_003EB8F8` went from 132 rows to 0 by fixing three wrong targets, nothing else; a jump into the middle of what looks like an arm is the sign. A table reached through two `la` with reloads between stores (`func_L09_003806A0`) is one structure array declared `MACRO_ADDR`: separate arrays give the `la` but no aliasing, pointers walk it into a reversed loop. A base kept unfolded for a hero field can be a pointer local inside the arm, which loop.c hoists: it reaches the loop's preheader without being available at the next use, so gcse leaves that use alone. A pointer local set before the branch on the path where PRE must not insert (`d = delta;` in one `case`) gives one insertion instead of three. loop.c's `threshold` falls by 3 per register moved: when retail hoists some constants of a loop and not others, make one a local so the count works out (`func_L10_0039DA48`).
+
 <a id="blocker-46"></a>
 
 ## 46. The `dli` expansion of all-ones masks

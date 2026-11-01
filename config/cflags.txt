@@ -2913,3 +2913,4 @@ src/pal/levels/14_aranos_prison/L14_003E0C90-gate-g8.c	-O2 -G8 -ffunction-sectio
 src/levels/14_aranos_prison/L14_00425CB0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/shared/L03_003E4680-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/20_yeedil/L20_0043ECB0-shard-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/levels/shared/L09_003806A0-g8.c	-O2 -G8 -ffunction-sections -g
