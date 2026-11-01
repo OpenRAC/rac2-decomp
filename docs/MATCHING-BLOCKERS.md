@@ -421,7 +421,12 @@ reaching register: the first computation must go through a pseudo, and the later
 later block (`vp = &velocity` after the first loop, `base2 = object + 0xC0` before the last). If nothing else
 has a saved register left, the reaching register is spilled, which accounts for a lone `sw` of a base
 (`func_L00_003EF560`, frame 0x110). Splitting one float variable in two can decide a frame size and the whole
-FPR order (`func_L00_003A9C58`: `scale`, `bounce`, `speed2`). Constants hoisted from a loop have to be
+FPR order (`func_L00_003A9C58`: `scale`, `bounce`, `speed2`). An allocno also keeps off a register that a
+lower-priority conflicting allocno prefers (global.c's `regs_someone_prefers`): that function's `scale` ranks
+below the loop's `one`, so `scale = f(age); scale /= f(7);` loses $f20 to it, but
+`scale = f(age) / f(7);` copies from a temp that took $f20, the copy makes $f20 `scale`'s preference, and `one`
+moves to $f21. Fewer refs on `scale`, and no wrapper needed. Try the expression form before counting refs.
+Constants hoisted from a loop have to be
 body locals or literals by the same measure, and `short life = 50` before the loop gives $fp to the 2.
 A byte read of a short that keeps the short's allocation is `int l = r->life & 0xFF`.
 Open: `func_L00_0041EE58` and its twin `func_L00_003E2510` keep their first frame address in a
