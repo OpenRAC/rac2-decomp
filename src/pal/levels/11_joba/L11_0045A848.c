@@ -89,7 +89,6 @@ void func_PAL_L11_0045A9A8(char *p)
     *(int *)(q + 0x1C4) = 0;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L11_0045AAE4);
 
 typedef struct {
     u8 pad00[0x10];

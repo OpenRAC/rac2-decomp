@@ -2945,6 +2945,18 @@ src/pal/levels/shared/L00_003ACF38-g.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L13_002C56D8-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/pal/levels/shared/L22_002C8740-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/pal/levels/shared/L22_002D1020-sw.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/pal/levels/00_aranos_tutorial/L00_003D2C94-gate-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/01_oozla/L01_003C20F0-flags.c	-O2 -G0 -ffunction-sections -fno-sched-interblock
+src/pal/levels/02_maktar_nebula/L02_00405F90-sw.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/11_joba/L11_0045A848-sw.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -fno-cse-follow-jumps
+src/pal/levels/12_todano/L12_00423C50-g83.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/23_damosel_orbit/L23_003C4CE8-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/pal/levels/shared/L00_002C95C0-sw.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-hazard-labels
+src/pal/levels/shared/L00_003A44FC-eye.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/pal/levels/shared/L00_0040C8CC-sw.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L18_0042C768-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/shared/L22_0039EBE4-sw.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L22_003A7FF0-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/levels/14_aranos_prison/L14_00425CB0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/shared/L03_003E4680-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/20_yeedil/L20_0043ECB0-shard-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy

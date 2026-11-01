@@ -70,6 +70,5 @@ void func_PAL_L01_003C20F0(L01_003BE4D0_OBJ *obj)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L01_003C2268);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L01_003C2688);
