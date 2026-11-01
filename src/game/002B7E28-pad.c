@@ -1,26 +1,5 @@
-/* sol-high, task v1269, USA v1.01, default game profile
- * (-O2 -G0 -ffunction-sections): 1804/1804 bytes, 0/28 places.
- * Final check.py rejection: instruction at +0x8C differs.
- * Eight nonrelocated instructions differ, all spill-slot immediates:
- * analog_prev is at sp+0x14 instead of sp+0x18 (one store, two loads),
- * hist_ang is at sp+0x18 instead of sp+0x10 (one store, two loads),
- * hist_btn is at sp+0x10 instead of sp+0x14 (one store, one load).
- * The history condition captures its modulo index, preserving the second
- * magnitude read in the body; this recovers retail's induction, scheduling
- * and the low-magnitude flag block in the earlier mirror-branch gap.
- * The angular threshold is 0.959931194782257080078125f (0x3F75BE0D).
- * Thirteen checker runs, plus one allocator diagnostic (baseline and dump
- * objects identical). Scoped/reused index locals, reassociation of the
- * modulo numerator, and do-while spellings of the two sixteen-value loops
- * tie on the eight offsets. Explicit array pointers alter scheduling and
- * allocation; sharing the two flick-loop counters changes registers.
- * Next useful experiment: explain GCSE-created address-pseudo order and
- * reload spill-slot assignment without adding synthetic accesses.
- * RAC1 counterpart: src/game/pad.c func_002181F0_r (GPL-3.0).
- * Requires the declarations and PadState layout below. No linked build.
- */
 #include "common.h"
-extern float Fe617c30b_FUN_00283CE0(int);
+extern float func_00283CE0(int);
 /* Adapted from RAC1 pad.c, GPL-3.0, func_002181F0. */
 struct PadState {
     u8 pad_0[0x100] __attribute__((aligned(16)));
@@ -77,7 +56,7 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
     float mag, ang;
 
     p->raw_held = p->held = ((buf[0] << 8) | buf[1]) ^ 0xFFFF;
-    for (i = 15; i >= 0; i--) {
+    for (i = 0; i < 16; i++) {
         p->analog[i] = 0;
     }
     if (len >= 6) {
@@ -86,7 +65,7 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
             if (d < 0)
                 d = -d;
             if (d >= 0x30) {
-                float f = Fe617c30b_FUN_00283CE0(d - 0x30) / Fe617c30b_FUN_00283CE0(0x4C);
+                float f = func_00283CE0(d - 0x30) / func_00283CE0(0x4C);
                 p->analog[i] = f;
                 if (f > 1.0f) {
                     p->analog[i] = 1.0f;
@@ -99,7 +78,7 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
     }
     if (len >= 0x12) {
         for (i = 4; i < 16; i++) {
-            p->analog[i] = Fe617c30b_FUN_00283CE0(buf[i + 2]) * 0.003921569f;
+            p->analog[i] = func_00283CE0(buf[i + 2]) * 0.003921569f;
         }
     }
     if (D_001A7A40.mirror) {
@@ -112,11 +91,8 @@ void func_002B88F0(PadState *p, u8 *buf, s32 len) {
         }
         p->raw_held = p->held;
     }
-    {
-        float *dst = p->analog_prev, *src = p->analog;
-        for (i = 15; i >= 0; i--) {
-            *dst++ = *src++;
-        }
+    for (i = 0; i < 16; i++) {
+        p->analog_prev[i] = p->analog[i];
     }
     if (p->analog[2] != 0.0f || p->analog[3] != 0.0f) {
         p->stick_moved = 1;
