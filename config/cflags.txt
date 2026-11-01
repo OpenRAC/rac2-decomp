@@ -2122,3 +2122,4 @@ src/levels/12_todano/L12_00418418-g8.c	-O2 -G8 -fno-sched-interblock -ffunction-
 src/levels/30_insomniac_museum/L30_003D9CA8-g8.c	-O2 -G8 -ffunction-sections -Wa,-G64
 src/levels/12_todano/L12_0041BF88.c	-O2 -G0 -ffunction-sections -mno-split-addresses -g
 src/levels/shared/L07_002B3580-ground.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L09_003806A0-g8.c	-O2 -G8 -ffunction-sections -g

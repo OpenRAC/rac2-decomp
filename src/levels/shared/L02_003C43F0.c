@@ -1036,7 +1036,6 @@ void func_L02_003DED08(void) {
 
 /* func_L02_003E2150: defined in L02_003C43F0-ring-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_003EB8F8);
 
 /* Copies the byte at +0x40 of the object held at +0x68 over its byte at +0x25. */
 void func_L02_003F0628(char *a0) {

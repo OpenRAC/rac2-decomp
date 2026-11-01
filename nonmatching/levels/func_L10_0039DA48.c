@@ -20,6 +20,14 @@
  * (-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels). Local `one` and `zero`, set
  * before the first loop, give retail's f20 and f22. Retail has points in fp and the &normal copy in s7; a pointer
  * parameter, statement order and a forced bucket sweep tie. Priority only: a permuter job is worth trying.
+ *
+ * closer D, later: 24 words, now the plain s7/fp swap alone. Retail keeps 2 in the loop (`li v0,2`) while 0.0 and
+ * 1.0 leave it. Rerun loop.c has threshold 60..62 and subtracts 3 per move, so one constant may be a local and the
+ * other moves by itself; both as locals hoist the 2 too. `count` goes after the floats, as in the sibling, for
+ * f23/f24. What is left: greg priorities points 27*10000/177 = 1525 against the &normal copy 68*10000/446 = 1524.
+ * One extra RTL insn anywhere before loop two, or one fewer inside it, flips them; __asm__("") at the top proves
+ * it (only the barrier's own prologue change remains). Spellings tried, 300 variants: pointer-walking loops, scale
+ * temporaries, TI assignments for qcopy, colour and flags forms. None changes the count without changing the code.
  */
 
 #include "common.h"
@@ -33,12 +41,12 @@ extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *,
 extern void func_00282DD8(void *, void *, void *), func_00282D30(void *, void *, float);
 extern float func_00282DF0(void *);
 /* Draws textured core and camera-facing glow quads along a segmented strip. */
-void func_L10_0039DA48(void *path, int alpha, int outerAlpha, int count, float coreWidth, float width, float extend, int innerColor, int outerColor) {
+void func_L10_0039DA48(void *path, int alpha, int outerAlpha, float coreWidth, float width, float extend, int count, int innerColor, int outerColor) {
     StripVector *points = path;
     StripPacket core, halo;
     StripVector normal, widthStripVector, eye, tangent, first, last, firstRay, lastRay, toEye, extension;
     float length, initialLength, haloLength, firstLength, lastLength;
-    int i; float one, zero;
+    int i; float zero;
     u32 coreColor, haloColor;
     core.texture = func_0027C878(14);
     coreColor = innerColor | (alpha << 24);
@@ -64,13 +72,13 @@ void func_L10_0039DA48(void *path, int alpha, int outerAlpha, int count, float c
     func_00282D30(&normal, &normal, coreWidth * initialLength);
     func_00282CC0(&core.vertex[0], points, &normal);
     func_00282CF0(&core.vertex[1], points, &normal);
-    one = 1.0f; zero = 0.0f;
+    zero = 0.0f;
     for (i = 1; i < count - 1; i++) {
         func_00282CF0(&eye, points + i, D_L10_001B9680);
         func_00282CF0(&tangent, points + i + 1, points + i);
         func_00282DD8(&normal, &tangent, &eye);
         length = func_00282DF0(&normal);
-        if (length != zero) length = one / length;
+        if (length != zero) length = 1.0f / length;
         func_00282D30(&normal, &normal, coreWidth * length);
         func_00282CC0(&core.vertex[2], points + i, &normal);
         func_00282CF0(&core.vertex[3], points + i, &normal);
