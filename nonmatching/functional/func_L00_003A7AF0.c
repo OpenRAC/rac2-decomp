@@ -17,7 +17,7 @@
 extern float D_L00_001B2868 __attribute__((section(".data")));
 extern float D_L00_001B286C __attribute__((section(".data")));
 extern float D_L00_001B2870 __attribute__((section(".data")));
-extern float ref_L00_003A7AF0_00 __attribute__((sda));
+extern float D_L00_001B286C __attribute__((sda));
 extern int D_L00_001AF6C4 __attribute__((sda));
 extern int D_L00_001AF6CC __attribute__((sda));
 extern int func_L00_00329E90(char *, int, void *);
@@ -64,6 +64,6 @@ void func_L00_003A7AF0(char *object)
         D_L00_001B2870 = 0.104719766f;
         return;
     }
-    ref_L00_003A7AF0_00 = 30.0f;
+    D_L00_001B286C = 30.0f;
     D_L00_001B2870 = 0.104719766f;
 }

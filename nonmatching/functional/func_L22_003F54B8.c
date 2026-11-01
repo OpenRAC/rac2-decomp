@@ -43,9 +43,9 @@ extern float func_00283248(float, float);
 extern float func_00283B98(float, float);
 typedef struct { u8 pad[0xB0]; f32 angle; u8 gap[8]; f32 bc, c0; int c4; } AimCtl;
 
-extern char ref_L22_003F54B8_00[];
-extern f32 ref_L22_003F54B8_01 __attribute__((sda));
-extern f32 ref_L22_003F54B8_02 __attribute__((sda));
+extern char D_L22_001B9C80[];
+extern f32 D_L22_001B0A1C __attribute__((sda));
+extern f32 D_L22_001B0A14 __attribute__((sda));
 
 void func_L22_003F54B8(u8 *a0)
 {
@@ -53,7 +53,7 @@ void func_L22_003F54B8(u8 *a0)
     AimCtl *s1;
 
     s1 = *(AimCtl **)(a0 + 0x68);
-    func_00282CF0(block, ref_L22_003F54B8_00, a0 + 0x10);
+    func_00282CF0(block, D_L22_001B9C80, a0 + 0x10);
     func_002AFDD8(a0, block, block, 0);
     if (func_002A77E0(2) != 0)
         s1->angle = 1.5707964f;
@@ -61,7 +61,7 @@ void func_L22_003F54B8(u8 *a0)
         s1->angle = -1.5707964f;
     s1->angle = func_00283B98(s1->angle,
                                       func_00283248(block[0], block[1]));
-    s1->c0 = ref_L22_003F54B8_01 * 0.000290888245f;
-    s1->bc = ref_L22_003F54B8_02;
+    s1->c0 = D_L22_001B0A1C * 0.000290888245f;
+    s1->bc = D_L22_001B0A14;
     s1->c4 = 0;
 }

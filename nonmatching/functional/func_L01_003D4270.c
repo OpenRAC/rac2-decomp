@@ -15,7 +15,7 @@
 #include "common.h"
 extern char D_00189EA0[];
 extern char *D_L01_001B264C NOT_SDA;
-extern char *ref_L01_003D4270_00 __attribute__((sda));
+extern char *D_L01_001B264C __attribute__((sda));
 extern char *D_L01_001FE180[];
 extern char D_L01_001B94C0[];
 extern int func_002ACBC8(void *, int);
@@ -83,7 +83,7 @@ void func_L01_003D4270(char *m)
             created->s1a=d->b30; created->b1e=d->b31; created->b1f=d->b32; created->b18=d->b46;
             if(d->f40!=-1) created->f34=d->f40;
             if(d->anchor!=-1) {
-                if(d->b49) created->pos=*(Quad *)(ref_L01_003D4270_00+(d->anchor<<7));
+                if(d->b49) created->pos=*(Quad *)(D_L01_001B264C+(d->anchor<<7));
                 else {func_00282CF0(pos,D_L01_001B264C+(d->anchor<<7)+0x30,D_00189EA0); created->pos=*(Quad *)(pos);}
             }
         } else if(active && !d->state && d->target!=-1) {
@@ -104,13 +104,13 @@ void func_L01_003D4270(char *m)
             func_00335370(camera+0x10); func_003353C8(rot);
         } else if(!active && d->state) {func_003355A8(1);d->state=0;}
         else if(p && d->anchor!=-1) {
-            if(d->b49) p->pos=*(Quad *)(ref_L01_003D4270_00+(d->anchor<<7));
+            if(d->b49) p->pos=*(Quad *)(D_L01_001B264C+(d->anchor<<7));
             else {func_00282CF0(pos,D_L01_001B264C+(d->anchor<<7)+0x30,D_00189EA0);p->pos=*(Quad *)(pos);}
         }
         p=d->pool;
         if(p) {
             if(!d->b47 && d->anchor!=-1) {
-                *(Quad *)(pos)=*(Quad *)(ref_L01_003D4270_00+(d->anchor<<7)+0x30);pos[3]=1;
+                *(Quad *)(pos)=*(Quad *)(D_L01_001B264C+(d->anchor<<7)+0x30);pos[3]=1;
                 if(func_00283DB8(pos,255.0f)!=-1) {
                     d->b47=1;
                     if(d->b45) d->pool->f14=d->f28;

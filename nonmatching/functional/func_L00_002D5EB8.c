@@ -31,7 +31,7 @@ extern void func_L00_002D5E30(int*,int*,int*);
 extern void func_0028A180(int,int), func_L00_003F1300(void), func_L00_0030C7F8(int), func_002B0A18(int,int), func_002E5E58(int,int,int);
 extern int func_00288D58(void), func_00287F60(int);
 extern void func_L00_0037E6A8(int,int), func_00287EB0(int), func_00288508(int);
-extern int ref_L00_002D5EB8_00 __attribute__((sda));
+extern int D_L00_001B19C8 __attribute__((sda));
 static inline int special(int i) { int r=0; switch(i) {case 12:case 14:case 17:case 18:case 53: r=1; break;} return r; }
 static inline int unlocked(Entry1269 *e,int i){ if(e->state>=2 || (e->state==1 && special(i))) return 1; return 0;}
 static inline int owned(int i){ if(D_L00_00262570[D_00139568[i]].exists){ int n=func_00287F60(i); if(n>=2 || (n==1 && special(i))) return 1; } return 0; }
@@ -42,7 +42,7 @@ void func_L00_002D5EB8(void) {
  {int *p=D_0018C350; func_L00_002D5E30(p,p + -1,&count);}
  for(j=0;j<10;j++) if(D_001A7A28[j]) count++;
  if (D_001A7A00!=count) {
-  if (ref_L00_002D5EB8_00>=11 && D_001A7A00<count) {
+  if (D_L00_001B19C8>=11 && D_001A7A00<count) {
    if (!D_0018C958) func_0028A180(0x9a9,0);
    func_L00_003F1300(); func_L00_0030C7F8(0x168); func_002B0A18(0x1235,-1); func_002E5E58(6,0,0);
   }

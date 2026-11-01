@@ -51,10 +51,10 @@ typedef struct { u8 pad[4]; float look_height, distance, unk2C, unk30, unk34, un
 typedef struct { float position[4]; u8 pad10[0x10]; FollowCamReset reset; u8 pad40[0x20]; FollowCamBlock follow; FollowCamTail tail; } FollowCamState;
 struct UpdateCam { u8 pad0[0x30]; Vec4f pos; u8 pad40[0x30]; void *saved_state; u8 pad74[0x10]; s16 descriptor_index; };
 #define FOLLOW_CAM_STATE(cam) ((FollowCamState *)(cam)->saved_state)
-extern char *ref_L06_0047A408_00[];
-extern char *ref_L06_0047A408_01;
-extern char ref_L06_0047A408_02[];
-extern float ref_L06_0047A408_03, ref_L06_0047A408_04;
+extern char *D_L06_001B21C4[];
+extern char *D_L06_001B9890;
+extern char D_L06_001B9700[];
+extern float D_L06_001B9858, D_L06_001B9944;
 extern char D_00189E20[];
 extern s32 D_00138320[];
 extern PadSt D_00138180;
@@ -102,11 +102,11 @@ void func_L06_0047A408(char *arg) {
     f32 swing;
     f32 t;
 
-    params = ((CamDesc *)((cam->descriptor_index << 5) + (s32)ref_L06_0047A408_00[0]))->params;
-    if (params->type == 8 && FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode == 0) {
+    params = ((CamDesc *)((cam->descriptor_index << 5) + (s32)D_L06_001B21C4[0]))->params;
+    if (params->type == 8 && FOLLOW_CAM_STATE(((struct UpdateCam *)D_L06_001B9890))->tail.mode == 0) {
         return;
     }
-    if (params->type == 6 && FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode != 0) {
+    if (params->type == 6 && FOLLOW_CAM_STATE(((struct UpdateCam *)D_L06_001B9890))->tail.mode != 0) {
         return;
     }
     if (func_L06_0047A268((void *)cam) == 0) {
@@ -120,7 +120,7 @@ void func_L06_0047A408(char *arg) {
         return;
     }
     if (params->check_yaw != 0
-        && func_00283C80(((CamDesc *)ref_L06_0047A408_00[0])[cam->descriptor_index].yaw, ref_L06_0047A408_03) >= 1.396263599395752f) {
+        && func_00283C80(((CamDesc *)D_L06_001B21C4[0])[cam->descriptor_index].yaw, D_L06_001B9858) >= 1.396263599395752f) {
         goto stop;
     }
     if (params->l_buttons_end != 0 && params->type == 5 && (pad_held_r[0] & 4)) {
@@ -133,13 +133,13 @@ stop:
         return;
     }
     if (params->timer == 0) {
-        u8 *g = (u8 *)&ref_L06_0047A408_02;
+        u8 *g = (u8 *)&D_L06_001B9700;
         params->start_lateral_stiffness = FOLLOW_CAM_STATE(*(struct UpdateCam **)(g + 0x190))->follow.lateral_stiffness;
         params->start_lateral_damping = FOLLOW_CAM_STATE(*(struct UpdateCam **)(g + 0x190))->follow.lateral_damping;
     }
     if (*(s32 *)&params->type == 5) {
         *(s32 *)&params->swing = 0;
-        rec = ((struct UpdateCam *)ref_L06_0047A408_01);
+        rec = ((struct UpdateCam *)D_L06_001B9890);
         rig = FOLLOW_CAM_STATE(rec);
         tail = &rig->tail;
         state = rig;
@@ -177,14 +177,14 @@ stop:
     params->timer++;
     if (params->type == 10) {
         func_L00_00424C60();
-        FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode = 0x14D;
+        FOLLOW_CAM_STATE(((struct UpdateCam *)D_L06_001B9890))->tail.mode = 0x14D;
     }
     if (params->type == 11) {
         func_L00_00424C60();
-        FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode = 2;
+        FOLLOW_CAM_STATE(((struct UpdateCam *)D_L06_001B9890))->tail.mode = 2;
     }
     if (params->type == 2 || params->type == 4) {
-        { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.ctl; ctl->flags |= 3; }
+        { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)D_L06_001B9890))->tail.ctl; ctl->flags |= 3; }
         if (params->timer > 200) {
             at_end = 1;
             params->timer = 200;
@@ -197,7 +197,7 @@ stop:
         }
         if (params->timer >= 200) {
             at_end = 1;
-            if (ref_L06_0047A408_04 > 0.0f) {
+            if (D_L06_001B9944 > 0.0f) {
                 params->timer = 200;
             }
         }
@@ -217,8 +217,8 @@ stop:
             params->timer = 200;
         }
     }
-    dir[0] = func_00283180(((CamDesc *)ref_L06_0047A408_00[0])[cam->descriptor_index].yaw);
-    dir[1] = func_00283198(((CamDesc *)ref_L06_0047A408_00[0])[cam->descriptor_index].yaw);
+    dir[0] = func_00283180(((CamDesc *)D_L06_001B21C4[0])[cam->descriptor_index].yaw);
+    dir[1] = func_00283198(((CamDesc *)D_L06_001B21C4[0])[cam->descriptor_index].yaw);
     *(s32 *)&dir[2] = 0;
     swing = params->swing * ((params->timer / total) * 0.01745329424738884f);
     if ((params->type != 1 && params->type != 7 && params->type != 9) || at_end == 0) {
@@ -251,10 +251,10 @@ stop:
         func_L00_00424B20(params->unk50 * 0.01745329424738884f);
     }
     if (params->set_flag1 != 0) {
-        { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.ctl; ctl->flags |= 2; }
+        { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)D_L06_001B9890))->tail.ctl; ctl->flags |= 2; }
     }
     if (params->set_flag0 != 0) {
-        { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.ctl; ctl->flags |= 1; }
+        { FollowCamFlags *ctl = &FOLLOW_CAM_STATE(((struct UpdateCam *)D_L06_001B9890))->tail.ctl; ctl->flags |= 1; }
     }
     if (params->keep_unk10 == 0) {
         func_L00_00424B48(0);
