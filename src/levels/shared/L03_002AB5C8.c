@@ -609,7 +609,6 @@ int func_L03_003A4978(unsigned char *p) { return p[0x20] == 1; }
 
 INCLUDE_ASM("asm/levels", func_L03_003C1BF0);
 
-INCLUDE_ASM("asm/levels", func_L03_003C3220);
 
 float func_L03_003C5AB8(unsigned char *);
 

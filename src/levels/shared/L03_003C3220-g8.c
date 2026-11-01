@@ -1,44 +1,3 @@
-/* Retained near miss with a recorded exact-bytes form: initialize this object and its child, record
- * subtitle-history progress, then dispatch the player's requested target action.
- * Tier: Claude Opus 5.5 (xhigh), task v1888, 31 October 2026.
- * Unit: its own file, src/levels/shared/L03_002AB5C8-command-g8.c (-O2 -G8 -ffunction-sections, no
- * other options), with `#include "common.h"` first and the marker taken out of L03_002AB5C8.c. It
- * must not share L03_002AB5C8-g8.c: a sized D_L03_001B2A38 there emits `.extern NAME,size` and turns
- * the loop's absolute count load into $gp. All required declarations follow.
- *
- * Best compliant result (this file): US 3992/3992 bytes, 0/2 places; US2 3992/3992 bytes, 0/2
- * places; PAL absent from both catalogues. Exactly four instructions differ, at 0x3C3474, 0x3C3494,
- * 0x3C34A8 and 0x3C34B4: $f1 and $f2 are exchanged between turn_scale's and turn_step's constants.
- *
- * Exact-bytes form, not used because the guide forbids it: add
- *     if (vars) target = vars->target;
- * between `vars->turn_step = ...;` and `func_002A7750(object, 1, 0);`. Results: US 2 of 2 places,
- * US2 2 of 2 places, PAL absent, and linkcheck level 03 printed "OK: 2107272 loaded bytes equal".
- * It is an always-true test, since vars is dereferenced earlier on this path, and its only effect is
- * on allocation, so it needs a maintainer's ruling. Do not land it without one.
- *
- * Why retail needs a boundary there. Measured with the argument moves in the store block: sched1
- * pairs each constant load with one integer insn, live lengths are A=20, B=18, C=18 (A turn_scale,
- * B turn_limit, C turn_step), and the registers come out B,C,A,0.5 = f0,f1,f2,f3. Measured with any
- * test placed between the stores and the call: retail's B,A,C,0.5. My reading: the moves then leave
- * the block during sched1, which shortens the C range less than the A range. The test has to compare
- * a live register with zero to leave no word, and its arm has to die only at flow, so that the jump
- * lasts until jump2, which runs after sched2.
- * Tried without reaching exact bytes: a constant arm, `n++`, `n = n + 1` and `a = b; b = a + 1` arms
- * (the boundary was gone by sched1); -g; locals for two constants and one address; nine store
- * orders; chained 0.5 stores. A do/while(0) wrapper around stores kept them apart in the final order.
- * Identical arms holding the call did not merge (+32 bytes), and arms holding stores merged too late
- * for the argument moves to interleave. Every value I found live in a register at that point is a
- * non-null pointer, so I found no compliant test. Reopen only with a real, not always-true,
- * condition already in a register, or with a ruling on this form.
- *
- * Corrections since v1602, each measured by its effect on the diff (explanations are my reading):
- * one group view with no local base, which gives retail's frame, spill and copies; the radius and
- * height stores written out in each switch arm, which keeps the equal 0x93C and 0xA59 arms separate;
- * the target-class test as a two-case switch; 0.5f stored to 0x118 first, so that store fills the
- * call's delay slot; incomplete sda arrays for the group count and entity base; the five counters
- * as nonzero-offset members of one object at D_L03_001B2750, which keeps them out of delay slots.
- */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } StateVector;
@@ -236,11 +195,11 @@ void func_L03_003C3220(u8 *object)
             break;
         }
         vars->movement_limit = 0.5f;
-        vars->path_data = state + 0x2C0;
         vars->movement_acceleration = 0.5f;
         vars->turn_scale = 1.5882498f;
         vars->turn_limit = 0.523598849773407f;
         vars->movement_data = state + 0x240;
+        vars->path_data = state + 0x2C0;
         vars->turn_step = 0.0055555557f;
         func_002A7750(object, 1, 0);
         if (mob->animation)

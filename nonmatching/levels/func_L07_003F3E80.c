@@ -1,9 +1,13 @@
-/* func_L07_003F3E80: retained near miss, 30 October 2026.
-   Profile: -O2 -G8 -ffunction-sections.
-   Complete moving/death effect reconstruction. func_00283958 writes exactly 48 matrix bytes, confirmed from the retail primitive, so rotation[12] is complete. Callee inputs/returns and all particle arguments are preserved. Allocation, frame and scheduling remain.
-   No linked match is claimed.
-*/
-
+/* func_L07_003F3E80 (1372 B). Opus closer g1, 1 November 2026: 1360/1372 bytes, profile -O2 -G8
+ * -ffunction-sections, about 30 rows after normalising registers. The tuning pairs are one word $gp
+ * and one word absolute: an SDATA view plus a MACRO_ADDR array read at [1], which keeps the second
+ * out of delay slots as retail does.
+ * Main gap: retail hoists 210000.0f into $f25 (the extra 12 bytes: one more save, restore and load
+ * order) and leaves 1/60 in the loop. loop.c's test is threshold * savings * lifetime >= insn_count,
+ * and a move costs 3 of threshold. A scale local at the loop top hoists it first and then 1/60 too;
+ * before the loop it hoists 1/60 alone, into $f26. Retail's six earlier moves come first, so this
+ * constant needs one more lifetime or the loop one or two fewer insns.
+ * The cooldown is a widened post-increment; per-arm `(1/60) * -D` and `D * (1/60)` cross-jump as retail. */
 #include "common.h"
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
 typedef union { s32 q __attribute__((mode(TI))); f32 f[4]; } Vector;
@@ -28,8 +32,10 @@ extern f32 D_L07_001B0E44 __attribute__((sda)), D_L07_001B0E48 __attribute__((sd
 extern f32 D_L07_001B0E4C __attribute__((sda));
 extern s32 D_L07_001B0E50 __attribute__((sda));
 extern u32 D_L07_001B0E58 __attribute__((sda));
-extern s32 D_L07_001B0E70 __attribute__((sda)), D_L07_001B0E64;
-extern f32 D_L07_001B0E78 __attribute__((sda)), D_L07_001B0E6C;
+extern s32 D_L07_001B0E70[] MACRO_ADDR;
+extern s32 D_L07_001B0E70_gp SDATA(D_L07_001B0E70);
+extern f32 D_L07_001B0E78[] MACRO_ADDR;
+extern f32 D_L07_001B0E78_gp SDATA(D_L07_001B0E78);
 
 void func_L07_003F3E80(u8 *object)
 {
@@ -64,9 +70,9 @@ void func_L07_003F3E80(u8 *object)
         }
         magnitude = func_00282DF0(&displacement);
         for (i = 0; i < D_L07_001B0E50; i++) {
-            size = func_002A7820(D_L07_001B0E70, D_L07_001B0E64);
+            size = func_002A7820(D_L07_001B0E70_gp, D_L07_001B0E70[1]);
             count = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-            life = func_002A7878(D_L07_001B0E78, D_L07_001B0E6C) * 210000.0f;
+            life = func_002A7878(D_L07_001B0E78_gp, D_L07_001B0E78[1]) * 210000.0f;
             step = magnitude;
             func_002AA2E8(&step, 0.0f, func_002A7878(2.0f, 6.0f) * (1.0f / 60.0f));
             func_00282F20(&velocity, &displacement, step);
@@ -78,17 +84,22 @@ void func_L07_003F3E80(u8 *object)
         if (func_002761F8(&previous, object + 0x10, 2, object, 0)) {
             qcopy(object + 0x10, D_L07_001BF660);
             func_002A7750(object, 1, -1);
-        } else if ((*(u16 *)(object + 0x96))++ >= 301) func_0029F338(object);
+        } else {
+            unsigned int timer = *(u16 *)(object + 0x96);
+            unsigned int old = timer++;
+            *(u16 *)(object + 0x96) = timer;
+            if (old >= 301) func_0029F338(object);
+        }
         break;
     case 1:
         if (func_002B3868(object)) {
             func_002E5DA0(4, 0, object, 0xE5F);
             F(object, 0x18) += 0.333f;
-            *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xEFFF;
             *(u32 *)(object + 0x98) = 0;
+            *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xEFFF;
             F(state, 0x24) = 0.1f;
             F(state, 0x28) = 1.0f;
-            if (func_002A77E0(2)) F(state, 0x30) = -D_L07_001B0E4C * (1.0f / 60.0f);
+            if (func_002A77E0(2)) F(state, 0x30) = (1.0f / 60.0f) * -D_L07_001B0E4C;
             else F(state, 0x30) = D_L07_001B0E4C * (1.0f / 60.0f);
             F(state, 0x2C) = func_002A7878(0.0f, 1.0f);
             if (*(u8 **)(state + 0x20))
