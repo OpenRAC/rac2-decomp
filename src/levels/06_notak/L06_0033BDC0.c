@@ -202,7 +202,6 @@ finish:
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L06_003D64C0);
 
 typedef struct {
     unsigned char pad00[0x68];

@@ -281,7 +281,6 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L22_003955D8);
 
 /* func_L22_003A6620 lives in the -g8 sibling file (it reaches a global through $gp). */
 

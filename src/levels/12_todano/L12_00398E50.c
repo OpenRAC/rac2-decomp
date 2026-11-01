@@ -122,7 +122,6 @@ extern void func_002AF000(void *,float,float,float);
 extern void func_00282CC0(void *,void *,void *);
 extern void func_002AF1D0(u8 *,u8 *,int,int);
 
-INCLUDE_ASM("asm/levels", func_L12_00398E50);
 
 /* func_L12_003A0F00 is defined in L12_00398E50-mirror.c. */
 

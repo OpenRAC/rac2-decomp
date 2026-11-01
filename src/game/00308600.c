@@ -112,7 +112,6 @@ void func_00308DB8(X *x) {
 
 /* func_0030A188 is defined in 0030A188-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0030A348);
 
 /* func_0030BBA0 is defined in 00308600-beam-g8.c. */
 

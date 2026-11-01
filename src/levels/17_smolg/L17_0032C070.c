@@ -353,7 +353,6 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L17_003966D8);
 
 /* func_L17_003A14A0 is defined in L17_0032C070-burst-g8.c. */
 
