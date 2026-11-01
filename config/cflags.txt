@@ -2119,3 +2119,4 @@ src/game/002AF580-qcopy.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-qcop
 src/levels/shared/L00_004266E8-g8-hazard.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L00_004287E8-movables.c	-O2 -G0 -ffunction-sections -fmove-all-movables
 src/levels/shared/L00_00370408-edges.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/levels/shared/L00_00376600-g.c	-O2 -G0 -ffunction-sections -g

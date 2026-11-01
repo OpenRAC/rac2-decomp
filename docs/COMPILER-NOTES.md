@@ -659,6 +659,19 @@ Combining both switches affects sched1/sched2 differently and needs its own proo
   `(st + 3) & 0xFF < 2` plus one compare. A right-nested spelling
   `st == 0xFE || (st == 0xFD || st == 3)` keeps the three separate compares in
   source order (measured in `func_L08_0042F440`/`0042FAC0`, 544-byte twins).
+- A copy before a loop that gcse's cprop keeps deleting can come from cse2: read the global inside the loop, loop.c
+  hoists the `la`, and cse2 following `-fcse-skip-blocks` around the preceding `if` turns it into a copy of the earlier
+  pseudo (`func_L00_00376600`, `daddu $fp,$s0`). The source of the copy can then share its register with a later local.
+- A constant used in another basic block than its set stays in a body after a `continue`, because loop.c will not
+  move a cross-block set when `maybe_never` holds: `tint = 0xF0F0B0` early in the body (`func_L00_00376600`).
+- `addiu v1,s0,1 / daddu s3,v1 / slt v1,v1,a0` is gcse PRE's reaching copy: write `i + 1` at each use and `i++`
+  in the loop, with no variable for it. The index register can then be reused for the record pointer
+  (`func_002E3BD8`, `func_002E3998`).
+- `sll 3 / srl 3 / addiu 0xF / srl 4 / sll 4` is a plain VLA of bytes, `u8 frame[count]`: bits to bytes, then
+  rounding (`func_002E3BD8`).
+- A body with no loop.c work (constants unhoisted, counter neither reversed nor eliminated) matches row for row
+  when the loop is written with labels, which leave no loop notes (`func_00329488`, near miss: the alignment nop
+  shows retail did have a loop note, so a real loop rejected as invalid is still possible).
 - `x = load; if (flag) x = 0.0f;` differs from a ternary in branch polarity and
   likely slots (`func_L00_0042A460`). Store order affects allocation, but there is
   no universal reversal or permutation rule.

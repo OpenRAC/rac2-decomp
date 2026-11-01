@@ -401,7 +401,6 @@ void func_L00_00374B78(void) {
 /* func_L00_00374C18 is defined in L00_00374C18-g8.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L00_00376600);
 
 INCLUDE_ASM("asm/levels", func_L00_003769C0);
 
