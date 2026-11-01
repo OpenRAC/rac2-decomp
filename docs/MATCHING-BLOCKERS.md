@@ -437,6 +437,11 @@ so `speed` must not die at the multiply or be a global pseudo; a new target ties
 helpers with float parameters and named locals for both operands were tried on 2026-11-01 and change nothing.
 `func_PAL_L00_004266C8`, the PAL copy of `func_L00_004212B8`: the 50 Hz timers are `(D * 5 + 2) / 6`
 and all its sizes match, with only $s3/$s4 swapped, as the extra insns change the live lengths.
+A sweep of forced bucket counts gives every size that fixes a draft, so read the whole list: `func_002B88F0` was 199,
+with 161 to 183, 191, 193, 201 and up all exact, so it needed 2 more buckets (4 insns) and nothing else. Plain indexed
+loops give them: `for (i = 0; i < 16; i++) a[i] = 0;` has an address computation per element at gcse, and loop.c turns it
+into the same pointer countdown as `*dst++` over a reversed counter. Check loop spellings first when a near miss is
+all stack offsets; they change nothing after loop.c.
 
 **Qualified field and call-lifetime remedies, 25 October 2026:**
 `func_002B52A0` is now a 980-byte C implementation at 21 places in each
