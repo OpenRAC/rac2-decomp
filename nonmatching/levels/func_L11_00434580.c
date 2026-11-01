@@ -14,6 +14,11 @@
  * Keeping separate expiry calls recovers the GPR allocation at 1152 bytes.
  * Next: original collision/expiry CFG and source lifetime evidence, without
  * artificial references. No linked build was run because no checker match exists.
+ * 1 November 2026: the shared expiry tail copied into the guard arm takes this
+ * from 54 rows to 14 (object in s2, retail's frame and order). Left: the two
+ * impact branches are bnel with a0=object where retail has bnez with a0=impact
+ * in the slot (reorg's simple pass, fall-through), and two mov.s/t2 orders.
+ * Writing func_L11_00434F48 per arm makes the a0 load right but keeps bnel.
  */
 #include "common.h"
 typedef int Quad34580 __attribute__((mode(TI)));
@@ -56,7 +61,9 @@ void func_L11_00434580(char *obj) {
             impact=(float *)D_L11_001C0D20;
             *(Quad34580 *)(st+0x10)=*(Quad34580 *)impact;
             if(!func_002B38B8(obj)) { count=6; goto burst; }
-            goto retire;
+            {
+                func_L00_003294F0(obj,1); func_0029F338(obj); return;
+}
         }
         size=func_002A7878(1,4);
         sign=func_002A7820(25,35); if(!sign) sign--;
@@ -84,7 +91,6 @@ void func_L11_00434580(char *obj) {
                 burst:
                     func_L11_00434F48(impact,count);
                 }
-            retire:
                 func_L00_003294F0(obj,1); func_0029F338(obj); return;
             }
             func_00282F20(pos,st+0x20,1.66666675f);

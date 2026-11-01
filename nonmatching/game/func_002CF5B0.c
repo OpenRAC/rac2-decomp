@@ -1,3 +1,11 @@
+/* Closer B, 2026-11-01: 576/576, 10 words: declare status at function scope and use it for cost. That
+ * gives retail's slot copy and 0x5A in a1. Left: base and status swapped (v1/a0, including the two early
+ * status words at +0x60/+0x64), and item in v0 instead of a0 at +0x1D8/+0x1E4.
+ * Why: base is single-block, so local-alloc takes v1 before global sees status. Retail's base must
+ * lose v1 to status, so it is a global (live across blocks) or v1 is busy there. Its copy to s0 is
+ * in beq's slot and s0 is read on both paths. Next: what makes base used in a second block.
+ * local-alloc skips a pseudo with two deaths too. A local t reread at the retest gives 580 bytes.
+ */
 /*
  * v1665 (Claude Opus 5.5, xhigh, 30 October 2026): 576/576 bytes, 0/28 USA v1.01 places.
  * Profile: -O2 -G32 -Wa,-G32 -ffunction-sections; -O2 -G8 with or without
@@ -56,12 +64,12 @@ static __inline__ int shop_item(int index)
 int func_002CF5B0(void)
 {
     int result = 0;
+    int status;
     int limit = func_002B0E90();
     int flags = D_00138180.flags;
 
     if (flags & 0x10) {
         int value;
-        int status;
         D_001AB9EC = 0;
         value = *(int *)(D_001F2840.source + 0xE0);
         if (value != 0)
@@ -101,8 +109,8 @@ finish:
             D_001AB9EC = cur;
         }
         if (D_00138180.flags & 0x40) {
-            int cost = shop_cost(D_001AB9EC);
-            if ((cost != 0x5A && cost <= limit)
+            status = shop_cost(D_001AB9EC);
+            if ((status != 0x5A && status <= limit)
                 || (shop_cost(D_001AB9EC) == 0x5A && D_001A7A60[0] != 0)) {
                 unsigned char *slot;
                 func_002E5E58(4, 0, 0);

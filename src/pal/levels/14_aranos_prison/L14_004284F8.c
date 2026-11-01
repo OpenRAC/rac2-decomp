@@ -18,7 +18,6 @@ void func_PAL_L14_004284F8(char *a0)
     }
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_00428558);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L14_004288B0);
 
@@ -59,4 +58,37 @@ end:
     return;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_00429150);
+#include "common.h"
+extern char D_L14_001B9500[];
+extern char D_L14_001B9500[];
+extern void func_PAL_002AC3C0(char *a0, void *a1);
+extern void func_002AEC48(char *a0, void *a1, int a2, float a3, float a4);
+extern float func_00282E48(char *a0, void *a1);
+extern void func_002A93B0(char *a0);
+
+/* Restarts the owner's animation: two timed fades, the counter, then the panic state. */
+void func_PAL_L14_00429150(char *a0)
+{
+    char *s1;
+    float f20;
+    float f21;
+
+    s1 = *(char **)(a0 + 0x68);
+    f21 = 0.0432f;
+    f20 = 0.43200004f;
+    func_PAL_002AC3C0(a0, s1 + 0x50);
+    func_002AEC48(a0, s1 + 0x680, 1, f21, f20);
+    func_002AEC48(a0, s1 + 0x600, 0, f21, f20);
+    if (*(unsigned short *)(a0 + 0x96) <= 0xFFFE)
+        *(unsigned short *)(a0 + 0x96) = *(unsigned short *)(a0 + 0x96) + 1;
+    *(unsigned short *)(s1 + 0x776) = 0;
+    *(unsigned short *)(s1 + 0x778) = 0;
+    *(unsigned short *)(s1 + 0x77A) = 0;
+    if (*(unsigned char *)(a0 + 0x31) != 0) {
+        if (func_00282E48(a0 + 0x10, D_L14_001B9500) < 24.0f) {
+            func_002A93B0(a0);
+            *(unsigned char *)(a0 + 0x6F) = 0x16;
+        }
+    }
+}
+

@@ -1,3 +1,7 @@
+/* Closer b, 2026-11-01, on item 5: retail keeps three values: the madd for the first .w store, a separate mult, and
+ * D + mult from loop.c's giv init (the `daddu v1, v0` is cse2 merging two givs' inits). So `.w`'s giv in retail does not
+ * start from the madd. Eleven forms of the store (row[n], [r][n], cast and pointer views, no row local) give 56 lines or
+ * worse; forms that name D_L00_00240080 fold 12 into the symbol (2760). Item 1 is one if/else over both arguments. */
 /* Tier: opus-1 (v1898), USA v1.01; best 2752/2752 bytes, 0/27 places; 650 of 688 instructions
  * align with retail once relocations are masked. Replaces sol-high's 2708-byte draft.
  * Unit: src/levels/shared/L00_003C3D90-g8.c, profile -O2 -G8 -ffunction-sections -g -frac2-hazard-labels.

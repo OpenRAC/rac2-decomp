@@ -1,7 +1,5 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/levels", func_L20_0043ECB0);
-
 /* func_L20_0043F318 defined in L20_0043F318-g8.c. */
 
 /* func_L20_0043F460 is defined in L20_0043ECB0-g8.c (it reaches a global through $gp). */

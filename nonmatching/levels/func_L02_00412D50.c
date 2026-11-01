@@ -39,6 +39,11 @@
  * needs an extra non-memory insn between hero1 and point0 in sched1's
  * output that later vanishes. Direct expression, dx/dy or dy/dx locals,
  * a nested call and a hero pointer local were tried: no gain.
+ * Opus G2, 1 November 2026: both sub.s operands get the argument register as a suggestion and the
+ * shorter life wins, so $f13 on point1 and $f12 on hero0 fit a sched1 order of hero1, point0, then
+ * those two. A two-death variable for hero1 (target, current) gives $f13 to it instead, and x/y, h/x/y
+ * and dy locals tie. The eight initial values are dead and must go: read named constants or argument
+ * copies in a later block instead (func_L08_0042A0B0), to reach 588 to 591 insns (295 buckets).
  * Declarations below are complete.
  */
 

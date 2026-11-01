@@ -36,7 +36,6 @@ extern void func_00282948();
 
 /* func_L01_003839F0 is defined in L01_003839F0.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_00388FD0);
 
 INCLUDE_ASM("asm/levels", func_L01_003A5BB8);
 

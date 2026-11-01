@@ -1,5 +1,8 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0026F670);
+unsigned int func_PAL_0026F670(void)
+{
+    return 0;
+}
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0026F678);
+

@@ -10,6 +10,14 @@
  * State parameters need4B, object at leastAC, nullable definition at least48.
  * Both object/rule tables have incomplete declared extents and real sentinels.
  * The negated less-than tests retain retail's NaN rejection, unlike >=.
+ *
+ * closer D, 1 November 2026: 736 bytes with `i = 0; while (T[i].class != -1) { if (T[i].class != K) { i++; continue; }
+ * range = T[i].range; break; }`, pos = object + 0x10 as a local, excluded[i] compared as `object != excluded[i]` and
+ * D_001A79F0 read into a local before the second loop. Retail's two rule loops are invisible to loop.c: no strength
+ * reduction (mult by the outer-hoisted 12 at the aligned label) and no hoist of the %lo. `for (...; i++)` with a break
+ * reaches the same tail (`bnel; i++; addu a1,a0; lw 4(v0)`), but jump1's duplicate_loop_exit_test copies the whole
+ * test and found arm ahead of the loop ("multiple entry points"). That copy is the only thing left to lose: the exit
+ * code would need a CODE_LABEL, or more than LOOP_TEST_THRESHOLD insns. goto-in, inline helpers and do-while forms fail.
  */
 #include "common.h"
 extern void func_L05_00444D60(void *, int *, int *, int);

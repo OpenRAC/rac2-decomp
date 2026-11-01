@@ -125,7 +125,7 @@ void func_L09_004051F8(NativeAngleOwner *owner) {
     else if (angle < -0.52359885f) state->field2E8 = -0.52359885f;
 }
 
-INCLUDE_ASM("asm/levels", func_L09_00410200);
+/* func_L09_00410200 is in L09_003F9468-dust-g8.c. */
 
 /* func_L09_00410608 lives in L09_00410608-g8.c. */
 

@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00305110);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00305570);
 
@@ -30,4 +29,18 @@ int func_PAL_L00_003062B0(int index)
     return 1;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003066C8);
+typedef int s32;
+struct Table2 { char pad[52]; s32 slots[4]; };
+extern struct Table2 Fee2b87d1_D_00152CD0;
+
+void func_PAL_L00_003066C8(void)
+{
+    extern void func_00282A60(unsigned int *, unsigned int, int);
+    struct Table2 *table = &Fee2b87d1_D_00152CD0;
+    int i;
+    func_00282A60((unsigned int *)table, 0, 0x35840);
+    *(short *)((char *)table + 0x14) = -1;
+    for (i = 2; i >= 0; --i)
+        table->slots[i] = -1;
+}
+

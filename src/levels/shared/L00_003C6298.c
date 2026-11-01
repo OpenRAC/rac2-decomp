@@ -283,8 +283,6 @@ void func_L00_003CEC50(char *object)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003CED50);
-
 /* Defined in L00_003D1258-g8.c. */
 
 

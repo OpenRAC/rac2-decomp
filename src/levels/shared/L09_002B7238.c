@@ -176,7 +176,6 @@ extern void ref_L09_003F8858_00(char *object, int value);
 
 /* index -> entry of a per-level table; a live entry's first word is a one-based id. */
 
-INCLUDE_ASM("asm/levels", func_L09_002B7238);
 
 
 INCLUDE_ASM("asm/levels", func_L09_00326E90);
@@ -248,7 +247,6 @@ int func_L09_0033E8B0(char *object, int index, void *out, int current, int direc
 
 INCLUDE_ASM("asm/levels", func_L09_0037FCE8);
 
-INCLUDE_ASM("asm/levels", func_L09_003806A0);
 
 INCLUDE_ASM("asm/levels", func_L09_003A01D8);
 
@@ -426,7 +424,7 @@ int func_L09_003EA2D0(char *object, int index, int value)
     return -1;
 }
 
-INCLUDE_ASM("asm/levels", func_L09_003EA360);
+/* func_L09_003EA360 is defined in L09_003EA360-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L09_003EA798);
 
@@ -631,7 +629,6 @@ void func_L09_003F8858(char *object)
 
 /* func_L09_003F8898 lives in the L09_002B7238-g8.c sibling: its four counters are small data. */
 
-INCLUDE_ASM("asm/levels", func_L09_003F8AE0);
 
 
 /* func_L09_003F9108 is defined in L09_003F9108-partner.c. */

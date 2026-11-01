@@ -508,7 +508,6 @@ void func_002934B8(u8 *a0, u8 *a1) {
     *(u8 **)(a0 + 0x20) = a1 + *(s32 *)(a1 + 8);
 }
 
-INCLUDE_ASM("asm/game", func_002934F8);
 
 /* func_00293890 is in 00291758-g8.c. */
 

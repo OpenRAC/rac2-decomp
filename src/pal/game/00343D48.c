@@ -23,4 +23,3 @@ long func_PAL_00343F50(char *object, int arg)
     return 0;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00343FA0);

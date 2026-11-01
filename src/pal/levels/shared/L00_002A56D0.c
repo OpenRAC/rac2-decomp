@@ -1,14 +1,9 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002A56D0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002A5B40);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002A5E98);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002A6018);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002A6058);
 
 typedef unsigned char u8;
 extern void func_L00_002A61C8(int arg0, int arg1, int arg2, int arg3);

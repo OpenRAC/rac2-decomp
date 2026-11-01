@@ -5,7 +5,14 @@
  * enabled is a real measured field reloaded after the counter test
  * even on paths without a call. Inlining/address grouping tie.
  * Extern returns checked against definitions or retail return banks.
- * No strict/local match. Reopen with pointer lifetime/CFG evidence. */
+ * No strict/local match. Reopen with pointer lifetime/CFG evidence.
+ *
+ * closer D, later: enabled needs no volatile; every read stays state->enabled, and cse threads the !enabled path to
+ * the end of the case (retail's beqz a1,+0x8E), so the reload at the last test is only the block after the counter
+ * path. Retail has no activate = 0 at all, a1 = 1 on every edge into the first activation, and sb a1,0xBC there, so
+ * object[0xBC] = activate. The high half of D_0019B4A8 is PRE's copy in s2, which needs the threaded CFG. if/else
+ * leaves, gotos and an inline flare_triggered() (916 bytes) do not thread as retail does: 127 to 134 words.
+ */
 #include "common.h"
 
 extern float func_002A7940(void);

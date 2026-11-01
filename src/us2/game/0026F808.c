@@ -1,7 +1,14 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_0026F808);
+unsigned int func_US2_0026F808(void)
+{
+    return 0;
+}
 
-INCLUDE_ASM("asm/us2/game", func_US2_0026F810);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0026F818);
+unsigned int func_US2_0026F810(void)
+{
+    return 0;
+}
+
+

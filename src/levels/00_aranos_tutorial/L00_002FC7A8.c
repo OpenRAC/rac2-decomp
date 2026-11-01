@@ -458,7 +458,6 @@ finish:
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00393148);
 
 /* The level's copy of func_003173B0 (src/game/003173B0.c): same instructions, its own path table. */
 extern float func_00283B98(float angle, float step);

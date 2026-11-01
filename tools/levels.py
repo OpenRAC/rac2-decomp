@@ -283,6 +283,20 @@ GP = 0x001AEFF0
 BOOT_HI = 0x1A                  # an address half below this points into memory every program shares
 
 
+def packs_constant(w, k: int) -> bool:
+    """Is the lui at W[K] the high half of a constant? The compiler builds addresses with
+    addiu or a load's offset, and only numbers with ori, so a following ori on the same
+    register (within the few instructions the scheduler puts between them) means a number."""
+    rt = (w[k] >> 16) & 31
+    for x in w[k + 1:k + 5]:
+        if x >> 26 == 0x0D and (x >> 21) & 31 == rt and (x >> 16) & 31 == rt:
+            return True
+        op = x >> 26
+        if (op == 0 and (x >> 11) & 31 == rt) or (op not in (0, 2, 3) and op < 0x28 and (x >> 16) & 31 == rt):
+            return False            # something else writes the register first
+    return False
+
+
 def identity(b: bytes, address: int = 0) -> bytes:
     """One function's words with only its address fields masked: what two copies must
     share to be the same function. Masked: jump targets, the high half of a RAM address
@@ -321,7 +335,7 @@ def identity(b: bytes, address: int = 0) -> bytes:
                 x &= 0xFC000000
         elif op == 0x0F:
             resident[rt] = 0x10 <= imm < BOOT_HI
-            if 0x10 <= imm < 0x200 and not resident[rt]:
+            if 0x10 <= imm < 0x200 and not resident[rt] and not packs_constant(w, k):
                 x &= 0xFFFF0000
         elif rs in resident and resident[rs] and (op in MEM or op in (0x09, 0x0D, 0x19)) and rs != 29:
             pass                     # the low half of a resident address
@@ -704,6 +718,101 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_0028FF50": (184, 8),
     "func_00282848": (72, 56),
     "func_L00_00428EE0": (32, 24),
+    "func_PAL_002907D0": (184, 8),
+    "func_PAL_002BC58C": (276, 4),
+    "func_PAL_002C0DF0": (260, 8),
+    "func_PAL_002C9678": (436, 8),
+    "func_PAL_002DB044": (1668, 4),
+    "func_PAL_002DBEA8": (524, 8),
+    "func_PAL_002DD5F8": (436, 8),
+    "func_PAL_002DEEA8": (716, 16),
+    "func_PAL_002E7964": (516, 4),
+    "func_PAL_00305470": (2240, 104),
+    "func_PAL_0031EBA0": (1668, 24),
+    "func_PAL_003299B8": (976, 16),
+    "func_PAL_L00_002F8BE8": (120, 64),
+    "func_PAL_L00_0033E2F0": (456, 8),
+    "func_PAL_L00_0033E61C": (488, 4),
+    "func_PAL_L00_00342BF4": (432, 4),
+    "func_PAL_L00_003BE89C": (1108, 4),
+    "func_PAL_L00_003F8134": (1184, 4),
+    "func_PAL_L00_0040F050": (2832, 8),
+    "func_PAL_L01_003B55C4": (940, 4),
+    "func_PAL_L01_003CD89C": (1324, 4),
+    "func_PAL_L01_003D68A4": (464, 4),
+    "func_PAL_L01_003D6ECC": (460, 4),
+    "func_PAL_L01_003ED1BC": (992, 4),
+    "func_PAL_L01_003EE6C4": (2324, 4),
+    "func_PAL_L02_0033ED74": (1308, 4),
+    "func_PAL_L04_0045030C": (824, 4),
+    "func_PAL_L05_0039A60C": (508, 4),
+    "func_PAL_L06_004015EC": (1204, 4),
+    "func_PAL_L06_00404194": (352, 4),
+    "func_PAL_L06_00467544": (1020, 4),
+    "func_PAL_L07_0040CDD4": (600, 4),
+    "func_PAL_L09_003C693C": (68, 4),
+    "func_PAL_L09_0040D464": (1744, 4),
+    "func_PAL_L10_0036B4D0": (288, 16),
+    "func_PAL_L11_003D5F64": (96, 4),
+    "func_PAL_L14_00435424": (664, 4),
+    "func_PAL_L16_0034F000": (288, 16),
+    "func_PAL_L16_0041E0CC": (768, 4),
+    "func_PAL_L17_003A7CCC": (228, 4),
+    "func_PAL_L17_003CB334": (568, 4),
+    "func_PAL_L17_0041FC60": (468, 8),
+    "func_PAL_L19_003E1C98": (3336, 8),
+    "func_PAL_L19_0042451C": (1384, 4),
+    "func_PAL_L20_003A328C": (684, 4),
+    "func_PAL_L22_00337244": (172, 4),
+    "func_PAL_L22_00401A08": (168, 16),
+    "func_PAL_L25_00363700": (288, 16),
+    "func_PAL_L30_003890DC": (260, 4),
+    "func_PAL_002EE914": (1552, 76),
+    "func_PAL_0030D834": (1628, 28),
+    "func_PAL_003278FC": (2196, 84),
+    "func_PAL_0033067C": (2256, 100),
+    "func_PAL_L00_003CC6CC": (568, 4),
+    "func_PAL_L00_003E1874": (2116, 4),
+    "func_PAL_L00_004026C4": (1088, 4),
+    "func_PAL_L00_00413EA4": (1376, 4),
+    "func_PAL_L01_003F2FCC": (532, 4),
+    "func_PAL_L02_004285CC": (796, 4),
+    "func_PAL_L05_0033F3A8": (1848, 8),
+    "func_PAL_L05_003D0F1C": (580, 4),
+    "func_PAL_L05_00420F94": (552, 4),
+    "func_PAL_L05_0042232C": (444, 4),
+    "func_PAL_L05_0042C5DC": (444, 4),
+    "func_PAL_L06_003F7964": (2196, 4),
+    "func_PAL_L08_00414BDC": (2160, 4),
+    "func_PAL_L12_00426674": (776, 4),
+    "func_PAL_L12_0042DB94": (3576, 4),
+    "func_PAL_L13_003C885C": (992, 4),
+    "func_PAL_L15_0043DF7C": (732, 4),
+    "func_PAL_L17_003C713C": (1756, 4),
+    "func_PAL_L22_0039EBE4": (4532, 4),
+    "func_PAL_L00_0040C8CC": (2648, 4),
+    "func_PAL_L00_003D2C94": (1768, 4),
+    "func_PAL_L00_003A44FC": (1620, 4),
+    "func_PAL_L01_0039A174": (524, 4),
+    "func_PAL_L05_0042C044": (444, 4),
+    "func_PAL_L05_0042BA94": (444, 4),
+    "func_PAL_L11_0045AAE4": (3840, 4),
+    "func_PAL_L11_0043F35C": (1612, 4),
+    "func_PAL_L04_003EBF44": (1428, 4),
+    "func_PAL_L13_00402E14": (620, 4),
+    "func_US2_002DD630": (436, 8),
+    "func_US2_00303880": (792, 72),
+    "func_US2_0030A510": (2668, 24),
+    "func_US2_0030D238": (1628, 24),
+    "func_US2_00319140": (5184, 80),
+    "func_US2_00326F90": (2168, 88),
+    "func_US2_0032F944": (2224, 100),
+    "func_US2_L09_00409904": (1744, 4),
+    "func_US2_L10_0036A298": (288, 16),
+    "func_US2_L16_0034DE08": (288, 16),
+    "func_US2_L19_00353D38": (288, 16),
+    "func_US2_L19_003DEC48": (3336, 8),
+    "func_US2_L19_004131DC": (596, 4),
 }
 
 

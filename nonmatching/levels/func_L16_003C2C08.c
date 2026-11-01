@@ -21,6 +21,13 @@
  * pointer additions and merged message-pointer scopes did not close the body.
  * Reopen with evidence for the message-buffer handle lifetime and the
  * original color-input alias model; do not retry equivalent pointer wordings.
+ * 1 November 2026: with s2/s3 exchanged only a handful of rows differ. Retail's
+ * object is s3 because a third call-crossing local of the message block takes s2:
+ * text s1 and `daddu s2,s1` after the name lookup, with the later a0 from s2.
+ * Copies of text through a local, a late copy or (int) all fold (89 rows); no
+ * local at all gives 94. Find what keeps that copy and the rotation closes.
+ * Wrapping the state call in do/while(0) gives 1776 bytes and 78 rows, but with an
+ * alignment nop and still no copy, so that block boundary is not the mechanism.
  * Required declarations are retained below. PAL/US2 were not checked here.
  */
 

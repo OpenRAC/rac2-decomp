@@ -1,3 +1,6 @@
+/* 1 November 2026: with compiler/block-move-quad, packet = D_L00_002A26A0 gives retail's lq/sq copy: 2564/2572,
+ * 192 aligned words (412 before). Left: retail saves f26 and has four more spill slots in order; the frame is
+ * 0x10 short. func_L00_0038E880 is the same routine family. */
 /* GPT-6.1 Sol (high), USA v1.01, default -O2 -G0 -ffunction-sections.
  * Retained reconstruction: 2572/2572 bytes, 0/27 placements; equal size is
  * not a match. The frame is 0x190 rather than 0x1A0, initial paired-copy
@@ -73,19 +76,7 @@ void func_L00_0038DE70(char *object, char *direction, char *axis)
     int *child;
     int i, n, counter, asset1, asset2, life1, life2;
     float scale, length, twice, speed, force;
-    {
-        V1306TI *end = D_L00_002A26A0.q + 4;
-        V1306TI *dst = packet.q;
-        V1306TI *src = D_L00_002A26A0.q;
-        do {
-            V1306TI a = src[0], b = src[1];
-            dst[0] = a;
-            dst[1] = b;
-            src += 2;
-            dst += 2;
-        } while (src != end);
-        *dst = *src;
-    }
+    packet = D_L00_002A26A0;
     child = *(int **)(object + 0x68);
     counter = 9;
     scale = func_00283CE0(V1306_FLAG) + 1.0f;

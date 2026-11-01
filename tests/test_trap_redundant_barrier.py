@@ -1,4 +1,4 @@
-"""reorg's redundant-insn search stops at a division guard: transformer drift and EE compiler output."""
+"""reorg's redundant-insn search stops at a division guard or volatile asm: transformer drift and EE compiler output."""
 import importlib.util
 import os
 from pathlib import Path
@@ -13,11 +13,20 @@ spec = importlib.util.spec_from_file_location("trap_redundant_barrier",
 transformer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(transformer)
 
-FUNCTIONS = ("guarded", "plain")
+FUNCTIONS = ("guarded", "plain", "copied", "stored")
 
 
 def function_text(asm: str, name: str) -> str:
     return re.search(r"(?ms)^" + name + r":.*?\.end\s+" + name, asm).group()
+
+
+def last_jump_lands_on_restore(text: str) -> bool:
+    """Whether the function's last `b` goes to a label directly above the restore of $16."""
+    lines = [l.strip() for l in text.splitlines()]
+    label = [l for l in lines if l.startswith("b\t$L")][-1].split()[1]
+    at = lines.index(label + ":")
+    following = next(l for l in lines[at + 1:] if not l.endswith(":"))
+    return following.startswith("ld\t$16,")
 
 
 def first_branch_slot(text: str) -> str:
@@ -34,7 +43,9 @@ class TransformerTests(unittest.TestCase):
             reorg.write_text("before\n" + transformer.SCAN_OLD + "\nafter\n")
             transformer.patch(reorg)
             text = reorg.read_text()
-            self.assertIn("      if (GET_CODE (trial) == INSN && GET_CODE (pat) == TRAP_IF)\n"
+            self.assertIn("      if (GET_CODE (trial) == INSN\n"
+                          "\t  && (GET_CODE (pat) == TRAP_IF\n"
+                          "\t      || (GET_CODE (pat) != SEQUENCE && volatile_insn_p (pat))))\n"
                           "\treturn 0;\n", text)
             self.assertNotIn("flag_rac2", text)
             with self.assertRaisesRegex(ValueError, "redundant_insn"):
@@ -81,6 +92,12 @@ class CompilerOutputTests(unittest.TestCase):
         # reload as redundant and stole the `li $2,5' after it.
         self.assertIn("break\t7", self.outputs["guarded"])
         self.assertRegex(first_branch_slot(self.outputs["guarded"]), r"^lw\t\$\d+,ticks$")
+
+    def test_a_restore_is_not_redundant_across_a_volatile_asm(self):
+        self.assertTrue(last_jump_lands_on_restore(self.outputs["copied"]), self.outputs["copied"])
+
+    def test_without_an_asm_the_restore_is_skipped(self):
+        self.assertFalse(last_jump_lands_on_restore(self.outputs["stored"]), self.outputs["stored"])
 
     def test_without_a_guard_the_reload_is_dropped(self):
         self.assertNotIn("break\t7", self.outputs["plain"])

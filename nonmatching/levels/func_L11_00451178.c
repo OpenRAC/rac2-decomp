@@ -42,6 +42,14 @@
  * int vs float 0x1A8 clear, a byte-offset qcopy in the row loop. These change code: hoisted
  * &work[0]/&work[2] locals in case 9, a ?: argument for case 9's func_002A7750.
  * PERMUTE-FLAGS: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+ *
+ * closer D, 1 November 2026: the natural wording scores 19 words here. Merging the `object[0x60] & 2`
+ * tails of cases 5, 6 and 10 with a shared label would lower max_cuid, but retail keeps those tails
+ * apart (4,784 to 4,808 bytes), so the 5 to 28 fewer insns have to come from elsewhere.
+ * Dropping the started, launch and goal locals scores 18 words; the first difference stays at +0xA24.
+ *
+ * closer D, later: MACRO_ADDR on D_00189E20 or D_L11_001C0D18 (one fewer insn each, same-register lui/addiu) moves
+ * code, 29 to 57 words. They are not the missing 5 to 28 insns.
  */
 #include "common.h"
 

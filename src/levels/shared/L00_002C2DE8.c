@@ -76,7 +76,6 @@ struct S {
 };
 
 
-INCLUDE_ASM("asm/levels", func_L00_002C30B0);
 
 /* Walks the resident player block: when the player is moving, has a short range and a
  * small health, the state word selects a new sub-state. The sub-state then drives a turn

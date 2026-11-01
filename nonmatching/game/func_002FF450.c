@@ -8,6 +8,11 @@
  * object register differ. Next: actual camera field model/base lifetime.
  * All required declarations are below. Earlier screening's straight-line
  * description was incorrect: this is an eight-state transition dispatcher.
+ * Closer C2, 1 November 2026: retail mixes two address forms. Data loads are macro loads of length 2 (lui+lw, not
+ * moved into call slots, one $gp store in a delay slot), as -mno-split-addresses plus MACRO_ADDR gives for
+ * D_001B23xx; D_001AD7xx is sda ($gp everywhere). But the jump table and D_001A63A8 / D_001B5200 are split: lui and
+ * addiu have other insns between them, which only split mode gives. Neither profile does both yet. Also needed:
+ * float zero through a local (swc1, not sw) and the camera as a plain base (+0x144 stays in the offset).
  */
 #include "common.h"
 extern short D_001B2310 MACRO_ADDR, D_001B2312 MACRO_ADDR, D_001B2318 NOT_SDA, D_001B231E NOT_SDA;

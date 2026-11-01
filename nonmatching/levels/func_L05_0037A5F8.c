@@ -13,6 +13,13 @@
    view with split color staging shrinks to 1148. Debug labels do not close it.
    Reopen with an evidenced list-base/color lifetime; no handwritten claim.
    Required declarations are included below.
+   1 November 2026: both draw sites share alpha (retail's a0, set to 0x80 in the
+   slot of the second site's first test) and c. In retail every integer insn of
+   those sites and of the entry comes after "cvt.w.s; mfc1", though sll is ready
+   at the top of the block and an ALU slot is free: mtc1/cvt.s.w, lw 0x150, sll
+   and the texture argument behave as if in a later block. The conversion
+   result's register (a1 at the entry, v1 at both sites) also looks global. A
+   static inline drawing helper taking y as an int was tried: worse (115 rows).
 */
 
 #include "common.h"
@@ -50,7 +57,7 @@ void func_L05_0037A5F8(void)
     u64 texture,color;
     u8 *object,*state;
     u16 *list,*nextList;
-    int i,alpha;
+    int i,alpha,c;
     y = (float)(int)(D_L05_001AC4E4*D_L05_001B2D84[0]+0.5f);
     texture = func_0027C878(D_L05_001AC4FC);
     func_L05_003008C0(D_L05_001AC4E0,y,D_L05_001AC4E8,D_L05_001AC4EC,0,0,D_L05_001AC4F0,D_L05_001AC4F4,0x80808080ULL,texture);
@@ -81,7 +88,8 @@ void func_L05_0037A5F8(void)
                     else if (distance < 0.0f) distance=0.0f;
                     x = offset[0]+D_L05_001AC4E0;
                     y = (float)(int)((D_L05_001AC4E4-offset[1])*D_L05_001B2D84[0]+0.5f);
-                    color = (s64)(*(s32 *)(state+0x150) | (alpha<<24));
+                    c = *(s32 *)(state+0x150) | (alpha<<24);
+                    color = c;
                     texture = func_0027C878(D_L05_001AC4FC);
                     func_L05_003008C0(x,y,distance,distance,0,0,D_L05_001AC4F0,D_L05_001AC4F4,color,texture);
                 } else if (*(int *)(state+0x158)) {
@@ -94,12 +102,14 @@ void func_L05_0037A5F8(void)
                     func_002836E8(view,D_L05_001B96C0.view);
                     func_00283098(offset,offset,view);
                     func_00283098(offset,offset,rotate);
+                    alpha=128;
                     distance = D_L05_001AC4E8;
                     if (distance > D_L05_001AC4E8+D_L05_001AC4E8) distance=D_L05_001AC4E8+D_L05_001AC4E8;
                     else if (distance < 0.0f) distance=0.0f;
                     x = offset[0]+D_L05_001AC4E0;
                     y = (float)(int)((D_L05_001AC4E4-offset[1])*D_L05_001B2D84[0]+0.5f);
-                    color = (s64)(s32)(*(u32 *)(state+0x150) | 0x80000000U);
+                    c = *(s32 *)(state+0x150) | (alpha<<24);
+                    color = c;
                     texture = func_0027C878(D_L05_001AC4FC);
                     func_L05_003008C0(x,y,distance,distance,0,0,D_L05_001AC4F0,D_L05_001AC4F4,color,texture);
                 }

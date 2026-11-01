@@ -34,14 +34,17 @@ typedef struct {
     unsigned char byte04;
     unsigned char pad05[7];
     int word0C;
-    unsigned char pad10[0x70];
+    unsigned char pad10[0x3A];
+    short child;
+    short parent;
+    unsigned char pad4E[0x32];
     int word80;
     unsigned char pad84[4];
     unsigned short half88;
     unsigned char pad8A[8];
     unsigned short half92;
     unsigned char pad94[0x4C];
-} ClassRecord;
+} __attribute__((aligned(16))) ClassRecord;
 
 /* a pending table row: five halfwords, the value compared at +6 */
 typedef struct {
@@ -203,7 +206,28 @@ int func_00288768(int value) {
 }
 
 
-INCLUDE_ASM("asm/game", func_00288870);
+/* Walks to the root of the chain index is in, then depth links down it, and
+   copies that entry to dst when its kind byte equals depth.  Returns 1 when
+   copied. */
+int func_00288870(ClassRecord *dst, int index, int depth)
+{
+    int ret = 0;
+    int i;
+    int n;
+
+    if (depth < 0xFF) {
+        i = index;
+        while (D_00239BA0[i].parent != 0)
+            i = D_00239BA0[i].parent;
+        for (n = 0; n < depth && D_00239BA0[i].child != 0; n++)
+            i = D_00239BA0[i].child;
+        if (D_00239BA0[i].byte04 == depth) {
+            ret = 1;
+            *dst = D_00239BA0[i];
+        }
+    }
+    return ret;
+}
 
 
 

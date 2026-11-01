@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_00405648);
 
 #include "common.h"
 extern char ref_L02_004012A0_00[] __attribute__((nosda));
@@ -32,4 +31,3 @@ void func_PAL_L02_00405BE0(char *a0) {
     ref_L02_004012A0_05(a0, a0 + 0x10, v, 0.0f);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_00405D00);

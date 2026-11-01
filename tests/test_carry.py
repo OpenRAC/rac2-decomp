@@ -33,6 +33,20 @@ def lw(rt: int, rs: int, imm: int) -> int:
     return 0x23 << 26 | rs << 21 | rt << 16 | (imm & 0xFFFF)
 
 
+class Identity(unittest.TestCase):
+    def test_a_packed_constant_is_compared_and_an_address_is_not(self):
+        def packed(high):
+            return code(lui(2, high), 0x0D << 26 | 2 << 21 | 2 << 16 | 0x1010, JR_RA, NOP)
+        self.assertNotEqual(levels.identity(packed(0x20)), levels.identity(packed(0x80)))
+        self.assertEqual(levels.identity(code(lui(2, 0x20), addiu(2, 2, 0x10), JR_RA, NOP)),
+                         levels.identity(code(lui(2, 0x80), addiu(2, 2, 0x10), JR_RA, NOP)))
+
+    def test_an_ori_of_another_value_is_no_constant(self):
+        def overwritten(high):
+            return code(lui(2, high), lw(2, 18, 8), 0x0D << 26 | 2 << 21 | 2 << 16 | 0x88, JR_RA, NOP)
+        self.assertEqual(levels.identity(overwritten(0x1F)), levels.identity(overwritten(0x20)))
+
+
 class CrossIdentity(unittest.TestCase):
     def test_addresses_are_masked_resident_too(self):
         a = code(lui(2, 0x1A), lw(2, 2, 0x7BB4), JR_RA, NOP)

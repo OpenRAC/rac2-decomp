@@ -6,6 +6,9 @@
  * Reordered ordinary initializers did not close FP/store scheduling.
  * Next: a source shape that rematerializes the real self+0x10 pointer after
  * the copy, rather than preserving it until the later distance call.
+ * closer D successor, 1 November 2026: retail materialises both addresses for the copy
+ * (addiu a0,s2,0x200; addiu v1,s3,0x10) and recomputes self+0x10 for the distance call. Flags
+ * alone: -fno-gcse 71, -fno-cse-follow-jumps 78 (1124), both cse switches off 153 (1128).
  * Earlier sol-low measurements follow (still applicable):
  * Best check: 1132 bytes versus 1128; 0 of 2 places match.
  * The qcopy address self+0x10 is retained in s4 across calls, adding a save

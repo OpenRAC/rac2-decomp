@@ -158,7 +158,6 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L23_00399C10);
 
 
 /* func_L23_003BDA20 is defined in L23_003BDA20-g8.c ($gp, -ffast-math). */

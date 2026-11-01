@@ -1,3 +1,9 @@
+/* func_L00_003F0CC8 (1592 B, 27 places). Opus closer g1, 1 November 2026: 3 rows off, profile
+ * -O2 -G8 -ffunction-sections. Left: `addiu s0,sp,0x10` comes after the 0x500000000000 mask's
+ * ori/dsll in the hit loop's preheader; retail has it first. A pointer local in the loop body and
+ * before the loop did not move it. The body follows func_L00_003E4BF0's relatives: an indexed
+ * angle loop, `remaining = count` before the do/while, `progress` from one divide statement.
+ * The retail read of the request impulse before its first fill is kept. */
 /* GPT-6.1 Sol (high effort), bounded retry, 29 October 2026; not linked.
  * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
  * USA v1.01 and USA v2.00: 1592/1592 bytes, 0/27 placements each.
@@ -91,9 +97,8 @@ void func_L00_003F0CC8(char *object)
     char **hit;
     char *satellite;
     Light *light;
-    int count;
+    int count, remaining, i;
     float progress, first_angle, second_angle;
-    float (*angles)[2];
 
     qcopy(object + 0x10, H->ptr[0x2290 / 4] + 0x10);
     switch (*(unsigned char *)(object + 0x20)) {
@@ -101,14 +106,10 @@ void func_L00_003F0CC8(char *object)
         *(unsigned char *)(object + 0x20) = 1;
         state->timer = 60;
         state->radius = 0.0f;
-        angles = D_L00_00252F60;
-        count = 136;
-        do {
-            --count;
-            (*angles)[0] = func_002A7940();
-            (*angles)[1] = func_002A7940();
-            ++angles;
-        } while (count >= 0);
+        for (i = 0; i < 137; i++) {
+            D_L00_00252F60[i][0] = func_002A7940();
+            D_L00_00252F60[i][1] = func_002A7940();
+        }
     case 1:
         *(unsigned char *)(object + 0x20) = 2;
     case 2:
@@ -130,8 +131,9 @@ void func_L00_003F0CC8(char *object)
             state->timer = 120;
             *(unsigned char *)(object + 0x20) = 3;
             count = func_00277F48((Vector *)&H->b[0xE0], 0, object, 0, 15.0f);
-            hit = D_L00_001C3280;
             if (count > 0) {
+            hit = D_L00_001C3280;
+            remaining = count;
             do {
                 if ((*(unsigned long long *)(*hit + 0x30) & 0x500000000000ULL) != 0 &&
                     *hit != H->ptr[0x2290 / 4] && *(short *)(*hit + 0xaa) != 0xce7 &&
@@ -150,7 +152,7 @@ void func_L00_003F0CC8(char *object)
                     func_002A8E20(*hit, &request);
                 }
                 ++hit;
-            } while (--count != 0);
+            } while (--remaining != 0);
             }
             func_0032A978(object);
         }
@@ -172,8 +174,7 @@ void func_L00_003F0CC8(char *object)
         }
         break;
     }
-    progress = func_00283CE0(state->timer);
-    progress /= func_00283CE0(120);
+    progress = func_00283CE0(state->timer) / func_00283CE0(120);
     progress = 1.0f - progress;
     progress *= 6.2831855f;
     progress -= 3.1415927f;

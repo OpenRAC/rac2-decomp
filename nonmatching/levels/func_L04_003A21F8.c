@@ -15,6 +15,10 @@
  * Next useful experiment: establish the original packet-cursor/GS field views
  * and UV update grouping. No linked build was run; placement symbols remain
  * unvalidated. All required declarations are below.
+ *
+ * closer D, 1 November 2026: all 240 orders of the uv statements stay at 74-78. 1024.0f (insn 1227) is ready at
+ * t=1 of the block and, at priority 2, passes the blend call in sched1; retail issues it first after
+ * func_00283D38. A do/while(0) barrier is worse (114), so this is not a block or loop-note boundary.
  */
 #include "common.h"
 /* Adapted from RAC1 render_water_grids, GPL-3.0, with RAC2 blend/GS setup. */

@@ -140,6 +140,8 @@ wrong profile with extra operations or knowingly false prototypes.
 | Nop pair before div.s (float rounding helper) | -g | func_002AEAE0 |
 | Register addresses and grouped 16-byte transfer | -frac2-qcopy | func_L20_0039E158, func_L20_0039F210, func_00305058 (with -g for the pre-div.s nop pair) |
 | Correct copy, wrong motion across it | -frac2-qcopy-barrier, with qcopy | func_002B5E48, func_002EE988, func_L01_003BC490, func_L08_003D3D80 |
+| Loop constants hoisted though the loop is over `threshold` for them | -fmove-all-movables on a file of its own | func_L00_004287E8, func_L16_004117A8 |
+| Hoisted addresses, branch joined with an empty edge block | -frac2-gcse-unsplit-edges | func_L00_00370408 |
 | Float min/max expands into compare and branch | -ffast-math; optimization level still affects allocation | func_L01_003BD560, func_L00_002EE050 |
 
 `-G8` can change allocation even without GP accesses: `func_L17_003BCBC8` puts
@@ -226,6 +228,19 @@ loops), `func_L00_002FC980` (27 places), `func_L30_0040B9D8`, `func_002AF0A8`. N
 matched function changes: `build.py all --strict` is OK with and without the patch.
 Control: [test_block_move_loop.py](../tests/test_block_move_loop.py), where a
 four-word store loop keeps its three NOPs.
+
+[block_move_quad.py](../tools/compiler/transformers/block_move_quad.py) gives those loops
+retail's quadword form. `expand_block_move` capped the alignment at the 8-byte word, so a
+structure of 16-byte alignment copied by `ld`/`sd`: four scratch registers per 32-byte round
+and four more for the leftover. Retail has `lq ; lq ; sq ; sq ; addiu ; bne ; addiu` with
+`lq ; sq` for the leftover, the shape of `block_move_loop` (`src + bytes`, unaligned label,
+`bne` on the source pointer) and not of a C loop. The alignment now reaches
+`output_block_move`, which has a quadword case. Copies of 0x40 bytes or less still go through
+`move_by_pieces` at word alignment. Witnesses: `func_L12_00418418` (one place) and
+`func_L03_003E4148` (eight) become exact, `func_L12_0041BF88`'s six copies each lose their six
+extra words. All 5,849 compilable units give the same assembly with and without the patch, so
+nothing already matched moves. Control: [test_block_move_quad.py](../tests/test_block_move_quad.py),
+where an 8-byte-aligned page keeps `ld`/`sd` and a 0x40-byte copy keeps its pieces.
 
 The padding counts words, as the retail assembler does, for the two 16-byte copies too:
 [count_asm_words.py](../tools/compiler/transformers/count_asm_words.py) counts an asm
@@ -439,6 +454,14 @@ bytes and relocations and pass every carrying release's placement checks.
 The complete strict builds remain the acceptance gate. This is a reconstruction
 profile, not evidence of the shipping compiler's flags.
 
+A small-data object read at a nonzero offset is the other tied form. cc1 does not split it (the
+symbol carries `SYMBOL_REF_FLAG`), and `simple_memory_operand` rejects the offset, so the insn has
+length 2: it never fills a slot, and the assembler expands it to `lui $r; lw $r,lo($r)` or
+`lui $at; sw`. Declare the block `extern int D[] __attribute__((sda));` at its real start and read
+`D[1]`, or use an incomplete struct array and its fields. `func_L00_004266E8` (`D_001A7BA0[1]`),
+`func_0029D830` (a three-word block at `D_001B1A50`), retained `func_002FF0D8` and
+`func_L00_0036F488`. A bare `D[0]` has length 1 and does fill slots.
+
 The same size rule applies beyond vectors. The particle emitters
 `func_L18_003FCD70` and `func_L18_003FCC48` declare their measured 24-byte
 settings records and use `-G32 -Wa,-G32`. `func_L00_00396078` keeps its complete
@@ -637,6 +660,16 @@ Combining both switches affects sched1/sched2 differently and needs its own proo
 
 ### Useful C shapes
 
+- A flag set to 1 only by a test in a block of its own is `flag = 0; ... if (test) flag = 1;`. jump.c makes a
+  conditional move from it and puts the 1 in a fresh pseudo set once, which loop.c hoists and cse reuses, so retail
+  shows `daddu a2,s7` / `movn a2,zero,v0` (`func_L00_00323958`, near miss) or `addiu s5,1` / `daddu s1,s5` (`func_003248A8`, near miss).
+  `flag = 1; if (other) flag = 0;` has the constant in the same block and combine folds it to `sltiu`.
+- A loop index read after the loop keeps its loop.c rewrite honest: `for (j = 0; j < 8; j++) h[j] = h[j * 2];
+  func(h + j, data + 32, n);` has the counter reversed (`addiu a2,7` / `bgez a2`), two pointers reduced, and the final
+  value of `h + j` computed after the loop as `addiu a0,a3,0x10`, while the plain `data + 32` is hoisted before it by PRE
+  (`func_002934F8`). If retail recomputes a pointer it just walked, look for the index in the call.
+- A register copy of a global's load that appears near a branch, with no variable to explain it, is PRE's reaching
+  copy: read the global inline at every use rather than through a local (`func_003248A8`).
 - Read branch direction and operand width: signed countdowns and unsigned increment
   loops need not share a layout. A switch can retain branches that if/else folds
   into sltu/xori/conditional moves (`func_L18_002E4090`).
@@ -649,6 +682,29 @@ Combining both switches affects sched1/sched2 differently and needs its own proo
   `(st + 3) & 0xFF < 2` plus one compare. A right-nested spelling
   `st == 0xFE || (st == 0xFD || st == 3)` keeps the three separate compares in
   source order (measured in `func_L08_0042F440`/`0042FAC0`, 544-byte twins).
+- A copy before a loop that gcse's cprop keeps deleting can come from cse2: read the global inside the loop, loop.c
+  hoists the `la`, and cse2 following `-fcse-skip-blocks` around the preceding `if` turns it into a copy of the earlier
+  pseudo (`func_L00_00376600`, `daddu $fp,$s0`). The source of the copy can then share its register with a later local.
+- A constant used in another basic block than its set stays in a body after a `continue`, because loop.c will not
+  move a cross-block set when `maybe_never` holds: `tint = 0xF0F0B0` early in the body (`func_L00_00376600`).
+- `addiu v1,s0,1 / daddu s3,v1 / slt v1,v1,a0` is gcse PRE's reaching copy: write `i + 1` at each use and `i++`
+  in the loop, with no variable for it. The index register can then be reused for the record pointer
+  (`func_002E3BD8`, `func_002E3998`).
+- `sll 3 / srl 3 / addiu 0xF / srl 4 / sll 4` is a plain VLA of bytes, `u8 frame[count]`: bits to bytes, then
+  rounding (`func_002E3BD8`).
+- A body with no loop.c work (constants unhoisted, counter neither reversed nor eliminated) matches row for row
+  when the loop is written with labels, which leave no loop notes (`func_00329488`, near miss: the alignment nop
+  shows retail did have a loop note, so a real loop rejected as invalid is still possible).
+- A value `r` from `if (a || (b && c)) r = 1; else r = 0;` or a helper with `return 1; return 0;` reads
+  `beqz x / r = 0 / r = 1 / beqz r` in retail: reorg steals `r = 0` into each branch slot and the else goes
+  (`func_L00_002D5EB8`, near miss). Flag sets inside a switch or a call stay out of r's life this way.
+- Under `-g` a line label before a division costs the two-word floor. Statements on one source line share a
+  label, so `bb = cos(x); D = aa / bb;` written on one line keeps the locals with no padding, where putting the division
+  in the call's statement changes allocation (`func_L00_00429568`).
+- A branch label on those nops when the division follows a branch group needs `-frac2-hazard-labels`: without it
+  gas moves the label behind the padding (`func_L00_00429568`).
+- `i + 1` written at each use also stops PRE from keeping `(i + 1) << 2`, since each shift then has its own
+  operand pseudo; `i << 2` for the same loop is still kept (`func_L00_00429568`).
 - `x = load; if (flag) x = 0.0f;` differs from a ternary in branch polarity and
   likely slots (`func_L00_0042A460`). Store order affects allocation, but there is
   no universal reversal or permutation rule.
@@ -672,6 +728,25 @@ not propagate a constant zero into the loop. Same-block CSE folds it earlier.
 The observations on `func_L20_0039E0A0`, `func_L20_0039DBC8`,
 `func_L20_00440398` and `func_L20_0044AC38` describe pass ordering, not permission
 to add a fictitious guard just to prevent optimization.
+
+Four shapes from `func_L01_003B9798`, `func_L00_003E8A98` and the near misses
+`func_L20_004441D8` and `func_L00_003C8A90`:
+
+- A retail loop with no hoisted constants that still has its alignment nop is a real
+  loop entered in the middle: `goto test; do { ...; test: ...; } while (...);`. The loop
+  note stays, and loop.c refuses to hoist because of the outside jump. A loop written
+  only with labels loses the nop and the loop weight on its registers.
+- A call in two arms merges when something other than a call ends each arm at flow:
+  flow puts `(use 0)` after a call that ends a block, and jump2 can't match it to the
+  other arm's jump. A real following statement in both arms is the usual fix; the two
+  `func_002A7750` arms of `func_L01_003B9798` carry the sound check.
+- Spill slots go up with pseudo number, and gcse reaching registers follow by hash
+  bucket. Raising a parameter's pseudo with a late `unsigned char *object = arg;` or
+  naming an address (`first = attachments[0]; dst = first;`) moves its slot or gives
+  the reaching register retail's reference count. A pointer loop has fewer insns at
+  gcse than an indexed one, which is an honest way to change the bucket count.
+- A byte table that is a field of a larger object adds base first (`T.flags[i]`, retail
+  `addu base, index`); a plain array adds index first.
 
 ### gcse: every store kills every load
 
@@ -761,6 +836,16 @@ every matched function in `tools/build.py all --strict`, none compiled different
 [tests/test_trap_redundant_barrier.py](../tests/test_trap_redundant_barrier.py)
 checks the transformer and authored controls: across a guard the reload fills the slot, and
 without a division the redundant reload is still dropped.
+
+A volatile asm ends the same scan. `func_0030E8A8` (1,052 bytes, 28 places) has a `bc1f` to the
+epilogue past `ld $s0` with that restore in its slot, then a `qcopy` and a `b` to the epilogue.
+Retail's `b` lands on the restore; this tree took the slot's copy as redundant across the asm and
+branched one word further, the last word of the function. In the 28 retail programs, 30 such
+shapes (a branch slot holding a `$sp` restore, then `lq`/`sq`, then a `b` to that restore or
+the word after it) land on the restore and none past it, including `func_L22_003F5580`. With the
+rule, none of the 5,846 units under `src/` compiles differently and `func_0030E8A8` is 28/28 in
+both USA releases. The search stops at volatile asm alone: a plain store in that place keeps
+the dropped restore, which the test's `stored` control checks.
 
 ### SDK objects: the assembler fills the slots the compiler leaves
 
@@ -862,6 +947,14 @@ increments (`n_extra_increment`); that has no retail witness yet and stays on (t
 also changes no matched function). [tests/test_no_recombine_givs.py](../tests/test_no_recombine_givs.py)
 checks the transformer and an authored loop: the digit read stays on the entry pointer
 (`lbu 36(entry)`, not `-1(name + 5)`), and a one-pointer loop is unchanged.
+
+A scalar global read across pointer stores is `fixed_scalar_and_varying_struct_p`: cc1 assumes a
+fixed scalar cannot alias a varying array element, so the load is hoisted or moved over the stores.
+Where retail reloads, declare the global as an array and read `[0]`: `D_L00_001B2B58[0][i] = 0` keeps
+the reload and the integer index in `func_L00_003E4BF0`, and the cursor `D_001B22A8[0]` stays behind
+the `t[]` stores in retained `func_00285030`, with no fence. An integer index that survives inside a
+loop means no loop notes: loop.c reduces every `for` or `do` form, a `goto` loop keeps it (retained
+`func_L00_003769C0`).
 
 ### Compiler control-flow passes
 
@@ -1166,6 +1259,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
 | Block-move loop padding | [test_block_move_loop.py](../tests/test_block_move_loop.py) |
+| Quadword block moves | [test_block_move_quad.py](../tests/test_block_move_quad.py) |
 | Asm-word loop padding | [test_count_asm_words.py](../tests/test_count_asm_words.py) |
 
 Copy controls cover volatile/unaligned/scalar/quadword memory, calls, integer/FP

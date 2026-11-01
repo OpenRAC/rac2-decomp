@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_002E7BE0);
 
 extern char D_00189E20_9[];
 extern char D_001A63A8_3[];
@@ -33,8 +32,56 @@ void func_US2_002E7E70(void)
     D_00152C2A = 0;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_002E7EE8);
+#include "common.h"
+extern void func_US2_002E7BE0();
+#define MACRO_ADDR __attribute__((section(".sdata")))
+typedef struct { char pad[0x20]; short active; short slot; } Menu2E7090;
+typedef struct { char pad[0xC]; int start; int end; } Range2E7090;
+typedef struct { char pad[0x30]; int selected; int base; int page; int row; char pad40[0x6C - 0x40]; int start; int destination; } List2E7090;
+extern float D_001B15A0 MACRO_ADDR;
+extern int D_001B15A4 MACRO_ADDR;
+extern Menu2E7090 D_00152C00;
+extern int D_001B22B0 MACRO_ADDR;
+extern Range2E7090 D_001BAEC0;
+extern List2E7090 D_001B8840;
+extern int D_001A79F0 MACRO_ADDR;
+extern int D_001A7B90 MACRO_ADDR;
+extern int D_001B1680 MACRO_ADDR;
+extern void func_002FC138(void);
+extern void func_00294070(int);
+extern int func_0029B3E0(int, int);
 
-INCLUDE_ASM("asm/us2/game", func_US2_002E8010);
+/* Opens the list: rebases its range on the loaded block and, for the current program, lays
+   out the first page (80 or 96 rows a page). */
+void func_US2_002E7EE8(int level)
+{
+    Menu2E7090 *menu = &D_00152C00;
+    short none = -1;
+    int base;
 
-INCLUDE_ASM("asm/us2/game", func_US2_002E80A0);
+    D_001B15A0 = 1.0f;
+    D_001B15A4 = 0;
+    menu->active = 0;
+    menu->slot = none;
+    func_002FC138();
+    base = D_001B22B0 - 0x60000;
+    D_001B8840.start = D_001BAEC0.start + base;
+    D_001B8840.destination = D_001BAEC0.end + base;
+    D_001B22B0 = base;
+    if (D_001A79F0 == level) {
+        func_US2_002E7BE0(3);
+        level = D_001A7B90 ? 0x50 : 0x60;
+        D_001B8840.base = 0;
+        D_001B8840.row = D_001B8840.base / level;
+        func_00294070(D_001B8840.row);
+        D_001B8840.page = D_001B8840.base % level;
+    } else {
+        func_0029B3E0(0, level);
+        D_001B1680 = level;
+        menu->active = 1;
+        menu->slot = none;
+    }
+}
+
+
+

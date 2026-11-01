@@ -1,3 +1,6 @@
+/* Closer C, 1 November 2026: 456/452, 40 rows. range < D ? range : D; the class table cast through unsigned keeps mult + addu
+ * (as func_L00_003E4BF0); a struct hero is rebuilt in the loop as retail. Left: cc1 hoists D_00139568 and 5627.92f, retail neither.
+ */
 /*
  * Retained manual C reconstruction; not linked or counted.
  * Profile: -O2 -G8 -ffunction-sections -ffast-math (for min.s), as its own unit
@@ -36,9 +39,11 @@ typedef struct {
 extern s32 D_001B0100 __attribute__((sda));
 extern f32 D_001B00F4 __attribute__((sda));
 extern u8 *D_001BF000[];
-extern char D_00239BA0[];
+typedef struct { char prefix[0x70]; float damage; char tail[0x6C]; } Class_7B40;
+extern Class_7B40 D_00239BA0[];
 extern u8 D_00139568[];
-extern char D_00189E20[];
+typedef struct { char pad[0x2290]; u8 *target; } Hero_7B40;
+extern Hero_7B40 D_00189E20;
 
 extern int func_00277F48(float, void *, int, void *, void *);
 extern int func_002AB1F0(unsigned char *);
@@ -61,19 +66,19 @@ void func_00327B40(u8 *self)
     if (*(s32 *)(state + 0x20) < D_001B0100 - 20)
         return;
     range = *(f32 *)(state + 0x24);
-    range = D_001B00F4 < range ? D_001B00F4 : range;
+    range = range < D_001B00F4 ? range : D_001B00F4;
     n = func_00277F48(range, self + 0x10, 0, self, 0);
     for (i = 0; i < n; i++) {
         obj = D_001BF000[i];
         if (func_002AB1F0(obj) == 0 && (*(u16 *)(obj + 0x34) & 0x4000) == 0)
             continue;
-        if (obj == *(u8 **)(D_00189E20 + 0x2290))
+        if (obj == D_00189E20.target)
             continue;
         func_00282CF0(dir, obj + 0x10, self + 0x10);
         func_00282F20(dir, dir, 1.0f);
         func_00282F20(msg.push, msg.push, 1.0f);
         func_002A8C00(msg.push, self, 0x830000, dir,
-                      *(f32 *)(D_00239BA0 + D_00139568[0x20] * 0xE0 + 0x70));
+                      ((Class_7B40 *)((unsigned int)D_00239BA0 + D_00139568[0x20] * sizeof(Class_7B40)))->damage);
         *(TI128 *)msg.push = *(TI128 *)dir;
         msg.push[3] = 5627.9248046875f;
         msg.type = 5;
