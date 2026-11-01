@@ -472,7 +472,6 @@ void func_L30_003BE678(char *a0) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L30_003D9CA8);
 
 /* func_L30_003D9E60 is defined in L30_003D9E60-g8.c. */
 

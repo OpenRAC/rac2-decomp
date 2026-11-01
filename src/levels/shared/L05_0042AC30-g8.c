@@ -1,12 +1,3 @@
-/* Complete C near miss; not linked and no matching credit.
- * closer D, 1 November 2026: game -O2 -G8 -ffunction-sections.
- * 928/940 bytes, 0/4 places; 74 words differ, frame 0xA0. The earlier draft inverted the 0x80 test:
- * a set bit deletes the object. Rewritten as closed func_L05_0042BDB0 was: each tuning float a
- * $gp scalar, fields through a union view, D_001A79F0 MACRO_ADDR, separate loop counters.
- * Left: retail has eight saved GPRs where this has seven; actor is s3 and state s5, the origin
- * copy at +0x13C is a short-lived v0 and the second loop keeps state+0x24 in s4.
- * Reopen: scalar/child-pointer lifetime evidence for those registers.
- */
 #include "common.h"
 
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
@@ -52,7 +43,6 @@ void func_L05_0042AC30(u8 *actor)
 {
     Vector position, step, rotation;
     u8 *state = *(u8 **)(actor + 0x68);
-    float *origin;
     if (D_L05_00221D94[0] != 0 || (D_0019B2E8[actor[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
         func_0029F338(actor);
         return;
@@ -62,18 +52,22 @@ void func_L05_0042AC30(u8 *actor)
         float phase = 0.0f;
         ((Fields *)actor)->uh[0x34 / 2] |= 0x41;
         func_002833F0(actor + 0xC0, actor + 0xF0);
-        actor[0x20] = 1;
         actor[0x30] = 0xFF;
+        actor[0x20] = 1;
         ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * (D_L05_001B1680 * D_L05_001B1688);
-        span = D_L05_001B169C * 6.0f;
-        D_L05_001B1690 = D_L05_001B16E4 = D_L05_001B16F8 = D_L05_001B16FC = 0.0f;
-        D_L05_001B1704 = D_L05_001B170C = D_L05_001B16D4 = D_L05_001B16E8 = 0.0f;
+        span = D_L05_001B169C;
+        span *= 6.0f;
+        D_L05_001B16FC = D_L05_001B16F8 = D_L05_001B16E4 = D_L05_001B1690 = 0.0f;
+        D_L05_001B16E8 = D_L05_001B16D4 = D_L05_001B170C = D_L05_001B1704 = 0.0f;
         ((Fields *)state)->f[0x20 / 4] = span;
         func_00282D30(&position, actor + 0xC0, span);
         func_00282CC0(&position, &position, actor + 0x10);
-        ((float *)(state + 0x24))[0] = position.f[0];
-        ((float *)(state + 0x24))[1] = position.f[1];
-        ((float *)(state + 0x24))[2] = position.f[2];
+        {
+            float *head = (float *)(state + 0x24);
+            head[0] = position.f[0];
+            head[1] = position.f[1];
+            head[2] = position.f[2];
+        }
         span *= 0.14285715f;
         func_00282D30(&step, actor + 0xC0, -span);
         func_002AB600(&rotation, actor + 0xC0);
@@ -89,24 +83,24 @@ void func_L05_0042AC30(u8 *actor)
         D_L05_001B1728 = actor;
     }
     {
-    char **slot = (char **)state;
     int j;
-    origin = (float *)(state + 0x24);
-    for (j = 6; j >= 0; j--, slot++) {
-        u8 *object = (u8 *)*slot;
+    for (j = 0; j < 7; j++) {
+        u8 *object = ((u8 **)state)[j];
         if (object != 0) {
             float amount = D_L05_001B168C * 0.016666668f;
+            float *pos = (float *)(object + 0x10);
             u8 *objectState;
             amount += amount;
             func_00282D30(&position, actor + 0xC0, -amount);
-            func_00282CC0(object + 0x10, object + 0x10, &position);
+            func_00282CC0(pos, pos, &position);
             objectState = *(u8 **)(object + 0x68);
             ((Fields *)objectState)->f[0x10 / 4] += amount;
             if (((Fields *)state)->f[0x20 / 4] <= ((Fields *)objectState)->f[0x10 / 4]) {
-                ((float *)(object + 0x10))[0] = origin[0];
-                ((float *)(object + 0x10))[1] = origin[1];
-                ((float *)(object + 0x10))[3] = 0;
-                ((float *)(object + 0x10))[2] = origin[2];
+                float *base = (float *)(state + 0x24);
+                pos[0] = base[0];
+                pos[1] = base[1];
+                pos[2] = base[2];
+                pos[3] = 0;
                 ((Fields *)objectState)->i[0x10 / 4] = 0;
             }
         }

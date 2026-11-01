@@ -631,7 +631,6 @@ void func_L09_003F8858(char *object)
 
 /* func_L09_003F8898 lives in the L09_002B7238-g8.c sibling: its four counters are small data. */
 
-INCLUDE_ASM("asm/levels", func_L09_003F8AE0);
 
 
 /* func_L09_003F9108 is defined in L09_003F9108-partner.c. */

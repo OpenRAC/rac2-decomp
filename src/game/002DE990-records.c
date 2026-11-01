@@ -1,30 +1,3 @@
-/* Claude Opus 5.5 (xhigh), v1709, 2026-10-31; retained near miss, not linked.
- * Unit: its own file, default profile -O2 -G0 -ffunction-sections (no -frac2-qcopy).
- * check.py: 1728/1728 bytes, 0/28 places (USA v1.01), first difference +0x30; 117 of
- * 432 instructions differ once relocations are masked, all register choices or local
- * scheduling. The frame and everything after +0x5C8 already agree.
- * BLOCKER, the compiler: retail's 0xE0-byte copy is `lq; lq; sq; sq; addiu; bne; addiu`
- * with `bne src,src+0xE0`, the shape of mips.c block_move_loop (32 bytes per pass,
- * final_src, NE). This tree's output_block_move has no lq/sq case and expand_block_move
- * clamps align to 8, so `saved.records[j] = D_00239BA0[j]` gives the ld/sd loop: 1760
- * bytes here. Its movstrsi_internal2 has four scratch registers; that wording makes this
- * compiler use $t8,$t9 as scratch, and retail's reload temporaries are exactly $t8,$t9.
- * Retail's temporaries $a0,$a3 ($a0,$a2 in the restore loop) would be the other two.
- * Hypothesis, not tested: with an align>=16 lq/sq case in output_block_move, the plain
- * struct assignment would replace both explicit copy loops below. No C copy reaches
- * retail: a C `lq`'s pseudo is allocated before src/end/dst, and the scheduler moves
- * `addiu src` ahead of the second `sq`, which is still waiting on its load.
- * Established, keep these: one local struct for flags, words, slots and records (separate
- * arrays give 1784 bytes with the natural copy); separate index variables per big loop
- * (a shared `i` stops PRE reusing i*4 and leaves the outer loop strength-reduced; with
- * them plain j++ gives retail's `j+1` before the copy and `j = next` after it); state
- * bytes as fields of D_001A79F8; D_001A7B94 as an array (its [1] store stays out of a
- * delay slot); D_001A7AF0 read MACRO_ADDR and written through SDATA ($gp in a delay slot);
- * the second kind test nested in `if (D_001A7B08)`; base-pointer locals for the
- * reg+offset accesses. The `(int)` sum only reproduces (plus off sp) for the explicit
- * loop and should go with it. Unaligned 64-byte state copy semantics are preserved.
- * All declarations are below; no linked build was run.
- */
 #include "common.h"
 
 typedef unsigned int QuadDE990 __attribute__((mode(TI)));
@@ -100,7 +73,6 @@ void func_002DE990(int selected)
     unsigned char *card, *block, *slots;
     int *words;
     unsigned char *state, *hud;
-    QuadDE990 *src, *dst, *end, a, b;
     card = D_0018C958;
     D_001A79F8.f12++;
     D_001A79F8.f3a = 1;
@@ -112,17 +84,7 @@ void func_002DE990(int selected)
     for (j = 0; j < 56; j++) {
         saved.flags[j] = D_001A7AF8[j];
         saved.words[j] = D_00139868[j];
-        dst = (QuadDE990 *)(j * (int)sizeof(RecordDE990) + (int)&saved + 0x2A0);
-        src = D_00239BA0[j].data;
-        end = src + 14;
-    copy1:
-        a = src[0];
-        b = src[1];
-        dst[0] = a;
-        dst[1] = b;
-        src += 2;
-        dst += 2;
-        if (src != end) goto copy1;
+        *(saved.records + j) = D_00239BA0[j];
         saved.slots[j] = D_00139568[j];
     }
     for (i = 0; i < 32; i++) saved32[i] = D_001A7A60[i];
@@ -152,9 +114,8 @@ void func_002DE990(int selected)
     block[0x90] = control;
     func_00282A60(D_001A7AB8, 0, 56);
     for (i = 0; i < 56; i++) D_001A7A80[i] = saved56[i];
-    for (i = 7; i >= 0; i--) D_001A73B8[i] = 0;
-    gameState = &D_001A79F8;
-    *gameState = savedState;
+    { int m; for (m = 7; m >= 0; m--) D_001A73B8[m] = 0; }
+    D_001A79F8 = savedState;
     D_001A73B8[0] = 30;
     D_001A73B8[1] = 42;
     D_001A79F8.f22 = 0;
@@ -171,17 +132,7 @@ void func_002DE990(int selected)
     for (k = 0; k < 56; k++) {
         D_001A7AF8[k] = saved.flags[k];
         D_00139868[k] = saved.words[k];
-        dst = D_00239BA0[k].data;
-        src = (QuadDE990 *)(k * (int)sizeof(RecordDE990) + (int)&saved + 0x2A0);
-        end = src + 14;
-    copy2:
-        a = src[0];
-        b = src[1];
-        dst[0] = a;
-        dst[1] = b;
-        src += 2;
-        dst += 2;
-        if (src != end) goto copy2;
+        D_00239BA0[k] = *(saved.records + k);
         D_00139568[k] = saved.slots[k];
         D_00139688[k] = D_00239BA0[D_00139568[k]].f.cost;
     }
@@ -191,13 +142,11 @@ void func_002DE990(int selected)
     D_001A7B94[0] = 0;
     func_00287FF8(10, 3);
     if (D_001A7B08) {
-        slots = D_00139568;
-        if (D_00239BA0[slots[0x10]].f.kind == 0)
+        if (D_00239BA0[D_00139568[0x10]].f.kind == 0)
             func_00287FF8(16, 2);
         else
             func_00287FF8(16, 3);
-        slots = D_00139568;
-        if (D_00239BA0[slots[0x10]].f.kind == 0) {
+        if (D_00239BA0[D_00139568[0x10]].f.kind == 0) {
             func_00288870(&first, 16, 2);
             func_00288870(&second, 16, 0);
             words = D_00139868;

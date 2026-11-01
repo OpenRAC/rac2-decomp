@@ -1,4 +1,4 @@
-/* opus-1 (Claude Opus 5.5, xhigh), task v1948, USA v1.01: 2588/2444 bytes, 0/1 places.
+/* opus-1 (Claude Opus 5.5, xhigh), task v1948, USA v1.01: 2444/2444 bytes, 0/1 places (see the closer notes below).
  * Unit: its own file, e.g. src/levels/12_todano/L12_004149B8-field.c, flags
  *   -O2 -G0 -ffunction-sections -mno-split-addresses -g
  * (-mno-split-addresses: retail's adjacent lui/lw pairs for D_L12_001B2F8C are gas
@@ -43,6 +43,21 @@
  * `i` lands in $s0 everywhere); `angle` stores precede the height/width loads; the
  * top-z chain stores point[3] first; holding D_L12_001B1D4C in a local hoists it.
  *
+ * closer D successor, 1 November 2026: 2444/2444 bytes, 4 words off, on the block-move-quad compiler.
+ * What is left is one transposition in the loop-2 preheader: mov.s f25,f1 / mov.s f27,f0 (retail has
+ * f27 first, each separated by a sw). Closed since the last note:
+ *  - the $f1/$f2 choice for 0.5: `width * 0.5f` went to a local-alloc pseudo in $f1, which gave `width` an
+ *    $f1 preference, so global-alloc's regs_someone_prefers kept 0.5 off $f1. Sharing a scratch float
+ *    (`thickness`, also the loop's value) makes that pseudo global and removes the preference.
+ *  - spill slots 0x26C/0x270: need 233 or 237 gcse buckets; every x-store loop and the second bottom-z
+ *    loop descending give 237, the first bottom-z loop must stay ascending (subset sweep of 256).
+ * The two movs are loop.c's hoists: 0.5 (j loop, scanned first) precedes the bound (mult needs that 0.5),
+ * and cse2 turns both into copies; sched1 sees a weight and priority tie, so LUID order stands. Retail's
+ * order needs one of them to differ in weight or priority; not found. Tried: while form, nextPhase
+ * after the j loop (27), `0.5f * height`, -fmove-all-movables (47), -frac2-gcse-unsplit-edges,
+ * -fno-sched-interblock. Inline helpers instead of `({ })`: the frame base goes through a register
+ * (addiu s1,sp,0x130, retail is sp-relative) and the copy is ld/sd, 2420-2428 bytes, so the statement
+ * expressions stay; they read as an inlined macro.
  * closer D, 1 November 2026: on branch compiler/block-move-quad the six copies are retail's lq/sq
  * loops and this draft reaches 2444/2444 bytes with 13 words left, the FPR and spill-slot items.
  */
@@ -80,7 +95,7 @@ void func_L12_0041BF88(u8 *self)
     BF88Packet packet;
     BF88Vector matrix[4], rotation[4], angle, offset;
     u8 *p = *(u8 **)(self + 0x68);
-    float width, height;
+    float width, height, thickness;
     float h, y, phase, nextPhase, step, halfHeight;
     int i, j, k, n;
 
@@ -92,7 +107,8 @@ void func_L12_0041BF88(u8 *self)
     ({
         BF88Vector corner;
         corner.q = 0;
-        corner.f[1] = width * 0.5f;
+        thickness = width * 0.5f;
+        corner.f[1] = thickness;
         corner.f[2] = D_L12_001B1D40;
         corner.f[3] = 1.0f;
         offset.q = corner.q;
@@ -135,7 +151,7 @@ void func_L12_0041BF88(u8 *self)
         });
     }
     for (k = 0; k < 4; k++) {
-        float thickness = D_L12_001B1D44;
+        thickness = D_L12_001B1D44;
         packet.point[k].f[2] -= height;
         if (packet.point[k].f[2] <= 0.0f) thickness = -thickness;
         packet.point[k].f[2] = thickness;
@@ -152,13 +168,13 @@ void func_L12_0041BF88(u8 *self)
         } }
         { int i; for (i = 0; i < 2; i++) packet.point[i].f[2] = -halfHeight; }
         packet.point[2].f[2] = packet.point[3].f[2] = halfHeight + halfHeight;
-        { int i; for (i = 0; i < 4; i++) packet.point[i].f[0] = D_L12_001B1D80; }
+        { int i; for (i = 3; i >= 0; i--) packet.point[i].f[0] = D_L12_001B1D80; }
         ({
             BF88Packet rotated, side;
             rotated = packet;
-            { int i; for (i = 0; i < 4; i++) rotated.point[i].f[0] = D_L12_001B1D80; }
+            { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = D_L12_001B1D80; }
             func_00280B90(&rotated, matrix, 1);
-            { int i; for (i = 0; i < 4; i++) rotated.point[i].f[0] = -D_L12_001B1D80; }
+            { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = -D_L12_001B1D80; }
             func_00280B90(&rotated, matrix, 1);
             side = packet;
             qcopy(&side.point[0], &packet.point[0]);
@@ -183,17 +199,17 @@ void func_L12_0041BF88(u8 *self)
             packet.point[j].f[1] = y;
             if (j & 1) packet.point[j].f[1] = y + 0.5f;
         } }
-        { int i; for (i = 0; i < 2; i++) packet.point[i].f[2] = D_L12_001B1D84; }
+        { int i; for (i = 1; i >= 0; i--) packet.point[i].f[2] = D_L12_001B1D84; }
         packet.point[2].f[2] = packet.point[3].f[2] = halfHeight + halfHeight;
-        { int i; for (i = 0; i < 4; i++) packet.point[i].f[0] = D_L12_001B1D80; }
+        { int i; for (i = 3; i >= 0; i--) packet.point[i].f[0] = D_L12_001B1D80; }
         ({
             BF88Packet rotated, side;
             rotated = packet;
-            { int i; for (i = 0; i < 4; i++) rotated.point[i].f[0] = D_L12_001B1D80; }
+            { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = D_L12_001B1D80; }
             func_00280B90(&rotated, matrix, 1);
             rotated = packet;
             func_00280B90(&rotated, matrix, 1);
-            { int i; for (i = 0; i < 4; i++) rotated.point[i].f[0] = -D_L12_001B1D80; }
+            { int i; for (i = 3; i >= 0; i--) rotated.point[i].f[0] = -D_L12_001B1D80; }
             func_00280B90(&rotated, matrix, 1);
             side = packet;
             qcopy(&side.point[0], &packet.point[0]);

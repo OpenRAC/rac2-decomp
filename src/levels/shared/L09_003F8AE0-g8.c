@@ -1,18 +1,3 @@
-/* Retained complete C reconstruction, 30 October 2026. NOT MATCHING.
- * Profile: -O2 -G8 -ffunction-sections.
- * 1372/1372 bytes, 0/2 places on 1 November 2026; 53 words differ, mostly $a0/$a1 naming.
- * Complete parent/child target propagation, hit response and deletion logic. The measured
- * 48-byte animation parameter group is an actual packed structure assignment, not per-
- * instruction assembly. Both detach loops and real integer helper results remain. Reload
- * scheduling, copy grouping and control flow differ.
- * closer D: retail rereads the slot through a pointer giv in both detach loops, and the D_001A79F0
- * read is one MACRO_ADDR lui/lw. Left: child[0xA8] loads into v0, is compared against a1 (cse's 255,
- * the object's own byte) and is copied to a1 in the delay slot; here one pseudo holds it, so the
- * a0/a1 roles swap through the first half. The constant 1 for byte 0x31 is set in both qzero arms
- * in retail (delay of the b, then after the sq), before the loop here; unsplit edges does not move it.
- * Reopen: Independent packed-parameter lifetime/alias witness.
- * Local placement checks only; no strict linked or native-runtime claim.
- */
 #include "common.h"
 #define I(p,o) (*(int *)((p)+(o)))
 #define H(p,o) (*(u16 *)((p)+(o)))
@@ -41,20 +26,23 @@ extern void func_00282D30(void *,void *,float),func_002A6C58(void *,int,int),fun
  */
 void func_L09_003F8AE0(u8 *object)
 {
-    u8 *state = P(object,0x68), *child, *vars;
+    u8 *state = P(object,0x68), *vars, *moved, **effects;
     int before, result, i, remove = 0;
     if (object[0x95] == 0) func_L09_003F7CE0(object);
     if (object[0x31] && func_00282E48(object + 0x10, D_L09_001B9A00) < 24.0f) {
         func_002A93B0(object); object[0x6F] = 22;
     }
     if (object[0xA8] == 255) {
-        child = P(state,0x2F8);
+        u8 *child = P(state,0x2F8);
         if (child && S(child,0xAA) == 0xD0E && child[0x20] != 0xFE && child[0x20] != 0xFD) {
-            int index, v = child[0xA8];
-            if (v != 255) { index = v; if (D_L09_001C40C0[index].owner == child) {
-                object[0xA8] = index;
-                D_L09_001C40C0[object[0xA8]].owner = object;
-            } }
+            if (child[0xA8] != 255) {
+                int index = child[0xA8];
+                TargetSlot *slots = D_L09_001C40C0;
+                if (slots[index].owner == child) {
+                    object[0xA8] = index;
+                    slots[object[0xA8]].owner = object;
+                }
+            }
         }
     }
     before = object[0x20];
@@ -64,18 +52,18 @@ void func_L09_003F8AE0(u8 *object)
         S(state,0xC0) = -1;
     }
     if (result) {
+        u8 *child;
         func_L09_003F8858(object);
         child = P(state,0x2F8);
         if (child) {
-            vars = P(child,0x68);
             if (result == 4) {
                 H(object,0x34) &= 0xEFFF;
                 H(P(state,0x2F8),0x34) &= 0xEFFF;
                 H(P(state,0x2F8),0x7C) |= 0x300;
                 I(state,0x20) = 0;
-                vars = P(P(state,0x2F8),0x68);
-                *(AnimationParameters *)(vars + 0x20) = *(AnimationParameters *)(state + 0x20);
-                func_002B3380(P(state,0x2F8), vars + 0x50, vars + 0x20);
+                moved = P(P(state,0x2F8),0x68);
+                *(AnimationParameters *)(moved + 0x20) = *(AnimationParameters *)(state + 0x20);
+                func_002B3380(P(state,0x2F8), moved + 0x50, moved + 0x20);
                 func_L09_003F8598(object);
                 func_L09_003F7370(object,0.4f);
                 func_L09_003F77D0(object);
@@ -87,15 +75,19 @@ void func_L09_003F8AE0(u8 *object)
                     I(state,0xCC) = -1;
                     func_00282D30(state + 0xD0,state + 0xD0,0.05f);
                 } else qzero(state + 0xD0);
-                for (i = 0; i < 2; i++) {
-                    if (((u8 **)(state + 0x2F0))[i]) {
-                        H(((u8 **)(state + 0x2F0))[i],0x34) &= 0xFFFD;
-                        H(((u8 **)(state + 0x2F0))[i],0x34) &= 0xFFFE;
-                        ((u8 **)(state + 0x2F0))[i][0x31] = 1;
-                        ((u8 **)(state + 0x2F0))[i] = 0;
+                {
+                    int j;
+                    effects = (u8 **)(state + 0x2F0);
+                for (j = 0; j < 2; j++) {
+                    if (effects[j]) {
+                        H(effects[j],0x34) &= 0xFFFD;
+                        H(effects[j],0x34) &= 0xFFFE;
+                        effects[j][0x31] = 1;
+                        effects[j] = 0;
                     }
-                }
+                } }
             } else {
+                vars = P(child,0x68);
                 *(AnimationParameters *)(vars + 0x20) = *(AnimationParameters *)(state + 0x20);
                 func_002B3380(P(state,0x2F8),vars + 0x50,vars + 0x20);
                 func_002A7470(P(state,0x2F8),object[0x43],0,3);
@@ -104,14 +96,13 @@ void func_L09_003F8AE0(u8 *object)
                     state[0x30F] = 1;
                     if (object[0x95] != 9) func_002A7750(object,13,8);
                 }
-                child = P(state,0x2F8);
-                if (!(H(child,0x7C) & 0x10)) H(child,0x7C) |= 0x100;
-                child = P(state,0x2F8);
-                if (!(H(child,0x7C) & 0x20)) H(child,0x7C) |= 0x200;
+                { u8 *t = P(state,0x2F8); if (!(H(t,0x7C) & 0x10)) H(t,0x7C) |= 0x100; }
+                { u8 *t = P(state,0x2F8); if (!(H(t,0x7C) & 0x20)) H(t,0x7C) |= 0x200; }
+                effects = (u8 **)(state + 0x2F0);
                 for (i = 0; i < 2; i++) {
-                    if (((u8 **)(state + 0x2F0))[i] && !((H(P(state,0x2F8),0x7C) >> (i+4)) & 1)) {
-                        H(((u8 **)(state + 0x2F0))[i],0x34) &= 0xFFFD;
-                        ((u8 **)(state + 0x2F0))[i] = 0;
+                    if (effects[i] && !((H(P(state,0x2F8),0x7C) >> (i+4)) & 1)) {
+                        H(effects[i],0x34) &= 0xFFFD;
+                        effects[i] = 0;
                     }
                 }
             }
@@ -121,7 +112,7 @@ void func_L09_003F8AE0(u8 *object)
     func_L09_003F8960(object);
     if (state[0x2E] == 2) remove = 1;
     else {
-        child = P(state,0x2F8);
+        u8 *child = P(state,0x2F8);
         if (child && S(child,0xAA) == 0xD0E && child[0x20] != 0xFE && child[0x20] != 0xFD)
             remove = P(child,0x68)[0x2E] == 2;
     }
