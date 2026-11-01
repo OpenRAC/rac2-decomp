@@ -1,11 +1,10 @@
-/* Near miss: unit of its own, -O2 -G0 -ffunction-sections -g -frac2-hazard-labels. us 0/27, 2700/2708 bytes,
- * one arm's order left. PAL has no such function. Measured 2026-11-01:
+/* Near miss: unit of its own, -O2 -G0 -ffunction-sections -g -frac2-hazard-labels. us 0/27, 2708/2708 bytes,
+ * 6 raw lines: one insn out of place. PAL has no such function. Measured 2026-11-01:
  * func_002829D8 returns int; declaring it void was the whole of the old +0x88 $v0/$v1 swap, so no pin is needed.
- * The label before the row loop is 8-aligned, so its nop comes back with the size.
- * Left: the aim arm. Retail sets $s1 = &origin before the 0.75 load and has `b` with `a0 = s1` in the delay slot,
- * into the tail at the jal. Here jump2 merges one insn more, the a0 set, so s1 lands in the delay slot. At jump2
- * retail's tail starts at `a1 += 0xE0`, with a0 already set. Per-inner-arm tails are too long (2724). The old
- * `if (known)` block boundary gave exact bytes but stays refused.
+ * The label before the row loop is 8-aligned, so its nop came back with the size.
+ * `o = &origin` set before the aim arm's qcopy gives retail's size and the cross-jump, with no always-true test.
+ * Left: retail has `addiu s1, sp, 0x10` after the lq/sq and `lw a1`; here it stays above the qcopy. Set after
+ * the qcopy, the size falls to 2700. qcopy_nc changes nothing, a TImode copy moves other rows.
  */
 #include "common.h"
 
@@ -104,6 +103,7 @@ extern void func_00291450(int);
 /* Acquires a stable target, fires and drives the short muzzle light. */
 void func_L00_003A48D0(Moby *moby)
 {
+    Vector *o;
     TurretVars *vars = moby->vars;
     Vector direction, origin, aim, muzzle, offset, lift;
     float horizontal, vertical;
@@ -143,9 +143,10 @@ void func_L00_003A48D0(Moby *moby)
         else
             color = 0x600FFF0F;
         func_00273318(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
+        o = &origin;
         qcopy(&direction, &HERO->q[0x760 / 16]);
         func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
+        func_00282CC0(&origin, &HERO->q[0x80 / 16], o);
         point = &origin;
     } else {
         vars->aiming = 0;
