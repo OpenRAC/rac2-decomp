@@ -1,24 +1,3 @@
-/* Tier: sol-high. USA v1.01 game compiler, -O2 -G8 -ffunction-sections.
- * 1356/1356 bytes, 0 of 1 places match; four non-relocation instructions differ
- * at +0x118 through +0x124. The owner-presence flag is lowered to an early
- * register copy plus movz in the branch delay slot; retail branches first,
- * leaves a nop, then loads the collision type and copies the constant one.
- * All other non-relocation instruction words agree, including frame and saves.
- *
- * Improvements over the sol-low draft: typed collision/damage records, separate
- * scale/sign lifetimes, sign-- for zero, interleaved particle-call arguments,
- * and a named position in the burst branch. Both the collision-damage path and
- * completed burst must jump to func_0029F338, not return as the old draft did.
- * Moving the packet type assignment after its byte flags fixes call scheduling.
- *
- * Tried nested flags, boolean initialization, repeated pointer guards, outer
- * initialization, a separate collision-type temporary, decrement-on-mismatch,
- * and a named owner. Nested flags collapse to sltiu and disturb allocation;
- * the retained guards and the named-owner spelling tie at four instructions.
- * Next useful experiment: recover a source control-flow shape retaining the
- * owner flag without the extra movz. No volatile accesses or flag changes used.
- * Required declarations are below; compile in a separate -g8.c unit.
- */
 #include "common.h"
 extern void func_002AFFD8(void *,void *,int);
 extern void func_00282CC0(void *,void *,void *);
@@ -64,13 +43,7 @@ void func_L11_004590F0(char *p) {
         hit.type=*(u16 *)(p+0xAA);
         if(func_002761F8(next,p+0x10,0,p,0)) {
             other=D_L11_001C0D00.owner;
-            same=0;
-            if(other && *(char **)(q+0x50)) {
-                same=1;
-            }
-            if(other && *(char **)(q+0x50)) {
-                if(*(s16 *)(other+0xAA)!=*(s16 *)(*(char **)(q+0x50)+0xAA)) same=0;
-            }
+            same=other && *(char **)(q+0x50) && *(s16 *)(other+0xAA)==*(s16 *)(*(char **)(q+0x50)+0xAA);
             if(!same) {
                 if(!D_L11_001C0D00.owner) func_L11_00459640(D_L11_001C0D00.point,1,0);
                 else if(*(int *)(D_L11_001C0D00.owner+0x98)) func_L11_00459640(D_L11_001C0D00.point,1,1);

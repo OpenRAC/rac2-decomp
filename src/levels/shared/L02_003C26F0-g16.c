@@ -1,102 +1,3 @@
-/* GPT-6.1 Sol high worker v1629, 2026-10-29: retained improvement, unlinked.
- * Current pinned profile: -O2 -G16 -ffunction-sections -Wa,-G16.
- * Final check.py: 6516/6516 bytes, 0/8 USA v1.01 placements; first mismatch
- * +0x234 at every place. Opcode alignment is 1628/1629 (difflib, autojunk=False).
- * Eleven instructions differ after excluding relocation immediates:
- *  - L02 003C2924/2928: actor argument move and color's lui are interchanged.
- *  - 003C3194/3198/31A4/31AC: case 9 record base/sum use a1 instead of v0/v1.
- *  - 003C3F50/3F5C/3F60/3F64/3F88: case 10 final reset loop swaps v0/v1.
- * Improvements over v1620:
- *  - Case 1 snapshots mode after the proximity call, before its result is tested,
- *    and refreshes it after the guarded calls. This reproduces retail's gp load
- *    in the first beqz slot and its following absolute flag load, without nosda.
- *  - Case 0's two loops are ascending indexed loops. Loop reversal and strength
- *    reduction generate retail's pointer/countdown registers and initialization
- *    order, including all address setups before the random-angle loop.
- *  - A struct view with completion bytes at +0x464 reproduces the flag-index
- *    operand order and register choice. No level addresses are hard-coded.
- * Bounded negative trials: record pointer local, typed record indexing, and
- * pointer-sized integer arithmetic all leave case 9 unchanged. An actor local,
- * typed rotator fields, a saved-angle local and a vars-pointer local leave the
- * final reset loop unchanged. A color local before the guard leaves its setup
- * unchanged. Explicit vector pointers before the first loop move setup earlier
- * but change registers/accesses; ascending indexing is the measured remedy.
- * Reopen with new source-lifetime/allocation evidence for the three blocks above.
- * PAL and US2 checks report the name in neither catalogue. No linked check was
- * run because this body does not match. Required declarations follow below.
- * The earlier notes below are historical and their residual lists are superseded.
- */
-/* GPT-6.1 Sol low worker v1620, 2026-10-29: retained improvement, still unlinked.
- * Current pinned compiler, -O2 -G16 -ffunction-sections -Wa,-G16:
- * 6508/6516 bytes, 0/8 USA v1.01 placements; 1625/1629 opcode alignment
- * (difflib, autojunk=False), up from the retained draft's 1624/1629.
- * Case 4 now uses a widened unsigned timer and explicit previous = timer++;
- * storing timer before testing previous emits retail's lhu/daddu/addiu/sltiu/
- * bnez/sh sequence, replacing the old redundant andi with the required copy.
- * Direct previous+1 shortened that sequence; splitting stores across the branch
- * added an extra branch/store. Duplicating case 1's failure arm compiled unchanged.
- * A nosda declaration for D_001A7B1E reached 6516 bytes and 1626 opcode alignment,
- * but still filled the first delay slot with its lui rather than the target's
- * gp load and changed the flag-test register; equal size was not a match.
- * Retained here is the smaller, minimal counter improvement. Case 0's setup order,
- * case 1's delay-slot fill and scattered allocation differences remain; reopen
- * with independent evidence for their source lifetimes/control-flow shape.
- * Declarations are self-contained below. PAL and us2 check.py both report this
- * name is in neither catalogue; no linked build was run for this unmatched body.
- * Older measurements below describe historical drafts, not this pinned result.
- */
-/* Nonmatching (Opus big7 handoff, 2026-10-26): 6508/6516 bytes; opcodes 1621/1629 and
- * full instructions 1588/1629 aligned (difflib vs L02 retail; identical at L03 and L17).
- * Profile: -O2 -G16 -ffunction-sections -Wa,-G16 (unit L02_003C26F0-g16.c).
- * What moved it from 1160/1629 opcodes: retail case order 0,1,4,2,3,9,6,8,7,10,5; then-arm
- * first (`== 7` arms in cases 6/7/9, gate-loop arms in 7, decoration != 0 in 3); inner gate
- * switch order 0,2,3,1; folded TImode assignments (position.bits = *(Quad *)...) where
- * retail has lq 0x10(reg)/sq 0x20(sp), qcopy where it has register addresses; u8 object;
- * duplicated counter address per arm in case 8; common 0xFF store after the case-0 if/else;
- * D_L02_001BA500 as one struct (view at +0x50); D_001A63A8[] selectors; rereads of
- * state->rotators[i] instead of an actor local; one loop counter per loop (cases 6/8/10);
- * int returns for func_L00_002C42E0 and func_002B0CE0 (both set $v0).
- * Still different:
- *  - case 0 matrix block: retail PREs HIGH(D_L02_001C8280) into $fp and rematerialises
- *    gp+0xD30 (D_L02_001AFD20) at the use; this keeps D_L02_001AFD20 in $fp. Retail also
- *    builds row 2 from a fresh lui and stores row1.w through (&D_L02_001C8280)+0x39C, which
- *    only happens here with the rows on a separate D_L02_001C8600 Matrix name (an
- *    overlapping symbol: replace it before landing). Likely a global-alloc priority tie
- *    between the two PRE'd pseudos (both live across the else-arm calls).
- *  - case 1: retail fills the first beqz delay slot from the target (gp lw of
- *    D_L02_001A8F00); here reorg fills it from the fall-through (D_001A7B1E load), 4 bytes.
- *  - case 4: `andi v1,v0,0xFFFF` where retail copies the lhu value (u16 post-increment).
- *  - case 9/10/0: a few v0/v1/a0/a1 choices; case 0 loop-init order (s1/s2), lui a1 slot.
- * Opus big9 (2026-10-26), re-measured on the reload-inheritance base: unchanged at 6508/6516,
- * 1621/1629 opcodes, 1588 full. Findings for the next attempt:
- *  - case 0: gcse PRE hoists four expressions into both arms of the disabled test:
- *    HIGH(rows+0x10) ($s7 in both), &D_L02_001AFD20, HIGH(D_L02_001C8280) and
- *    HIGH(D_L02_0021F4F0). Global-alloc priorities of the middle two are 111 vs 108 (3 refs,
- *    live 268 vs 276), so &D_L02_001AFD20 wins $fp. Putting row 2 on
- *    D_L02_001C8280.transform.row[2] gives retail's $fp = HIGH(...C8280) and the rematerialised
- *    gp+0xD30, but CSE then derives row 2 and the w store from each other. Retail has three
- *    unrelated HIGH computations (rows 1/0/3, row 2, the w store); the same row-2 fresh lui
- *    appears in func_002CA070 (boot, 27 places) and near 0x0037AA14 in L02, so it is a common
- *    idiom (row 1 set, row 0 copied, rows 3 and 2 cleared). Plain CSE relates any two
- *    addresses of one symbol, so the idiom must hide row 2's address from cse1; not found.
- *  - case 1: both reads are the gas macro (`lbu $2,D_001A7B1E` / `lw $3,D_L02_001A8F00`; gas
- *    uses $gp only inside a delay slot). Retail filled the first beqz from the target, which
- *    reorg does only when mostly_true_jump > 0 (EQ test gives 0): a NOTE_INSN_LOOP_BEG just
- *    before the target label or a LOOP_VTOP just after it. do/while and while wrappers did not
- *    produce it.
- *  - 0x3C2AF0 (addu operand order) is unaffected by index spellings.
- 
- * Opus big16 (2026-10-26): the case 0 matrix block now matches retail exactly. The rows are
- * written on the real symbol (D_L02_001C8280.transform.row[...]; the overlapping
- * D_L02_001C8600 name is gone) and both clears use qzero_nc (common.h, rac1-decomp's
- * clobber-free qzero): its bare volatile asm flushes cse's table, so row 2's address and the
- * w store's base are rebuilt as in retail ($fp = HIGH(D_L02_001C8280), gp+0xD30
- * rematerialised, fresh lui for row 2). The case-0 notes above about this block are history.
- * Now 6508/6516 bytes, 1624/1629 opcodes, 1605 with registers. Left: the else arm's block
- * before the first func_002A7940 call (retail &position/&target/&rotation and the $fp lui
- * before randomAngle/i; here after), case 1's delay slot, case 4's andi, 0x3C2DD0 and the
- * small v0/v1 choices listed above.
- */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad bits; float f[4]; } Vector;
@@ -185,7 +86,7 @@ extern void func_0029F338(void *);
 extern void func_0029FC20(char *, int, char *);
 extern void func_0029FCC0(char *, int, char *);
 extern void func_002A0430(unsigned int);
-extern void func_002A0468(u64 *, u64, u64, u64, u64);
+extern void func_002A0468(u64 *, int, int, int, int);
 extern void func_002A7750(u8 *, int, int);
 extern float func_002A7940(void);
 extern int func_002A8508(int, int);
@@ -232,18 +133,13 @@ void func_L02_003C26F0(u8 *object)
     Vector position, target, rotation;
     Matrix transform;
     u32 status;
+    char *record;
 
     switch ((u8)object[0x20]) {
     case 0: {
         char *actor;
         char *records;
-        ChallengeGlobals *g;
-        Matrix *m;
-        char *record;
-        int *linked;
-        float *randomAngle;
         u16 *list;
-        u16 last;
         u16 id;
         int i;
         int status;
@@ -280,7 +176,7 @@ void func_L02_003C26F0(u8 *object)
             do {
                 actor = D_L02_001B359C + (*list & 0x7FFF) * 0x100;
                 if (*(short *)(actor + 0xAA) != 0x896)
-                    func_002A0468((u64 *)actor, 0x505010ULL, 14ULL, 14ULL, 14ULL);
+                    func_002A0468((u64 *)actor, 0x505010, 14, 14, 14);
                 if (*(short *)(actor + 0xAA) == 0xA24 && state->gateCount < 20) {
                     state->gates[state->gateCount] = actor;
                     *(float *)(*(char **)(actor + 0x68) + 0x10) = (float)state->delayFrames * 0.016666668f;
@@ -420,7 +316,6 @@ void func_L02_003C26F0(u8 *object)
     case 3: {
         u8 *decoration;
         s16 *selectors;
-        char *record;
         int status;
         func_002B0CE0(1, 0, 1);
         D_00189E20.controlMode = 3;
@@ -463,12 +358,11 @@ void func_L02_003C26F0(u8 *object)
     case 9: {
         char *actor;
         char *actors;
-        char *part;
         u16 *list;
-        u16 last;
         func_002B0CE0(1, 0, 1);
         func_L00_002C42E0(0x6F, 1);
-        if (func_00282E48(&D_L02_001BA500.from, D_L02_001B368C + state->record * 0x80 + 0x30) <= 1.0f) {
+        record = D_L02_001B368C + state->record * 0x80;
+        if (func_00282E48(&D_L02_001BA500.from, record + 0x30) <= 1.0f) {
             if (D_L02_001A8F00 == 7) {
                 *(u16 *)(object + 0x34) &= 0xFF7F;
                 if (func_002A8508((u8)object[0x21], -1) >= 2) {
@@ -499,7 +393,6 @@ void func_L02_003C26F0(u8 *object)
 
     }
     case 6: {
-        char *part;
         char *other;
         char *data;
         char *actor;
@@ -607,8 +500,6 @@ void func_L02_003C26F0(u8 *object)
     }
     case 8: {
         u16 id;
-        u8 *counter;
-        int idx;
         int i, j, k;
         if (D_L02_001A8F00 == 7) {
             func_L00_002E6CF0(func_L02_003C43F0, object);
@@ -760,13 +651,15 @@ void func_L02_003C26F0(u8 *object)
     }
     case 10: {
         char *actor;
+        char *vars;
         int i1, i2;
         int completed;
         float angle;
         func_L00_002E6CF0(func_L02_003C43F0, object);
         completed = 0;
         for (i1 = 0; i1 < state->rotatorCount; i1++) {
-            angle = func_00283C80(*(float *)(*(char **)(state->rotators[i1] + 0x68) + 0x10), *(float *)(state->rotators[i1] + 0xF8));
+            vars = *(char **)(state->rotators[i1] + 0x68);
+            angle = func_00283C80(*(float *)(vars + 0x10), *(float *)(state->rotators[i1] + 0xF8));
             if (func_00282C48(angle) >= 0.08f) {
                 *(float *)(state->rotators[i1] + 0xF8) = func_00283B98(*(float *)(state->rotators[i1] + 0xF8), 0.05235988274f);
                 func_002833F0(state->rotators[i1] + 0xC0, state->rotators[i1] + 0xF0);
@@ -776,18 +669,16 @@ void func_L02_003C26F0(u8 *object)
         }
         if (completed == state->rotatorCount) {
             for (i2 = 0; i2 < state->rotatorCount; i2++) {
-                *(float *)(state->rotators[i2] + 0xF8) = *(float *)(*(char **)(state->rotators[i2] + 0x68) + 0x10);
+                vars = *(char **)(state->rotators[i2] + 0x68);
+                *(float *)(state->rotators[i2] + 0xF8) = *(float *)(vars + 0x10);
                 func_002833F0(state->rotators[i2] + 0xC0, state->rotators[i2] + 0xF0);
             }
             func_002A7750((u8 *)object, 6, -1);
         }
         break;
     }
-    case 5: {
-
+    case 5:
         break;
-
-    }
     }
 
     status = (u8)object[0x20];

@@ -2843,3 +2843,8 @@ src/levels/shared/L00_00429568-g.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-
 src/levels/shared/L06_0035EA68-links.c	-O2 -G0 -ffunction-sections -ffast-math
 src/levels/shared/L00_003C6298-gate-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
 src/pal/levels/14_aranos_prison/L14_003E0C90-gate-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/levels/shared/L02_003C26F0-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
+src/levels/11_joba/L11_004590F0-g8.c	-O2 -G8 -ffunction-sections
+src/levels/06_notak/L06_003FB050.c	-O2 -G0 -ffunction-sections
+src/levels/shared/L00_003EEE90-g8.c	-O2 -G8 -ffunction-sections
+src/levels/shared/L03_003C3220-g8.c	-O2 -G8 -ffunction-sections
