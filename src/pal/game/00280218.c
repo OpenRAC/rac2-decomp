@@ -52,4 +52,9 @@ void func_PAL_002803E8(int x, int y, u64 color, u8 *text, int length, float scal
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002804A8);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00280A30);
+extern void func_PAL_002804A8(float);
+
+void func_PAL_00280A30(void) {
+    func_PAL_002804A8(1.0f);
+}
+

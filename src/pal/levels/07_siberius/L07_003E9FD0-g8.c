@@ -67,3 +67,55 @@ void func_PAL_L07_003E9FD0(u8 *obj) {
         func_0029F338(obj);
     }
 }
+
+extern int func_002AD0E0(void *, void *, void *, void *, void *, void *);
+extern void func_002A7A00(void *, float, float);
+extern int func_002A7820(int, int);
+extern void func_00283098(void *, void *, void *);
+extern float func_002A7878(float, float);
+extern int func_002A77E0(int);
+extern void *func_002C3150(void *, void *, int, float, unsigned char, unsigned char, int);
+extern float D_L07_001B0AD8 __attribute__((sda));
+extern float D_L07_001B0AB0 __attribute__((sda));
+extern float D_L07_001B0AB4[] __attribute__((sda));
+extern int D_L07_001B0AD0[] __attribute__((sda));
+extern float D_L07_001B0AC0[] __attribute__((sda));
+extern int D_L07_001B0AC8 __attribute__((sda));
+
+/* Emit two particles at opposite local offsets, including platform motion. */
+void func_PAL_L07_003EA1F8(char *arg)
+{
+    float carryDelta[4] __attribute__((aligned(16)));
+    float angles[4] __attribute__((aligned(16)));
+    float velocity[4] __attribute__((aligned(16)));
+    float position[4] __attribute__((aligned(16)));
+    char *state = *(char **)(arg + 0x68);
+    int side;
+
+    qzero_nc(angles);
+    if (*(void **)(state + 0x260)) {
+        func_002AD0E0(arg, *(void **)(state + 0x260), arg + 0x10, angles, carryDelta, angles);
+        func_00282CF0(carryDelta, carryDelta, arg + 0x10);
+    } else {
+        qzero_nc(carryDelta);
+    }
+    for (side = 0; side < 2; side++) {
+        int randomValue, randomByte;
+        float scale;
+
+        qzero_nc(position);
+        position[2] = D_L07_001B0AD8;
+        if (!side)
+            position[2] = -position[2];
+        func_002A7A00(velocity, D_L07_001B0AB0 * (0.020000001f),
+                      D_L07_001B0AB4[0] * (0.020000001f));
+        func_00282CC0(velocity, velocity, carryDelta);
+        randomValue = ((s32)(func_002A7820(D_L07_001B0AD0[0], D_L07_001B0AD0[1])) * 5 + 2) / 6;
+        func_00283098(position, position, arg + 0xC0);
+        randomValue = (unsigned char)randomValue;
+        func_00282CC0(position, position, arg + 0x10);
+        scale = func_002A7878(D_L07_001B0AC0[0], D_L07_001B0AC0[1]);
+        randomByte = func_002A77E0(255);
+        func_002C3150(position, velocity, D_L07_001B0AC8, scale, randomValue, (unsigned char)randomByte, 0);
+    }
+}

@@ -2,4 +2,3 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00421578);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00421E28);

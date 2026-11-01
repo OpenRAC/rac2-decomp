@@ -113,4 +113,3 @@ void func_PAL_L00_0039B490(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0039B4C8);

@@ -62,4 +62,3 @@ void func_PAL_L18_0043F330(u8 *obj) {
 INCLUDE_ASM("asm/pal/levels", func_PAL_L18_00441640);
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_00441F00);

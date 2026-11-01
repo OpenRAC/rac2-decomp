@@ -29,5 +29,4 @@ extern int func_002E5CF8(int, int, char *);
 extern s32 func_PAL_00311D98(s32 arg0, f32 fparg0);
 extern void func_0030F408(char *);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00310BE8);
 

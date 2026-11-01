@@ -31,4 +31,3 @@ void func_PAL_L02_00405BE0(char *a0) {
     ref_L02_004012A0_05(a0, a0 + 0x10, v, 0.0f);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_00405D00);

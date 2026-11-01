@@ -56,4 +56,3 @@ void func_PAL_L20_0039D9C8(unsigned char *object)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0039EA48);

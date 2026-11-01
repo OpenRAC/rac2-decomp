@@ -70,7 +70,6 @@ void func_PAL_L06_0045CBF0(unsigned char *a0)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_0045CD20);
 
 void func_PAL_L06_0045CEC0(unsigned char *a0)
 {

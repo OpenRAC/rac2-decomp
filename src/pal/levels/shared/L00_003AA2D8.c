@@ -48,5 +48,4 @@ void func_PAL_L00_003AAFC8(char *moby)
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003AB208);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003AB368);
 

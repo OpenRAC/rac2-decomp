@@ -95,6 +95,5 @@ void func_PAL_002C0218(char *o)
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002C0428);
 
 
