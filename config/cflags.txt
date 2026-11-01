@@ -1843,6 +1843,9 @@ src/us2/levels/shared/L13_002C58E8-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-q
 src/us2/levels/shared/L13_002C58E8-sw3.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
 src/us2/levels/shared/L22_002C9B20-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/us2/levels/shared/L22_002D0F48-sw.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/us2/game/0030FAC0-sw2.c	-O2 -G8 -ffunction-sections -g
+src/us2/game/00315DD0-sw.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels
+src/us2/game/00348BF8-wrap.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/game/002DD400-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/game/002D2018-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/game/002D1D20-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections

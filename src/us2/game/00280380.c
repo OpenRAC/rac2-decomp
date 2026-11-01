@@ -34,4 +34,9 @@ INCLUDE_ASM("asm/us2/game", func_US2_002804C0);
 
 INCLUDE_ASM("asm/us2/game", func_US2_00280550);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00280B20);
+extern void func_US2_00280550(float);
+
+void func_US2_00280B20(void) {
+    func_US2_00280550(1.0f);
+}
+
