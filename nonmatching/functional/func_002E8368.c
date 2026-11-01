@@ -156,8 +156,8 @@ int func_002E8368(void)
         func_00294070(0);
         goto after;
     } else {
-        if (D_001A7284 == 0)
-            return 0;
+        /* The last phase has ended: both paths of retail's test return 1 (the first through its
+           branch's delay slot), the flag cleared. */
         D_001A7284 = 0;
         return 1;
     }
