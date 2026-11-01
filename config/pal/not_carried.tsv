@@ -108,3 +108,4 @@ func_0033FB98	boot: instruction at +0x1D4 differs
 func_003458F8	boot: instruction at +0x34 differs
 func_00345B78	boot: instruction at +0x20 differs
 func_0034E070	boot: instruction differs
+func_L13_0040DFC0	30_insomniac_museum: D_L13_001B1300 needs two values
