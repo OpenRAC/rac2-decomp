@@ -2961,7 +2961,6 @@ src/pal/levels/shared/L22_003A7FF0-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-
 src/pal/levels/03_endako/L03_0041EED8-arc-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/pal/levels/11_joba/L11_003F7778-sw.c	-O2 -G8 -ffunction-sections -g -frac2-gcse-unsplit-edges
 src/levels/14_aranos_prison/L14_00425CB0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
-src/levels/shared/L03_003E4680-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/20_yeedil/L20_0043ECB0-shard-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/shared/L09_003806A0-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L08_003CC4B8-g8.c	-O2 -G8 -ffunction-sections

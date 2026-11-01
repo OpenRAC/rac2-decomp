@@ -688,3 +688,4 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 | [`func_L00_003C8A90`](levels/func_L00_003C8A90.c) | 2628 | 2624/2628 bytes, frame equal, about 70 rows off, mostly register names. See the file header. |
 | [`func_L06_00455BC0`](levels/func_L06_00455BC0.c) | 1540 | 1 November 2026: family F7 (five members, identical opcodes). 1540/1540, 34 raw rows: cases 3 and 4 equal retail, only the `missing` allocation is left; it needs a 4th reference. |
 | [`func_L15_00430168`](levels/func_L15_00430168.c) | 1064 | 1 November 2026: 1072/1064 bytes, float registers rotated. |
+| [`func_L03_003E4680`](levels/func_L03_003E4680.c) | 2540 | Exact (compiled at -O2 -G8 -frac2-qcopy) but held: reserved in #152 until #385 merges. |
