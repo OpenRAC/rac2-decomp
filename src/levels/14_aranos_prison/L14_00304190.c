@@ -135,7 +135,7 @@ INCLUDE_ASM("asm/levels", func_L14_0035F510);
 
 /* func_L14_00390DF8 is defined in L14_00390DF8-helpers.c. */
 
-INCLUDE_ASM("asm/levels", func_L14_00390EC0);
+/* func_L14_00390EC0 is defined in L14_00304190-zp.c (it clears a stack vector with por, which needs -frac2-zero-ti-por). */
 
 void func_L14_00390FE8(char *arg0) {
     char *s0 = *(char **)(arg0 + 0x68);

@@ -1,4 +1,4 @@
-#include "include_asm.h"
+#include "common.h"
 
 extern int D_L14_001B17D8 __attribute__((sda));
 extern int D_L14_001B17DC;
@@ -63,12 +63,121 @@ void func_L14_00426E60(char *a0)
     }
 }
 
+/* The light object: state byte, an update flag, the visibility flags, its state block,
+   a frame counter and a word cleared when it shuts down. */
+typedef struct PrisonLight {
+    u8 pad00[0x20];
+    u8 state;            /* 0x20 */
+    u8 pad21[0x10];
+    u8 update;           /* 0x31 */
+    u8 pad32[2];
+    u16 flags;           /* 0x34 */
+    u8 pad36[0x32];
+    struct PrisonLightState *vars; /* 0x68 */
+    u8 pad6C[0x2A];
+    u16 frames;          /* 0x96 */
+    u32 pending;         /* 0x98 */
+} PrisonLight;
+
+/* Its state block: the beam level, the done flag and the sound slot. */
+typedef struct PrisonLightState {
+    float level;         /* 0x0 */
+    int done;            /* 0x4 */
+    int sound;           /* 0x8 */
+} PrisonLightState;
+
+/* A sound slot as seen from D_00188660 plus 0x70 per slot number. */
+typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; void *owner; } PrisonSoundAnchor;
+extern char D_00188660[];
+extern unsigned char D_0018C0D4 NOT_SDA;
+extern char D_L14_001B17E0[], D_L14_001B1800[];
+extern int D_L14_001B20C8;
+extern int D_L14_001B17C0 SDATA(D_L14_001B17C0);
+extern float D_L14_001B17C4 SDATA(D_L14_001B17C4);
+extern float D_L14_001B17C8 SDATA(D_L14_001B17C8);
+extern float D_L14_001B17D0 SDATA(D_L14_001B17D0);
+extern float D_L14_001B17D4 MACRO_ADDR;
+
+extern void func_002A7750(void *self, int state, int mode);
+extern void *func_002A9640(void *a0, int a1, int a2);
+extern int func_002B38B8(void *);
+extern int func_002E5CF8(int a, int b, void *self);
+extern void func_002E59F8(int);
+extern float func_00283CE0(int);
+extern float func_00283198(float);
+extern float func_002AA2E8(float *, float, float);
+extern void func_0029F338(void *a0);
+extern void func_L00_0030DD70(int, int);
+extern void func_L00_002E6CF0(void *, void *);
+extern void func_L14_004272D8(void *);
+
+/* A prison searchlight: waits for the alarm, sweeps while it lasts, then fades out. */
+void func_L14_00426F28(PrisonLight *object)
+{
+    PrisonLightState *state = object->vars;
+    float angle, denominator;
+    int period, ticks;
+    unsigned int counter, previous;
+    unsigned short flags;
+
+    switch (object->state) {
+    case 0:
+        func_002A7750(object, 1, -1);
+        state->sound = -1;
+        break;
+    case 1:
+        if (D_0018C0D4 != 1)
+            break;
+        if (object->update)
+            func_L14_004272D8(object);
+        if (func_002A9640(object, 0x10000, 0) || func_002B38B8(object)) {
+            func_L00_0030DD70((int)D_L14_001B17E0, 240);
+            func_002A7750(object, 2, -1);
+        }
+        if (((PrisonSoundAnchor *)(D_00188660 + state->sound * 112))->owner != object || !((PrisonSoundAnchor *)(D_00188660 + state->sound * 112))->active)
+            state->sound = func_002E5CF8(0, 4, object);
+        break;
+    case 2:
+        ticks = D_L14_001B20C8;
+        period = D_L14_001B17C0;
+        angle = func_00283CE0(ticks % period);
+        denominator = func_00283CE0(period);
+        angle *= 6.2831855f;
+        angle /= denominator;
+        angle = func_00283198(angle - 3.1415927f);
+        func_002AA2E8(&state->level, D_L14_001B17C4 * angle + D_L14_001B17C8, D_L14_001B17D0 * 0.016666668f);
+        func_L00_002E6CF0((void *)func_L14_00427250, object);
+        counter = object->frames;
+        previous = counter++;
+        object->frames = counter;
+        if (previous >= 181)
+            state->done = 1;
+        if (state->sound != -1 && ((PrisonSoundAnchor *)(D_00188660 + state->sound * 112))->owner == object && ((PrisonSoundAnchor *)(D_00188660 + state->sound * 112))->active)
+            func_002E59F8(state->sound);
+        state->sound = -1;
+        if (!D_0018C0D4) {
+            func_L00_0030DD70((int)D_L14_001B1800, 240);
+            flags = object->flags;
+            object->pending = 0;
+            flags |= 0x41;
+            flags &= 0xefff;
+            object->flags = flags;
+            func_002A7750(object, 3, -1);
+        }
+        break;
+    case 3:
+        func_L00_002E6CF0((void *)func_L14_00427250, object);
+        func_002AA2E8(&state->level, 0.0f, D_L14_001B17D4 * 0.016666668f);
+        if (state->level == 0.0f)
+            func_0029F338(object);
+        break;
+    }
+}
+
 extern float D_L14_001B16B0 __attribute__((sda));
-extern int func_002A9640(char *a0, int a1, int a2);
 extern void func_002B0ED8(char *a0, char *a1, int a2);
 extern void func_002AC728(char *a0, char *a1, float f12, float f13, int a2);
 extern void func_002A6C58(char *a0, int a1, int a2);
-extern void func_0029F338(char *a0);
 
 /* Resets the moby's scale when its model says so, then lets it fall or die. */
 void func_L14_00423240(char *a0)
@@ -131,9 +240,7 @@ extern int D_L14_001B259C __attribute__((sda));
 
 extern int func_L00_00324120(char *self);
 extern void func_L00_003294F0(int table, int mode);
-extern void func_002A7750(char *self, int state, int mode);
 extern int func_002B3868(char *self);
-extern void func_002E5CF8(int a, int b, char *self);
 extern float func_00283B98(float a, float b);
 extern float func_00283198(float a);
 extern int func_00283D38(int a, int b, float c);
@@ -238,9 +345,7 @@ typedef struct {
 
 extern void func_L14_00428BA0(L14Obj *);
 extern L14ColorPair D_L14_001B18C0[];
-extern int D_L14_001B20C8;
 extern void func_0029FC20(void *moby, int joint, void *out);
-extern void func_L00_002E6CF0(void *, void *);
 
 /* Advances the owner's pulse (the angle, then the blend it gives), tints the owner with the
    first colour pair and, when its stamp is not the current one, refreshes every live class-0x112B

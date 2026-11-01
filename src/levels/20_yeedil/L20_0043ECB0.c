@@ -176,7 +176,7 @@ done:
 
 /* func_L20_00442CD8 is defined in L20_00442CD8-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_00442E68);
+/* func_L20_00442E68 is defined in L20_00442E68-g8.c (it reaches data through $gp). */
 
 extern int func_002ABB78(char *);
 
@@ -292,13 +292,38 @@ void func_L20_00443908(char *arg0) {
 
 /* func_L20_00443B60 is defined in L20_00443B60-helpers.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_00443CF0);
-/* func_L20_00443CF0 is one word pair away: its near miss is in
-   nonmatching/levels/func_L20_00443CF0.c. */
+extern void func_L20_00443B60(char *, char *, char *, float *);
+extern u8 *func_L20_00440198(int, const float *, const float *, float);
 
-INCLUDE_ASM("asm/levels", func_L20_00443D58);
+u8 *func_L20_00443CF0(char *arg0) {
+    char *state = *(char **)(arg0 + 0x68);
+    TI128 v0;
+    TI128 v1;
+    float f;
 
-INCLUDE_ASM("asm/levels", func_L20_00443DF0);
+    f = 1.0471977f;
+    func_L20_00443B60(arg0, (char *)&v0, (char *)&v1, &f);
+    return func_L20_00440198(*(int *)(state + 0x21C), (float *)&v0, (float *)&v1, f);
+}
+
+extern char *func_L20_00449FD0(char *, char *, char *, float, int, float);
+
+char *func_L20_00443D58(char *arg0) {
+    char *state = *(char **)(arg0 + 0x68);
+    TI128 a;
+    TI128 b;
+    float f;
+    float g;
+    int r;
+
+    f = 1.0471977f;
+    func_L20_00443B60(arg0, (char *)&a, (char *)&b, &f);
+    g = f;
+    r = func_002A7820(0x12C, 0x258);
+    return func_L20_00449FD0(arg0, (char *)&a, (char *)&b, g, r, (float)*(unsigned char *)(state + 0x36));
+}
+
+/* func_L20_00443DF0 is defined in L20_00443DF0.c (it needs -frac2-hazard-labels). */
 
 /* func_L20_00444018 is defined in L20_00444088-g8.c (it needs this unit's -fno-schedule-insns). */
 
@@ -343,9 +368,7 @@ void func_L20_00444C68(int arg0) {
 
 /* func_L20_00444CA8 is defined in L20_00444CA8.c. */
 
-INCLUDE_ASM("asm/levels", func_L20_004450D8);
-/* func_L20_004450D8 reads a global through $gp: its near miss is in
-   nonmatching/levels/func_L20_004450D8.c and belongs in the -G8 sibling. */
+/* func_L20_004450D8 is defined in L20_004450D8-g8.c (it reads a global through $gp). */
 
 /* func_L20_004451C0 is defined in L20_004451C0-g16.c (it reaches two 16-byte vectors through $gp). */
 
@@ -361,6 +384,7 @@ extern void func_002AA548(char *, char *, float, float, float, float);
 extern int func_002E5CF8(int, int, char *);
 
 extern unsigned char D_0019B2E8[];
+extern int D_001A79F0 MACRO_ADDR;
 
 /* The five behaviours the object's state byte selects; the table in the level's data
    holds the address of each. */
@@ -380,7 +404,7 @@ c0:
     func_002A7750(arg0, 1, -1);
     goto out;
 c1:
-    if ((D_0019B2E8[((unsigned char *)arg0)[0xB0] + *(int *)0x001A79F0 * 16] & 0x80) == 0) {
+    if ((D_0019B2E8[((unsigned char *)arg0)[0xB0] + D_001A79F0 * 16] & 0x80) == 0) {
         goto end;
     }
     func_002A7750(arg0, 2, -1);

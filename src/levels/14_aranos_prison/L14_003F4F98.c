@@ -441,7 +441,7 @@ void func_L14_00423DC0(char *a0, int a1)
     *(float *)(s0 + 0x664) = f;
 }
 
-INCLUDE_ASM("asm/levels", func_L14_00423E50);
+/* func_L14_00423E50 is defined in L14_00423E50-gu.c (it needs -frac2-gcse-unsplit-edges). */
 
 
 typedef struct {
@@ -708,7 +708,7 @@ void func_L14_00426DE8(char *a0)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L14_00426F28);
+/* func_L14_00426F28 is defined in L14_003F4F98-g8.c (it reaches data through $gp). */
 
 
 /* func_L14_00427250 lives in the -g8 sibling file (it reaches a global through $gp). */
@@ -756,7 +756,7 @@ void func_L14_004286F8(unsigned char *a0)
 
 /* func_L14_00428E68 is defined in L14_00428E68-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L14_004295D0);
+/* func_L14_004295D0 is defined in L14_004295D0-g8.c (it reaches data through $gp). */
 
 void func_L14_004298F0(unsigned char *self) {
     unsigned char *state = *(unsigned char **)(self + 0x68);
