@@ -57,7 +57,8 @@ typedef struct D_2D9EA0 {
     int f7C;
 } D_2D9EA0;
 extern char D_00189E20[], D_00189EA0[];
-extern Vec D_L00_0023A670[], D_L00_0023A6F0[];
+/* One table: the second eight entries are at 0x80, which no name of a level has. */
+extern Vec D_L00_0023A670[];
 extern float D_001AF180_gp[] SDATA(D_001AF180);
 extern char D_L00_001B8DC0[];
 extern Moby *D_L00_001B1AEC;
@@ -150,26 +151,26 @@ void func_003136D0(Moby *m) {
             m->update_dist = 0xFF;
             d->pending = 0;
             func_00282F20(&D_L00_0023A670[0], &m->rot_row0, D_001AF130);
-            qcopy_nc(&D_L00_0023A6F0[0], &m->rot_row2);
+            qcopy_nc(&D_L00_0023A670[8], &m->rot_row2);
             func_00282F20(&D_L00_0023A670[1], &m->rot_row1, D_001AF130);
-            qcopy_nc(&D_L00_0023A6F0[1], &m->rot_row0);
+            qcopy_nc(&D_L00_0023A670[9], &m->rot_row0);
             func_00282F20(&D_L00_0023A670[2], &m->rot_row2, D_001AF130);
-            qcopy_nc(&D_L00_0023A6F0[2], &m->rot_row1);
+            qcopy_nc(&D_L00_0023A670[10], &m->rot_row1);
             func_00282CC0(&D_L00_0023A670[3], &m->rot_row0, &m->rot_row2);
             func_00282F20(&D_L00_0023A670[3], &D_L00_0023A670[3], D_001AF130);
-            func_00282DD8(&D_L00_0023A6F0[3], &D_L00_0023A670[3], &m->rot_row1);
+            func_00282DD8(&D_L00_0023A670[11], &D_L00_0023A670[3], &m->rot_row1);
             func_00282CC0(&D_L00_0023A670[4], &m->rot_row0, &m->rot_row1);
             func_00282F20(&D_L00_0023A670[4], &D_L00_0023A670[4], D_001AF130);
-            func_00282DD8(&D_L00_0023A6F0[4], &D_L00_0023A670[4], &m->rot_row2);
+            func_00282DD8(&D_L00_0023A670[12], &D_L00_0023A670[4], &m->rot_row2);
             func_00282CF0(&D_L00_0023A670[5], &m->rot_row1, &m->rot_row2);
             func_00282F20(&D_L00_0023A670[5], &D_L00_0023A670[5], D_001AF130);
-            func_00282DD8(&D_L00_0023A6F0[5], &D_L00_0023A670[5], &m->rot_row0);
+            func_00282DD8(&D_L00_0023A670[13], &D_L00_0023A670[5], &m->rot_row0);
             func_00282CF0(&D_L00_0023A670[6], &m->rot_row0, &m->rot_row2);
             func_00282F20(&D_L00_0023A670[6], &D_L00_0023A670[6], D_001AF130);
-            func_00282DD8(&D_L00_0023A6F0[6], &D_L00_0023A670[6], &m->rot_row1);
+            func_00282DD8(&D_L00_0023A670[14], &D_L00_0023A670[6], &m->rot_row1);
             func_00282CF0(&D_L00_0023A670[7], &m->rot_row0, &m->rot_row1);
             func_00282F20(&D_L00_0023A670[7], &D_L00_0023A670[7], D_001AF130);
-            func_00282DD8(&D_L00_0023A6F0[7], &D_L00_0023A670[7], &m->rot_row2);
+            func_00282DD8(&D_L00_0023A670[15], &D_L00_0023A670[7], &m->rot_row2);
         }
         {
             float a = 0.0f;
