@@ -227,6 +227,19 @@ matched function changes: `build.py all --strict` is OK with and without the pat
 Control: [test_block_move_loop.py](../tests/test_block_move_loop.py), where a
 four-word store loop keeps its three NOPs.
 
+[block_move_quad.py](../tools/compiler/transformers/block_move_quad.py) gives those loops
+retail's quadword form. `expand_block_move` capped the alignment at the 8-byte word, so a
+structure of 16-byte alignment copied by `ld`/`sd`: four scratch registers per 32-byte round
+and four more for the leftover. Retail has `lq ; lq ; sq ; sq ; addiu ; bne ; addiu` with
+`lq ; sq` for the leftover, the shape of `block_move_loop` (`src + bytes`, unaligned label,
+`bne` on the source pointer) and not of a C loop. The alignment now reaches
+`output_block_move`, which has a quadword case. Copies of 0x40 bytes or less still go through
+`move_by_pieces` at word alignment. Witnesses: `func_L12_00418418` (one place) and
+`func_L03_003E4148` (eight) become exact, `func_L12_0041BF88`'s six copies each lose their six
+extra words. All 5,849 compilable units give the same assembly with and without the patch, so
+nothing already matched moves. Control: [test_block_move_quad.py](../tests/test_block_move_quad.py),
+where an 8-byte-aligned page keeps `ld`/`sd` and a 0x40-byte copy keeps its pieces.
+
 The padding counts words, as the retail assembler does, for the two 16-byte copies too:
 [count_asm_words.py](../tools/compiler/transformers/count_asm_words.py) counts an asm
 statement by its instruction count (`qcopy` is `lq` plus `sq`) and the grouped
@@ -1166,6 +1179,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
 | Block-move loop padding | [test_block_move_loop.py](../tests/test_block_move_loop.py) |
+| Quadword block moves | [test_block_move_quad.py](../tests/test_block_move_quad.py) |
 | Asm-word loop padding | [test_count_asm_words.py](../tests/test_count_asm_words.py) |
 
 Copy controls cover volatile/unaligned/scalar/quadword memory, calls, integer/FP
