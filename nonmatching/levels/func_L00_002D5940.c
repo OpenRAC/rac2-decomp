@@ -1,3 +1,8 @@
+/* Closer C4, 1 November 2026: 1248/1260 under -O2 -G8 -ffunction-sections with plain data NOT_SDA, 80 rows, most of them a rotation
+ * (retail s3 = src, s4 = the D_00189E20 high then D_0018B334, s5 = hero). The tuning floats are an if/else: with `f = a; if (...) f = b`
+ * cse skips the then-block and keeps 0.02f in f20, where retail rebuilds it in f2. Left: D_L00_001A7FE4 as `lui at` / lwc1, FE0 through
+ * $gp in a delay slot; the 0.00029 constant stays in f0 (mul.s f12,f1,f0); the rotation.
+ */
 /* GPT-6.1 Sol high worker, USA v1.01, 29 October 2026.
  * Default game profile: -O2 -G0 -ffunction-sections.
  * check.py: 1244/1260 bytes, 0/27 places. No linked build run.
@@ -50,9 +55,9 @@ typedef struct {
 extern Hero5940 D_00189E20;
 
 extern char D_L00_001B8FF0[], D_L00_001B8DC0_data[], D_L00_001BF220[];
-extern unsigned char D_001A7A44;
-extern int D_L00_001B19C8;
-extern float D_L00_001A7FE0 __attribute__((sda)), D_L00_001A7FE4;
+extern unsigned char D_001A7A44 NOT_SDA;
+extern int D_L00_001B19C8 NOT_SDA;
+extern float D_L00_001A7FE0 __attribute__((sda)); extern float D_L00_001A7FE4 NOT_SDA;
 extern float D_L00_001A7CE0 __attribute__((sda)), D_L00_001A7CE4 __attribute__((sda));
 extern Quad1269 D_L00_001B8DD0;
 extern int func_L00_002ADED8(int);
@@ -61,8 +66,8 @@ extern char *func_L00_002F3DA8(int);
 extern void func_00283658(void*,void*);
 extern int func_L00_002D6418(void);
 extern void func_002AA2E8(float*,float,float);
-extern float D_0018B334;
-extern float D_0018B328;
+extern float D_0018B334 NOT_SDA;
+extern float D_0018B328 NOT_SDA;
 extern float func_00283B98(float,float), func_00283198(float);
 extern void func_002830C0(void*,void*,void*), func_00282CC0(void*,void*,void*);
 extern void func_00283410(void*,void*), func_00283738(void*,void*,void*);
@@ -99,8 +104,7 @@ void func_L00_002D5940(void) {
  qcopy_nc(offset,src);
  offset[0]+=D_00189E20.offset;
  if (D_001A7A44 && !func_L00_002D6418()) offset[1]=-offset[1];
- f=D_L00_001A7FE0;
- if (D_00189E20.speed>0.02f) f=D_L00_001A7FE4;
+ if (D_00189E20.speed<=0.02f) f=D_L00_001A7FE0; else f=D_L00_001A7FE4;
  func_002AA2E8(&D_0018B334,f*0.0002908882452175021f,0.006981317885220051f);
  hero = (Hero5940 *)((char *)&D_0018B334 - 0x1514);
  hero->angle=func_00283B98(hero->angle,hero->angleVelocity);

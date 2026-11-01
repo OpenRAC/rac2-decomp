@@ -660,6 +660,16 @@ Combining both switches affects sched1/sched2 differently and needs its own proo
 
 ### Useful C shapes
 
+- A flag set to 1 only by a test in a block of its own is `flag = 0; ... if (test) flag = 1;`. jump.c makes a
+  conditional move from it and puts the 1 in a fresh pseudo set once, which loop.c hoists and cse reuses, so retail
+  shows `daddu a2,s7` / `movn a2,zero,v0` (`func_L00_00323958`, near miss) or `addiu s5,1` / `daddu s1,s5` (`func_003248A8`, near miss).
+  `flag = 1; if (other) flag = 0;` has the constant in the same block and combine folds it to `sltiu`.
+- A loop index read after the loop keeps its loop.c rewrite honest: `for (j = 0; j < 8; j++) h[j] = h[j * 2];
+  func(h + j, data + 32, n);` has the counter reversed (`addiu a2,7` / `bgez a2`), two pointers reduced, and the final
+  value of `h + j` computed after the loop as `addiu a0,a3,0x10`, while the plain `data + 32` is hoisted before it by PRE
+  (`func_002934F8`). If retail recomputes a pointer it just walked, look for the index in the call.
+- A register copy of a global's load that appears near a branch, with no variable to explain it, is PRE's reaching
+  copy: read the global inline at every use rather than through a local (`func_003248A8`).
 - Read branch direction and operand width: signed countdowns and unsigned increment
   loops need not share a layout. A switch can retain branches that if/else folds
   into sltu/xori/conditional moves (`func_L18_002E4090`).
