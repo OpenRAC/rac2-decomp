@@ -1,3 +1,10 @@
+/* 1 November 2026: 5860 of 5868 bytes, 173 rows off once relocations are masked, allocation of
+   the whole chain loop and the scan pointer equal to retail.  Unit flags as below.  What closed it
+   (see docs/MATCHING-BLOCKERS.md, Families F4 and F7): RAC1's two-dimensional chain array
+   P2[2][20] of a union vector, per-arm calls to func_002A8E20 (cross-jumped in retail; hit1's two
+   extra in-loop refs put it in $fp), &D_002295D0[k].v[1] (the addend hoisted, so madd), block
+   scopes that lengthen a movable's life past loop.c's threshold (near-arm vA0 copy, the
+   D_00189E20 base), the pre-increment scan loop.  Older notes below are history. */
 /* fable (Claude Fable 5.1) 2026-10-28, v2/c03 toolchain (upstream master + PR #348): still a
    near miss, closer than opus-2's draft.  Unit for a retry: src/game/0030A348-g8.c with
        -O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
@@ -289,6 +296,7 @@
 #include "common.h"
 
 typedef int V4 __attribute__((mode(TI)));
+typedef union { V4 q; float f[4]; } Vec;
 
 /* The lock-on tether: a chain of twenty points that hangs from the player's hand to up to two
    locked targets, its glow spots and sparks. Only the fields this function touches are named. */
@@ -372,10 +380,11 @@ typedef struct HitResult {
 } HitResult;
 extern HitResult D_001BAF98;
 extern Tgt *D_001EE960[];
-extern float D_00229150[][4], D_00229160[][4], D_00229170[][4];
+extern float D_00229150[][4], D_00229160[][4];
+extern Vec P2[2][20] __asm__("D_00229170");
 extern V4 D_002292A0;
 extern float D_002293F0[];
-extern float D_00229440[][4];
+extern Vec D_00229440[];
 extern float D_00229580[];
 typedef struct { V4 v[5]; } Node5;
 extern Node5 D_002295C0[], D_002295D0[], D_002295E0[];
@@ -466,15 +475,14 @@ void func_0030A348(Moby *self)
     float len;
     float angle0, angle1;
     int n;
-    Tgt **list;
     Tgt *t;
     int sn;
     float dist, ang, sa2, cs, sm, score, proj, fa, fb;
     float d0;
     float *ia, *ib;
+    Tgt *ta, *tb;
     float length, blend;
-    float amp, height, angle, old, bearing, radial, cpj, cd, cm;
-    float *cp2, *prev;
+    float amp, height, angle, old, cd, cm;
     int fa2;
     Tgt *ht;
     float *hinfo;
@@ -485,8 +493,10 @@ void func_0030A348(Moby *self)
     float ksize, kf, ks;
     int j1, j2;
     float *q;
-    int spin;
-    float tsize;
+    int spin, spin2;
+    float tsize, cd2;
+    Vec *prev;
+    float proj2, cm2;
     int k;
 
     D_001AEE0C = func_00283B98(D_001AEE0C, D_001AEE10);
@@ -500,8 +510,8 @@ void func_0030A348(Moby *self)
             st->lockB = 0;
             st->u.s.h42 = 0;
         } else {
-            list = D_001EE960;
-            for (sn = 0; (t = list[sn]) != 0; sn++) {
+            sn = 0;
+            for (t = D_001EE960[0]; t != 0; t = D_001EE960[++sn]) {
                 if (t != st->lockA && t != st->lockB) {
                     if (t != 0 && t->cls != 0 && t->cls->id == 5) {
                         if (t->kind != 0xFE) {
@@ -522,8 +532,8 @@ void func_0030A348(Moby *self)
                                         sa2 = 0.0f;
                                         if (D_001A8CA0 != 0) {
                                             func_00282CF0(va, t->pos, D_00189EA0);
-                                            proj = func_00282DB0(va, D_00189E20.ent + 0xE0);
-                                            func_00282D30(vb, D_00189E20.ent + 0xE0, proj);
+                                            proj2 = func_00282DB0(va, D_00189E20.ent + 0xE0);
+                                            func_00282D30(vb, D_00189E20.ent + 0xE0, proj2);
                                             func_00282CF0(va, va, vb);
                                             cs = func_00282DB0(va, D_00189E20.ent + 0xC0);
                                             sm = func_00282DF0(va);
@@ -580,16 +590,18 @@ void func_0030A348(Moby *self)
     len = 0.0f;
     if (st->lockA != 0) {
         ia = func_002AB1F0(st->lockA);
-        qcopy(v0, st->lockA->pos);
-        func_00282D30(va, (char *)st->lockA + 0xE0, ia[4]);
+        ta = st->lockA;
+        qcopy(v0, ta->pos);
+        func_00282D30(va, (char *)ta + 0xE0, ia[4]);
         func_00282CC0(v0, v0, va);
         len = func_00282E48(st, v0);
         reach = len * 0.05f;
     }
     if (st->lockB != 0) {
         ib = func_002AB1F0(st->lockB);
-        qcopy(va, st->lockB->pos);
-        func_00282D30(vb, (char *)st->lockB + 0xE0, ib[4]);
+        tb = st->lockB;
+        qcopy(va, tb->pos);
+        func_00282D30(vb, (char *)tb + 0xE0, ib[4]);
         func_00282CC0(va, va, vb);
         reach = (func_00282E48(v0, va) + len) * 0.05f;
     }
@@ -613,36 +625,34 @@ void func_0030A348(Moby *self)
     got = 0;
     func_00282D30(v90, v60, reach);
     nheld = 0;
-    qcopy(D_00229170[0], st);
-    qcopy(D_00229170[20], st);
+    qcopy(&P2[0][0], st);
+    qcopy(&P2[1][0], st);
     {
     int i;
     for (i = 1; i < 20; i++) {
-        prev = D_00229170[i - 1];
-        cp2 = prev + 84;
-
         amp = D_001AEE04 + (D_001AEE08 - D_001AEE04) * (func_00283CE0(i) * 0.05f);
         height = amp * func_00283198(func_002ABB18(D_001AEE0C + (float)i * D_001AEE00));
         height += func_002A78D8(D_001AEE44, D_001AEE48);
         old = D_002293F0[i];
         D_002293F0[i] = height;
-        D_00229170[i][2] = D_00229170[i][2] - old;
-        func_00300190(D_00229170[i], D_00229170[i]);
-        func_00282CF0(v70, D_00229170[i], D_00229160[i]);
+        P2[0][i].f[2] = P2[0][i].f[2] - old;
+        func_00300190(&P2[0][i], &P2[0][i]);
+        func_00282CF0(v70, &P2[0][i], D_00229160[i]);
         func_00282D08(v80, v70, v90, 0.85f);
         cm = func_00282DF0(v80);
         if (cm == 0.0f) {
-            qcopy(D_00229170[i], prev);
+            prev = &P2[0][i - 1];
+            qcopy(&P2[0][i], prev);
         } else {
             func_00282D30(v80, v80, reach / cm);
-            func_00282CC0(D_00229170[i], D_00229160[i], v80);
+            func_00282CC0(&P2[0][i], D_00229160[i], v80);
             qcopy(v90, v80);
         }
-        D_00229170[i][2] = D_00229170[i][2] + height;
-        func_00282CF0(v70, D_00229170[i], D_00229160[i]);
+        P2[0][i].f[2] = P2[0][i].f[2] + height;
+        func_00282CF0(v70, &P2[0][i], D_00229160[i]);
         if (st->lockA != 0) {
             if (!locked || st->lockB == 0) {
-                func_00282CF0(s2B0, v0, D_00229170[i]);
+                func_00282CF0(s2B0, v0, &P2[0][i]);
                 length = func_00282DF0(s2B0);
                 if (length != 0.0f) {
                     if (i == 0x13) {
@@ -660,9 +670,9 @@ void func_0030A348(Moby *self)
                 }
             } else {
                 if (i >= 10)
-                    func_00282CF0(s2B0, va, D_00229170[i]);
+                    func_00282CF0(s2B0, va, &P2[0][i]);
                 else
-                    func_00282CF0(s2B0, v0, D_00229170[i]);
+                    func_00282CF0(s2B0, v0, &P2[0][i]);
                 length = func_00282DF0(s2B0);
                 if (length != 0.0f) {
                     if (i == 9 || i == 0x13) {
@@ -674,8 +684,8 @@ void func_0030A348(Moby *self)
                         reach = length / cd;
                     } else if (i >= 0xF) {
                         blend = 0.7f;
-                        cd = func_00283CE0(0x13 - i);
-                        reach = length / cd;
+                        cd2 = func_00283CE0(0x13 - i);
+                        reach = length / cd2;
                     } else {
                         blend = 0.2f;
                     }
@@ -687,46 +697,55 @@ void func_0030A348(Moby *self)
         if (i < 10) {
             angle = func_002ABB18(D_001AEE14 + (float)i * D_001AEE1C);
             amp = D_001AEE20 * func_00283198(func_002ABB18(D_001AEE28 + (float)i * D_001AEE30));
-            qcopy(cp2, D_00229170[i]);
+            qcopy(&P2[1][i], &P2[0][i]);
             height = amp * func_00283198(angle) + func_002A78D8(0.0f, 0.1f);
             D_00229580[i] = height;
-            cp2[2] = cp2[2] + height;
-            bearing = func_00283B98(func_00283248(v70[0], v70[1]), 1.5707965f);
-            radial = D_001AEE24 * func_00283180(angle);
-            vA0[0] = func_00283180(bearing) * radial;
-            vA0[1] = func_00283198(bearing) * radial;
-            vA0[2] = 0.0f;
-            qcopy(D_00229440[i], vA0);
-            func_00282CC0(cp2, cp2, vA0);
+            P2[1][i].f[2] = P2[1][i].f[2] + height;
+            {
+                float bearing = func_00283B98(func_00283248(v70[0], v70[1]), 1.5707965f);
+                {
+                    float radial = D_001AEE24 * func_00283180(angle);
+                    vA0[0] = func_00283180(bearing) * radial;
+                    vA0[1] = func_00283198(bearing) * radial;
+                    vA0[2] = 0.0f;
+                    qcopy(&D_00229440[i], vA0);
+                }
+            }
+            func_00282CC0(&P2[1][i], &P2[1][i], vA0);
         } else {
             fa2 = 0x15 - i;
-            qcopy(cp2, D_00229170[i]);
-            cp2[2] = cp2[2] + D_00229580[fa2];
-            func_00282CC0(cp2, cp2, D_00229440[fa2]);
-            qcopy(vA0, D_00229440[i]);
+            qcopy(&P2[1][i], &P2[0][i]);
+            P2[1][i].f[2] = P2[1][i].f[2] + D_00229580[fa2];
+            func_00282CC0(&P2[1][i], &P2[1][i], &D_00229440[fa2]);
+            qcopy(vA0, &D_00229440[i]);
         }
         if (i >= 2 && (i == 0x13 || !(i & 1))) {
-            func_00282CF0(vb, D_00229170[i], D_001B5340);
+            func_00282CF0(vb, &P2[0][i], D_001B5340);
             if (D_001A8CA0 != 0) {
-                cpj = func_00282DB0(vb, D_00189E20.ent + 0xE0);
-                func_00282D30(s2B0, D_00189E20.ent + 0xE0, cpj);
-                func_00282CF0(vb, vb, s2B0);
+                float cpj = func_00282DB0(vb, D_00189E20.ent + 0xE0);
+                {
+                    char *ax = D_00189E20.ent + 0xE0;
+                    func_00282D30(s2B0, ax, cpj);
+                    func_00282CF0(vb, vb, s2B0);
+                }
             } else {
                 *(int *)&vb[2] = 0;
             }
-            cm = func_00282DF0(vb);
-            if (cm == 0.0f)
+            cm2 = func_00282DF0(vb);
+            if (cm2 == 0.0f)
                 vb[2] = 1.0f;
             else
-                func_00282D30(vb, vb, 1.0f / cm);
+                func_00282D30(vb, vb, 1.0f / cm2);
             vb[3] = 5627.925f;
             qcopy(&hit1, vb);
-            got = func_002761F8(D_00229150[i], D_00229170[i], 0x10, self, 0);
+            got = func_002761F8(D_00229150[i], &P2[0][i], 0x10, self, 0);
             if (got != 0) {
                 ht = D_001BAF98.hit;
                 if (ht != 0) {
                     hinfo = func_002AB1F0(ht);
-                    if (hinfo == 0 || ht->cls == 0 || ht->cls->id != 5) {
+                    if (hinfo == 0) {
+                        func_002A8E20(ht, &hit1);
+                    } else if (ht->cls == 0 || ht->cls->id != 5) {
                         func_002A8E20(ht, &hit1);
                     } else {
                         got = 0;
@@ -735,7 +754,7 @@ void func_0030A348(Moby *self)
                     }
                 }
                 if (got != 0) {
-                    qcopy(D_00229170[i], D_001BAF98.pos);
+                    qcopy(&P2[0][i], D_001BAF98.pos);
                     st->count = i;
                     qcopy(st->b, D_001BAF98.pos);
                     if (D_001BAF98.hit == 0) {
@@ -754,7 +773,6 @@ void func_0030A348(Moby *self)
         qcopy(st->b, &D_002292A0);
     if (st->lockA != 0 && (st->u.q & 0x0000FFFF0000FFFFUL) == 0) {
         tv = hb.q;
-        an = 5;
         func_00282CF0(s2B0, st->lockA->pos, D_001B5340);
         if (D_001A8CA0 != 0) {
             apj = func_00282DB0(s2B0, D_00189E20.ent + 0xE0);
@@ -763,6 +781,7 @@ void func_0030A348(Moby *self)
         } else {
             *(int *)&s2B0[2] = 0;
         }
+        an = 5;
         func_00282F20(s2B0, s2B0, 1.0f);
         s2B0[3] = 5627.925f;
         func_002A8C00(&hb.a.r, self, 0x210000, s2B0, D_00239BA0[D_00139568.cur].f70);
@@ -778,7 +797,6 @@ void func_0030A348(Moby *self)
         st->u.s.h44 = an;
     }
     if (st->lockB != 0 && (st->u.q & 0xFFFF0000FFFF0000UL) == 0) {
-        bn = 5;
         func_00282CF0(s2B0, st->lockB->pos, D_001B5340);
         if (D_001A8CA0 != 0) {
             bpj = func_00282DB0(s2B0, D_00189E20.ent + 0xE0);
@@ -787,6 +805,7 @@ void func_0030A348(Moby *self)
         } else {
             *(int *)&s2B0[2] = 0;
         }
+        bn = 5;
         func_00282F20(s2B0, s2B0, 1.0f);
         s2B0[3] = 5627.925f;
         func_002A8C00(&hb.b.r, self, 0x210000, s2B0, D_00239BA0[D_00139568.cur].f70);
@@ -819,7 +838,7 @@ void func_0030A348(Moby *self)
             func_002ACEC0(s2B0, s2B0, D_0018A560 + 0x10, angle0);
             qcopy(&D_002295D0[k].v[0], hb.q);
             ks = 1.0f;
-            func_00282CC0(D_002295E0[k].v, hb.q, s2B0);
+            func_00282CC0(&D_002295D0[k].v[1], hb.q, s2B0);
             for (j1 = 2; j1 < 5; j1++) {
                 func_00282CF0(hb.q + 4, &D_002295C0[k].v[j1], D_001B5340);
                 kf = func_002A7878(0.17453295f, 0.9599312f) * ks;
@@ -857,9 +876,9 @@ void func_0030A348(Moby *self)
         tsize = func_002A7878(0.2f, 0.6f);
         func_002C2210(st, 0xF, D_001AEE58 | 0x7F000000, 0, spin, s2B0, 1, tsize * 0.3f, tsize, 0.0f);
         func_002C2210(st, 0xF, 0x307F7F7F, 0, -spin, s2B0, 1, tsize * 0.15f, tsize * 0.5f, 0.0f);
-        spin = func_002A7820(1, 8);
-        spin = func_002A77E0(2) != 0 ? -spin : spin;
+        spin2 = func_002A7820(1, 8);
+        spin2 = func_002A77E0(2) != 0 ? -spin2 : spin2;
         tsize = func_002A7878(0.15f, 3.0f);
-        func_002C2210(st->b, 0xC, D_001AEE58 | 0x7F000000, 0, spin, D_001A8BD0, 1, tsize * 0.1f, tsize, 0.0f);
+        func_002C2210(st->b, 0xC, D_001AEE58 | 0x7F000000, 0, spin2, D_001A8BD0, 1, tsize * 0.1f, tsize, 0.0f);
     }
 }
