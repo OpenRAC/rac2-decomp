@@ -1,21 +1,6 @@
-/* sol-high reconstruction, USA v1.01, game -O2 -G8 -ffunction-sections.
- * Best check: 1476-byte object section versus 1476 retail, 0/28 places;
- * first mismatch +0x8. No linked build run. All declarations are below.
- * Retains the matched opacity operand order, score-color branch shape,
- * unsigned text-byte loads and final movn vertical-position selection.
- * Remaining: object/alpha/color s4/s5 allocation, color result in s5 rather
- * than s0 followed by a move into s4, and record addresses in a0 rather than
- * v1/v0 for the name and height phases. The first hyphen arm has an extra
- * alignment nop instead of retail's earlier color move.
- * A fresh opacity local, a block-scoped score color, and a text-phase color
- * copy improve the earlier draft. Typed records reproduce the raw-field
- * draft. -fno-regmove and -frac2-gcse-unsplit-edges give the same remaining
- * differences. -fno-gcse recovers the color move but loses the saved table
- * high halves, changes the frame to 0xC0, and gives 1472 bytes.
- * Next: a source-lifetime explanation for the color's two register phases;
- * avoid repeating the equivalent field/struct and simple-copy variants.
- */
 #include "common.h"
+
+/* Weapon wheel. One scratch int holds the colour and then the name's length: the reassignment is why cprop leaves retail's copy into the colour register. */
 #define F(p,t,o) (*(t *)((char *)(p)+(o)))
 extern float func_00283CE0(int);
 extern int func_00283CF0(float);
@@ -37,13 +22,13 @@ extern unsigned char D_00139568[];
 extern int D_001A73B8[] MACRO_ADDR;
 extern int D_00139688[];
 typedef struct { int active; char reserved04[0x44]; short localizedName; char reserved4A[0x3E]; unsigned short sellsAmmo; char reserved8A[4]; unsigned short ammoCapacity; char reserved90[0x50]; } WheelWeaponRecord;
-extern WheelWeaponRecord D_L00_00239BA0[];
+extern WheelWeaponRecord D_L00_00262570[];
 extern char D_001A8E28[];
-int func_0028C6D0(char *o)
+int func_US2_0028D110(char *o)
 {
     float a,b;
     int alpha,x,y,i,selected,split,j,len,yy;
-    unsigned int color;
+    unsigned int scratch;
     char buffer[80], *text,*tail;
     WheelWeaponRecord *record;
     unsigned char *fade=(unsigned char *)o+0x70;
@@ -64,14 +49,14 @@ int func_0028C6D0(char *o)
         }
         if(F(D_001B18D4[D_001A8D48]+i*28,int,0) && D_001A8CFC) {
             char *p=D_001A8CFC+0x38000;
-            F(p,int,0x7354)=func_00290748()?func_00283CF0((float)alpha*0.5f):0;
+            F(p,int,0x79DC)=func_00290748()?func_00283CF0((float)alpha*0.5f):0;
         }
     }
     selected=F(o,int,0x74);
     if(selected>=0 && F(D_001B18D4[D_001A8D48]+selected*28,int,0) && !D_001A8C64) {
         int n=D_001A73B8[selected], value;
         float opacity;
-        record=&D_L00_00239BA0[D_00139568[n]];
+        record=&D_L00_00262570[D_00139568[n]];
         opacity=a*b;
 
         if(record->active && record->sellsAmmo) {
@@ -84,13 +69,13 @@ int func_0028C6D0(char *o)
                 func_0027FAA8(x+105,y+112,c,buffer,-1);
             }
         }
-        color=func_00283D38(0x00f0f0f0,0x80f0f0f0,opacity);
+        scratch=func_00283D38(0x00f0f0f0,0x80f0f0f0,opacity);
         split=0;
-        record=&D_L00_00239BA0[D_00139568[F(D_001B18D4[D_001A8D48]+selected*28,int,0x18)]];
-        text=func_00288FB8(record->localizedName);
+        text=func_00288FB8(D_L00_00262570[D_00139568[F(D_001B18D4[D_001A8D48]+selected*28,int,0x18)]].localizedName);
         if(text && func_001157AC(text)) {
-            unsigned int textColor=color;
-            len=func_001157AC(text);
+            unsigned int color=scratch;
+            scratch=func_001157AC(text);
+            len=scratch;
             tail=text;
             for(j=0;j<len;j++) {
                 tail++;
@@ -103,14 +88,13 @@ int func_0028C6D0(char *o)
                     if(*(unsigned char *)tail==' ') {tail++;split=j+1;break;}
                 }
             }
-            record=&D_L00_00239BA0[D_00139568[D_001A73B8[selected]]];
             yy=y+100;
-            if(record->sellsAmmo) yy=y+75;
+            if(D_L00_00262570[D_00139568[D_001A73B8[selected]]].sellsAmmo) yy=y+75;
             else { int splitY=y+85; yy=split ? splitY : yy; }
             if(split) {
-                func_0027FAA8(x+105,yy,textColor,text,split);
-                func_0027FAA8(x+105,yy+16,textColor,tail,-1);
-            } else func_0027FAA8(x+105,yy,textColor,text,-1);
+                func_0027FAA8(x+105,yy,color,text,split);
+                func_0027FAA8(x+105,yy+16,color,tail,-1);
+            } else func_0027FAA8(x+105,yy,color,text,-1);
         }
     }
     return F(o,int,0x58);

@@ -1804,6 +1804,12 @@ field view shortens the body to 984 bytes; disabling GCSE or sched1 gives 996.
 Independent alias/lifetime evidence is the next useful input, not more identical
 loop spellings.
 
+The way out that closed two of these: jump2 cross-jumps two arms that end the same, the branch
+goes, and the load that fed it stays dead, because flow ran before jump2. `func_L18_00432630`
+keeps two equal arms on `0x7FC`. `func_L18_002CA350` (1 November 2026, local match) keeps
+`if (hero[0x340]) { if (mode == -1) return; } else { if (mode == -1) return; }`, which gives the
+dead `lw`; it also ends the extended block, so the hero address is built again in the next block.
+
 **Consequence:** retain unresolved attempts and their bounded stopping reasons. Do not label the whole category unexpressible or add volatile/artificial uses solely to preserve an operation.
 
 <a id="blocker-27"></a>
@@ -1994,6 +2000,21 @@ The flag can keep lui and its low-half calculation together where the tested def
 Current witnesses: func_L00_003EA7D0 has its dedicated profile and passes 27/27; func_002A90C8 passes 23/23 in its existing profile. Older examples func_002B0C28 and func_002B0CE0 remain markers and are not resolved by those successes.
 
 Section31's proposed infrastructure is present. Requalify every C function when changing a unit's flags; isolate incompatible profiles.
+
+**1 November 2026 (local matches):** `func_L17_003A4740` and `func_L00_003A09F8` (17 places)
+needed no `-mno-split-addresses`. The viewport words are one `MACRO_ADDR` array: `[2]`, `[3]`,
+`[0]`, `[1]` keep their `lui` in the destination register, and an offset element is two
+instructions, so it cannot fill a slot, which `[0]` of a scalar would. The phase word's
+`lui; addiu; lwc1 0(reg)` is reload's: a pointer set outside the inner loop is hoisted by loop,
+gets no register because every saved register is taken, and its constant is not a valid split
+address, so reload builds it beside the load. The hoisted pointer also uses up the threshold
+that stopped the colour constants at the inner pre-header.
+
+`func_L00_003B9310` (same date, local match): a `MACRO_ADDR` scalar read by `lui`/`lwc1` and
+written by `$gp` in a slot is one symbol to sched, so the read stays above the store and gets the
+store's height in the priority chain. Two names for the word (`sda` or `SDATA` views) lose that
+dependence and the load sinks. Its other 9 words were a prototype: the integer target is the
+last parameter, after five floats.
 
 <a id="blocker-37"></a>
 
@@ -2210,6 +2231,11 @@ Historical examples, to requalify in the final unit:
 - A rule table loop with an unreduced `mult` at an aligned label is a loop that loop.c skipped (func_L05_00444840): `for` with a `break` gets the same tail, but jump1 copies the test and the found arm ahead of the loop, which gives "multiple entry points".
 - A float kept off a free register: a pseudo set by local-alloc in a hard register gives its operands a preference that keeps other pseudos off that register (global.c regs_someone_prefers). In func_L12_0041BF88 a scratch float shared with a later loop made the pseudo global and freed $f1.
 - **Encoding correction:**0x700014A9 is por v0,zero,zero, not pcpyld. TI zero materialisation is reachable in appropriate cases; retention/folding depends on current source/profile(section 17). The word alone neither proves handwritten assembly nor proves a complete C match.
+- **A register copy retail keeps means its source was overwritten.** gcse's cprop removes `b = a` whenever `a` is untouched between the copy and b's uses, so a surviving `daddu` in front of a long stretch says `a` is set again later: one scratch variable doing two jobs. func_0028C6D0 (37 words to 0): `scratch` holds the colour, is copied into `color`, then takes the string length. func_L00_003ED198 (57 words to 0, size 1712 to 1720): an int holds &delta, is copied into the loop's pointer, then takes the random phase in the loop; a block-local `float *t` used only up to the call gives retail's `$v0`-then-`$s5` pair. Measured with cprop switched off in a research cc1: most near misses get worse, so cprop itself runs in retail.
+- A value pseudo with no user variable gives a different local-alloc tie. func_0028C6D0's last four words closed by dropping `record` and writing the table read into the call's argument.
+- Reads of a `$gp` scalar pass struct stores (section 1, MEM_IN_STRUCT). If retail keeps such a load behind the stores, write the stores through a char view: func_00342BE8, 19 words to 2.
+- An int under -G8 can fill a branch slot from the target thread. If retail has the two-word form there, it is part of a larger object: func_002F8178's screen size as one 8-byte struct, 66 words to 33.
+- A hill climb over statement order (48 orders a round, 1 to 3 moves each, on box2) closed func_002F8178's store blocks where 18 statements are too many to enumerate: 33 words to 8.
 
 <a id="blocker-46"></a>
 
@@ -3204,6 +3230,11 @@ Three retained near misses from this wave (`func_L09_003FE0C0`, `func_L10_004237
   produce the first two words. The extent itself is not suspect: the preceding row
   `func_L04_003C6FE8` ends exactly at 0x3A4740. Do not call it handwritten on this
   alone; the entry needs an indirect-reference audit first.
+  **Update, 1 November 2026 (local match):** v1.01's and v2.00's catalogues start the function
+  after those two words, and its C is in `L17_0032C070-grid.c`. PAL's row
+  (`func_PAL_L17_003A7DB0`, 528 bytes) still includes them, as `func_PAL_L01_0039A174` (524
+  bytes, 12 places) includes a leading `nop`; those two PAL rows stay assembly until the
+  catalogue cuts them the same way.
 - `func_L11_003F2A30` dispatches through a compiler jump table of 11 entries based at
   D_L11_002BAA10 (`lw $a0,0($v1); jr $a0`, cases reached from `a0[0x42]`). wslcmp
   checks only the function bytes, so a `switch` whose case *order* differs can look

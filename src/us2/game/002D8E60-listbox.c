@@ -1,15 +1,3 @@
-/* GPT-6.1 Sol (high), 29 October 2026: retained near miss.
- * Profile: -O2 -G0 -ffunction-sections; USA v1.01: 1252/1252 bytes,
- * 0/28 placements. Final check.py first mismatch: +0x174.
- * Four opcode/register words differ at +0x174, +0x180, +0x188 and +0x190:
- * the rectangle inset and scroll offset use a2/a3 in the opposite roles.
- * Widening the completed y - 4 subtraction and computing fields[1] before
- * fields[0] preserves retail's arithmetic and store order without conversions.
- * Moving/caching the scroll load worsens scheduling; wide and negated scroll
- * expressions tie the retained bytes. Reopen with an inset/scroll lifetime
- * hypothesis that changes the local allocation. Other releases were not run.
- * Required declarations are included below. No linked-build claim.
- */
 #include "common.h"
 
 typedef struct { short fields[12]; } MenuTextRectangle;
@@ -27,7 +15,7 @@ extern void func_002D9CF8(int, int, int);
 extern void func_0028FAB8(int, int, int, int, int, int);
 
 
-int func_002D89D8(char *object)
+int func_US2_002D9718(char *object)
 {
     MenuTextRectangle rectangle, initial;
     short *row;
@@ -57,9 +45,9 @@ int func_002D89D8(char *object)
     else spacing = *(int *)(object + 0x24) / (count + 1);
     top = spacing - height / 2 + *(int *)(object + 0x1C);
     func_00115484(&initial, 0, 24);
+    initial.fields[0] = *(int *)(object + 0x1C) + 4;
     initial.fields[2] = *(int *)(object + 0x18);
     initial.fields[1] = (long)(*(int *)(object + 0x1C) - 4) + *(int *)(object + 0x24);
-    initial.fields[0] = *(int *)(object + 0x1C) + 4;
     initial.fields[3] = *(int *)(object + 0x18) + *(int *)(object + 0x20) - 2;
     initial.fields[5] = top - *(int *)(object + 0x44);
     initial.fields[8] = lineHeight;
@@ -93,7 +81,8 @@ int func_002D89D8(char *object)
             func_0027FC70(rectangle.fields, colour, text, -1, textureWord, font);
             rectangle.fields[5] += spacing;
         }
-        rectangle.fields[5] += 8;
+        if (!(*(int *)(object + 0x30) & 0x80000))
+            rectangle.fields[5] += 8;
         if (!(*(int *)(object + 0x30) & 0x10000) && selected) {
             int bottom = rectangle.fields[5] + rectangle.fields[7];
             if (bottom > rectangle.fields[1]) {

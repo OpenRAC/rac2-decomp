@@ -317,7 +317,7 @@ float func_L00_00341A88(void *a0, void *a1, float scale)
 
 INCLUDE_ASM("asm/levels", func_L00_00341FA8);
 
-INCLUDE_ASM("asm/levels", func_L00_003425F8);
+/* func_L00_003425F8 is defined in L00_0033F678-pushout.c. */
 
 
 #define NOT_SDA __attribute__((section(".data")))

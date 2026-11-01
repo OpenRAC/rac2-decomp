@@ -1,5 +1,7 @@
 #include "common.h"
 
+/* Restores saved state after a level reload. Needs the 16-byte-aligned block move: both record copies are structure assignments. */
+
 typedef unsigned int QuadDE990 __attribute__((mode(TI)));
 typedef union RecordDE990 {
     QuadDE990 data[14];
@@ -84,7 +86,11 @@ void func_002DE990(int selected)
     for (j = 0; j < 56; j++) {
         saved.flags[j] = D_001A7AF8[j];
         saved.words[j] = D_00139868[j];
+<<<<<<<< HEAD:src/game/002DE990-records.c
         *(saved.records + j) = D_00239BA0[j];
+========
+        *(RecordDE990 *)(j * (int)sizeof(RecordDE990) + (int)&saved + 0x2A0) = D_00239BA0[j];
+>>>>>>>> match/opus-next-a-quad:src/game/002DDEC8-restore.c
         saved.slots[j] = D_00139568[j];
     }
     for (i = 0; i < 32; i++) saved32[i] = D_001A7A60[i];
@@ -114,8 +120,17 @@ void func_002DE990(int selected)
     block[0x90] = control;
     func_00282A60(D_001A7AB8, 0, 56);
     for (i = 0; i < 56; i++) D_001A7A80[i] = saved56[i];
+<<<<<<<< HEAD:src/game/002DE990-records.c
     { int m; for (m = 7; m >= 0; m--) D_001A73B8[m] = 0; }
     D_001A79F8 = savedState;
+========
+    {
+        int n;
+        for (n = 7; n >= 0; n--) D_001A73B8[n] = 0;
+    }
+    gameState = &D_001A79F8;
+    *gameState = savedState;
+>>>>>>>> match/opus-next-a-quad:src/game/002DDEC8-restore.c
     D_001A73B8[0] = 30;
     D_001A73B8[1] = 42;
     D_001A79F8.f22 = 0;
@@ -132,7 +147,14 @@ void func_002DE990(int selected)
     for (k = 0; k < 56; k++) {
         D_001A7AF8[k] = saved.flags[k];
         D_00139868[k] = saved.words[k];
+<<<<<<<< HEAD:src/game/002DE990-records.c
         D_00239BA0[k] = *(saved.records + k);
+========
+        {
+            RecordDE990 *from = (RecordDE990 *)(k * (int)sizeof(RecordDE990) + (int)&saved + 0x2A0);
+            D_00239BA0[k] = *from;
+        }
+>>>>>>>> match/opus-next-a-quad:src/game/002DDEC8-restore.c
         D_00139568[k] = saved.slots[k];
         D_00139688[k] = D_00239BA0[D_00139568[k]].f.cost;
     }

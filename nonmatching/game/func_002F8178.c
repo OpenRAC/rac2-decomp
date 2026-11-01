@@ -1,3 +1,7 @@
+/* 1 November 2026: 8 words, 1520/1520 (was 128). Screen size as one 8-byte object (an int under -G8 fills a
+ * branch slot from the target thread), store orders from a hill climb. Left: sw $a0 (retail's constant) against
+ * $v1 for the mode store at +0x1B0, and the v / 2 block: retail has $v0 taken over the whole load-to-sra range,
+ * so count, srl, slt and 0x28 sit one register up (v1, a0, a1, a2) with a block-local count. */
 /* GPT-6.1 Sol (high), task v1149, USA v1.01, 29 October 2026.
  * Best retained: 1524/1520 bytes, 0/28 places, game -O2 -G8
  * -ffunction-sections. The 0x50 frame and much of the entry/control flow
@@ -46,7 +50,7 @@ typedef struct { char pad[0x20]; short level; } Settings_002F8178;
 extern Settings_002F8178 D_001A79F8 MACRO_ADDR;
 extern char D_001B5340[];
 extern unsigned char D_001A7BB4[] __attribute__((sda));
-extern int D_001B2294, D_001B2298, D_001B2290, D_001B2284, D_001B2288, D_001B228C, D_001A7AF0;
+extern int D_001B2294, D_001B2298, D_001B2290, D_001B2284, D_001B2288, D_001B228C, D_001A7AF0 MACRO_ADDR;
 extern int D_001AD1C0;
 extern int func_002E5CF8(int, int, void *);
 extern void func_00282A60(void *, int, int);
@@ -65,7 +69,7 @@ extern unsigned char D_001A7BB1;
 extern char D_001AD1E0[] SDATA(D_001AD1E0), D_001AD1F0[] SDATA(D_001AD1F0), D_001AD210[] SDATA(D_001AD210), D_001AD220[] SDATA(D_001AD220);
 extern float D_001AD234 SDATA(D_001AD234), D_001AD238 SDATA(D_001AD238);
 extern int D_001B2244, D_001B2248, D_001B2238, D_001B8BB0;
-extern int D_001A7340[] __attribute__((sda)), D_001A7344[] __attribute__((sda));
+extern struct { int w, h; } D_001A7340;
 typedef struct { char pad[0x1248]; int mode; char pad124C[0x1069]; char flag22B5; char pad22B6[6]; char flag22BC; } Hero_002F8178;
 extern Hero_002F8178 D_00189E20;
 extern char D_00152CE4[], D_001C2AC0[];
@@ -109,13 +113,25 @@ void func_002F8178(char *moby)
     D_0021F240.field88 = 0; D_0021F240.field8C = 0; D_0021F240.field38 = 0;
     D_0021F240.field44 = D_001A7BB4[0] - 1;
     if (D_0021F240.field44 < 0) D_0021F240.field44 = 0;
+    D_0021F240.field78 = -1;
+    D_0021F240.field7C = -1;
+    D_0021F240.field64 = 0;
+    D_0021F240.index = 0;
+    D_001B2244 = 0;
+    D_0021F240.field84 = 0;
     D_0021F240.field68 = -1;
+    D_001AD234 = 0.8f;
+    D_001AD238 = 1.0f;
+    D_001B2290 = 96;
+    D_001B2238 = 0;
+    D_001B2248 = 0;
     D_001B2294 = 96;
-    D_001AD234 = 0.8f; D_001AD238 = 1.0f; D_001B2298 = 85;
-    D_0021F240.field78 = -1; D_0021F240.field7C = -1; D_0021F240.field64 = 0; D_0021F240.index = 0;
-    D_001B2244 = 0; D_0021F240.field84 = 0; D_001B2290 = 96; D_001B2248 = 0; D_001B2238 = 0;
-    D_001AD230 = 0; D_001B2284 = 0; D_001B2288 = 0; D_001B228C = 0;
-    func_00132AF8(93); func_002B72E8(0); func_00132028();
+    D_001AD230 = 0;
+    D_001B2284 = 0;
+    D_001B2288 = 0;
+    D_001B2298 = 85;
+    D_001B228C = 0;
+        func_00132AF8(93); func_002B72E8(0); func_00132028();
     if (D_0021F240.mode == 0) func_002F6608(0);
     else if (D_0021F240.mode == 3) func_002F71B8();
     else if (D_0021F240.mode == 1) func_002F73A8();
@@ -130,11 +146,14 @@ void func_002F8178(char *moby)
     if (D_0021F240.mode != 2) func_0029B698(0x112A880);
     if (D_0021F240.mode == 0 && D_0021F240.slots[D_0021F240.index].kind == 1 && D_00189E20.mode != 10)
         func_0029B6D0(D_0021F240.slots[D_0021F240.index].id, 0x112A880);
+    D_0021F240.state = 0;
     D_0021F240.base10 = D_001BAEC0.base10 + 0x60000;
+    D_0021F240.base1C = D_0021F240.base10 + D_001A7340.w * D_001A7340.h * 4;
+    D_0021F240.field8 = 0;
+    D_0021F240.fieldC = 1;
+    D_0021F240.moby = moby;
     D_0021F240.base14 = D_001BAEC0.baseC + 0x60000;
-    D_0021F240.base1C = D_0021F240.base10 + D_001A7340[0] * D_001A7344[0] * 4;
-    D_0021F240.state = 0; D_0021F240.field8 = 0; D_0021F240.fieldC = 1; D_0021F240.moby = moby;
-    func_002E5CF8(3, 17, moby);
+        func_002E5CF8(3, 17, moby);
     D_0021F240.field4C = D_001A7AF0; D_0021F240.fieldA0 = *(short *)D_00152CE4;
     func_00288EA0();
     D_001B8BB0 = 5; D_001B15A0 = 0.0f; D_001B15A4 = 0;

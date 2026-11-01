@@ -1,15 +1,3 @@
-/* GPT-6.1 Sol high, 28 October 2026. USA v1.01: 816/816 bytes, 0/27 places.
- * Profile: -O2 -G0 -ffunction-sections. Requires common.h transfer helpers.
- * Only two instructions differ: +0x214/+0x218 set a0=s3, a1=sp, whereas retail
- * sets a1=sp, a0=s3 before the endpoint displacement scale call.
- * Direct &position expressions with qcopy reproduce the a2-to-fp copy and
- * the saved-register allocation; a separate dot-product statement fixes s0/s1.
- * A float-first declaration for the in-place scale preserves the EE bank orders
- * and fixes its argument scheduling. Float-first/middle/default declarations for
- * the endpoint call, moving hit=1 after it, and i=hit versus i=0 all tie.
- * Stop: tied source forms. Next: a justified endpoint-call expression/lifetime
- * change that reverses only those two argument setup moves.
- */
 #include "common.h"
 
 typedef int Quadword __attribute__((mode(TI)));
@@ -57,9 +45,9 @@ int func_L00_003425F8(int pathIndex, const Vector *point, Vector *out, float rad
             along = func_00282DB0(&relative, &unit);
             if (length < along || along < 0.0f) {
                 if (func_00282DF0(&relative) < radius) {
-                    hit = 1;
                     func_00282F20(&displacement, &relative, radius);
                     func_00282CC0(&position, &displacement, start);
+                    hit = 1;
                 }
             } else {
                 hit = 1;

@@ -1,3 +1,7 @@
+/* 1 November 2026: with compiler/block-move-quad, tmpl = D_L00_002A26A0 gives retail's lq/sq copy and the
+ * prologue: 1944/1952, 105 aligned words (ld/sd and 386 words without that compiler). Left: a madd at the
+ * second table read (retail: mult, addu of the low part, lbu 4), the TI zero's register (t1, a1 in retail),
+ * the tail lq in t1 (retail's %hi is live in t0 there), the spill slots 0xC4/0xCC. Needs that compiler. */
 /* GPT-6.1 Sol high, v1294, USA v1.01, default game -O2 -G0 -ffunction-sections.
  * Reconstructed candidate: 1952 compiled bytes / 1952 retail bytes, 0/27 places.
  * Size equality only: check.py first reports instruction mismatch at +0x14.
@@ -77,18 +81,10 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
 {
     int *data = *(int **)(object + 0x68);
     BurstTemplate tmpl;
-    BurstQuad *dst = tmpl.q;
-    BurstQuad *src = D_L00_002A26A0.q;
     BurstVector delta, projected, shard, random, drift, point;
     float scale, distance, height, ground;
 
-    do {
-        BurstQuad first = src[0], second = src[1];
-        dst[0] = first;
-        dst[1] = second;
-        src += 2; dst += 2;
-    } while (src != D_L00_002A26A0.q + 4);
-    dst[0] = src[0];
+    tmpl = D_L00_002A26A0;
     scale = 1.0f + func_00283CE0(D_L00_00262570[D_00139568[12]].enabled != 0);
     func_00282D30(velocity, velocity, scale);
     func_00282CF0(&delta, D_L00_001B8DC0, object + 0x10);
@@ -107,7 +103,7 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
             func_00282F20(&shard, &shard, scale * func_002A7878(3.5f, 6.5f) * (1.0f / 60.0f));
             func_00282CC0(&shard, &shard, velocity);
             func_00308600(object + 0x10, &shard, func_002A7820(60, 120), 0,
-            D_L00_00262570[D_00139568[12]].enabled != 0);
+            ((BurstWeapon *)((char *)D_L00_00262570 + D_00139568[12] * 0xE0))->enabled != 0);
         }
     }
     *(float *)(object + 0x18) += 1.0f;

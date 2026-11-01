@@ -1,3 +1,7 @@
+/* 1 November 2026: 2 words (sw 0x24 / sw 0x2C in the reset block). The colours through a char view
+ * (MenuColourQuad stores are MEM_IN_STRUCT, so the D_001B23C0 load passed them): 19 to 2. Retail's sched1
+ * issues the flag's constant at t3 ahead of clip.y1's store; all 120 orders of the block tie, also with the flag
+ * as a field of the clip state at D_001B23B0 + 0x10 (priority 3 against 4). */
 /* GPT-6.1 Sol (high), pinned game compiler, -O2 -G8 -ffunction-sections.
  * Best check: 900/900 bytes, frame 0xB0, 0/28 placements in USA v1.01,
  * PAL and USA v2.00. Nineteen instruction differences (relocation operands
@@ -49,7 +53,8 @@ void func_00342BE8(MenuList *object)
 {
     float high, low, current;
     int index, first, second, texture;
-    MenuColourQuad normal, alternate, *colours;
+    MenuColourQuad normal, alternate;
+    char *colours;
     MenuClipRectangle clip;
     unsigned char *entry;
     func_00343068(&object->position);
@@ -60,8 +65,8 @@ void func_00342BE8(MenuList *object)
         normal = D_001AE1D8;
         alternate = D_001AE1E8;
         entry = D_00239BA0 + D_00139568[object->ids[object->selected + index]] * 224;
-        colours = &normal;
-        if (*(int *)entry && entry[4]) colours = &alternate;
+        colours = (char *)&normal;
+        if (*(int *)entry && entry[4]) colours = (char *)&alternate;
         current = (float)index;
         first = func_003427C0((char *)object, low,
                 object->position->y + object->rowHeight * current + (float)object->scrollOffset,
@@ -69,10 +74,10 @@ void func_00342BE8(MenuList *object)
         second = func_003427C0((char *)object, low,
                 object->position->y + object->rowHeight * current + object->iconSize + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
-        colours->values[0] = (colours->values[0] & 0xFFFFFF) | (first << 24);
-        colours->values[1] = (colours->values[1] & 0xFFFFFF) | (first << 24);
-        colours->values[2] = (colours->values[2] & 0xFFFFFF) | (second << 24);
-        colours->values[3] = (colours->values[3] & 0xFFFFFF) | (second << 24);
+        *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | (first << 24);
+        *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | (first << 24);
+        *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | (second << 24);
+        *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | (second << 24);
         if (D_001B23C0 == 0) {
             clip.x0 = 0;
             clip.x1 = screenWidthGP - 1;
@@ -86,7 +91,7 @@ void func_00342BE8(MenuList *object)
         texture = func_0028E588(*(unsigned short *)(entry + 0x3C), 0);
         func_0028EA58(texture, (int)object->position->x,
                 (int)(object->position->y + object->rowHeight * current + (float)object->scrollOffset),
-                (int)object->iconSize, (int)object->iconSize, colours->values);
+                (int)object->iconSize, (int)object->iconSize, (unsigned int *)colours);
         func_002FC620(0, D_001A7340 - 1, 0, D_001A7344 - 1);
     }
 }

@@ -8,4 +8,4 @@ INCLUDE_ASM("asm/us2/game", func_US2_002D8F70);
 
 INCLUDE_ASM("asm/us2/game", func_US2_002D9178);
 
-INCLUDE_ASM("asm/us2/game", func_US2_002D9718);
+/* func_US2_002D9718 is defined in 002D8E60-listbox.c. */

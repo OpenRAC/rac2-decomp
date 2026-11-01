@@ -1,14 +1,11 @@
-/* Unsafe historical alternative: reads the float global as an integer.
- * Retained for provenance only; do not prefer its smaller residual over the corrected type. */
-/* func_L17_003A4740 near miss: 516/520 bytes with file flags -O2 -G0 -ffunction-sections -mno-split-addresses (without it 508).
-   Remaining: retail forms the float-global address in a register (lui $v0; addiu $v0,-0xAD4; lwc1 $f21,0($v0)) where cc1 here emits lwc1 through $at; plus the schedule of lui $s5 / ori around it. Tried: [1]/scalar/nosda declarations and a pointer local. */
 #include "common.h"
 
-extern int D_001A7340;
-extern int D_001A7344;
-extern int D_001A7348;
-extern int D_001A734C;
-extern int D_001AF52C[];
+/* The screen rectangle is one array: an element read with an offset is two instructions and
+   never fills a slot. The scroll word's pointer is set outside the inner loop: loop hoists it, it
+   gets no register, and reload builds the address beside the load. */
+
+extern int D_001A7340[] MACRO_ADDR;
+extern int D_L17_001AF52C[];
 extern float func_00283CE0(int);
 extern int func_00283CF0(float);
 extern unsigned long func_0027C878(int);
@@ -25,17 +22,18 @@ void func_L17_003A4740(char *self) {
     int color;
     int t0, t1;
 
-    fv[0] = func_00283CE0(D_001A7348);
-    fv[1] = func_00283CE0(D_001A734C);
+    fv[0] = func_00283CE0(D_001A7340[2]);
+    fv[1] = func_00283CE0(D_001A7340[3]);
     packet = func_0027C878(0x1E);
-    nx = D_001A7340 / 32 + 1;
-    ny = D_001A7344 / 32 + 1;
+    nx = D_001A7340[0] / 32 + 1;
+    ny = D_001A7340[1] / 32 + 1;
 
     for (i = 0; i < nx; i++) {
+        int *p = D_L17_001AF52C;
         for (j = 0; j < ny; j++) {
             pv[0] = (float)(i * 32);
             pv[1] = (float)(j * 32);
-            base = (float)D_001AF52C[0];
+            base = (float)*p;
             a = func_00283CE0(*(int *)(data + 0x140));
             b = func_00283CE0(0x5A);
             color = (func_00283CF0(a * 127.5f / b) << 24) + 0xFF7F7F;

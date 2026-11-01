@@ -1,20 +1,6 @@
-/* GPT-6.1 Sol (high effort), task v0822, USA v1.01.
- * Best check.py: 1712/1720 bytes; 0 of 27 places match.
- * Required profile: -O2 -G0 -ffunction-sections -g; declarations below.
- * Improved over the sol-low draft: index-first byte-offset table addressing
- * fixes s7/fp and the addu operand order; sda on D_L00_001B19C8 fixes the
- * final modulo load; one shared tracking/trail pointer fixes phase to s0.
- * Remaining: delta address uses s1 directly instead of v0 then s5, and the
- * trail delta lacks retail's s0-to-s5 copy. Trail counter/position/particle
- * registers remain s2/s3/s5 instead of s1/s2/s3. This accounts for the two
- * missing moves. No linked build run for this unmatched function.
- * Ascending for/do loops tie; moving pointer assignment after vector calls,
- * enclosing the stack arrays in a struct, and using individual vector structs
- * all tie with this draft. Explicit trail/particle pointer aliases change
- * allocation but do not improve it. A reordered union changed stack offsets.
- */
-
 #include "common.h"
+
+/* Homing shot. The short-lived t and the int reused for the trail delta are what keep retail's copies past cprop: it is reassigned in the loop. */
 extern void func_00282D30(char *, char *, float);
 extern void func_002AFFD8(void *, void *, int);
 extern int func_L00_003EE228(char *);
@@ -35,7 +21,7 @@ extern int func_002A77E0(int);
 extern float func_002A7878(float, float);
 extern float func_002A78D8(float, float);
 extern char *func_002C65A0(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
-extern void func_L00_002E6EF8(void *, void *);
+extern void ref_L00_003ED198_00(void *, void *);
 extern void func_0029F338(void *);
 extern char D_00139568[];
 typedef struct { unsigned char flag[4]; unsigned char enabled; char pad[0x6B]; float value; char tail[0x6C]; } B0714Entry;
@@ -60,7 +46,7 @@ void func_L00_003ED198(char *obj)
     char *p;
     float *tracking_delta;
     float length, speed, scale;
-    int phase, i;
+    int work, i;
 
     qcopy(old, obj + 0x10);
     func_002AFFD8(obj + 0x10, scratch, 1);
@@ -71,7 +57,9 @@ void func_L00_003ED198(char *obj)
         if (*(unsigned char *)(target + 0x20) == 0xFD) goto clear_target;
         if (func_L00_003EE228(target)) goto clear_target;
         {
-            func_00282CF0(tracking_delta = delta, *(char **)(state + 0x1C) + 0x10, obj + 0x10);
+            { float *t = delta;
+            func_00282CF0(t, *(char **)(state + 0x1C) + 0x10, obj + 0x10);
+            tracking_delta = t; }
             info = func_002AB1F0(*(char **)(state + 0x1C));
             if (info) {
                 func_00282D30((char *)temp, *(char **)(state + 0x1C) + 0xE0, *(float *)(info + 0x10));
@@ -128,35 +116,37 @@ target_done:
             *(unsigned short *)(obj + 0x34) |= 0x41;
             *(int *)(state + 0x38) = 6;
         }
-        phase = func_002A77E0(255);
-        p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 2, 0x202080, phase, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        work = func_002A77E0(255);
+        p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (p) p[2] = *D_L00_001FEA14;
-        p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 2, 0x202080, (phase + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (p) p[2] = *D_L00_001FEA14;
-        func_00282CF0(tracking_delta = delta, obj + 0x10, previous);
-        func_00282D30((char *)tracking_delta, (char *)tracking_delta, 0.1f);
+        work = (int)delta;
+        func_00282CF0((void *)work, obj + 0x10, previous);
+        func_00282D30((char *)work, (char *)work, 0.1f);
         qcopy(temp, previous);
+        tracking_delta = (float *)work;
         for (i = 4; i >= 0; i--) {
-            phase = func_002A77E0(255);
+            work = func_002A77E0(255);
             scale = func_002A7878(0.1f, 0.3f);
             particle[0] = temp[0] + func_002A78D8(0.0f, 0.05f);
             particle[1] = temp[1] + func_002A78D8(0.0f, 0.05f);
             particle[2] = temp[2] + func_002A78D8(0.0f, 0.05f);
-            func_002C65A0(particle, D_L00_001A8F20, 15, 0x808080, phase, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            func_002C65A0(particle, D_L00_001A8F20, 15, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
             func_00282CC0(temp, temp, tracking_delta);
         }
         if (D_L00_001B19C8 % 10 == 0) {
             p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
             if (p) p[2] = *D_L00_001FE9F4;
         }
-        func_L00_002E6EF8(func_L00_003ED850, obj);
+        ref_L00_003ED198_00(func_L00_003ED850, obj);
         break;
     case 1:
         if (func_00282948(state + 0x38)) {
             func_0029F338(obj);
             return;
         }
-        func_L00_002E6EF8(func_L00_003ED850, obj);
+        ref_L00_003ED198_00(func_L00_003ED850, obj);
         break;
     }
     if (*(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||

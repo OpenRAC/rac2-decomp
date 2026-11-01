@@ -2,4 +2,4 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003F10D8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003F1518);
+/* func_PAL_L00_003F1518 is defined in L00_003F10D8-seeker.c. */
