@@ -23,6 +23,10 @@
  * Retail: 225 `lbu; andi` tests of offset 0x60 in levels 1 and 2, none in a delay
  * slot, against 5 of 229 at other offsets; suggestive only.
  *
+ * 1 November 2026: the copy follows the branch in RTL (reorg fills the slot from the
+ * fall-through). Loading into a separate local before `distance > 4` and copying after
+ * it is still merged (51 rows, same size).
+ *
  * Recovered in this attempt (effects measured, mechanisms inferred from dumps):
  * - A separate heading call in each target-selection arm. jump2 cross-jumps them
  *   but sched1 still sees the block boundary after them, which gives retail's
