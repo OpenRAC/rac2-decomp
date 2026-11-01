@@ -43,7 +43,7 @@
  * shorter life wins, so $f13 on point1 and $f12 on hero0 fit a sched1 order of hero1, point0, then
  * those two. A two-death variable for hero1 (target, current) gives $f13 to it instead, and x/y, h/x/y
  * and dy locals tie. The eight initial values are dead and must go: read named constants or argument
- * copies in a later block instead (func_L08_0042A0B0), to reach 590 to 593 insns.
+ * copies in a later block instead (func_L08_0042A0B0), to reach 588 to 591 insns (295 buckets).
  * Declarations below are complete.
  */
 
