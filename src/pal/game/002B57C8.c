@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002B57C8);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002B57D0);
 
 extern float func_00283248(float, float);
 extern char *func_002B5D28(void *);
@@ -31,10 +30,8 @@ int func_PAL_002B5BA8(char *self, float *target, float amount)
     return func_002B50E0(self, target, angle);
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002B5C98);
 
 void func_PAL_002B5E10(char *m) {
     func_002B50E0(m, m + 0x10, *(float *)(m + 0xF8));
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002B5E58);

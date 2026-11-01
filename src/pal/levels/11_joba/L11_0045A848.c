@@ -91,4 +91,126 @@ void func_PAL_L11_0045A9A8(char *p)
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L11_0045AAE4);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L11_0045B9E8);
+typedef struct {
+    u8 pad00[0x10];
+    float position[4];
+    u8 stage;
+    u8 pad21[0x10];
+    u8 active;
+    u8 pad32[0x68 - 0x32];
+    void *state;
+    u8 pad6C[3];
+    u8 f6F;
+    u8 pad70[0xAA - 0x70];
+    s16 id;
+} JobaObject;
+typedef struct {
+    u8 pad00[0x20];
+    JobaObject *object;
+    u8 pad24[8];
+    s32 f2C;
+} HitRecord;
+typedef struct {
+    u8 pad00[0x28];
+    u8 f28;
+    u8 f29;
+    u8 pad2A[4];
+    u8 f2E;
+    u8 pad2F;
+    float f30;
+    u8 pad34[0x48 - 0x34];
+    u8 f48;
+    u8 pad49;
+    u8 f4A;
+    u8 pad4B[5];
+    char contact[0x10];
+    u8 f60;
+    u8 pad61[0x80 - 0x61];
+    float f80;
+    float f84;
+    u8 pad88[4];
+    float f8C;
+    u8 pad90[8];
+    s32 f98;
+    u8 pad9C[0xE0 - 0x9C];
+    s32 fE0;
+    float fE4;
+    u8 padE8[0x100 - 0xE8];
+    float f100;
+    float f104;
+    float f108;
+    float f10C;
+    float f110;
+    u8 pad114[0x12C - 0x114];
+    float f12C;
+    float f130;
+    float f134;
+    u8 pad138[0x256 - 0x138];
+    s16 f256;
+} JobaActorState;
+extern JobaObject *D_L11_001C4D80[];
+extern int func_00283CF0(float);
+extern HitRecord *func_002A9640(void *, int, int);
+extern int func_PAL_002B1A50(void *, void *, int);
+extern float func_00282E48(void *, void *);
+extern void func_002A93B0(void *);
+extern char D_L11_001BA8C0[];
+extern void func_L11_00456540(char *);
+extern void func_L11_00456378(char *);
+
+/* func_L11_00454F18 lives in L11_00454F18-g8.c. */
+
+/* Sets up the actor's tuning on its first stage, handles contacts while active, and runs the
+   attack-state update. */
+void func_PAL_L11_0045B9E8(JobaObject *obj)
+{
+    JobaActorState *state = obj->state;
+    HitRecord *hit;
+    JobaObject *other;
+
+    if (obj->stage == 0) {
+        state->f48 = func_00283CF0(15.0f);
+        state->f4A = func_00283CF0(12.0f);
+        state->f80 = 0.5f;
+        state->f84 = 0.5f;
+        state->f108 = 0.5f;
+        state->f256 = 0;
+        state->f60 = 13;
+        state->f98 = 4;
+        state->f8C = 0.4f;
+        state->f100 = 1.0f;
+        state->f104 = 0.25f;
+        state->f10C = 0.5f;
+        state->f110 = 1.57079649f;
+        state->f130 = 0.52359885f;
+        state->f134 = 0.01f;
+        state->f12C = 0.008f;
+        state->f28 = 3;
+        state->f30 = 0.75f;
+        state->f29 = 1;
+        func_L11_00456540((char *)obj);
+    }
+
+    if (obj->active) {
+        if (obj->stage >= 3) {
+            hit = func_002A9640(obj, 0x10000, 1);
+            if (hit && (other = hit->object) && !obj->active) {
+                if (other->id == 0xDF9 || other->id == 0xB89)
+                    hit->f2C = 0;
+            }
+            if (func_PAL_002B1A50(obj, state->contact, 0) == 5) {
+                state->fE0 = 0;
+                state->fE4 = 1.0053098f;
+            }
+        }
+        if (obj->active && func_00282E48(obj->position, D_L11_001BA8C0) < 24.0f) {
+            func_002A93B0(obj);
+            obj->f6F = 22;
+        }
+    }
+
+    if (obj->stage >= 2 && state->f2E == 2)
+        func_L11_00456540((char *)obj);
+    func_L11_00456378((char *)obj);
+}
+

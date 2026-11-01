@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/game", func_PAL_00323D48);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_003240E8);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_003242C8);
 

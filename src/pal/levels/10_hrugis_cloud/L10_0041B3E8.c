@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L10_0041B3E8);
 
 typedef signed int s32;
 typedef unsigned char u8;
@@ -51,4 +50,3 @@ void func_PAL_L10_0041BD40(u8 *arg0) {
     *(u16 *)(arg0 + 0x7C) = 0xFF;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L10_0041BDF8);

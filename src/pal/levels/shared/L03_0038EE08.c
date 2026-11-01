@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L03_0038EE08);
 
 extern unsigned char D_L03_00189E20[];
 extern float func_2EF158(void *, void *);

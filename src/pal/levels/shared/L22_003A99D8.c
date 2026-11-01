@@ -19,4 +19,3 @@ void func_PAL_L22_003ABFB8(u8 *a0) {
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L22_003AF154);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L22_003B06CC);

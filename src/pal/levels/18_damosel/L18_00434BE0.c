@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_00434BE0);
 
 typedef unsigned char u8;
 extern u8 D_001C97C0[];
@@ -27,12 +26,9 @@ void func_PAL_L18_00435260(u8 *a0) {
     func_L18_00432310(a0);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_004352C8);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L18_00435908);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L18_00435E70);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_004370E8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_00437388);

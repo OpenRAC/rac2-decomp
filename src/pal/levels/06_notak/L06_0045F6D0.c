@@ -1,12 +1,39 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_0045F6D0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_00460E58);
+extern float D_L06_001B234C __attribute__((sda));
+extern float D_001B2350 __attribute__((sda));
+extern int func_002A9640(char *, int, int);
+extern void func_L01_003D6B00(char *, int, float, float, float, float);
+extern int func_002E5CF8(int, int, char *);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_004610E0);
+void func_PAL_L06_00460E58(char *a0)
+{
+    char *p;
+    int n;
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_00461210);
+    if (*(unsigned char *)(a0 + 0x20) == 0) {
+        *(unsigned char *)(a0 + 0x20) = 1;
+        *(unsigned short *)(a0 + 0x34) |= 0x800;
+    }
+
+    p = (char *)func_002A9640(a0, 0x4010000, 0);
+    if (p != 0 && *(short *)(*(char **)(p + 0x20) + 0xAA) != 0xFE5) {
+        n = 3;
+        if (D_L06_001B234C < 0.8999999761581421f && D_001B2350 < 0.8999999761581421f)
+            n = 0xE;
+
+        func_L01_003D6B00(a0, n, 0.0f, 3.263000011444092f, 1.9739999771118164f,
+                          0.14000002f);
+        func_002E5CF8(0, 0, a0);
+        func_0029F338(a0);
+    } else {
+        *(unsigned char *)(a0 + 0xA8) = 0xFF;
+    }
+}
+
+
+
 
 #include "common.h"
 extern int func_00273B70(char *);
@@ -36,8 +63,6 @@ void func_PAL_L06_00461470(unsigned char *a0)
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L06_00461504);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_00461850);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L06_00467544);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_00468998);

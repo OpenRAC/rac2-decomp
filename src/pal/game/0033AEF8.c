@@ -1,14 +1,47 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033AEF8);
+extern void func_003361A8(void *p);
+extern void func_00336968(void *p);
+
+/* func_00338F58 is matched in 00338F58.c. */
+
+/* Initialises eight sub-objects at byte offsets 8, 84, 160, 236 (step 76) and 312, 384, 456, 528 (step 72) of the argument with two different helpers and returns the argument. */
+void *func_PAL_0033AEF8(char *a0)
+{
+    func_003361A8(a0 + 8);
+    func_003361A8(a0 + 84);
+    func_003361A8(a0 + 160);
+    func_003361A8(a0 + 236);
+    func_00336968(a0 + 312);
+    func_00336968(a0 + 400);
+    func_00336968(a0 + 488);
+    func_00336968(a0 + 576);
+    return a0;
+}
+
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0033AF68);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0033B218);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033B4B8);
+extern void func_00336320(char *a);
+extern void func_PAL_00338770(char *a);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033B520);
+/* early-returns when a 32-bit field is zero, otherwise calls one helper four times and another three times with fixed byte offsets off the argument pointer. */
+void func_PAL_0033B4B8(char *a0)
+{
+    if (*(int *)(a0 + 728) == 0)
+        return;
+    func_00336320(a0 + 8);
+    func_00336320(a0 + 84);
+    func_00336320(a0 + 160);
+    func_00336320(a0 + 236);
+    func_PAL_00338770(a0 + 312);
+    func_PAL_00338770(a0 + 400);
+    func_PAL_00338770(a0 + 488);
+}
+
+
 
 typedef int s32;
 typedef unsigned char u8;
@@ -40,9 +73,7 @@ void func_PAL_0033B6C0(char *p)
     *(int *)(p + 812) = 0;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033B740);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033B8D8);
 
 extern void func_L00_0042BAD0_1(char *object);
 extern void func_L00_0042C290_1(char *object);

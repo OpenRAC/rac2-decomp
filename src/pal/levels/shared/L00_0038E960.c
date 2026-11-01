@@ -1,8 +1,6 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0038E960);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0038EB58);
 
 extern float func_002A7878_1(float low, float high);
 typedef unsigned char L00_0037F7E8_u8;

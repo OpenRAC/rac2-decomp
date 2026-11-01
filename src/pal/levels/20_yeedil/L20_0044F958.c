@@ -1,8 +1,6 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0044F958);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0044FC48);
 
 extern void func_0032C700(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
                           int a7, float f12, float f13, int s1, int s2, int s3,
@@ -23,13 +21,9 @@ void func_PAL_L20_0044FD80(char *arg0, char *arg1) {
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0044FE40);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_004502D0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_004504B0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00450568);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00450700);
 
 typedef int TI128 __attribute__((mode(TI)));
 extern void func_00283098(void *, void *, void *);
@@ -64,8 +58,6 @@ void func_PAL_L20_004507E0(char *arg0) {
     }
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_004508B0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00450AD0);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00450D78);
