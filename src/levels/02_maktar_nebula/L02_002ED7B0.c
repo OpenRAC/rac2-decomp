@@ -533,7 +533,6 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L02_0039D708);
 
 /* func_L02_003CA4A8 is defined in L02_003CA4A8-g8.c. */
 

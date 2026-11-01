@@ -325,7 +325,6 @@ void func_L22_002B7C70(void) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L22_002C8610);
 
 
 extern unsigned char D_0018C0D4;

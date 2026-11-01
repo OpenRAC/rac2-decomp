@@ -245,5 +245,4 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L24_00389210);
 

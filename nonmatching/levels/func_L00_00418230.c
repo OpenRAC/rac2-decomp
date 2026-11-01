@@ -1,3 +1,4 @@
+/* Closer i, 1 November 2026: exact at 27 of 27 USA places with compiler/reload-other-inherit (checked with a scratch compile, not check.py), 2 rows off without it. Land once that branch is accepted. */
 /* GPT-6.1 Sol (high), task v0818, 29 October 2026.
  * USA v1.01, default -O2 -G0 -ffunction-sections: 1276/1276 bytes,
  * 0/27 places. First mismatch +0x4C. Indexed points preserve count in fp;
@@ -17,7 +18,7 @@ typedef struct { V vertex[4]; unsigned color[4]; union { float uv[4][2]; unsigne
 extern char D_L00_001B8C80[];
 extern int D_L00_0025A9B8;
 extern unsigned long long func_0027C878(int);
-extern void func_L00_00418140(void *,int),func_L00_004181A8(void *);
+extern void ref_L00_00418230_00(void *,int), ref_L00_00418230_01(void *);
 extern void func_00282CF0(void *,void *,void *),func_00282DD8(void *,void *,void *),func_002830C0(void *,void *,void *);
 extern void func_00282F20(void *,void *,float),func_00282D30(void *,void *,float);
 extern void func_00280B90(void *,int,int);
@@ -46,9 +47,9 @@ void func_L00_00418230(char *object,int alpha,V *points,int count)
     inner.f[2]=.04f; outer.f[2]=.16f;
     a.color[1]=color; b.color[0]=color;
     inner.f[3]=1; outer.f[3]=1;
-    func_L00_00418140(points,count);
-    func_L00_004181A8(&a);
-    func_L00_004181A8(&b);
+    ref_L00_00418230_00(points,count);
+    ref_L00_00418230_01(&a);
+    ref_L00_00418230_01(&b);
     a.tex.uvBits[0][0]=0; a.tex.uvBits[0][1]=0; a.tex.uvBits[1][0]=0;
     a.tex.uv[1][1]=1; a.tex.uv[2][0]=1; a.tex.uvBits[2][1]=0;
     a.tex.uv[3][0]=1; a.tex.uv[3][1]=1;

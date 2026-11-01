@@ -527,8 +527,6 @@ void func_L00_003E80A8(int index, char *object)
 
 /* func_L00_003E8180 uses small data in L00_003E8180-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003E8A98);
-
 /* func_L00_003E9490 is defined in L00_003E9490-qcopy.c. */
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */

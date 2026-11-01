@@ -1,3 +1,4 @@
+/* Closer i, 1 November 2026: 1360/1360 bytes, 6 rows. The damage field is fixed by reading through (&table[i])->damage. Left: +0x58/+0x5C/+0x64 (retail forms the position in a1, copying to a0 and s6) and +0x2C0 order; seven spellings of the position copy tie. */
 /* GPT-6.1 Sol (high effort), bounded retry, 29 October 2026; not linked.
  * Profile: -O2 -G8 -ffunction-sections, current pinned upstream compiler.
  * USA v1.01 and USA v2.00: 1360/1360 bytes, 0/27 placements each.
@@ -153,7 +154,7 @@ void func_L00_003EEE90(char *object)
                  * native C execution is undefined and unverified. */
                 func_00282F20(&request.impulse, &request.impulse, 1.0f);
                 func_002A8C00((char *)&request, (int)object, 0x830000,
-                             D_L00_00262570[D_00139568[0x2a]].damage,
+                             (&D_L00_00262570[D_00139568[0x2a]])->damage,
                              (Quad16 *)&normal);
                 request.impulse.word = normal.word;
                 request.kind = 3;

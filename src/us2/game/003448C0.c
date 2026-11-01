@@ -24,7 +24,97 @@ char *func_US2_003448C0(char *p)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_00344950);
+extern int func_00336E40(void *);
+extern int *func_00336DA8(int, int);
+extern void func_003361E0(void *, void *, void *);
+extern void func_US2_003377B0(void *, void *, void *);
+extern int *func_00335E20(void *);
+extern void func_00336A30(void *, int);
+extern void func_00335F88(void *, float, float, float, float);
+extern void func_00336390(void *, void *, int);
+extern void func_00336710(void *, void *, void *);
+extern int func_00288FB8(int);
+extern void func_00336A38(void *, int);
+extern int func_US2_003453D0();
+extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[], D_001ADFC0[], D_001ADFC8[];
+extern char D_001ADF10[], D_001ADF18[], D_001ADF20[], D_001ADD60[], D_001AE250[];
+extern char D_001ADD58[], D_001AE030[], D_001ADFD8[];
+extern char *D_001A8CFC[] __attribute__((sda));
+
+void func_US2_00344950(char *self, void *arg)
+{
+    int *buf;
+    float zero;
+
+    *(void **)(self + 0x4A4) = arg;
+    if (arg) {
+        buf = func_00336DA8(16, func_00336E40(arg));
+        *(int **)(self + 0x4A0) = buf;
+        buf[1] = 0;
+        buf[2] = 0;
+        buf[3] = 0;
+        buf[0] = 0;
+    }
+    zero = 0.0f;
+    *(int *)(self + 0x4A8) = 1;
+    (*(float **)(self + 0x4A0))[0] = 250.0f;
+    (*(float **)(self + 0x4A0))[1] = 207.0f;
+    func_003361E0(self, D_001ADC10, arg);
+    func_003361E0(self + 0x4C, D_001ADC18, arg);
+    func_003361E0(self + 0x98, D_001ADC20, arg);
+    func_003361E0(self + 0xE4, D_001ADC28, arg);
+    func_003361E0(self + 0x130, D_001ADFC0, arg);
+    func_003361E0(self + 0x17C, D_001ADFC8, arg);
+    func_US2_003377B0(self + 0x368, D_001ADF10, arg);
+    func_US2_003377B0(self + 0x3C0, D_001ADF18, arg);
+    func_US2_003377B0(self + 0x418, D_001ADF20, arg);
+    func_US2_003377B0(self + 0x2B8, D_001ADD60, arg);
+    func_US2_003377B0(self + 0x310, D_001AE250, arg);
+    func_US2_003377B0(self + 0x1C8, D_001ADD58, arg);
+    func_US2_003377B0(self + 0x220, D_001AE030, arg);
+    *func_00335E20(self) = 0x60442D00;
+    *func_00335E20(self + 0x4C) = 0x60241700;
+    *func_00335E20(self + 0x98) = 0x55F0C070;
+    *func_00335E20(self + 0xE4) = 0x55F0C070;
+    *func_00335E20(self + 0x17C) = 0x70FFFEED;
+    *func_00335E20(self + 0x130) = 0x55F0C070;
+    *func_00335E20(self + 0x2B8) = 0x80F0F0F0;
+    *func_00335E20(self + 0x310) = 0x80F0F0F0;
+    *func_00335E20(self + 0x1C8) = 0x80F0F0F0;
+    *func_00335E20(self + 0x220) = 0x80F0F0F0;
+    *func_00335E20(self + 0x368) = 0x80F0F0F0;
+    *func_00335E20(self + 0x3C0) = 0x80F0F0F0;
+    *func_00335E20(self + 0x418) = 0x80F0F0F0;
+    func_00336A30(self + 0x2B8, 0);
+    func_00336A30(self + 0x310, 1);
+    func_00335F88(self + 0x310, 0.9f, 0.9f, zero, zero);
+    func_00336390(self, D_001A8CFC[0] + 0x8710, 0x9E);
+    func_00336390(self + 0x4C, D_001A8CFC[0] + 0x8710, 0x9F);
+    func_00336390(self + 0x98, D_001A8CFC[0] + 0x8710, 0xA0);
+    func_00336390(self + 0xE4, D_001A8CFC[0] + 0x8710, 0xA1);
+    func_00336390(self + 0x130, D_001A8CFC[0] + 0x8710, 0x5D);
+    func_00336390(self + 0x17C, D_001A8CFC[0] + 0x8710, 0x5E);
+    *(int *)(self + 0x4AC) = 0;
+    *(int *)(self + 0x4B0) = 0;
+    *(int *)(self + 0x4B8) = 3;
+    func_00336710(self + 0x278, D_001ADFD8, arg);
+    *func_00335E20(self + 0x278) = 0x60F0F0B0;
+    func_00335F88(self + 0x278, 32.0f, 32.0f, zero, zero);
+    *func_00335E20(self + 0x1C8) = 0x80F0F0F0;
+    *func_00335E20(self + 0x220) = 0x80F0F0F0;
+    func_00336A38(self + 0x1C8, func_00288FB8(0x2BEA));
+    func_00336A38(self + 0x220, func_00288FB8(0x2BEF));
+    func_00336A38(self + 0x368, (int)(self + 0x470));
+    func_00336A38(self + 0x3C0, (int)(self + 0x480));
+    func_00336A38(self + 0x418, (int)(self + 0x490));
+    func_00336A30(self + 0x368, 0);
+    func_00336A30(self + 0x3C0, 0);
+    func_00336A30(self + 0x418, 0);
+    *(int *)(self + 0x4B4) = 0;
+    func_00336A38(self + 0x2B8, func_00288FB8(0x2BE5));
+    func_US2_003453D0(self, 0);
+}
+
 
 typedef struct {
     unsigned char gap0[0x4AC];
