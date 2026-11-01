@@ -1,32 +1,4 @@
-/* sol-high, USA v1.01, game -O2 -G8 -ffunction-sections.
- * Best check.py: 1808/1808 bytes, 0 of 2 places match (levels 02 and 12).
- * Twelve non-relocation instructions differ in level 02: +0x11C/+0x124/+0x12C
- * use v1 instead of a0 for the auxiliary index; +0x4EC through +0x50C
- * allocate the hero-target comparison's operands differently. The other
- * instructions agree after excluding relocation immediate fields. Symbol
- * values and both linked placements still need validation; no build was run.
- *
- * Improvements over the earlier 1780-byte draft: typed private/HUD/object
- * records, explicit SDATA views, paired tuning words accessed at +4 from
- * their owners, unsigned halfword indices, distinct frame/progress/message
- * temporaries, and duplicated active updates that the compiler tail-merges.
- * Read the frame counter before storing angle2 to reproduce the store in
- * the branch delay slot. func_002AA2E8 returns float (confirmed by its C
- * definition); its old void prototype assigned the fade read to the wrong FPR.
- * The angular step is exactly 0x3998825C, not the earlier 0x3998825A.
- * The particle helper's float size argument precedes the lifetime argument
- * in the declaration, preserving both EE argument banks and their widths.
- *
- * Negative trials: a two-dimensional save-byte array gave 48 instruction
- * differences; unsigned auxiliary indices materialized a two-word -1;
- * computing the auxiliary pointer before its sentinel test grew to 1812
- * bytes. Direct versus local auxiliary indices, and char-pointer versus
- * typed entity-pool arithmetic, tied at the twelve remaining differences.
- * Next: investigate allocation of the auxiliary-index and hero-target
- * temporaries without repeating those equivalent expressions. Required
- * declarations follow. A successful version needs its own G8 unit for the
- * switch table and a wrapper-mediated linked check. No volatile accesses or inline instruction sequences.
- */
+/* Multi-stage switch: hero target clear keeps the candidate pointer a named local, read after its index. */
 #include "common.h"
 typedef struct { char pad[0x464]; unsigned char flags[0]; } L02E1A40Progress;
 extern L02E1A40Progress D_L02_0021F4F0;
@@ -186,11 +158,7 @@ void func_L02_003E1A40(L02E1A40Object *obj)
         obj->ticks = ticks + 1;
         if(ticks>180) func_002A7750(obj,4,-1);
         else if(obj->ticks>60) {
-            {
-                L02E1A40Hero *hero=&D_00189E20;
-                L02E1A40Object *candidate=D_L02_001B359C[0]+d->other;
-                if(hero->target==candidate) hero->target=0;
-            }
+{ L02E1A40Object *candidate; int i=d->other; candidate=D_L02_001B359C[0]+i; if(D_00189E20.target==candidate) D_00189E20.target=0; }
             func_L00_003294F0((D_L02_001B359C[0]+d->first),1);
             func_L00_003294F0((D_L02_001B359C[0]+d->second),1);
         }

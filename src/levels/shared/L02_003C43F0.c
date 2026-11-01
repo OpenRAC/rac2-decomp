@@ -1032,7 +1032,7 @@ void func_L02_003DED08(void) {
     func_L00_0037E5F0(10000.0f);
 }
 
-INCLUDE_ASM("asm/levels", func_L02_003E1A40);
+/* func_L02_003E1A40 is defined in L02_003E1A40-g8.c. */
 
 /* func_L02_003E2150: defined in L02_003C43F0-ring-g8.c. */
 

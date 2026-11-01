@@ -426,7 +426,7 @@ int func_L09_003EA2D0(char *object, int index, int value)
     return -1;
 }
 
-INCLUDE_ASM("asm/levels", func_L09_003EA360);
+/* func_L09_003EA360 is defined in L09_003EA360-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L09_003EA798);
 

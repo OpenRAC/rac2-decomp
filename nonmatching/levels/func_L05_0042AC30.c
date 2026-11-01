@@ -1,19 +1,39 @@
 /* Complete C near miss; not linked and no matching credit.
- * 2026-10-30: game -O2 -G8 -ffunction-sections.
- * us: 0/4; us2: 0/4; pal: absent.
- * 944/940 bytes; frame 0xA0. Real seven-child state, three complete vectors and spring inputs
- * retained. Scalar initialization/store and loop induction schedules differ. The registered
- * callback is now canonical after the independent twelve-placement entry repair.
- * Reopen: Independent scalar/child-pointer lifetime and initializer scheduling witness.
+ * closer D, 1 November 2026: game -O2 -G8 -ffunction-sections.
+ * 928/940 bytes, 0/4 places; 74 words differ, frame 0xA0. The earlier draft inverted the 0x80 test:
+ * a set bit deletes the object. Rewritten as closed func_L05_0042BDB0 was: each tuning float a
+ * $gp scalar, fields through a union view, D_001A79F0 MACRO_ADDR, separate loop counters.
+ * Left: retail has eight saved GPRs where this has seven; actor is s3 and state s5, the origin
+ * copy at +0x13C is a short-lived v0 and the second loop keeps state+0x24 in s4.
+ * Reopen: scalar/child-pointer lifetime evidence for those registers.
  */
 #include "common.h"
 
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
-extern int D_L05_00221D94;
-extern int D_001A79F0;
+extern int D_L05_00221D94[];
+extern int D_001A79F0 MACRO_ADDR;
 extern u8 D_0019B2E8[];
 extern char *D_L05_001B251C;
-extern float D_L05_001B1680[] SDATA(D_L05_001B1680);
+extern float D_L05_001B1680 __attribute__((sda));
+extern float D_L05_001B1688 __attribute__((sda));
+extern float D_L05_001B168C __attribute__((sda));
+extern float D_L05_001B1690 __attribute__((sda));
+extern float D_L05_001B1694 __attribute__((sda));
+extern float D_L05_001B1698 __attribute__((sda));
+extern float D_L05_001B169C __attribute__((sda));
+extern float D_L05_001B16D4 __attribute__((sda));
+extern float D_L05_001B16D8 __attribute__((sda));
+extern float D_L05_001B16DC __attribute__((sda));
+extern float D_L05_001B16E0 __attribute__((sda));
+extern float D_L05_001B16E4 __attribute__((sda));
+extern float D_L05_001B16E8 __attribute__((sda));
+extern float D_L05_001B16EC __attribute__((sda));
+extern float D_L05_001B16F0 __attribute__((sda));
+extern float D_L05_001B16F4 __attribute__((sda));
+extern float D_L05_001B16F8 __attribute__((sda));
+extern float D_L05_001B16FC __attribute__((sda));
+extern float D_L05_001B1704 __attribute__((sda));
+extern float D_L05_001B170C __attribute__((sda));
 extern void *D_L05_001B1728 __attribute__((sda));
 extern void func_0029F338(void *);
 extern void func_002833F0(void *, void *);
@@ -26,73 +46,80 @@ extern void func_L00_002E6CF0(void (*)(void *), void *);
 /* The registered entry includes its measured pre-prologue F1 load. */
 extern void func_L05_0042AFE0(void *);
 
+typedef union { float f[0x40]; int i[0x40]; u16 uh[0x80]; } Fields;
+
 void func_L05_0042AC30(u8 *actor)
 {
     Vector position, step, rotation;
     u8 *state = *(u8 **)(actor + 0x68);
-    int i;
-    char **child;
-    float *tuning = D_L05_001B1680;
-    if (D_L05_00221D94 != 0 || !(D_0019B2E8[(D_001A79F0 << 4) + actor[0xB0]] & 0x80)) {
+    float *origin;
+    if (D_L05_00221D94[0] != 0 || (D_0019B2E8[actor[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
         func_0029F338(actor);
         return;
     }
     if (actor[0x20] == 0) {
         float span;
         float phase = 0.0f;
-        *(u16 *)(actor + 0x34) |= 0x41;
+        ((Fields *)actor)->uh[0x34 / 2] |= 0x41;
         func_002833F0(actor + 0xC0, actor + 0xF0);
         actor[0x20] = 1;
         actor[0x30] = 0xFF;
-        *(float *)(actor + 0x2C) = *(float *)(*(char **)(actor + 0x24) + 0x24) * (tuning[0] * tuning[2]);
-        span = tuning[7] * 6.0f;
-        tuning[4] = tuning[25] = tuning[30] = tuning[31] = 0.0f;
-        tuning[33] = tuning[35] = tuning[21] = tuning[26] = 0.0f;
-        *(float *)(state + 0x20) = span;
+        ((Fields *)actor)->f[0x2C / 4] = *(float *)(*(char **)(actor + 0x24) + 0x24) * (D_L05_001B1680 * D_L05_001B1688);
+        span = D_L05_001B169C * 6.0f;
+        D_L05_001B1690 = D_L05_001B16E4 = D_L05_001B16F8 = D_L05_001B16FC = 0.0f;
+        D_L05_001B1704 = D_L05_001B170C = D_L05_001B16D4 = D_L05_001B16E8 = 0.0f;
+        ((Fields *)state)->f[0x20 / 4] = span;
         func_00282D30(&position, actor + 0xC0, span);
         func_00282CC0(&position, &position, actor + 0x10);
-        *(float *)(state + 0x24) = position.f[0];
-        *(float *)(state + 0x28) = position.f[1];
-        *(float *)(state + 0x2C) = position.f[2];
+        ((float *)(state + 0x24))[0] = position.f[0];
+        ((float *)(state + 0x24))[1] = position.f[1];
+        ((float *)(state + 0x24))[2] = position.f[2];
         span *= 0.14285715f;
         func_00282D30(&step, actor + 0xC0, -span);
         func_002AB600(&rotation, actor + 0xC0);
-        child = (char **)state;
-        for (i = 6; i >= 0; i--) {
-            *child++ = func_L05_0042BCE0(&position, &rotation, tuning[0], phase);
+        {
+        char **child = (char **)state;
+        int i;
+        for (i = 6; i >= 0; i--, child++) {
+            *child = func_L05_0042BCE0(&position, &rotation, D_L05_001B1680, phase);
             phase += span;
             func_00282CC0(&position, &position, &step);
         }
+        }
         D_L05_001B1728 = actor;
     }
-    child = (char **)state;
-    for (i = 6; i >= 0; i--, child++) {
-        u8 *object = (u8 *)*child;
+    {
+    char **slot = (char **)state;
+    int j;
+    origin = (float *)(state + 0x24);
+    for (j = 6; j >= 0; j--, slot++) {
+        u8 *object = (u8 *)*slot;
         if (object != 0) {
-            float amount = tuning[3] * 0.016666668f;
+            float amount = D_L05_001B168C * 0.016666668f;
             u8 *objectState;
             amount += amount;
             func_00282D30(&position, actor + 0xC0, -amount);
             func_00282CC0(object + 0x10, object + 0x10, &position);
             objectState = *(u8 **)(object + 0x68);
-            *(float *)(objectState + 0x10) += amount;
-            if (*(float *)(state + 0x20) <= *(float *)(objectState + 0x10)) {
-                *(float *)(object + 0x10) = *(float *)(state + 0x24);
-                *(float *)(object + 0x14) = *(float *)(state + 0x28);
-                *(int *)(object + 0x1C) = 0;
-                *(float *)(object + 0x18) = *(float *)(state + 0x2C);
-                *(int *)(objectState + 0x10) = 0;
+            ((Fields *)objectState)->f[0x10 / 4] += amount;
+            if (((Fields *)state)->f[0x20 / 4] <= ((Fields *)objectState)->f[0x10 / 4]) {
+                ((float *)(object + 0x10))[0] = origin[0];
+                ((float *)(object + 0x10))[1] = origin[1];
+                ((float *)(object + 0x10))[3] = 0;
+                ((float *)(object + 0x10))[2] = origin[2];
+                ((Fields *)objectState)->i[0x10 / 4] = 0;
             }
         }
     }
-    if (*(int *)(*(char **)(D_L05_001B251C + (*(int *)(state + 0x1C) << 8) + 0x68) + 0x34) != 0) {
-        tuning[3] = func_002702C8(tuning + 4, tuning[3], tuning[6], 0.02f, 0.2f, 0.0f);
-        tuning[22] = func_002702C8(tuning + 25, tuning[22], tuning[24], 0.02f, 0.2f, 0.0f);
-        tuning[27] = func_002702C8(tuning + 30, tuning[27], tuning[29], 0.02f, 0.2f, 0.0f);
+    }
+    if (*(int *)(*(char **)(D_L05_001B251C + (((Fields *)state)->i[0x1C / 4] << 8) + 0x68) + 0x34) != 0) {
+        D_L05_001B168C = func_002702C8(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1698, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16D8 = func_002702C8(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16E0, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16EC = func_002702C8(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F4, 0.02f, 0.2f, 0.0f);
     } else {
-        tuning[3] = func_002702C8(tuning + 4, tuning[3], tuning[5], 0.02f, 0.2f, 0.0f);
-        tuning[22] = func_002702C8(tuning + 25, tuning[22], tuning[23], 0.02f, 0.2f, 0.0f);
-        tuning[27] = func_002702C8(tuning + 30, tuning[27], tuning[28], 0.02f, 0.2f, 0.0f);
+        D_L05_001B168C = func_002702C8(&D_L05_001B1690, D_L05_001B168C, D_L05_001B1694, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16D8 = func_002702C8(&D_L05_001B16E4, D_L05_001B16D8, D_L05_001B16DC, 0.02f, 0.2f, 0.0f);
+        D_L05_001B16EC = func_002702C8(&D_L05_001B16F8, D_L05_001B16EC, D_L05_001B16F0, 0.02f, 0.2f, 0.0f);
     }
     func_L00_002E6CF0(func_L05_0042AFE0, actor);
 }

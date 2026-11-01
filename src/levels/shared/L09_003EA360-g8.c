@@ -1,12 +1,3 @@
-/* Retained complete C reconstruction, 30 October 2026. NOT MATCHING.
- * Profile: -O2 -G8 -ffunction-sections -g.
- * us: 09_dobbo: 1080 bytes, expected 1076; us2: 09_dobbo: 1080 bytes, expected 1076; pal: ABSENT.
- * Complete aim/fire reconstruction with a genuine 64-byte joint matrix. Absolute and GP views of
- * the clock retain one canonical storage identity. A scoped distance split and macro-address
- * witness recover the GPR frame; FP lifetimes, scheduling and divide padding still differ.
- * Reopen: Independent FP-lifetime and division scheduling witness.
- * Local placement checks only; no strict linked or native-runtime claim.
- */
 #include "common.h"
 extern void func_0029FCC0(void *,int,void *),func_0029FC20(void *,int,void *);
 extern float func_00282E48(void *,void *),func_00282E80(void *,void *),func_00282E20(void *);
@@ -18,7 +9,7 @@ extern void func_002ACB48(void *,float),func_002A7470(void *,int,int,int);
 extern void func_002AEC48(void *,void *,int,float,float);
 extern void *func_L09_003AE8C8(void *,void *,void *,int,int,float,float,float,float);
 extern char D_00189F30[] MACRO_ADDR;
-extern int D_L09_001B2388 NOT_SDA;
+extern int D_L09_001B2388 MACRO_ADDR;
 extern int D_L09_001B2388_gp SDATA(D_L09_001B2388);
 extern float D_L09_001B0BD4 __attribute__((sda));
 extern float D_L09_001B0C30 __attribute__((sda));
@@ -34,6 +25,8 @@ extern float D_L09_001B0BEC __attribute__((sda));
 extern float D_L09_001B0C38 __attribute__((sda));
 extern float D_L09_001B0C3C __attribute__((sda));
 
+typedef union { u8 pad[0x318]; struct { u8 pad0[0x298]; float yaw; u8 pad1[0x314 - 0x29C]; float pitch; } aim; } AimState;
+
 /* Tracks a shot direction in active states and drives the two aim channels.
  * The joint transform is a complete 64-byte matrix, not one vector.
  */
@@ -42,13 +35,12 @@ void func_L09_003EA360(u8 *object)
     struct { float point[4], direction[4], joint[16]; } frame;
     u8 *state = *(u8 **)(object + 0x68);
     float blend = 1.0f, distance, angle;
-    float one = 1.0f;
     if ((unsigned)(object[0x20] - 3) < 3) {
         func_0029FCC0(object, 0, frame.point);
-        distance = func_00282E48(frame.point, state + 0x140) - one;
+        distance = func_00282E48(frame.point, state + 0x140) - 1.0f;
         distance /= D_L09_001B0BD4 * 0.016666668f;
-        func_00282D30(frame.direction, D_00189F30,
-                     distance * func_002A7878(D_L09_001B0C2C, D_L09_001B0C30));
+        distance *= func_002A7878(D_L09_001B0C2C, D_L09_001B0C30);
+        func_00282D30(frame.direction, D_00189F30, distance);
         func_002ACB48(frame.direction, D_L09_001B0C34);
         frame.direction[2] = 0.0f;
         func_00282CC0(frame.direction, frame.direction, state + 0x140);
@@ -73,7 +65,7 @@ void func_L09_003EA360(u8 *object)
             func_0029FC20(object, 2, frame.joint);
             func_00282F20(frame.direction, frame.joint, D_L09_001B0BD4 * 0.016666668f);
             func_L09_003AE8C8(frame.point, object, frame.direction, 1, 1,
-                              (float)state[0x34], distance, one, one);
+                              (float)state[0x34], distance, 1.0f, 1.0f);
             state[0x369]++;
             state[0x368] = D_L09_001B0BDC;
             if (D_L09_001B0BD8 < state[0x369]) {
@@ -81,19 +73,18 @@ void func_L09_003EA360(u8 *object)
                 *(u16 *)(state + 0x36A) = D_L09_001B0BE0;
                 if (func_00282E80(object + 0x10, state + 0x140) < D_L09_001B0BE8)
                     *(u16 *)(state + 0x36A) = D_L09_001B0BE4;
+                if (object[0x43] != 0) func_002A7470(object, 0, 0, 0);
             }
         }
-        if (object[0x43] != 0) func_002A7470(object, 0, 0, 0);
         blend = func_00283CE0(*(u16 *)(object + 0x96)) / D_L09_001B0BEC;
         if (blend > 1.0f) blend = 1.0f;
         else if (blend < 0.0f) blend = 0.0f;
-    } else {
-        if (object[0x20] < 3) return;
+    } else if (object[0x20] < 3) {
         if (object[0x43] != 0) func_002A7470(object, 0, 0, 0);
         blend = 0.1f;
-        *(float *)(state + 0x314) = func_00283198(func_002ABB18(
+        ((AimState *)state)->aim.pitch = func_00283198(func_002ABB18(
             func_00283CE0(D_L09_001B2388_gp) * 0.016666668f)) * 0.2617994248867035f;
-        *(float *)(state + 0x298) = func_00283198(func_002ABB18(
+        ((AimState *)state)->aim.yaw = func_00283198(func_002ABB18(
             func_00283CE0(D_L09_001B2388) * 0.014285714365541935f)) * 0.349065899848938f;
     }
     func_002AEC48(object, state + 0x230, 0, D_L09_001B0C38 * blend, D_L09_001B0C3C);

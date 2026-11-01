@@ -42,6 +42,9 @@
  * by loop.c into retail's descending stores; per-loop counters are needed (one shared
  * `i` lands in $s0 everywhere); `angle` stores precede the height/width loads; the
  * top-z chain stores point[3] first; holding D_L12_001B1D4C in a local hoists it.
+ *
+ * closer D, 1 November 2026: on branch compiler/block-move-quad the six copies are retail's lq/sq
+ * loops and this draft reaches 2444/2444 bytes with 13 words left, the FPR and spill-slot items.
  */
 #include "common.h"
 

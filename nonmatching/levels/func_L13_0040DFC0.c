@@ -13,6 +13,11 @@
  * Allocator dump: red load/shift pseudos 212/213 -> v1; green 216/217 -> a2.
  * A new hypothesis must change that allocation while retaining the OR DAG.
  * Compile as a separate -G8 unit; required declarations follow.
+ *
+ * closer D, 1 November 2026: same dataflow and order as retail; only the qty sort differs. The red
+ * chain 212/213/228/230 has 10 refs (priority about 0.88), the green chain 216/217 has 5 (0.71), so
+ * red takes $v1. Retail gives green $v1, which needs fewer refs tied to red or a longer red life.
+ * Nine more spellings of the opaque/transparent pair tie or are worse.
  */
 #include "common.h"
 

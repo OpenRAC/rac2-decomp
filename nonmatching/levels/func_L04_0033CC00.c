@@ -14,6 +14,11 @@
  * Next: recover a real source dependence around the vertical branch, without
  * volatile locals, fabricated field accesses, or barriers.
  * All required declarations follow; symbols remain unqualified by a full build.
+ *
+ * closer D, 1 November 2026: sched1 hoists the flags load into the load-delay gap after the
+ * velocity load, ahead of mul.s/swc1. Retail keeps it after the store, which needs a dependence from
+ * the sp+0x14 store to the cfg+0x38 load: base_alias_check sees stack against argument and answers
+ * no alias, so cfg's base must be unknown to alias analysis in retail (a pseudo with two sets?).
  */
 #include "common.h"
 extern void func_00282CF0(void *, void *, void *);

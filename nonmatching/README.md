@@ -86,8 +86,7 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 | [`func_L05_00417D48`](levels/func_L05_00417D48.c) | 1204 | 1200/1204 bytes; nonmatching. Independent constructor result/state lifetime witness. See source for the profile and measured release coverage. |
 | [`func_L05_00419888`](levels/func_L05_00419888.c) | 1068 | 1060/1068 bytes; nonmatching. Independent collision CFG/packet-lifetime witness, preserving all query and effect arguments. See source for the profile and measured release coverage. |
 | [`func_L05_00427238`](levels/func_L05_00427238.c) | 1196 | 1124/1196 bytes; nonmatching. Independent impact/trail CFG and packet/argument lifetime witness. See source for the profile and measured release coverage. |
-| [`func_L05_0042AC30`](levels/func_L05_0042AC30.c) | 940 | 944/940 bytes; nonmatching. Independent scalar/child-pointer lifetime and initializer scheduling witness. See source for the profile and measured release coverage. |
-| [`func_L05_0042BDB0`](levels/func_L05_0042BDB0.c) | 1020 | 1024/1020 bytes; nonmatching. Measured state CFG and scratch lifetime evidence. See source for the profile and measured release coverage. |
+| [`func_L05_0042AC30`](levels/func_L05_0042AC30.c) | 940 | Near miss, 928/940 bytes, 74 words; the 0x80 test corrected. See source. |
 | [`func_L05_00442A58`](levels/func_L05_00442A58.c) | 1332 | 1336/1332 bytes; nonmatching. Independent controller ramp/FP lifetime witness; no false volatile or register pins. See source for the profile and measured release coverage. |
 | [`func_L05_004432E0`](levels/func_L05_004432E0.c) | 1116 | 1060/1116 bytes; nonmatching. Independent camera record lifetime and scalar scheduling evidence. See source for the profile and measured release coverage. |
 | [`func_L07_003F3E80`](levels/func_L07_003F3E80.c) | 1372 | nonmatching. Complete moving/death effect reconstruction. See source for the profile and measured release coverage. |
@@ -100,9 +99,8 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 | [`func_L09_003A01D8`](levels/func_L09_003A01D8.c) | 1240 | nonmatching. Independent source-lifetime/union scheduling witness; preserve the complete impact extent. See source for the profile and measured release coverage. |
 | [`func_L09_003AE8C8`](levels/func_L09_003AE8C8.c) | 444 | nonmatching. Independent original argument-lifetime and division line-boundary evidence. See source for the profile and measured release coverage. |
 | [`func_L09_003E3288`](levels/func_L09_003E3288.c) | 1216 | nonmatching. Independent global-base and scan-loop source witness. See source for the profile and measured release coverage. |
-| [`func_L09_003EA360`](levels/func_L09_003EA360.c) | 1076 | nonmatching. Independent FP-lifetime and division scheduling witness. See source for the profile and measured release coverage. |
 | [`func_L09_003F04D0`](levels/func_L09_003F04D0.c) | 1348 | nonmatching. Independent switch/control-flow and constructor argument-lifetime witness. See source for the profile and measured release coverage. |
-| [`func_L09_003F8AE0`](levels/func_L09_003F8AE0.c) | 1372 | nonmatching. Independent packed-parameter lifetime/alias witness. See source for the profile and measured release coverage. |
+| [`func_L09_003F8AE0`](levels/func_L09_003F8AE0.c) | 1372 | Near miss, 1372/1372 bytes, 53 words, mostly $a0/$a1 naming. See source. |
 | [`func_L09_003FB9F8`](levels/func_L09_003FB9F8.c) | 1440 | nonmatching. Independent loop FP-lifetime and scalar-division scheduling witness. See source for the profile and measured release coverage. |
 | [`func_L11_003F4A58`](levels/func_L11_003F4A58.c) | 880 | nonmatching. Independent loop-local vector pointer lifetime witness. See source for the profile and measured release coverage. |
 | [`func_L11_00416D70`](levels/func_L11_00416D70.c) | 1156 | nonmatching. Independent child-basis copy and switch lifetime witness. See source for the profile and measured release coverage. |

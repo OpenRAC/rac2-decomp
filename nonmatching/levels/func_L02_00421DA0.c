@@ -14,6 +14,10 @@
  * Next useful evidence: a real base-pointer use/lifetime that changes this
  * priority without adding the axis pointer or spilling the input flag.
  * All declarations needed are below. Historical notes follow.
+ *
+ * closer D, 1 November 2026: in the dumps base is pseudo 204, the gcse copy of 87 (REG_EQUIV, so
+ * update_equiv_regs doubles its live length from 244 to 488) and axis is 205, PRE-inserted before
+ * the loop, 227 live. Global allocates 205 first. Unsplit edges, keep-block-order and -g tie.
  */
 
 /*

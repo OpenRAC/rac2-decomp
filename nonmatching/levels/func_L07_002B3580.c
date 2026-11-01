@@ -23,6 +23,15 @@
  * register bank's physical interface. All declarations are included below.
  * Related RAC1 body: src/overlays/l05_rilgar/hero_collision.c,
  * HeroL05_GroundProbe (the RAC2 version has additional ground modes).
+ *
+ * closer D, 1 November 2026: the $v0/$v1 swap is local-alloc's three-quantity sort. Block 2 holds
+ * exactly three quantities: the constant 2 (q0), the 2.2f constant (q1) and the mode load (q2).
+ * block_alloc's hand sort for next_qty == 3 calls qty_compare with fixed quantity numbers while it
+ * exchanges qty_order, so with q1 and q2 tied the mode load goes last and the constant takes $v0.
+ * Retail needs q2 ahead: any fourth quantity in the block (qsort is correct), or q1 out of the
+ * block. A multi-block `s = 2.2f; ... s = 2.9f` gives retail's $v1/$v0, but s then prefers $f12
+ * through the copy to reach, so the FPRs differ (5 words). Tied: operand order, h local, -g,
+ * unsplit edges, keep-block-order.
  */
 #include "common.h"
 

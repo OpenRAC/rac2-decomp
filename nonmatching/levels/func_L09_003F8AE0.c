@@ -1,10 +1,15 @@
 /* Retained complete C reconstruction, 30 October 2026. NOT MATCHING.
  * Profile: -O2 -G8 -ffunction-sections.
- * us: 09_dobbo: 1356 bytes, expected 1372; us2: 09_dobbo: 1356 bytes, expected 1372; pal: ABSENT.
+ * 1372/1372 bytes, 0/2 places on 1 November 2026; 53 words differ, mostly $a0/$a1 naming.
  * Complete parent/child target propagation, hit response and deletion logic. The measured
  * 48-byte animation parameter group is an actual packed structure assignment, not per-
  * instruction assembly. Both detach loops and real integer helper results remain. Reload
  * scheduling, copy grouping and control flow differ.
+ * closer D: retail rereads the slot through a pointer giv in both detach loops, and the D_001A79F0
+ * read is one MACRO_ADDR lui/lw. Left: child[0xA8] loads into v0, is compared against a1 (cse's 255,
+ * the object's own byte) and is copied to a1 in the delay slot; here one pseudo holds it, so the
+ * a0/a1 roles swap through the first half. The constant 1 for byte 0x31 is set in both qzero arms
+ * in retail (delay of the b, then after the sq), before the loop here; unsplit edges does not move it.
  * Reopen: Independent packed-parameter lifetime/alias witness.
  * Local placement checks only; no strict linked or native-runtime claim.
  */
@@ -18,7 +23,7 @@ typedef struct __attribute__((packed)) { u64 fields[6]; } AnimationParameters;
 typedef struct { char prefix[0x38]; u8 *owner; char suffix[4]; } TargetSlot;
 extern TargetSlot D_L09_001C40C0[];
 extern char D_L09_001B9A00[];
-extern int D_001A79F0 NOT_SDA;
+extern int D_001A79F0 MACRO_ADDR;
 extern u8 *D_L09_001B285C __attribute__((sda));
 extern int D_L09_001A9040 __attribute__((sda));
 extern float func_00282E48(void *,void *);
@@ -45,11 +50,11 @@ void func_L09_003F8AE0(u8 *object)
     if (object[0xA8] == 255) {
         child = P(state,0x2F8);
         if (child && S(child,0xAA) == 0xD0E && child[0x20] != 0xFE && child[0x20] != 0xFD) {
-            int index = child[0xA8];
-            if (index != 255 && D_L09_001C40C0[index].owner == child) {
+            int index, v = child[0xA8];
+            if (v != 255) { index = v; if (D_L09_001C40C0[index].owner == child) {
                 object[0xA8] = index;
                 D_L09_001C40C0[object[0xA8]].owner = object;
-            }
+            } }
         }
     }
     before = object[0x20];
@@ -83,12 +88,11 @@ void func_L09_003F8AE0(u8 *object)
                     func_00282D30(state + 0xD0,state + 0xD0,0.05f);
                 } else qzero(state + 0xD0);
                 for (i = 0; i < 2; i++) {
-                    u8 *effect = P(state,0x2F0 + i * 4);
-                    if (effect) {
-                        H(effect,0x34) &= 0xFFFD;
-                        H(effect,0x34) &= 0xFFFE;
-                        effect[0x31] = 1;
-                        P(state,0x2F0 + i * 4) = 0;
+                    if (((u8 **)(state + 0x2F0))[i]) {
+                        H(((u8 **)(state + 0x2F0))[i],0x34) &= 0xFFFD;
+                        H(((u8 **)(state + 0x2F0))[i],0x34) &= 0xFFFE;
+                        ((u8 **)(state + 0x2F0))[i][0x31] = 1;
+                        ((u8 **)(state + 0x2F0))[i] = 0;
                     }
                 }
             } else {
@@ -105,10 +109,9 @@ void func_L09_003F8AE0(u8 *object)
                 child = P(state,0x2F8);
                 if (!(H(child,0x7C) & 0x20)) H(child,0x7C) |= 0x200;
                 for (i = 0; i < 2; i++) {
-                    u8 *effect = P(state,0x2F0 + i * 4);
-                    if (effect && !((H(P(state,0x2F8),0x7C) >> (i+4)) & 1)) {
-                        H(effect,0x34) &= 0xFFFD;
-                        P(state,0x2F0 + i * 4) = 0;
+                    if (((u8 **)(state + 0x2F0))[i] && !((H(P(state,0x2F8),0x7C) >> (i+4)) & 1)) {
+                        H(((u8 **)(state + 0x2F0))[i],0x34) &= 0xFFFD;
+                        ((u8 **)(state + 0x2F0))[i] = 0;
                     }
                 }
             }

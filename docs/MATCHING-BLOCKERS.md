@@ -34,6 +34,23 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Three-quantity local allocation
+
+**1 November 2026, retained near miss.** `block_alloc` sorts two or three quantities by hand:
+`qty_compare (0, 1)`, `(1, 2)`, `(0, 1)` take fixed quantity numbers while `EXCHANGE` moves
+`qty_order`, so the result depends on birth order; four or more go through `qsort`, which is
+correct. `func_L07_002B3580` misses by a $v0/$v1 swap for this reason: block 2 holds the constant 2,
+the 2.2f constant and the mode load, the last two tie, and the load is allocated last. Taking 2.2f
+out of the block gives retail's pair but moves the FPRs. When two integer registers swap in a
+block with few locals, count its quantities before trying spellings.
+
+### 16-bit counters read through a wider local
+
+**1 November 2026, local match.** `x++ > n` on a `u16` field keeps the old value in a HImode pseudo
+and compares through `zero_extend`, which `func_L03_00409248` shows as `andi` where retail has
+`daddu`. `unsigned c = x, old = c++; x = c;` gives retail's SImode copy. An `int` pair is one word
+off (signed compare), and a true bitfield does not help.
+
 ### Complete matrix storage and loop lifetimes
 
 `func_L09_003FEAE8` needs one 64-byte joint matrix, with its position at
