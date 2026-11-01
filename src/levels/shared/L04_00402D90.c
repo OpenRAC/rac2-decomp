@@ -130,7 +130,7 @@ INCLUDE_ASM("asm/levels", func_L04_004045E0);
 
 /* func_L04_00407078 is in L04_00402D90-debris.c. */
 
-INCLUDE_ASM("asm/levels", func_L04_004073E8);
+/* func_L04_004073E8 is in L04_00402D90-trail.c. */
 
 extern int func_00282978(void *);
 extern void func_L00_002E6EF8(void (*)(void *), void *);
