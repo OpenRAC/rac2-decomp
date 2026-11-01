@@ -25,3 +25,47 @@ void plain(void)
     if (ticks == 5)
         every_fifth();
 }
+
+extern float measure(float *);
+extern void mark(float *);
+
+/* A volatile asm between the `bc1f' that holds the restore of $16 in its slot and the `b' to the
+   epilogue: the restore at the epilogue is not redundant across it. */
+void copied(float *dst, float *src, float *state, int mode, float *probe)
+{
+    if (mode == 0) {
+        if (measure(probe) > 0.0f) {
+            __asm__ __volatile__("lq $2,0x0(%1)\n\tsq $2,0x0(%0)" : : "r"(dst), "r"(src) : "$2", "memory");
+            *state = 0.0f;
+        } else {
+            mark(probe);
+            mark(probe);
+            if (measure(probe) > 0.0f) {
+                __asm__ __volatile__("lq $2,0x0(%1)\n\tsq $2,0x0(%0)" : : "r"(dst), "r"(src) : "$2", "memory");
+                *state = 0.0f;
+            }
+        }
+    } else {
+        prepare();
+    }
+}
+
+/* Control: a plain store in the asm's place; the `b' skips the redundant restore. */
+void stored(float *dst, float *src, float *state, int mode, float *probe)
+{
+    if (mode == 0) {
+        if (measure(probe) > 0.0f) {
+            src[0] = 0.0f;
+            *state = 0.0f;
+        } else {
+            mark(probe);
+            mark(probe);
+            if (measure(probe) > 0.0f) {
+                dst[0] = 0.0f;
+                *state = 0.0f;
+            }
+        }
+    } else {
+        prepare();
+    }
+}
