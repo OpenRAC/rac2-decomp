@@ -28,6 +28,6 @@ void func_PAL_002DF6D0(int value, int mode)
     }
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002DF760);
+/* func_PAL_002DF760 is defined in 002DF6D0-restore.c. */
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002DFE20);

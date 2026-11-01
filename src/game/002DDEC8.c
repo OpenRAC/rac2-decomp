@@ -235,7 +235,7 @@ void func_002DE900(int value, int mode)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002DE990);
+/* func_002DE990 is defined in 002DDEC8-restore.c. */
 
 
 void func_002DF158(s32 object, s32 amount)
