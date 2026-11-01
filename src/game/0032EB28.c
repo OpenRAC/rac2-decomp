@@ -438,7 +438,6 @@ void func_003349E8(void *owner, int flag, float value)
     F7242f0a4_FUN_00282D30(owner, root + 12, F7242f0a4_FUN_00282DB0(root + 12, buffer));
 }
 
-INCLUDE_ASM("asm/game", func_00334A88);
 
 typedef int TI __attribute__((mode(TI)));
 extern void *D_0026E810[7];

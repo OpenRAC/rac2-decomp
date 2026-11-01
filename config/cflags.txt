@@ -2843,3 +2843,10 @@ src/levels/shared/L00_00429568-g.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-
 src/levels/shared/L06_0035EA68-links.c	-O2 -G0 -ffunction-sections -ffast-math
 src/levels/shared/L00_003C6298-gate-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
 src/pal/levels/14_aranos_prison/L14_003E0C90-gate-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/levels/shared/L00_003B3450-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/02_maktar_nebula/L02_00401638-sway.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L18_002DEFF8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/game/00334A88-pivot-g8.c	-O2 -G8 -ffunction-sections
+src/levels/08_tabora/L08_0042A0B0-ribbon.c	-O2 -G0 -ffunction-sections -g
+src/levels/30_insomniac_museum/L30_00417120-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L12_00429ED8-g8.c	-O2 -G8 -ffunction-sections -g

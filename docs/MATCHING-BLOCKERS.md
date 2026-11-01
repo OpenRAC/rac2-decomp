@@ -369,6 +369,26 @@ slot order therefore means a different insn count at gcse, not a different alloc
 `color` local dropped and an `int` last argument. `func_L00_003A53E8` needs at least 12 more,
 `func_L00_003A1580` about 10 to 20 fewer. Forcing the size in a diagnostic cc1 is enough to test
 this: a two-line `getenv` in `alloc_expr_hash_table`, never in the real compiler.
+Honest insns for the count: a value set before a label and read only past it survives cse1, is
+counted, and gcse's cprop folds it, so the bytes stay. `func_L08_0042A0B0` needed 12: small named
+constants read in the loop (`last = 19`, `total = 20`, `mask = 3`, two counts, `mode`, `flags`) and
+argument copies read only in it (`segment`, `path`, `entry`, `row`, `w0`). No dead initial values.
+A literal float gains nothing (it already takes two insns), nor a constant read in its own block,
+nor a large constant (it stays in a register).
+
+**Sub operands and one-cycle-late insns, 1 November 2026:**
+`sub.s $f13,$f0,$f13` (the subtrahend in the argument register): local-alloc suggests the hard
+register to both dying operands, so the minuend takes it unless it is not local. A variable with
+two deaths goes to global-alloc: `t = p[5]; t = f(z, t - q[5]);` closed `func_L02_00401638`. With two
+local operands the shorter life wins, which is sched1's order.
+An ALU insn retail issues after a call that sched2 here puts before it (`func_00334A88`) can be a
+block-placement matter: `$a0`, `$a1` and the insn compete for two issue slots, and one more insn in
+the block delays the call by a cycle. Setting `axis` before the branch moved that insn into the
+previous block, so the call became ready together with the set, and `reorg` filled its slot with
+the argument. Check this before looking for a hidden insn. `func_L12_00300410` has the same shape
+with no such insn to move, and stays open: its $s0 set would need a barrier or a dependence.
+An argument pair `lui`/`addiu` kept together among other argument moves is a `MACRO_ADDR` object:
+that alone closed `func_L00_003B3450` and took 7 rows from `func_L02_00401638`.
 Sched ties: `rank_for_schedule` compares priority, register weight, class against the last insn,
 then the count of dependents, then the original order. An insn that reads the frame register gets
 one more dependent from a following call in its block (`func_L23_0041A3B8`).

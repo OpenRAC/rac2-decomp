@@ -17,6 +17,10 @@
  * into a local before assigning the state pointer adds a move. Reusing a separate
  * context pointer for state and scene worsens allocation. An early velocity
  * pointer used only in the emitter loop adds a duplicate pointer and eight bytes.
+ * Opus G2, 1 November 2026: the five rows are one cause. sched2 issues the $s0 set in the second
+ * slot of the cycle before the call, and reorg then fills the call's slot with it. Retail keeps it
+ * after the call, so the a0 low half fills the slot. Int-returning callee: tied. Nothing else
+ * competes for the slot, unlike func_00334A88; it needs a barrier or a real dependence.
  * Next useful investigation: why the mode-check pointer's allocation and the
  * post-call scheduling differ together; equivalent comparisons have tied.
  * All required declarations are below. To reproduce, compile this alone in
