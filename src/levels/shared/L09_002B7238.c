@@ -176,7 +176,6 @@ extern void ref_L09_003F8858_00(char *object, int value);
 
 /* index -> entry of a per-level table; a live entry's first word is a one-based id. */
 
-INCLUDE_ASM("asm/levels", func_L09_002B7238);
 
 
 INCLUDE_ASM("asm/levels", func_L09_00326E90);

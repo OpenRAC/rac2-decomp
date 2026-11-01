@@ -1,20 +1,3 @@
-/*
- * GPT-6.1 Sol high-effort worker, 2026-10-29.
- * Profile: -O2 -G0 -ffunction-sections, current task wrapper/toolchain.
- * Best check: 1356/1356 bytes, 0/1 USA v1.01 places; six words differ.
- * Separate sound-pointer lifetimes in each arm recover all sound addresses,
- * branches and state-3 scheduling. State 2 must test !(height <= playerZ):
- * the previous height > playerZ spelling lost retail's unordered path.
- * MACRO_ADDR on the frame counter preserves the measured absolute FP load.
- * Remaining differences: +0x4FC..+0x510 (003FB54C..003FB560), color-packing
- * register ownership and final OR operand order. Text before/after is exact
- * under check.py's relocation binding, including the store at +0x518.
- * Sequential color assembly, commuted middle OR, and an ordinary inlined
- * RGBA packer produce the same six-word mismatch: stop on this tie.
- * Reopen with an independently supported color-value type/lifetime model.
- * Required declarations are below. Other releases and linked builds untested.
- */
-
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 typedef float Vector[4] __attribute__((aligned(16)));
@@ -141,10 +124,9 @@ done:
         wave = 1.0f - wave;
     brightness = (int)(wave * 255.0f);
     {
-        int color = (brightness << 8) | 0x7F000000;
-        color |= brightness << 16;
-        color |= brightness;
-        *(int *)(moby + 0x78) = color;
+        int hi = (brightness << 8) | 0x7F000000;
+        int mid = (brightness << 16) | hi;
+        *(int *)(moby + 0x78) = mid | brightness;
     }
     func_00282CF0(delta, moby + 0x10, oldPosition);
     func_002AD6F0(state + 0x20, delta, oldRotation, moby + 0xF0);
