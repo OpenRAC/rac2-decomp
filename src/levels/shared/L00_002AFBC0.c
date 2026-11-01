@@ -587,7 +587,6 @@ void func_L00_002B1F90(void)
 
 /* func_L00_002B2200 is in L00_002B2200-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002B2318);
 
 /* Reset the hero update state, install the requested mode and object, and update the mode-one counters. */
 void func_L00_002B2A40(int mode, int value, char *object)

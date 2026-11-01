@@ -1,3 +1,10 @@
+/* Closer B, 2026-11-01. Without the goto (arm ends in its own func_L00_0035F5A0(0x21, 0, 0); return 1)
+ * the branch is retail's, and only the la is late. rank_for_schedule at the frame setups: priority and
+ * class tie, so the count of dependents decides: la 3 (jump, a0=0x21, call), a1/a2 4 (those, plus the
+ * next call, which clobbers the frame register). A join hides that but then cross-jumps with the
+ * kind-0xC tail. Tail at the end of the function: cygnus_merge_blocks folds it back up (same 6 lines);
+ * with -frac2-keep-block-order the kind-0x10 tail merges into it instead (656 bytes). A local for the
+ * address is propagated by cse. Next: a source form that takes 1 dependent off a1/a2 or adds 1 to la. */
 /* GPT-6.1 Sol high, task v0676, 2026-10-28: 652/652 bytes, 0/1 USA v1.01 places.
  * Profile: -O2 -G8 -ffunction-sections -mno-split-addresses, in a dedicated -g8 unit.
  * Sharing the kind-0xF and kind-0xC sound tail with a goto fixes the previous

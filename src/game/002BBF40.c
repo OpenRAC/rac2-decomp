@@ -1,19 +1,3 @@
-/*
- * Tier: sol-high, task v1133, 2026-10-29. USA v1.01 only.
- * Best: 1480/1480 bytes, 0/28 places; 34 instruction words differ outside
- * relocation bits. Profile: -O2 -G0 -ffunction-sections -g -ffast-math.
- * Remaining: size/quadratic FPR allocation ($f22/$f23), arithmetic scheduling,
- * root ordering and expired-state GPR/store ordering. First difference +0x1D4.
- * Corrects the older draft: size recalculation follows the child-spawn test
- * unconditionally, subject to flag bit 4; it is not the test's else branch.
- * Scoped integer locals and a shared decrement pointer recover the GPR frame.
- * Inline doubled denominator preserves retail's post-root scheduling better
- * than reassigning quadratic before calculating the two roots.
- * The spawn declaration interleaves one FP and integer argument while keeping
- * each EE argument bank's order, count and widths; this matches its call setup.
- * MACRO_ADDR on D_001B168C recovers the absolute assembler-macro float load.
- * All needed declarations follow. No linked-build or matching credit claimed.
- */
 #include "common.h"
 extern void func_00282CC0(void *,void *,void *),func_00282F20(void *,void *,float);
 extern int func_00282978(void *),func_00283CF0(float),func_00283D38(int,int,float);
@@ -54,28 +38,21 @@ void func_002BBF40(char *p)
         {
             if(!(q[0x19]&4)) {
                 float size, duration, linear, quadratic, root, first, second, b;
-                float scaled8, scaled3, denominator;
+                float scaled8, scaled3, y;
                 size = *(float *)(q + 28);
                 duration = func_00283CE0((unsigned char)q[0x1b]);
-                linear = 8.0f;
-                quadratic = 3.0f;
-                scaled8 = size * linear;
-                scaled3 = size * quadratic;
-                linear = duration * linear;
-                denominator = size * scaled8;
-                scaled3 = duration * scaled3;
-                quadratic = duration * quadratic;
-                denominator += scaled8;
-                linear -= scaled3;
-                linear /= denominator;
-                quadratic = (quadratic + linear * scaled8) / (size * -8.0f);
+scaled8 = size * 8.0f;
+scaled3 = size * 3.0f;
+linear = (duration * 8.0f - duration * scaled3) / (size * scaled8 + scaled8);
+quadratic = duration * 3.0f;
+                quadratic += linear * scaled8; quadratic /= size * -8.0f;
                 duration -= func_00283CE0(*(short *)(p + 10));
                 duration *= 4.0f;
-                duration = quadratic * duration;
-                root = func_00282C10(linear * linear - duration);
-                first = (-linear - root) / (quadratic + quadratic);
-                second = (-linear + root) / (quadratic + quadratic);
-                *(float *)(p + 12) = first > second ? first : second;
+                y = quadratic * duration;
+                root = func_00282C10(linear * linear - y);
+                first = (-linear + root) / (quadratic + quadratic);
+second = (-linear - root) / (quadratic + quadratic);
+*(float *)(p + 12) = first > second ? first : second;
                 b=func_00282E48(p+16,D_001B5340);
                 if(b<10.0f) *(float *)(p+12)*=b*0.075f+0.25f;
             }
@@ -93,11 +70,10 @@ void func_002BBF40(char *p)
                 func_00282F20(q,q,*(float *)(q+12)*size);
             } else {
                 int life;
-                int duration = (unsigned char)q[0x1b];
-                *(int *)(q+16)=*(int *)(q+20);
-                q[0x19]=flags|1;
-                *(int *)(q+20)=((unsigned char)p[3]==0x48)?0:0x0f2f3f3f;
-                life=func_002A7820(duration*2,duration*3);
+*(int *)(q+16)=*(int *)(q+20);
+*(int *)(q+20)=((unsigned char)p[3]==0x48)?0:0x0f2f3f3f;
+flags|=1; q[0x19]=flags;
+life=func_002A7820((unsigned char)q[0x1b]*2,(unsigned char)q[0x1b]*3);
                 if(q[0x19]&8) life*=5;
                 q[0x1b]=life;
                 *(short *)(p+10)=(unsigned char)life;

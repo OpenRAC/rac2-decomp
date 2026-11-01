@@ -1,42 +1,12 @@
-/* Retained nonmatching C (opus-1, Claude Opus 5.5 xhigh), measured 31 October 2026; replaces the Opus big40 draft.
- * Profile: a unit of its own (src/levels/shared/L00_003A48D0.c, because this Vector typedef conflicts with
- * L00_003A0F30.c), -O2 -G0 -ffunction-sections -g. Only the declarations below are needed.
- * Best legitimate result: us 0/27, 2700/2708 bytes, 9 rows differ once aligned with retail. PAL has no such function.
- *
- * Exact bytes exist but use forbidden forms, so this is not landed: us 27/27 and us2 27/27 with both of these edits:
- *  (a) else arm: Vector *known = &direction; if (known) func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
- *      (an always-true test on a known address);
- *  (b) first hero test, replacing the plain if (a register pin and an empty asm barrier):
- *      { register int pinned __asm__("$2") = HERO->i[0x2294 / 4];
- *        if (pinned == 1) { __asm__("" : : : "$2"); func_L00_002C42E0(0x1D, 1); } }
- * Everything else below is therefore confirmed, relocations included.
- *
- * What the structure below settles, each measured against dumps from tools/regalloc.py:
- *  - Each aim arm has its own scale and add calls and ends in point = &origin. CSE then sees HERO+0x760 / HERO live
- *    across the scale call ($s0), and the add's address is a fresh lui at +0x80. point lands in $a0, a non-call last
- *    insn, so flow2 adds no (use 0) and jump2 cross-jumps the arms. An arm ending in a call never merges.
- *  - Each light arm ends in the joint call, pos = &muzzle and off = &offset. The block boundary keeps the $s3 copy
- *    after the call (in one block sched1 lifts it above), and the later $a2 set ranks $a2 before $a1 in sched2.
- *
- * Still differing, without the edits above:
- *  (1) +0x88: the first hero test has $v0/$v1 swapped. Inferred from the dump's reference counts: local-alloc ranks
- *      the HERO quantity (hi+lo: 5 refs, life 8, about 1.25) above the loaded value (2/2 = 1.0), and retail ranks the
- *      value first, which would take two more hidden insns inside the hi..lo span or one more reference to the value.
- *      None of these fixes it: a block-local mode variable, passing it as the argument, a one-case switch, an inline
- *      accessor, the separate D_00189EA0 symbol, -frac2-gcse-unsplit-edges, -frac2-keep-block-order,
- *      -frac2-no-null-pointer-checks, -fno-gcse (which also makes other rows worse).
- *  (2) +0x1C4: `addiu $s1` fills the then arm's `b` slot; retail has `daddu $a0,$s1` there, branching one word later.
- *      Inferred, and reproduced by edit (a): retail's else arm keeps a free (use 0) in its join block. With no other
- *      work to place, it lands in the load-delay
- *      cycle between `daddu $a0,$s1` and `addiu $a1,$a1,0xE0`, stopping the cross-jump there. It comes from a scale
- *      or add call that ended a block before cse, behind a label cse then removes; edit (a) reproduces that. The then
- *      arm's copy can float above the qcopy asm, so the source may be symmetric, e.g. a helper used in both arms.
- *  (3) The loop-head alignment nop at +0x5CC is missing only because (2) shifts the code by one word.
- * -frac2-qcopy with -frac2-qcopy-barrier changes nothing with the helper, and plain quad assignments are worse.
- * Reopen: a real, non-placeholder test that cse resolves behind a scale or add call for (2), and a natural source
- * of the extra span or reference for (1). Also reopen if the maintainers rule on these forms; (b) is a pin either way.
+/* Near miss: unit of its own, -O2 -G0 -ffunction-sections -g -frac2-hazard-labels. us 0/27, 2700/2708 bytes,
+ * one arm's order left. PAL has no such function. Measured 2026-11-01:
+ * func_002829D8 returns int; declaring it void was the whole of the old +0x88 $v0/$v1 swap, so no pin is needed.
+ * The label before the row loop is 8-aligned, so its nop comes back with the size.
+ * Left: the aim arm. Retail sets $s1 = &origin before the 0.75 load and has `b` with `a0 = s1` in the delay slot,
+ * into the tail at the jal. Here jump2 merges one insn more, the a0 set, so s1 lands in the delay slot. At jump2
+ * retail's tail starts at `a1 += 0xE0`, with a0 already set. Per-inner-arm tails are too long (2724). The old
+ * `if (known)` block boundary gave exact bytes but stays refused.
  */
-
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
@@ -99,7 +69,7 @@ extern WeaponEntry D_00262570[];
 extern u8 D_00294880[];
 
 extern void func_L00_003A41F0(Moby *);
-extern void func_002829D8(void *);
+extern int func_002829D8(void *);
 extern void func_L00_002C42E0(int, int);
 extern void func_002A75E0(void *, int, int, int, int);
 extern void func_002A7470(void *, int, int, int);
@@ -185,9 +155,10 @@ void func_L00_003A48D0(Moby *moby)
             func_00282D30(&direction, &moby->forward, -1.0f);
         else
             qcopy(&direction, &HERO->q[0x760 / 16]);
-        func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
-        point = &origin;
+        { Vector *o = &origin;
+        func_00282D30(o, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        func_00282CC0(o, &HERO->q[0x80 / 16], o);
+        point = o; }
     }
     candidate = func_L00_00324D18(point, &direction, horizontal, vertical, 75.0f, horizontal, horizontal, 1);
 

@@ -516,7 +516,6 @@ void func_002BBB70(char *p)
 
 /* func_002BBCB0 is in 002BBCB0-g8-qcopy.c. */
 
-INCLUDE_ASM("asm/game", func_002BBF40);
 
 /* func_002BC508 is in 002BC508-g8.c. */
 

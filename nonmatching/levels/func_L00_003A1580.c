@@ -1,3 +1,5 @@
+/* Closer B, 2026-11-01: the slot rotation is gcse table size (see MATCHING-BLOCKERS 1). 269 buckets here;
+ * forcing 245, 249 or 259 leaves 5 lines, so retail has about 10 to 20 fewer insns at gcse. */
 /* Retained nonmatching C; GPT-6.1 Sol (high), measured 29 October 2026.
  * Current checkout profile: -O2 -G8 -ffunction-sections; use a separate -g8.c unit.
  * USA v1.01 check.py: 2532/2532 bytes, 0/27 places; first difference +0x144.

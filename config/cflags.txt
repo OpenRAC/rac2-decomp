@@ -2124,3 +2124,27 @@ src/levels/12_todano/L12_0041BF88.c	-O2 -G0 -ffunction-sections -mno-split-addre
 src/levels/shared/L07_002B3580-ground.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L00_003EA0E0-seeker.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L00_003F10D8-seeker.c	-O2 -G0 -ffunction-sections -g
+src/game/00306680-qcopy.c	-O2 -G32 -ffunction-sections -Wa,-G32 -frac2-qcopy -frac2-qcopy-barrier
+src/pal/game/00307900-qcopy.c	-O2 -G32 -ffunction-sections -Wa,-G32 -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L00_003A6538-g8.c	-O2 -G8 -ffunction-sections
+src/levels/shared/L00_003DCC48.c	-O2 -G0 -ffunction-sections
+src/game/002BBF40.c	-O2 -G0 -ffunction-sections -g -ffast-math
+src/pal/game/002BCBD8.c	-O2 -G0 -ffunction-sections -g -ffast-math
+src/levels/shared/L00_002ACF88.c	-O2 -G0 -ffunction-sections
+src/pal/levels/shared/L00_002ACE70.c	-O2 -G0 -ffunction-sections
+src/levels/shared/L00_004212B8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_00421C50.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_0041C2D0.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/shared/L00_00421578-rocket.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_002A67F8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_002A67F8-mode.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_002A6688-mode.c	-O2 -G8 -ffunction-sections
+src/levels/shared/L00_002B2318.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/pal/levels/shared/L00_002B2230-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/us2/levels/shared/L00_002B2408-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/levels/shared/L00_003FEEA0.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/levels/shared/L00_003A9C58.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/pal/levels/shared/L00_003AD3F8-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/levels/shared/L00_003EF560.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels
+src/pal/levels/shared/L00_003F38E0-own.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels
+src/levels/shared/L00_003A0F30-eye.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels

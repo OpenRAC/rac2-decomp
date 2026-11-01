@@ -1,16 +1,4 @@
-/*
- * Near miss (M19, 2026-10-26): 948/948 bytes, 6 differing instructions, register only.
- * Profile: -O2 -G32 -ffunction-sections -Wa,-G32 -frac2-qcopy -frac2-qcopy-barrier.
- * us: 0/28 placements; us2: 0/28; pal: absent from catalogue.
- * What closed the rest: the seven settings are separate sda floats (retail fills delay slots
- * with them, which a struct field at a nonzero offset cannot do); velocity, position, side,
- * axis, projection, pull in stack order; func_002C2210 takes (p, int, float, float, u32, int,
- * int, p, float, int) (callers' setup order); the third spawn written out per arm; a separate
- * loop counter; spin = random, then if (!spin) spin--.
- * Residual: $s7/$fp swapped between the loop's copy of &side and the %hi of ref_00306680_00.
- * Queued on the permuter.
- */
-typedef unsigned int u32;
+#include "common.h"
 typedef int ParticleWord __attribute__((mode(TI)));
 typedef union { ParticleWord word; float f[4]; } ParticleVector;
 typedef struct {
@@ -43,10 +31,11 @@ extern int func_00283CF0(float);
 void func_00306680(void *origin, int count)
 {
     ParticleVector velocity, position, side, axis, projection, pull;
+    ParticleVector *anchor=&ref_00306680_00;
     char *particle;
     float size, speed, angle, projectionLength;
     int random, spin, i;
-    func_00282CF0(&side,&ref_00306680_00,origin);
+    func_00282CF0(&side,anchor,origin);
     func_002FE8D8(origin,&axis);
     projectionLength=func_00282DB0(&axis,&side);
     func_00282D30(&projection,&axis,projectionLength);

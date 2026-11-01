@@ -1,25 +1,3 @@
-/* GPT-6.1 Sol, high effort, 29 October 2026.
- * USA v1.01, all 27 placements: 1784/1784 bytes, 0/27 match;
- * first bound difference +0x94. Dedicated unit: -O2 -G8 -ffunction-sections.
- * The approved qcopy helper needs no extra compiler options on this toolchain.
- * Preparing both second-spin inputs before committing the first-spin result
- * reproduces the three previously differing instructions around state +0x28.
- * 30 nonrelocated words remain different: 28 accesses to six address-spill
- * slots, plus the flash color[0] store / view-address setup swap at +0x590.
- * Spill mapping (ours -> retail): vertex[1] 170->160, spoke 174->164,
- * vertex[2] 160->168, side 164->16C, vertex[3] 168->170, up 16C->174.
- * Offsets in this comment are hexadecimal. All declarations are included below.
- *
- * New measured constraints: grouping the adjacent settings with SDATA retains
- * the spill mismatch; explicit vertex pointers produce 1792 bytes, or 1784
- * with earlier setup differences when vertex[0] is left as the packet base.
- * Explicit views of all six spill candidates and an inline corner builder each
- * produce 1776 bytes with changed allocation. Separate color stores change the
- * packet store order. The correct pointer-valued axis argument and qcopy_nc
- * each tie the improved qcopy draft. No register pins or volatile accesses used.
- * Reopen with evidence for PRE expression ordering and real address lifetimes,
- * rather than repeating these tied forms. No linked build was run for this miss.
- */
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 typedef struct { u8 pad[0x70]; long f70, f78, f80, f88; } QuadPacket;
@@ -49,12 +27,11 @@ extern void func_00282DD8(void *, void *, void *);
 extern void func_00280B90(void *, int, int);
 extern float func_00283B98(float, float);
 extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_0027DE50(int, int, int, int, long);
+extern void func_0027DE50(int, int, int, int, int);
 
 /* Draw the beam's ring, crossing core planes and terminal flash. */
-void func_L00_003A6538(void *object)
+void func_L00_003A6538(char *moby)
 {
-    char *moby = object;
     EffectQuad quad;
     float position[4], normal[4], view[4], radius[4], center[4], rotation[4];
     float spoke[4], side[4], up[4], horizontal[4], vertical[4], corner[4], temporary[4];
@@ -69,8 +46,7 @@ void func_L00_003A6538(void *object)
     if (*(short *)(state + 8)) {
         float ringAlpha = func_00283CE0(*(short *)(state + 8)) * *(float *)(state + 0x20);
         func_00281DE8((QuadPacket *)&quad, 11, 1, 0x80);
-        color = (func_00283CF0(ringAlpha * 255.0f) << 24) | 0x2040FF;
-        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = (func_00283CF0(ringAlpha * 255.0f) << 24) | 0x2040FF;
         quad.uv[0][0] = 0.5f; quad.uv[0][1] = 0.0f;
         quad.uv[1][0] = 0.5f; quad.uv[1][1] = 1.0f;
         quad.uv[2][0] = 1.0f; quad.uv[2][1] = 0.0f;
@@ -99,13 +75,11 @@ void func_L00_003A6538(void *object)
     {
         float first = func_00283B98(*(float *)(state + 0x28), D_L00_001AF6A8 * 0.017453294f);
         float secondStep = D_L00_001AF6AC * 0.017453294f;
-        float second = *(float *)(state + 0x2C);
         *(float *)(state + 0x28) = first;
-        *(float *)(state + 0x2C) = func_00283B98(second, secondStep);
+        *(float *)(state + 0x2C) = func_00283B98(*(float *)(state + 0x2C), secondStep);
     }
     func_00281DE8((QuadPacket *)&quad, 0x38, 1, 0x80);
-    color = (func_00283CF0(alpha * 20.0f) << 24) | 0x8080FF;
-    quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
+    quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = (func_00283CF0(alpha * 20.0f) << 24) | 0x8080FF;
     quad.uv[0][0] = 0.0f; quad.uv[0][1] = 0.0f;
     quad.uv[1][0] = 0.0f; quad.uv[1][1] = 1.0f;
     quad.uv[2][0] = 1.0f; quad.uv[2][1] = 0.0f;
@@ -144,8 +118,7 @@ void func_L00_003A6538(void *object)
     if (*(int *)(state + 0x40)) {
         alpha = func_00283CE0(*(int *)(state + 0x40)) * *(float *)(state + 0x44);
         func_00281DE8((QuadPacket *)&quad, 11, 4, 0x80);
-        color = (func_00283CF0(alpha * 255.0f) << 24) | 0x808080;
-        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = (func_00283CF0(alpha * 255.0f) << 24) | 0x808080;
         func_00282D30(temporary, view, -0.1f);
         func_00282CC0(center, D_L00_001B8DC0, temporary);
         func_00282DD8(vertical, view, normal);
@@ -159,9 +132,8 @@ void func_L00_003A6538(void *object)
         func_00282CC0(quad.vertex[2], corner, vertical);
         func_00282CF0(quad.vertex[3], corner, vertical);
         func_00280B90(&quad, 0, 0);
-        color = (func_00283CF0(D_L00_001AF6B8 * alpha) << 24) | 0x808080;
-        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = color;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = (func_00283CF0(D_L00_001AF6B8 * alpha) << 24) | 0x808080;
         func_002FC560(0x42, 0x48ULL);
-        func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (long)(int)quad.color[0]);
+        func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], quad.color[0]);
     }
 }

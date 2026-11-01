@@ -198,7 +198,6 @@ void func_L00_002A6420(void)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_002A67F8);
 
 
 /* reads a global mode value; for 8, 9 or 19 probes two engine queries and returns 1 if either reports true, else 0 */
@@ -566,7 +565,6 @@ void func_L00_002AB3E0(void)
 
 /* func_L00_002ACA08 is defined in L00_002ACA08-flags.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002ACF88);
 
 /* func_L00_002AD868 is defined in L00_002AD868-rail.c. */
 
