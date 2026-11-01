@@ -13,6 +13,9 @@
  * An inline area-test helper shared by the hero and moby checks gives 876 bytes (the
  * pointers are then computed once), so retail computes them per branch.
  * Needs: common.h (qcopy, qzero) and the declarations below.
+ *
+ * closer D, 1 November 2026: for/while/limit/pointer-local forms of the moby area loop do not
+ * change out's priority: 25, 44, 74 and 153 words.
  */
 #include "common.h"
 #define WBYTE(p,o) (*(unsigned char *)((char *)(p)+(o)))

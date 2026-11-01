@@ -311,7 +311,6 @@ void func_L00_003E4968(char *a0) {
 
 /* func_L00_003E4B80 is defined in L00_003E4B80-g.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003E4BF0);
 
 /* func_L00_003E51C0 is defined in L00_003E51C0-g8.c. */
 
@@ -388,7 +387,6 @@ INCLUDE_ASM("asm/levels", func_L00_003E5BD8);
 
 INCLUDE_ASM("asm/levels", func_L00_003E6030);
 
-INCLUDE_ASM("asm/levels", func_L00_003E64F8);
 
 /* Walks the shared table of 0x50-byte records and, for the one owned by OBJECT, either
    releases the owner when the record is busy, or (half of the time) runs the effect helper
@@ -528,8 +526,6 @@ void func_L00_003E80A8(int index, char *object)
 }
 
 /* func_L00_003E8180 uses small data in L00_003E8180-g8.c. */
-
-INCLUDE_ASM("asm/levels", func_L00_003E8A98);
 
 /* func_L00_003E9490 is defined in L00_003E9490-qcopy.c. */
 

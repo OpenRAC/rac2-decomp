@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_002EA0C0);
 
 extern short D_00152C20;
 extern int D_001B1594 __attribute__((sda));

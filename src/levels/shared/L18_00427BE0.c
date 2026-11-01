@@ -67,13 +67,10 @@ void func_L18_004286D0(u8 *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L18_00428738);
 
-INCLUDE_ASM("asm/levels", func_L18_00428AE8);
 
 /* func_L18_00428F08 lives in L18_00428F08-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L18_0042B008);
 
 /* func_L18_0043E938 lives in the sibling small-data unit (L18_00427BE0-g8.c): its controls are read through $gp. */
 
@@ -130,7 +127,7 @@ void func_L18_0043F040(u8 *obj) {
 
 INCLUDE_ASM("asm/levels", func_L18_0043FFF8);
 
-INCLUDE_ASM("asm/levels", func_L18_004401E0);
+/* func_L18_004401E0 is in L18_00427BE0-sparks.c. */
 
 /* Store the supplied unsigned 32-bit word at owner byte offset 0xB 8. */
 void func_L18_0046B1E0(int param_1, unsigned int param_2)

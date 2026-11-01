@@ -160,7 +160,6 @@ void func_L06_003E0D88(u8 *moby)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L06_003E1498);
 
 s32 func_L06_003E3CC8(u8 *a0) {
     if (*(s16 *)(a0 + 0xAA) != 0x330)
@@ -214,7 +213,6 @@ void func_L06_003E4FA0(char *a2)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L06_003E57E8);
 
 INCLUDE_ASM("asm/levels", func_L06_003E5D30);
 

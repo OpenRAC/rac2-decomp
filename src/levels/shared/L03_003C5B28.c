@@ -367,10 +367,10 @@ void func_L03_003E3308(u8 *a0) {
 
 INCLUDE_ASM("asm/levels", func_L03_003E3A00);
 
-INCLUDE_ASM("asm/levels", func_L03_003E4148);
-
-
 INCLUDE_ASM("asm/levels", func_L03_003E4680);
+
+/* func_L03_003E4148 is defined in L03_003E4148-g8.c. */
+
 
 extern u8 *func_0029EFD0(s32);
 
@@ -432,7 +432,7 @@ void func_L03_003E5218(u8 *a0) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L03_00409248);
+/* func_L03_00409248 is defined in L03_00409248-g8.c. */
 
 /* func_L03_00409AB0 lives in L03_00409AB0-g8.c. */
 
@@ -573,7 +573,7 @@ s32 func_L03_00419C58(u32 a0, f32 *a1) {
 
 INCLUDE_ASM("asm/levels", func_L03_0041B848);
 
-INCLUDE_ASM("asm/levels", func_L03_00424C40);
+/* func_L03_00424C40 is in L03_00424C40-g8.c (-G8, -fno-gcse). */
 
 extern s32 func_002A77E0(s32);
 

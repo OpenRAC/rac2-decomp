@@ -1,3 +1,6 @@
+/* Closer b, 2026-11-01: retail's start is `a0 = 1; s5 = a0; movn s5, zero, v1` with the 1 in a0 reused by the state byte's
+ * store, $s1 as the Hero base from the very first insn and $s4 a copy of its %hi. Hero first with a 64-bit flag, an `on`
+ * local (int or long long) and every int/char flag form leave the 58 lines as they are or shift the size to 2096. */
 /* GPT-6.1 Sol (high), 29 October 2026: NONMATCHING.
  * Best and final check: 2100/2100 bytes, 0/27 USA v1.01 places;
  * check.py reports the first instruction difference at +0x8.

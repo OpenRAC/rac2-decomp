@@ -104,7 +104,6 @@ char *func_0033F0A0(char *object)
 
 /* func_0033F218 is in 0033F030-radial-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0033FB98);
 
 
 INCLUDE_ASM("asm/game", func_00340498);

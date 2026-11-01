@@ -1,3 +1,4 @@
+/* 1 November 2026: still 6 words. 21 colour spellings tried (fresh temps, chain orders, the last OR in the call): none gives or $v1,$v1,$v0 then or $a2,$v1,$a0 with grey in $a0. Position first, a temp and a stride temp leave $a0 for the position load. */
 /* Near miss, 26 October 2026 (M6): 1156/1156 bytes, 6 instructions off, register-only.
  * Unit src/levels/shared/L00_002E2C30.c, flags -O2 -G0 -ffunction-sections -g.
  * What closed the size: callee func_L00_002E30B8 takes (text, float, ...): the float is the

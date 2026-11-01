@@ -18,6 +18,9 @@
  * and upgrade-condition allocation, rather than repeat equivalent clears.
  * All declarations are below. Relocation binding and linked validation
  * have not been reached; equal size and the diagnostic count are no match.
+ *
+ * closer D, 1 November 2026: 10 words. The `por` sits after the negative constant at the four 0($sp)
+ * clears; a local 1.0f, no z local and storing word 3 first tie or worsen it (10, 10, 28, 28).
  */
 #include "common.h"
 typedef unsigned int ShotQuad __attribute__((mode(TI)));

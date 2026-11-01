@@ -1,8 +1,6 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034A148);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034A230);
 
 typedef int s32;
 typedef unsigned char u8;
@@ -38,7 +36,6 @@ s32 func_PAL_0034A2F0(u8 *a0) { return *(s32 *)(a0 + 0x60); }
 /* Measured target: byte-identical across all 27 levels. */
 s32 func_PAL_0034A2F8(u8 *a0) { return *(s32 *)(a0 + 0xC0); }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034A300);
 
 extern void Faac80289_FUN_003361A8(char *p);
 extern void Faac80289_FUN_00336968(char *p);

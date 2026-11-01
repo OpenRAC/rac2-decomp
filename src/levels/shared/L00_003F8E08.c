@@ -272,7 +272,6 @@ INCLUDE_ASM("asm/levels", func_L00_003FEAC8);
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_003FEEA0);
 
 
 /* takes the float array at +104 and writes four values returned by a call with argument 255, then four float constants (-1.0, -2.25, 1.25, 2.5) at +16..+28, a descending count 255/191/127/63 into the ints at +44..+32 and 2.5/3.0 pairs at +48..+60 */

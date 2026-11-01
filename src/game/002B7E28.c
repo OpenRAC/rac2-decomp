@@ -313,7 +313,6 @@ void func_002B8888(u8 *a0) {
  do { p[-16]=0;count--;p[0]=0;p++; }while(count>=0);
 }
 
-INCLUDE_ASM("asm/game", func_002B88F0);
 
 void func_002B9000(void) {
     extern void func_002B85F8(void *);
@@ -516,7 +515,6 @@ void func_002BBB70(char *p)
 
 /* func_002BBCB0 is in 002BBCB0-g8-qcopy.c. */
 
-INCLUDE_ASM("asm/game", func_002BBF40);
 
 /* func_002BC508 is in 002BC508-g8.c. */
 

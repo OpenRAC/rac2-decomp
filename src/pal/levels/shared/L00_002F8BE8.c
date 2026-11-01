@@ -1,6 +1,17 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002F8BE8);
+#include "common.h"
+extern int func_0028B950(void *);
+
+int func_PAL_L00_002F8BE8(char *self) {
+    *(short *)(self + 0x48) = 0;
+    *(short *)(self + 0x4A) = 0;
+    *(int *)(self + 0x58) = 0x20;
+    *(int *)(self + 0x7C) = 0x26;
+    *(int *)(self + 0x5C) = 0x20;
+    return func_0028B950(self);
+}
+
 
 extern int r1_func_0011CC38();
 

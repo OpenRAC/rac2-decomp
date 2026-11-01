@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0027C258);
 
 extern void func_00284F40(int);
 extern int D_001B1594 __attribute__((sda));

@@ -353,11 +353,10 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L17_003966D8);
 
 /* func_L17_003A14A0 is defined in L17_0032C070-burst-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L17_003A4740);
+/* func_L17_003A4740 is defined in L17_0032C070-grid.c. */
 
 /* func_L17_003BCBC8 is defined in L17_0032C070-g8.c: the -G8 profile of that
    unit is what makes its register allocation come out right. */

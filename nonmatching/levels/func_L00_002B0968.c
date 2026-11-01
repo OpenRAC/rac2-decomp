@@ -1,3 +1,7 @@
+/* Closer b, 2026-11-01: retail has a real next index: `lw s7, 0x88(sp)` at the loop end, set in the `continue` path's delay
+ * slot and again after the test, and the inner loop has `daddu fp, s4`. `for (i = 0; i < 7; i = next)` with next set
+ * in both paths gives retail's s7/fp and most of the head, at 2240 bytes; with the inner `nj` as well, 2228. Still open:
+ * `addiu v0, sp, 0x30` is hoisted out of the outer loop here and not in retail; scoping the arrays doesn't change that. */
 /* GPT-6.1 Sol (high effort), task v1398, USA v1.01.
  * Retained draft: 2244/2244 bytes, 0/27 places; first mismatch at +0x44.
  * Profile: -O2 -G8 -ffunction-sections, in a dedicated -g8.c unit.

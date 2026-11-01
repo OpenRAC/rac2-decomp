@@ -194,11 +194,7 @@ char *func_00345400(char *p)
 
 /* func_00345490 is built from 00345358-init.c. */
 
-INCLUDE_ASM("asm/game", func_003458F8);
 
-INCLUDE_ASM("asm/game", func_00345B78);
-
-INCLUDE_ASM("asm/game", func_00345D58);
 
 /* func_00345F70 is built from 00345358-layout-g8.c. */
 

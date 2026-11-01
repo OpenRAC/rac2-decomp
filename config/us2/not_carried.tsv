@@ -35,6 +35,7 @@ func_00341558	00_aranos_tutorial: instruction at +0x8 differs
 func_00341CE0	00_aranos_tutorial: instruction at +0x60 differs
 func_003438E8	00_aranos_tutorial: instruction at +0x18 differs
 func_00344478	00_aranos_tutorial: instruction at +0x24 differs
+func_00345D58	boot: instruction at +0x18 differs
 func_L00_0030C7F8	00_aranos_tutorial: instruction at +0x1c differs
 func_L00_0030D368	00_aranos_tutorial: instruction at +0x24 differs
 func_L00_0030D478	00_aranos_tutorial: instruction at +0x24 differs
@@ -62,3 +63,10 @@ func_L03_003D20F8	03_endako: instruction at +0x4c differs
 func_L08_00318F90	08_tabora: instruction at +0x38 differs
 func_L20_00446E70	20_yeedil: instruction at +0x64 differs
 func_L20_00445738	20_yeedil: instruction at +0x64 differs
+func_0028C6D0	boot: instruction at +0x260 differs
+func_L12_00429ED8	30_insomniac_museum: instruction at +0x260 differs
+func_0033FB98	boot: instruction at +0x1D4 differs
+func_003458F8	boot: instruction at +0x34 differs
+func_00345B78	boot: instruction at +0x20 differs
+func_0034E070	boot: instruction differs
+func_002CAF18	00_aranos_tutorial: instruction at +0x30 differs

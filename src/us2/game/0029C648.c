@@ -22,13 +22,10 @@ void func_US2_0029C678(int a0, int a1, int a2, int a3, int a4, int a5, int a6, i
 
 INCLUDE_ASM("asm/us2/game", func_US2_0029C700);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029C818);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029C8F0);
 
 INCLUDE_ASM("asm/us2/game", func_US2_0029CA88);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029CA98);
 
 INCLUDE_ASM("asm/us2/game", func_US2_0029CC48);
 
@@ -36,18 +33,45 @@ INCLUDE_ASM("asm/us2/game", func_US2_0029CCB8);
 
 INCLUDE_ASM("asm/us2/game", func_US2_0029CD18);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029CF08);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029CF10);
+extern void func_US2_0034F1C0(void *);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029CF40);
+void func_US2_0029CF10(void) {
+    if (D_001A8CFC[0] != 0)
+        func_US2_0034F1C0(D_001A8CFC[0] + 0x36F28);
+}
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029CF70);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029CFA0);
+extern void func_US2_0034F240(void *);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029CFE0);
+void func_US2_0029CF40(void) {
+    if (D_001A8CFC[0] != 0)
+        func_US2_0034F240(D_001A8CFC[0] + 0x36F28);
+}
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029D010);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029D040);
+extern void func_US2_00349C00(void *);
+
+void func_US2_0029CF70(void) {
+    if (D_001A8CFC[0] != 0)
+        func_US2_00349C00(D_001A8CFC[0] + 0x39160);
+}
+
+
+
+extern void func_US2_00348628(void *);
+
+void func_US2_0029CFE0(void) {
+    if (D_001A8CFC[0] != 0)
+        func_US2_00348628(D_001A8CFC[0] + 0x39620);
+}
+
+
+extern void func_US2_00347550(void *);
+
+void func_US2_0029D010(void) {
+    if (D_001A8CFC[0] != 0)
+        func_US2_00347550(D_001A8CFC[0] + 0x39AF0);
+}
+
+

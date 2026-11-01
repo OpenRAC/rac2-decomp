@@ -373,7 +373,6 @@ void func_L11_00436A78(char *obj)
 
 /* func_L11_00436B78 is defined in L11_00436B78-flags.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_00436D08);
 
 /* func_L11_00436F80 is defined in L11_00436F80.c. */
 

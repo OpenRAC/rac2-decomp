@@ -587,7 +587,6 @@ void func_L00_002B1F90(void)
 
 /* func_L00_002B2200 is in L00_002B2200-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002B2318);
 
 /* Reset the hero update state, install the requested mode and object, and update the mode-one counters. */
 void func_L00_002B2A40(int mode, int value, char *object)
@@ -843,7 +842,6 @@ void func_L00_002B54F8(float x, float y) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_002B55F0);
 
 
 /* func_L00_002B5B60 is in L00_002B5B60-motion.c. */
@@ -862,7 +860,6 @@ void func_L00_002B6118(f32 a0) {
 
 /* func_L00_002B6560 is in L00_002B6560.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002B6BC8);
 
 INCLUDE_ASM("asm/levels", func_L00_002B75A0);
 

@@ -35,4 +35,3 @@ int func_PAL_002D44B0(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002D4530);

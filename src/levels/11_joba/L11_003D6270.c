@@ -223,7 +223,6 @@ void func_L11_003F31C0(u8 *arg0) {
 
 /* Defined in L11_003F4490-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_003F4A58);
 
 /* Defined in L11_003F4F30-g8.c. */
 
@@ -317,7 +316,6 @@ void func_L11_004169E0(u8 *arg0) {
     func_00282CC0(pos, pos, tmp2);
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00416D70);
 
 /* func_L11_00417340 is defined in L11_003D6270-g8.c (this unit has no $gp access for it). */
 

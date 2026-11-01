@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0038822C);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0038A370);
 
 extern int func_002A77E0(int mode);
 extern float func_002A90F8(char *object, char *local);

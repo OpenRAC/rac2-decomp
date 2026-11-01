@@ -179,7 +179,6 @@ void func_L16_002AD320(void)
     func_L16_002C0BC8(0x78, 1);
 }
 
-INCLUDE_ASM("asm/levels", func_L16_002B3250);
 
 int func_L16_002B59A0(int mode)
 {

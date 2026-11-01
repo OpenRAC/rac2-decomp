@@ -1,8 +1,6 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002BE658);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002BE880);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002BE9A8);
 

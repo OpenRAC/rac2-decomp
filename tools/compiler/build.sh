@@ -48,6 +48,7 @@ python3 $T/enable_loop_padding.py gcc/config/mips/mips.h
 python3 $T/ti_one_gpr.py gcc/config/mips/mips.h
 python3 $T/count_trap_length.py gcc/config/mips/mips.c
 python3 $T/count_block_move_length.py gcc/config/mips/mips.c
+python3 $T/block_move_quad.py gcc/config/mips/mips.c
 python3 $T/ascending_save_order.py gcc/config/mips/mips.c
 python3 $T/reorder_save_blocks.py gcc/config/mips/mips.c
 python3 $T/u4_mtc1_helper.py gas/config/tc-mips.c
@@ -79,12 +80,12 @@ python3 $T/trap_redundant_barrier.py gcc/reorg.c
 python3 $T/count_asm_words.py gcc/config/mips/mips.c
 python3 $T/no_recombine_givs.py gcc/loop.c
 sha256sum --check --quiet <<'SUMS'
-f8563063b5311e7ab2b2b29e9959afd6d8d79d017e896724483a3b073837d2da  gcc/config/mips/mips.c
+356137f8b9c8a3dc726c914f4c15f88e3215fbc72a5ddb77be01bfea7834d0a0  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
 d75635500f55f4c7c626e925f6e8146c4e33d3865314eca4ae9bb3860fe7eeab  gcc/toplev.c
 3098888cc26ac83c936a8d505662b6ba1aa9039811e89c534f4ea8f1a851e7d6  gcc/haifa-sched.c
-e57d41902ac5792fea91c8fb54b529c042004542bc0eef6f1fea866acb3cb233  gcc/reorg.c
+656c2b9546b5c38d96cfe25b02620cce02b625f5637ecad6386f0a4d89f3e0fe  gcc/reorg.c
 5bc40b011473cd756c2a6128b6106fd2e96569c8e92bba1a8f9bc00f166feac2  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 ba947e44256e3d5144e353a4976aac931a4941acc8dcb1dc0fda99fa8b7b504a  gcc/flow.c
@@ -142,4 +143,5 @@ python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_block_move_loop.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_block_move_quad.py"
 echo "compiler in $OUT"

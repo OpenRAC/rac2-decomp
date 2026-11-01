@@ -313,7 +313,6 @@ INCLUDE_ASM("asm/levels", func_L14_00421BC0);
 
 /* func_L14_004221D8 is defined in L14_003F4F98-ribbon-g8.c (it reaches data through $gp and needs -frac2-qcopy). */
 
-/* func_L14_00422498 is defined in L14_00422498-g8.c (it reaches data through $gp and needs -g). */
 
 /* func_L14_004228C0 is defined in L14_003F4F98-g8.c. */
 
@@ -445,8 +444,6 @@ void func_L14_00423DC0(char *a0, int a1)
 /* func_L14_00423E50 is defined in L14_00423E50-gu.c (it needs -frac2-gcse-unsplit-edges). */
 
 
-INCLUDE_ASM("asm/levels", func_L14_00425CB0);
-
 typedef struct {
     char pad00[0x18];
     int exitTrigger;            /* 0x18 */
@@ -505,7 +502,7 @@ extern int func_002ACBC8(void *, int);
 extern void func_L00_002B9D60(void *, void *, int, int);
 extern void func_L14_00426D18(void *);
 extern void func_L00_003294F0(void *, int);
-extern void func_L00_0030DDB0(int, int);
+extern int func_L00_0030DDB0(int, int);
 extern int func_002B3868(void *);
 extern void func_L00_002B2A40(int, int, void *);
 extern void func_L01_00323310(int, int);
@@ -716,8 +713,6 @@ void func_L14_00426DE8(char *a0)
 
 /* func_L14_00427250 lives in the -g8 sibling file (it reaches a global through $gp). */
 
-
-/* func_L14_004275E0 is defined in L14_004275E0-g8.c (it reaches data through $gp). */
 
 /* func_L14_004281D0 is defined in L14_004281D0-g8.c (it reaches data through $gp and needs the quadword-copy profile). */
 

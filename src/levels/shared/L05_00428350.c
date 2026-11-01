@@ -71,7 +71,6 @@ typedef struct {
 /* func_L05_00428AC8 is defined in L05_00428AC8-g8.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L05_0042AC30);
 
 INCLUDE_ASM("asm/levels", func_L05_0042AFE0);
 
@@ -142,7 +141,7 @@ char *func_L05_0042BCE0(char *a0, char *a1, float f12, float f13)
     return obj;
 }
 
-INCLUDE_ASM("asm/levels", func_L05_0042BDB0);
+/* func_L05_0042BDB0 is defined in L05_0042BDB0-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L05_0042C928);
 

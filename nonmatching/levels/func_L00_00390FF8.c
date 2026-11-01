@@ -1,3 +1,4 @@
+/* 1 November 2026: 12 words: every order of the six entry stores ties (hi part $v0 here, $v1 in retail), and the attachment store sits before the func_L00_002C42E0 arguments where retail has it in the slot. */
 /* GPT-6.1 Sol (high), 29 October 2026: retained near miss, not linked.
  * USA v1.01, -O2 -G8 -ffunction-sections: 792/792 bytes, 0/27 places;
  * first difference +0x58. Required declarations and measured layouts follow.

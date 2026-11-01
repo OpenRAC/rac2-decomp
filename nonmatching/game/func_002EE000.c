@@ -1,3 +1,7 @@
+/* Closer C3, 1 November 2026: struct views and inline helpers tie. Measured `float *t2 = temp;` at the top of the arm: an ALU
+ * insn in the block moves all six registers to retail's (4 rows left, the extra addiu itself). So the spans model
+ * above is right: retail has one more counted insn between the gain and the old angle.
+ */
 /* GPT-6.1 Sol worker, 28 October 2026: 564/564 bytes, 0/28 places.
  * Current pinned compiler, default -G8 profile. Six instructions differ:
  * f1/f2 are exchanged for the D_001AC244 and object +0x30 expression operands.

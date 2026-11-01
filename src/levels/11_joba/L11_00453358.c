@@ -663,7 +663,6 @@ void func_L11_00458F58(char *p)
 
 /* func_L11_00458F90 is defined in L11_00458F90-qcopy-barrier-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_004590F0);
 
 /* func_L11_00459640 and func_L11_00459D48 live in the sibling small-data unit (L11_00453358-g8.c). */
 

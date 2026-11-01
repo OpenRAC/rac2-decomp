@@ -1,8 +1,6 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_004489E0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00448C40);
 
 extern unsigned int D_L20_001B2F9C __attribute__((sda));
 extern int func_L20_00449AC8(char *);

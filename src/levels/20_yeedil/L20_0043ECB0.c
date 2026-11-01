@@ -1,7 +1,5 @@
 #include "common.h"
 
-/* func_L20_0043ECB0 is defined in L20_0043ECB0-orbit-g8.c (-G8 without -mno-split-addresses). */
-
 /* func_L20_0043F318 defined in L20_0043F318-g8.c. */
 
 /* func_L20_0043F460 is defined in L20_0043ECB0-g8.c (it reaches a global through $gp). */

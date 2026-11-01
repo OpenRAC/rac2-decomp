@@ -1,3 +1,10 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003CE538);
+extern void func_L00_003CA688(char *);
+
+void func_PAL_L00_003CE538(char *object)
+{
+    if (*(unsigned char *)(object + 0x20) == 1)
+        func_L00_003CA688(object);
+}
+

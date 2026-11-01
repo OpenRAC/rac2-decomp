@@ -1061,7 +1061,6 @@ void func_L02_003AA650(char *arg0) {
 
 /* func_L02_003C0890 is defined in L02_003C0890-helpers.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_003C26F0);
 
 /* func_L02_003C4068 is defined in L02_003C4068.c. */
 

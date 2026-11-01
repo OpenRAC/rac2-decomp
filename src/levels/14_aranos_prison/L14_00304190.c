@@ -363,7 +363,6 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L14_0039F820);
 
 int func_L14_003C9548(char *arg0) {
     return (arg0[0x95] ^ 1) == 0;

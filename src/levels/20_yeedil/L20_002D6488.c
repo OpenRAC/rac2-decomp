@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-/* func_L20_002D6488 is defined in L20_002D6488-timers.c (it needs -fno-cse-follow-jumps). */
-
 /* Not attempted: nonmatching/levels/func_L20_002D7730.c holds a map of this
    body (19548 bytes, 4887 instructions, 278 blocks, 238 calls, no loop; the
    dispatch through the level's own jump table jtbl_002B2A40, the join points

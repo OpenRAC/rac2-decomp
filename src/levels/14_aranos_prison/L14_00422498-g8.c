@@ -1,6 +1,3 @@
-/* Built with -g: without it the function comes out 8 bytes short of retail
- * (1056 against 1064), the same need as its twin L11_0046BD18-g8.c. */
-
 #include "common.h"
 
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) Vector;
@@ -23,9 +20,6 @@ typedef struct {
     int row;        /* 0x38: this bolt's row of the vertex table */
 } BoltState;
 
-/* The last collision query's result: the moby it hit. */
-typedef struct { char pad[0x18]; char *hit; } Collision;
-
 extern int D_L14_001B1618 __attribute__((sda));
 extern Path *D_L14_001FE1C0[];
 extern BoltBuffer D_L14_002594F0[];
@@ -41,15 +35,9 @@ extern float D_L14_001B165C __attribute__((sda));
 extern float D_L14_001B1670 __attribute__((sda));
 extern float D_L14_001B1674 __attribute__((sda));
 extern char D_L14_001A8F20[] __attribute__((sda));
-extern Collision D_L14_001BF940;
-typedef struct {
-    char pad0[0x5B0];
-    float unk5B0;   /* 0x5B0 */
-    float pad5B4;
-    float unk5B8;   /* 0x5B8 */
-    char pad5BC[0x2290 - 0x5BC];
-    char *moby;     /* 0x2290: the hero's moby */
-} Hero;
+typedef struct { char pad[0x18]; void *owner; } Controller;
+extern Controller D_L14_001BF940;
+typedef struct { char pad0[0x5B0]; float f5B0; char pad5B4[4]; float f5B8; char pad5BC[0x2290 - 0x5BC]; void *moby; } Hero;
 extern Hero D_00189E20;
 extern float func_002A7940(void);
 extern float func_00283B98(float, float);
@@ -66,10 +54,9 @@ extern float func_00283248(float, float);
 extern void func_002A8C00(void *, void *, int, float, void *);
 extern int func_002761F8(void *, void *, int, void *, void *);
 
-/* Twin of func_L11_0046BD18 (L11_0046BD18-g8.c): rebuilds a lightning bolt along
- * its path. Each point gets a random jitter (core), a copy of it is displaced by
- * a travelling wave (wave), and every second segment spawns a spark effect; a
- * spark segment that hits the hero zeroes two of the hero's fields. */
+/* Rebuilds a lightning bolt along its path: each point gets a random jitter
+ * (core), a copy of it is displaced by a travelling wave (wave), and every
+ * second segment spawns a spark effect. */
 void func_L14_00422498(char *object)
 {
     Vector position;
@@ -127,10 +114,11 @@ void func_L14_00422498(char *object)
         if (i > 1 && (i == D_L14_001B1618 - 1 || !(i & 1))) {
             func_002A8C00(effect, object, 1, 0.0f, D_L14_001A8F20);
             *(unsigned short *)(effect + 26) = *(unsigned short *)(object + 0xaa);
-            if (func_002761F8(&path->points[i - 2], &path->points[i], 17, object, effect) &&
-                D_L14_001BF940.hit == D_00189E20.moby) {
-                D_00189E20.unk5B0 = 0.0f;
-                D_00189E20.unk5B8 = 0.0f;
+            if (func_002761F8(&path->points[i - 2], &path->points[i], 17, object, effect)) {
+                if (D_L14_001BF940.owner == D_00189E20.moby) {
+                    D_00189E20.f5B0 = 0.0f;
+                    D_00189E20.f5B8 = 0.0f;
+                }
             }
         }
     }

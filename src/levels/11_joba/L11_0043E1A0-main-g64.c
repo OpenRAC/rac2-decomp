@@ -11,6 +11,10 @@
  * - The sound-slot blocks read st->sound before the slot test and pass the second slot's
  *   buffer as a pointer plus 0xE0; index-first sums where retail adds the index first.
  * - Case 8's wave end reads the class as (u16) into cls3 right after cls1.
+ * - func_L00_0030DD70 is called for its effect only and declared void here: its ignored
+ *   $v0 result otherwise takes v0 from the case-9 light/lamp chain in local-alloc.
+ *   (Its definition in src/levels/shared/L00_002FC7A0.c returns its argument or the
+ *   helper's value.)
  * - Case 9's start flags are set D_L11_001A8FF4 first, then D_L11_001A8FF0.
  */
 #include "common.h"

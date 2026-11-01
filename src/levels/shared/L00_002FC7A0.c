@@ -178,9 +178,9 @@ extern void func_0034CE98(int value, int argument);
 
 extern int D_L00_001A904C_7 __attribute__((sda));
 
-extern void func_003387A0_1(int a, int b, int c);
+extern int func_003387A0_1(int a, int b, int c);
 
-extern void func_00338040_1(int a, int b, int c);
+extern int func_00338040_1(int a, int b, int c);
 
 extern void func_L00_0042D9D0(int);
 
@@ -1263,22 +1263,22 @@ void func_L00_0030DCF8(void)
         func_00340250(value + 0x3A388);
 }
 
-/* When the bound object is set, calls the helper on its sub-object at +0x36F28 with both arguments. */
-void func_L00_0030DD70(int a0, int a1)
+/* Reads a bound global word; when it is zero it returns its first argument, otherwise it calls a helper with that value plus a fixed base offset and both of its arguments. */
+int func_L00_0030DD70(int a0, int a1)
 {
     int v = D_L00_001A904C_7;
 
-    if (v != 0)
-        func_003387A0_1(v + 0x36F28, a0, a1);
+    if (v == 0) return a0;
+    return func_003387A0_1(v + 0x36F28, a0, a1);
 }
 
-/* When the bound object is set, calls the helper on its sub-object at +0x36F28 with both arguments. */
-void func_L00_0030DDB0(int a0, int a1)
+/* Reads a bound global word; when it is zero it returns its first argument, otherwise it calls a helper with that value plus a fixed base offset and both of its arguments. */
+int func_L00_0030DDB0(int a0, int a1)
 {
     int v = D_L00_001A904C_7;
 
-    if (v != 0)
-        func_00338040_1(v + 0x36F28, a0, a1);
+    if (v == 0) return a0;
+    return func_00338040_1(v + 0x36F28, a0, a1);
 }
 
 /* Reads a word from a shared global; when it is non-zero, calls a one-argument helper with that word plus a fixed byte offset. */

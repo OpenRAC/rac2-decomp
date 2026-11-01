@@ -1,0 +1,140 @@
+#include "include_asm.h"
+
+#include "common.h"
+typedef struct Ent Ent;
+typedef int V4 __attribute__((mode(TI)));
+typedef struct {
+    u8 pad0[0x28];
+    unsigned char f28;
+    unsigned char f29;
+    u8 pad2A[0x6];
+    float f30;
+    u8 pad34[0x14];
+    unsigned char f48;
+    u8 pad49[0x1];
+    unsigned char f4A;
+    u8 pad4B[0x15];
+    unsigned char f60;
+    unsigned char f61;
+    unsigned char f62;
+    u8 pad63[0x3];
+    unsigned char f66;
+    unsigned char f67;
+    u8 pad68[0x2];
+    unsigned char f6A;
+    u8 pad6B[0x1];
+    float f6C;
+    float f70;
+    float f74;
+    float f78;
+    float f7C;
+    float f80;
+    float f84;
+    short f88;
+    u8 pad8A[0x2];
+    float f8C;
+    u8 pad90[0x8];
+    int f98;
+    u8 pad9C[0x20];
+    unsigned char fBC;
+    unsigned char fBD;
+    unsigned char fBE;
+    unsigned char fBF;
+    u8 padC0[0x2];
+    unsigned char fC2;
+    unsigned char fC3;
+    unsigned char fC4;
+    u8 padC5[0x1];
+    unsigned char fC6;
+    u8 padC7[0x95];
+    float f15C;
+    u8 pad160[0x28];
+    unsigned char f188;
+    unsigned char f189;
+    unsigned char f18A;
+    u8 pad18B[0x5];
+    int f190;
+    int f194;
+    int f198;
+    int f19C;
+    int f1A0;
+    int f1A4;
+    int f1A8;
+    u8 pad1AC[0x4];
+    float f1B0;
+    u8 pad1B4[0xA];
+    short f1BE;
+    float f1C0;
+} InitState1348;
+extern int func_00283CF0(f32);
+extern f32 func_002A7878(f32, f32);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_L08_00422900(Ent *);
+extern int D_L08_001B2508[] __attribute__((sda));
+extern void *D_L08_001FE7C0[];
+extern float func_L08_0032EF80(void *, int, int, int, int);
+extern void func_L01_003377C8(void *);
+extern void func_PAL_002A7E68(void *, int, int, int);
+extern void func_002A7750(void *, int, int);
+extern void func_L08_00422EE0(Ent *);
+
+void func_PAL_L08_00428900(u8 *object)
+{
+    InitState1348 *state = *(InitState1348 **)(object + 0x68);
+    float position[4], radius;
+    state->f48 = func_00283CF0(15.0f);
+    state->f4A = func_00283CF0(3.2f);
+    state->f29 = 1;
+    if (!D_L08_001B2508[0]) **(int **)((char *)state+0x1CC)=0;
+    qcopy((char *)state+0x150,object+0x10);
+    func_L08_00422900((Ent *)object);
+    *(float *)(object+0x18)=state->f1B0;
+    qcopy((char *)state+0x150,object+0x10);
+    state->f188=object[0x30];
+    *(V4 *)position=*(V4 *)(object+0x10);
+    radius=func_L08_0032EF80(position,state->f190,state->f198,state->f194,-1);
+    if(radius>0) object[0x30]=func_00283CF0(radius+2.0f);
+    state->f188=state->f189=object[0x30];
+    *(V4 *)position=*(V4 *)(object+0x10);
+    radius=func_L08_0032EF80(position,state->f19C,state->f1A4,state->f1A0,-1);
+    if(radius>0) state->f188=func_00283CF0(radius+2.0f);
+    if(state->f1A8!=-1) func_L01_003377C8(D_L08_001FE7C0[state->f1A8]);
+    *(void **)((char *)state+0x10)=(char *)state+0x50;
+    state->f60=9; state->f98=-1;
+    state->f88=0; state->f6A=0;
+    state->f62=state->f61=255; state->f67=state->f66=5;
+    state->f6C=0.3f; state->f70=0.16000001f;
+    state->f74=0.006f; state->f78=0.012f;
+    state->f7C=0.004f; state->f80=0.3f;
+    state->f8C=0.4f;
+    state->f84=0;
+    state->fBC=1; state->fBD=3; state->fBE=1; state->fBF=3; state->fC2=1; state->fC3=3; state->fC6=1; state->fC4=0;
+    state->f1BE=0; state->f28=0; state->f30=0;
+    qcopy((char *)state+0x160,object+0x10);
+    state->f1C0=0;
+    switch((unsigned char)state->f18A) {
+    case 0:
+        *(float *)(object+0x18)=state->f1B0-1.7f;
+        qcopy((char *)state+0x150,object+0x10); qzero_nc((char *)state+0x170);
+        *(unsigned short *)(object+0x34)&=0xEFFF;
+        if((unsigned char)object[0x43]!=1) func_PAL_002A7E68(object,1,0,3);
+        object[0x31]=0; *(unsigned short *)(object+0x34)|=1;
+        func_002A7750(object,1,-1); break;
+    case 1:
+        *(float *)(object+0x18)=state->f1B0+2.7f;
+        qcopy((char *)state+0x150,object+0x10); qzero_nc((char *)state+0x170);
+        func_L08_00422EE0((Ent *)object);
+        *(unsigned short *)(object+0x34)|=0x1000;
+        if((unsigned char)object[0x43]!=1) func_PAL_002A7E68(object,1,0,3);
+        func_002A7750(object,6,0); break;
+    case 2:
+        qcopy((char *)state+0x170,(char *)state+0xD0);
+        func_00282CC0(object+0x10,object+0x10,(char *)state+0x170);
+        qcopy((char *)state+0x150,object+0x10);
+        if((unsigned char)object[0x43]!=5) func_PAL_002A7E68(object,5,0,3);
+        object[0x31]=1;
+        *(unsigned short *)(object+0x34)=(*(unsigned short *)(object+0x34)|0x1000)&0xFFFE;
+        func_002A7750(object,4,-1); break;
+    }
+    state->f15C=func_002A7878(0,1);
+}
