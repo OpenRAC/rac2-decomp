@@ -132,4 +132,3 @@ int func_PAL_L00_002CA360(int arg0, int arg1)
     return 1;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002CA448);
