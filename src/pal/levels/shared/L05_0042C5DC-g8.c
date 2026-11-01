@@ -179,3 +179,54 @@ void *func_PAL_L05_0042DA18(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, 
     }
     return obj;
 }
+
+extern int D_L05_001B1504 __attribute__((sda));
+extern int D_001A79F0;
+extern float func_002AA458(void *, void *, void *, float, float, float);
+extern float func_00283B98(float, float);
+extern void func_L05_0037AB88(int, int);
+extern void func_PAL_0029D5E8(int, int, int);
+extern int func_002E5DA0(int, int, char *, int);
+extern void func_0029F338(void *);
+extern void func_PAL_L05_0042C880(void *);
+
+/* Turns the object towards the global target and clamps its aim cone; a target within
+   half a unit takes the fast path, the rest the slow one (an angle step and an update). */
+void func_PAL_L05_0042C5DC(char *object)
+{
+    char *state = *(char **)(object + 0x68);
+    float distance;
+
+    if (D_L05_001B1504 != 0) {
+        char *pos = object + 0x10;
+        char *aim;
+        float scaled;
+        float capped;
+
+        distance = func_00282E48((char *)D_L05_001B1504 + 0x10, pos);
+        if (D_001A79F0 == 0x14) {
+            func_002AA458(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+                          0.012800001f, 0.0048f, 1.2800001f);
+        } else {
+            if (distance < 6e+01f) {
+                aim = *(char **)(object + 0x24);
+                scaled = *(float *)(aim + 0x24) * 0.022222222f * distance;
+                *(float *)(object + 0x2C) = scaled;
+                capped = *(float *)(aim + 0x24) * 0.3f;
+                if (capped > scaled)
+                    *(float *)(object + 0x2C) = capped;
+                func_002AA458(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+                              0.008f, 0.0024f, 0.6f);
+            }
+        }
+        if (distance < 0.5f) {
+            func_L05_0037AB88(4, 1);
+            func_PAL_0029D5E8(0x1285, 1, -1);
+            func_002E5DA0(0xC, 0, object, 0xFBF);
+            func_0029F338(object);
+            return;
+        }
+    }
+    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.04f);
+    func_PAL_L05_0042C880(object);
+}
