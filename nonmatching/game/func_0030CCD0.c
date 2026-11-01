@@ -1,9 +1,8 @@
 /* func_0030CCD0: beam chain update, the small cousin of the F4 family's chain loop.
-   Flags tried: -O2 -G8 -ffunction-sections -g -frac2-qcopy. 1888/1888 bytes, about 12 rows off.
-   Left: f20 against f21 for the first float local; preheader and latch order of s1 and fp;
-   f24 against s7 in the preheader; negu t0 against mul.s f13 in the second effect call.
-   The 0x78/0x7C spill slots follow gcse's bucket count (retail fits 205, 211 and 221; this
-   draft has 219). D_L00_ names are level 0's: rename to the boot's before landing. */
+   Flags: -O2 -G8 -ffunction-sections -g -frac2-qcopy. 1888/1888 bytes, 12 rows off.
+   Left: spill slots 0x78/0x7C (gcse's bucket count), s2 against s5 in the preheader, the order of
+   mov.s f12/f13 in the last effect call. D_L00_ names are level 0's: rename to the boot's before
+   landing. */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
@@ -33,6 +32,9 @@ extern float D_L00_001AF384 __attribute__((sda));
 extern Vector D_L00_0023A210[], D_L00_0023A350[], D_L00_0023A340[], D_L00_0023A4E0[];
 extern float D_L00_0023A490[], D_L00_0023A620[];
 extern char D_L00_001A8F20[] MACRO_ADDR;
+extern Vector P2[2][20] __asm__("D_L00_0023A210");
+extern Vector B0[] __asm__("D_L00_0023A200");
+
 
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00282CF0(void *, void *, void *);
@@ -64,10 +66,11 @@ void func_0030CCD0(Actor *actor)
     BeamState *s = actor->vars;
     void *target, *other;
     ThingInfo *info;
-    float wob, amp, d1, z, h, len, weight, sway, was, dist, t, angle, radius, wave;
+    float wob, amp, d1, z, h, len, weight, sway, was, dist, t, angle, wave;
     int i, spin;
     int off4, off16;
     float *p;
+    float zero;
 
     if (D_001A79F0 == 1 && D_L00_001A8F00 == 2)
         s = D_L00_001C5890;
@@ -104,36 +107,37 @@ void func_0030CCD0(Actor *actor)
         func_002ACEC0(&dir, &dir, &side, 0.17453295f);
     }
     func_00282D30(&last, &dir, len);
-    qcopy(&D_L00_0023A210[0], s);
-    qcopy(&D_L00_0023A210[20], s);
+    qcopy(P2[0], s);
+    qcopy(P2[1], s);
     i = 1;
     do {
         float fi = i;
         off4 = i * 4;
         weight = func_00283CE0(i) * 0.05f;
-        radius = D_L00_001AF2F4 + (D_L00_001AF2F8 - D_L00_001AF2F4) * weight;
-        radius = radius * func_00283198(func_002ABB18(D_L00_001AF2FC + fi * D_L00_001AF2F0));
-        radius = radius + func_002A78D8(D_L00_001AF334, D_L00_001AF338);
+        wave = D_L00_001AF2F4 + (D_L00_001AF2F8 - D_L00_001AF2F4) * weight;
+        wave = wave * func_00283198(func_002ABB18(D_L00_001AF2FC + fi * D_L00_001AF2F0));
+        wave = wave + func_002A78D8(D_L00_001AF334, D_L00_001AF338);
         p = (float *)(off4 + (char *)D_L00_0023A490);
         was = *p;
-        *p = radius;
-        D_L00_0023A210[i].f[2] -= was;
-        func_00282CF0(&side, &D_L00_0023A210[i], &D_L00_0023A210[i - 1]);
+        *p = wave;
+        P2[0][i].f[2] -= was;
+        func_00282CF0(&side, &P2[0][i], &P2[0][i - 1]);
         func_00282D08(&step, &side, &last, 0.85f);
+        zero = 0.0f;
         d1 = func_00282DF0(&step);
-        if (d1 == 0.0f) {
-            qcopy(&D_L00_0023A210[i], &D_L00_0023A210[i - 1]);
+        if (d1 == zero) {
+            qcopy(&P2[0][i], &P2[0][i - 1]);
         } else {
             func_00282D30(&step, &step, len / d1);
-            func_00282CC0(&D_L00_0023A210[i], &D_L00_0023A210[i - 1], &step);
+            func_00282CC0(&P2[0][i], &P2[0][i - 1], &step);
             qcopy(&last, &step);
         }
-        D_L00_0023A210[i].f[2] += radius;
-        func_00282CF0(&side, &D_L00_0023A210[i], &D_L00_0023A210[i - 1]);
+        P2[0][i].f[2] += wave;
+        func_00282CF0(&side, &P2[0][i], &P2[0][i - 1]);
         if (s->target != 0) {
-            func_00282CF0(&tip, &goal, &D_L00_0023A210[i]);
+            func_00282CF0(&tip, &goal, &P2[0][i]);
             dist = func_00282DF0(&tip);
-            if (dist != 0.0f) {
+            if (dist != zero) {
                 if (i == 0x13) {
                     sway = 0.5f;
                     len = dist;
@@ -150,10 +154,10 @@ void func_0030CCD0(Actor *actor)
         }
         angle = func_002ABB18(D_L00_001AF304 + (float)i * D_L00_001AF30C);
         wave = D_L00_001AF310 * func_00283198(func_002ABB18(D_L00_001AF318 + (float)i * D_L00_001AF320));
-        qcopy(&D_L00_0023A210[i + 20], &D_L00_0023A210[i]);
+        qcopy(&P2[1][i], &P2[0][i]);
         wave = wave * func_00283198(angle);
         D_L00_0023A620[i] = wave;
-        D_L00_0023A210[i + 20].f[2] += wave;
+        P2[1][i].f[2] += wave;
         wave = func_00283B98(func_00283248(side.f[0], side.f[1]), 1.5707965f);
         {
             float r2 = D_L00_001AF314 * func_00283180(angle);
@@ -162,7 +166,7 @@ void func_0030CCD0(Actor *actor)
         }
         delta.f[2] = 0.0f;
         qcopy(&D_L00_0023A4E0[i], &delta);
-        func_00282CC0(&D_L00_0023A210[i + 20], &D_L00_0023A210[i + 20], &delta);
+        func_00282CC0(&P2[1][i], &P2[1][i], &delta);
         i++;
     } while (i < 0x14);
     qcopy(&s->end, D_L00_0023A340);
