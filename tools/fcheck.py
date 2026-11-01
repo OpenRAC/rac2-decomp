@@ -21,7 +21,9 @@ scratchpad, the result by the return type, the kept registers and the order of d
 accesses and system calls are compared (each run on a fresh machine with the capture run's
 hooks table and disc, so a hooked library function answers as it did in the capture). Exit
 status: 0 SAME, 1 differs, 2 the candidate did not build or place, 3 no states, 4 every state
-skipped. `--retail` is the harness's self-test: retail's own bytes of NAME, moved to 0x000A0000,
+skipped. $RAC2_FCHECK_PHASE splits a check between machines: "build" compiles and places, for the
+programs of the states the root names (empty files will do), and stops; "run", where the states
+and the disc are, runs what "build" left in the work directory. `--retail` is the harness's self-test: retail's own bytes of NAME, moved to 0x000A0000,
 are the candidate (CANDIDATE, or src/'s C, gives only the return type); a DIFFERS on it is the
 harness's or the states', never the C's.
 
@@ -1208,12 +1210,35 @@ def check(name: str, candidate: Path | None, ulps: int = 0, work: Path | None = 
     for k, prog in enumerate(order):
         where = work if k == 0 else work / prog.key
         label = "" if len(order) == 1 and prog.level is None else f" ({prog.label})"
+        built = where / "built.json"
+        phase = os.environ.get("RAC2_FCHECK_PHASE", "")
         try:
-            info = (build_retail(name, candidate, where, prog) if retail
-                    else build_candidate(name, candidate, where, includes, prog))
+            if phase == "run":          # built elsewhere (a box without the states' machine)
+                info = json.loads(built.read_text())
+                if "link" in info:
+                    raise Link(info["link"])
+            else:
+                info = (build_retail(name, candidate, where, prog) if retail
+                        else build_candidate(name, candidate, where, includes, prog))
+                if phase == "build":
+                    built.write_text(json.dumps(info))
         except Link as e:
+            if phase == "build":
+                built.parent.mkdir(parents=True, exist_ok=True)
+                built.write_text(json.dumps({"link": str(e)}))
             print(str(e) + label)
+            # Data a level function names at its own level's addresses need not place in the
+            # other levels that share its code: its own level's states decide.
+            own = re.fullmatch(r"func_L(\d\d)_[0-9A-F]{8}", name)
+            if not (own and prog.level != int(own.group(1)) and any(g.level == int(own.group(1)) for g in order)):
+                codes.append(2)
+            continue
+        except FileNotFoundError:
+            print(f"LINK {name}: not built for {prog.label}{label}")
             codes.append(2)
+            continue
+        if phase == "build":
+            codes.append(0)
             continue
         # The capture run's hooks and disc: a hooked function's service answers in both runs.
         cmd = [str(FCHECK), "--hooks", str(HOOKS), "--disc", str(DISC), "--limit", str(RETAIL_LIMIT),
