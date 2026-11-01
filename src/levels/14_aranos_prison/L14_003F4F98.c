@@ -445,8 +445,6 @@ void func_L14_00423DC0(char *a0, int a1)
 INCLUDE_ASM("asm/levels", func_L14_00423E50);
 
 
-INCLUDE_ASM("asm/levels", func_L14_00425CB0);
-
 typedef struct {
     char pad00[0x18];
     int exitTrigger;            /* 0x18 */
@@ -716,8 +714,6 @@ INCLUDE_ASM("asm/levels", func_L14_00426F28);
 
 /* func_L14_00427250 lives in the -g8 sibling file (it reaches a global through $gp). */
 
-
-INCLUDE_ASM("asm/levels", func_L14_004275E0);
 
 /* func_L14_004281D0 is defined in L14_004281D0-g8.c (it reaches data through $gp and needs the quadword-copy profile). */
 
