@@ -46,6 +46,7 @@
  * closer D, 1 November 2026: the natural wording scores 19 words here. Merging the `object[0x60] & 2`
  * tails of cases 5, 6 and 10 with a shared label would lower max_cuid, but retail keeps those tails
  * apart (4,784 to 4,808 bytes), so the 5 to 28 fewer insns have to come from elsewhere.
+ * Dropping the started, launch and goal locals scores 18 words; the first difference stays at +0xA24.
  */
 #include "common.h"
 

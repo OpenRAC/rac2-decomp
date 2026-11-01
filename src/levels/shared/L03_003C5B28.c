@@ -367,7 +367,7 @@ void func_L03_003E3308(u8 *a0) {
 
 INCLUDE_ASM("asm/levels", func_L03_003E3A00);
 
-INCLUDE_ASM("asm/levels", func_L03_003E4148);
+/* func_L03_003E4148 is defined in L03_003E4148-g8.c. */
 
 
 INCLUDE_ASM("asm/levels", func_L03_003E4680);
