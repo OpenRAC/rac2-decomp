@@ -1,29 +1,10 @@
-/* sol-high retained attempt, USA v1.01, one placement.
- * Best check: 1472/1472 bytes, 0/1 places; 10 non-relocation instruction
- * differences, first at +0x284 (004018BC). No linked build was run.
- * Profile: -O2 -G0 -ffunction-sections -g in a separate source unit.
- * Keep inv=1.0f/inv on its own line: -g retains the two pre-div.s nops.
- * Aligned float arrays fix the temporary's sp+0x18 store. Independent scoped
- * indices for each coordinate, lower-point address first, and advancing the
- * shared path pointer fix all path-index scheduling/GPR differences.
- * Remaining: Y-delta f0/f13 swap at +0x284/+0x288/+0x290; a1/a2 setup order
- * at +0x50C/+0x514; final func_002B0A68 setup at +0x528/+0x534/+0x53C/
- * +0x540/+0x54C. Separate Y locals, low-first/high-first initialization and
- * delta accumulation tie. Three ABI-preserving integer/FP interleavings of
- * func_002B0A68 and multiline calls also tie. Whole-path array indexing adds
- * address instructions. No fabricated volatile access or register pinning.
- * Next: a related matched path-following update may reveal the original
- * expression shape; avoid repeating the tied local/call-order variants.
- * All required declarations follow; 18 check.py runs (one parse failure),
- * plus one regalloc.py diagnosis. Source marker restored on stopping.
- */
 #include "common.h"
 extern char D_00189EA0[];
 extern void func_002A7750(char *,int,int);
 extern float func_002AA2E8(float *,float,float);
 extern int func_00282948(void *);
 extern char *D_L02_001FF1C0[];
-extern char D_L02_001A8F20[], D_L02_001BA500[];
+extern char D_L02_001A8F20[] MACRO_ADDR, D_L02_001BA500[];
 extern float func_00282E48(void *, void *);
 extern int func_00283CF0(float);
 extern float func_00283248(float,float), func_00283C80(float,float);
@@ -96,7 +77,8 @@ void func_L02_00401638(char *e) {
             char *path=*(char **)(s+0x164);
             char *lo=path+lowIndex*16;
             path+=highIndex*16;
-            t=func_00283248(z,*(float *)(path+0x14)-*(float *)(lo+0x14));
+            t=*(float *)(path+0x14);
+            t=func_00283248(z,t-*(float *)(lo+0x14));
         }
         t=1.0f-func_00283C80(t,*(float *)(s+0x138)); if(t<0.1f)t=0.1f;
         func_002AA548((float *)(s+0x14c),(float *)(s+0x150),(float)**(int **)(s+0x164)-1.0f,*(float *)(s+0x154),*(float *)(s+0x158),t**(float *)(s+0x15c));

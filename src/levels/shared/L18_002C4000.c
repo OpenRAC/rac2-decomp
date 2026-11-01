@@ -188,7 +188,6 @@ void func_L18_002D1998(s32 force)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L18_002DEFF8);
 
 extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 

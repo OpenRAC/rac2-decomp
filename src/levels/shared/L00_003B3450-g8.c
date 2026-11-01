@@ -1,21 +1,3 @@
-/* GPT-6.1 Sol (high), 2026-10-29. FAILED: 1388/1388 bytes, 0/27 places.
- * Profile: -O2 -G8 -ffunction-sections -g. All declarations are included below.
- * Three instruction positions differ after allowing address relocations, at
- * +0x27C/+0x280/+0x284:
- * retail sets a0 = s0 before materializing D_L00_001A8F20 in a1; this draft
- * materializes a1 first, then sets a0. First check.py failure is +0x284.
- * Retained improvements over the 1372-byte draft: approved qcopy transfers
- * recover saved-register allocation; explicit destroy calls recover the entry
- * base reload; two cached timer values recover the load/store order; the -g
- * profile and standalone state-2 division recover its two padding nops;
- * qzero_nc and the established mixed-bank emitter signature recover call setup.
- * Canonical entry is +8 from the catalogue name. The state-2 division must stay
- * on its own source line; state 3 keeps its denominator call in the division.
- * Stopped on a three-way tie: canonical/interleaved lerp declarations and
- * Quad/float-array zero-vector views emit the same remaining instruction order.
- * Next: independent evidence for the lerp argument/address source shape or its
- * scheduling, rather than further equivalent type/argument permutations.
- */
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } UpdateVector;
@@ -59,12 +41,12 @@ extern int D_L00_001AF8EC __attribute__((sda));
 extern unsigned short D_L00_001AF8CC __attribute__((sda));
 extern float D_L00_001AF8E4 __attribute__((sda));
 extern float D_L00_001AF8E8 __attribute__((sda));
-extern float D_L00_001A8F20[4];
+extern float D_L00_001A8F20[4] MACRO_ADDR;
 extern Quad D_L00_001BF230;
 extern void func_00282CC0(void *,void *,void *),func_002B00D8(void *,void *,void *,float);
 extern float func_00283B98(float,float),func_00282DB0(void *,void *),func_00283CE0(int);
 extern int func_00282978(short *),func_00282948(int *);
-extern void func_00282D08(void *,void *,void *,float),func_L00_002E6EF8(void (*)(void *),void *);
+extern void func_00282D08(void *,void *,void *,float),ref_L00_003B3450_00(void (*)(void *),void *);
 extern int func_00277258(void *,int,void *,float);
 extern void func_0029F338(void *);
 extern void func_L00_003B39D0(void *),func_L00_003B4E88(void *),func_L00_003B4EF8(void *),func_L00_003B4198(void *),func_L00_003B3E78(void *),func_L00_003B4018(void *),func_L00_003B3C40(void *),func_L00_003B3AF8(void *);
@@ -111,7 +93,7 @@ void func_L00_003B3450(UpdateObject *object)
         object->rotX=func_00283B98(object->rotX,ctx->rotC);
         object->rotY=func_00283B98(object->rotY,ctx->rot10);
         func_L00_003B4EF8(object);
-        func_L00_002E6EF8(func_L00_003B4198,object);
+        ref_L00_003B3450_00(func_L00_003B4198,object);
         if(func_00277258(&object->position,0,D_00189E20.field2290,0.25f)) qcopy(&object->position,&D_L00_001BF230);
         if(object->position.f[0]<2.0f || object->position.f[0]>1021.0f || object->position.f[1]<2.0f || object->position.f[1]>1021.0f || object->position.f[2]<2.0f || object->position.f[2]>1021.0f) {
         func_0029F338(object);return;
@@ -127,7 +109,7 @@ void func_L00_003B3450(UpdateObject *object)
         object->rotY=func_00283B98(object->rotY,ctx->rot10);
         func_L00_003B4EF8(object);func_L00_003B4018(object);
         if(ctx->timer8>=60) func_L00_003B3C40(object);
-        func_L00_002E6EF8(func_L00_003B4198,object);
+        ref_L00_003B3450_00(func_L00_003B4198,object);
         func_00282948(&ctx->timer14);
         if(ctx->timer14) {
             fraction=func_00283CE0(ctx->timer14);fraction/=func_00283CE0(D_L00_001AF8E0);
