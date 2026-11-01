@@ -5,7 +5,7 @@ Another release's function catalogues, carried from USA v1.01's by identical cod
   python3 tools/carry.py --version pal    # config/pal/boot/functions.tsv, config/pal/levels/functions.tsv
   python3 tools/carry.py --version us2    # config/us2/...
   python3 tools/carry.py --version pal --entries  # measured boundary repairs, existing identities
-  python3 tools/carry.py --version pal --demote   # after tools/build.py all --version pal: config/pal/not_carried.tsv
+  python3 tools/carry.py --version pal --demote   # after tools/build.py all --version pal: what the build disproved
 
 Needs the dumps of both releases (tools/levels.py dump, and with --version V). Writes the two
 catalogues of release V in the formats of USA v1.01's (docs/VERSIONS.md), and
@@ -29,6 +29,13 @@ Every program of V is compared with the same program of v1.01, one code section 
 Then the catalogue rules of tools/levels.py apply unchanged: the linker's filler and an
 epilogue's residue are not functions, and identical code (V's own levels.identity, its own
 resident memory compared) is one function, the k-th copy in each level being one.
+
+**Demotion.** `tools/carry.py --version V --demote` does not realign the release again. It
+reads the release's last build, takes the functions whose C does not build to the release's
+bytes, and makes them the release's own: they are listed in `config/<V>/not_carried.tsv`,
+renamed for the release in the release's catalogues and given INCLUDE_ASM markers in
+`src/<V>/`. The carried callers of a demoted function are demoted with it. Every other row
+of the release's catalogues keeps its name, address and places.
 
 **Names.** A function of V found as the same code as a v1.01 function takes its v1.01 name,
 so the C in src/ is linked into V's programs by tools/build.py --version V at V's addresses
@@ -275,29 +282,186 @@ def joins(aligned: dict, version: str) -> None:
 REAL = ("instruction at", "would be at", "differs", "bytes, expected", "needs two values")
 
 
-def not_carried(version: str) -> set[str]:
-    """config/<version>/not_carried.tsv: v1.01 functions whose code equals this release's with
-    every address masked but whose C does not build to it, as tools/build.py measured: an
-    offset inside an address (a field of a large global) moved. With --demote, the functions
-    the last build of the release (build/<version>/*/placed.json) reports so are added."""
-    v = levels.VERSIONS[version]
-    path = ROOT / v["config"] / "not_carried.tsv"
-    names = {}
+def not_carried_path(version: str) -> Path:
+    """config/<version>/not_carried.tsv."""
+    return ROOT / levels.VERSIONS[version]["config"] / "not_carried.tsv"
+
+
+def read_not_carried(path: Path) -> dict[str, str]:
+    """The v1.01 functions a release does not carry, and what the build said of each."""
+    out = {}
     if path.is_file():
         for line in path.read_text().splitlines():
             if line and not line.startswith("#"):
                 name, why = line.split("\t", 1)
-                names[name] = why
-    if "--demote" in sys.argv:
-        for placed in sorted((ROOT / v["build"]).glob("*/placed.json")):
-            for name, why in json.loads(placed.read_text())["differ"].items():
-                if not name.startswith("func_") or "_PAL_" in name or "_US2_" in name:
-                    continue
-                if "which is not C" not in why and any(r in why for r in REAL):
-                    names.setdefault(name, f"{placed.parent.name}: {why}")
-        path.write_text("# v1.01 function\twhat tools/build.py said (the first program) -- tools/carry.py --demote\n" +
-                        "".join(f"{n}\t{w}\n" for n, w in sorted(names.items())))
-    return set(names)
+                out[name] = why
+    return out
+
+
+def write_not_carried(path: Path, names: dict[str, str]) -> None:
+    """The list of what a release does not carry: every row that is there keeps its place
+    and the reason it has, and what the build measured afresh is added at the end."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("# v1.01 function\twhat tools/build.py said (the first program) -- tools/carry.py --demote\n" +
+                    "".join(f"{n}\t{w}\n" for n, w in names.items()), newline="\n")
+
+
+def measured_not_carried(version: str) -> dict[str, str]:
+    """What the release's last build shows is not the same code: the functions whose C does
+    not build to the release's bytes, for a reason of the code itself. A knock-on row
+    ("needs ... which is not C") is not one, and a function the release already owns is not
+    v1.01's."""
+    v = levels.VERSIONS[version]
+    out = {}
+    for placed in sorted((ROOT / v["build"]).glob("*/placed.json")):
+        for name, why in json.loads(placed.read_text())["differ"].items():
+            if not name.startswith("func_") or "_PAL_" in name or "_US2_" in name:
+                continue
+            if "which is not C" not in why and any(r in why for r in REAL):
+                out.setdefault(name, f"{placed.parent.name}: {why}")
+    return out
+
+
+def not_carried(version: str) -> set[str]:
+    """config/<version>/not_carried.tsv: v1.01 functions whose code equals this release's with
+    every address masked but whose C does not build to it, as tools/build.py measured: an
+    offset inside an address (a field of a large global) moved. They and their callers are
+    the release's own functions."""
+    return set(read_not_carried(not_carried_path(version)))
+
+
+def demoted_names(direct: set[str], edges: list[tuple[str, str]], carried: set[str]) -> set[str]:
+    """The functions the release does not carry: the measured ones, and every carried
+    caller of one of them, to a fixed point (a caller's caller is a caller too). A caller
+    the release already owns keeps its name: it is the release's own function already."""
+    out = set(direct)
+    while True:
+        grown = {caller for caller, callee in edges if callee in out and caller in carried}
+        if grown <= out:
+            return out
+        out |= grown
+
+
+def release_names(tag: str, boot_rows: list, rows: list, demoted: set[str]) -> dict[str, str]:
+    """The release's own name for each demoted function: the boot's copy by its address, a
+    level's copy by its first place."""
+    out = {}
+    for name, address, _ in boot_rows:
+        if name in demoted:
+            out[name] = f"func_{tag}_{address:08X}"
+    for name, _, _, _, places in rows:
+        if name in demoted and name not in out:
+            number, address = places[0]
+            out[name] = f"func_{tag}_L{number:02d}_{address:08X}"
+    return out
+
+
+def demote_catalogue(tag: str, boot_rows: list, rows: list, demoted: set[str]) -> tuple:
+    """The release's catalogues with the demoted functions named for the release.
+
+    Only the demoted rows change: every other row keeps its name, address, size,
+    fingerprint and places, and every row keeps its place in the file.
+    """
+    renames = release_names(tag, boot_rows, rows, demoted)
+    new_boot = [(renames.get(name, name), address, size) for name, address, size in boot_rows]
+    boot_names = {name for name, _, _ in new_boot}
+    new_rows = []
+    for name, kind, size, fp, places in rows:
+        new = renames.get(name)
+        if new is None:
+            new_rows.append((name, kind, size, fp, places))
+            continue
+        if new in boot_names:
+            kind = "boot"
+        else:
+            kind = "level" if len({p[0] for p in places}) == 1 else "shared"
+        new_rows.append((new, kind, size, fp, places))
+    for names in ([n for n, _, _ in new_boot], [n for n, *_ in new_rows]):
+        if len(set(names)) != len(names):
+            sys.exit("the demotion would give two functions of the release one name")
+    return new_boot, new_rows, renames
+
+
+def call_edges(boot_rows: list, rows: list) -> list[tuple[str, str]]:
+    """(caller, callee) for every call the release's own code makes.
+
+    The boot's calls are the boot's. A level holds the boot's resident functions (below
+    levels.LEVEL_BASE) at the boot's addresses and its own code above that line, so a call
+    from a level reaches the boot's function below it and the level's own above it.
+    """
+    edges = []
+    spans = [(a, d) for _, a, d in boot_sections(levels.BOOT)]
+    starts = {address: name for name, address, _ in boot_rows}
+    for name, address, size in boot_rows:
+        for target in jal_targets(read(spans, address, size), address):
+            callee = starts.get(target)
+            if callee:
+                edges.append((name, callee))
+    resident = {a: n for n, a, _ in boot_rows if a < levels.LEVEL_BASE}
+    by_level = {}
+    for name, _, size, _, places in rows:
+        for number, address in places:
+            by_level.setdefault(number, []).append((name, address, size))
+    for number in sorted(by_level):
+        base, data = levels.level_text(levels.DUMP / levels.level_dir(number))
+        here = dict(resident)
+        for name, address, _ in by_level[number]:
+            here[address] = name
+        for name, address, size in by_level[number]:
+            body = data[address - base:address - base + size]
+            for target in jal_targets(body, address):
+                callee = here.get(target)
+                if callee:
+                    edges.append((name, callee))
+    return edges
+
+
+def write_catalogues(boot_rows: list, rows: list) -> None:
+    """config/<version>/boot/functions.tsv and config/<version>/levels/functions.tsv, in the
+    formats docs/VERSIONS.md gives them."""
+    levels.BOOT_FUNCTIONS.parent.mkdir(parents=True, exist_ok=True)
+    levels.BOOT_FUNCTIONS.write_text("# name\taddress\tsize -- tools/carry.py\n" + "".join(
+        f"{name}\t{address:08X}\t{size}\n" for name, address, size in boot_rows), newline="\n")
+    levels.LEVELS.mkdir(parents=True, exist_ok=True)
+    lines = ["# name\tkind\tsize\tfingerprint\tlevels\tplaces (level:address) -- tools/carry.py"]
+    for name, kind, size, fp, places in rows:
+        lines.append(f"{name}\t{kind}\t{size}\t{fp}\t{len({p[0] for p in places})}\t" +
+                     ",".join(f"{lv:02d}:{a:08X}" for lv, a in places))
+    levels.CATALOGUE.write_text("\n".join(lines) + "\n", newline="\n")
+
+
+def demote(version: str) -> None:
+    """Take the functions the build disproves out of the release's carry.
+
+    The measured ones and the carried callers of them become the release's own functions:
+    they are listed in config/<version>/not_carried.tsv, renamed for the release in the
+    release's catalogues and given INCLUDE_ASM markers in src/<version>/. The release is
+    not realigned: every other row of its catalogues keeps its name, address and places.
+    """
+    tag = levels.VERSIONS[version]["tag"]
+    levels.select(version)
+    path = not_carried_path(version)
+    names = read_not_carried(path)
+    measured = measured_not_carried(version)
+    for name in sorted(measured):
+        names.setdefault(name, measured[name])
+    write_not_carried(path, names)
+
+    boot_rows = levels.read_boot_functions()
+    rows = levels.read_catalogue()
+    carried = {name for name, _, _ in boot_rows} | {name for name, *_ in rows}
+    carried = {name for name in carried if not name.startswith(f"func_{tag}_")}
+    direct = {name for name in names if name in carried}
+    edges = call_edges(boot_rows, rows) if direct else []
+    demoted = demoted_names(direct, edges, carried)
+    if not demoted:
+        print(f"{version}: {len(names)} functions not carried; none of them is carried here")
+        return
+    new_boot, new_rows, renames = demote_catalogue(tag, boot_rows, rows, demoted)
+    write_sources(version, tag, new_boot, new_rows)
+    write_catalogues(new_boot, new_rows)
+    print(f"{version}: {len(demoted)} functions demoted ({len(direct)} measured, "
+          f"{len(demoted) - len(direct)} their carried callers); {len(renames)} names changed")
 
 
 def correct_level_entries(rows: list[tuple]) -> list[tuple]:
@@ -336,13 +500,7 @@ def refresh_entries() -> None:
             boot.append((name, a, n))
     rows = correct_level_entries(levels.read_catalogue())
     # Validate both catalogues completely before writing either output.
-    levels.BOOT_FUNCTIONS.write_text("# name\taddress\tsize -- tools/carry.py\n" + "".join(
-        f"{name}\t{a:08X}\t{n}\n" for name, a, n in boot))
-    lines = ["# name\tkind\tsize\tfingerprint\tlevels\tplaces (level:address) -- tools/carry.py"]
-    for name, kind, n, fp, places in rows:
-        lines.append(f"{name}\t{kind}\t{n}\t{fp}\t{len({p[0] for p in places})}\t" +
-                     ",".join(f"{lv:02d}:{a:08X}" for lv, a in places))
-    levels.CATALOGUE.write_text("\n".join(lines) + "\n")
+    write_catalogues(boot, rows)
     print(f"entry repairs: {len(boot)} boot functions, {len(rows)} level rows; identities retained")
 
 
@@ -353,6 +511,9 @@ def main() -> None:
         sys.exit("USA v1.01 is the catalogue the others are carried from: --version pal or us2")
     if "--entries" in sys.argv:
         refresh_entries()
+        return
+    if "--demote" in sys.argv:
+        demote(version)
         return
     tag = levels.VERSIONS[version]["tag"]
     levels.select("us")
@@ -446,15 +607,7 @@ def main() -> None:
     if len({r[0] for r in out}) != len(out):
         sys.exit("two level functions would have one name")
 
-    levels.BOOT_FUNCTIONS.parent.mkdir(parents=True, exist_ok=True)
-    levels.BOOT_FUNCTIONS.write_text("# name\taddress\tsize -- tools/carry.py\n" + "".join(
-        f"{n}\t{a:08X}\t{s}\n" for n, a, s, _, _ in sorted(boot_rows, key=lambda r: r[1])))
-    levels.LEVELS.mkdir(parents=True, exist_ok=True)
-    lines = ["# name\tkind\tsize\tfingerprint\tlevels\tplaces (level:address) -- tools/carry.py"]
-    for name, kind, size, fp, places in out:
-        lines.append(f"{name}\t{kind}\t{size}\t{fp}\t{len({p[0] for p in places})}\t" +
-                     ",".join(f"{lv:02d}:{a:08X}" for lv, a in places))
-    levels.CATALOGUE.write_text("\n".join(lines) + "\n")
+    write_catalogues([(n, a, s) for n, a, s, _, _ in sorted(boot_rows, key=lambda r: r[1])], out)
 
     # What each v1.01 function became, for docs/VERSIONS.md and tools/progress.py's notes.
     report = {"boot": {}, "levels": {}}
@@ -485,33 +638,15 @@ MARKER = re.compile(r'^(?:INCLUDE_ASM|ASM_FUNC|LINKER_REMNANT)\("[^"]*",\s*(func
 DEFINITION = re.compile(r"^(?:[A-Za-z_][^;=#]*?\b)?(func_\w+)\s*\(", re.M)
 
 
-def write_sources(version: str, tag: str, boot_rows: list, rows: list) -> None:
-    """src/<version>/: an INCLUDE_ASM marker for every function of the release that has no
-    v1.01 name, in files of consecutive such functions as src/ has them (the boot's core.text
-    in core/, its .text in game/, level code in levels/shared/ and levels/NN_name/). Files
-    already there are kept; new functions get new files; a function of src/<version>/ the
-    catalogues no longer have stops the tool."""
-    root = ROOT / "src" / version
-    have = set()
-    for path in root.rglob("*.c"):
-        text = path.read_text()
-        have |= set(MARKER.findall(text)) | {m for m in DEFINITION.findall(text) if m.startswith(f"func_{tag}_")}
+def source_runs(tag: str, boot_rows: list, rows: list, have: set[str], core: tuple[int, int]) -> list[tuple[str, str, list[str]]]:
+    """The files src/<version>/ needs for the release's own functions that have no marker
+    yet: (directory, file stem, the functions in the file), in the layout src/ has them
+    (the boot's core.text in core/, its .text in game/, level code in levels/shared/ and
+    levels/NN_name/). HAVE are the functions src/<version>/ already has."""
     mine = lambda name: name.startswith(f"func_{tag}_")
-    known = {r[0] for r in boot_rows} | {r[0] for r in rows}
-    stale = sorted(n for n in have if mine(n) and n not in known)
-    if stale:
-        sys.exit(f"src/{version}/ has {len(stale)} functions the catalogues no longer have, e.g. {stale[:5]}")
-    core = next(a for name, a, d in boot_sections(levels.BOOT) if name == "core.text"), \
-        next(a + len(d) for name, a, d in boot_sections(levels.BOOT) if name == "core.text")
-    runs = []                   # (directory, file stem, [names])
-
-    def add(directory: str, stem: str, name: str, fresh: bool) -> None:
-        if fresh and runs and runs[-1][0] == directory and runs[-1][3]:
-            runs[-1][2].append(name)
-        else:
-            runs.append((directory, stem, [name], fresh))
+    runs = []                   # (directory, file stem, [names], fresh)
     previous = None
-    for name, a, n, _, _ in sorted(boot_rows, key=lambda r: r[1]):
+    for name, a in sorted(((r[0], r[1]) for r in boot_rows), key=lambda r: r[1]):
         directory = "core" if core[0] <= a < core[1] else "game"
         fresh = mine(name) and name not in have
         if fresh and not (previous and runs and runs[-1][3] and runs[-1][0] == directory):
@@ -533,15 +668,40 @@ def write_sources(version: str, tag: str, boot_rows: list, rows: list) -> None:
             elif fresh:
                 runs.append((directory, f"L{number:02d}_{a:08X}", [name], True))
             previous = directory if fresh else None
-    written = 0
-    for directory, stem, names, _ in runs:
+    return [(directory, stem, names) for directory, stem, names, _ in runs]
+
+
+def write_sources(version: str, tag: str, boot_rows: list, rows: list) -> None:
+    """src/<version>/: an INCLUDE_ASM marker for every function of the release that has no
+    v1.01 name, in files of consecutive such functions as src/ has them (the boot's core.text
+    in core/, its .text in game/, level code in levels/shared/ and levels/NN_name/). Files
+    already there are kept; new functions get new files; a function of src/<version>/ the
+    catalogues no longer have stops the tool."""
+    root = ROOT / "src" / version
+    have = set()
+    for path in root.rglob("*.c"):
+        text = path.read_text()
+        have |= set(MARKER.findall(text)) | {m for m in DEFINITION.findall(text) if m.startswith(f"func_{tag}_")}
+    mine = lambda name: name.startswith(f"func_{tag}_")
+    known = {r[0] for r in boot_rows} | {r[0] for r in rows}
+    stale = sorted(n for n in have if mine(n) and n not in known)
+    if stale:
+        sys.exit(f"src/{version}/ has {len(stale)} functions the catalogues no longer have, e.g. {stale[:5]}")
+    sections = boot_sections(levels.BOOT)
+    core = next(a for name, a, d in sections if name == "core.text"), \
+        next(a + len(d) for name, a, d in sections if name == "core.text")
+    runs = source_runs(tag, boot_rows, rows, have, core)
+    for directory, stem, _ in runs:                # nothing is written if one file would go
         path = root / directory / f"{stem}.c"
         if path.exists():
             sys.exit(f"{path.relative_to(ROOT)} exists; move its functions before regenerating")
+    written = 0
+    for directory, stem, names in runs:
+        path = root / directory / f"{stem}.c"
         path.parent.mkdir(parents=True, exist_ok=True)
         area = directory.split("/")[0]
         path.write_text('#include "include_asm.h"\n\n' + "\n".join(
-            f'INCLUDE_ASM("asm/{version}/{area}", {name});\n' for name in names))
+            f'INCLUDE_ASM("asm/{version}/{area}", {name});\n' for name in names), newline="\n")
         written += len(names)
     print(f"src/{version}/: {written} new markers in {len(runs)} files")
 

@@ -30,7 +30,7 @@ extern int D_001A7AF0;
 extern unsigned short D_001A7AF2;
 extern void func_002FC138(void);
 extern int func_002E5CF8(int, int, void *);
-extern void func_002923C0(int);
+extern void func_US2_00292C70(int);
 extern int func_00288FB8(int);
 extern void func_US2_0029DAD0(int, int);
 extern void func_002925F0(int);
@@ -60,7 +60,7 @@ void func_US2_002FA028(void)
     D_001B228C = 85;
     if (D_0021F240.mode == 3) {
         if (D_001AD1B8) D_001A79F8.level = D_001AD1BC; else D_001A79F8.level = D_001AD1C0;
-        func_002923C0(D_001A79F8.level);
+        func_US2_00292C70(D_001A79F8.level);
         table = D_001AD308;
         if (D_001AD1B8) func_US2_0029DAD0(func_00288FB8(table.words[D_001A79F8.level]), -1);
     }

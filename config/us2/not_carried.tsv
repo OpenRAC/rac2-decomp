@@ -63,6 +63,7 @@ func_L03_003D20F8	03_endako: instruction at +0x4c differs
 func_L08_00318F90	08_tabora: instruction at +0x38 differs
 func_L20_00446E70	20_yeedil: instruction at +0x64 differs
 func_L20_00445738	20_yeedil: instruction at +0x64 differs
+func_00292078	00_aranos_tutorial: instruction at +0x50 differs
 func_0028C6D0	boot: instruction at +0x260 differs
 func_L12_00429ED8	30_insomniac_museum: instruction at +0x260 differs
 func_0033FB98	boot: instruction at +0x1D4 differs

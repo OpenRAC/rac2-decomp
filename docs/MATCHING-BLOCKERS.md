@@ -51,6 +51,24 @@ and compares through `zero_extend`, which `func_L03_00409248` shows as `andi` wh
 `daddu`. `unsigned c = x, old = c++; x = c;` gives retail's SImode copy. An `int` pair is one word
 off (signed compare), and a true bitfield does not help.
 
+### Small-data constants, the conditional negate and local-register allocation
+
+**29 October 2026:** Two ground probes reconstructed from retail bytes,
+`func_00327038` (840 bytes) and `func_00330150` (904 bytes), compile to their
+retail sizes as separate `-G8` units but match 0/28 USA v1.01 placements. The
+drafts are retained in `nonmatching/game/`. `__attribute__((sda))` on a
+four-byte global is GP-relative only in a `-G8` unit; in `-G0` it becomes an
+absolute `lui`/`addiu`. Retail's `lwc1 $f12, 0x1118($gp)` therefore requires
+`-G8`; the build resolves the per-program address from the retail relocation,
+so the constants need no `ref_` name. The conditional negate is an
+if-conversion artifact: `if (flag) x = -x` emits `bnel` with the negate in the
+delay slot, while the inverse condition emits `beql`. The remaining blocker is
+the local-registers pass: retail allocates `$s1` to the object and `$s3` to the
+loop counter, while cc1 assigns `$s1` to the counter and `$s2` to the object.
+Changing how the ninth vector is named changes the promotion order; the next
+experiment is a source shape that names the object and counter in retail's
+allocation order. Equal size is not a match.
+
 ### Complete matrix storage and loop lifetimes
 
 `func_L09_003FEAE8` needs one 64-byte joint matrix, with its position at
@@ -1192,6 +1210,23 @@ generator produces identical catalogues. Separate G8 C bodies pass 27/27 places
 for each applicable release, including equality of the tick word's SDA/absolute
 aliases. The 148-byte extents end at entry+0x94 and retain the four-byte gap before
 the next entry at +0x98. The combined tree passes all 84 strict program builds.
+
+**1 November 2026 identity-preserving demotion:** `tools/carry.py --version V --demote`
+no longer realigns the release. It reads the release's last build
+(`build/<V>/*/placed.json`), takes the functions whose C does not build to the
+release's bytes for a reason of the code itself (a knock-on "needs ... which is not
+C" is not one), lists them in `config/<V>/not_carried.tsv` (the rows that are there
+keep their place and their reason) and renames them, and the carried callers of them,
+for the release in the release's catalogues, with INCLUDE_ASM markers in `src/<V>/`.
+Every other row keeps its name, its address and its places, so a demotion no longer
+changes the identities of functions the build did not disprove. The callers are
+found by `jal` target in the release's own code: the boot's, and each level's, where
+a call below `levels.LEVEL_BASE` reaches the boot's resident function and a call
+above it the level's own. A caller the release already owns keeps its name. The
+demotion is idempotent: a second run finds nothing left to demote and changes
+nothing. The end-to-end demotion of a measured release is not verified here (no
+`placed.json` and no US2 dumps in the tree that ran it); the transformation and its
+rules are covered by `tests/test_carry.py`.
 
 The PAL timer uses the shared resident identity `D_00189E20`, whose PAL binding is
 `0x00189EA0`. The canonical `D_00189EA0` instead names the distinct mutable resident vector

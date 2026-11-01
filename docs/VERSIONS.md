@@ -84,7 +84,13 @@ time, and cuts the release's code where v1.01's catalogue cuts it:
    still differ, because an offset inside an address moved (a field of a large global, the
    accessors of `src/game/0029BCC8.c`, `func_L00_0030D*`). `tools/carry.py --demote` reads the
    release's last build and lists them in `config/<version>/not_carried.tsv`: they and
-   their callers are the release's own functions.
+   their callers are the release's own functions. The demotion does not realign the release
+   again: the measured functions and the carried callers of them take the release's names
+   (`func_<TAG>_XXXXXXXX`, `func_<TAG>_LNN_XXXXXXXX`) and get INCLUDE_ASM markers in
+   `src/<version>/`, and every other row of the release's catalogues keeps its name, its
+   address and its places. A caller the release already owns keeps its name. The demotion
+   needs the release's dumps (for the calls) and the build's `placed.json` (for the
+   measurements).
 
 Then the catalogue rules of `tools/levels.py` apply unchanged: the linker's filler and an
 epilogue's residue are not functions, and identical code is one function, counted once (the
