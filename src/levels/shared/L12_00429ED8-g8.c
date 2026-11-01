@@ -1,22 +1,3 @@
-/* GPT-6.1 Sol (high effort), task v1360, 29 October 2026.
- * USA v1.01, game -O2 -G8 -ffunction-sections: 2152/2152 bytes,
- * 2/3 places match (Todano and Smolg). Museum differs only at +0x260
- * and +0x268: lui/ori pack 0x00801010 instead of 0x00202020, then
- * sw writes that color to quad.colors[2] and quad.colors[3].
- * Changing only the literal to 0x801010 matches Museum exactly (1/3).
- * This is a catalogue grouping collision, not a remaining C mismatch:
- * tools/levels.py identity() masks the two color-immediate halves.
- * The constructor also needs ref_L12_00429ED8_00 for Museum's copy.
- * Next step: correct the catalogue identity/split through the maintainer;
- * the worker is not permitted to edit tools or generated catalogues.
- *
- * Improvements over v0358: pack directly into quad color fields, use
- * independent loop counters, initialize the V iterator before U, separate
- * final glow from angle, and give the state its measured float fields.
- * These recover retail color, loop, FPR and angle-store scheduling.
- * Eight check.py compiles; no flags or compiler changes. All declarations
- * are below. No full build/link check: the current row is not a full match.
- */
 #include "common.h"
 
 extern float D_L12_001B22EC __attribute__((sda));

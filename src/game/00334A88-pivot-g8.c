@@ -1,24 +1,3 @@
-/* GPT-6.1 Sol (high), USA v1.01, game -O2 -G8 -ffunction-sections.
- * Best/final check: 1820/1820 bytes, 0 of 1 places match.
- * Five instructions differ: at 00334C60 (+0x1D0), C emits
- * daddu a1,s1,zero then jal func_00282DB0; retail puts the jal first
- * and the argument move in its delay slot. At +0x260/+0x268/+0x26C,
- * v0/v1 are swapped for the hero state load/test following func_00334710.
- * The corrected catalogue entry is 00334A90.
- * Removing redundant axis assignments after the first two mode branches
- * restores their load scheduling and pointer lifetimes. Separating each
- * base-vector dot product from its scale call restores retail tail sharing
- * and the late temp address formation. Those changes recover eight bytes.
- * Separate dot/scale statements and a typed projection pointer in the third
- * mode branch emit the same bytes: stopped on a three-wording tie. A new
- * hypothesis for that call's scheduling is needed, rather than another
- * equivalent local expression. func_00334710's TI return is verified from
- * its current matched definition; the earlier void prototype had only the
- * delay-slot mismatch but gave a false return contract. Six checker runs
- * (five compiled, one GCC
- * ICE from a direct mode attribute in a prototype, fixed with a typedef).
- * No linked build was run; all required declarations follow.
- */
 #include "common.h"
 typedef int Qword_34A88 __attribute__((mode(TI)));
 typedef union { Qword_34A88 q; float f[4]; } V651;
@@ -32,7 +11,7 @@ extern float D_001B11C0 __attribute__((sda)), D_001B11C4 __attribute__((sda)), D
 extern float func_00282DB0(void *, void *), func_00282DF0(void *), func_00283CE0(int), func_003348A8(void *,float);
 extern int func_00283CF0(float), func_00277258(void *,int,int,float),func_00282978(void *),func_00334730(void *,int);
 extern void func_00282D30(void *,void *,float),func_00282CF0(void *,void *,void *),func_00282D08(void *,void *,void *,float);
-extern Qword_34A88 func_00334710(int, Qword_34A88 *);
+extern void func_00334710(int, Qword_34A88 *);
 extern void func_003349E8(void *,int,float);
 #define H651(p,o) (*(short *)((p)+(o)))
 #define F651(p,o) (*(float *)((p)+(o)))
@@ -68,16 +47,19 @@ void func_00334A88(char *obj, void *out)
             f=func_00283CE0(H651(state,0xD8))/func_00283CE0(15);
             H651(state,0xD8)=func_00283CF0(func_00283CE0(H651(state,0xEC))*f);
             H651(state,0xEE)=2;
-        } else if (H651(state,0xEE)>=2) {
+        } else {
             axis=cam+0x30;
-            func_00282D30(state+0x10,axis,func_00282DB0(state,axis));
+            if (H651(state,0xEE)>=2) {
+            f=func_00282DB0(state,axis);
+            func_00282D30(state+0x10,axis,f);
             qcopy(state+0x20,state+0x10);
             mode=B651(state,0xC4);
             axis=cam+0x30;
             if ((unsigned)(mode-5)<3 || mode==3)
                 func_003349E8(state+0x30,1,D_001B120C*0.5f);
             if (++H651(state,0xEE)>=16) H651(state,0xEE)=0;
-        } else axis=cam+0x30;
+            }
+        }
     }
     func_00334710((int)obj,&base.q);
     if (D_00189E20.i2294==0x74) {

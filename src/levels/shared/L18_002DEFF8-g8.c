@@ -1,26 +1,3 @@
-/* GPT-6.1 Sol high, v1304, 2026-10-29. Nonmatching; never linked.
- * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * USA v1.01: 2016/2016 bytes, 0/2 placements. check.py first rejects +0x3AC.
- * Four instruction-shape differences when relocation values are excluded for
- * diagnosis: +0x3AC (beqz versus beql, different destination), +0x418,
- * +0x42C and +0x430 (player/object position-address scheduling). Relocation
- * consistency after the first rejected instruction remains unqualified.
- * This improves the prior 1904-byte draft; US2 and PAL were not checked here.
- * Neighboring hero union practices, a controller view based at D_00138180,
- * MACRO_ADDR scalar declarations, embedded position history, and the explicit
- * n8 divisor recover the frame, saved registers, timers and remaining tail.
- * D_001A7AF8[7] uses the existing equipment flags array identity.
- * Retail's initial object read is from D_L18_001FB6E0; subsequent reads use
- * D_L18_0025B6E0, not the same table as the old draft assumed.
- * The latter table and D_L18_002653E0 share retail's high address word:
- * its empty-object branch skips the timer loop's high-half load and reuses
- * the word loaded in its delay slot. The C keeps those symbols independent.
- * Next: establish their actual containing data layout/address relationship;
- * do not manufacture a common object or a dependency merely to force reuse.
- * RAC1 counterpart: src/overlays/shared/hero_update_ledge_grab.c,
- * update_hero_timers_and_spatial_state (same timer/history/reach phases).
- * All required declarations are included below; use a dedicated G8 unit.
- */
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
 typedef struct { float x,y,z; } FamilyC94396F4Vector_Fc94396f4;
@@ -37,7 +14,6 @@ extern int D_L18_001A8F00 MACRO_ADDR;
 extern float D_L18_001B2260 MACRO_ADDR,D_L18_001B2264 MACRO_ADDR;
 extern unsigned int D_L18_001B2348 MACRO_ADDR;
 extern char *D_L18_001FB6E0[] __attribute__((nosda));
-extern char *D_L18_0025B6E0[];
 extern TimedRecord D_L18_002653E0[4];
 extern Vector128 D_0018BBB0[32];
 extern void func_L00_002B9380(void);
@@ -127,15 +103,13 @@ void func_L18_002DEFF8(void)
     {
     char *player=D_00189E20;
     if(HERO->h[0x224 / 2]!=0) {
-        char *position;
         char *object;
         int j;
         object=D_L18_001FB6E0[0];
-        for(j=0;object!=0;object=D_L18_0025B6E0[++j]) {
+        for(j=0;object!=0;object=D_L18_001FB6E0[++j]) {
             if((func_002ABB78(object)!=0 || (object!=0 && *(void **)(object+0x24)!=0 && *(short *)(*(char **)(object+0x24)+0x46)==0x16)) && ((D_L18_001B2348&7)==((int)object>>8&7) || func_002A77E0(4)==0)) {
-                position=object+0x10;
-                if(func_00282E48(&HERO->q[0x80/16],position)<15.37f) {
-                    func_00282CF0(sum,position,&HERO->q[0x80/16]);
+                if(func_00282E48(&HERO->q[0x80/16],object+0x10)<15.37f) {
+                    func_00282CF0(sum,object+0x10,&HERO->q[0x80/16]);
                     func_00282F20(sum,sum,1.7f);
                     func_002A8F70(object,HERO->p[0x2290/4],0x4000000u,&HERO->q[0x80/16],sum,1.0f);
                 }

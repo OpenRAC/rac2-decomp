@@ -283,6 +283,20 @@ GP = 0x001AEFF0
 BOOT_HI = 0x1A                  # an address half below this points into memory every program shares
 
 
+def packs_constant(w, k: int) -> bool:
+    """Is the lui at W[K] the high half of a constant? The compiler builds addresses with
+    addiu or a load's offset, and only numbers with ori, so a following ori on the same
+    register (within the few instructions the scheduler puts between them) means a number."""
+    rt = (w[k] >> 16) & 31
+    for x in w[k + 1:k + 5]:
+        if x >> 26 == 0x0D and (x >> 21) & 31 == rt and (x >> 16) & 31 == rt:
+            return True
+        op = x >> 26
+        if (op == 0 and (x >> 11) & 31 == rt) or (op not in (0, 2, 3) and op < 0x28 and (x >> 16) & 31 == rt):
+            return False            # something else writes the register first
+    return False
+
+
 def identity(b: bytes, address: int = 0) -> bytes:
     """One function's words with only its address fields masked: what two copies must
     share to be the same function. Masked: jump targets, the high half of a RAM address
@@ -321,7 +335,7 @@ def identity(b: bytes, address: int = 0) -> bytes:
                 x &= 0xFC000000
         elif op == 0x0F:
             resident[rt] = 0x10 <= imm < BOOT_HI
-            if 0x10 <= imm < 0x200 and not resident[rt]:
+            if 0x10 <= imm < 0x200 and not resident[rt] and not packs_constant(w, k):
                 x &= 0xFFFF0000
         elif rs in resident and resident[rs] and (op in MEM or op in (0x09, 0x0D, 0x19)) and rs != 29:
             pass                     # the low half of a resident address
