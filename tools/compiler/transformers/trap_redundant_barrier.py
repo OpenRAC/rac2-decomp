@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reorg's redundant-insn search stops at a division guard, as retail's compiler does.
+"""reorg's redundant-insn search stops at a division guard or volatile asm, as retail's compiler does.
 
 When `fill_slots_from_thread` (reorg.c) takes an insn from a branch's target for the delay
 slot, it first asks `redundant_insn` whether an identical insn earlier on the branch's path
@@ -27,7 +27,15 @@ converse, a branch slot holding a reload of the value its register already holds
 between and no intervening store, occurs only in func_L00_002C2DE8 (27 placements). Of every
 matched function in tools/build.py all, none compiled differently.
 
-The first backward scan of redundant_insn now ends, finding nothing, at a TRAP_IF insn.
+A volatile asm stops the search the same way. func_0030E8A8 (1,052 bytes, 28 places) ends one
+arm with a `bc1f` to the epilogue past `ld $s0`, whose slot holds that restore, then a qcopy and
+a `b` to the epilogue. Retail's `b` lands on the `ld $s0`; this tree took the slot's restore as
+redundant across the qcopy and branched one word further. Census of the 28 programs (a branch
+slot holding a $sp restore, then lq/sq, then a `b` to that restore or the word after it): 30 land
+on the restore, none past it. No unit of src/ compiles differently.
+
+The first backward scan of redundant_insn now ends, finding nothing, at a TRAP_IF insn or a
+volatile asm.
 tests/test_trap_redundant_barrier.py covers the transformer and the compiler output; see
 docs/COMPILER-NOTES.md.
 
@@ -51,8 +59,10 @@ SCAN_OLD = ("  /* Scan backwards looking for a match.  */\n"
             "\n"
             "      if (GET_CODE (pat) == SEQUENCE)\n")
 GUARD = ("      /* RAC2: retail's compiler does not look for a match across a\n"
-         "\t division guard (trap_if).  */\n"
-         "      if (GET_CODE (trial) == INSN && GET_CODE (pat) == TRAP_IF)\n"
+         "\t division guard (trap_if) or a volatile asm.  */\n"
+         "      if (GET_CODE (trial) == INSN\n"
+         "\t  && (GET_CODE (pat) == TRAP_IF\n"
+         "\t      || (GET_CODE (pat) != SEQUENCE && volatile_insn_p (pat))))\n"
          "\treturn 0;\n"
          "\n")
 SCAN_NEW = SCAN_OLD.replace("      if (GET_CODE (pat) == SEQUENCE)\n",

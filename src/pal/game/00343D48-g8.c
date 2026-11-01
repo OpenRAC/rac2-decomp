@@ -42,3 +42,35 @@ void func_PAL_00343D48(char *object, void *argument)
     func_003480D8(widget, 11, 60);
     func_00341EE8(object, 0);
 }
+
+extern void func_00335E38(void *, float, float, float, float);
+extern int func_PAL_0034A2F8(void *);
+extern float D_001AE130 __attribute__((sda));
+extern float D_001AE134 __attribute__((sda));
+extern int D_00138344[];
+extern int func_PAL_00343EF8(void *);
+extern void func_00336320(void *);
+extern void func_PAL_0034A300(void *);
+extern int func_PAL_002A9FA0(int, int, int, int, int);
+
+void func_PAL_00343FA0(char *self)
+{
+    int count = func_PAL_0034A2F8(self + 0x10);
+    int i;
+    int *slot;
+
+    if (D_00138344[0] & 0x5000)
+        func_PAL_002A9FA0(0, 0, 1, 0, 1);
+    for (i = 0; i < count; i++) {
+        float step = (float)i;
+        func_00335E38(self + 0xEC, (*(float **)self)[0] + D_001AE134,
+                      (*(float **)self)[1] + D_001AE130 * step, 0.0f, 0.0f);
+        func_00335E38(self + 0x138, (*(float **)self)[0] + D_001AE134,
+                      (*(float **)self)[1] + D_001AE130 * step, 0.0f, 0.0f);
+        slot = func_00335E20(self + 0x138);
+        *slot = func_PAL_00343EF8(self) == i ? func_PAL_002A9FA0(0x20FFFEED, 0x70FFFEED, 0x14, 0, 0) : 0x55F0C070;
+        func_00336320(self + 0xEC);
+        func_00336320(self + 0x138);
+    }
+    func_PAL_0034A300(self + 0x10);
+}

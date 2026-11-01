@@ -773,7 +773,6 @@ void func_00306040(void *owner, float *position)
 
 
 
-INCLUDE_ASM("asm/game", func_00306680);
 
 /* func_00307298 uses the profile in 00307298-g8-qcopy.c. */
 

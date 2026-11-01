@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L22_002AA488);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L22_002AA840);
 
 extern char D_00189E20[];
 extern void func_L00_002D24B8(void);

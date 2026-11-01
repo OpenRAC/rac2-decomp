@@ -105,7 +105,7 @@ void func_L09_003FECF0(char *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L09_003FEF00);
+/* func_L09_003FEF00 is in L09_003FEA48-patrol-g8.c. */
 
 /* func_L09_00402D50 is in L09_00402D50-g8.c. */
 

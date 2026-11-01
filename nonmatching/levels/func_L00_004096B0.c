@@ -1,3 +1,12 @@
+/* 1 November 2026 (closer a3): 1944/1944, 28 words, profile -O2 -G8 -ffunction-sections -frac2-hazard-labels -g
+ * -frac2-zero-ti-por. From 94 with: no pointer locals for state + 0x10 / + 0x20 (PRE's reaching copies are the two
+ * spilled slots 0x11C and 0x120, and s0 is reload's register for the first, inherited over the three calls), plain
+ * locals for contacts/kind/triggered (the old stack struct was a stand-in for spilled pseudos), hoisted 5 now gets
+ * $s6 once &rotation stops outranking it, D_0018C0B0 NOT_SDA, (idx + table)->field for retail's mult-then-index addu.
+ * Left: (1) the 12-byte copy: retail's %hi is v1, so ptr gets a1 and reload's scratches v0/a0; local-alloc's fake_death
+ * sends %hi off v0 only if a local in v0 follows the copy, and here the load of state + 0x24 waits on the copy while
+ * the range load doesn't (a fixed scalar symbol against a frame store), so the range load sits in between. (2) the
+ * range: retail stores it before 1.5's li.s, so 1.5 gets f0; here 1.5 goes first. (3) spill reloads a2/a3 for a1/a2. */
 /* GPT-6.1 Sol high, task v1293, 29 October 2026.
  * Best check: 1944/1944 bytes, 0/27 USA v1.01 placements; first mismatch
  * +0xB0. Compile alone with game -O2 -G8 -ffunction-sections; declarations
@@ -67,7 +76,7 @@ extern float D_L00_001B0FB0 __attribute__((sda));
 extern float D_L00_001B0FC0 __attribute__((sda));
 extern int D_L00_001ADB2C __attribute__((sda));
 extern int D_L00_001A8FF0, D_L00_001A8FF4;
-extern char *D_0018C0B0;
+extern char *D_0018C0B0 NOT_SDA;
 extern char *D_L00_001C3280[];
 extern unsigned char D_00139568[];
 typedef struct {
@@ -119,52 +128,42 @@ void func_L00_004096B0(char *object)
     CollisionWorkspace workspace;
     char *state = *(char **)(object + 0x68);
     char *position = object + 0x10;
-    struct {
-        int contacts, contact_kind, triggered;
-        char *rotation, *timer;
-    } result;
+    int contacts, contact_kind, triggered;
     float range, fade;
 
     func_002AFFD8(position, (char *)&direction, 1);
     func_00300190(position, position);
     if (*(unsigned char *)(object + 0x20) == 0) {
         float query_range;
-        CollisionShape *ignored;
 
         qcopy(&previous, position);
         func_00282CC0(position, position, state);
         func_002FEE70(*(int *)(state + 0x28), state, 0);
         func_002FE880(position, (float *)state, 0.0040555559f);
-        ignored = __builtin_memcpy(shape, &D_L00_001B0FC8, sizeof(shape));
+        shape[0] = D_L00_001B0FC8;
         query_range = D_L00_001B0FAC;
         if (*(int *)(state + 0x24) != 0)
             query_range = D_L00_001B0FBC;
         qcopy(&query.previous, &previous);
         qcopy(&query.position, position);
         qcopy(&query.velocity, state);
-        query.range = query_range;
-        query.owner = object;
-        query.shape = ignored;
-        query.kind = 3;
-
-        query.radius = 1.5f;
-        query.scale = (D_L00_001B0FA0 - 1.0f) + 1.0f;
-        query.flags = 0;
-        query.reserved = 0;
-        query.extra = 0;
-        result.contacts = func_002FE9D0(&query);
-        result.contact_kind = func_00300540(query.result_kind);
+    query.shape = shape;
+    query.radius = 1.5f;
+    query.scale = (D_L00_001B0FA0 - 1.0f) + 1.0f;
+    query.owner = object;
+    query.kind = 3;
+    query.range = query_range;
+    query.flags = 0;
+    query.reserved = 0;
+    query.extra = 0;
+    contacts = func_002FE9D0(&query);
+        contact_kind = func_00300540(query.result_kind);
         qcopy(position, &query.position);
         qcopy(state, &query.velocity);
-        result.timer = state + 0x20;
-        result.rotation = state + 0x10;
-        {
-            char *rotate = result.rotation;
-            func_002ACDE8(object + 0xC0, object + 0xC0, rotate);
-            func_002ACDE8(object + 0xD0, object + 0xD0, rotate);
-            func_002ACDE8(object + 0xE0, object + 0xE0, rotate);
-        }
-        if (result.contacts > 0) {
+        func_002ACDE8(object + 0xC0, object + 0xC0, state + 0x10);
+        func_002ACDE8(object + 0xD0, object + 0xD0, state + 0x10);
+        func_002ACDE8(object + 0xE0, object + 0xE0, state + 0x10);
+        if (contacts > 0) {
             int count, i, best;
             count = func_00277F48(position, 7.0f, 1, D_0018C0B0, 0);
             if (count != 0) {
@@ -223,24 +222,24 @@ void func_L00_004096B0(char *object)
                 func_002ACDE8(&workspace.math.point, &workspace.math.point, &workspace.math.work);
             }
             range = func_002A7878(0.05235988646745682f, 0.10471977293491364f);
-            func_002AB668(result.rotation, (int)&workspace.math.point, range);
+            func_002AB668(state + 0x10, (int)&workspace.math.point, range);
             func_002E5CF8(0, 0, object);
         }
         workspace.impact.owner = object;
         workspace.impact.flags = 0x830000;
-        workspace.impact.strength = D_L00_00262570[D_00139568[0x25]].strength;
+        workspace.impact.strength = (D_00139568[0x25] + D_L00_00262570)->strength;
         workspace.impact.count = 1;
         qcopy(&workspace.impact.force, state);
-        result.triggered = 0;
+        triggered = 0;
         func_00282F20(&workspace.impact.force, &workspace.impact.force, 1.0f);
         workspace.impact.kind = 3;
         workspace.impact.force.f[3] = 5627.9248046875f;
         workspace.impact.enabled = 1;
         workspace.impact.object_class = *(short *)(object + 0xAA);
         range = *(int *)(state + 0x24) != 0 ? 8.0f : 2.0f;
-        if (func_00282978(result.timer) != 0 ||
-            (result.contacts > 0 && (unsigned int)(result.contact_kind - 1) <= 1)) {
-            result.triggered = 1;
+        if (func_00282978(state + 0x20) != 0 ||
+            (contacts > 0 && (unsigned int)(contact_kind - 1) <= 1)) {
+            triggered = 1;
         } else {
             if (*(short *)(state + 0x22) == 0) {
                 int count, i;
@@ -252,7 +251,7 @@ void func_L00_004096B0(char *object)
                     if (special != 0 || (description != 0 && *(float *)description > 0.0f &&
                                          *(short *)(description + 6) == 0)) {
                         func_002A8E20(target, &workspace.impact);
-                        result.triggered = 1;
+                        triggered = 1;
                         if (special == 0) {
                             if (*(int *)(state + 0x24) != 0)
                                 func_0032D758(target, 0x4C, *(void **)(object + 0xB8));
@@ -268,7 +267,7 @@ void func_L00_004096B0(char *object)
                     *(short *)(state + 0x22) = 0;
             }
         }
-        if (result.triggered) {
+        if (triggered) {
             float blast_range;
             func_002E5CF8(1, 0, object);
             blast_range = 0.6f;

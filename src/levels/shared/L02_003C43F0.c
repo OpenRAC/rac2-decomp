@@ -1032,11 +1032,10 @@ void func_L02_003DED08(void) {
     func_L00_0037E5F0(10000.0f);
 }
 
-INCLUDE_ASM("asm/levels", func_L02_003E1A40);
+/* func_L02_003E1A40 is defined in L02_003E1A40-g8.c. */
 
 /* func_L02_003E2150: defined in L02_003C43F0-ring-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_003EB8F8);
 
 /* Copies the byte at +0x40 of the object held at +0x68 over its byte at +0x25. */
 void func_L02_003F0628(char *a0) {
@@ -1148,8 +1147,6 @@ void func_L02_004012A0(char *a0) {
 }
 
 
-
-INCLUDE_ASM("asm/levels", func_L02_00401530);
 
 /* Defined in L02_00401ED8-g8.c. */
 

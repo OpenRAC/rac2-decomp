@@ -1,3 +1,7 @@
+/* Closer b, 2026-11-01: the store sequence and registers follow retail for the first 30 stores; retail's callee saves come
+ * late, each just before its register's first use, so its stores outrank the saves in sched2 (anti-dependences from
+ * reusing few registers). One `lui $fp` too many. A hill climb over statement order (42,768 compiles) took 227 raw lines
+ * to 93, still 1476/1472: this order. Volatile, struct, sized and pointer views of the table and the scheduler flags don't help. */
 /* Retained manual reconstruction, 2026-10-24.
  * Profile: -O2 -G0 -ffunction-sections.
  * Final measurements: us: 0/28 placements, exit1, 1476 compiled bytes; us2:
@@ -13,129 +17,228 @@
  * saves; three tied profile trials are a stopping point.
  * No byte-match or linked-build credit is claimed.
  */
-/* The table holds callback entry addresses; this initializer does not call them.
- * Empty parameter lists deliberately leave each callback's interface unspecified.
- * The consumed return type is likewise irrelevant at this address-only use. */
-#define PARTICLE_UPDATES(X) \
- X(0, func_002BA6A0) \
- X(1, func_002BA978) \
- X(2, func_002BABE8) \
- X(3, func_002BAE48) \
- X(4, func_002BAF68) \
- X(5, func_002BB058) \
- X(6, func_002BB100) \
- X(7, func_002BB798) \
- X(8, func_002BB928) \
- X(9, func_002BBA38) \
- X(10, func_002BBB70) \
- X(11, func_002BBF40) \
- X(12, func_002BC510) \
- X(13, func_002BC8E8) \
- X(14, func_002BCA10) \
- X(15, func_002BCC58) \
- X(16, func_002BD0D0) \
- X(17, func_002BD390) \
- X(18, func_002BD398) \
- X(19, func_002BD508) \
- X(20, func_002BD5B0) \
- X(21, func_002BD9B0) \
- X(22, func_002B9288) \
- X(23, func_002BDEB0) \
- X(24, func_002BE150) \
- X(25, func_002BE400) \
- X(26, func_002BE7E8) \
- X(27, func_002BE928) \
- X(28, func_002BE9B8) \
- X(29, func_002BEBC8) \
- X(30, func_002BEE78) \
- X(31, func_002BF390) \
- X(32, func_002BF520) \
- X(33, func_002BF6F0) \
- X(34, func_002BF8F0) \
- X(35, func_002BFC50) \
- X(36, func_002BFE80) \
- X(37, func_002BFFE8) \
- X(38, func_002C00F8) \
- X(39, func_002C0200) \
- X(40, func_002C04C0) \
- X(41, func_002C0C78) \
- X(42, func_002C0E50) \
- X(43, func_002C14E0) \
- X(44, func_002C1840) \
- X(45, func_002C1B38) \
- X(46, func_002C1C88) \
- X(47, func_002C1DB8) \
- X(48, func_002C1E58) \
- X(49, func_002C1EF0) \
- X(50, func_002C1FC0) \
- X(51, func_002C2080) \
- X(52, func_002C2170) \
- X(53, func_002C23B8) \
- X(54, func_002C2658) \
- X(55, func_002C27B0) \
- X(56, func_002C28F8) \
- X(57, func_002C29A8) \
- X(58, func_002C2C80) \
- X(59, func_002C30F8) \
- X(60, func_002C3280) \
- X(61, func_002C3430) \
- X(62, func_002C37E0) \
- X(63, func_002C38A8) \
- X(64, func_002C38E0) \
- X(65, func_002C3B10) \
- X(66, func_002C3EE8) \
- X(67, func_002C4100) \
- X(68, func_002C43D0) \
- X(69, func_002C4500) \
- X(70, func_002C4788) \
- X(71, func_002C47F0) \
- X(72, func_002C4B10) \
- X(73, func_002C4B58) \
- X(74, func_002C4D20) \
- X(75, func_002C4F08) \
- X(76, func_002C5020) \
- X(77, func_002C5070) \
- X(78, func_002C5120) \
- X(79, func_002C5408) \
- X(80, func_002C5550) \
- X(81, func_002C58A8) \
- X(82, func_002C5D00) \
- X(83, func_002C6360) \
- X(84, func_002C64E0) \
- X(85, func_002B9380) \
- X(86, func_002C6868) \
- X(87, func_002C6A08) \
- X(88, func_002C6748) \
- X(89, func_002C6B80) \
- X(90, func_002C6EF0) \
- X(91, func_002C7058) \
- X(92, func_002C72A8) \
- X(93, func_002B9380) \
- X(94, func_002C7538) \
- X(95, func_002C7628) \
- X(96, func_002C7888) \
- X(97, func_002C7AE8) \
- X(98, func_002C7D58) \
- X(99, func_002C7F78) \
- X(100, func_002C8268) \
- X(101, func_002C8350) \
- X(102, func_002C8428) \
- X(103, func_002C85D8) \
- X(104, func_002C8610) \
- X(105, func_002C87B0) \
- X(106, func_002C8888) \
- X(107, func_002C8A38) \
- X(108, func_002C8CA0) \
- X(109, func_002C8F40) \
- X(110, func_002C90A0)
-#define DECLARE_UPDATE(index, name) extern void name();
-PARTICLE_UPDATES(DECLARE_UPDATE)
-#undef DECLARE_UPDATE
+extern void func_002B9288();
+extern void func_002B9380();
+extern void func_002BA6A0();
+extern void func_002BA978();
+extern void func_002BABE8();
+extern void func_002BAE48();
+extern void func_002BAF68();
+extern void func_002BB058();
+extern void func_002BB100();
+extern void func_002BB798();
+extern void func_002BB928();
+extern void func_002BBA38();
+extern void func_002BBB70();
+extern void func_002BBF40();
+extern void func_002BC510();
+extern void func_002BC8E8();
+extern void func_002BCA10();
+extern void func_002BCC58();
+extern void func_002BD0D0();
+extern void func_002BD390();
+extern void func_002BD398();
+extern void func_002BD508();
+extern void func_002BD5B0();
+extern void func_002BD9B0();
+extern void func_002BDEB0();
+extern void func_002BE150();
+extern void func_002BE400();
+extern void func_002BE7E8();
+extern void func_002BE928();
+extern void func_002BE9B8();
+extern void func_002BEBC8();
+extern void func_002BEE78();
+extern void func_002BF390();
+extern void func_002BF520();
+extern void func_002BF6F0();
+extern void func_002BF8F0();
+extern void func_002BFC50();
+extern void func_002BFE80();
+extern void func_002BFFE8();
+extern void func_002C00F8();
+extern void func_002C0200();
+extern void func_002C04C0();
+extern void func_002C0C78();
+extern void func_002C0E50();
+extern void func_002C14E0();
+extern void func_002C1840();
+extern void func_002C1B38();
+extern void func_002C1C88();
+extern void func_002C1DB8();
+extern void func_002C1E58();
+extern void func_002C1EF0();
+extern void func_002C1FC0();
+extern void func_002C2080();
+extern void func_002C2170();
+extern void func_002C23B8();
+extern void func_002C2658();
+extern void func_002C27B0();
+extern void func_002C28F8();
+extern void func_002C29A8();
+extern void func_002C2C80();
+extern void func_002C30F8();
+extern void func_002C3280();
+extern void func_002C3430();
+extern void func_002C37E0();
+extern void func_002C38A8();
+extern void func_002C38E0();
+extern void func_002C3B10();
+extern void func_002C3EE8();
+extern void func_002C4100();
+extern void func_002C43D0();
+extern void func_002C4500();
+extern void func_002C4788();
+extern void func_002C47F0();
+extern void func_002C4B10();
+extern void func_002C4B58();
+extern void func_002C4D20();
+extern void func_002C4F08();
+extern void func_002C5020();
+extern void func_002C5070();
+extern void func_002C5120();
+extern void func_002C5408();
+extern void func_002C5550();
+extern void func_002C58A8();
+extern void func_002C5D00();
+extern void func_002C6360();
+extern void func_002C64E0();
+extern void func_002C6748();
+extern void func_002C6868();
+extern void func_002C6A08();
+extern void func_002C6B80();
+extern void func_002C6EF0();
+extern void func_002C7058();
+extern void func_002C72A8();
+extern void func_002C7538();
+extern void func_002C7628();
+extern void func_002C7888();
+extern void func_002C7AE8();
+extern void func_002C7D58();
+extern void func_002C7F78();
+extern void func_002C8268();
+extern void func_002C8350();
+extern void func_002C8428();
+extern void func_002C85D8();
+extern void func_002C8610();
+extern void func_002C87B0();
+extern void func_002C8888();
+extern void func_002C8A38();
+extern void func_002C8CA0();
+extern void func_002C8F40();
+extern void func_002C90A0();
 extern void (*D_001F2340[])();
 void func_002BA0E0(void)
 {
-#define STORE_UPDATE(index, name) D_001F2340[index] = name;
-    PARTICLE_UPDATES(STORE_UPDATE)
-#undef STORE_UPDATE
+    D_001F2340[0] = func_002BA6A0;
+    D_001F2340[25] = func_002BE400;
+    D_001F2340[2] = func_002BABE8;
+    D_001F2340[13] = func_002BC8E8;
+    D_001F2340[19] = func_002BD508;
+    D_001F2340[31] = func_002BF390;
+    D_001F2340[29] = func_002BEBC8;
+    D_001F2340[36] = func_002BFE80;
+    D_001F2340[9] = func_002BBA38;
+    D_001F2340[39] = func_002C0200;
+    D_001F2340[15] = func_002BCC58;
+    D_001F2340[7] = func_002BB798;
+    D_001F2340[1] = func_002BA978;
+    D_001F2340[20] = func_002BD5B0;
+    D_001F2340[14] = func_002BCA10;
+    D_001F2340[4] = func_002BAF68;
+    D_001F2340[5] = func_002BB058;
+    D_001F2340[3] = func_002BAE48;
+    D_001F2340[21] = func_002BD9B0;
+    D_001F2340[24] = func_002BE150;
+    D_001F2340[17] = func_002BD390;
+    D_001F2340[33] = func_002BF6F0;
+    D_001F2340[6] = func_002BB100;
+    D_001F2340[11] = func_002BBF40;
+    D_001F2340[10] = func_002BBB70;
+    D_001F2340[37] = func_002BFFE8;
+    D_001F2340[12] = func_002BC510;
+    D_001F2340[16] = func_002BD0D0;
+    D_001F2340[27] = func_002BE928;
+    D_001F2340[23] = func_002BDEB0;
+    D_001F2340[22] = func_002B9288;
+    D_001F2340[30] = func_002BEE78;
+    D_001F2340[26] = func_002BE7E8;
+    D_001F2340[8] = func_002BB928;
+    D_001F2340[34] = func_002BF8F0;
+    D_001F2340[35] = func_002BFC50;
+    D_001F2340[40] = func_002C04C0;
+    D_001F2340[32] = func_002BF520;
+    D_001F2340[38] = func_002C00F8;
+    D_001F2340[47] = func_002C1DB8;
+    D_001F2340[52] = func_002C2170;
+    D_001F2340[49] = func_002C1EF0;
+    D_001F2340[50] = func_002C1FC0;
+    D_001F2340[53] = func_002C23B8;
+    D_001F2340[43] = func_002C14E0;
+    D_001F2340[44] = func_002C1840;
+    D_001F2340[48] = func_002C1E58;
+    D_001F2340[41] = func_002C0C78;
+    D_001F2340[46] = func_002C1C88;
+    D_001F2340[18] = func_002BD398;
+    D_001F2340[51] = func_002C2080;
+    D_001F2340[54] = func_002C2658;
+    D_001F2340[28] = func_002BE9B8;
+    D_001F2340[45] = func_002C1B38;
+    D_001F2340[42] = func_002C0E50;
+    D_001F2340[55] = func_002C27B0;
+    D_001F2340[56] = func_002C28F8;
+    D_001F2340[57] = func_002C29A8;
+    D_001F2340[58] = func_002C2C80;
+    D_001F2340[59] = func_002C30F8;
+    D_001F2340[63] = func_002C38A8;
+    D_001F2340[66] = func_002C3EE8;
+    D_001F2340[62] = func_002C37E0;
+    D_001F2340[64] = func_002C38E0;
+    D_001F2340[61] = func_002C3430;
+    D_001F2340[65] = func_002C3B10;
+    D_001F2340[68] = func_002C43D0;
+    D_001F2340[67] = func_002C4100;
+    D_001F2340[74] = func_002C4D20;
+    D_001F2340[79] = func_002C5408;
+    D_001F2340[72] = func_002C4B10;
+    D_001F2340[80] = func_002C5550;
+    D_001F2340[76] = func_002C5020;
+    D_001F2340[60] = func_002C3280;
+    D_001F2340[71] = func_002C47F0;
+    D_001F2340[75] = func_002C4F08;
+    D_001F2340[73] = func_002C4B58;
+    D_001F2340[70] = func_002C4788;
+    D_001F2340[78] = func_002C5120;
+    D_001F2340[83] = func_002C6360;
+    D_001F2340[69] = func_002C4500;
+    D_001F2340[81] = func_002C58A8;
+    D_001F2340[82] = func_002C5D00;
+    D_001F2340[88] = func_002C6748;
+    D_001F2340[84] = func_002C64E0;
+    D_001F2340[86] = func_002C6868;
+    D_001F2340[87] = func_002C6A08;
+    D_001F2340[77] = func_002C5070;
+    D_001F2340[89] = func_002C6B80;
+    D_001F2340[94] = func_002C7538;
+    D_001F2340[90] = func_002C6EF0;
+    D_001F2340[91] = func_002C7058;
+    D_001F2340[97] = func_002C7AE8;
+    D_001F2340[92] = func_002C72A8;
+    D_001F2340[95] = func_002C7628;
+    D_001F2340[101] = func_002C8350;
+    D_001F2340[96] = func_002C7888;
+    D_001F2340[98] = func_002C7D58;
+    D_001F2340[99] = func_002C7F78;
+    D_001F2340[107] = func_002C8A38;
+    D_001F2340[102] = func_002C8428;
+    D_001F2340[100] = func_002C8268;
+    D_001F2340[103] = func_002C85D8;
+    D_001F2340[104] = func_002C8610;
+    D_001F2340[85] = func_002B9380;
+    D_001F2340[93] = func_002B9380;
+    D_001F2340[105] = func_002C87B0;
+    D_001F2340[106] = func_002C8888;
+    D_001F2340[109] = func_002C8F40;
+    D_001F2340[108] = func_002C8CA0;
+    D_001F2340[110] = func_002C90A0;
 }
-#undef PARTICLE_UPDATES

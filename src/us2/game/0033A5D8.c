@@ -56,9 +56,46 @@ void func_US2_0033A7E0(char *p)
     *(int *)(p + 812) = 0;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033A860);
+extern void *func_00288FB8(int);
+extern void func_US2_0033C098(void *, void *, void *, void *);
+extern void func_US2_0033C0F0(void *, float);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033A9F8);
+/* looks up three objects by numeric id, runs a four-argument routine and a (pointer,float) routine on a sub-object at self+8, then stores 1 at self+764 */
+void func_US2_0033A860(int *self)
+{
+    void *a;
+    void *b;
+    void *c;
+    void *sub = (void *)(self + 2);
+
+    a = func_00288FB8(11315);
+    b = func_00288FB8(11314);
+    c = func_00288FB8(11237);
+
+    func_US2_0033C098(sub, a, b, c);
+    func_US2_0033C0F0(sub, 0.0f);
+
+    self[203] = 1;
+}
+
+
+extern int D_L00_001A8FD8 __attribute__((sda));
+extern int D_L00_001A8FDC __attribute__((sda));
+extern void func_US2_0033BE68(int *p, int flag);
+extern void func_US2_0033BF90(int *p);
+extern void func_00336320(int *p);
+
+/* Lazily initialises a sub-object of the argument behind two global flags and a field, runs one guarded setup step on it, then hands it to two callees. */
+void func_US2_0033A9F8(int *obj)
+{
+    if (D_L00_001A8FD8 != 0 || D_L00_001A8FDC != 0 || obj[204] != 0)
+        func_US2_0033BE68(obj + 2, 0);
+    if (obj[203] == 1)
+        func_US2_0033BE68(obj + 2, 1);
+    func_US2_0033BF90(obj + 2);
+    func_00336320(obj + 182);
+}
+
 
 extern void func_L00_0042BAD0_1(char *object);
 extern void func_L00_0042C290_1(char *object);

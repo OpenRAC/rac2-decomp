@@ -98,7 +98,6 @@ extern void func_310440();
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_003B3450);
 
 
 INCLUDE_ASM("asm/levels", func_L00_003B39D0);
@@ -312,4 +311,4 @@ Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
     return 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003B9310);
+/* func_L00_003B9310 is defined in L00_003B3158-lock-g8.c. */

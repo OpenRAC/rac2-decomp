@@ -1,7 +1,6 @@
 #include "common.h"
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/levels", func_L07_00389EB8);
 
 /* func_L07_003B72E8 is in L07_003B72E8-g8.c. */
 

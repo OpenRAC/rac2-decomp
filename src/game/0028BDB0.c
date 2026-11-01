@@ -16,7 +16,7 @@ void func_0028BDB0(u8 *object) {
  *(u16 *)(object+0x48)=0;*(u16 *)(object+0x4a)=0;*(s32 *)(object+0x70)=0;
 }
 
-INCLUDE_ASM("asm/game", func_0028C6D0);
+/* func_0028C6D0 is defined in 0028BDB0-wheel-g8.c. */
 
 
 INCLUDE_ASM("asm/game", func_0028CCE0);

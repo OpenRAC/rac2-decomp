@@ -34,6 +34,23 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Three-quantity local allocation
+
+**1 November 2026, retained near miss.** `block_alloc` sorts two or three quantities by hand:
+`qty_compare (0, 1)`, `(1, 2)`, `(0, 1)` take fixed quantity numbers while `EXCHANGE` moves
+`qty_order`, so the result depends on birth order; four or more go through `qsort`, which is
+correct. `func_L07_002B3580` misses by a $v0/$v1 swap for this reason: block 2 holds the constant 2,
+the 2.2f constant and the mode load, the last two tie, and the load is allocated last. Taking 2.2f
+out of the block gives retail's pair but moves the FPRs. When two integer registers swap in a
+block with few locals, count its quantities before trying spellings.
+
+### 16-bit counters read through a wider local
+
+**1 November 2026, local match.** `x++ > n` on a `u16` field keeps the old value in a HImode pseudo
+and compares through `zero_extend`, which `func_L03_00409248` shows as `andi` where retail has
+`daddu`. `unsigned c = x, old = c++; x = c;` gives retail's SImode copy. An `int` pair is one word
+off (signed compare), and a true bitfield does not help.
+
 ### Complete matrix storage and loop lifetimes
 
 `func_L09_003FEAE8` needs one 64-byte joint matrix, with its position at
@@ -340,6 +357,111 @@ The numbered history below is retained, with obsolete conclusions and incorrect 
 <a id="blocker-01"></a>
 
 ## 1. Register allocation on long bodies (the dominant wall)
+
+**Ties and spill slots, 1 November 2026:**
+global allocation orders pseudos by `floor_log2(refs) * refs / live length`. With equal refs, the
+order of two sets decides. `func_00306680` swapped $s7/$fp until its `%hi` was set first, through a
+local for the address (same bytes otherwise). Its PAL copy needs the plain form.
+Spill slots of hoisted addresses follow gcse's reaching-register numbers, and those follow hash
+bucket order: `(14030 + K) % size` for a frame address K, with size `max_cuid / 2 | 1`. A rotated
+slot order therefore means a different insn count at gcse, not a different allocation.
+`func_L00_003A6538` closed with 3 fewer insns: the second spin read inline instead of a local, a
+`color` local dropped and an `int` last argument. `func_L00_003A53E8` needs at least 12 more,
+`func_L00_003A1580` about 10 to 20 fewer. Forcing the size in a diagnostic cc1 is enough to test
+this: a two-line `getenv` in `alloc_expr_hash_table`, never in the real compiler.
+Honest insns for the count: a value set before a label and read only past it survives cse1, is
+counted, and gcse's cprop folds it, so the bytes stay. `func_L08_0042A0B0` needed 12: small named
+constants read in the loop (`last = 19`, `total = 20`, `mask = 3`, two counts, `mode`, `flags`) and
+argument copies read only in it (`segment`, `path`, `entry`, `row`, `w0`). No dead initial values.
+A literal float gains nothing (it already takes two insns), nor a constant read in its own block,
+nor a large constant (it stays in a register).
+
+**Sub operands and one-cycle-late insns, 1 November 2026:**
+`sub.s $f13,$f0,$f13` (the subtrahend in the argument register): local-alloc suggests the hard
+register to both dying operands, so the minuend takes it unless it is not local. A variable with
+two deaths goes to global-alloc: `t = p[5]; t = f(z, t - q[5]);` closed `func_L02_00401638`. With two
+local operands the shorter life wins, which is sched1's order.
+An ALU insn retail issues after a call that sched2 here puts before it (`func_00334A88`) can be a
+block-placement matter: `$a0`, `$a1` and the insn compete for two issue slots, and one more insn in
+the block delays the call by a cycle. Setting `axis` before the branch moved that insn into the
+previous block, so the call became ready together with the set, and `reorg` filled its slot with
+the argument. Check this before looking for a hidden insn. `func_L12_00300410` has the same shape
+with no such insn to move, and stays open: its $s0 set would need a barrier or a dependence.
+An argument pair `lui`/`addiu` kept together among other argument moves is a `MACRO_ADDR` object:
+that alone closed `func_L00_003B3450` and took 7 rows from `func_L02_00401638`.
+Sched ties: `rank_for_schedule` compares priority, register weight, class against the last insn,
+then the count of dependents, then the original order. An insn that reads the frame register gets
+one more dependent from a following call in its block (`func_L23_0041A3B8`).
+Later the same day: `func_L00_003DCC48` lost its slot rotation with two locals for its `color | K`
+values, set at the top of the loop body. loop.c hoists them only from before the body's first
+conditional; set after it they stay in the loop (1632 bytes). `func_L00_002ACF88`: jump.c turns
+`if (c) goto L; x = a; goto M; L: x = b` into `x = a; if (c) ...` when both arms start by setting
+the same register, so `v0 = 0` took the slot `object = 0` needs. A `goto fail` to the function's last
+`return 0` leaves no such arm; retail's `found` test after the increment is a plain `break`.
+`func_002BBF40`: `optabs.c` swaps a commutative pair when the target is the second operand, so
+`x = y * x` emits `x, y`; a new target keeps `y, x`. A float constant written inline gets a pseudo that
+crosses no call, and sched then keeps it after the call, unlike a named local. Under `-g`, two
+statements on one line share their note, so no `nop` before their `div.s`.
+`func_L00_00421C50`: the unit's copies through `p + 0x60` kept `p` alive and rotated every saved
+register; check each long-lived pointer's last use against retail first. Pseudos of PRE copies at an
+arm's end prefer the next call's argument register, which puts that copy in a branch's slot.
+`func_L00_00420C38`: retail's `lbu`, `andi` at every use and raw `sb` act like an unpromoted QImode
+pseudo; `int state` with `(u8)state` gives only the first `andi`, as combine knows the upper bits.
+Fresh drafts from m2c, same day: `func_L00_004212B8`, `func_L00_00421C50`, `func_L00_0041C2D0` and
+`func_L00_002A67F8` closed in 5 to 15 rounds each, after the older drafts had plateaued. What did it:
+a frame or field address written inline at every use, with no pointer local, so gcse makes retail's
+reaching copies (`s0 = cam + 0x30` in each arm, `s1 = s0` before the join; a local for it gives one
+pseudo). The local goes after the arms if retail needs one. `d = f(a); v = tmp; g(v, c, d)` keeps a
+call's result apart from a frame address, and stops a tail cross-jumping further back than retail's.
+`lhu; sll 16; sra 16; sh` is a `u16` local read once and cast at the call, `lhu` then `addiu; sll; sra`
+is `s->h = s->h + 1; if (s->h >= K)`. `sb` or `sw` behind `lui $at`, with no `$gp` form in a slot, is a
+small-data object at a nonzero offset (`D_001A7A70[0xD]`, `D_001A79F8[2]`). `lui; addiu; lbu 0x16` is a
+complete struct larger than `-G` read by field; an incomplete array folds to `%lo`.
+`addu rd, shift, sum` needs the index in an address, `pp[i]` used twice; `pp + i` gives the operands
+the other way, whatever the source order. `func_L00_002A67F8`: `li v0, K; sw zero; sw v0` in two arms is
+a post-reload cross-jump. Written with one `next_state` variable the stores swap, as sched's register
+weight prefers the store that kills it, and no spelling of the two stores moves that. The permuter's
+exact result for this needed a zero local unset on the `goto` path, refused as an uninitialised read
+(reload substitutes the constant only after sched1). Per-arm statements match under the plain profile,
+so its old `-frac2-gcse-unsplit-edges -frac2-keep-block-order` were not needed.
+Next run, 2026-11-01: `func_L00_002B2318`, `func_L00_003FEEA0`, `func_L00_003A9C58`, `func_L00_003EF560`
+and `func_L00_003A0F30`. A callee's real return type matters even when the value is ignored: a call
+declared `void` leaves $v0 free, one declared `int` marks it set and unused, and that moved the
+next block's registers in `func_L00_003FEEA0` and `func_L00_003A48D0` (take the type other units agree on).
+A dead read in a loop with both arms identical is `if (flag) A else A`, cross-jumped at jump2. Whole arms
+written out also lengthen a pseudo that spans them, which is how `func_L00_002B2318`'s $s4/$s5 swap went:
+priority is `floor(log2(refs)) * refs / live`, and 396 against 402 was enough. A constant that is
+rematerialised after a call where cse should have reused it means a label with a second use at cse time, so
+the destroy calls are written at each exit and cross-jump later, instead of a `goto`.
+Under `-g` the two-slot `div.s` floor counts from the line note, so `x = 1.0f / w->rate` after a statement
+computing `w` gives retail's single nop, and a statement of its own gives two. Loop labels are 8-aligned, so
+a nop before one comes back by itself once the size is right.
+A frame or base address in a call-clobbered temp with a copy in a saved register (`daddu fp, s0`) is gcse's
+reaching register: the first computation must go through a pseudo, and the later one is a local set in a
+later block (`vp = &velocity` after the first loop, `base2 = object + 0xC0` before the last). If nothing else
+has a saved register left, the reaching register is spilled, which accounts for a lone `sw` of a base
+(`func_L00_003EF560`, frame 0x110). Splitting one float variable in two can decide a frame size and the whole
+FPR order (`func_L00_003A9C58`: `scale`, `bounce`, `speed2`). An allocno also keeps off a register that a
+lower-priority conflicting allocno prefers (global.c's `regs_someone_prefers`): that function's `scale` ranks
+below the loop's `one`, so `scale = f(age); scale /= f(7);` loses $f20 to it, but
+`scale = f(age) / f(7);` copies from a temp that took $f20, the copy makes $f20 `scale`'s preference, and `one`
+moves to $f21. Fewer refs on `scale`, and no wrapper needed. Try the expression form before counting refs.
+Constants hoisted from a loop have to be
+body locals or literals by the same measure, and `short life = 50` before the loop gives $fp to the 2.
+A byte read of a short that keeps the short's allocation is `int l = r->life & 0xFF`.
+Open: `func_L00_0041EE58` and its twin `func_L00_003E2510` keep their first frame address in a
+call-clobbered temp with a copy in the call's delay slot, and every later use on the copy; ours is one
+pseudo over the calls. A local after the call merges into it, and `-fno-regmove` changes nothing there.
+`func_L00_003F4210` has one word left, `mul.s f1, f0, f1`: the target has to tie to the second operand,
+so `speed` must not die at the multiply or be a global pseudo; a new target ties to the first. Inline
+helpers with float parameters and named locals for both operands were tried on 2026-11-01 and change nothing.
+`func_PAL_L00_004266C8`, the PAL copy of `func_L00_004212B8`: the 50 Hz timers are `(D * 5 + 2) / 6`
+and all its sizes match, with only $s3/$s4 swapped, as the extra insns change the live lengths.
+A sweep of forced bucket counts gives every size that fixes a draft, so read the whole list: `func_002B88F0` was 199,
+with 161 to 183, 191, 193, 201 and up all exact, so it needed 2 more buckets (4 insns) and nothing else. Plain indexed
+loops give them: `for (i = 0; i < 16; i++) a[i] = 0;` has an address computation per element at gcse, and loop.c turns it
+into the same pointer countdown as `*dst++` over a reversed counter. Check loop spellings first when a near miss is
+all stack offsets; they change nothing after loop.c.
 
 **Qualified field and call-lifetime remedies, 25 October 2026:**
 `func_002B52A0` is now a 980-byte C implementation at 21 places in each
@@ -1787,6 +1909,12 @@ field view shortens the body to 984 bytes; disabling GCSE or sched1 gives 996.
 Independent alias/lifetime evidence is the next useful input, not more identical
 loop spellings.
 
+The way out that closed two of these: jump2 cross-jumps two arms that end the same, the branch
+goes, and the load that fed it stays dead, because flow ran before jump2. `func_L18_00432630`
+keeps two equal arms on `0x7FC`. `func_L18_002CA350` (1 November 2026, local match) keeps
+`if (hero[0x340]) { if (mode == -1) return; } else { if (mode == -1) return; }`, which gives the
+dead `lw`; it also ends the extended block, so the hero address is built again in the next block.
+
 **Consequence:** retain unresolved attempts and their bounded stopping reasons. Do not label the whole category unexpressible or add volatile/artificial uses solely to preserve an operation.
 
 <a id="blocker-27"></a>
@@ -1977,6 +2105,21 @@ The flag can keep lui and its low-half calculation together where the tested def
 Current witnesses: func_L00_003EA7D0 has its dedicated profile and passes 27/27; func_002A90C8 passes 23/23 in its existing profile. Older examples func_002B0C28 and func_002B0CE0 remain markers and are not resolved by those successes.
 
 Section31's proposed infrastructure is present. Requalify every C function when changing a unit's flags; isolate incompatible profiles.
+
+**1 November 2026 (local matches):** `func_L17_003A4740` and `func_L00_003A09F8` (17 places)
+needed no `-mno-split-addresses`. The viewport words are one `MACRO_ADDR` array: `[2]`, `[3]`,
+`[0]`, `[1]` keep their `lui` in the destination register, and an offset element is two
+instructions, so it cannot fill a slot, which `[0]` of a scalar would. The phase word's
+`lui; addiu; lwc1 0(reg)` is reload's: a pointer set outside the inner loop is hoisted by loop,
+gets no register because every saved register is taken, and its constant is not a valid split
+address, so reload builds it beside the load. The hoisted pointer also uses up the threshold
+that stopped the colour constants at the inner pre-header.
+
+`func_L00_003B9310` (same date, local match): a `MACRO_ADDR` scalar read by `lui`/`lwc1` and
+written by `$gp` in a slot is one symbol to sched, so the read stays above the store and gets the
+store's height in the priority chain. Two names for the word (`sda` or `SDATA` views) lose that
+dependence and the load sinks. Its other 9 words were a prototype: the integer target is the
+last parameter, after five floats.
 
 <a id="blocker-37"></a>
 
@@ -2178,6 +2321,18 @@ The displayed object column is unrelocated, so zero call/address addends can loo
 
 ## 45. Source shapes that move a body
 
+Measured on `func_L00_004096B0` (1 November 2026, 94 to 28 words, retained near miss):
+
+- A spilled slot plus a callee-saved register holding the same address over a few calls is one spilled PRE copy, with
+  reload inheriting its reload register. Write the address inline at each use, with no local, and the frame and
+  spill slots appear. A stack struct standing in for those slots hides the real pressure.
+- A hoisted constant that is rematerialised at its use lost its register to a higher-priority pseudo: loop.c did move
+  it. Compare `floor_log2(refs) * refs / live` before looking for a reason it wasn't hoisted.
+- `(index + table)->field` gives `mult; addu mult, base` where `table[index].field` gives `addu base, mult`.
+- Local-alloc first tries each qty with `fake_birth`/`fake_death`, one insn wider on each side, so a qty avoids the
+  registers of its neighbours (`find_free_reg`, `-fschedule-insns2` only). This is why a register seems occupied with
+  no instruction using it, and it's worth checking before assuming a hidden insn (`func_002F8178`).
+
 Historical examples, to requalify in the final unit:
 
 - Removing a seemingly unused duplicate extern changed 180 to 188 bytes because the remaining declaration followed the call and implicit-int/default promotions altered floating arguments. Preserve correct visible prototypes.
@@ -2185,7 +2340,38 @@ Historical examples, to requalify in the final unit:
 - Else-if versus independent ifs changed float-constant rematerialisation; signedness changed immediate/branch forms. These were bounded examples, not guaranteed transformations.
 - Stack-local ordering/layout examples remain in L00_002B91C0.c and L09_003F9468.c. A measured aligned struct containing TI128 plus a byte array expressed a frame that separate locals did not reproduce.
 - func_L16_00404A60(988 bytes) matched after 24 store permutations; the winning order was neither retail order nor simple reversal. Do not infer one universal scheduler permutation.
+- A register that varies between sites means different pseudos, not a tie. func_L09_003F8AE0 went from 53 words to exact by giving each site its own block-local (`child`, a fresh `u8 *t` per test, a separate counter `j`), reading `vars` in the arm that uses it (retail's bnel slot), and reading a byte twice instead of keeping a local so that the copy reaches the delay slot.
+- A pointer that retail recomputes while cc1 hoists it early: move it to where it is used. In func_L05_0042AC30 `float *base = state + 0x24` before the loop is partially redundant and PRE places it on the other edge of the `if`; declared inside the innermost `if`, loop.c hoists it to the preheader, as retail has it. An ascending loop puts the reversed counter and the biv after that hoist. A local pointer read at `[0]` is folded back to the base register by cse, so `0x24($s5)` next to `4($s4)` still means one local.
+- Spill slots that move with several unrelated registers can be a bucket count too: func_002DE990 went from 77 words to exact when `*gameState = savedState` lost its pointer local, which took the count from 159 to 157. `*(table + i)` gives (plus index sp) where `table[i]` gives (plus sp index).
+- Hoist order in a preheader follows the source's expressions. In func_L12_0041BF88 the 0.5 from the inner loop always came before `-(width * 0.5f)`, scanned last from the rotated test. A `halfWidth` local takes the multiply out of the test, and the two copies swap.
+- Before tuning a near miss, compare it with its matched relatives by masked opcodes. func_L02_00421DA0 needed func_L15_00438B00's `for` loop and `angle` local, func_L07_002B3580 the `scale` local of the ground probes (a constant set before an `if`, used after it), and func_L13_0040DFC0 is func_L16_003E7248 with other data. Copy the relative's flags too: func_L10_0039DA48 went from 131 to 26 words on func_L00_0040D058's.
+- A rule table loop with an unreduced `mult` at an aligned label is a loop that loop.c skipped (func_L05_00444840): `for` with a `break` gets the same tail, but jump1 copies the test and the found arm ahead of the loop, which gives "multiple entry points".
+- A float kept off a free register: a pseudo set by local-alloc in a hard register gives its operands a preference that keeps other pseudos off that register (global.c regs_someone_prefers). In func_L12_0041BF88 a scratch float shared with a later loop made the pseudo global and freed $f1.
+- **A variable reused across blocks is a global pseudo (1 November 2026).** Local-alloc only takes pseudos of one block. A function-scope `f`, `n`, `id` or `history` reused for an unrelated later job goes to global-alloc after the block-local temporaries, which swaps whole register groups around it. A fresh block-local closed func_L22_003FC870 (f0/f1 group), func_L18_00428AE8 (a0/a2), and the history pointers of func_L08_003D4190. Check this before reading allocator dumps.
+- **Byte-pointer stores pin later loads.** `*(float *)(m + 0xF8) = x` is not in a struct, so a following scalar global load cannot pass it; a store through a struct view can (`MEM_IN_STRUCT_P`). Where retail reads a global ahead of an object field just after a store, view the store's object as a struct: func_L08_003E5BB8, func_L05_004170C8.
+- **Loop inits after the hoisted constants mean an indexed loop.** Strength reduction emits its inits at the loop start, after the movables, so `for (j = 0; j < 5; j++) { p = links + j * 8; ...` gives retail's order where a walking pointer does not (func_L06_003E1498, the UV loop of func_L06_003E57E8). Giv init order then follows the expression forms: func_L13_004388C8 needed `first->point[i]` in the projection loops and `(i << 4)` for base-first `addu`.
+- **`s7 = i + 1` beside `i` is a real `next` variable.** Writing `next = i + 1` in the body and `i = next` as the step fixed the setup order and the s4/s5 swap of func_L06_003E57E8.
+- **A saved register holding a small constant is a local.** func_L05_004170C8's `s5 = 1` and a stored register known equal to a constant (`sw a0` after `mode == 1`): keep the variable; cse only folds it in register sets. The extra saved register also explained that function's 0x10 frame difference.
+- **gcse cprop and colour locals (open).** func_L05_003CF350 keeps 0x7FFFFFFF in s5 only as a `long` local, since cprop cannot substitute into the SImode subreg; `li` then stays one RTL insn and the body is 4 bytes over, while retail splits lui/ori. A SImode source shape that blocks cprop is still unknown.
+- **A variable shared by two loops or two cases can be the whole difference (1 November 2026).** func_L02_003C26F0 (6,516 B, eight places) closed its last eleven words with one `vars` local shared by case 10's two loops and one function-scope `record` shared by cases 3 and 9, both global pseudos, plus `int` parameters for `func_002A0468`. func_L08_003C5940 needed the reverse: single-set block locals for the short-lived floats.
+- **`same = a && b && c` is not `if (a && b) same = c`.** func_L11_004590F0's movn tail with a nop slot came only from the whole test in one condition; every nested flag spelling collapses to sltiu.
+- **Close a colour pack by enumerating the or-chain.** func_L06_003FB050 took 144 spellings in one sweep: `0x7F000000 | (b << 16) | (b << 8)`, then `|= b`.
+- **Stores ordered by sched1 still choose registers.** func_L03_003C3220 had been written off as needing a vanishing test between its stores and a call. A hill climb over seven store statements closed the f1/f2 swap in 94 compiles: no boundary was needed.
+- **Read the branch targets before the registers.** A draft's `return` in a guard was retail's jump to the delete call (func_L08_003D4190), and an `else` was a fall-through into the following call. Both showed up only as a few bytes of size and branch offsets.
+- **A shared tail in C can be cross-jumped arms in retail (1 November 2026).** A `goto remove` or `goto destroy` to one `func_0029F338(m); return;` looks right, because retail shows one tail. Jump2 merges the arms only after both schedulers and the allocators have run, so before that retail had the tail in each arm. The copies add references to `m`, which raises its allocation priority, and they keep later argument setters in the same block, so `rank_for_schedule`'s later-dependence count puts `a0` ahead of `t0`. Writing the tail in every arm took func_L16_003A8D58 from 32 rows to 0, func_L09_003FEF00 from 30 to 0 (no shared variable was needed after all), and func_L04_003F9718 from 73 to 18, closing its s1/s2/s3/s4 rotation. When a saved-register rotation or an argument-order swap resists, look for a label first.
+- **A counted loop whose counter runs down after the moved constants was written ascending.** func_L04_003F9718's `addiu s3, 0xF` came after the hoisted setup only with `for (count = 0; count < 16; count++)`; loop.c reverses it. Written as a countdown it swapped two registers.
+- **The address of a member can leave a base pseudo.** With one union for a frame area, `scratch.fx.a` sets a pseudo for `&scratch` first. Cse folds the member but keeps that pseudo for the base member, so its `addiu` appears too early (func_L18_004401E0). Retail's overlap of four vectors and a request block is block-scoped storage: declare the vectors in a block nested one level inside the `if`, with nothing after them, as the slots are then freed for the request block's own nested scope.
+- **A catalogue row's name is not always its address.** func_L05_0033D3A0 sits at 0x33D3A8 and func_L16_003A8D58 at 0x3A8D60; the eight bytes before each are the previous function's end. Read the address from the row before generating assembly. Fuzzy twin screens should use it too: func_L05_0033D3A0 turned out to be func_002B1350 with a data name changed.
+- **An `sda` read at a nonzero offset stays out of delay slots (1 November 2026).** func_L01_003980D0 read a byte at 0x001A7A0A. As a plain global it splits into `lui` + `lbu` with two registers, and the `lui` fills the branch slot. As an `sda` scalar it is a one-word load that reorg moves into the slot, where it becomes a $gp load. Declared as `D_001A7A00[]` under `sda` and read at `[0xA]`, it is a length-2 macro load: tied `lui v0 / lbu v0`, not eligible for the slot, so reorg takes retail's `beql` from the target. The offset's value is real: 0x001A7A00 is a known object elsewhere in `src/`. Try this where retail has a tied load after a branch-likely.
+- **A table field through a struct orders the `addu` (1 November 2026).** func_L00_0039E7A8 indexed two level tables at +0x464 through local byte pointers, which put the index first. `struct { char pad[0x464]; u8 disabled[1]; }` read as `table.disabled[i]` puts the base first at all three sites and closed the function; func_L01_003980D0 already read its table that way. It did not move func_L00_003D3388, whose retail order is the other way round (index first after a `mult`).
 - **Encoding correction:**0x700014A9 is por v0,zero,zero, not pcpyld. TI zero materialisation is reachable in appropriate cases; retention/folding depends on current source/profile(section 17). The word alone neither proves handwritten assembly nor proves a complete C match.
+- **A register copy retail keeps means its source was overwritten.** gcse's cprop removes `b = a` whenever `a` is untouched between the copy and b's uses, so a surviving `daddu` in front of a long stretch says `a` is set again later: one scratch variable doing two jobs. func_0028C6D0 (37 words to 0): `scratch` holds the colour, is copied into `color`, then takes the string length. func_L00_003ED198 (57 words to 0, size 1712 to 1720): an int holds &delta, is copied into the loop's pointer, then takes the random phase in the loop; a block-local `float *t` used only up to the call gives retail's `$v0`-then-`$s5` pair. Measured with cprop switched off in a research cc1: most near misses get worse, so cprop itself runs in retail.
+- A value pseudo with no user variable gives a different local-alloc tie. func_0028C6D0's last four words closed by dropping `record` and writing the table read into the call's argument.
+- Reads of a `$gp` scalar pass struct stores (section 1, MEM_IN_STRUCT). If retail keeps such a load behind the stores, write the stores through a char view: func_00342BE8, 19 words to 2.
+- An int under -G8 can fill a branch slot from the target thread. If retail has the two-word form there, it is part of a larger object: func_002F8178's screen size as one 8-byte struct, 66 words to 33.
+- A hill climb over statement order (48 orders a round, 1 to 3 moves each, on box2) closed func_002F8178's store blocks where 18 statements are too many to enumerate: 33 words to 8.
+
+**Update, 1 November 2026 (closer D).** Before tuning a near miss, walk its branch targets against retail's: `func_L02_003EB8F8` went from 132 rows to 0 by fixing three wrong targets, nothing else; a jump into the middle of what looks like an arm is the sign. A table reached through two `la` with reloads between stores (`func_L09_003806A0`) is one structure array declared `MACRO_ADDR`: separate arrays give the `la` but no aliasing, pointers walk it into a reversed loop. A base kept unfolded for a hero field can be a pointer local inside the arm, which loop.c hoists: it reaches the loop's preheader without being available at the next use, so gcse leaves that use alone. A pointer local set before the branch on the path where PRE must not insert (`d = delta;` in one `case`) gives one insertion instead of three. loop.c's `threshold` falls by 3 per register moved: when retail hoists some constants of a loop and not others, make one a local so the count works out (`func_L10_0039DA48`).
 
 <a id="blocker-46"></a>
 
@@ -2786,6 +2972,9 @@ attributed for provenance, not exclusive ownership.
 | --- | --- | --- |
 | `_fpadd_parts`, `func_00122800` | **Merged, #265** | 576 bytes, 1/1 boot placement with the SDK profile. The assembler's bounded positive shifted-mask rule reduced two constants from seven to three instructions each. Full 28-program strict build passed. |
 | `dpmul`, `func_00122B00` | **Merged, #267** | 680 bytes, 1/1 boot placement. Restoring the public fraction union restores the real alias dependence and the rounding `bnel`/store slot. Two sign-bit loads use the per-file unsigned assembler seed; the signed default remains unchanged. All 80 tests and 28 strict programs passed. |
+| Late-issued ALU insn, `func_0032D758`, `func_0027BA68`, `func_L03_003C1BF0` | **Open, 1 November** | Each is 3 to 5 rows off with the structure exact. sched2's ready lists show the insn ready at t with the highest priority (`func_0032D758`: insn 20 p9 against p6), while retail's order needs it at t+1. The same compiler sources can only give that from a different RTL input, so a hidden insn is the likely cause, as in `func_002EE000` and `func_L00_00426C78`. To read the lists, rebuild `haifa-sched.o` privately with `BUF_LEN` 4096 and `-U_FORTIFY_SOURCE`, and print `INSN_PRIORITY` in `debug_ready_list`: `-dR -fsched-verbose-4` then works where `-dS` aborts. Tied: nine spellings of the table read, inline helpers, `-g`, `-frac2-qcopy`, sched flags. |
+| Spill-slot order, `func_L00_003E5BD8` | **Open, 1 November** | 1108/1108, only 19 stack offsets differ. A private cc1 overriding `expr_hash_table_size` shows the slots follow gcse's bucket order: 133 buckets gives 7 rows, no odd size from 101 to 501 gives 0, and declaration order has no effect. Three pseudos remain rotated, so retail differs in more than the table size. |
+| Weighted refs, `func_002FDBD8` | **Open, 1 November** | Global-alloc priority is `floor_log2(refs) * refs / live`, refs weighted by loop depth. With the shared `off` the colour block is exact but `n` falls to 15 refs; 16 would pass `direction`. One more read of `n` inside the loop is what is missing. |
 | Copy epilogue, `func_00335370` | **Qualified C, 25 October** | Default game profile plus the reviewed shared `qcopy`: 88 bytes, 28/28 per release, all 84 strict programs pass. Prior TI-only measurements are historical; source is `src/game/00335370-copy.c`. |
 
 For #267, a same-source comparison of 781 configured units changed code only in the new multiplier; eleven differences were debug-only. The shared union changed no object section in the four existing users. Source, flags and durable explanations are in the merged repository; partial C remains in `nonmatching/`. No progress report was regenerated.
@@ -3180,6 +3369,11 @@ Three retained near misses from this wave (`func_L09_003FE0C0`, `func_L10_004237
   produce the first two words. The extent itself is not suspect: the preceding row
   `func_L04_003C6FE8` ends exactly at 0x3A4740. Do not call it handwritten on this
   alone; the entry needs an indirect-reference audit first.
+  **Update, 1 November 2026 (local match):** v1.01's and v2.00's catalogues start the function
+  after those two words, and its C is in `L17_0032C070-grid.c`. PAL's row
+  (`func_PAL_L17_003A7DB0`, 528 bytes) still includes them, as `func_PAL_L01_0039A174` (524
+  bytes, 12 places) includes a leading `nop`; those two PAL rows stay assembly until the
+  catalogue cuts them the same way.
 - `func_L11_003F2A30` dispatches through a compiler jump table of 11 entries based at
   D_L11_002BAA10 (`lw $a0,0($v1); jr $a0`, cases reached from `a0[0x42]`). wslcmp
   checks only the function bytes, so a `switch` whose case *order* differs can look
@@ -3410,3 +3604,62 @@ compiler rejects `-mno-branch-likely`; no compiler change was made.
 **Update, 29 October 2026 (pending review):** matched by the tiered-wave series; `func_L07_003F7968` is C in `src/levels/07_siberius/L07_003F7968-g32.c` (`-O2 -G32 -Wa,-G32 -ffunction-sections`), placed at 1 US, 1 PAL, 1 US2 places. The measurements above are kept as history.
 
 **Update, 29 October 2026 (pending review):** matched by the tiered-wave series; `func_00133580` is C in `src/core/00133580-g8.c` (`-O2 -G8 -ffunction-sections -mno-split-addresses -fno-gcse`), placed at 1 US, 1 PAL, 1 US2 places; `func_00290B48` is C in `src/game/00290A40.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places; `func_00291640` is C in `src/game/00290A40.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places; `func_00291CA8` is C in `src/game/00291758.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places; `func_0029EFD0` is C in `src/game/0029DE38.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places; `func_0029FDF0` is C in `src/game/0029DE38-textures-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places; `func_002B6480` is C in `src/game/002B6120.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US places (PAL and US2 catalogues have no function of this name); `func_002CA790` is C in `src/game/002CA790.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US places (PAL and US2 catalogues have no function of this name); `func_002CB510` is C in `src/game/002CB510.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places; `func_002FE8D8` is C in `src/game/002FC8D0.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places; `func_003427C0` is C in `src/game/003427B0-fade.c` (`-O2 -G0 -ffunction-sections -frac2-hazard-labels`), placed at 28 US, 28 PAL, 28 US2 places; `func_003462A8` is C in `src/game/00345358-descriptor-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 28 US places (PAL and US2 catalogues have no function of this name); `func_0034AC10` is C in `src/game/00345358.c` (`-O2 -G0 -ffunction-sections`), placed at 28 US, 28 PAL, 28 US2 places. The measurements above are kept as history.
+
+## F4, the lock-on tether: closing a slot rotation
+
+**1 November 2026, USA v1.01.** `func_0030A348` and its 26 level copies (5,868 bytes each) are exact at `-O2 -G8 -g -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels`. Every instruction but the spill slots had matched for a while. What closed the slots:
+
+- The count that sets gcse's buckets is `max_cuid`, the number of real insns in the `-ds` dump: `grep -cE '^\((insn|jump_insn|call_insn)(/[a-z]+)? ' x.i.cse`. Buckets are `max_cuid / 2 | 1`. This is exact where the bucket count moves in steps of two.
+- Sweep buckets widely before aiming. Forcing them here showed six good windows: 617-625, 647-653, 677-685, 711-719, 747-757, 789-799. A frame address `14030 + K` wraps at multiples of the count, so windows repeat at about `14100 / n`.
+- Spellings that add insns at gcse and leave the bytes alone. A `short` local between an int value and a narrow store (`short fade = f(); D[k] = fade;`) is +2: the two sign-extension shifts die at combine. Not through an unsigned load, where `lhu` turns into `lh`. A named pointer copying a register into an asm operand (`float *from = st->a; qcopy(x, from);`) is +1: cse doesn't replace asm operands, so the copy reaches gcse. Sharing one such pointer between two `qcopy`s is +1 only and costs 36 rows.
+- Spellings that do nothing: local pointers for call arguments, inline helpers returning a value, inline wrappers around `qcopy`. A macro `qcopy` loses 72 bytes, so the helper really is an inline.
+- A swap of two slots is a tie, not a count. `(plus k 1)` hashes on the pseudo number, `14029 + regno + 1`, and sat in bucket 649, ahead of `&vA0` in 650. One more function-scope local declared before `k` moved it. List `PRE: ... reaching reg is N` against the `-dG` expression table for two variants and diff them: that names the expression that moved.
+- `if (i == 9 || i == 0x13)` is byte-identical to two identical arms, so the repeated arm was never needed. `if (sm == 0.0f) continue;` replaces a `goto` with the same bytes.
+- `sa2 = 0.0f` is dead on every path, but retail keeps it, because its zero register is reused by the `sm` test (`mtc1 $zero, $f21`, then `c.eq.s $f0, $f21`). Removing it costs 68 rows.
+- A block-local `cm` keeps the `&v80` copy's life at 9, so `55 * 9 >= 451` and it moves in loop pass 1, which is retail's preheader order at 0x7AC. Up to 44 more real loop insns stay safe.
+- `func_002C2210` takes `(pos, ticks, a, b, colour, 0, spin, dir, 1, 0.0f)`, as RAC1's spawn call and the matched `L06_00458138.c`.
+
+The steering locals are live, and are commented in the source. They are spellings that reach the right count, not proof of what the original said.
+## Families F4 and F7, and what the beam chain loop showed
+
+**1 November 2026, USA v1.01.** Opcode lists confirm two untried families: F4 is nine functions of 5,868 bytes (L03, L07, L10, L11, L14, L15, L18, L22, L30) and F7 is five of 1,540 bytes (L06, L10, L15, L18, L22). All 14 are compiled code, no COP2. One match in each family ports to its siblings: about 60 KB. `func_0030CCD0` carries F4's chain loop in small form, so close it first.
+
+Spellings measured on `func_0030CCD0` (`-O2 -G8 -ffunction-sections -g -frac2-qcopy`), which took it from 442 raw rows to 25:
+
+- Index the chain arrays directly (`D[i - 1]`, `D[i]`, `D[i + 20]`, `D2[i]`) and let strength reduction build the pointers. Explicit pointers were worse in every combination.
+- A `mov.s` copy of `(float)i` beside a reused register is gcse's reaching copy: write `(float)i` at each later use instead of one local.
+- `sll` of the index stored to a slot while the register stays in use is the same thing for `i * 4`: an early `i * 4` local plus a later `D[i]`.
+- A reload-rebuilt constant or address inside a loop (`addiu v1, 1`, `lui`/`addiu` beside the use) means loop.c hoisted it and global-alloc gave it no register. Check `Register N, refs, live_length` in `-dg`; ordering is `floor_log2(refs) * refs / live_length`.
+- Spill slots 0x78 and 0x7C follow the bucket count; the other rows did not move under `RAC_S`, so they need spellings.
+
+`func_L06_00455BC0` stops on the third point: its flag has 3 refs across 118 insns, the hoisted `1` 3 across 86. An added set gives 4 refs, which fixes the frame and the loop's registers at three extra instructions; two rows in cases 3 and 4 stay open (the draft header lists them). Not tried yet: a real 4th reference that later passes remove.
+
+**1 November 2026, later: `func_0030A348` (boot's F4 member) at 5860 of 5868 bytes, 173 rows off with relocations masked.** F4 is 27 functions, 158,436 bytes. The chain loop, its allocation (`$s1` near, `$s2` i, `$s3` the `&s2B0` copy, `$s4` far, `$s7` `&v80`, `$fp` `&hit1`) and every spill slot now equal retail. What closed it, in order of effect:
+
+- RAC1's counterpart is `update_electric_water_bolt_effect` (rac1-decomp `src/overlays/shared/electric_water.c`). Its shape is the guide. The chain is a two-dimensional array of a union vector, `P2[2][20]`, read `P2[0][i].f[2]` and `P2[1][i]`. That alone gives retail's giv order (`func_0030CCD0` too) with no pointer locals, and `0x148($s1)` for the far z. `float[][4]` with `[2]` leaves the z address in its own giv.
+- One float variable holds the amplitude, the radius and the near-arm value (`func_0030CCD0`'s f20/f21 swap closed the same way).
+- `func_002A8E20(ht, &hit1)` written once per arm: jump2 cross-jumps them, and the two extra in-loop refs lift `&hit1` above `best` (13 refs, 0.0565 against 0.0527). That was the whole `$fp` question of the earlier runs.
+- `&D_002295D0[k].v[1]`, not a separate `D_002295E0` symbol: the addend is then the hoisted register and `r5900_madd_profitable_p` accepts it (it refuses an addend set in the same block).
+- loop.c's move test is `T * savings * life >= insns`, T about 48 on these targets (61 in older notes is wrong: `func_0030CCD0` fails at 198 insns with savings 2, life 2). Non-line notes count towards life, so a block end between a movable's set and its last use adds one. Block-scoped `bearing` and `radial` around the near-arm `qcopy` (life 8) hoist the `&vA0` copy, slot 0x370; `{ char *ax = D_00189E20.ent + 0xE0; ...}` hoists the base so it is rematerialised at both uses.
+- `for (t = D_001EE960[0]; t != 0; t = D_001EE960[++sn])`: the pre-increment gives the lo_sum life enough to hoist and form the pointer giv, slot 0x3AC, with the head read and the giv init on the right sides of the branch.
+- `k` must be pseudo 161 or above so `k + 1` lands after `&vA0` in the PRE slots: more function-level scalars before `int k`.
+- A load's delay-slot `nop` before `jal func_00282948` is `la` (one RTL insn of length 2, not eligible) plus a store reading `$a0`.
+
+Still open: reload's spill registers run one step behind retail from `0x1F4` to about `0x690` and again from `0xF44`. The first wrong choice is the `high` of `D_00189E20` in the scan preheader: retail takes `$a0`, here `$v1`, because sched1 puts the list `lo_sum` (it kills its `high`, smaller reg weight) ahead of `s2`'s `lo_sum`. Fixing that is likely worth about 100 rows. Others: the `&vA0` copy is not inherited for the `a2` of `func_00282CC0` (`0xBD4`); `sw $s7,0x36C` order in the chain preheader; `addu` operand order and `D_001B23E8[k]` block order in the k loop; `tsize` argument order in the last spark.
+
+`func_0030CCD0`: 1888/1888, 12 rows with the two-dimensional array, one float variable and a `zero` local set after the `func_00282D08` call (the 0.0 then hoists in loop pass 1, in scan order, as retail). Left: slots 0x78/0x7C (bucket count), `s2` against `s5` in the preheader (issue parity: `1311` must issue with `300`), `mov.s $f12` order in the last call.
+
+**1 November 2026, later: `func_0030A348` at 5868/5868, all rows outside spill slots 0x370 to 0x39F equal retail, at all 27 members.** Only the bucket count is left. What closed the rest, on top of closer D5's section "F4 from the level side" on `match/opus-next-d-quad`:
+
+- `&D_00189E20.x`, not a separate `D_00189EA0`: the related address depends on the base in the preheader, so the base's `lo_sum` has priority 2 and is scheduled ahead of the list giv's `lo_sum`. Reload then rebuilds `high` while `$v1` is still live, which closes the round-robin shift from `0x1F4`.
+- Reload's spill registers are a round robin that skips what is live, so a one-step shift over many rows comes from one insn order earlier. Read sched1's order at the first wrong row.
+- Statement order `st->lockA = best; st->u.s.h40 = 0;`: sched2 puts the `sh` back ahead of the `sw` once reload has added the load, so retail's order is not the source's. The memory unit takes one store a cycle, so with the `sh` first the `la` passes the `sw`.
+- cse's wider-mode lookup replaces a QImode constant with `(subreg:QI reg)` when any reg holds it in a wider mode, even across calls: it beats the plain reg on equal cost. `hb.kind = 5` then reads `$s1`.
+- Loop.c's threshold is 61 minus 3 per move made. A block local (`{ float cm = ...; if ... }`) adds a block note, so life 9 moved the `&v80` copy in pass 1, ahead of the 0.0: 55 * 9 >= 451.
+- `func_002C2210`: the prototype matched L06 and L18 callers use, in RAC1's argument order. The definition's own order is 6 rows worse.
+
+`func_L06_00455BC0` (F7): retail allocates `missing` first (`$s5`), then `fail`, -1 and the high, leaving the hoisted 1 unallocated. So `missing` must outrank `fail` (0.0615), which at live 118 takes 4 refs. The 1 must stay a hoisted register: with `1 << n` inline, combine folds it to `srav` plus `andi`. Setting `missing = 0` at the loop's end gives the 4 refs, the frame and 33 rows, but it is not retail's shape (preheader) and `continue` skips it, so it does not land.
+
+`func_0030CCD0` closed at 1888 bytes, 28 of 28 places, in `src/game/00308600-chain-g8.c`. Unused locals in the draft held the pseudo numbers that rotated slots 0x78/0x7C: dropping them closed the slots at the same bucket count. `func_002C2210`'s prototype with the pointer first fixed the `mov.s` order. The preheader needed one more priority-3 insn so that `r175`'s copy issues first in its cycle and `i = 1` pairs with it, since `sched2` keeps `sched1`'s tie order. A local `to = &last` set before `func_00282D30` gives the in-loop copy life 5 or more, so loop.c hoists it; the copy is tied and leaves no code.
+
+`func_L06_00455BC0` (F7), same day: 34 raw rows. `notify = 1` after the 0x18 test lands in the `beq` delay slot through reorg's target thread, and case 4 has its own flag. Only the 4th reference for `missing` is left.

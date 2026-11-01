@@ -25,6 +25,8 @@
  *  - velOffset/curOffset and the two-statement column keep retail's three i16+beam
  *    adds: a 3-insn combine split makes them after CSE2, and natural [j][i] flattens.
  *  - k is separate from j, or the last loop's $s3/$s4 swap.
+ * Opus G2, 1 November 2026: the four initial values are dead (each is overwritten before any read), so
+ * they must be replaced by read values. Forced bucket counts: 175-179, 193-197 and 203 keep the one row.
  */
 #include "common.h"
 typedef int VectorWord __attribute__((mode(TI)));

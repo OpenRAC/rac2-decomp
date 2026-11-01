@@ -321,4 +321,3 @@ void func_L12_00427DD0(char *obj) {
 
 /* func_L12_00429D60 is defined in L12_003E1CB0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L12_00429ED8);

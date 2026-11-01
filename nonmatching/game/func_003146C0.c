@@ -1,3 +1,8 @@
+/* Closer B, 2026-11-01: MACRO_ADDR on D_001B24C0 fixes both call setups: 1588/1588, 4 words, the s1/s2 swap
+ * of the v and u iterators. Allocno priorities: v 14 refs over 42 insns, u 14 over 41, so u wins; retail
+ * needs v first, with v still read first (swapping the sets also swaps which address gets the spill).
+ * Ties: declaration order, increment order, v++ pairs, a scoped pointer copy for the second store.
+ */
 /* Tier: sol-high, task v1099.
  * Best: 1588/1588 bytes, 0/28 USA v1.01 places; first difference +0x108.
  * Profile: -O2 -G8 -ffunction-sections -g (current pinned toolchain).
@@ -36,7 +41,7 @@ extern u32 D_001AF254 __attribute__((sda));
 extern u32 D_001AF258 __attribute__((sda));
 extern u32 D_001AF25C __attribute__((sda));
 extern char D_001B5340[];
-extern char D_001B24C0[];
+extern char D_001B24C0[] MACRO_ADDR;
 extern char D_002668D0[];
 extern char D_00267AF0[];
 extern char D_00268410[];
@@ -98,10 +103,7 @@ void func_003146C0(unsigned char *moby) {
     center[0] = *(float *)(moby + 0x10);
     center[1] = *(float *)(moby + 0x14);
     center[2] = *(float *)(moby + 0x18);
-    {
-        float displacement = -0.5f - *(float *)vars;
-        func_002B00D8(moby + 0x10, center, center, displacement);
-    }
+    func_002B00D8(moby + 0x10, center, center, -0.5f - *(float *)vars);
     center[3] = 1.0f;
     func_00282CC0(&center, &center, D_001B24C0);
     func_00282CF0(&to_camera, D_001B5340, &center);

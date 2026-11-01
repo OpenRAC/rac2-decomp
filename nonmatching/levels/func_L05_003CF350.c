@@ -16,6 +16,11 @@
  * Next: evidence for source structure preventing the color's cross-block
  * constant propagation while retaining GCSE for the earlier loops.
  * 0x230000 is a collision mask, not a level address. No linked build claimed.
+ * 1 November 2026: `long color` keeps the constant in s5 (cprop cannot replace the
+ * SImode subreg) and fixes the frame slots: 14 rows off, but 1656 bytes, because a
+ * DImode li is one RTL insn and retail splits lui/ori around the entry test. A
+ * literal argument and locals set inside the loop tie the int draft. Still open:
+ * an SImode shape that survives cprop, and the v0/v1 swap at the 0x956 comparison.
  */
 #include "common.h"
 extern char *func_334CB8(char *, unsigned int, int);
@@ -119,7 +124,7 @@ int func_L05_003CF350(char *obj)
             count = 40.0f; radius = 0.1f; angle = 0.03333333507180214f; spread *= 3.0f;
         }
     } else qzero(base);
-    { int color = 0x7fffffff;
+    { long color = 0x7fffffff;
     for (k = 0; (float)k < count; k++) {
         int spin;
         pos[0] = center[0] + func_332BB0(0.0f, radius);

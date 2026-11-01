@@ -46,6 +46,4 @@ void func_PAL_L10_0041D2A0(u8 *arg0) {
     *(f32 *)(arg0 + 0x2C) = 0.16f;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L10_0041D338);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L10_0041D518);

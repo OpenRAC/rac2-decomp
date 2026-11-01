@@ -424,7 +424,7 @@ int func_002D8338(char *object)
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_002D89D8);
+/* func_002D89D8 is defined in 002D5E98-listbox.c. */
 
 extern char *D_001A8CFC[] __attribute__((sda));
 extern unsigned char D_00139568[];

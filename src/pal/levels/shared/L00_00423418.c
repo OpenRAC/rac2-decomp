@@ -65,4 +65,3 @@ void func_PAL_L00_00423778(void *arg0)
     }
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00423918);

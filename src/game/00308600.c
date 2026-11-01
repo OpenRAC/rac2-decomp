@@ -112,7 +112,6 @@ void func_00308DB8(X *x) {
 
 /* func_0030A188 is defined in 0030A188-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0030A348);
 
 /* func_0030BBA0 is defined in 00308600-beam-g8.c. */
 
@@ -123,7 +122,6 @@ INCLUDE_ASM("asm/game", func_0030A348);
 
 /* func_0030CAD0 is defined in 0030CAD0-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0030CCD0);
 
 /* func_0030D430 is matched in its own unit, src/game/0030D430-g8.c. */
 
@@ -180,7 +178,7 @@ void func_0030E700(char *object)
     func_002AB8C0(object, state);
 }
 
-INCLUDE_ASM("asm/game", func_0030E8A8);
+/* func_0030E8A8 is defined in 00308600-spring.c. */
 
 /* func_0030ECC8 is defined in 00308600-ammo-g8.c. */
 

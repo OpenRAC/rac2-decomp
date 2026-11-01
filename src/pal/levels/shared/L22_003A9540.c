@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L22_003A95C8);
 
 typedef unsigned char u8;
 extern u8 D_001A63A8_4[];

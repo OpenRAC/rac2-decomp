@@ -1,13 +1,46 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L13_003E5340);
+typedef float f32;
+typedef unsigned char u8;
+extern f32 func_00283B98(f32, f32);
+extern f32 D_L13_001B2568 __attribute__((sda));
+extern u8 D_L13_001B1E60[];
+extern u8 D_0019B2E8[];
+extern u8 *D_L13_001B2A0C __attribute__((sda));
+extern u8 *D_L13_001B291C_2;
+extern u8 D_00189E20[];
+extern f32 func_00282E80(void *, void *);
+extern f32 func_00282E48(void *, void *);
+extern u8 D_0012EA0[];
+extern u8 D_00188660[];
+extern u8 D_L13_001B1C20[];
+extern u8 D_L13_001B1C48[];
+extern u8 D_001395B8[];
+extern u8 D_L13_001B1E60[];
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L13_003E5378);
+void func_PAL_L13_003E5340(u8 *a0) {
+    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+}
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L13_003E53B0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L13_003E53E8);
+void func_PAL_L13_003E5378(u8 *a0) {
+    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+}
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L13_003E5420);
+
+void func_PAL_L13_003E53B0(u8 *a0) {
+    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.03490659f);
+}
+
+
+void func_PAL_L13_003E53E8(u8 *a0) {
+    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+}
+
+
+void func_PAL_L13_003E5420(u8 *a0) {
+    *(f32 *)(a0 + 0xF4) = func_00283B98(*(f32 *)(a0 + 0xF4), 0.020943955f);
+}
+
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L13_003EC9C0);

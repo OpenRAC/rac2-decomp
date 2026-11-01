@@ -360,7 +360,6 @@ void func_L00_0036FA68(void)
     func_00289178();
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00370408);
 
 /* func_L00_00373D40 is defined in L00_00373D40-g8.c. */
 
@@ -402,12 +401,10 @@ void func_L00_00374B78(void) {
 /* func_L00_00374C18 is defined in L00_00374C18-g8.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L00_00376600);
 
 INCLUDE_ASM("asm/levels", func_L00_003769C0);
 
 
-INCLUDE_ASM("asm/levels", func_L00_00377580);
 
 /* Draws the selected-item panel, its value and label, and the top counter. */
 void func_L00_003778F0(void) {

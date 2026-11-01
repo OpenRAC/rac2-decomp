@@ -66,7 +66,6 @@ typedef struct {
 } L03SpawnState;
 
 
-INCLUDE_ASM("asm/levels", func_L03_00399230);
 
 
 /* func_L03_003C6208 is defined in L03_003C6208-g8.c. */
