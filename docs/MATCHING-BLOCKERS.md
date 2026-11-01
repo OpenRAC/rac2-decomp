@@ -3450,3 +3450,7 @@ Still open: reload's spill registers run one step behind retail from `0x1F4` to 
 - `func_002C2210`: the prototype matched L06 and L18 callers use, in RAC1's argument order. The definition's own order is 6 rows worse.
 
 `func_L06_00455BC0` (F7): retail allocates `missing` first (`$s5`), then `fail`, -1 and the high, leaving the hoisted 1 unallocated. So `missing` must outrank `fail` (0.0615), which at live 118 takes 4 refs. The 1 must stay a hoisted register: with `1 << n` inline, combine folds it to `srav` plus `andi`. Setting `missing = 0` at the loop's end gives the 4 refs, the frame and 33 rows, but it is not retail's shape (preheader) and `continue` skips it, so it does not land.
+
+`func_0030CCD0` closed at 1888 bytes, 28 of 28 places, in `src/game/00308600-chain-g8.c`. Unused locals in the draft held the pseudo numbers that rotated slots 0x78/0x7C: dropping them closed the slots at the same bucket count. `func_002C2210`'s prototype with the pointer first fixed the `mov.s` order. The preheader needed one more priority-3 insn so that `r175`'s copy issues first in its cycle and `i = 1` pairs with it, since `sched2` keeps `sched1`'s tie order. A local `to = &last` set before `func_00282D30` gives the in-loop copy life 5 or more, so loop.c hoists it; the copy is tied and leaves no code.
+
+`func_L06_00455BC0` (F7), same day: 34 raw rows. `notify = 1` after the 0x18 test lands in the `beq` delay slot through reorg's target thread, and case 4 has its own flag. Only the 4th reference for `missing` is left.

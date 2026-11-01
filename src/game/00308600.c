@@ -123,7 +123,6 @@ INCLUDE_ASM("asm/game", func_0030A348);
 
 /* func_0030CAD0 is defined in 0030CAD0-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0030CCD0);
 
 /* func_0030D430 is matched in its own unit, src/game/0030D430-g8.c. */
 

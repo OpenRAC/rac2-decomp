@@ -1,8 +1,4 @@
-/* func_0030CCD0: beam chain update, the small cousin of the F4 family's chain loop.
-   Flags: -O2 -G8 -ffunction-sections -g -frac2-qcopy. 1888/1888 bytes, 12 rows off.
-   Left: spill slots 0x78/0x7C (gcse's bucket count), s2 against s5 in the preheader, the order of
-   mov.s f12/f13 in the last effect call. D_L00_ names are level 0's: rename to the boot's before
-   landing. */
+/* func_0030CCD0: beam chain update, the small cousin of the F4 family's chain loop. */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
@@ -29,12 +25,9 @@ extern float D_L00_001AF308 __attribute__((sda)), D_L00_001AF30C __attribute__((
 extern float D_L00_001AF314 __attribute__((sda)), D_L00_001AF318 __attribute__((sda)), D_L00_001AF31C __attribute__((sda));
 extern float D_L00_001AF320 __attribute__((sda)), D_L00_001AF334 __attribute__((sda)), D_L00_001AF338 __attribute__((sda));
 extern float D_L00_001AF384 __attribute__((sda));
-extern Vector D_L00_0023A210[], D_L00_0023A350[], D_L00_0023A340[], D_L00_0023A4E0[];
+extern Vector D_L00_0023A210[2][20], D_L00_0023A340[], D_L00_0023A4E0[];
 extern float D_L00_0023A490[], D_L00_0023A620[];
 extern char D_L00_001A8F20[] MACRO_ADDR;
-extern Vector P2[2][20] __asm__("D_L00_0023A210");
-extern Vector B0[] __asm__("D_L00_0023A200");
-
 
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00282CF0(void *, void *, void *);
@@ -55,7 +48,7 @@ extern float func_002A78D8(float, float);
 extern ThingInfo *func_002AB1F0(void *);
 extern float func_002ABB18(float);
 extern void func_002ACEC0(void *, void *, void *, float);
-extern void *func_002C2210(float, float, void *, int, unsigned int, int, int, void *, int, float);
+extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
 extern float func_00282DF0(void *);
 extern float func_00283180(float);
 extern unsigned int func_0030CAA0(void);
@@ -63,14 +56,25 @@ extern unsigned int func_0030CAA0(void);
 void func_0030CCD0(Actor *actor)
 {
     Vector goal, dir, side, step, last, delta, tip;
-    BeamState *s = actor->vars;
-    void *target, *other;
-    ThingInfo *info;
-    float wob, amp, d1, z, h, len, weight, sway, was, dist, t, angle, wave;
-    int i, spin;
-    int off4, off16;
+    float angle;
+    float len;
     float *p;
+    int off4;
+    float dist;
+    void *target;
+    float was;
+    int spin;
+    float d1;
+    float weight;
+    float wave;
+    int i;
+    float sway;
+    void *other;
+    BeamState *s = actor->vars;
     float zero;
+    Vector *to;
+    ThingInfo *info;
+    float h;
 
     if (D_001A79F0 == 1 && D_L00_001A8F00 == 2)
         s = D_L00_001C5890;
@@ -107,8 +111,8 @@ void func_0030CCD0(Actor *actor)
         func_002ACEC0(&dir, &dir, &side, 0.17453295f);
     }
     func_00282D30(&last, &dir, len);
-    qcopy(P2[0], s);
-    qcopy(P2[1], s);
+    qcopy(D_L00_0023A210[0], s);
+    qcopy(D_L00_0023A210[1], s);
     i = 1;
     do {
         float fi = i;
@@ -120,22 +124,22 @@ void func_0030CCD0(Actor *actor)
         p = (float *)(off4 + (char *)D_L00_0023A490);
         was = *p;
         *p = wave;
-        P2[0][i].f[2] -= was;
-        func_00282CF0(&side, &P2[0][i], &P2[0][i - 1]);
+        D_L00_0023A210[0][i].f[2] -= was;
+        func_00282CF0(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
         func_00282D08(&step, &side, &last, 0.85f);
         zero = 0.0f;
         d1 = func_00282DF0(&step);
         if (d1 == zero) {
-            qcopy(&P2[0][i], &P2[0][i - 1]);
+            qcopy(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
         } else {
             func_00282D30(&step, &step, len / d1);
-            func_00282CC0(&P2[0][i], &P2[0][i - 1], &step);
+            func_00282CC0(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1], &step);
             qcopy(&last, &step);
         }
-        P2[0][i].f[2] += wave;
-        func_00282CF0(&side, &P2[0][i], &P2[0][i - 1]);
+        D_L00_0023A210[0][i].f[2] += wave;
+        func_00282CF0(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
         if (s->target != 0) {
-            func_00282CF0(&tip, &goal, &P2[0][i]);
+            func_00282CF0(&tip, &goal, &D_L00_0023A210[0][i]);
             dist = func_00282DF0(&tip);
             if (dist != zero) {
                 if (i == 0x13) {
@@ -148,16 +152,18 @@ void func_0030CCD0(Actor *actor)
                 } else {
                     sway = 0.1f;
                 }
+                /* Live across the next call: loop.c hoists this copy, which retail's preheader order shows. */
+                to = &last;
                 func_00282D30(&tip, &tip, len / dist);
-                func_00282D08(&last, &last, &tip, sway);
+                func_00282D08(to, to, &tip, sway);
             }
         }
         angle = func_002ABB18(D_L00_001AF304 + (float)i * D_L00_001AF30C);
         wave = D_L00_001AF310 * func_00283198(func_002ABB18(D_L00_001AF318 + (float)i * D_L00_001AF320));
-        qcopy(&P2[1][i], &P2[0][i]);
+        qcopy(&D_L00_0023A210[1][i], &D_L00_0023A210[0][i]);
         wave = wave * func_00283198(angle);
         D_L00_0023A620[i] = wave;
-        P2[1][i].f[2] += wave;
+        D_L00_0023A210[1][i].f[2] += wave;
         wave = func_00283B98(func_00283248(side.f[0], side.f[1]), 1.5707965f);
         {
             float r2 = D_L00_001AF314 * func_00283180(angle);
@@ -166,7 +172,7 @@ void func_0030CCD0(Actor *actor)
         }
         delta.f[2] = 0.0f;
         qcopy(&D_L00_0023A4E0[i], &delta);
-        func_00282CC0(&P2[1][i], &P2[1][i], &delta);
+        func_00282CC0(&D_L00_0023A210[1][i], &D_L00_0023A210[1][i], &delta);
         i++;
     } while (i < 0x14);
     qcopy(&s->end, D_L00_0023A340);
@@ -181,11 +187,11 @@ void func_0030CCD0(Actor *actor)
     if (func_002A77E0(2))
         spin = -spin;
     wave = func_002A7878(0.2f, 0.6f);
-    func_002C2210(wave * 0.3f, wave, s, 0xF, func_0030CAA0() | 0x7F000000, 0, spin, &tip, 0, 0.0f);
-    func_002C2210(wave * 0.15f, wave * 0.5f, s, 0xF, 0x307F7F7F, 0, -spin, &tip, 0, 0.0f);
+    func_002C2210(s, 0xF, wave * 0.3f, wave, func_0030CAA0() | 0x7F000000, 0, spin, &tip, 0, 0.0f);
+    func_002C2210(s, 0xF, wave * 0.15f, wave * 0.5f, 0x307F7F7F, 0, -spin, &tip, 0, 0.0f);
     spin = func_002A7820(1, 8);
     if (func_002A77E0(2))
         spin = -spin;
     wave = func_002A7878(0.15f, 3.0f);
-    func_002C2210(wave * 0.1f, wave, &s->end, 0xC, func_0030CAA0() | 0x7F000000, 0, spin, D_L00_001A8F20, 0, 0.0f);
+    func_002C2210(&s->end, 0xC, wave * 0.1f, wave, func_0030CAA0() | 0x7F000000, 0, spin, D_L00_001A8F20, 0, 0.0f);
 }

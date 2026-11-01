@@ -1,9 +1,14 @@
 /* func_L06_00455BC0: family F7, five level members with identical opcodes (L06, L10, L15,
-   L18, L22, 1540 bytes each). Flags tried: -O2 -G8 -ffunction-sections.
-   Blocker: retail's missing flag beats the hoisted constant 1 in global-alloc; here it has
-   3 refs across 118 insns and is spilled. 4 refs fixes the frame and the loop's registers (an
-   extra else set proves it, but adds three instructions). Still open: notify = 1 must land
-   in the beq delay slot, not the jal's, and case 4's flag is s0 in retail, s2 here. */
+   L18, L22, 1540 bytes each). Flags: -O2 -G8 -ffunction-sections. 1540/1540, 34 raw rows.
+   Cases 3 and 4 now equal retail: notify = 1 goes after the 0x18 test, and case 4 has its own
+   flag (s0 in retail, s2 in case 3).
+   Not a landing form: `missing = 0` at the loop's end stands in for retail's preheader set, to
+   give the 4 refs that fix the frame. It leaves missing in t2, not s5. Set at the loop's top it
+   is hoisted as in retail, but has 3 refs and is spilled (1548 B, 300 rows).
+   Retail's order is missing s5, fail s6, -1 s7, high fp, with the 1 unallocated, so missing must
+   outrank fail (.0615): 4 refs across 118 insns gives .0678. Where the 4th ref comes from is open.
+   Tried, all worse: a do/for wrapper with breaks, per-arm sets at the p->msg guard, a second
+   test of missing, missing = fail = 1. */
 #include "common.h"
 
 typedef struct {
@@ -67,6 +72,7 @@ void func_L06_00455BC0(Thing *m)
 {
     TriggerVars *p = m->vars;
     int notify, i, missing, fail;
+    int played;
 
     switch (m->state) {
     case 0:
@@ -99,7 +105,6 @@ void func_L06_00455BC0(Thing *m)
         if (D_L06_002AA490[D_001A79F0] != 0 && D_L06_002AA490[D_001A79F0][p->idx] != 0) {
             for (i = 0; D_L06_002AA490[D_001A79F0][p->idx][i] != -1; i++) {
                 int e = D_L06_002AA490[D_001A79F0][p->idx][i];
-                missing = 0;
                 if (p->tail.b.quiet == 0) {
                     int bit = 1 << (e & 0x1F);
                     if (D_00139768[(unsigned int)e >> 2] & bit)
@@ -110,6 +115,7 @@ void func_L06_00455BC0(Thing *m)
                     return;
                 }
                 fail = 0;
+                missing = 0;
             }
         }
         if (missing != 0)
@@ -142,9 +148,9 @@ void func_L06_00455BC0(Thing *m)
         notify = 0;
         if (p->item != -1) {
             func_002AD7B8(p->item);
-            notify = 1;
             if (p->item != 0x18)
                 func_002AF0A8(p->item);
+            notify = 1;
         }
         if (m->group != 0xFF && !(D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80)) {
             func_002A0430(m->group);
@@ -163,16 +169,16 @@ void func_L06_00455BC0(Thing *m)
             func_0029B3E0(0, -1);
         break;
     case 4:
-        notify = 0;
+        played = 0;
         if (p->item != -1) {
             func_002AD7B8(p->item);
-            notify = 1;
             if (p->item != 0x18)
                 func_002AF0A8(p->item);
+            played = 1;
         }
         if (m->group != 0xFF && !(D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80)) {
             func_002A0430(m->group);
-            notify = 1;
+            played = 1;
         }
         if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
@@ -183,7 +189,7 @@ void func_L06_00455BC0(Thing *m)
         }
         if (p->tail.low != -1)
             func_00288CB0(p->tail.low, 1);
-        else if ((notify != 0 || p->tail.b.had != 0) && p->count != p->tail.low)
+        else if ((played != 0 || p->tail.b.had != 0) && p->count != p->tail.low)
             func_0029B3E0(0, -1);
         func_0029F338(m);
         break;
