@@ -44,5 +44,4 @@ extern s32 func_00282C30(s32);
 #define EF(p, n) (*(f32 *)((u8 *)(p) + (n)))
 #define EI(p, n) (*(s32 *)((u8 *)(p) + (n)))
 
-INCLUDE_ASM("asm/us2/game", func_US2_0030FAC0);
 

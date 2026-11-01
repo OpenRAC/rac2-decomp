@@ -1,20 +1,8 @@
-/* GPT-6.1 Sol high, USA v1.01, game -O2 -G8 -ffunction-sections.
- * Best check: 1260/1260 bytes, 0/16 places; first difference +0x80.
- * Indexed traversal restores the retail 0x140 frame and three distinct
- * position induction pointers. Separate per-case object pointers restore
- * the moby/tie/shrub allocations; splitting the average into += then *=
- * restores the f20/f21 allocation and floating call schedule.
- * Retail keeps constant 1 in s7 and spills the third position cursor;
- * this draft keeps that cursor in s7 and rematerializes the constant.
- * Periodic activation also differs: retail reloads period and conditionally
- * clears an initially true flag, while this draft emits a boolean sltiu.
- * Clamp constant allocation and some setup ordering still differ.
- * A declared volatile period field with a local guard snapshot adds redundant
- * andi instructions and is worse (1268 bytes); it is not retained here.
- * -fno-cse-follow-jumps does not help; -fno-expensive-optimizations does not
- * fix the flag or cursor allocation. The sentinel-period switch is 1252 bytes.
- * Next: recover the activation flag's real lifetime before further allocation
- * trials. All required declarations are included; no linked build attempted.
+/* Closer C4, 1 November 2026: -O2 -G8 -ffunction-sections, 1260/1260, 23 rows, nearly all one register. The hoisted 1 now lands in
+ * s7 and the third cursor spills: `active = 0; ... if (frame % period == phase) active = 1;` is jump.c's case 2 cmov, with the 1 in a
+ * fresh single-set pseudo that loop.c hoists (`active = 1; if (...) active = 0` combines back into sltiu). Left: reload's choice for
+ * the hoisted 2 in the first and third switches and for the third cursor's increment is a0 in retail, v0 and v1 here, though nothing
+ * live there explains it (order_regs_for_reload takes the first free reg); and the clamp, where retail loads 0x10000 twice.
  */
 #include "common.h"
 typedef int V4TI_F36d8a248 __attribute__((mode(TI)));
@@ -124,17 +112,15 @@ void func_L00_00323958(char *object, B1320Entry *entries)
         }
         switch (entries[i].type) {
         case 0: {
-            char *item;
-            item = D_L00_001B1E9C + entries[i].index * 256;
-            if (*(int *)(item + 0x24)) func_002A0F48(item);
+            typedef struct { char p[0x24]; int f; char q[256-0x28]; } M;
+            if (((M *)D_L00_001B1E9C)[entries[i].index].f) func_002A0F48(&((M *)D_L00_001B1E9C)[entries[i].index]);
             break;
         }
         case 1:
             active = 0;
             if (entries[i].period == 0) active = 1;
             else if (entries[i].period != 255) {
-                active = D_L00_001B19C8 % entries[i].period;
-                active = active == entries[i].phase ? 1 : 0;
+                if (D_L00_001B19C8 % entries[i].period == entries[i].phase) active = 1;
             }
             func_L00_0036AE00(entries[i].index, active);
             break;
@@ -148,7 +134,7 @@ void func_L00_00323958(char *object, B1320Entry *entries)
             y = func_00282DF0(item + 0x20);
             sx = func_002EF250(x * 4096.0f);
             sy = func_002EF250(y * 4096.0f);
-            if (sy > 65536) sy = 65536;
+            sy = sy <= 65536 ? sy : 65536;
             if (sx > 65536) sx = 65536;
             *(int *)(item + 0x2C) = sx | (sy << 16);
             func_00283098(data, D_L00_0021EA20[(unsigned char)data[0x1A]], item);

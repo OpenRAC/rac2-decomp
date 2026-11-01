@@ -9,7 +9,6 @@ void func_US2_00342978(int param_1)
   return;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_00342998);
 
 extern void func_00336320_6(char *);
 extern void func_00336A78_7(char *);

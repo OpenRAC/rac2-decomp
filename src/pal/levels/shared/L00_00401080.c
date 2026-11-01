@@ -49,4 +49,3 @@ void func_PAL_L00_00401080(float *pos)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_004012A0);

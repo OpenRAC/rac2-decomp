@@ -1095,7 +1095,6 @@ s32 func_L02_00400CC8(char *a0) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L02_00401638);
 
 /* func_L02_00401BF8 is matched in L02_00401BF8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 

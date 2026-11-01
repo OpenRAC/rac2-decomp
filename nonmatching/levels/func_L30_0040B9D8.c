@@ -36,6 +36,10 @@
  * Earlier draft corrections kept: state-nonzero always sets +0xA8 to 255; the +0x1A4 mask-0x4 gate
  * is positive; phase/bob tuning symbols were interchanged; case 6 shares the default exit, as
  * retail's seven-entry table does.
+ *
+ * closer D: reload_cse_regno_equal_p compares a CONST_INT by mode, so the second constant lives only with a label
+ * between, or with a first constant in a wider mode. Moving the store to `copied = 1` gives 2200 bytes but puts the
+ * first constant in a0 and costs 28 words. Per-arm flag stores give 2240 to 2244 bytes.
  */
 #include "common.h"
 #define F(p,o) (*(float *)((char *)(p)+(o)))

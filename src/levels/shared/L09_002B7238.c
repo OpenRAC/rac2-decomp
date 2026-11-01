@@ -248,7 +248,6 @@ int func_L09_0033E8B0(char *object, int index, void *out, int current, int direc
 
 INCLUDE_ASM("asm/levels", func_L09_0037FCE8);
 
-INCLUDE_ASM("asm/levels", func_L09_003806A0);
 
 INCLUDE_ASM("asm/levels", func_L09_003A01D8);
 

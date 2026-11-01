@@ -38,5 +38,4 @@ extern void func_US2_002FC008(void);
 #define ROW (D_0021F240.rows[D_0021F240.index])
 #define BUTTONS (D_00138180.buttons)
 
-INCLUDE_ASM("asm/us2/game", func_US2_002F97A8);
 

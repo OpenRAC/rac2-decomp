@@ -264,4 +264,3 @@ void func_PAL_L00_003D3A48(AranosMoby *obj) {
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003D4858);

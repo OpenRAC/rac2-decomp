@@ -32,7 +32,6 @@ extern void func_002A91F0(void *, float *);
 
 /* func_0031F210 is in 0031F210-ribbon.c. */
 
-INCLUDE_ASM("asm/game", func_0031F6E8);
 
 /* func_0031FC28 is in 0031F210-pickup-g8.c. */
 

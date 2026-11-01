@@ -27,4 +27,3 @@ int func_PAL_L03_003C81C8(unsigned char *a0, int a1, int a2) {
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L03_003C8588);

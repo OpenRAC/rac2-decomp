@@ -76,3 +76,22 @@ int func_PAL_L20_00447F88(char *arg0) {
     }
     return 0;
 }
+
+extern float D_L20_001B212C __attribute__((sda));
+extern float D_L20_001B2130 __attribute__((sda));
+extern float D_L20_001B2138 __attribute__((sda));
+extern float D_L20_001B2128 __attribute__((sda));
+extern void *func_002B60B0(unsigned char *, float, float, float, float);
+extern float func_00282C10(float);
+
+void func_PAL_L20_00447ED8(char *actor)
+{
+    char *state = *(char **)(actor + 0x68);
+    func_002B60B0((unsigned char *)actor, 0.0f, 0.0f,
+                 D_L20_001B212C * 6.981318e-06f,
+                 D_L20_001B2130 * 0.0003490659f);
+    *(float *)(state + 0x7C) = D_L20_001B2138 * 0.00040000002f;
+    *(float *)(state + 0xE0) = func_002A89A8(actor + 0x10, 0, 0.5f);
+    qzero(state + 0xF0);
+    *(float *)(state + 0xF8) = func_00282C10(*(float *)(state + 0x7C) * 2.0f * D_L20_001B2128);
+}

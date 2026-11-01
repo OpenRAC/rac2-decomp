@@ -17,6 +17,10 @@
  * See nonmatching/levels/func_L01_00410AD0.c for the previously measured
  * allocation-priority blocker. Reopen with a new source-lifetime hypothesis;
  * do not repeat the rejected redundant pre-test clear from that file's notes.
+ * Opus G2, 1 November 2026: retail clears noList in the preheader, so the clear is at the loop top.
+ * That with `1 << (dep & 31)` inline gives 1540 bytes, but loop.c then hoists the bitset base as well
+ * and noList spills (frame 0x60). Retail hoists only the queue high half and -1. MACRO_ADDR, operand
+ * order and the mask local do not change it; the mask local keeps the base in the loop and hoists 1.
  * All required declarations are included below.
  */
 #include "common.h"
