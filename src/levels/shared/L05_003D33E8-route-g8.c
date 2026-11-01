@@ -1,11 +1,3 @@
-/* Complete C near miss; not linked and no matching credit.
- * 2026-10-30: game -O2 -G8 -ffunction-sections.
- * us: 0/3; us2: 0/3; pal: absent.
- * 884/892 bytes; frame 0x60 instead of0x70. Two complete vectors, route progression, movement
- * address-word return, real callback registration and sound-record validation are retained.
- * Movement/path pointer lifetimes and predicate/FP scheduling differ.
- * Reopen: Measured saved path/movement lifetime evidence; preserve actual movement and sound interfaces.
- */
 #include "common.h"
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
 extern int func_L00_00367720(void);
@@ -28,17 +20,19 @@ extern float func_002A7878(float, float);
 extern int func_00283CF0(float);
 extern void func_L05_00417550(void *);
 extern int D_L05_001B0F50 __attribute__((sda));
-extern int D_L05_00221D48;
+extern int D_L05_00221D48 NOT_SDA;
 extern char *D_L05_001FE380[];
-extern char *D_L05_001B251C;
+extern char *D_L05_001B251C MACRO_ADDR;
 extern u8 D_00188660[];
 
+typedef struct { u8 pad[0x11C]; int mode; } Movement;
 void func_L05_004170C8(u8 *actor)
 {
     Vector direction, facing;
     u8 *state = *(u8 **)(actor + 0x68);
     u8 *movement;
     char *path;
+    int one, mode;
     if (actor[0x20] == 0) {
         actor[0x30] = 0xFF;
         if (func_L00_00367720() == 0)
@@ -53,10 +47,11 @@ void func_L05_004170C8(u8 *actor)
     if (*(int *)(movement + 0x110) == 0)
         return;
     path = D_L05_001FE380[D_L05_00221D48];
+    one = 1;
     func_002EE678(actor, 11);
     if (*(int *)(state + 0x1B8) == 0) {
-        *(int *)(state + 0x1BC) = 1;
-        *(int *)(state + 0x1B8) = 1;
+        *(int *)(state + 0x1B8) = one;
+        *(int *)(state + 0x1BC) = one;
         qcopy(actor + 0x10, path + 0x10);
         *(int *)(state + 0x1BC) = 2;
         func_002EE920(actor, path + 0x20);
@@ -66,10 +61,10 @@ void func_L05_004170C8(u8 *actor)
     } else if (func_002EEB00(actor) != 0) {
         int next = *(int *)(state + 0x1BC);
         if (next >= *(int *)path)
-            D_L05_001B0F50 = 1;
+            D_L05_001B0F50 = one;
         else {
             *(int *)(state + 0x1BC) = next + 1;
-            func_002EE920(actor, path + next * 16 + 16);
+            func_002EE920(actor, path + (next * 16 + 16));
             *(int *)(movement + 0x130) = 2000000;
         }
     }
@@ -77,10 +72,11 @@ void func_L05_004170C8(u8 *actor)
         func_L05_0037C160(actor);
         func_L05_0037B948(actor, 1, 32.0f);
     }
-    if (*(int *)(movement + 0x110) == 1) {
+    mode = *(int *)(movement + 0x110);
+    if (mode == 1) {
         if (*(int *)(state + 0x1B0) != -1) {
             u8 *other;
-            *(int *)(movement + 0x11C) = 1;
+            ((Movement *)movement)->mode = mode;
             other = (u8 *)D_L05_001B251C + (*(int *)(state + 0x1B0) << 8);
             *(u8 **)(movement + 0x120) = other;
             if (func_00282E48(other + 0x10, actor + 0x10) < 15.0f) {

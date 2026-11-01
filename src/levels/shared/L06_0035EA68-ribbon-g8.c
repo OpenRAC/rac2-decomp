@@ -1,19 +1,5 @@
-/*
-GPT-6.1 Sol high; USA v1.01, game -O2 -G8 -ffunction-sections.
-Best check.py: 1352/1352 bytes, 0/3 places; first mismatch +0x1E8.
-The dynamic 0x240 frame, packet offsets, VLA allocation, and alpha math agree.
-First UV loop swaps table/counter a1/a2 and its setup order. The vertex loop
-swaps packet/order s4/s5 and the i*64 / next-i setup order. Packet and original
-union layouts tie; disabling interblock scheduling ties. Explicit UV table
-pointer changes allocation without improving it. Recover original pointer
-lifetimes rather than trying more declaration permutations.
-Adapted from RAC1's render_data_processor_linked_effect in
-src/overlays/l10_orxon/platforms_doors_and_bombthrower.c (GPL-3.0).
-An unsigned VLA preserves retail's sll 9 / srl 3 size sequence. Typed row
-indexing prevents the unwanted integer madd and retains the spilled 320.
-Staged packet flag ORs preserve retail's left-associated evaluation tree.
-All required declarations follow. No linked build was attempted for this draft.
-*/
+/* Adapted from RAC1's render_data_processor_linked_effect in
+   src/overlays/l10_orxon/platforms_doors_and_bombthrower.c (GPL-3.0). */
 #include "common.h"
 extern char *D_L06_001B281C;
 extern char D_L06_001B9840[];
@@ -33,7 +19,7 @@ extern float D_L06_001AF578[] SDATA(D_L06_001AF578);
 extern float D_L06_001AF5A0[] SDATA(D_L06_001AF5A0);
 extern float D_L06_001AF620 __attribute__((sda));
 extern float D_L06_001AF57C[7] __attribute__((sda));
-extern float D_L06_001AF70C;
+extern float D_L06_001AF71C;
 extern int D_L06_001B31B0,D_L06_001B31B4;
 typedef unsigned int Quad57 __attribute__((mode(TI)));
 void func_L06_003E57E8(u8 *moby) {
@@ -96,8 +82,8 @@ void func_L06_003E57E8(u8 *moby) {
     }
     {
         int k;
-        for (k = 3; k >= 0; k--) {
-            uv1[(3-k) * 2] = uv2[(3-k) * 2] = D_L06_001AF57C[(3-k) * 2];
+        for (k = 0; k < 4; k++) {
+            uv1[k * 2] = uv2[k * 2] = D_L06_001AF57C[k * 2];
         }
     }
     group = 0;
@@ -107,14 +93,14 @@ void func_L06_003E57E8(u8 *moby) {
         row = 0;
         do {
             int next;
-            phase += D_L06_001AF70C;
+            phase += D_L06_001AF71C;
             if (phase > 1.0f) phase -= 1.0f;
             next_row = row + 1;
             for (j = 0; j < 4; j++) {
                 matrix1[j * 2] = matrix2[j * 2] =
                     D_L06_001AF578[j * 2] + phase + *(float *)(base + 0x12de0);
             }
-            for (i = 0; i < *(int *)(data + 4); i++) {
+            for (i = 0; i < *(int *)(data + 4); i = next) {
                 int offset;
                 int age;
                 float progress;
@@ -145,6 +131,7 @@ void func_L06_003E57E8(u8 *moby) {
                 }
                 vertex = 0;
                 offset = i * 0x40;
+                next = i + 1;
                 buffers.back.color[3] = color;
                 buffers.back.color[2] = color;
                 buffers.back.color[1] = color;

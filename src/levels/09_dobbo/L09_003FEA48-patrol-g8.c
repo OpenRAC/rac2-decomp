@@ -1,53 +1,3 @@
-/* opus-1 (Claude Opus 5.5, xhigh), USA v1.01, default game profile -O2 -G8 -ffunction-sections.
- * Near miss, not linked into the game; retry it as its own -g8.c unit.
- * Best check.py: 09_dobbo 4020 bytes, expected 4020; 0 of 1 places match. The body is one
- * word short up to the explosion block (see 1 below) and one word long at the debris loop's
- * .p2align nop, so raw rows are offset; aligned, 14 rows differ. No forbidden wording is used.
- *
- * What still differs, both scheduling or allocation inside otherwise matching code:
- * 1. State 6 explosion, func_002ABBB8 setup (retail 0x3FFC48 on). Retail: 0x810001 in $a0,
- *    5 in $v0, -1 in $v1; mine: $v0, $v1, $a0. Retail's $a0 needs that store ahead of
- *    "$a0 = obj" and 0x810001 to lose local-alloc's priority, which it wins inside one block.
- *    Evidence: an experiment that makes it live across a real test in the block (allocated
- *    by global-alloc) reproduces $v0 = 5, $v1 = -1 and the whole later argument sequence,
- *    though it then took $a3/$t0 and the test stayed, so that wording was discarded. Next
- *    idea: a real test that vanishes at jump2 (as func_002D3D88 in src/game/002D3390.c) or
- *    another reason for a global pseudo. Fixing this also restores the stolen "lui" in the bnez slot at
- *    0x3FFC24, the branch offsets and the loop nop.
- * 2. End of state 4 (retail 0x3FFA84): retail has "$a0 = obj" before the 0xF4 store, mine after.
- *    The store seems to become ready one cycle later in retail, as if a copy of $f0 survived
- *    combine. Named float locals, single or reused, are merged and give the same bytes.
- *
- * Recovered shapes, each verified by compiling; do not undo them:
- * - State 4 ends in func_L09_003FDFF0 and returns; it does not join the shared tail. This
- *   alone fixed the state-2 call merge (jump2 now cross-jumps the two state-2 calls).
- * - The six bounds tests branch straight to func_0029F338, skipping the explosion. Splitting
- *   them from the timer/collision test makes 2.0f live in $f20 with no local.
- * - There is no motion pointer: every use is the expression data + 0x390. gcse PRE makes
- *   retail's s0/s2 pair and the else-arm order.
- * - The class test needs a local holding 0xCB before the null test. Its register then crosses
- *   a block, so loop cannot move it, and 0x76C is the first movable of the second pass
- *   (threshold 61, less 3 per move, against 61 real insns).
- * - The hero base is a local inside the loop body, after the candidate. That order gives the
- *   $v0/$v1/$a0 high parts and s7/s6.
- * - Debris loop: ascending with a compare against zero. loop reverses it (s1 = 1 between the
- *   two hoist passes) and the 52 real insns let 0x3C move in pass 1. "i < 2" has 53.
- * - D_L09_001B2388 and D_L09_001A8F20 are incomplete sda arrays: retail uses the tied macro
- *   forms (lui $a0; lw $a0 and lui $a2; addiu $a2), and this also fixes neighbouring order.
- * - Colour: tint = (c << 8) | K, then c | ((c << 16) | tint). One expression gets reassociated.
- * - Prototypes keep each register bank's order against the real definitions (func_002ABBB8 in
- *   002AA800-blast.c, func_002BDCE8 in 002BDCE8.c); only the interleaving differs.
- * - 0x3F4 copy through a pointer set after the call; 0x420 before 0x422 in state 3;
- *   0x44 before 60 in the particle.
- *
- * Tried without effect on item 1 or 2: a local for 0x810001, data + 0x400 in place of vel,
- * pos locals (they take s1 from the loop counter, which needs s1, and stop the s2 copy).
- * About 50 check.py runs; no linked build or PAL/US2 checks, since USA v1.01 is unmatched.
- *
- * Behaviour: state 1 patrols and picks a target (hero or classes 0xCB, 0x76C, 0xEB0), state 2
- * falls or lands, state 3 chases, state 4 starts breaking up, state 6 is falling debris that
- * vanishes out of bounds and explodes on timeout or contact.
- */
 #include "common.h"
 
 /* The gate suppresses updates between its two height bands. */
@@ -128,7 +78,9 @@ extern char *func_002BDCE8(void *, float, float, float, int, void *, float, int,
 #define B(p, o) (*(u8 *)((char *)(p) + (o)))
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 
-/* Follows paths, acquires nearby targets, and handles falling debris and effects. */
+/* State 1 patrols and picks a target (hero or classes 0xCB, 0x76C, 0xEB0), state 2 falls or lands,
+ * state 3 chases, state 4 starts breaking up, state 6 is falling debris that vanishes out of
+ * bounds and explodes on timeout or contact. */
 void func_L09_003FEF00(char *obj)
 {
     float a[4], b[4], previous[4];
@@ -144,8 +96,9 @@ void func_L09_003FEF00(char *obj)
     if (B(obj, 0x20) == 0) func_L09_003FE670(obj);
     if (B(data, 0x2E) == 2) {
         I(data, 0x42C) = 0;
-        /* Retail branches to destruction, bypassing the shared animation tail. */
-        goto destroy;
+        func_002A6C58(obj, 0, 3);
+        func_0029F338(obj);
+        return;
     }
     {
         if (B(obj, 0x20) == 5) {
@@ -367,7 +320,8 @@ void func_L09_003FEF00(char *obj)
             F(obj, 0xF0) = func_00283B98(F(obj, 0xF0), func_002A78D8(0.0f, 0.78539824f));
             F(obj, 0xF4) = func_00283B98(F(obj, 0xF4), func_002A78D8(0.0f, 0.78539824f));
             func_002A7750(obj, 6, -1);
-            goto finish;
+            func_L09_003FDFF0(obj);
+            return;
         }
         case 5: goto tail;
         case 6: {
@@ -382,13 +336,14 @@ void func_L09_003FEF00(char *obj)
             F(data, 0x280) = 10.0f;
             if (F(obj, 0x10) < 2.0f || F(obj, 0x10) > 1021.0f ||
                 F(obj, 0x14) < 2.0f || F(obj, 0x14) > 1021.0f ||
-                F(obj, 0x18) < 2.0f || F(obj, 0x18) > 1021.0f) goto remove;
+                F(obj, 0x18) < 2.0f || F(obj, 0x18) > 1021.0f) {
+                func_0029F338(obj);
+                return;
+            }
             if (func_00282978(data + 0x410) || func_00277258(obj + 0x10, 0, obj, 0.5f)) {
                 func_002ABBB8(obj, data + 0x400, obj + 0x10, 2.0f, 1.0f, 5, 2, 4,
                              2.0f, 1.0f, 9.0f, 1.0f, 1, 15.0f, 1, 5, -1, 0, 0x810001);
-destroy:
                 func_002A6C58(obj, 0, 3);
-remove:
                 func_0029F338(obj);
                 return;
             }
@@ -415,7 +370,6 @@ remove:
                     B(extra, 0xB) = B(particle, 0xA);
                 }
             }
-finish:
             func_L09_003FDFF0(obj);
             return;
         }

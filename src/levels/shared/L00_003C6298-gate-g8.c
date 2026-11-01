@@ -1,20 +1,3 @@
-/*
- * Tier: sol-high worker v1303, USA v1.01, pinned upstream toolchain.
- * Best: 1764/1764 bytes, 0/2 places; 24 instruction words differ.
- * Standalone flags: -O2 -G8 -ffunction-sections -frac2-keep-block-order.
- * Remaining differences: effect-call argument scheduling at +0x474/+0x478,
- * +0x494/+0x4A0 and +0x56C..+0x5B8. The first pair exchanges the zero FP
- * argument and -1 stack temporary; the second exchanges a0/a2 setup. The
- * later effect call also orders its constants, arguments and store differently.
- * Separate object/list/base locals recover all three indexed-object walks.
- * D_L00_001A8F20 needs MACRO_ADDR; this also recovers collision-branch setup.
- * Corrected the old draft: collision success jumps to DeleteMoby, not closing.
- * Retail writes v repeatedly but passes the uninitialized vb/vc stack vectors;
- * preserve this observed behavior. All required declarations are included.
- * No linked build claimed. Further useful work needs original effect-argument
- * lifetimes; additional FP/integer interleavings and an inline effect helper
- * did not improve this retained result. Explicit-break list loops grew to 1812.
- */
 #include "common.h"
 typedef struct { char pad[0x10]; int collision; } GateClass;
 typedef struct { int child[4]; int destroy_on_child; int close_volume; int block_volume; int group; } GateContext;
@@ -83,7 +66,17 @@ void func_L00_003CED50(GateObject *m)
                 GateObject *o=D_L00_001B1E9C+d->child[i];
                 if(o->destroyed || (s8)o->state<0) {
                     if(d->destroy_on_child) {
-                        goto destroyed;
+                        {
+    m->state=12;
+    qcopy(v,m->position);v[2]+=1.0f;
+    func_002E5CF8(2,0,m);
+    a[0]=func_00283180(m->angle-1.5707964897155762f)*0.3f;
+    a[1]=func_00283198(m->angle-1.5707964897155762f)*0.3f;a[2]=0;
+    func_002ABBB8(m,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
+    func_002B0A68(m,255,a,3,6,3,6,255);
+
+    func_0029F338(m);return;
+}
                     }
                     m->state=1;
                     if(m->animation!=1)func_002A7470(m,1,0,0);
@@ -110,11 +103,12 @@ void func_L00_003CED50(GateObject *m)
         if(func_00277258(a,0.6f,0,m) || func_00277258(b,0.68f,0,m) || func_00277258(c,0.68f,0,m)) {
             func_002E5CF8(2,0,m);
             func_002ABBB8(m,D_L00_001A8F20,a,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
-            goto delete_object;
+            {
+    func_0029F338(m);return;
+}
         }
     }
     goto closing;
-destroyed:
     m->state=12;
     qcopy(v,m->position);v[2]+=1.0f;
     func_002E5CF8(2,0,m);
@@ -122,7 +116,6 @@ destroyed:
     a[1]=func_00283198(m->angle-1.5707964897155762f)*0.3f;a[2]=0;
     func_002ABBB8(m,D_L00_001A8F20,v,0,0,10,3,16,4,2,9,1,-1,15,0,9,-1,0,0x810001);
     func_002B0A68(m,255,a,3,6,3,6,255);
-delete_object:
     func_0029F338(m);return;
 closing:
     if(m->state==3 && func_002ACBC8(D_00189EA0,d->close_volume)) {

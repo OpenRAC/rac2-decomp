@@ -51,6 +51,7 @@ func_0033B540	00_aranos_tutorial: instruction at +0x314 differs
 func_00341558	00_aranos_tutorial: instruction at +0x8 differs
 func_003438E8	00_aranos_tutorial: instruction at +0x18 differs
 func_00344478	00_aranos_tutorial: instruction at +0x24 differs
+func_00345D58	boot: instruction at +0x18 differs
 func_00347EC8	00_aranos_tutorial: instruction at +0x18 differs
 func_L00_002A5480	00_aranos_tutorial: instruction at +0x38 differs (PAL delay 25 frames, USA 30)
 func_L00_0030C7F8	00_aranos_tutorial: instruction at +0x1c differs

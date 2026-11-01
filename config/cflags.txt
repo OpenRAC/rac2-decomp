@@ -2153,3 +2153,6 @@ src/levels/shared/L00_004287E8-movables.c	-O2 -G0 -ffunction-sections -fmove-all
 src/levels/shared/L00_00370408-edges.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/levels/shared/L00_00376600-g.c	-O2 -G0 -ffunction-sections -g
 src/levels/shared/L00_00429568-g.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels
+src/levels/shared/L06_0035EA68-links.c	-O2 -G0 -ffunction-sections -ffast-math
+src/levels/shared/L00_003C6298-gate-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/14_aranos_prison/L14_003E0C90-gate-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order

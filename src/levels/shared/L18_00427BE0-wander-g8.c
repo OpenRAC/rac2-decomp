@@ -1,15 +1,3 @@
-/* GPT-6.1 Sol high, task v0962. USA v1.01, levels 18/19/20.
- * -O2 -G8 -ffunction-sections: 1052/1052 bytes, 0/3 places.
- * Five instructions differ: final object pointer is a0, retail a2, at +0x3CC
- * and its four dependent accesses. Current pinned toolchain requalifies the
- * prior draft. Six checks: typed 256-byte indexing only reverses addu operands;
- * a shared outer pointer breaks the initial block; repeated final expressions
- * and an out-of-else restore block with early exit retain the baseline bytes.
- * regalloc: final pointer pseudo 194 has five refs/live length 11; allocated
- * globally to a0 without conflicting with the table base (local pseudo 196).
- * Reopen with independently justified pointer/base lifetime evidence.
- * Required declarations are included below. No linked build was run.
- */
 #include "common.h"
 extern u8 *D_L18_001B281C MACRO_ADDR;
 extern int ref_L18_00428AE8_00 __attribute__((sda));
@@ -22,7 +10,7 @@ extern void func_L01_00321178(void *, void *);
 extern void func_002B4FF0(void *, void *, float);
 extern void func_L01_00318638(void *, void *, void *);
 extern float func_00282E80(void *, void *);
-extern int func_L09_003F7A88(void *, int);
+extern int ref_L18_00428AE8_01(void *, int);
 extern int func_L18_00427130(void *, int, int);
 extern int func_L18_004271C0(void *);
 extern void func_L18_00426F28(void *, int, int, float);
@@ -59,7 +47,7 @@ void func_L18_00428AE8(u8 *o) {
         goto restore;
     } else {
         if (*(int *)(s+0x38C) != -1) {
-            if (func_L09_003F7A88(o, *(int *)(s+0x38C))) {
+            if (ref_L18_00428AE8_01(o, *(int *)(s+0x38C))) {
                 switch (o[0x95]) {
                 case 5:
                     if (s[0x399] & 2) s[0x399] = 0;
@@ -113,11 +101,11 @@ wander:
             func_002A7750(o,12,10);
         }
 restore:
-        n = *(int *)(s+0x3B4);
-        if (n != -1) {
-            u8 *m = (u8 *)((n << 8) + ref_L18_00428AE8_00);
+        { int k = *(int *)(s+0x3B4);
+        if (k != -1) {
+            u8 *m = (u8 *)((k << 8) + ref_L18_00428AE8_00);
             if (((Obj *)m)->h[0xAA/2] == 0x114D && ((Obj *)m)->b[0x20] != 0xFE && ((Obj *)m)->b[0x20] != 0xFD)
                 ((Obj *)m)->i[0x98/4] = *(int *)(((Obj *)m)->i[0x24/4]+0x10);
-        }
+        } }
     }
 }

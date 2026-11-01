@@ -361,7 +361,7 @@ void func_L04_003F8FA0(unsigned char *a0) {
 
 INCLUDE_ASM("asm/levels", func_L04_003F9320);
 
-INCLUDE_ASM("asm/levels", func_L04_003F9718);
+/* func_L04_003F9718 is in L04_003C8380-homing.c. */
 
 /* func_L04_003F9C60 is in L04_003F9C60-zero.c. */
 

@@ -1,20 +1,3 @@
-/* sol-high; USA v1.01; -O2 -G0 -ffunction-sections.
- * Best check.py: 1236/1236 bytes, 0/4 places; no linked build.
- * The pointer's sda declaration prevents a saved high-half address and fixes
- * the frame, all copy-address registers and nearly all scheduling.
- * Corrected earlier draft semantics: when trigger is zero, bypass only the
- * rounded-progress/side comparison; still require the hero object/state test.
- * Remaining: two five-instruction load groups at +0x358 and +0x380. Retail
- * loads the target-table pointer, then index, then local rotation, then shifts
- * index; this draft loads index, table pointer, shifts, then local rotation.
- * Named table/index/angle temporaries, typed target/vector fields, MACRO_ADDR,
- * and incomplete sda pointer-array spelling all tied the retained bytes.
- * -mno-split-addresses, -fno-force-mem and -fno-schedule-insns worsened the
- * size to 1232 and did not repair these groups. Stop this wording family.
- * Next useful experiment: identify the scheduling dependence/latency that
- * distinguishes the last two rotation calls from the first, which is exact.
- * All required declarations follow; keep the default G0 profile.
- */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef struct { u8 pad[0x88]; float z; u8 pad2[0x2b0]; int object; int state; } EHero;
@@ -36,6 +19,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 #define E_I(p,o) (*(int *)((u8 *)(p)+(o)))
 #define E_F(p,o) (*(float *)((u8 *)(p)+(o)))
 typedef struct { u8 pad[0x60]; TI128 pos; TI128 rot; int index; float duration; float progress; u8 pad2[2]; u8 trigger; u8 side; int sound; } EPlatform;
+typedef struct { u8 pad[0xf0]; float rx, ry, rz; } EMob;
 void func_L08_003E5BB8(u8 *m)
 {
     TI128 oldpos, oldrot, delta;
@@ -73,9 +57,9 @@ void func_L08_003E5BB8(u8 *m)
         func_00282CF0(&delta,D_L08_001B2ACC+p->index*128+0x30,&p->pos);
         func_00282D30(&delta,&delta,t);
         func_00282CC0(m+0x10,&p->pos,&delta);
-        E_F(m,0xf8)=func_002AA150(E_F((u8 *)p,0x78),E_F(D_L08_001B2ACC+p->index*128,0x78),t);
-        E_F(m,0xf4)=func_002AA150(E_F((u8 *)p,0x74),E_F(D_L08_001B2ACC+p->index*128,0x74),t);
-        E_F(m,0xf0)=func_002AA150(E_F(p,0x70),E_F(D_L08_001B2ACC+p->index*128,0x70),t);
+        ((EMob*)m)->rz=func_002AA150(E_F((u8 *)p,0x78),E_F(D_L08_001B2ACC+p->index*128,0x78),t);
+        ((EMob*)m)->ry=func_002AA150(E_F((u8 *)p,0x74),E_F(D_L08_001B2ACC+p->index*128,0x74),t);
+        ((EMob*)m)->rx=func_002AA150(E_F(p,0x70),E_F(D_L08_001B2ACC+p->index*128,0x70),t);
         if(m[0xbc] ? p->progress>=1.0f : p->progress<=0.0f) {
             int i=p->sound;
             if(i!=-1 && ((ESound *)(D_00188660+i*0x70))->object==(int)m && ((ESound *)(D_00188660+i*0x70))->active) func_002E59F8(i);

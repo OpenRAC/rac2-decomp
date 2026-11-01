@@ -50,8 +50,6 @@ void func_L01_00398008(char *a2)
         func_002A7750(a2, 1, -1);
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003980D0);
-
 
 INCLUDE_ASM("asm/levels", func_L01_00398B50);
 

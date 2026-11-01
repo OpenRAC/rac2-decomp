@@ -198,8 +198,6 @@ INCLUDE_ASM("asm/game", func_003458F8);
 
 INCLUDE_ASM("asm/game", func_00345B78);
 
-INCLUDE_ASM("asm/game", func_00345D58);
-
 /* func_00345F70 is built from 00345358-layout-g8.c. */
 
 /* func_003462A8 is built from 00345358-descriptor-g8.c for small-data access. */

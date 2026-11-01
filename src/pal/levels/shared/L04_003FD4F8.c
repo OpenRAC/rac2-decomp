@@ -2,7 +2,7 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003FD4F8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003FD8F0);
+/* func_PAL_L04_003FD8F0 is in L04_003FD4F8-homing.c. */
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003FDE38);
 
