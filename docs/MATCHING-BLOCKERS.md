@@ -3604,3 +3604,46 @@ compiler rejects `-mno-branch-likely`; no compiler change was made.
 - `func_002C2210` takes `(pos, ticks, a, b, colour, 0, spin, dir, 1, 0.0f)`, as RAC1's spawn call and the matched `L06_00458138.c`.
 
 The steering locals are live, and are commented in the source. They are spellings that reach the right count, not proof of what the original said.
+## Families F4 and F7, and what the beam chain loop showed
+
+**1 November 2026, USA v1.01.** Opcode lists confirm two untried families: F4 is nine functions of 5,868 bytes (L03, L07, L10, L11, L14, L15, L18, L22, L30) and F7 is five of 1,540 bytes (L06, L10, L15, L18, L22). All 14 are compiled code, no COP2. One match in each family ports to its siblings: about 60 KB. `func_0030CCD0` carries F4's chain loop in small form, so close it first.
+
+Spellings measured on `func_0030CCD0` (`-O2 -G8 -ffunction-sections -g -frac2-qcopy`), which took it from 442 raw rows to 25:
+
+- Index the chain arrays directly (`D[i - 1]`, `D[i]`, `D[i + 20]`, `D2[i]`) and let strength reduction build the pointers. Explicit pointers were worse in every combination.
+- A `mov.s` copy of `(float)i` beside a reused register is gcse's reaching copy: write `(float)i` at each later use instead of one local.
+- `sll` of the index stored to a slot while the register stays in use is the same thing for `i * 4`: an early `i * 4` local plus a later `D[i]`.
+- A reload-rebuilt constant or address inside a loop (`addiu v1, 1`, `lui`/`addiu` beside the use) means loop.c hoisted it and global-alloc gave it no register. Check `Register N, refs, live_length` in `-dg`; ordering is `floor_log2(refs) * refs / live_length`.
+- Spill slots 0x78 and 0x7C follow the bucket count; the other rows did not move under `RAC_S`, so they need spellings.
+
+`func_L06_00455BC0` stops on the third point: its flag has 3 refs across 118 insns, the hoisted `1` 3 across 86. An added set gives 4 refs, which fixes the frame and the loop's registers at three extra instructions; two rows in cases 3 and 4 stay open (the draft header lists them). Not tried yet: a real 4th reference that later passes remove.
+
+**1 November 2026, later: `func_0030A348` (boot's F4 member) at 5860 of 5868 bytes, 173 rows off with relocations masked.** F4 is 27 functions, 158,436 bytes. The chain loop, its allocation (`$s1` near, `$s2` i, `$s3` the `&s2B0` copy, `$s4` far, `$s7` `&v80`, `$fp` `&hit1`) and every spill slot now equal retail. What closed it, in order of effect:
+
+- RAC1's counterpart is `update_electric_water_bolt_effect` (rac1-decomp `src/overlays/shared/electric_water.c`). Its shape is the guide. The chain is a two-dimensional array of a union vector, `P2[2][20]`, read `P2[0][i].f[2]` and `P2[1][i]`. That alone gives retail's giv order (`func_0030CCD0` too) with no pointer locals, and `0x148($s1)` for the far z. `float[][4]` with `[2]` leaves the z address in its own giv.
+- One float variable holds the amplitude, the radius and the near-arm value (`func_0030CCD0`'s f20/f21 swap closed the same way).
+- `func_002A8E20(ht, &hit1)` written once per arm: jump2 cross-jumps them, and the two extra in-loop refs lift `&hit1` above `best` (13 refs, 0.0565 against 0.0527). That was the whole `$fp` question of the earlier runs.
+- `&D_002295D0[k].v[1]`, not a separate `D_002295E0` symbol: the addend is then the hoisted register and `r5900_madd_profitable_p` accepts it (it refuses an addend set in the same block).
+- loop.c's move test is `T * savings * life >= insns`, T about 48 on these targets (61 in older notes is wrong: `func_0030CCD0` fails at 198 insns with savings 2, life 2). Non-line notes count towards life, so a block end between a movable's set and its last use adds one. Block-scoped `bearing` and `radial` around the near-arm `qcopy` (life 8) hoist the `&vA0` copy, slot 0x370; `{ char *ax = D_00189E20.ent + 0xE0; ...}` hoists the base so it is rematerialised at both uses.
+- `for (t = D_001EE960[0]; t != 0; t = D_001EE960[++sn])`: the pre-increment gives the lo_sum life enough to hoist and form the pointer giv, slot 0x3AC, with the head read and the giv init on the right sides of the branch.
+- `k` must be pseudo 161 or above so `k + 1` lands after `&vA0` in the PRE slots: more function-level scalars before `int k`.
+- A load's delay-slot `nop` before `jal func_00282948` is `la` (one RTL insn of length 2, not eligible) plus a store reading `$a0`.
+
+Still open: reload's spill registers run one step behind retail from `0x1F4` to about `0x690` and again from `0xF44`. The first wrong choice is the `high` of `D_00189E20` in the scan preheader: retail takes `$a0`, here `$v1`, because sched1 puts the list `lo_sum` (it kills its `high`, smaller reg weight) ahead of `s2`'s `lo_sum`. Fixing that is likely worth about 100 rows. Others: the `&vA0` copy is not inherited for the `a2` of `func_00282CC0` (`0xBD4`); `sw $s7,0x36C` order in the chain preheader; `addu` operand order and `D_001B23E8[k]` block order in the k loop; `tsize` argument order in the last spark.
+
+`func_0030CCD0`: 1888/1888, 12 rows with the two-dimensional array, one float variable and a `zero` local set after the `func_00282D08` call (the 0.0 then hoists in loop pass 1, in scan order, as retail). Left: slots 0x78/0x7C (bucket count), `s2` against `s5` in the preheader (issue parity: `1311` must issue with `300`), `mov.s $f12` order in the last call.
+
+**1 November 2026, later: `func_0030A348` at 5868/5868, all rows outside spill slots 0x370 to 0x39F equal retail, at all 27 members.** Only the bucket count is left. What closed the rest, on top of closer D5's section "F4 from the level side" on `match/opus-next-d-quad`:
+
+- `&D_00189E20.x`, not a separate `D_00189EA0`: the related address depends on the base in the preheader, so the base's `lo_sum` has priority 2 and is scheduled ahead of the list giv's `lo_sum`. Reload then rebuilds `high` while `$v1` is still live, which closes the round-robin shift from `0x1F4`.
+- Reload's spill registers are a round robin that skips what is live, so a one-step shift over many rows comes from one insn order earlier. Read sched1's order at the first wrong row.
+- Statement order `st->lockA = best; st->u.s.h40 = 0;`: sched2 puts the `sh` back ahead of the `sw` once reload has added the load, so retail's order is not the source's. The memory unit takes one store a cycle, so with the `sh` first the `la` passes the `sw`.
+- cse's wider-mode lookup replaces a QImode constant with `(subreg:QI reg)` when any reg holds it in a wider mode, even across calls: it beats the plain reg on equal cost. `hb.kind = 5` then reads `$s1`.
+- Loop.c's threshold is 61 minus 3 per move made. A block local (`{ float cm = ...; if ... }`) adds a block note, so life 9 moved the `&v80` copy in pass 1, ahead of the 0.0: 55 * 9 >= 451.
+- `func_002C2210`: the prototype matched L06 and L18 callers use, in RAC1's argument order. The definition's own order is 6 rows worse.
+
+`func_L06_00455BC0` (F7): retail allocates `missing` first (`$s5`), then `fail`, -1 and the high, leaving the hoisted 1 unallocated. So `missing` must outrank `fail` (0.0615), which at live 118 takes 4 refs. The 1 must stay a hoisted register: with `1 << n` inline, combine folds it to `srav` plus `andi`. Setting `missing = 0` at the loop's end gives the 4 refs, the frame and 33 rows, but it is not retail's shape (preheader) and `continue` skips it, so it does not land.
+
+`func_0030CCD0` closed at 1888 bytes, 28 of 28 places, in `src/game/00308600-chain-g8.c`. Unused locals in the draft held the pseudo numbers that rotated slots 0x78/0x7C: dropping them closed the slots at the same bucket count. `func_002C2210`'s prototype with the pointer first fixed the `mov.s` order. The preheader needed one more priority-3 insn so that `r175`'s copy issues first in its cycle and `i = 1` pairs with it, since `sched2` keeps `sched1`'s tie order. A local `to = &last` set before `func_00282D30` gives the in-loop copy life 5 or more, so loop.c hoists it; the copy is tied and leaves no code.
+
+`func_L06_00455BC0` (F7), same day: 34 raw rows. `notify = 1` after the 0x18 test lands in the `beq` delay slot through reorg's target thread, and case 4 has its own flag. Only the 4th reference for `missing` is left.
