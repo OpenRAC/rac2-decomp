@@ -597,7 +597,7 @@ ASM_FUNC("asm/levels", func_L04_0032F340);
 
 ASM_FUNC("asm/levels", func_L04_0032F3C0);
 
-INCLUDE_ASM("asm/levels", func_L04_0032F62C);
+ASM_FUNC("asm/levels", func_L04_0032F62C);
 
 ASM_FUNC("asm/levels", func_L04_0032F994);
 
