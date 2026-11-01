@@ -1,12 +1,9 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002AEA00);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002AEC50);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002AF2C8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002AF458);
 
 extern void *func_L00_002A4E48(void *p);
 extern void func_L00_002D2168(void *a, void *b, float f);

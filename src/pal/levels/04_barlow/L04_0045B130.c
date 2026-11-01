@@ -74,4 +74,46 @@ void func_PAL_L04_0045B130(u8 *a0) {
     }
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0045C268);
+extern u8 D_001A7B00[] __attribute__((sda));
+extern u8 D_001395B8[];
+extern s32 D_L04_001B2008[] __attribute__((sda));
+extern u8 *D_L04_001B25CC[] __attribute__((sda));
+extern u8 D_00189EA0[];
+extern void func_PAL_L00_002B9CD8(void *a0, void *a1, s32 a2, s32 a3);
+extern s32 func_002ACBC8(void *a0, void *a1);
+extern u8 D_L04_001B9680[];
+extern u8 D_00189EA0[];
+extern u8 D_L04_001B1218[];
+extern u8 D_L04_001B1230[];
+
+/* On the first update: with inventory item 0x1F owned, the byte at D_001395B8+0x12
+   clear and the level counter D_L04_001B2008 below 5, passes the +0x30/+0x70 vectors
+   of the level record the object names to func_PAL_L00_002B9CD8 (RAC1's Hero_ResetToPosition
+   call shape); with the item owned and that byte set, hands the object to
+   func_0029F338. Later, once func_002ACBC8 accepts the hero position (D_00189EA0) for
+   the object's volume and the item is still owned, sets the byte and does the same. */
+void func_PAL_L04_0045C268(u8 *a0) {
+    u8 *s2 = *(u8 **)(a0 + 0x68);
+    u8 *p;
+    if (a0[0x20] == 0) {
+        if (D_001A7B00[0x1F] != 0 && D_001395B8[0x12] == 0 && D_L04_001B2008[0] < 5) {
+            p = D_L04_001B25CC[0] + (*(s32 *)(s2 + 4) << 7);
+            func_PAL_L00_002B9CD8(p + 0x30, p + 0x70, 0, 1);
+        } else if (D_001A7B00[0x1F] != 0 && D_001395B8[0x12] != 0) {
+            func_0029F338(a0);
+            return;
+        } else {
+            a0[0x20] = 1;
+        }
+        a0[0x30] = 0xFF;
+    }
+    if (a0[0x20] == 1) {
+        if (func_002ACBC8(D_00189EA0, *(void **)s2) != 0) {
+            if (D_001A7B00[0x1F] != 0) {
+                D_001395B8[0x12] = 1;
+                func_0029F338(a0);
+            }
+        }
+    }
+}
+

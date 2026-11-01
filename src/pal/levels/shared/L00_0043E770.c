@@ -6,6 +6,46 @@ INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0043E798);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0043E7B8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0043EBB8);
+extern void F449e2f67_FUN_003361A8(char *p);
+extern void F449e2f67_FUN_00336968(char *p);
+extern void F449e2f67_FUN_003366D0(char *p);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_004406A0);
+char *func_PAL_L00_0043EBB8(char *p)
+{
+    F449e2f67_FUN_003361A8(p);
+    F449e2f67_FUN_003361A8(p + 76);
+    F449e2f67_FUN_003361A8(p + 152);
+    F449e2f67_FUN_003361A8(p + 228);
+    F449e2f67_FUN_003361A8(p + 304);
+    F449e2f67_FUN_003361A8(p + 380);
+    F449e2f67_FUN_00336968(p + 456);
+    F449e2f67_FUN_00336968(p + 544);
+    F449e2f67_FUN_003366D0(p + 632);
+    F449e2f67_FUN_00336968(p + 696);
+    F449e2f67_FUN_00336968(p + 784);
+    F449e2f67_FUN_00336968(p + 872);
+    F449e2f67_FUN_00336968(p + 960);
+    F449e2f67_FUN_00336968(p + 1048);
+    return p;
+}
+
+
+char *func_PAL_L00_004406A0(char *p)
+{
+    F449e2f67_FUN_003361A8(p);
+    F449e2f67_FUN_003361A8(p + 76);
+    F449e2f67_FUN_003361A8(p + 152);
+    F449e2f67_FUN_003361A8(p + 228);
+    F449e2f67_FUN_003361A8(p + 304);
+    F449e2f67_FUN_003361A8(p + 380);
+    F449e2f67_FUN_00336968(p + 456);
+    F449e2f67_FUN_00336968(p + 544);
+    F449e2f67_FUN_003366D0(p + 632);
+    F449e2f67_FUN_00336968(p + 696);
+    F449e2f67_FUN_00336968(p + 784);
+    F449e2f67_FUN_00336968(p + 872);
+    F449e2f67_FUN_00336968(p + 960);
+    F449e2f67_FUN_00336968(p + 1048);
+    return p;
+}
+

@@ -86,7 +86,6 @@ void func_PAL_L02_00400F20(char *a0) {
         func_L00_002B30E8();
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_00401118);
 
 extern void func_002A7750(char *, s32, s32);
 extern char *D_L02_001B368C __attribute__((sda));

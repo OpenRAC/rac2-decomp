@@ -39,4 +39,50 @@ void func_PAL_L01_002A8368(void) {
     }
 }
 
+#include "common.h"
+extern char D_00189E20[];
+extern int D_L01_001A8F40 MACRO_ADDR;
+extern char D_00189EA0[];
+extern void func_PAL_L01_002A8368(void);
+extern void func_PAL_L00_002D29E8(void);
+extern void func_PAL_L00_002B3608(void);
+extern void func_L01_002ADDC8(void);
+extern void func_PAL_L01_002AE010(char *a0, char *a1, char *a2);
+extern void func_PAL_L01_002C3A10(void);
+extern void func_L00_002D2E68(void);
+extern void func_L00_002D3068(void);
+extern void func_L00_002AE0C8(void);
+extern void func_PAL_L00_002B9C20(void);
+extern void func_PAL_L00_002AC088(void);
+extern void func_PAL_L00_002AB0C0(void);
+extern void func_PAL_L00_002AB308(void);
+extern void func_PAL_L00_002ABA88(void);
+extern void func_PAL_L00_002AB830(void);
+extern void func_PAL_L00_002A53A8(void);
+extern void func_PAL_L00_002A56D0(void);
+extern void func_PAL_L00_002B7688(void);
+extern void func_L00_002A5368(void);
+extern void func_L00_002A9460(void);
+extern void func_L00_002AA178(int a0);
+extern void func_PAL_L00_002B2018(void);
+extern void func_PAL_L00_002B2230(void);
+extern void func_PAL_L00_002B20F8(void);
+extern void func_L00_002AFBC0(void);
+extern int func_L00_002D6418(void);
+extern void func_L00_002A7958(void);
+extern void func_L00_002A7748(void);
+extern void func_PAL_L00_002A6688(void);
+extern void func_PAL_L00_002D6408(void);
+extern void func_PAL_L00_002A62B0(void);
+extern void func_PAL_L00_002D5680(void);
+extern int func_L00_002A7000(void);
+extern void func_L00_003080D0(void *a0);
+extern void func_002A677C(int a0);
+extern void func_L01_002A9298(void);
+extern void func_L00_002A9760(void);
+
 INCLUDE_ASM("asm/pal/levels", func_PAL_L01_002A8B30);
+
+
+
+

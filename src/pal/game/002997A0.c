@@ -53,4 +53,3 @@ void func_PAL_002997A0(void)
     D_00152C00[6] = -1;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00299898);

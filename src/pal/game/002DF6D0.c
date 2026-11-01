@@ -29,4 +29,32 @@ void func_PAL_002DF6D0(int value, int mode)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002DFE20);
+#include "common.h"
+typedef struct {
+    short f0;
+    short f2;
+    char pad4[8];
+} Slot;
+extern Slot D_0025EBD0[];
+extern int D_001AB29C[4] MACRO_ADDR;
+extern int D_001A7318 MACRO_ADDR;
+extern int func_002B0E90(void);
+extern int func_002B0E28(void);
+
+/* Unlock levels for the counts the player has collected. */
+void func_PAL_002DFE20(void)
+{
+    int a = func_002B0E90() >= 15;
+    int b = func_002B0E90() >= 30;
+    int c = func_002B0E28() >= 10;
+    D_0025EBD0[5].f2 = a ? 3 : 2;
+    D_0025EBD0[6].f2 = b ? 3 : 2;
+    D_0025EBD0[7].f2 = c ? 10 : 2;
+    D_0025EBD0[8].f2 = c ? 3 : 2;
+    D_001AB29C[0] = a ? 0xC2F : 0xC35;
+    D_001AB29C[1] = b ? 0xC30 : 0xC36;
+    D_001AB29C[2] = c ? 0xC33 : 0xC37;
+    D_001AB29C[3] = c ? 0xC34 : 0xC37;
+    if (D_001A7318) D_0025EBD0[8].f0 = 0;
+}
+

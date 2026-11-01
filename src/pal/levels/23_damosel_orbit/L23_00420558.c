@@ -19,4 +19,3 @@ s32 func_PAL_L23_00420558(void) {
     return 1;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L23_00420578);

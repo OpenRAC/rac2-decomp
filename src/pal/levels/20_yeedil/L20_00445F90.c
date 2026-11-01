@@ -2,17 +2,12 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00445F90);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_004476F0);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00447B78);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00447BE0);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00447ED8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00447F88);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00448178);
 
 extern void func_002A8C28(char *, char *, int, int, float, float, float, int,
                           int);
@@ -34,7 +29,6 @@ void func_PAL_L20_00448200(char *arg0, char *arg1, float f) {
     }
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_004482C8);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00448428);
 
