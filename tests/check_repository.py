@@ -14,7 +14,7 @@
    or fragments, no per-level copies, no per-batch or campaign documents, no file over 2.5 MB.
 
 4. nonmatching/functional.tsv (C for the native port only, never counted) lists only functions
-   that are still INCLUDE_ASM in src/, once each, with a file under nonmatching/functional/.
+   that are still INCLUDE_ASM or ASM_FUNC in src/, once each, with a file under nonmatching/functional/.
 
 Exits nonzero, listing every problem, on failure.
 """
@@ -106,7 +106,7 @@ def check_sources(known: dict, errors: list) -> set:
         for m in re.finditer(rf'^(?:INCLUDE_ASM|ASM_FUNC|LINKER_REMNANT)\("[^"]*",\s*({NAME})\);', text, re.M):
             n = text[:m.start()].count("\n") + 1
             defined.setdefault(m.group(1), []).append(f"{relative}:{n} (asm)")
-            if m.group(0).startswith("INCLUDE_ASM"):
+            if not m.group(0).startswith("LINKER_REMNANT"):
                 still_asm.add(m.group(1))
     for name, where in sorted(defined.items()):
         if len(where) > 1:

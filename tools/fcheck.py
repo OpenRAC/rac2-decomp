@@ -75,15 +75,16 @@ one a line, optionally followed by the states wanted per phase) into build/fchec
 <script>/ ($RAC2_FCHECK_STATES overrides the root). menu: the boot and title, the main menu's
 pages (Load, Options, New Game's no-card question); newgame: New Game up to the first level's
 load, never past it; level00: New Game into level 00 (Aranos, the tutorial), played to frame
-7000 (running, jumping, the wrench, the pause menu, weapons, the map: SCRIPTS). Each run is cut
+7000 (running, jumping, the wrench, the pause menu, weapons, the map: SCRIPTS); levelNN: the
+same play in level NN, reached by keeping the boot's next-level word at NN through New Game
+(--write: no save and no play-through). Each run is cut
 into phases and takes the calls numbered 1 and 2 of each phase (`--capture-phases`,
 `--capture-spread`), so a function called every frame has states from each part of the run.
 A capture line holds the first bytes of the function and their CRC-32: a call is taken only
 while that code is at the address (in level00, a level function's place holds the boot's code
 until the level is loaded). A function a run never calls gets a NAME.none marker there. Level
 states are about 16 MB each (the boot's about 5): list what is needed. `--script all` runs
-every script. Levels other than 00 are not captured yet (each needs its script: the way there,
-and its play) and their functions not checked.
+every script.
 
 Needs: OpenRAC's interpreter built (cmake -S tools/interpreter -B build/interpreter in
 OpenRAC; $OPENRAC_ROOT, default ~/Projects/RAC/OpenRAC; level00 needs its --stick), the
@@ -179,6 +180,13 @@ SCRIPTS = {
                    "6550:40:8", "6600:40:8", "6650:4000:8", "6750:1000:8", "6800:1000:8"],
                 "sticks": L00_PLAY[1]},
 }
+# The boot keeps the level New Game loads in a word (RequestLevelExit's destination): kept at N
+# from before New Game until the load, the run loads level N with level 00's press script.
+NEXT_LEVEL = 0x1B1680
+for _level in sorted(levels.NAMES):
+    if _level:
+        SCRIPTS[f"level{_level:02d}"] = {**SCRIPTS["level00"], "level": _level, "per_phase": 1,
+                                         "writes": [f"900:{NEXT_LEVEL:x}:{_level:x}:740"]}
 SHF_WRITE = 1
 STT_FUNC, STT_SECTION = 2, 3
 SHN_ABS = 0xFFF1
@@ -1153,6 +1161,8 @@ def capture(names: list[str], script: str, frames: int | None = None, force: boo
         cmd += ["--press", p]
     for p in s.get("sticks", []):
         cmd += ["--stick", p]
+    for p in s.get("writes", []):
+        cmd += ["--write", p]
     with open(out / "capture.log", "a") as log:
         log.write("$ " + shlex.join(cmd) + "\n")
         log.flush()
