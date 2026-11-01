@@ -1,6 +1,7 @@
 /* Closer C, 1 November 2026: -O2 -G0 -ffunction-sections -fmove-all-movables, 1212/1216, 43 rows. Retail's search keeps
  * its integer index, so it is a goto loop: loop.c reduces every do/while or for form. Left: retail recomputes the
  * entry address for the colour (addu v0,a1,a0; lw 4(v0)), idx/colour take s2/s3 the other way, i+1/y+56 swapped.
+ * Closer C4: cse reuses the key address whichever way the sum is written; table base a1 and j a3 follow from that row.
  */
 #include "common.h"
 /* sol-high; USA v1.01, -O2 -G0 -ffunction-sections.
