@@ -1,19 +1,9 @@
-/* Bounded manual reconstruction, 2026-10-25; not linked.
- * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * 268/264 bytes; us: 0/2 placements; us2: 0/2 placements; pal: absent from catalogue.
- * Three complete vectors, six integer inputs and three independent FP inputs are preserved. The
- * allocator returns pointer/null. The prologue now agrees, but the header materializes 255 twice
- * and its stores are scheduled differently.
- * Reopen with independent evidence for the real header constant lifetimes or field declarations; do
- * not change the argument ABI or invent a dependency.
- * Prior complete variants and allocator diagnostics are preserved privately.
- * No candidate or linked-build credit is claimed.
- */
+
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
-/* Known header fields; the complete allocated-object extent is unspecified. */
+
 struct SpawnHeader {
     u8 unknown000[0x20];
     u8 mode;
@@ -38,9 +28,9 @@ char *func_L02_00401530(TI128 *a0, TI128 *a1, TI128 *a2, unsigned char a3,
         goto end;
     qcopy(s0 + 0x10, a0);
     header = (struct SpawnHeader *)s0;
-    header->flags = 0xFF;
     header->rate = 0.014999999664723873f;
     header->kind = 0xFF;
+    header->flags = 0xFF;
     header->mode = 0;
     v1 = *(char **)(s0 + 0x68);
     qcopy(v1, a1);

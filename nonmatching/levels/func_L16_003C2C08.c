@@ -26,6 +26,8 @@
  * text s1 and `daddu s2,s1` after the name lookup, with the later a0 from s2.
  * Copies of text through a local, a late copy or (int) all fold (89 rows); no
  * local at all gives 94. Find what keeps that copy and the rotation closes.
+ * Wrapping the state call in do/while(0) gives 1776 bytes and 78 rows, but with an
+ * alignment nop and still no copy, so that block boundary is not the mechanism.
  * Required declarations are retained below. PAL/US2 were not checked here.
  */
 
