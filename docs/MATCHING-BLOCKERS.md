@@ -2321,6 +2321,18 @@ The displayed object column is unrelocated, so zero call/address addends can loo
 
 ## 45. Source shapes that move a body
 
+Measured on `func_L00_004096B0` (1 November 2026, 94 to 28 words, retained near miss):
+
+- A spilled slot plus a callee-saved register holding the same address over a few calls is one spilled PRE copy, with
+  reload inheriting its reload register. Write the address inline at each use, with no local, and the frame and
+  spill slots appear. A stack struct standing in for those slots hides the real pressure.
+- A hoisted constant that is rematerialised at its use lost its register to a higher-priority pseudo: loop.c did move
+  it. Compare `floor_log2(refs) * refs / live` before looking for a reason it wasn't hoisted.
+- `(index + table)->field` gives `mult; addu mult, base` where `table[index].field` gives `addu base, mult`.
+- Local-alloc first tries each qty with `fake_birth`/`fake_death`, one insn wider on each side, so a qty avoids the
+  registers of its neighbours (`find_free_reg`, `-fschedule-insns2` only). This is why a register seems occupied with
+  no instruction using it, and it's worth checking before assuming a hidden insn (`func_002F8178`).
+
 Historical examples, to requalify in the final unit:
 
 - Removing a seemingly unused duplicate extern changed 180 to 188 bytes because the remaining declaration followed the call and implicit-int/default promotions altered floating arguments. Preserve correct visible prototypes.
