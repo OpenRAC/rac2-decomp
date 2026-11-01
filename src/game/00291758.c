@@ -50,7 +50,7 @@ typedef struct {
     DiscFile archive1;        /* 0x52B8 */
 } DiscToc;
 extern DiscToc D_0014B540;
-extern long D_001A72A0[] __attribute__((sda));
+extern unsigned long long D_001A72A0[] __attribute__((sda));
 
 extern void func_00133230(void);
 extern int func_00132028(void);

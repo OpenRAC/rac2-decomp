@@ -34,6 +34,24 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Small-data constants, the conditional negate and local-register allocation
+
+**29 October 2026:** Two ground probes reconstructed from retail bytes,
+`func_00327038` (840 bytes) and `func_00330150` (904 bytes), compile to their
+retail sizes as separate `-G8` units but match 0/28 USA v1.01 placements. The
+drafts are retained in `nonmatching/game/`. `__attribute__((sda))` on a
+four-byte global is GP-relative only in a `-G8` unit; in `-G0` it becomes an
+absolute `lui`/`addiu`. Retail's `lwc1 $f12, 0x1118($gp)` therefore requires
+`-G8`; the build resolves the per-program address from the retail relocation,
+so the constants need no `ref_` name. The conditional negate is an
+if-conversion artifact: `if (flag) x = -x` emits `bnel` with the negate in the
+delay slot, while the inverse condition emits `beql`. The remaining blocker is
+the local-registers pass: retail allocates `$s1` to the object and `$s3` to the
+loop counter, while cc1 assigns `$s1` to the counter and `$s2` to the object.
+Changing how the ninth vector is named changes the promotion order; the next
+experiment is a source shape that names the object and counter in retail's
+allocation order. Equal size is not a match.
+
 ### Complete matrix storage and loop lifetimes
 
 `func_L09_003FEAE8` needs one 64-byte joint matrix, with its position at

@@ -65,6 +65,11 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 
 | Function | Size | Status and remaining differences |
 | --- | ---: | ---: |
+| [`func_003486A8`](game/func_003486A8.c) | 824 | 804 bytes, 0/28 places. Frame size, callee-saved save order, spill-slot order and the first small-data reference differ. See source. |
+| [`func_L00_002E30B8`](levels/func_L00_002E30B8.c) | 644 | 724 bytes, 0/27 places. Frame, switch layout, tail call and float scheduling differ; the source records unresolved hypotheses and level-specific references. |
+| [`func_00327038`](game/func_00327038-g8.c) | 840 | 840/840 bytes as its own -G8 unit, 0/28 places. Frame and control flow match; local-register allocation differs. |
+| [`func_00330150`](game/func_00330150-g8.c) | 904 | 904/904 bytes as its own -G8 unit, 0/28 places. The 0x150 frame and local-register allocation differ from retail's 0x160 frame. |
+| [`func_L00_003A98E8`](levels/func_L00_003A98E8.c) | 876 | 748/876 bytes, 0/27 places. The twelve-argument constructor call and its float/stack argument shape remain unresolved. See source. |
 | [`func_L05_00420360`](levels/func_L05_00420360.c) | 1064 | 30 October: 1064/1064 bytes, no match. Saved FP constants, 0x8710/one GPR roles, text lifetime and outgoing arguments. See source for profile and release coverage. |
 | [`func_L05_00420A88`](levels/func_L05_00420A88.c) | 928 | 30 October: 928/928 bytes, no match. Only four non-relocation words: first-vector x/y constants and stores use f2/f1 instead of f1/f2. See source for profile and release coverage. |
 | [`func_L07_003F4578`](levels/func_L07_003F4578.c) | 1012 | 30 October: 1008/1012 bytes, no match. The 0x2D0 frame and closed 33-vector ring are reconstructed. Allocation, loop scheduling and address setup still differ. The 0x30 query storage is a full aligned object; its later particle vectors share an explicit union. |
