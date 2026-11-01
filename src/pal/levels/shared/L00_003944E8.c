@@ -90,6 +90,4 @@ void func_PAL_L00_00394630(char *actor, int fragments) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00394A18);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00395680);
