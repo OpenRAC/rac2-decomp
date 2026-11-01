@@ -2207,6 +2207,11 @@ Historical examples, to requalify in the final unit:
 - Stack-local ordering/layout examples remain in L00_002B91C0.c and L09_003F9468.c. A measured aligned struct containing TI128 plus a byte array expressed a frame that separate locals did not reproduce.
 - func_L16_00404A60(988 bytes) matched after 24 store permutations; the winning order was neither retail order nor simple reversal. Do not infer one universal scheduler permutation.
 - **Encoding correction:**0x700014A9 is por v0,zero,zero, not pcpyld. TI zero materialisation is reachable in appropriate cases; retention/folding depends on current source/profile(section 17). The word alone neither proves handwritten assembly nor proves a complete C match.
+- **A register copy retail keeps means its source was overwritten.** gcse's cprop removes `b = a` whenever `a` is untouched between the copy and b's uses, so a surviving `daddu` in front of a long stretch says `a` is set again later: one scratch variable doing two jobs. func_0028C6D0 (37 words to 0): `scratch` holds the colour, is copied into `color`, then takes the string length. func_L00_003ED198 (57 words to 0, size 1712 to 1720): an int holds &delta, is copied into the loop's pointer, then takes the random phase in the loop; a block-local `float *t` used only up to the call gives retail's `$v0`-then-`$s5` pair. Measured with cprop switched off in a research cc1: most near misses get worse, so cprop itself runs in retail.
+- A value pseudo with no user variable gives a different local-alloc tie. func_0028C6D0's last four words closed by dropping `record` and writing the table read into the call's argument.
+- Reads of a `$gp` scalar pass struct stores (section 1, MEM_IN_STRUCT). If retail keeps such a load behind the stores, write the stores through a char view: func_00342BE8, 19 words to 2.
+- An int under -G8 can fill a branch slot from the target thread. If retail has the two-word form there, it is part of a larger object: func_002F8178's screen size as one 8-byte struct, 66 words to 33.
+- A hill climb over statement order (48 orders a round, 1 to 3 moves each, on box2) closed func_002F8178's store blocks where 18 statements are too many to enumerate: 33 words to 8.
 
 <a id="blocker-46"></a>
 

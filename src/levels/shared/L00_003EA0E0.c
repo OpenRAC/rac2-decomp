@@ -541,7 +541,7 @@ void func_L00_003ECC90(char *a, int b)
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_003ED198);
+/* func_L00_003ED198 is defined in L00_003EA0E0-seeker.c. */
 
 
 extern void func_00282CF0(char *local, char *first, char *second);

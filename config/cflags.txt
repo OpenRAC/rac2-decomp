@@ -2116,3 +2116,5 @@ src/levels/06_notak/L06_00458138-ribbon-g8.c	-O2 -G8 -ffunction-sections -frac2-
 src/levels/16_snivelak/L16_0040D4E8-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
 src/levels/03_endako/L03_0041F720-g8.c	-O2 -G8 -Wa,-G32 -ffunction-sections -frac2-hazard-labels
 src/game/002AF580-qcopy.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L00_003EA0E0-seeker.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L00_003F10D8-seeker.c	-O2 -G0 -ffunction-sections -g
