@@ -287,7 +287,6 @@ void func_L00_0041C160(void *unused, float *b, float *a, int k, float f)
     func_00280B90(&local, &local.m00, 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_0041C2D0);
 
 
 
@@ -522,7 +521,6 @@ void func_L00_004208C8(MoveObject *object, TI128 *input)
 
 INCLUDE_ASM("asm/levels", func_L00_00420C38);
 
-INCLUDE_ASM("asm/levels", func_L00_004212B8);
 
 /* reads a base pointer from a0+112 and pushes three consecutive tweak slots through the same five-float interpolation helper, writing each result back over the first float vector while forwarding three trailing floats unchanged. */
 void func_L00_004219D8(char *a0, float *a1, float *a2,
@@ -536,6 +534,5 @@ void func_L00_004219D8(char *a0, float *a1, float *a2,
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_00421C50);
 
 /* func_L00_00422268 is in L00_0041ABB8-g8.c. */

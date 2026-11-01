@@ -370,6 +370,30 @@ register; check each long-lived pointer's last use against retail first. Pseudos
 arm's end prefer the next call's argument register, which puts that copy in a branch's slot.
 `func_L00_00420C38`: retail's `lbu`, `andi` at every use and raw `sb` act like an unpromoted QImode
 pseudo; `int state` with `(u8)state` gives only the first `andi`, as combine knows the upper bits.
+Fresh drafts from m2c, same day: `func_L00_004212B8`, `func_L00_00421C50`, `func_L00_0041C2D0` and
+`func_L00_002A67F8` closed in 5 to 15 rounds each, after the older drafts had plateaued. What did it:
+a frame or field address written inline at every use, with no pointer local, so gcse makes retail's
+reaching copies (`s0 = cam + 0x30` in each arm, `s1 = s0` before the join; a local for it gives one
+pseudo). The local goes after the arms if retail needs one. `d = f(a); v = tmp; g(v, c, d)` keeps a
+call's result apart from a frame address, and stops a tail cross-jumping further back than retail's.
+`lhu; sll 16; sra 16; sh` is a `u16` local read once and cast at the call, `lhu` then `addiu; sll; sra`
+is `s->h = s->h + 1; if (s->h >= K)`. `sb` or `sw` behind `lui $at`, with no `$gp` form in a slot, is a
+small-data object at a nonzero offset (`D_001A7A70[0xD]`, `D_001A79F8[2]`). `lui; addiu; lbu 0x16` is a
+complete struct larger than `-G` read by field; an incomplete array folds to `%lo`.
+`addu rd, shift, sum` needs the index in an address, `pp[i]` used twice; `pp + i` gives the operands
+the other way, whatever the source order. `func_L00_002A67F8`: `li v0, K; sw zero; sw v0` in two arms is
+a post-reload cross-jump. Written with one `next_state` variable the stores swap, as sched's register
+weight prefers the store that kills it, and no spelling of the two stores moves that. The permuter's
+exact result for this needed a zero local unset on the `goto` path, refused as an uninitialised read
+(reload substitutes the constant only after sched1). Per-arm statements match under the plain profile,
+so its old `-frac2-gcse-unsplit-edges -frac2-keep-block-order` were not needed.
+Open: `func_L00_0041EE58` and its twin `func_L00_003E2510` keep their first frame address in a
+call-clobbered temp with a copy in the call's delay slot, and every later use on the copy; ours is one
+pseudo over the calls. A local after the call merges into it, and `-fno-regmove` changes nothing there.
+`func_L00_003F4210` has one word left, `mul.s f1, f0, f1`: the target has to tie to the second operand,
+so `speed` must not die at the multiply or be a global pseudo; a new target ties to the first.
+`func_PAL_L00_004266C8`, the PAL copy of `func_L00_004212B8`: the 50 Hz timers are `(D * 5 + 2) / 6`
+and all its sizes match, with only $s3/$s4 swapped, as the extra insns change the live lengths.
 
 **Qualified field and call-lifetime remedies, 25 October 2026:**
 `func_002B52A0` is now a 980-byte C implementation at 21 places in each

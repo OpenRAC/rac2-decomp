@@ -230,15 +230,11 @@ void func_L00_003F4210(char *object)
                 func_00282D30(&temporary, &scratch.motion.normal, -dot);
                 func_00282CF0((&state->velocity), (&state->velocity), &temporary);
             } else state->velocity.v[2] = 0.0f;
-            speed = func_00282E20(&state->velocity);
             {
-                float damping = D_L00_001B0918;
-                float min = D_L00_001B0908;
-                state->velocity.v[3] = speed;
-                min *= 0.016666668f;
-                damping = speed * damping;
-                state->velocity.v[3] = damping;
-                if (state->velocity.v[3] < min)
+                float v = D_L00_001B0918 * func_00282E20(&state->velocity);
+                float min = D_L00_001B0908 * 0.016666668f;
+                state->velocity.v[3] = v;
+                if (v < min)
                     state->velocity.v[3] = min;
             }
             func_00282F20((&state->velocity), (&state->velocity), state->velocity.v[3]);

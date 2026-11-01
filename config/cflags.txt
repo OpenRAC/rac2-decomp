@@ -2124,3 +2124,10 @@ src/game/002BBF40.c	-O2 -G0 -ffunction-sections -g -ffast-math
 src/pal/game/002BCBD8.c	-O2 -G0 -ffunction-sections -g -ffast-math
 src/levels/shared/L00_002ACF88.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L00_002ACE70.c	-O2 -G0 -ffunction-sections
+src/levels/shared/L00_004212B8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_00421C50.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_0041C2D0.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/shared/L00_00421578-rocket.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_002A67F8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_002A67F8-mode.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_002A6688-mode.c	-O2 -G8 -ffunction-sections

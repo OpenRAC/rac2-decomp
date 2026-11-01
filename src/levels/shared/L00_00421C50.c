@@ -1,14 +1,3 @@
-/* Closer B, 2026-11-01: first draft from retail, no draft existed. Profile -O2 -G8 -ffunction-sections -g.
- * 1560/1560, 12 lines, every insn aligned. Left: 1) s + 0x50 and h swap s5/s7. Priorities: h 6 refs/204,
- * s + 0x50 3 refs/126, so h is first and takes the lowest free register; retail's h has s7, so it needs a
- * reason to skip s5 (regs_someone_prefers?). 2) Argument order at +0x4CC and +0x528: with the frame
- * address written inline these two are right, but PRE then leaves a copy at each arm's end (reg 280, which
- * prefers a1) and the a1 copy lands in b's slot, so the pointer local vp stays. Mixing them ties.
- * Settled, keep: inline cam + 0x20 (retail's s2 and copies are PRE), a pointer local for i, the split
- * read of D_L00_001B8E10 (incomplete), D_L00_001B184C MACRO_ADDR, func_00334710 (moby, out),
- * func_L00_00424A50 (float, float), func_002702C8 (float *, a, b, c, d, limit), dd read after the call.
- * box1 was down, so no permuter job; it is a fit for one (register-only).
- */
 #include "common.h"
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; } Hero;
 extern char D_00189E20[];
@@ -46,7 +35,7 @@ extern void func_00282D30(void *, void *, float);
 extern float func_00282DB0(void *, void *);
 extern float func_00282E48(void *, void *);
 extern float func_00283CE0(int);
-extern float func_002EE238(void *);
+extern float func_00282DF0(void *);
 extern void func_00334710(void *, void *);
 extern void func_L00_00420C38(void *);
 extern void func_L00_004212B8(void *, void *);
@@ -133,24 +122,24 @@ void func_L00_00421C50(char *moby)
     func_00282CF0(g, f, g);
     if (func_002761F8(f, g, D_L00_001B184C, HERO->i[0x8A4], 0))
         qcopy(g, D_L00_001BF220);
-    pi = (char *)i;
-    func_00282CF0(pi, g, h);
-    if (func_002EE238(pi) < 2.0f * scale) {
+        func_00282CF0(i, g, h);
+    if (func_00282DF0(i) < 2.0f * scale) {
         func_00282CC0(v0, h, g);
-        func_00282D30(vp = (char *)v0, vp, 0.5f);
-        goto set;
+        func_00282D30(v0, v0, 0.5f);
+        qcopy(s + 0x50, v0);
+        func_00282CF0(i, v0, s);
+        func_L00_00424A50(func_00282DB0(i, cam + 0x20), 0.006f);
+        return;
     }
-    func_00282CF0(pi, h, s);
-    dd = func_002EE238(pi);
+    func_00282CF0(i, h, s);
+    dd = func_00282DF0(i);
     r2 = *(float *)(q + 0x30);
     if (dd <= r2 + scale) {
         func_00282D30(v0, cam + 0x20, scale);
-        vp = (char *)v0;
-        func_00282CF0(vp, h, vp);
-set:
-        qcopy(s + 0x50, vp);
-        func_00282CF0(pi, vp, s);
-        func_L00_00424A50(func_00282DB0(pi, cam + 0x20), 0.006f);
+        func_00282CF0(v0, h, v0);
+        qcopy(s + 0x50, v0);
+        func_00282CF0(i, v0, s);
+        func_L00_00424A50(func_00282DB0(i, cam + 0x20), 0.006f);
         return;
     }
     dd = func_00282DB0(s, cam + 0x30);
