@@ -2,4 +2,8 @@
 
 INCLUDE_ASM("asm/us2/game", func_US2_002D0D04);
 
-INCLUDE_ASM("asm/us2/game", func_US2_002D1150);
+unsigned int func_US2_002D1150(void)
+{
+    return 0;
+}
+

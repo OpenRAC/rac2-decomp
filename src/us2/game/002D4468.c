@@ -35,4 +35,3 @@ int func_US2_002D44E8(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_002D4568);

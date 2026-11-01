@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_0027C3D0);
 
 extern void func_00284F40(int);
 extern int D_001B1594 __attribute__((sda));
