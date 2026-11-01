@@ -1,5 +1,7 @@
 /* functional: medium. Near-miss draft, not byte-compared in the latest sweep: paths the captured calls never take are unproven. */
+#define qcopy qcopy_c
 #include "common.h"
+#undef qcopy
 typedef struct MuseumPlayer {
     char pad00[0x40];
     float matrix40[16];

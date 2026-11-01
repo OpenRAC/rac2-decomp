@@ -21,15 +21,15 @@
  * Ruled out: the sdk profile. Its pass forgets the label after a branch, but it uses
  * 16-byte save slots and a sibling call, 448/456 bytes with a different frame.
  *
- * Declarations: the file's Table1, Table2 and Fee2b87d1_ names, as in 00291758.c.
+ * Declarations: the file's Table1_00294420, Table2_00294420 and Fee2b87d1_ names, as in 00291758.c.
  */
 #include "include_asm.h"
 
-struct Slot { int w; int rest[4]; };
-struct Table1 { char pad[19264]; struct Slot slots[48]; };
-struct Table2 { char pad[52]; int slots[4]; };
-extern struct Table1 Fee2b87d1_D_0014B540;
-extern struct Table2 Fee2b87d1_D_00152CD0;
+struct Slot_00294420 { int w; int rest[4]; };
+struct Table1_00294420 { char pad[19264]; struct Slot_00294420 slots[48]; };
+struct Table2_00294420 { char pad[52]; int slots[4]; };
+extern struct Table1_00294420 Fee2b87d1_D_0014B540;
+extern struct Table2_00294420 Fee2b87d1_D_00152CD0;
 extern int func_00294630(int);
 extern void func_00294398(int, int);
 
@@ -73,7 +73,7 @@ void func_00294420(int value)
         b = -1;
     sa = -1;
     for (; i < 3; i++) {
-        struct Table2 *cache = &Fee2b87d1_D_00152CD0;
+        struct Table2_00294420 *cache = &Fee2b87d1_D_00152CD0;
         int v = Fee2b87d1_D_0014B540.slots[cache->slots[i]].w;
 
         if (a == v)
@@ -88,11 +88,11 @@ void func_00294420(int value)
         int cur = hero->cur;
 
         if (cur) {
-            struct Table2 *cache = &Fee2b87d1_D_00152CD0;
+            struct Table2_00294420 *cache = &Fee2b87d1_D_00152CD0;
             int k = cache->slots[i];
 
             if (k != -1) {
-                struct Table1 *toc = &Fee2b87d1_D_0014B540;
+                struct Table1_00294420 *toc = &Fee2b87d1_D_0014B540;
                 CacheRecord *rec = &D_00239BA0[D_00139568[cur]];
 
                 if (rec->value == toc->slots[k].w)

@@ -49,15 +49,15 @@
  * differences. No toolchain, catalogue or shared-header changes.
  */
 #include "common.h"
-typedef int Quad __attribute__((mode(TI)));
-typedef union { Quad quad; float f[4]; } Vector;
+typedef int QuadS __attribute__((mode(TI)));
+typedef union { QuadS quad; float f[4]; } Vector;
 typedef struct { float x, y, z, w; } Position;
 typedef struct { char pad[0x10]; Position position; } ActorPosition;
 typedef struct { char pad[0x80]; Vector position; } PlayerPosition;
 extern char D_00189E20[] NOT_SDA;
 extern int D_L02_001B0148 __attribute__((sda));
 extern void func_L02_003D10F0(char *), func_L02_003D14F8(char *), func_L02_003D1588(char *), func_L02_003D1610(char *), func_L02_003D1430(char *), func_L02_003D1C38(char *);
-extern void func_L02_003D25C8(char *, float *), func_L02_003D1ED0(char *, Quad *), func_L02_003D2390(char *), func_L02_003FC248(void *, int, int);
+extern void func_L02_003D25C8(char *, float *), func_L02_003D1ED0(char *, QuadS *), func_L02_003D2390(char *), func_L02_003FC248(void *, int, int);
 extern int func_L02_003D26B0(char *), func_L02_003D1698(char *), func_002B3868(u8 *), func_002B3890(u8 *), func_002A77E0(int), func_L02_003FC0B8(char *), func_L00_003206B8(void *, int), func_L00_0042AB40(char *);
 extern char *func_L02_003FC098(char *);
 extern float func_00283248(float, float), func_00282E80(void *, void *), func_00283C80(float, float), func_0029F530(char *);
@@ -91,7 +91,7 @@ void func_L02_003D0408(char *self) {
     }
     targetObject = *(char **)(state + 0x2E0);
     if (targetObject) {
-        target.quad = *(Quad *)(targetObject + 0x10);
+        target.quad = *(QuadS *)(targetObject + 0x10);
         selfX = ((ActorPosition *)self)->position.x;
         selfY = ((ActorPosition *)self)->position.y;
         targetX = ((ActorPosition *)*(char **)(state + 0x2E0))->position.x;
@@ -100,7 +100,7 @@ void func_L02_003D0408(char *self) {
         targetY -= selfY;
         heading = func_00283248(targetX, targetY);
     } else {
-        target.quad = *(Quad *)(D_00189E20 + 0x80);
+        target.quad = *(QuadS *)(D_00189E20 + 0x80);
         selfX = ((ActorPosition *)self)->position.x;
         selfY = ((ActorPosition *)self)->position.y;
         targetX = ((PlayerPosition *)D_00189E20)->position.f[0];
@@ -156,7 +156,7 @@ void func_L02_003D0408(char *self) {
     case 7:
         flags = func_002B1C20(self, state + 0x50);
         if (*(float *)(state + 0x20) <= 1 && *(char **)(state + 0x2E4)) {
-            scratch.quad = *(Quad *)(*(char **)(state + 0x2E4) + 0x10); func_L02_003D1ED0(self, &scratch.quad);
+            scratch.quad = *(QuadS *)(*(char **)(state + 0x2E4) + 0x10); func_L02_003D1ED0(self, &scratch.quad);
         }
         if (*(float *)(state + 0x20) <= 0 && !*(u8 *)(state + 0x291)) {
             func_00282A60(state + 0x290, 0, 64); func_0029F978((u8 *)self, 3, (u8 *)(state + 0x290));

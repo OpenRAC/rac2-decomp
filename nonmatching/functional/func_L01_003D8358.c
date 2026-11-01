@@ -19,7 +19,7 @@
  * definition in src/game/002AA800.c.
  */
 #include "common.h"
-typedef int Quad __attribute__((mode(TI)));
+typedef int QuadT __attribute__((mode(TI)));
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
 #define I(p,o) (*(s32 *)((u8 *)(p)+(o)))
 #define H(p,o) (*(s16 *)((u8 *)(p)+(o)))
@@ -95,8 +95,8 @@ void func_L01_003D8358(u8 *m)
             scale=D_L01_001B076C;
             pitch=-scale;
             pitch=pitch*y;
-            *(Quad *)oldAngle=*(Quad *)(s+0x60);
-            *(Quad *)oldPos=*(Quad *)(m+0x10);
+            *(QuadT *)oldAngle=*(QuadT *)(s+0x60);
+            *(QuadT *)oldPos=*(QuadT *)(m+0x10);
             scale=scale*x;
             func_002AA898(s+0x60,pitch,s+0x70,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
             func_002AA898(s+0x64,scale,s+0x74,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);

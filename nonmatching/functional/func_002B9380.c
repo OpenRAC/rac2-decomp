@@ -18,5 +18,5 @@
 
 void func_002B9380(void *a0)
 {
-    goto *(void *)(*(unsigned int *)((char *)a0 + 0x3C));
+    ((void (*)(void *))(*(unsigned int *)((char *)a0 + 0x3C)))(a0);
 }

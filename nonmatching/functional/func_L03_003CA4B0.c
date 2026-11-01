@@ -27,7 +27,9 @@
  * a2 loads there are rematerialised and s5-s7, fp stay free. It needs each use to stay a life-1 pseudo (undesirable
  * to hoist), so cse1 must not merge the two addresses.
  */
+#define qcopy qcopy_c
 #include "common.h"
+#undef qcopy
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 extern void func_00282F20(void *,void *,float),func_002830C0(void *,void *,void *),func_00282CF0(void *,void *,void *),func_00282D30(void *,void *,float),func_00283098(void *,void *,void *);

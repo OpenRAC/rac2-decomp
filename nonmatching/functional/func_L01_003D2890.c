@@ -18,8 +18,8 @@
 #include "common.h"
 
 
-typedef unsigned int Quad __attribute__((mode(TI)));
-typedef union { Quad quad; float value[4]; } LaunchVector;
+typedef unsigned int QuadS __attribute__((mode(TI)));
+typedef union { QuadS quad; float value[4]; } LaunchVector;
 typedef struct {
     float f0, f4, f8, f12, f16, f20;
     unsigned char f24, f25; short f26;

@@ -19,8 +19,8 @@
  */
 #include "common.h"
 
-typedef int Quad __attribute__((mode(TI)));
-typedef union { Quad q; float f[4]; } Vector;
+typedef int QuadS __attribute__((mode(TI)));
+typedef union { QuadS q; float f[4]; } Vector;
 extern int D_L26_001A8FF0;
 extern Vector D_L26_002967A0[6];
 extern Vector D_L26_001B1890 MACRO_ADDR;
