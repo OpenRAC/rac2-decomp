@@ -255,4 +255,3 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L16_0038EE98);

@@ -2898,6 +2898,7 @@ src/pal/levels/shared/L00_002B2230-own.c	-O2 -G8 -ffunction-sections -g -frac2-h
 src/us2/levels/shared/L00_002B2408-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/us2/levels/22_dobbo_orbit/L22_002BF2B8-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
 src/us2/levels/shared/L00_00378678-g84.c	-O2 -G8 -ffunction-sections
+src/us2/levels/16_snivelak/L16_0034DE08-tether-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
 src/levels/shared/L00_003FEEA0.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/levels/shared/L00_003A9C58.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/shared/L00_003AD3F8-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
