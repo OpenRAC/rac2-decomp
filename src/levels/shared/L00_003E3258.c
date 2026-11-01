@@ -387,7 +387,6 @@ INCLUDE_ASM("asm/levels", func_L00_003E5BD8);
 
 INCLUDE_ASM("asm/levels", func_L00_003E6030);
 
-INCLUDE_ASM("asm/levels", func_L00_003E64F8);
 
 /* Walks the shared table of 0x50-byte records and, for the one owned by OBJECT, either
    releases the owner when the record is busy, or (half of the time) runs the effect helper
