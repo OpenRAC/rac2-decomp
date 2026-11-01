@@ -292,8 +292,60 @@ INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003FE9E8);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003FFB98);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003FFF88);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L04_00400108);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_00400888);
+extern int func_00283CF0(float);
+typedef struct {
+    unsigned char pad0[0x74];
+    unsigned char active;
+    unsigned char pad75[0x88 - 0x75];
+    void *owner;
+} L04_C678Slot;
+typedef int L04_C678Quad __attribute__((mode(TI)));
+typedef struct {
+    unsigned char pad0[0x74];
+    unsigned char *owner;
+    int timer;
+    float age;
+} L04_C678Vars;
+extern int func_00282948(void *);
+extern int func_00283CF0(float);
+extern void func_0029F338(void *);
+extern float func_002AA800(void *, int, float, float);
+extern void func_002E59F8(int);
+extern void func_L00_002E6DB8(void *, void *);
+extern void func_PAL_L04_003FFB98(unsigned char *, L04_C678Vars *);
+extern void func_PAL_L04_00400108(void);
+extern unsigned char D_00188660[];
+extern int D_L04_001B0488 __attribute__((sda));
+
+void func_PAL_L04_00400888(unsigned char *m)
+{
+    L04_C678Vars *v = *(L04_C678Vars **)(m + 0x68);
+    int s;
+    L04_C678Slot *e;
+
+    *(L04_C678Quad *)(m + 0x10) = *(L04_C678Quad *)(v->owner + 0x10);
+    func_002AA800(m + 0xF8, 0, *(float *)(v->owner + 0xF8), 0.031415932f);
+    v->age = v->age + 1.0f;
+    if (v->timer != 0 && func_00282948(&v->timer) != 0) {
+        s = D_L04_001B0488;
+        if (s != -1) {
+            e = (L04_C678Slot *)(D_00188660 + s * 0x70);
+            if (e->owner == v->owner && e->active != 0) {
+                func_002E59F8(s);
+            }
+        }
+        D_L04_001B0488 = -1;
+        func_0029F338(m);
+        return;
+    }
+    if (25.0f < v->age && v->timer == 0) {
+        v->timer = func_00283CF0(12.833334f);
+    } else {
+        func_PAL_L04_003FFB98(m, v);
+    }
+    func_L00_002E6DB8(func_PAL_L04_00400108, m);
+}
+

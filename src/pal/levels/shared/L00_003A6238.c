@@ -169,4 +169,3 @@ int func_PAL_L00_003A9468(char *a0, char *a1, char *a2, char *a3)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003A9668);

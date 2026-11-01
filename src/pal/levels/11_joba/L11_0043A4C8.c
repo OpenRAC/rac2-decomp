@@ -49,5 +49,4 @@ void func_PAL_L11_0043A4C8(float *pos, int count) {
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L11_0043AB80);
 

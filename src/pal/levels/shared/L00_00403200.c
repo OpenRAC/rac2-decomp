@@ -10,7 +10,6 @@ INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00403780);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_004040D8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_004041C0);
 
 #include "common.h"
 extern void func_002A7750(char *arg, int mode, int value);
@@ -64,4 +63,3 @@ void func_PAL_L00_004043A0(char *arg)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_004044D0);

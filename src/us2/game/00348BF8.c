@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/us2/game", func_US2_00348BF8);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348CB8);
 
 typedef int s32;
 typedef unsigned char u8;

@@ -45,7 +45,27 @@ extern void func_003363D0(char *p);
 extern void func_00336968(char *p);
 extern void func_003366D0(char *p);
 
-INCLUDE_ASM("asm/us2/game", func_US2_003475F0);
+extern void func_003361A8(char *p);
+
+char *func_US2_003475F0(char *p)
+{
+    func_003361A8(p);
+    func_003361A8(p + 76);
+    func_003361A8(p + 152);
+    func_003361A8(p + 228);
+    func_003361A8(p + 304);
+    func_003361A8(p + 380);
+    func_003363D0(p + 456);
+    func_00336968(p + 528);
+    func_00336968(p + 616);
+    func_00336968(p + 704);
+    func_003366D0(p + 792);
+    func_003361A8(p + 852);
+    func_003361A8(p + 928);
+    func_003361A8(p + 1004);
+    return p;
+}
+
 
 
 

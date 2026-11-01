@@ -138,4 +138,3 @@ void func_PAL_L05_003D5738(char *object)
     *(int *)(s1 + 0x268) = 0x32;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L05_003D5800);

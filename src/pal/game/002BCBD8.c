@@ -211,4 +211,3 @@ void func_PAL_002BD698(Particle *p)
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002BD8E8);

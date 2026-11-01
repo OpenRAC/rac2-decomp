@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0038EFF0);
 
 
 extern void func_PAL_L00_00390C40(char *object);

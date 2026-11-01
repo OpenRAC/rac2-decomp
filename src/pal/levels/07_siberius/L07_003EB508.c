@@ -40,7 +40,23 @@ void func_PAL_L07_003EB508(char *arg)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L07_003EB648);
+extern void func_002A7750(int, int, int);
+extern int func_002A7820(int, int);
+extern void func_L07_002E2090(char *, int, int, char *, int, int, int);
+extern void func_002A7750(int, int, int);
+
+/* Arm the object's mode ten and hand it to the shared launcher. */
+void func_PAL_L07_003EB648(char *arg, int a1, int a2, int a3, int a4)
+{
+    int r;
+
+    func_002A7750(arg, 10, -1);
+    *(unsigned short *)(arg + 0x34) = (*(unsigned short *)(arg + 0x34) & 0xFFBE) | 0x1000;
+    *(int *)(arg + 0x98) = *(int *)(*(char **)(arg + 0x24) + 0x10);
+    r = ((s32)(func_002A7820(0x2D, 0x4B)) * 5 + 2) / 6;
+    func_L07_002E2090(arg, a1, a2, arg + 0xF0, r, a3, a4);
+}
+
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L07_003EEC8C);
 
