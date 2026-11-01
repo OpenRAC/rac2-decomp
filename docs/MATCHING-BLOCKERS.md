@@ -341,6 +341,21 @@ The numbered history below is retained, with obsolete conclusions and incorrect 
 
 ## 1. Register allocation on long bodies (the dominant wall)
 
+**Ties and spill slots, 1 November 2026:**
+global allocation orders pseudos by `floor_log2(refs) * refs / live length`. With equal refs, the
+order of two sets decides. `func_00306680` swapped $s7/$fp until its `%hi` was set first, through a
+local for the address (same bytes otherwise). Its PAL copy needs the plain form.
+Spill slots of hoisted addresses follow gcse's reaching-register numbers, and those follow hash
+bucket order: `(14030 + K) % size` for a frame address K, with size `max_cuid / 2 | 1`. A rotated
+slot order therefore means a different insn count at gcse, not a different allocation.
+`func_L00_003A6538` closed with 3 fewer insns: the second spin read inline instead of a local, a
+`color` local dropped and an `int` last argument. `func_L00_003A53E8` needs at least 12 more,
+`func_L00_003A1580` about 10 to 20 fewer. Forcing the size in a diagnostic cc1 is enough to test
+this: a two-line `getenv` in `alloc_expr_hash_table`, never in the real compiler.
+Sched ties: `rank_for_schedule` compares priority, register weight, class against the last insn,
+then the count of dependents, then the original order. An insn that reads the frame register gets
+one more dependent from a following call in its block (`func_L23_0041A3B8`).
+
 **Qualified field and call-lifetime remedies, 25 October 2026:**
 `func_002B52A0` is now a 980-byte C implementation at 21 places in each
 USA release; PAL has no matching canonical identity. Its controller +0x90

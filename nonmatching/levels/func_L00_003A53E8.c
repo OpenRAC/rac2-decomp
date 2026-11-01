@@ -1,3 +1,6 @@
+/* Closer B, 2026-11-01: forcing 307, 313 or 319 gcse buckets (301 here) takes 42 lines to 12, so retail
+ * has at least 12 more insns at gcse. See MATCHING-BLOCKERS 1.
+ * The 64-bit read with a mask gives retail's lwu at +0x3D8; the (unsigned long) cast and two short fields do not. */
 /* GPT-6.1 Sol high, 29 October 2026, task v1432: 2516/2516 bytes,
  * 0 of 27 USA v1.01 placements match with the current pinned toolchain.
  * Profile for a dedicated unit:
@@ -190,7 +193,7 @@ void func_L00_003A53E8(char *moby)
         func_00282978(state + 10);
         func_00282978(state + 8);
         func_00282948(state + 0x40);
-        if (*(unsigned int *)(state + 8))
+        if (*(unsigned long *)(state + 8) & 0xFFFFFFFF)
             func_L00_002E6EF8(func_L00_003A6538,moby);
     }
     if ((unsigned int)(*(u8 *)(moby + 0x20) - 2) >= 2 || !func_00282978(state + 6))

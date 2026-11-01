@@ -270,7 +270,6 @@ INCLUDE_ASM("asm/levels", func_L00_003A53E8);
 
 /* func_L00_003A5FC0 is defined in L00_003A5FC0-contact.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003A6538);
 
 
 /* Emit the two layers of a short particle trail. */
