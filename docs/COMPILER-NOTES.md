@@ -808,6 +808,16 @@ every matched function in `tools/build.py all --strict`, none compiled different
 checks the transformer and authored controls: across a guard the reload fills the slot, and
 without a division the redundant reload is still dropped.
 
+A volatile asm ends the same scan. `func_0030E8A8` (1,052 bytes, 28 places) has a `bc1f` to the
+epilogue past `ld $s0` with that restore in its slot, then a `qcopy` and a `b` to the epilogue.
+Retail's `b` lands on the restore; this tree took the slot's copy as redundant across the asm and
+branched one word further, the last word of the function. In the 28 retail programs, 30 such
+shapes (a branch slot holding a `$sp` restore, then `lq`/`sq`, then a `b` to that restore or
+the word after it) land on the restore and none past it, including `func_L22_003F5580`. With the
+rule, none of the 5,846 units under `src/` compiles differently and `func_0030E8A8` is 28/28 in
+both USA releases. The search stops at volatile asm alone: a plain store in that place keeps
+the dropped restore, which the test's `stored` control checks.
+
 ### SDK objects: the assembler fills the slots the compiler leaves
 
 [swap_branch_slots.py](../tools/compiler/transformers/swap_branch_slots.py) adds the opt-in

@@ -180,7 +180,7 @@ void func_0030E700(char *object)
     func_002AB8C0(object, state);
 }
 
-INCLUDE_ASM("asm/game", func_0030E8A8);
+/* func_0030E8A8 is defined in 00308600-spring.c. */
 
 /* func_0030ECC8 is defined in 00308600-ammo-g8.c. */
 

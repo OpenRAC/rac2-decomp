@@ -1,14 +1,3 @@
-/* M21 2026-10-26: 1052 of 1052 bytes with -O2 -G0 -ffunction-sections -frac2-qcopy
-   -frac2-qcopy-barrier (us, level 00 placement). One word off: the `b` after the second
-   reset (qcopy + 0x4C = 0) jumps to the epilogue's `ld $s0` in retail; here reorg redirects it
-   one insn further because the preceding bc1f slot already holds that `ld $s0`
-   (redundant_insn). Retail must have a CODE_LABEL between that bc1f and the b, so the source
-   shape of the mode == 0 tail differs. Tried: returns, early-return inversion, goto into the
-   first reset, -g, qcopy without barrier. What closed the rest: qcopy for the 16-byte copies,
-   float[4] locals, non-nested dot products before each scale, func_002AA3A8 as
-   (void *, float, void *, float, float, float), func_002A8240 with the int last, the
-   mode != 0 tail as `-=` then a reread, and 0.06666667f. Permuter queued. */
-
 #include "common.h"
 
 extern char D_00189E20[];
@@ -25,7 +14,7 @@ extern int func_002761F8(float *, float *, int, int, int);
 extern float func_002AA3A8(void *, float, void *, float, float, float);
 extern void func_002A8240(char *, float *, float, float, float, int);
 
-void func_0030E8A8(char *obj)
+void func_PAL_0030FCE8(char *obj)
 {
     char *e = *(char **)(obj + 0x68);
     char *d = D_00189E20;
@@ -84,9 +73,8 @@ void func_0030E8A8(char *obj)
         f = 0.0f;
     if (flag == 0)
         f = 0.0f;
-    step = 0.02f;
-    func_002AA3A8(&f, 0.0f, (float *)(e + 0x48), step, 0.3f, 0.06666667f);
-    if (f == 0.0f && *(float *)(e + 0x48) == 0.0f && acc < step)
+    func_002AA3A8(&f, 0.0f, (float *)(e + 0x48), 0.0288000014f, 0.432000041f, 0.080000006f);
+    if (f == 0.0f && *(float *)(e + 0x48) == 0.0f && acc < 0.02f)
         *(int *)(e + 0x44) = 0;
     if (l2 < *(float *)(e + 0x48))
         *(float *)(e + 0x48) = l2;
@@ -98,7 +86,7 @@ void func_0030E8A8(char *obj)
             qcopy(obj + 0x10, v6);
             *(float *)(e + 0x4C) = 0.0f;
         } else {
-            x = *(float *)(e + 0x4C) - 0.0066666668f;
+            x = *(float *)(e + 0x4C) - 0.0096000005f;
             *(float *)(e + 0x4C) = x;
             func_00282D30(v8, v0, x);
             func_00282CC0(obj + 0x10, v8, obj + 0x10);
@@ -109,7 +97,7 @@ void func_0030E8A8(char *obj)
             }
         }
     } else {
-        *(float *)(e + 0x4C) -= 0.0066666668f;
+        *(float *)(e + 0x4C) -= 0.0096000005f;
         func_00282D30(v8, v0, *(float *)(e + 0x4C));
         func_00282CC0(obj + 0x10, v8, obj + 0x10);
     }
