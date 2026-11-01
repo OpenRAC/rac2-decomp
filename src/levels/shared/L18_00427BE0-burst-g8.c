@@ -1,21 +1,10 @@
-/* Complete nonmatching reconstruction; 940/940 bytes.
- * -O2 -G8 -ffunction-sections. Local US/US2 each 0/3; PAL absent.
- * Five bounded source hypotheses plus final per-release validation.
- * Auditing the actual 002B5258 body removes an unused second caller value
- * from its interface and resolves the earlier state/target register swap.
- * Capturing the real byte burst and halfword cooldown before stores fixes
- * their two setup schedules. Remaining: the class-ED4 modulo branch and
- * control-mode boolean lowering (sltiu versus retail's live-value movn).
- * Reopen with independently grounded control-mode/lifetime evidence.
- * No fake second argument, volatile reload, pin or assembly barrier.
- */
 #include "common.h"
 extern float D_L18_001B1270 __attribute__((sda));
 extern u16 D_L18_001B1240 __attribute__((sda)), D_L18_001B1244 __attribute__((sda));
 extern u16 D_L18_001B1268 __attribute__((sda));
 extern u8 D_L18_001B1248 __attribute__((sda));
 extern int D_L18_001B124C __attribute__((sda)), D_L18_001B1250 __attribute__((sda));
-extern u32 D_00138324, D_00138320;
+extern u32 D_00138320[];
 extern char D_L18_001B1360[];
 extern float func_00282E80(void *, void *), func_00283248(float, float);
 extern void func_002B5258(void *), func_002B5278(void *, float);
@@ -39,7 +28,7 @@ int func_L18_00428738(u8 *object)
                 func_002B5258(object);
             else func_L01_00321178(object, state + 0x220);
         } else {
-            if (D_00138324 & 0x80) *(u16 *)(state + 0x392) = D_L18_001B1240;
+            if (D_00138320[1] & 0x80) *(u16 *)(state + 0x392) = D_L18_001B1240;
             func_00282978((short *)(state + 0x392));
         }
         if (*(float *)(object + 0x18) < *(float *)(state + 0x90)) {
@@ -91,8 +80,7 @@ int func_L18_00428738(u8 *object)
             {
                 int controlled = object[0xBC];
                 if (controlled == 1) {
-                    changed = controlled;
-                    if (D_00138320 & 0x80) changed = 0;
+                    changed = (D_00138320[0] & 0x80) ? changed : controlled;
                 } else if (state[0x39D] == 0) func_L18_00426F28(object, 12, 0, 10.0f);
             }
             break;

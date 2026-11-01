@@ -67,13 +67,10 @@ void func_L18_004286D0(u8 *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L18_00428738);
 
-INCLUDE_ASM("asm/levels", func_L18_00428AE8);
 
 /* func_L18_00428F08 lives in L18_00428F08-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L18_0042B008);
 
 /* func_L18_0043E938 lives in the sibling small-data unit (L18_00427BE0-g8.c): its controls are read through $gp. */
 

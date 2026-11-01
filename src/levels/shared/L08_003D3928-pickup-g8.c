@@ -1,28 +1,8 @@
-/* GPT-6.1 Sol high tier, v0919; complete C reconstruction, not linked.
- * Profile: -O2 -G8 -ffunction-sections.
- * USA v1.01: 1132/1136 bytes, 0/3 placements (08, 19, 30).
- * The previous retained draft revalidated at 1124 bytes. The unsigned 16-bit
- * ID storage view with signed casts for indexing keeps the tail sign extension
- * inside each parity branch, as retail does. A short nibble gives a branch
- * instead of movn. Keeping the cost comparison's health load independent of
- * the later subtraction restores the retail FP register/compare structure;
- * progress += (1-progress)*factor also restores its add operand order.
- * Remaining: entry table/index allocation, srl versus sra in nibble selection,
- * annulled entry returns, retirement counter address/load, tail address GPRs,
- * and several state-1 load/store schedules. There is still a four-byte deficit.
- * A 1024-byte history row type or -mno-split-addresses worsens address setup;
- * splitting entry loads by parity duplicates them; division by 16 adds bias
- * instructions. A separate active-vehicle local does not solve allocation.
- * Reopen with evidence for the packed-history access and original object-field
- * lifetimes. Only USA v1.01 checked this pass; no linked build or match claimed.
- */
-
 #include "common.h"
 typedef int PickupQuad __attribute__((mode(TI)));
 extern u8 D_L08_0021EAF0[];
 extern u8 D_0019B4A8[];
-extern int D_001A79F0 __attribute__((sda));
-extern int D_001A79FC[] MACRO_ADDR;
+extern int D_001A79F0[] __attribute__((sda));
 /* Partial resident view through the last state field read here. */
 typedef struct {
     u8 unknown00[0x80];
@@ -54,25 +34,27 @@ extern int func_00282948(int *timer);
 extern void func_0029F338(void *object);
 extern void func_L08_003D3EF8(u8 *object);
 
+typedef struct { u8 p[0x464]; u8 x[1]; } Hist;
+typedef struct { u8 p[0x8e]; short lock; } VData;
+typedef struct { u8 p[0x31]; u8 held; u8 p2[2]; u16 flags; u8 p3[0x12]; float scale; } OView;
 void func_L08_003D4190(u8 *object)
 {
     PickupState *data = *(PickupState **)(object + 0x68);
     u8 *vehicle;
     u8 *vehicleData;
-    u8 *history;
     unsigned short id;
-    short nibble;
     float cost;
     float movement[4] __attribute__((aligned(16)));
     if (object[0xb0] != 255) {
         id = *(unsigned short *)(object + 0xb2);
-        if (D_L08_0021EAF0[0x464 + (short)id])
-            return;
-        nibble = D_0019B4A8[(D_001A79F0 << 10) + ((short)id >> 1)];
-        if (id & 1)
-            nibble >>= 4;
-        if (nibble & 7)
-            return;
+        {
+        int n;
+        if (((Hist *)D_L08_0021EAF0)->x[(short)id])
+            goto kill;
+        n = D_0019B4A8[((short)id >> 1) + (D_001A79F0[0] << 10)];
+        if (id & 1) { if ((n >> 4) & 7) goto kill; }
+        else if (n & 7) goto kill;
+        }
     }
     switch (object[0x20]) {
     case 0: {
@@ -115,16 +97,16 @@ void func_L08_003D4190(u8 *object)
         func_00282CC0(object + 0x10, object + 0x10, movement);
         if (!func_00282948(&data->timer))
             return;
-        *(short *)(vehicleData + 0x8e) = 180;
+        ((VData *)vehicleData)->lock = 180;
         data->timer = D_L08_001B0370;
         qcopy(object + 0x10, &D_00189E20.position);
-        object[0x31] = 1;
-        *(unsigned short *)(object + 0x34) = (*(unsigned short *)(object + 0x34) & 0xfffe) | 0x800;
+        ((OView *)object)->held = 1;
+        ((OView *)object)->flags = (((OView *)object)->flags & 0xfffe) | 0x800;
         data->progress = D_L08_001B032C;
         if (object[0x43] != 1)
             func_002A7470(object, 1, 0, 30);
+        ((OView *)object)->scale = data->progress * 2.0f;
         object[0x20] = 2;
-        *(float *)(object + 0x48) = data->progress * 2.0f;
         break;
     }
     case 2: {
@@ -142,22 +124,23 @@ void func_L08_003D4190(u8 *object)
                 D_00189E20.mode == 0x6f) {
                 *(float *)(object + 0x2c) -= cost;
             } else {
-                D_001A79FC[0]++;
-                id = *(unsigned short *)(object + 0xb2);
-                if (id & 1) {
-                    history = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
-                    if (((*history >> 4) & 7) != 7)
-                        *history += 16;
+                D_001A79F0[3]++;
+                { unsigned short id2 = *(unsigned short *)(object + 0xb2);
+                if (id2 & 1) {
+                    u8 *h = &D_0019B4A8[((short)id2 >> 1) + (D_001A79F0[0] << 10)];
+                    if (((*h >> 4) & 7) != 7)
+                        *h += 16;
                 } else {
-                    history = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
-                    if ((*history & 7) != 7)
-                        (*history)++;
-                }
+                    u8 *h = &D_0019B4A8[((short)id2 >> 1) + (D_001A79F0[0] << 10)];
+                    if ((*h & 7) != 7)
+                        (*h)++;
+                } }
+kill:
                 func_0029F338(object);
+                return;
             }
-        } else {
-            func_L08_003D3EF8(object);
         }
+        func_L08_003D3EF8(object);
         break;
     }
     }

@@ -12,7 +12,6 @@ typedef int TI128 __attribute__((mode(TI)));
 /* func_L16_002B5EE0 is in L16_002B5EE0-motion.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L16_00395250);
 
 /* func_L16_00395858 is in L16_00395858-state.c. */
 

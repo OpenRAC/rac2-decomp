@@ -363,7 +363,6 @@ INCLUDE_ASM("asm/levels", func_L22_003FC338);
 
 /* func_L22_003FC780 is defined in L22_003FC780-helper-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L22_003FC870);
 
 /* func_L22_003FCF08 is defined in L22_003FCF08-g8.c. */
 

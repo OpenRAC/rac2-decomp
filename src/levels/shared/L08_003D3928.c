@@ -162,7 +162,6 @@ void func_L08_003D3EB8(u8 *a0)
     func_L00_00326048(a0, v, 0x80AAAAD2, 0x80396464, 0.0610865355f);
 }
 
-INCLUDE_ASM("asm/levels", func_L08_003D4190);
 
 void func_L08_003D4690(u8 *self)
 {
@@ -219,7 +218,6 @@ INCLUDE_ASM("asm/levels", func_L08_003DB518);
 /* func_L08_003DB8E8 is matched in its own unit, L08_003DB8E8-g8.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L08_003E5BB8);
 
 
 

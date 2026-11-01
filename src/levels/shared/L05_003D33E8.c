@@ -148,7 +148,6 @@ void func_L05_00416630(char *p)
     *(float *)(p + 60) = 1.0f;
 }
 
-INCLUDE_ASM("asm/levels", func_L05_004170C8);
 
 /* Spawns the object's effect: marks the object, takes one record of the shared
    128-byte table by the global index and gives it a random position. */

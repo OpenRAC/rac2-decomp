@@ -1,22 +1,3 @@
-/* GPT-6.1 Sol high, 29 October 2026; retained near miss, not linked.
- * Profile: -O2 -G8 -ffunction-sections, dedicated -g8.c unit.
- * Current pinned v2 toolchain, USA v1.01: 1544/1544 bytes, 0/2 places
- * (Snivelak and Jamming Array); check.py first differs at +0x78.
- * Ten visible non-relocation instruction differences remain, all in case 0:
- * the enable load uses v1 instead of v0; the pool load uses a0 instead of v1
- * and its lui precedes the state-index load. The remaining body agrees after
- * relocation. Typed resident/sentinel fields recover bases, the explicit vector
- * workspace recovers stack offsets, and a shared case-0/case-2 mode-1 path
- * recovers joins. State-2 >= test preserves the retail NaN path. Compound decay
- * expressions and a ground-height snapshot recover the FP sequences.
- * Sum reversal, array indexing and struct-wrapped globals tied. -g tied;
- * -fno-schedule-insns still differs; -mno-split-addresses fixes the case-0
- * loads but measures 1548 bytes and disrupts later base generation.
- * Reopen with evidence for mixed scalar-load/address generation or the original
- * source object's lifetime; do not repeat the recorded pointer forms.
- * Required declarations follow. No other releases or linked build tested.
- */
-
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
@@ -39,8 +20,8 @@ extern HudResident D_0018C958;
 
 extern int D_001A79F0 __attribute__((sda));
 extern u8 D_L16_0027F078[];
-extern int D_L16_001A8FF0 NOT_SDA;
-extern u8 *D_L16_001B2B1C NOT_SDA;
+extern int D_L16_001A8FF0;
+extern u8 *D_L16_001B2B1C;
 extern float D_L16_001AF430 __attribute__((sda));
 extern float D_L16_001AF434 __attribute__((sda));
 extern float D_L16_001AF438 __attribute__((sda));

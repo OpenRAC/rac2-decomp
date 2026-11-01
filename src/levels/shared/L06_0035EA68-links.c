@@ -1,18 +1,3 @@
-/* GPT-6.1 Sol (high), task v0776; USA v1.01, 1076/1076 bytes, 0/3 places.
- * Profile: -O2 -G0 -ffunction-sections -ffast-math.
- * Five non-relocation instructions differ: the first link loop initializes its
- * scan/count before the three invariant comparison constants at +0xB4..+0xC4;
- * retail initializes them after those constants. All other diff rows agree
- * apart from the unresolved relocation operands printed by check.py.
- * The scale adjustment is AFTER the switch (except destroy), not case 4 only.
- * Incomplete SDA array views prevent hoisted table-base saves; SDATA names the
- * canonical D_001A79F0 storage for the entry GP read. Caching the moby-table base
- * before writing a link avoids a redundant reload. Testing the two nibbles in
- * separate branches gives retail's branch/sra instead of conditional move.
- * Swapped for initializers and an equivalent --j do-loop have the same bytes;
- * -fmove-all-movables is neutral. Narrow n/casts instead give srl; int assignment
- * and switch give movn. Required declarations follow.
- */
 #include "common.h"
 extern int func_00282948(int *);
 extern void func_0029F338(void *);
@@ -38,7 +23,7 @@ void func_L06_003E1498(unsigned char *m) {
     if((unsigned char)m[0xb0]!=255 && (D_0019B2E8[(unsigned char)m[0xb0]+D_001A79F0_gp*16]&128)) goto dispatch;
     if(!(unsigned char)m[0x20]) goto dispatch;
     { int j; char *scan;
-    for(scan=links,j=4;j>=0;j--,scan+=8){
+    for(j=0;j<5;j++){ scan=links+j*8;
         if(I14(scan,0)!=-1) {
             char *other=D_L06_001B281C[0]+I14(scan,0)*256;
             if(other && *(short *)(other+0xaa)==*(short *)(scan+4) && (unsigned char)other[0x20]!=254 && (unsigned char)other[0x20]!=253) {

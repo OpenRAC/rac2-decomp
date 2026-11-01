@@ -1,19 +1,3 @@
-/* sol-high: USA v1.01, pinned worker game compiler, -O2 -G8 -ffunction-sections.
- * Best check: 1684/1684 bytes, 0/2 placements; first mismatch +0x358.
- * Retains the earlier sol-low draft, independently recompiled on 29 October 2026.
- * Six non-relocation instructions differ at +0x358, +0x360, +0x368,
- * +0x374, +0x378 and +0x37C: conversion/product use f0 instead of f1,
- * while 45 and its subtraction use f1 instead of f0.
- * New measurements: naming the conversion, naming the subtraction in a separate
- * local, and naming the 45 constant all give the identical baseline bytes (tie).
- * Reversing the final multiply adds an operand-order difference; consuming the
- * named subtraction directly in the chained stores grows the body to 1688 bytes.
- * Allocator evidence: baseline conversion/product pseudos 207/210 share f0;
- * constant/subtraction pseudos 211/212 share f1, and global/product 213/215
- * share f2. A new source-lifetime hypothesis must change the first two groups
- * without changing scheduling or the final multiply operand order.
- * Needs the declarations below in a dedicated -g8.c unit. No linked match claimed.
- */
 #include "common.h"
 extern u8 D_00189E20[];
 extern f32 func_00282E48(void *, void *);
@@ -110,8 +94,7 @@ void func_L22_003FC870(u8 *obj) {
             func_L22_003FCF08(scratch.transform.start, scratch.transform.end, ref_L22_003FC870_02, 0);
         }
         func_00283360(scratch.transform.scale);
-        f = (45.0f - (f32)*(u16 *)(obj + 0x96) * 0.022222223f) * (ref_L22_003FC870_03 * 0.022222223f);
-        scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = f;
+        scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = (45.0f - (f32)*(u16 *)(obj + 0x96) * 0.022222223f) * (ref_L22_003FC870_03 * 0.022222223f);
         func_00283738(scratch.transform.mat, scratch.transform.scale, scratch.transform.mat);
         func_00283738(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
         

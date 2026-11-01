@@ -11,6 +11,9 @@
  * not keep the constant in the outer body. An explicit later position pointer
  * fixes its setup but substantially worsens the timer/prologue allocation.
  * Union vectors and float arrays tie; void-pointer views retain the best bytes.
+ * 1 November 2026: indexed k loops fix the later pointer/countdown setup; only the
+ * 10.0f hoist remains (13 rows). Retail keeps 10.0f in the outer body although it
+ * is single-set, so something blocks the movable in the outer pass (maybe_never).
  * Next: inspect why loop optimization hoists the float bound; avoid repeating
  * the earlier for/do-while and qcopy/qcopy_nc ties without a new hypothesis.
  */
@@ -81,7 +84,7 @@ void func_L05_003D2048(char *obj)
   }
   if(!*(int *)(s+8)) {
    int k;
-   for(k=9;k>=0;k--) {
+   for(k=0;k<10;k++) {
     char *effect,*record;
     v.f[0]=func_332B50(-0.3f,0.3f)**(float *)(s+4);
     v.f[1]=func_332B50(-0.3f,0.3f)**(float *)(s+4);
@@ -94,7 +97,7 @@ void func_L05_003D2048(char *obj)
      *(float *)(record+0xC)=1;*(float *)(effect+0x1C)=0.05f;*(float *)(effect+0x2C)=0.25f;
     }
    }
-   for(k=9;k>=0;k--) {
+   for(k=0;k<10;k++) {
     char *effect;
     a=func_332C18();b=func_332C18();
     func_33B330(&v,func_332B50(7,10.5f)*(*(float *)(s+4)*0.016666668f),b,a);
