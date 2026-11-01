@@ -65,3 +65,8 @@ func_L20_00446E70	20_yeedil: instruction at +0x64 differs
 func_L20_00445738	20_yeedil: instruction at +0x64 differs
 func_0028C6D0	boot: instruction at +0x260 differs
 func_L12_00429ED8	30_insomniac_museum: instruction at +0x260 differs
+func_0033FB98	boot: instruction at +0x1D4 differs
+func_003458F8	boot: instruction at +0x34 differs
+func_00345B78	boot: instruction at +0x20 differs
+func_0034E070	boot: instruction differs
+func_002CAF18	00_aranos_tutorial: instruction at +0x30 differs

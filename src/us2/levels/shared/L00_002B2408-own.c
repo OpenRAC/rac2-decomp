@@ -151,7 +151,8 @@ void func_US2_L00_002B2408(void) {
                         a[1] = v[1] + func_002A78D8(0.0f, 0.04f);
                         a[2] = v[2] + func_002A78D8(0.0f, 0.04f);
                         record = &D_L00_00262570[D_00139568.index];
-                        /* Retail's arms are identical: jump2 cross-jumps them, and the byte read stays. */
+                        /* Identical arms: retail still reads this flag into $v0 and the next call clobbers it, the
+                           dead load jump2's cross-jump leaves. One arm is 36 bytes short of retail. */
                         if (record->flag) {
                             effect = func_002C16C0(a, D_L00_001A8F20, 2, 127, 0x20ff20, func_00283CF0(func_002A78D8(1.0f, -1.0f)), 31500.002f, 500.0f, 1.0f, 0.0f, 0.0f);
                             if (effect) effect[2] = *D_L00_001FE940.owner;

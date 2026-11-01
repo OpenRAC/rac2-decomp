@@ -69,8 +69,7 @@ void func_L00_003A9C58(char *m)
    } }
  }
  }
- /* The do/while weighs scale above the loop constants in global allocation, as in retail. */
- if(H(d,0x14)<7) {do {scale=func_00283CE0(H(d,0x14));scale/=func_00283CE0(7);scale*=0.45f;} while(0);
+ if(H(d,0x14)<7) {scale=func_00283CE0(H(d,0x14))/func_00283CE0(7);scale*=0.45f;
  qcopy(a,m+0x10);
  func_00282D30(b,direction,F(d,0x20));func_00282CF0(c,m+0x10,b);
  if(func_002761F8(a,c,18,m,0))func_00282CC0(m+0x10,D_L00_001BF220,b);

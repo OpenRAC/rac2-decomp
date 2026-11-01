@@ -1,17 +1,6 @@
-/* func_0034E070: Opus 5.5 xhigh, task v1751. Exact in USA v1.01, not in the other releases.
- * Result: USA v1.01 420/420 bytes, 28 of 28 places. PAL and v2.00: 420/420 bytes, 0 of 28 places.
- * Left to do: the C cannot be one definition. PAL and v2.00 differ from v1.01 only in five field
- * offsets of the record set, all +0x20 past f7A0: 0x220C/0x222C, 0x2210/0x2230, 0x1D30/0x1D50,
- * 0x1D6C/0x1D8C, 0x1FBC/0x1FDC. The catalogues carry the name to those releases, so it needs
- * tools/carry.py --demote (or a release-specific definition) before this body can land in src/.
- * Wording: record holds 0x8710 first because retail keeps that constant and the record pointer in
- * one pseudo ($s0); two variables cost a saved register. The scalar alias of D_001A8CFC is required:
- * the array spelling gives 0 of 28. Profile: -O2 -G0 -ffunction-sections.
- * Declarations are all below; the prototype in 0034CEA0.c is void func_0034E070(void *, void *, void *).
- */
 #include "common.h"
 
-extern char *D_001A8CFC_scalar __asm__("D_001A8CFC") __attribute__((sda));
+extern char *D_001A8CFC __attribute__((sda));
 extern char D_001AE710[];
 extern char D_001AE720[];
 
@@ -49,8 +38,8 @@ void func_0034E070(void *object, void *a1, void *a2)
     char *end = set->records + 0x750;
     void *colour;
 
-    set->f220C = func_00336D50((int)D_001A8CFC_scalar + (int)record, 0x57);
-    set->f2210 = func_00336D50((int)D_001A8CFC_scalar + (int)record, 0x58);
+    set->f220C = func_00336D50((int)D_001A8CFC + (int)record, 0x57);
+    set->f2210 = func_00336D50((int)D_001A8CFC + (int)record, 0x58);
     record = set->records;
     do {
         func_00336408(record, 0x20, 1, D_001AE710, a2);
