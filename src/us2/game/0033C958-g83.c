@@ -85,3 +85,100 @@ void func_US2_0033F200(char *object, void *argument)
     func_US2_00348E20(widget, 1);
     func_US2_0033F3F0(object, 0);
 }
+
+extern void func_US2_0033E8B0(void *, int);
+extern int D_001ADDE0[2] __attribute__((sda));
+
+INCLUDE_ASM("asm/us2/game", func_US2_0033E788);
+
+
+extern void func_US2_0033EC80(void *, int);
+
+INCLUDE_ASM("asm/us2/game", func_US2_0033EB58);
+
+
+extern void func_US2_0033EF30(void *, int);
+
+INCLUDE_ASM("asm/us2/game", func_US2_0033EE08);
+
+
+extern void func_US2_0033F128(void *, int);
+
+INCLUDE_ASM("asm/us2/game", func_US2_0033F000);
+
+
+extern void func_US2_0033BE70(void *);
+extern void func_0033B018(void *, float, float);
+extern void func_00335E38(void *, float, float, float, float);
+extern int func_002E5E58(int, int, void *);
+extern void func_00132938(int);
+extern void func_00336B98(void *, int);
+extern void func_002E4860(void);
+extern unsigned char D_001A7B94[] __attribute__((sda));
+extern struct { int w0, w1, w2; } D_00138340;
+extern float D_L00_001AE198 __attribute__((sda));
+extern float D_L00_001AE1A0 __attribute__((sda));
+extern float D_L00_001AE19C, D_L00_001AE1A4;
+
+int func_US2_0033E070(char *object, int flags)
+{
+    char *p = object + 8;
+    float *vec;
+
+    func_US2_0033BE70(p);
+    vec = *(float **)(object + 0x36C);
+    func_0033B018(p, vec[0], vec[1]);
+    vec = *(float **)(object + 0x36C);
+    func_00335E38(object + 0x2DC, vec[0] + D_L00_001AE198,
+                 vec[1] + D_L00_001AE19C, 0.0f, 0.0f);
+    vec = *(float **)(object + 0x36C);
+    func_00335E38(object + 0x324, vec[0] + D_L00_001AE1A0,
+                 vec[1] + D_L00_001AE1A4, 0.0f, 0.0f);
+    if (flags & 0x1000) {
+        func_002E5E58(3, 0, 0);
+        *(int *)(object + 0x2D8) = (*(int *)(object + 0x2D8) + 2) % 3;
+    } else if (flags & 0x4000) {
+        func_002E5E58(3, 0, 0);
+        *(int *)(object + 0x2D8) = (*(int *)(object + 0x2D8) + 1) % 3;
+    } else if (D_00138340.w0 & 0x8000) {
+        switch (*(int *)(object + 0x2D8)) {
+        case 0: {
+            int value = *(int *)(D_001A7B94 + 12) - 6;
+            *(int *)(D_001A7B94 + 12) = value < 0 ? 0 : value;
+            break;
+        }
+        case 1: {
+            int value = *(int *)(D_001A7B94 + 8) - 6;
+            *(int *)(D_001A7B94 + 8) = value < 0 ? 0 : value;
+            break;
+        }
+        }
+    } else if (D_00138340.w0 & 0x2000) {
+        switch (*(int *)(object + 0x2D8)) {
+        case 0: {
+            int value = *(int *)(D_001A7B94 + 12) + 6;
+            *(int *)(D_001A7B94 + 12) = value > 1024 ? 1024 : value;
+            break;
+        }
+        case 1: {
+            int value = *(int *)(D_001A7B94 + 8) + 6;
+            *(int *)(D_001A7B94 + 8) = value > 1024 ? 1024 : value;
+            break;
+        }
+        }
+    } else if (flags & 0x40) {
+        if (*(int *)(object + 0x2D8) == 2) {
+            int value;
+            func_002E5E58(4, 0, 0);
+            value = *(int *)(D_001A7B94 + 4) == 0;
+            *(int *)(D_001A7B94 + 4) = value;
+            func_00132938(!value);
+        } else {
+            func_002E5E58(5, 0, 0);
+        }
+    }
+    func_00336B98(object + 0x324, *(int *)(D_001A7B94 + 8));
+    func_00336B98(object + 0x2DC, *(int *)(D_001A7B94 + 12));
+    func_002E4860();
+    return (flags >> 6) & 1;
+}

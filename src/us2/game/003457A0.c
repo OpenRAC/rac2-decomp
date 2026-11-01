@@ -4,9 +4,7 @@
 INCLUDE_ASM("asm/us2/game", func_US2_00345890);
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_00345FF0);
 
-INCLUDE_ASM("asm/us2/game", func_US2_003460E0);
 
 
 extern void F6402b823_FUN_00336320(char *a);

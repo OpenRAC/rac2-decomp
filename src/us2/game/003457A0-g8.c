@@ -99,3 +99,9 @@ struct pos {
 
 INCLUDE_ASM("asm/us2/game", func_US2_003457A0);
 
+
+INCLUDE_ASM("asm/us2/game", func_US2_00345FF0);
+
+
+INCLUDE_ASM("asm/us2/game", func_US2_003460E0);
+

@@ -108,7 +108,6 @@ char *func_US2_L00_00434768(char *object)
     return object;
 }
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L00_004347A0);
 
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
@@ -195,7 +194,6 @@ char *func_US2_L00_00434DE8(char *object)
 }
 
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L00_00434E20);
 
 int func_US2_L00_00434F48 (char *object, int flags)
 {
@@ -228,7 +226,6 @@ char *func_US2_L00_00434FE0(char *object)
 }
 
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L00_00435018);
 
 int func_US2_L00_00435140 (char *object, int flags)
 {

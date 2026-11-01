@@ -159,3 +159,98 @@ void func_US2_002F6220(int n)
             func_001261F0(0);
     }
 }
+
+typedef struct { char pad[0xB0]; float fov; } CutsceneCamVars;
+extern CutsceneCamVars D_001B9040;
+extern void (*D_001A8C80)(int);
+extern int D_001A8C84, D_001A8BB8;
+extern int D_001BAD78[];
+extern void func_002FC138(void);
+extern void func_0027D330(int);
+extern void func_00272198(float);
+extern void func_002F5220(void);
+extern void func_0027AB40(void);
+extern void func_0029F338(void *);
+extern void func_0026F758(int);
+extern float func_002A89A8(void *, int, float);
+extern float func_00282C48(float);
+extern void func_US2_0026F730(void);
+extern void func_0026F780(void *, void *, int, int);
+extern void func_002B8108(void *, void *, int);
+extern void func_002B7340(int);
+extern void func_002E6120(void);
+
+/* Ends the cutscene: restores the frame rate, camera field of view and the
+   cutscene mobys, drops the hero and camera back to the ground, clears the
+   talk and menu mobys and runs the pending end callback. */
+void func_US2_002F6600(void)
+{
+    char *o;
+    CutsceneHero *p;
+    CutsceneState *b;
+    float g, f;
+    int i;
+
+    if ((unsigned short)(D_001A63A8.state - 6) >= 2)
+        D_001A63A8.state = 5;
+    func_002FC138();
+    func_0027D330(6);
+    D_001B15A8 = 0;
+    D_001B15AC = 0;
+    D_001B15A4 = 0;
+    D_001A8C7C = 0;
+    func_00272198(6.0f);
+    func_002F5220();
+    D_001B9040.fov = 0.62f;
+    func_0027AB40();
+    for (i = 0; i < D_001B8840.count; i++) {
+        CutsceneMoby *m = D_001B8840.mobys[i];
+        if (m) {
+            m->parts->n--;
+            m->parts->slots[m->parts->n] = 0;
+            func_0029F338(m);
+        }
+    }
+    for (o = D_001B1B60; (unsigned char)o[0x20] != 255; o += 0x100) {
+        if (!((unsigned char)o[0x20] & 0x80) && *(short *)(o + 0xAA) == 0xCB)
+            *(unsigned short *)(o + 0x34) &= 0xFF7F;
+    }
+    p = &D_00189E20;
+    if (p->active) {
+        func_0026F758(1);
+        g = func_002A89A8(p->pos, 0, 0.5f);
+        if (2.0f < g) {
+            if (func_00282C48(p->pos[2] - g) < 4.5f)
+                p->pos[2] = g;
+        }
+        D_00189E20.flag = 0;
+        func_US2_0026F730();
+        b = &D_001B8840;
+        if (b->restore) {
+            f = func_002A89A8(b->pos, 0, 0.5f);
+            if (2.0f < f && func_00282C48(b->pos[2] - f) < 2.0f)
+                b->pos[2] = f;
+            func_0026F780(D_001B8840.pos, D_001B8840.rot, 0, 1);
+        }
+    }
+    if (D_001B178C.moby)
+        *(unsigned short *)(D_001B178C.moby + 0x34) &= 0xFFFE;
+    if (D_001F2840.moby) {
+        *(unsigned short *)(D_001F2840.moby + 0x34) &= 0xFFFE;
+        D_001F2840.moby = 0;
+    }
+    if (D_001B178C.moby) {
+        char *moby = D_001B178C.moby;
+        void *data = D_001B178C.data;
+        D_001B178C.moby = 0;
+        D_001B178C.data = 0;
+        func_002B8108(moby, data, 1);
+    }
+    func_002B7340(30);
+    if (D_001A8C80 && !D_001BAD78[0] && D_001A8BB8 != 2 && D_001A8BB8 != 1) {
+        D_001A8C80(D_001A8C84);
+        D_001A8C80 = 0;
+        D_001A8C84 = 0;
+    }
+    func_002E6120();
+}

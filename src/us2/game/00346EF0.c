@@ -49,6 +49,8 @@ INCLUDE_ASM("asm/us2/game", func_US2_003475F0);
 
 
 
+
+
 INCLUDE_ASM("asm/us2/game", func_US2_00347680);
 
 INCLUDE_ASM("asm/us2/game", func_US2_00347B88);

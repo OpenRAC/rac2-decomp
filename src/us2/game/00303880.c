@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_00303880);
 
 typedef int s32;
 typedef unsigned char u8;

@@ -135,7 +135,6 @@ char *func_US2_0033DDC8(char *object)
     return object;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033E070);
 
 typedef struct { int ids[2]; } SolTextPair;
 extern SolTextPair D_L00_001AE1A8;
@@ -242,7 +241,6 @@ char *func_US2_0033E750(char *object)
     return object;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033E788);
 
 INCLUDE_ASM("asm/us2/game", func_US2_0033E8B0);
 
@@ -258,7 +256,6 @@ char *func_US2_0033EB20(char *object)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033EB58);
 
 int func_US2_0033EC80 (char *object, int flags)
 {
@@ -292,7 +289,6 @@ char *func_US2_0033EDD0(char *object)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033EE08);
 
 int func_US2_0033EF30 (char *object, int flags)
 {
@@ -325,7 +321,6 @@ char *func_US2_0033EFC8(char *object)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033F000);
 
 int func_US2_0033F128 (char *object, int flags)
 {

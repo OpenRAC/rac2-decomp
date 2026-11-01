@@ -22,7 +22,6 @@ void func_US2_0029C678(int a0, int a1, int a2, int a3, int a4, int a5, int a6, i
 
 INCLUDE_ASM("asm/us2/game", func_US2_0029C700);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0029C818);
 
 
 INCLUDE_ASM("asm/us2/game", func_US2_0029CA88);

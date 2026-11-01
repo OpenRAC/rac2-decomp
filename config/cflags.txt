@@ -1737,6 +1737,58 @@ src/us2/levels/shared/L02_0038B3C0-flags.c	-O2 -G0 -ffunction-sections -mno-spli
 src/us2/levels/shared/L04_002D93C0-flags.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/us2/levels/shared/L18_002D0050-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/us2/levels/shared/L18_004290D0-update-g8.c	-O2 -G8 -ffunction-sections -g
+src/us2/game/0029C648-g82.c	-O2 -G8 -ffunction-sections
+src/us2/game/002EA0C0-flags.c	-O2 -G0 -ffunction-sections -g
+src/us2/game/00303880-sw.c	-O2 -G0 -ffunction-sections -g
+src/us2/game/0030A098-sw2.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/us2/game/0030D238-sw.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/us2/game/0030FAC0-sw.c	-O2 -G8 -ffunction-sections -g
+src/us2/levels/01_oozla/L01_002BA3C8-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/01_oozla/L01_002BEEA8-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/02_maktar_nebula/L02_003CC648-sw.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/03_endako/L03_002BFAF8-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-hazard-labels
+src/us2/levels/03_endako/L03_002BFAF8-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/03_endako/L03_002BFAF8-sw3.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/us2/levels/04_barlow/L04_002E06B0-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/04_barlow/L04_002E06B0-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/07_siberius/L07_002B8720-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/07_siberius/L07_002B8720-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/08_tabora/L08_002CB8F0-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/08_tabora/L08_002CB8F0-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/09_dobbo/L09_002BC618-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/09_dobbo/L09_002BC618-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/11_joba/L11_002D24D0-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/11_joba/L11_002D24D0-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/12_todano/L12_002C0110-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/12_todano/L12_002C0110-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/15_gorn/L15_003DCFF8-sw.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/16_snivelak/L16_002BA0F8-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-hazard-labels
+src/us2/levels/16_snivelak/L16_002BA0F8-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/16_snivelak/L16_002BA0F8-sw3.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/us2/levels/18_damosel/L18_002D7758-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/18_damosel/L18_002E02E8-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/18_damosel/L18_002E6B50-sw.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/us2/levels/19_grelbin/L19_002BCB58-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/19_grelbin/L19_002BCB58-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/us2/levels/20_yeedil/L20_002CDA30-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/20_yeedil/L20_002D79B0-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/20_yeedil/L20_002DEE88-sw.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/us2/levels/23_damosel_orbit/L23_002C39B8-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/shared/L00_002BA8E0-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/shared/L00_002C4560-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/shared/L00_002C96D0-sw.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-hazard-labels
+src/us2/levels/shared/L00_002CB650-sw.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/us2/levels/shared/L00_00392CE0-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/us2/levels/shared/L00_003B9610-flags.c	sdk -O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_003CE5A0-flags.c	sdk -O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_003E0B88-flags.c	sdk -O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_00403EC0-flags.c	sdk -O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_00404330-flags.c	sdk -O2 -G8 -ffunction-sections
+src/us2/levels/shared/L13_002C58E8-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
+src/us2/levels/shared/L13_002C58E8-sw2.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/shared/L13_002C58E8-sw3.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/us2/levels/shared/L22_002C9B20-sw.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/us2/levels/shared/L22_002D0F48-sw.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
 src/game/002DD400-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/game/002D2018-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/game/002D1D20-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
