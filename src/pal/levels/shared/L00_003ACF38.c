@@ -4,7 +4,6 @@
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003AD088);
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003ADEA8);
 
 #include "common.h"
 typedef float HitVector[4] __attribute__((aligned(16)));
