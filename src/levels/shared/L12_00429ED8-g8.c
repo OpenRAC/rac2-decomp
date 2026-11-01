@@ -1,0 +1,246 @@
+#include "common.h"
+
+extern float D_L12_001B22EC __attribute__((sda));
+extern float D_L12_001B22F0 __attribute__((sda));
+extern float D_L12_001B22F4 __attribute__((sda));
+extern float D_L12_001B22F8 __attribute__((sda));
+extern u32 D_L12_001B22FC __attribute__((sda));
+extern float D_L12_001B2300 __attribute__((sda));
+extern u32 D_L12_001B2304 __attribute__((sda));
+extern u32 D_L12_001B2308 __attribute__((sda));
+extern u32 D_L12_001B230C __attribute__((sda));
+extern u32 D_L12_001B2310 __attribute__((sda));
+extern float D_L12_001B2314 __attribute__((sda));
+extern float D_L12_001B2318 __attribute__((sda));
+extern float D_L12_001B231C __attribute__((sda));
+extern u32 D_L12_001B2320 __attribute__((sda));
+extern u32 D_L12_001B2324 __attribute__((sda));
+extern u32 D_L12_001B2330 __attribute__((sda));
+extern u32 D_L12_001B2334 __attribute__((sda));
+extern u32 D_L12_001B2338 __attribute__((sda));
+extern u32 D_L12_001B233C __attribute__((sda));
+extern u32 D_L12_001B2340 __attribute__((sda));
+extern u32 D_L12_001B2344 __attribute__((sda));
+extern u32 D_L12_001B2348 __attribute__((sda));
+extern u32 D_L12_001B234C __attribute__((sda));
+extern u32 D_L12_001B2350 __attribute__((sda));
+extern u32 D_L12_001B2354 __attribute__((sda));
+extern u32 D_L12_001B2358 __attribute__((sda));
+extern u32 D_L12_001B2360 __attribute__((sda));
+extern u32 D_L12_001B2364 __attribute__((sda));
+extern u32 D_L12_001B2368 __attribute__((sda));
+extern u32 D_L12_001B2370 __attribute__((sda));
+extern u32 D_L12_001B2374 __attribute__((sda));
+extern u32 D_L12_001B2378 __attribute__((sda));
+extern float D_L12_001B2380 __attribute__((sda));
+extern float D_L12_001B2384 __attribute__((sda));
+extern char D_L12_001B9E00[];
+extern float D_L12_001B238C[];
+extern void ref_L12_00429ED8_00(void *);
+extern void func_00281DE8(void *, int, int, int);
+extern void func_00282CF0(void *, void *, void *);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_00282DD8(void *, void *, void *);
+extern void func_00282F20(void *, void *, float);
+extern void func_00280B90(void *, int, int);
+extern float func_00283180(float);
+extern float func_00283198(float);
+extern float func_00283B98(float, float);
+extern float func_002A7940(void);
+extern void func_00281EB8(void *, int, int, int, float, float, float);
+
+typedef struct {
+    float vertices[4][4];
+    u32 colors[4];
+    union { float uv[8]; u32 bits[8]; } tex;
+    u64 flags;
+    char pad[0x18];
+} RenderQuad;
+
+typedef struct {
+    float direction[4];
+    float pad10[3];
+    float angle;
+    float pad20[2];
+    float scroll;
+} BeamState;
+
+void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
+                      int unused4, char *obj)
+{
+    RenderQuad quad;
+    float delta[4], offset[4], center[4], width[4], base[4], temp[4];
+    BeamState *state = *(BeamState **)(obj + 0x68);
+    float *vertices;
+    float *u;
+    float *v;
+    float angle, cosine, sine, glow;
+    int i, j;
+    ref_L12_00429ED8_00(&quad);
+    func_00281DE8(&quad, D_L12_001B2320, 1, 0x80);
+    vertices = quad.vertices[1];
+    u = quad.tex.uv;
+    v = quad.tex.uv + 1;
+    quad.colors[1] = D_L12_001B233C << 24;
+    quad.colors[1] |= D_L12_001B2338 << 16;
+    quad.colors[1] |= D_L12_001B2334 << 8;
+    quad.colors[1] |= D_L12_001B2330;
+    quad.colors[3] = D_L12_001B234C << 24;
+    quad.colors[3] |= D_L12_001B2348 << 16;
+    quad.colors[3] |= D_L12_001B2344 << 8;
+    quad.colors[3] |= D_L12_001B2340;
+    quad.colors[0] = quad.colors[1];
+    quad.colors[2] = quad.colors[3];
+    quad.tex.bits[0] = 0;
+    quad.tex.bits[1] = 0;
+    quad.tex.bits[2] = 0;
+    quad.tex.uv[3] = 1;
+    quad.tex.uv[4] = 1;
+    quad.tex.bits[5] = 0;
+    quad.tex.uv[6] = 1;
+    quad.tex.uv[7] = 1;
+    {
+        float *p = u;
+        for (i = 3; i >= 0; i--) {
+            *p -= state->scroll;
+            if (*p <= 7.0f)
+                *p += 7.0f;
+            p += 2;
+        }
+    }
+    state->scroll += 0.1f;
+    if (state->scroll >= 4.0f)
+        state->scroll -= 4.0f;
+    func_00282CF0(delta, obj + 0x10, D_L12_001B9E00);
+    func_00282F20(offset, state, -D_L12_001B2318);
+    func_00282CC0(center, obj + 0x10, offset);
+    func_00282DD8(width, delta, offset);
+    func_00282F20(width, width, D_L12_001B22F8);
+    func_00282F20(base, state, D_L12_001B238C[0]);
+    func_00282CC0(base, obj + 0x10, base);
+    func_00282CC0(quad.vertices[0], base, width);
+    func_00282CF0(vertices, base, width);
+    func_00282CC0(quad.vertices[2], center, width);
+    func_00282CF0(quad.vertices[3], center, width);
+    func_00280B90(&quad, 0, 0);
+    quad.colors[0] = quad.colors[2];
+    quad.colors[1] = quad.colors[3];
+    quad.colors[2] = quad.colors[3] = 0x202020;
+    qcopy(quad.vertices[0], quad.vertices[2]);
+    qcopy(vertices, quad.vertices[3]);
+    func_00282CC0(quad.vertices[2], quad.vertices[2], offset);
+    func_00282CC0(quad.vertices[3], quad.vertices[3], offset);
+    func_00280B90(&quad, 0, 0);
+    func_00282F20(offset, state, -D_L12_001B231C);
+    quad.tex.bits[0] = 0;
+    quad.tex.bits[1] = 0;
+    quad.tex.bits[2] = 0;
+    quad.tex.uv[3] = 1;
+    quad.tex.uv[4] = 1;
+    quad.tex.bits[5] = 0;
+    quad.tex.uv[6] = 1;
+    quad.tex.uv[7] = 1;
+    angle = state->angle;
+    cosine = func_00283180(angle);
+    sine = func_00283198(angle);
+    {
+        float *q = v;
+        float *p = u;
+        for (j = 3; j >= 0; j--) {
+            temp[0] = *p - 0.5f;
+            temp[1] = *q - 0.5f;
+            *p = temp[0] * cosine - temp[1] * sine;
+            *q = temp[0] * sine + temp[1] * cosine;
+            *p += 0.5f;
+            *q += 0.5f;
+            p += 2;
+            q += 2;
+        }
+    }
+    state->angle = func_00283B98(state->angle, D_L12_001B2314 * 0.017453294f);
+    func_00281DE8(&quad, D_L12_001B2324, 1, 0x80);
+    quad.colors[1] = D_L12_001B2308 << 24;
+    quad.colors[1] |= D_L12_001B2358 << 16;
+    quad.colors[1] |= D_L12_001B2354 << 8;
+    quad.colors[1] |= D_L12_001B2350;
+    quad.colors[3] = D_L12_001B2368 << 16;
+    quad.colors[3] |= D_L12_001B2364 << 8;
+    quad.colors[3] |= D_L12_001B2360;
+    quad.flags = 5;
+    quad.colors[0] = quad.colors[1];
+    quad.colors[2] = quad.colors[3];
+    func_00282F20(width, width, D_L12_001B22EC);
+    func_00282F20(base, state, D_L12_001B238C[0]);
+    func_00282CC0(base, obj + 0x10, base);
+    func_00282CC0(quad.vertices[0], base, width);
+    func_00282CF0(vertices, base, width);
+    func_00282CC0(center, base, offset);
+    func_00282CC0(center, center, offset);
+    func_00282CC0(quad.vertices[2], center, width);
+    func_00282CF0(quad.vertices[3], center, width);
+    func_00280B90(&quad, 0, 0);
+    quad.colors[1] = D_L12_001B2308 << 24;
+    quad.colors[1] |= D_L12_001B2358 << 16;
+    quad.colors[1] |= D_L12_001B2354 << 8;
+    quad.colors[1] |= D_L12_001B2350;
+    quad.colors[3] = D_L12_001B2368 << 16;
+    quad.colors[3] |= D_L12_001B2364 << 8;
+    quad.colors[3] |= D_L12_001B2360;
+    quad.colors[0] = quad.colors[1];
+    quad.colors[2] = quad.colors[3];
+    func_00282F20(width, width, D_L12_001B22F0);
+    func_00282F20(base, state, D_L12_001B2380);
+    func_00282CC0(base, obj + 0x10, base);
+    func_00282CC0(quad.vertices[0], base, width);
+    func_00282CF0(vertices, base, width);
+    func_00282CC0(center, base, offset);
+    func_00282CC0(center, center, offset);
+    func_00282CC0(quad.vertices[2], center, width);
+    func_00282CF0(quad.vertices[3], center, width);
+    func_00280B90(&quad, 0, 0);
+    quad.colors[1] = D_L12_001B2310 << 24;
+    quad.colors[1] |= D_L12_001B2358 << 16;
+    quad.colors[1] |= D_L12_001B2354 << 8;
+    quad.colors[1] |= D_L12_001B2350;
+    quad.colors[3] = D_L12_001B2368 << 16;
+    quad.colors[3] |= D_L12_001B2364 << 8;
+    quad.colors[3] |= D_L12_001B2360;
+    quad.colors[0] = quad.colors[1];
+    quad.colors[2] = quad.colors[3];
+    func_00282F20(width, width, D_L12_001B22F4);
+    func_00282F20(base, state, D_L12_001B2380);
+    func_00282CC0(base, obj + 0x10, base);
+    func_00282CC0(quad.vertices[0], base, width);
+    func_00282CF0(vertices, base, width);
+    func_00282CC0(center, base, offset);
+    func_00282CC0(center, center, offset);
+    func_00282CC0(quad.vertices[2], center, width);
+    func_00282CF0(quad.vertices[3], center, width);
+    func_00280B90(&quad, 0, 0);
+    quad.colors[1] = D_L12_001B230C << 24;
+    quad.colors[1] |= D_L12_001B2378 << 16;
+    quad.colors[1] |= D_L12_001B2374 << 8;
+    quad.colors[1] |= D_L12_001B2370;
+    quad.colors[3] = D_L12_001B2368 << 16;
+    quad.colors[3] |= D_L12_001B2364 << 8;
+    quad.colors[3] |= D_L12_001B2360;
+    quad.colors[0] = quad.colors[1];
+    quad.colors[2] = quad.colors[3];
+    func_00282F20(width, width, D_L12_001B22EC);
+    func_00282F20(base, state, D_L12_001B2384);
+    func_00282CC0(base, obj + 0x10, base);
+    func_00282CC0(quad.vertices[0], base, width);
+    func_00282CF0(vertices, base, width);
+    func_00282F20(offset, state, -0.6f);
+    func_00282CC0(center, base, offset);
+    func_00282CC0(center, center, offset);
+    func_00282CC0(quad.vertices[2], center, width);
+    func_00282CF0(quad.vertices[3], center, width);
+    func_00280B90(&quad, 0, 0);
+    func_00281EB8(obj + 0x10, D_L12_001B22FC, D_L12_001B2304, 1,
+                   D_L12_001B2300, 0.08f, func_002A7940());
+    glow = D_L12_001B2300;
+    glow *= 0.4f;
+    func_00281EB8(obj + 0x10, D_L12_001B22FC, 0x80808080, 1,
+                   glow, 0.08f, func_002A7940());
+}

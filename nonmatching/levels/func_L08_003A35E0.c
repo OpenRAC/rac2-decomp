@@ -1,8 +1,4 @@
-/* MMI (SPECIAL2) instruction: no C spelling. 5868 bytes, level 08_tabora.
-   Retail at 0x003A35E0 carries the SPECIAL2 words 0x72A21800, 0x72A22000,
-   0x72A21800 (+0x124C, +0x1278, +0x1400) - opcode 0x1C, which rabbitizer
-   prints as `INVALID`; it is the MMI family (pcpyld and its relatives) the
-   sixth wave recorded and that no C spelling reaches. This cc1 emits
-   `lq`/`sq` for a `mode(TI)` local and `ldl`/`ldr`/`sdl`/`sdr` for a struct
-   assignment, never the packed copy. ASM_FUNC candidate, as for the rest of
-   the family. */
+/* Not started in C. 5868 bytes, levels 08 and 16.
+   The SPECIAL2 words 0x72A21800, 0x72A22000, 0x72A21800 (+0x124C, +0x1278, +0x1400) have funct 0: the R5900
+   three-operand madd rd,rs,rt, as in func_L00_003769C0's table reads, not an MMI copy. They are no reason to
+   call this assembly (closer C4, 1 November 2026). A fresh m2c pass is the way in. */

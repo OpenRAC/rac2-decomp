@@ -173,7 +173,6 @@ extern void func_L00_00417700(char *);
 extern void func_L00_00417D70(char *);
 extern void ref_L00_004170A8_00(void (*)(char *), char *);
 
-INCLUDE_ASM("asm/levels", func_L00_00412928);
 
 void func_L00_00413128(char *object)
 {

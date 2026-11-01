@@ -5,6 +5,12 @@
  * `o = &origin` set before the aim arm's qcopy gives retail's size and the cross-jump, with no always-true test.
  * Left: retail has `addiu s1, sp, 0x10` after the lq/sq and `lw a1`; here it stays above the qcopy. Set after
  * the qcopy, the size falls to 2700. qcopy_nc changes nothing, a TImode copy moves other rows.
+ * 2026-11-01: set after the qcopy, sched2 gives retail's order (lw a1, addiu s1, const, a0), but jump2 merges the
+ * arms from `daddu a0, s1` back to front and reorg then takes `addiu s1` over the two-word const into the `b` slot,
+ * so the shared tail starts one insn early (2700). Retail keeps s1 in place and has a0 in the slot. Above the qcopy
+ * the volatile asm stops reorg's scan, which is why that spelling gets the size. So either something stops the
+ * scan in retail or a0 is not merged there; a shared `point` local in both arms keeps the order but stops the
+ * cross-jump (2732). Not the arm order: sched2's a0 has priority 6 against the const's 7 here.
  */
 #include "common.h"
 

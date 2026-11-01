@@ -836,7 +836,6 @@ void func_002CADB0(void)
 
 /* func_002CB820 reads $gp slots: it is defined in 002C7748-g8.c. */
 
-INCLUDE_ASM("asm/game", func_002CAF18);
 
 s32 func_002CB4E8(s32 a0) {
  s32 result=0;

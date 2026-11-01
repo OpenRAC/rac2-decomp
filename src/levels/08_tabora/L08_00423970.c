@@ -262,6 +262,5 @@ INCLUDE_ASM("asm/levels", func_L08_00429560);
 
 /* func_L08_00429EE8 is isolated in L08_00429EE8.c. */
 
-INCLUDE_ASM("asm/levels", func_L08_0042A0B0);
 
 INCLUDE_ASM("asm/levels", func_L08_0042A980);

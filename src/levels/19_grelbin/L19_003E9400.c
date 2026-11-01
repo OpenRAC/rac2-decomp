@@ -123,7 +123,6 @@ void func_L19_00420818(char *obj)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L19_00420B48);
 
 extern int D_L19_001C9FC0[];
 extern void func_L00_00323448(char *, char *, int, int, int, int, int, int);

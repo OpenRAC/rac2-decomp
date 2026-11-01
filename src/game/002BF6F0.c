@@ -1780,7 +1780,6 @@ void func_002C6A08(Emitter2C6A08 *emitter)
     func_00282CC0((char *)emitter->pos, (char *)joint, (char *)toward);
 }
 
-INCLUDE_ASM("asm/game", func_002C6B68);
 
 char *func_002C6DD8(void *a0, void *a1, int a2, float f1)
 {

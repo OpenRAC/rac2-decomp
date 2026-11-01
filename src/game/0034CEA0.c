@@ -174,7 +174,6 @@ unsigned char *func_0034DFE0(unsigned char *a0)
     return a0;
 }
 
-INCLUDE_ASM("asm/game", func_0034E070);
 
 void func_0034E218(void)
 {

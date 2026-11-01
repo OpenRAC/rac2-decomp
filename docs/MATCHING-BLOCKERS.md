@@ -369,6 +369,26 @@ slot order therefore means a different insn count at gcse, not a different alloc
 `color` local dropped and an `int` last argument. `func_L00_003A53E8` needs at least 12 more,
 `func_L00_003A1580` about 10 to 20 fewer. Forcing the size in a diagnostic cc1 is enough to test
 this: a two-line `getenv` in `alloc_expr_hash_table`, never in the real compiler.
+Honest insns for the count: a value set before a label and read only past it survives cse1, is
+counted, and gcse's cprop folds it, so the bytes stay. `func_L08_0042A0B0` needed 12: small named
+constants read in the loop (`last = 19`, `total = 20`, `mask = 3`, two counts, `mode`, `flags`) and
+argument copies read only in it (`segment`, `path`, `entry`, `row`, `w0`). No dead initial values.
+A literal float gains nothing (it already takes two insns), nor a constant read in its own block,
+nor a large constant (it stays in a register).
+
+**Sub operands and one-cycle-late insns, 1 November 2026:**
+`sub.s $f13,$f0,$f13` (the subtrahend in the argument register): local-alloc suggests the hard
+register to both dying operands, so the minuend takes it unless it is not local. A variable with
+two deaths goes to global-alloc: `t = p[5]; t = f(z, t - q[5]);` closed `func_L02_00401638`. With two
+local operands the shorter life wins, which is sched1's order.
+An ALU insn retail issues after a call that sched2 here puts before it (`func_00334A88`) can be a
+block-placement matter: `$a0`, `$a1` and the insn compete for two issue slots, and one more insn in
+the block delays the call by a cycle. Setting `axis` before the branch moved that insn into the
+previous block, so the call became ready together with the set, and `reorg` filled its slot with
+the argument. Check this before looking for a hidden insn. `func_L12_00300410` has the same shape
+with no such insn to move, and stays open: its $s0 set would need a barrier or a dependence.
+An argument pair `lui`/`addiu` kept together among other argument moves is a `MACRO_ADDR` object:
+that alone closed `func_L00_003B3450` and took 7 rows from `func_L02_00401638`.
 Sched ties: `rank_for_schedule` compares priority, register weight, class against the last insn,
 then the count of dependents, then the original order. An insn that reads the frame register gets
 one more dependent from a following call in its block (`func_L23_0041A3B8`).
@@ -421,7 +441,12 @@ reaching register: the first computation must go through a pseudo, and the later
 later block (`vp = &velocity` after the first loop, `base2 = object + 0xC0` before the last). If nothing else
 has a saved register left, the reaching register is spilled, which accounts for a lone `sw` of a base
 (`func_L00_003EF560`, frame 0x110). Splitting one float variable in two can decide a frame size and the whole
-FPR order (`func_L00_003A9C58`: `scale`, `bounce`, `speed2`). Constants hoisted from a loop have to be
+FPR order (`func_L00_003A9C58`: `scale`, `bounce`, `speed2`). An allocno also keeps off a register that a
+lower-priority conflicting allocno prefers (global.c's `regs_someone_prefers`): that function's `scale` ranks
+below the loop's `one`, so `scale = f(age); scale /= f(7);` loses $f20 to it, but
+`scale = f(age) / f(7);` copies from a temp that took $f20, the copy makes $f20 `scale`'s preference, and `one`
+moves to $f21. Fewer refs on `scale`, and no wrapper needed. Try the expression form before counting refs.
+Constants hoisted from a loop have to be
 body locals or literals by the same measure, and `short life = 50` before the loop gives $fp to the 2.
 A byte read of a short that keeps the short's allocation is `int l = r->life & 0xFF`.
 Open: `func_L00_0041EE58` and its twin `func_L00_003E2510` keep their first frame address in a
@@ -432,6 +457,11 @@ so `speed` must not die at the multiply or be a global pseudo; a new target ties
 helpers with float parameters and named locals for both operands were tried on 2026-11-01 and change nothing.
 `func_PAL_L00_004266C8`, the PAL copy of `func_L00_004212B8`: the 50 Hz timers are `(D * 5 + 2) / 6`
 and all its sizes match, with only $s3/$s4 swapped, as the extra insns change the live lengths.
+A sweep of forced bucket counts gives every size that fixes a draft, so read the whole list: `func_002B88F0` was 199,
+with 161 to 183, 191, 193, 201 and up all exact, so it needed 2 more buckets (4 insns) and nothing else. Plain indexed
+loops give them: `for (i = 0; i < 16; i++) a[i] = 0;` has an address computation per element at gcse, and loop.c turns it
+into the same pointer countdown as `*dst++` over a reversed counter. Check loop spellings first when a near miss is
+all stack offsets; they change nothing after loop.c.
 
 **Qualified field and call-lifetime remedies, 25 October 2026:**
 `func_002B52A0` is now a 980-byte C implementation at 21 places in each
@@ -2322,6 +2352,8 @@ Historical examples, to requalify in the final unit:
 - Reads of a `$gp` scalar pass struct stores (section 1, MEM_IN_STRUCT). If retail keeps such a load behind the stores, write the stores through a char view: func_00342BE8, 19 words to 2.
 - An int under -G8 can fill a branch slot from the target thread. If retail has the two-word form there, it is part of a larger object: func_002F8178's screen size as one 8-byte struct, 66 words to 33.
 - A hill climb over statement order (48 orders a round, 1 to 3 moves each, on box2) closed func_002F8178's store blocks where 18 statements are too many to enumerate: 33 words to 8.
+
+**Update, 1 November 2026 (closer D).** Before tuning a near miss, walk its branch targets against retail's: `func_L02_003EB8F8` went from 132 rows to 0 by fixing three wrong targets, nothing else; a jump into the middle of what looks like an arm is the sign. A table reached through two `la` with reloads between stores (`func_L09_003806A0`) is one structure array declared `MACRO_ADDR`: separate arrays give the `la` but no aliasing, pointers walk it into a reversed loop. A base kept unfolded for a hero field can be a pointer local inside the arm, which loop.c hoists: it reaches the loop's preheader without being available at the next use, so gcse leaves that use alone. A pointer local set before the branch on the path where PRE must not insert (`d = delta;` in one `case`) gives one insertion instead of three. loop.c's `threshold` falls by 3 per register moved: when retail hoists some constants of a loop and not others, make one a local so the count works out (`func_L10_0039DA48`).
 
 <a id="blocker-46"></a>
 

@@ -920,7 +920,6 @@ void func_L02_003FD070(char *a0) {
 
 /* func_L02_003FD7C8 is defined in L02_003F5430-g8.c ($gp accesses). */
 
-INCLUDE_ASM("asm/levels", func_L02_003FD8B8);
 
 INCLUDE_ASM("asm/levels", func_L02_003FDDE8);
 
@@ -1095,7 +1094,6 @@ s32 func_L02_00400CC8(char *a0) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L02_00401638);
 
 /* func_L02_00401BF8 is matched in L02_00401BF8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 

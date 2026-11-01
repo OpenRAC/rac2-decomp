@@ -1,3 +1,8 @@
+/* Closer b, 2026-11-01: 303 buckets now, and 307 needs 8 more insns at gcse (under -G16). Writing the two statements
+ * after the timer arms per arm adds exactly that and takes the spill slots to three rotated ones (41 lines to 26), but
+ * moves retail's $f20 load and the arms' own layout: the join stays where it is in retail, so the 8 insns are elsewhere.
+ * Even forced to 307, 0x250/0x254/0x258 stay rotated and the pulse base/30 pair stays swapped (11 lines). -G32 is the
+ * same, -G8 is not; TImode copies, gcse-unsplit-edges, hazard labels change no bucket count. */
 /* Closer B, 2026-11-01: forcing 307, 313 or 319 gcse buckets (301 here) takes 42 lines to 12, so retail
  * has at least 12 more insns at gcse. See MATCHING-BLOCKERS 1.
  * The 64-bit read with a mask gives retail's lwu at +0x3D8; the (unsigned long) cast and two short fields do not. */

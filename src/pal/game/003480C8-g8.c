@@ -81,8 +81,8 @@ void func_PAL_00348628(char *o)
     func_00337210(f);
 }
 
-extern void func_003458F8(char *, int);
-extern void func_00345B78(char *, int);
+extern void func_PAL_00347A50(char *, int);
+extern void func_PAL_00347CD0(char *, int);
 extern void func_00345D58(char *, int);
 extern int D_00138344 __attribute__((section(".data")));
 extern int func_PAL_002A9FA0(int,int,int,int,int);
@@ -123,8 +123,8 @@ int func_PAL_003480C8(char *o,int buttons,int *out)
  ref_L00_00345F70_00=-1;
  offset=ref_L00_00345F70_01;
  switch(mode) {
- case 0:*out=0;func_003458F8(o,buttons);break;
- case 3:*out=mode;func_00345B78(o,buttons);break;
+ case 0:*out=0;func_PAL_00347A50(o,buttons);break;
+ case 3:*out=mode;func_PAL_00347CD0(o,buttons);break;
  case 1:*out=mode;func_00345D58(o,buttons);break;
  }
  if(D_00138344&0xf000) func_PAL_002A9FA0(0,0,1,0,1);

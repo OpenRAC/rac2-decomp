@@ -1,6 +1,7 @@
-/* Closer C, 1 November 2026: 2112/2124, 73 rows. qcopy_nc keeps the child pointer in a0 over the copy, which fixes the
- * whole child path; every row to +0x390 agrees. Left: retail's `addiu s5,1; daddu s1,s5; xori v0,2; movn s1,zero,v0`
- * for changed (1 kept in s5 for the first notification store). `one = 1; changed = one; if (...) changed = 0` folds to sltiu.
+/* Closer C4, 1 November 2026: 2120/2124, 58 rows, nearly all two registers. Found: `changed = 0; if (...) changed = 1;` gives the
+ * s5 constant, the search has no base local (PRE's reaching copy makes t0, so read D_001B1B5C inline), and a failed check goes
+ * straight to advance. Left: sched1 moves that copy up into a free slot, so peer ties to the a0 of the load; retail has it at the
+ * branch, peer in a2 and the class in v1, and a nop more. No flag moves it.
  */
 /* GPT-6.1 Sol (high effort), task v1342, 29 October 2026.
  * USA v1.01, default game -O2 -G0 -ffunction-sections; use a separate unit.
@@ -69,7 +70,7 @@ int func_003248A8(char *self)
     int changed, result;
     float pos[4];
     unsigned short *list;
-    char *peer, *pd, *base;
+    char *peer, *pd;
     int peerClass;
     if (B(self,0x20)==0) {
         F(self,0x2C)*=1.1f;
@@ -132,7 +133,7 @@ int func_003248A8(char *self)
     if(B(self,0x31) && func_00282E48(self+0x10,D_001B5340)<24.0f) {
         func_002A93B0(self); B(self,0x6F)=22;
     }
-    changed=B(d,0x2E)==2;
+    changed=0; if(B(d,0x2E)==2) changed=1;
     func_0029FCC0(self,3,d+0x310);
     result=func_002B0ED8(self,d+0x60,0);
     if(result || changed) {
@@ -141,8 +142,7 @@ int func_003248A8(char *self)
         func_00325320(self);
         if((result==4 || result==5 || changed) && B(self,0x21)<=D_001B1B78 && func_002A8508(B(self,0x21),-1)>=2) {
             list=D_001EE5A0[B(self,0x21)];
-            base=D_001B1B5C;
-            peer=base+((*list&0x7FFF)<<8);
+            peer=D_001B1B5C+((*list&0x7FFF)<<8);
             peerClass=*(short *)(peer+0xAA);
             if (peerClass==0xB0A) {
                 char *firstData=P(peer,0x68);
@@ -153,12 +153,13 @@ int func_003248A8(char *self)
                 if (peerClass==0xB0B) goto check_peer1;
 advance1:
                 if ((short)*list++<0) goto done1;
-                peer=base+((*list&0x7FFF)<<8);
+                peer=D_001B1B5C+((*list&0x7FFF)<<8);
                 peerClass=*(short *)(peer+0xAA);
                 if (peerClass!=0xB0A) continue;
 check_peer1:
                 pd=P(peer,0x68);
-                if (!I(pd,0x294)) break;
+                if (I(pd,0x294)) goto advance1;
+                break;
             }
             I(pd,0x294)=1;
 done1:;
@@ -169,8 +170,7 @@ done1:;
         I(d,0x2C8)=1;
         if(func_002A8508(B(self,0x21),-1)>=2) {
             list=D_001EE5A0[B(self,0x21)];
-            base=D_001B1B5C;
-            peer=base+((*list&0x7FFF)<<8);
+            peer=D_001B1B5C+((*list&0x7FFF)<<8);
             peerClass=*(short *)(peer+0xAA);
             if (peerClass==0xB0A) {
                 char *firstData=P(peer,0x68);
@@ -181,12 +181,13 @@ done1:;
                 if (peerClass==0xB0B) goto check_peer2;
 advance2:
                 if ((short)*list++<0) goto done2;
-                peer=base+((*list&0x7FFF)<<8);
+                peer=D_001B1B5C+((*list&0x7FFF)<<8);
                 peerClass=*(short *)(peer+0xAA);
                 if (peerClass!=0xB0A) continue;
 check_peer2:
                 pd=P(peer,0x68);
-                if (!I(pd,0x294)) break;
+                if (I(pd,0x294)) goto advance2;
+                break;
             }
             I(pd,0x294)=1;
 done2:;
