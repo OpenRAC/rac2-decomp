@@ -14,8 +14,11 @@
  * 1 November 2026: indexed k loops fix the later pointer/countdown setup; only the
  * 10.0f hoist remains (13 rows). Retail keeps 10.0f in the outer body although it
  * is single-set, so something blocks the movable in the outer pass (maybe_never).
- * Next: inspect why loop optimization hoists the float bound; avoid repeating
- * the earlier for/do-while and qcopy/qcopy_nc ties without a new hypothesis.
+ * 1 November 2026, later: a do/while has one use of 10.0f (life 1), so it stays in
+ * the inner loop (10 rows: retail has it in the outer body). With `for` the top test
+ * gives a second use, the inner pass hoists it, and the outer pass hoists it again
+ * because life is 84. Retail needs the first without the second. A second-pass inner
+ * hoist needs at most 61 real insns (threshold) against 68 here.
  */
 #include "common.h"
 typedef int BurstQuad __attribute__((mode(TI)));
@@ -65,7 +68,8 @@ void func_L05_003D2048(char *obj)
    func_3068F8(&offset,D_L05_001B98F0,0.5f);
    func_306630(&v,&v,&offset);
    scale*=3.0f;
-   for(j=0;(float)j<10.0f;j++) {
+   j=0;
+   do {
     pos.f[0]=v.f[0];pos.f[1]=v.f[1];pos.f[2]=v.f[2];
     velocity.f[0]=(func_332B50(0,0.1f)+ -0.05f)**(float *)(s+4);
     velocity.f[1]=(func_332B50(0,0.1f)+ -0.05f)**(float *)(s+4);
@@ -80,7 +84,8 @@ void func_L05_003D2048(char *obj)
      *(int *)(record+4)=2;*(unsigned char *)(record+0xA)=127;
      *(unsigned char *)(record+0xB)=*(unsigned char *)(effect+0xA);
     }
-   }
+    j++;
+   } while((float)j<10.0f);
   }
   if(!*(int *)(s+8)) {
    int k;

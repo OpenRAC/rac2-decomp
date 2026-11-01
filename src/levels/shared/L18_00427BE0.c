@@ -127,7 +127,7 @@ void func_L18_0043F040(u8 *obj) {
 
 INCLUDE_ASM("asm/levels", func_L18_0043FFF8);
 
-INCLUDE_ASM("asm/levels", func_L18_004401E0);
+/* func_L18_004401E0 is in L18_00427BE0-sparks.c. */
 
 /* Store the supplied unsigned 32-bit word at owner byte offset 0xB 8. */
 void func_L18_0046B1E0(int param_1, unsigned int param_2)

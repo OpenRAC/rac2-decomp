@@ -47,7 +47,7 @@ extern char *D_L16_001C3FC0[];
 /* reports whether the first live marker in the run still carries the kind byte it looks for */
 /* func_L16_003960F8 uses its dedicated compiler profile. */
 
-INCLUDE_ASM("asm/levels", func_L16_003A8D58);
+/* func_L16_003A8D58 is in L16_002B5EE0-shot.c. */
 
 
 INCLUDE_ASM("asm/levels", func_L16_003C2C08);
