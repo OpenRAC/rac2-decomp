@@ -2119,3 +2119,5 @@ src/game/002AF580-qcopy.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-qcop
 src/levels/14_aranos_prison/L14_00425CB0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/shared/L03_003E4680-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/20_yeedil/L20_0043ECB0-shard-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/levels/shared/L01_003B9798-lift-pre.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-gcse-unsplit-edges
+src/levels/shared/L00_003E8A98-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy

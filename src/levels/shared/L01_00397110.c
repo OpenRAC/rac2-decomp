@@ -76,8 +76,6 @@ void func_L01_00399098(char *a0)
 
 INCLUDE_ASM("asm/levels", func_L01_00399510);
 
-INCLUDE_ASM("asm/levels", func_L01_003B9798);
-
 void func_L01_003BD178(char *m, void *position, int count,
                       float speed, float rise, float maxRadius, float minRadius,
                       float size, float endSize)

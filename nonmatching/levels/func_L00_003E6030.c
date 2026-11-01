@@ -1,12 +1,13 @@
 /* func_L00_003E6030, 1220 bytes, 27 places. USA v1.01, -O2 -G8 -ffunction-sections -frac2-qcopy
- * -ffast-math: 1220/1220 bytes, 13 rows off, all of them spill slots: retail has `i + 1`'s reaching
- * register at 0x124 and object+0xC0's at 0x12C, this draft 0x138 and 0x124. Code, frame, registers
- * and every other slot match.
- * Both are gcse reaching registers ordered by hash bucket, hash 14029 + regno + offset. Frame
- * addresses already fall in retail's order at 131 buckets, and forcing 101..161 buckets gives no
- * exact form, so it is the regnos: at 131 buckets object+0xC0 needs a bucket in 30..89 (its regno is
- * 84, bucket 26) and `i + 1` one in 8..28. Reordering declarations and nesting `i` move neither far
- * enough. Reopen with a hypothesis that changes object's or i's pseudo number.
+ * -ffast-math: 1220/1220 bytes, 9 rows off, one slot swap: `i` is at 0x114 and the record at 0x110,
+ * retail has them the other way round.
+ * Non-gcse spill slots go up with pseudo number, gcse reaching registers come after them by hash
+ * bucket (14029 + regno + offset). Taking object from an argument copy declared late raises its
+ * regno, which fixes object+0xC0's slot. `i + 1`'s slot needs regno(i) about 120 or more, which only a
+ * block-scope `i` after the setup gives, and then the record, declared first, sorts below it. A real
+ * `next` variable lands in the wrong group of slots (0x118, retail 0x124). Forcing 101..181 buckets
+ * with `i` 1 to 8 places later finds nothing. Reopen with a way to give the record a higher pseudo
+ * than `i` although the setup reads it first.
  */
 #include "common.h"
 
@@ -46,16 +47,18 @@ extern float D_L00_00299830[][4];
 extern QuadUV D_L00_0029A990[];
 extern char D_L00_001B8DC0[];
 
-void func_L00_003E6030(unsigned char *object)
+void func_L00_003E6030(void *arg)
 {
     BeamQuad quad;
     Vector matrix[3];
     Vector view, center, saved, edge1, edge2;
-    int i, j;
-    GlowRecord *rec = *(GlowRecord **)(object + 0x68);
+    int j;
+    GlowRecord *rec;
     u64 alpha;
     int colour;
+    unsigned char *object = arg;
 
+    rec = *(GlowRecord **)(object + 0x68);
     quad.registers[1] = func_0027C878(D_L00_001B0634);
     alpha = D_L00_001B0620 | ((u64)D_L00_001B0624 << 2);
     alpha |= (u64)D_L00_001B0628 << 4;
@@ -75,6 +78,8 @@ void func_L00_003E6030(unsigned char *object)
     quad.colors[2] = colour;
     quad.colors[1] = colour;
     quad.colors[0] = colour;
+    {
+    int i;
     for (i = 0; i < 0x8F; i++) {
         for (j = 0; j < 4; j++) {
             int k = D_L00_0029A090[i][j].uv;
@@ -123,5 +128,6 @@ void func_L00_003E6030(unsigned char *object)
                 qcopy(D_L00_001B2B58[i], saved);
             func_00280B90(&quad, 0, 0);
         }
+    }
     }
 }

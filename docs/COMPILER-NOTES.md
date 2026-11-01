@@ -686,6 +686,25 @@ The observations on `func_L20_0039E0A0`, `func_L20_0039DBC8`,
 `func_L20_00440398` and `func_L20_0044AC38` describe pass ordering, not permission
 to add a fictitious guard just to prevent optimization.
 
+Four shapes from `func_L01_003B9798`, `func_L00_003E8A98` and the near misses
+`func_L20_004441D8` and `func_L00_003C8A90`:
+
+- A retail loop with no hoisted constants that still has its alignment nop is a real
+  loop entered in the middle: `goto test; do { ...; test: ...; } while (...);`. The loop
+  note stays, and loop.c refuses to hoist because of the outside jump. A loop written
+  only with labels loses the nop and the loop weight on its registers.
+- A call in two arms merges when something other than a call ends each arm at flow:
+  flow puts `(use 0)` after a call that ends a block, and jump2 can't match it to the
+  other arm's jump. A real following statement in both arms is the usual fix; the two
+  `func_002A7750` arms of `func_L01_003B9798` carry the sound check.
+- Spill slots go up with pseudo number, and gcse reaching registers follow by hash
+  bucket. Raising a parameter's pseudo with a late `unsigned char *object = arg;` or
+  naming an address (`first = attachments[0]; dst = first;`) moves its slot or gives
+  the reaching register retail's reference count. A pointer loop has fewer insns at
+  gcse than an indexed one, which is an honest way to change the bucket count.
+- A byte table that is a field of a larger object adds base first (`T.flags[i]`, retail
+  `addu base, index`); a plain array adds index first.
+
 ### gcse: every store kills every load
 
 [gcse_store_kills_loads.py](../tools/compiler/transformers/gcse_store_kills_loads.py) is
