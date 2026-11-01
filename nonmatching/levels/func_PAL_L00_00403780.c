@@ -1,20 +1,7 @@
-/* GPT-6.1 Sol (high), USA v1.01, game -O2 -G8 -ffunction-sections.
- * Best check: compiled 1664/1680 bytes, 0/27 placements; retail frame 0x170.
- * This file includes all declarations needed by the retained reconstruction.
- * Native TI only for the particle-loop snapshot recovers the position-pointer
- * spill and loop-carried load. Keep the other transfers as approved qcopy.
- * Guarded do/while countdowns recover retail's positive-entry / nonzero-backedge
- * hit loops. Deflection starts at bounces >= 4; shadows require both flags zero.
- * Remaining: params/query pointers have different saved registers, the particle
- * divide lacks two nops, query's 1.0 stays live across calls, and query/hit stores,
- * branch delay slots and final shadow setup differ. External bindings are not
- * validated: size mismatch prevents check.py from resolving all relocations.
- * Measured full query/workspace layouts preserve size/frame but do not fix
- * allocation. -mno-split-addresses retains the earlier 1648-byte baseline
- * (0/27), changing address models without closing allocation. Local particle
- * structs and inlining the size expression both remain 1664 bytes, 0/27.
- * Next: independently establish query-response / normalization live ranges and
- * the exclusion-list base priority; avoid repeating broad TI-copy substitutions.
+/* PAL copy of func_L00_003FEEA0: 1744/1744 bytes, all opcodes and registers right. The only
+ * difference is the 0xF0/0xF4 spill-slot pair, swapped. This is the gcse bucket rotation: with
+ * dcc1 the plain build has 191 buckets, and RAC_S=183, 193 or 199 gives an exact function, so
+ * the body wants 3 to 6 more (or about 16 fewer) insns at gcse with the same final code.
  */
 #include "common.h"
 
@@ -53,18 +40,18 @@ extern int func_002FE9D0(void *);
 extern int func_00300540(int);
 extern int func_00277F48(void *, int, void *, void *, float);
 extern void func_0032D758(void *, int, void *);
-extern void func_002E5CF8(int, int, void *);
+extern int func_002E5CF8(int, int, void *);
 extern void func_L00_003FF530(void *);
 extern void func_002A9288(void *, float);
 extern float func_00282DB0(void *, void *);
-extern unsigned char D_0013958D;
+extern unsigned char D_0013958D[];
 typedef struct EffectPlayer {
     unsigned char prefix[0x70];
     float scale;
     unsigned char suffix[0x6C];
 } EffectPlayer;
-extern EffectPlayer D_L00_00262570[] MACRO_ADDR;
-extern void *D_0018C0B0;
+extern EffectPlayer D_L00_00262570[];
+extern void *D_0018C0B0[];
 extern void *D_L00_001C3280[];
 extern int D_L00_001A8FF0[] MACRO_ADDR, D_L00_001A8FF4[] MACRO_ADDR;
 extern float D_L00_001B0C20 __attribute__((sda));
@@ -111,7 +98,7 @@ typedef struct EffectWorkspace {
     EffectVector offset, step;
 } EffectWorkspace;
 
-void func_L00_003FEEA0(char *self)
+void func_PAL_L00_00403780(char *self)
 {
     EffectState *p = *(EffectState **)(self + 0x68);
     EffectWorkspace work;
@@ -127,34 +114,43 @@ void func_L00_003FEEA0(char *self)
         qcopy(work.old.f, self + 0x10);
         func_00282CC0(self + 0x10, self + 0x10, p);
         func_002FEE70(p->rotation, p, 0);
-        func_002FE880(self + 0x10, p, 0.004055555909872055f);
+        func_002FE880(self + 0x10, p, 0.005840000230818987f);
         func_00282948(&p->trail);
         if (p->trail) {
             for (i = 0; i < 3; i++) {
                 int id;
                 EffectParticle *r;
+                float x;
+                float f;
                 float third = 0.33329999446868896f;
                 float one = 1.0f;
                 *(EffectQuad *)work.tmp.f = *(EffectQuad *)(self + 0x10);
                 func_L00_0031D670(work.params.point.f, work.old.f, work.tmp.f, func_00283CE0(i) * third);
                 id = func_002A77E0(6);
-                if (func_002A77E0(2)) id = -id;
-                r = func_002BDCE8(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20,
-                                   ((float)p->trail / func_00283CE0(50)) * 65000.0f + 10000.0f, 0x80808080, 1);
+                if (func_002A77E0(2)) {
+                    id = -id;
+                }
+                x = (float)p->trail / func_00283CE0(42) * 65000.0f + 10000.0f;
+                r = func_002BDCE8(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
                 if (r) {
+                    short life = 42;
                     EffectParticleExtension *extension = (EffectParticleExtension *)(r + 1);
-                    r->life = 50;
+                    r->life = life;
                     extension->mode = 2;
                     extension->alpha = 127;
-                    extension->life = *(unsigned char *)&r->life;
+                    { int l = r->life & 0xFF; extension->life = l; }
                 }
             }
         }
         __builtin_memcpy(work.params.excluded, D_L00_001B0C48, 8);
         extra = 1.5f;
-        if ((float)p->bounces == 3.0f) extra = 0.0f;
+        if ((float)p->bounces == 3.0f) {
+            extra = 0.0f;
+        }
         radius = D_L00_001B0C30;
-        if (p->charged) radius = D_L00_001B0C3C;
+        if (p->charged) {
+            radius = D_L00_001B0C3C;
+        }
         qcopy(work.query.start.f, work.old.f);
         qcopy(work.query.end.f, self + 0x10);
         qcopy(work.query.delta.f, p);
@@ -162,14 +158,18 @@ void func_L00_003FEEA0(char *self)
         work.query.owner = self;
         work.query.mode = 2;
         work.query.radius = radius;
-        work.query.scale = (D_L00_001B0C20 - 1.0f) + 1.0f;
+        work.query.scale = (D_L00_001B0C20 - 1.0f) * 1.2f + 1.0f;
         work.query.extra = extra;
         work.query.field48 = 0;
         work.query.field4c = 0;
         work.query.field58 = 0;
         swept = func_002FE9D0(&work.query);
         kind = func_00300540(work.query.hit);
-        if (swept > 0 && (unsigned)(kind - 1) < 2) break;
+        if (swept > 0 && (unsigned)(kind - 1) < 2) {
+            func_L00_003FF530(self);
+            func_0029F338(self);
+            return;
+        }
         qcopy(self + 0x10, work.query.end.f);
         qcopy(p, work.query.delta.f);
         func_002ACDE8(self + 0xC0, self + 0xC0, p->axis.f);
@@ -177,15 +177,15 @@ void func_L00_003FEEA0(char *self)
         func_002ACDE8(self + 0xE0, self + 0xE0, p->axis.f);
         work.hit.owner = self;
         work.hit.flags = 0x830000;
-        work.hit.scale = D_L00_00262570[D_0013958D].scale;
+        { EffectPlayer *pl = &D_L00_00262570[D_0013958D[0]]; work.hit.scale = pl->scale; }
         work.hit.enabled = 1;
         qcopy(work.hit.pos, p);
         func_00282F20(work.hit.pos, work.hit.pos, 1.0f);
         work.hit.type = 3;
-        work.hit.active = 1;
-        work.hit.classId = *(unsigned short *)(self + 0xAA);
         work.hit.radius = 5627.9248046875f;
-        result = func_00277F48(self + 0x10, 1, D_0018C0B0, &work.hit, radius + 0.1f);
+        work.hit.classId = *(unsigned short *)(self + 0xAA);
+        work.hit.active = 1;
+        result = func_00277F48(self + 0x10, 1, D_0018C0B0[0], &work.hit, radius + 0.1f);
         if (result) {
             if (p->charged) {
                 if (result > 0) {
@@ -206,29 +206,33 @@ void func_L00_003FEEA0(char *self)
                     } while (--remaining);
                 }
             }
-            break;
+            func_L00_003FF530(self);
+            func_0029F338(self);
+            return;
         }
         if (swept > 0) {
             qcopy(work.tmp.f, p);
             work.tmp.f[2] = 0;
             func_00282DD8(work.tmp.f, work.tmp.f, work.normal.f);
             func_00282F20(work.tmp.f, work.tmp.f, 1.0f);
-            func_002AB668(work.params.point.f, work.tmp.f, func_002A7878(0.05235988646745682f, 0.10471977293491364f));
+            func_002AB668(p->axis.f, work.tmp.f, func_002A7878(0.06283186376094818f, 0.10482405126094818f));
             func_002E5CF8(1, 0, self);
             p->bounces += 1;
             if (p->bounces >= 4) {
                 qcopy(self + 0x10, D_L00_001BF230);
                 self[0x20] = 1;
-                p->timer = D_L00_001B0C44;
-                speed = D_L00_001B0C28 * 0.05235988646745682f;
-                if (p->charged) speed *= D_L00_001B0C34;
+                p->timer = (D_L00_001B0C44 * 5 + 2) / 6;
+                speed = D_L00_001B0C28 * 0.06283186376094818f;
+                if (p->charged) {
+                    speed *= D_L00_001B0C34;
+                }
                 func_L00_003252A8(self, work.offset.f, 1);
                 scale = func_00282DB0(work.offset.f, p);
                 func_00282D30(work.step.f, work.offset.f, scale);
                 func_00282CF0(p, p, work.step.f);
                 func_00282F20(p, p, speed);
                 qcopy(p->axis.f, work.tmp.f);
-                p->axis.f[3] = 0.05235988646745682f;
+                p->axis.f[3] = 0.06283186376094818f;
             }
         }
         break;
@@ -238,7 +242,7 @@ void func_L00_003FEEA0(char *self)
         func_002ACDE8(self + 0xC0, self + 0xC0, work.old.f);
         func_002ACDE8(self + 0xD0, self + 0xD0, work.old.f);
         func_002ACDE8(self + 0xE0, self + 0xE0, work.old.f);
-        scale = (D_L00_001B0C40 - 1.0f) + 1.0f;
+        scale = (D_L00_001B0C40 - 1.0f) * 1.2f + 1.0f;
         p->axis.f[3] *= scale;
         func_00282D30(p, p, scale);
         if (func_00282948(&p->timer)) {
@@ -249,6 +253,10 @@ void func_L00_003FEEA0(char *self)
         break;
     }
     fadeRadius = D_L00_001B0C28;
-    if (p->charged) fadeRadius *= D_L00_001B0C34;
-    if (D_L00_001A8FF0[0] == 0 && D_L00_001A8FF4[0] == 0) func_002A9288(self, fadeRadius);
+    if (p->charged) {
+        fadeRadius *= D_L00_001B0C34;
+    }
+    if (D_L00_001A8FF0[0] == 0 && D_L00_001A8FF4[0] == 0) {
+        func_002A9288(self, fadeRadius);
+    }
 }

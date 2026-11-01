@@ -1,39 +1,3 @@
-/* GPT-6.1 Sol (high), task v1189, 29 October 2026.
- * USA v1.01, game -O2 -G8 -ffunction-sections.
- * Best retained check.py: 1604/1616 bytes, 0 of 27 places match.
- * Required declarations are below. Eighteen check.py trials (one syntax failure)
- * and one allocation diagnostic; stopped after the final source/profile tie.
- *
- * Improvement over v0639 (1608 bytes, also 0/27): the typed 0x80-byte oscillator
- * record, declared inside the indexed loop, recovers the complete initialization
- * loop, including s4 base, s1 field cursor, s0 indexed offset, s2 second-output
- * cursor, s3 ascending count, call slots and loop branch. Its initialization
- * path through retail +0x268 agrees apart from relocations and its exit target.
- * Plain scalar declarations for the two absolute globals preserve retail's
- * initial dispatch registers and absolute initialization store. NOT_SDA/nosda
- * instead introduce a shared split high address and change dispatch registers.
- *
- * A start/restart switch with a captured minimum and branch-local table/index
- * temporaries recovers the shared address/load/division tail. Separate old/next
- * charge values recover the idle path's f2/f1/f0 assignment. A speed variable
- * defined after the origin call, then negated in its branch, recovers the signed
- * velocity constant and removes duplicate materialization.
- *
- * Remaining: the case-1 -1.0 store moves into a branch slot and becomes GP-relative
- * instead of retail's absolute store; that also removes the subsequent likely-
- * branch mode preload. First start's byte-address/stride registers and scheduling
- * differ, and the common division lacks retail's nop. All later operations agree
- * structurally but have shifted addresses. No linked build was run for this miss.
- * -g ties both before and after the table/index rewrite. Replacing record-pointer
- * arithmetic by explicit byte offsets also ties, as does scalar NOT_SDA versus
- * incomplete-array spelling for the weapon index. Incomplete sda/MACRO_ADDR views
- * of the absolute globals tie each other and do not fix the case-1 store slot.
- * A shared pointer after the start/restart switch worsens the division registers.
- * Reopen with evidence for the absolute store's scheduling or the first start's
- * table/stride expression, not another cosmetic oscillator permutation.
- * Historical best before this task: v0639 1608/1616, 0/27; older 1552/1616, 0/27.
- */
-
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 /* Measured resident player-state prefix; fields beyond this prefix are unknown. */
@@ -51,8 +15,8 @@ typedef struct {
 extern PlayerStatePrefix D_00189E20;
 extern u8 D_00139584[];
 extern unsigned int D_00138180[];
-extern float D_L00_001B285C;
-extern int D_L00_001B2840;
+typedef struct { int mode; char pad[0x18]; float time; } Ctrl0F30;
+extern Ctrl0F30 D_L00_001B2840 __attribute__((sda));
 extern int D_L00_001AF5CC __attribute__((sda));
 extern float D_L00_001AF5D0 __attribute__((sda));
 extern float D_L00_001AF5D4 __attribute__((sda));
@@ -91,7 +55,9 @@ extern void func_00282F20(void *, void *, float);
 extern void func_L00_0032A1A8(char *, char *, char *, float);
 extern void *func_L00_003BB080(char *, char *, char *, char *);
 extern void func_L00_003A1580(void *);
-extern void func_L00_002E6EF8(void (*)(void *), void *);
+/* The binder: func_L00_002E6EF8 in 23 programs, its twin func_L08_002F2D10 in levels 08, 09,
+   19 and 30, so the call carries a name without an address. */
+extern void ref_L00_003A0F30_00(void (*)(void *), void *);
 extern float func_00283B98(float, float), func_00283198(float), func_00283180(float);
 
 /* Initialize the beam oscillators and update the weapon's charge cycle. */
@@ -113,7 +79,7 @@ void func_L00_003A0F30(char *moby)
         int i, handle;
         *(float *)state = 0.3666666746f;
         *(unsigned char *)(moby + 0x20) = 1;
-        D_L00_001B285C = -1.0f;
+        D_L00_001B2840.time = -1.0f;
         D_L00_001AF5E4 = 0;
         D_L00_001AF5CC = 0;
         if (*(unsigned char *)(moby + 0x43) || (*(unsigned char *)(moby + 0x60) & 2))
@@ -146,7 +112,7 @@ void func_L00_003A0F30(char *moby)
         return;
     }
     case 1: {
-    D_L00_001B285C = -1.0f;
+    D_L00_001B2840.time = -1.0f;
     if (D_L00_001AF5CC == 0) {
         *(int *)(state + 0xC) = 0;
         D_L00_001AF5CC = 1;
@@ -164,29 +130,26 @@ void func_L00_003A0F30(char *moby)
     if (func_002829D8(state) && ready && !D_00189E20.blocked && (D_00138180[0x68] & D_00189E20.buttons) &&
         !func_L00_003BB5F0() && D_00189E20.inputTicks > 22) {
         if (func_L00_002D3F30(-1, 1)) {
-            D_L00_001B2840 = 1;
+            D_L00_001B2840.mode = 1;
             func_002E5CF8(2, 0, moby);
             {
-                float minimum = D_L00_001AF5D8;
                 float cooldown;
                 switch (D_L00_001AF5E4) {
                 case 0: {
                     WeaponEntry *weapon;
                     int index;
                     D_L00_001AF5E4 = 1;
-                    *(float *)(state + 0xC) = minimum;
-                    weapon = D_L00_00262570;
-                    index = D_00139584[0];
-                    cooldown = 1.0f / (weapon + index)->rate;
+                    *(float *)(state + 0xC) = D_L00_001AF5D8;
+                    weapon = &D_L00_00262570[D_00139584[0]];
+                    cooldown = 1.0f / weapon->rate;
                     break;
                 }
                 case 2: {
                     WeaponEntry *weapon;
                     int index;
                     D_L00_001AF5E4 = 1;
-                    weapon = D_L00_00262570;
-                    index = D_00139584[0];
-                    cooldown = 1.0f / (weapon + index)->rate;
+                    weapon = &D_L00_00262570[D_00139584[0]];
+                    cooldown = 1.0f / weapon->rate;
                     break;
                 }
                 default:
@@ -194,9 +157,9 @@ void func_L00_003A0F30(char *moby)
                 }
                 *(float *)state = cooldown;
             }
-        } else if ((D_00138180[0x69] & D_00189E20.buttons) || D_L00_001B2840 == 1) {
+        } else if ((D_00138180[0x69] & D_00189E20.buttons) || D_L00_001B2840.mode == 1) {
             func_002E5CF8(6, 0, moby);
-            D_L00_001B2840 = 0;
+            D_L00_001B2840.mode = 0;
         }
     }
 updateCharge:
@@ -246,7 +209,7 @@ updateCharge:
     }
     }
     if (*(unsigned char *)(moby + 0x31))
-        func_L00_002E6EF8(func_L00_003A1580, moby);
+        ref_L00_003A0F30_00(func_L00_003A1580, moby);
     *(float *)(state + 0x10) = func_00283B98(*(float *)(state + 0x10), *(float *)(state + 0xC) * 0.3141593039f);
     *(float *)(state + 0x30) = func_00283198(*(float *)(state + 0x10) * 0.5f);
     *(float *)(state + 0x3C) = func_00283180(*(float *)(state + 0x10) * 0.5f);

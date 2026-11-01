@@ -387,11 +387,32 @@ weight prefers the store that kills it, and no spelling of the two stores moves 
 exact result for this needed a zero local unset on the `goto` path, refused as an uninitialised read
 (reload substitutes the constant only after sched1). Per-arm statements match under the plain profile,
 so its old `-frac2-gcse-unsplit-edges -frac2-keep-block-order` were not needed.
+Next run, 2026-11-01: `func_L00_002B2318`, `func_L00_003FEEA0`, `func_L00_003A9C58`, `func_L00_003EF560`
+and `func_L00_003A0F30`. A callee's real return type matters even when the value is ignored: a call
+declared `void` leaves $v0 free, one declared `int` marks it set and unused, and that moved the
+next block's registers in `func_L00_003FEEA0` and `func_L00_003A48D0` (take the type other units agree on).
+A dead read in a loop with both arms identical is `if (flag) A else A`, cross-jumped at jump2. Whole arms
+written out also lengthen a pseudo that spans them, which is how `func_L00_002B2318`'s $s4/$s5 swap went:
+priority is `floor(log2(refs)) * refs / live`, and 396 against 402 was enough. A constant that is
+rematerialised after a call where cse should have reused it means a label with a second use at cse time, so
+the destroy calls are written at each exit and cross-jump later, instead of a `goto`.
+Under `-g` the two-slot `div.s` floor counts from the line note, so `x = 1.0f / w->rate` after a statement
+computing `w` gives retail's single nop, and a statement of its own gives two. Loop labels are 8-aligned, so
+a nop before one comes back by itself once the size is right.
+A frame or base address in a call-clobbered temp with a copy in a saved register (`daddu fp, s0`) is gcse's
+reaching register: the first computation must go through a pseudo, and the later one is a local set in a
+later block (`vp = &velocity` after the first loop, `base2 = object + 0xC0` before the last). If nothing else
+has a saved register left, the reaching register is spilled, which accounts for a lone `sw` of a base
+(`func_L00_003EF560`, frame 0x110). Splitting one float variable in two can decide a frame size and the whole
+FPR order (`func_L00_003A9C58`: `scale`, `bounce`, `speed2`). Constants hoisted from a loop have to be
+body locals or literals by the same measure, and `short life = 50` before the loop gives $fp to the 2.
+A byte read of a short that keeps the short's allocation is `int l = r->life & 0xFF`.
 Open: `func_L00_0041EE58` and its twin `func_L00_003E2510` keep their first frame address in a
 call-clobbered temp with a copy in the call's delay slot, and every later use on the copy; ours is one
 pseudo over the calls. A local after the call merges into it, and `-fno-regmove` changes nothing there.
 `func_L00_003F4210` has one word left, `mul.s f1, f0, f1`: the target has to tie to the second operand,
-so `speed` must not die at the multiply or be a global pseudo; a new target ties to the first.
+so `speed` must not die at the multiply or be a global pseudo; a new target ties to the first. Inline
+helpers with float parameters and named locals for both operands were tried on 2026-11-01 and change nothing.
 `func_PAL_L00_004266C8`, the PAL copy of `func_L00_004212B8`: the 50 Hz timers are `(D * 5 + 2) / 6`
 and all its sizes match, with only $s3/$s4 swapped, as the extra insns change the live lengths.
 

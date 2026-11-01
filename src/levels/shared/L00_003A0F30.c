@@ -67,7 +67,6 @@ typedef float Vector[4] __attribute__((aligned(16)));
 typedef struct { float vertices[4][4]; unsigned int colors[4]; float uv[4][2]; u64 registers[4]; } __attribute__((aligned(16))) BeamQuad;
 extern void func_L00_003A2B28(char *);
 
-INCLUDE_ASM("asm/levels", func_L00_003A0F30);
 
 INCLUDE_ASM("asm/levels", func_L00_003A1580);
 

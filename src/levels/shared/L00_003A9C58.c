@@ -1,28 +1,3 @@
-/*
- * Tier: sol-high, task v1363. USA v1.01, game EE-GCC, -O2 -G8 -ffunction-sections.
- * Best check.py result: 2148/2156 bytes, 0/27 places; retail 0xF0 frame,
- * all nine saved GPRs and five saved FPRs, no pointer spill.
- * Required declarations are included below; compile in a dedicated -g8.c unit.
- *
- * Corrects three control-flow errors in the earlier sol-low transcription:
- * the line probe at 003A9E68 is inside the age < 7 branch; successful detonation
- * jumps from 003AA2B4 directly to cleanup at 003AA450; states other than 25/70
- * independently satisfy the detonation gate (003AA1A0 branches to 003AA1BC).
- *
- * The particle-loop snapshot uses an ordinary TImode copy, recovering retail's
- * offset load/store and likely-branch load. An explicit pre-loop minimumLifetime
- * recovers the fifth FPR and frame. Remaining differences: FPR allocation,
- * loop constant hoisting (127 rather than 2 in fp), particle-result registers,
- * particle-call address/setup and two div.s hazard nops, and global base setup.
- * Size mismatch still prevents relocation-qualified placement validation.
- *
- * Nineteen checker invocations (including final recheck) and two regalloc diagnostics in this task.
- * Splitting the lifetime arithmetic tied; bank-preserving call interleaving
- * did not change size. All constants declared before the loop gave 2132 bytes;
- * -mno-split-addresses gave 2140; separate vector scopes grew the frame to 0x110.
- * Next: reconstruct the particle-loop expression/lifetimes and actual global
- * record views; do not reintroduce the three control-flow errors above.
- */
 #include "common.h"
 typedef int Quad9C58 __attribute__((mode(TI)));
 #define F(p,o) (*(float *)((char *)(p)+(o)))
@@ -38,7 +13,7 @@ extern float func_00282DF0(void *),func_00282DB0(void *,void *);
 extern float func_00283CE0(int),func_00283B98(float,float),func_00283198(float),func_00282C48(float);
 extern int func_00282978(void *),func_00282948(void *),func_002A77E0(int);
 extern void func_L00_0031D670(void *,void *,void *,float);
-extern char *func_002BDCE8(void *,int,void *,float,float,unsigned int,float,float,int);
+extern char *func_002BDCE8(void *,float,float,float,int,void *,float,unsigned int,int);
 extern int func_002761F8(void *,void *,int,void *,int),func_00277258(void *,int,int,float);
 extern int func_002E5CF8(int,int,void *);
 extern void func_002E59F8(int),func_L00_00427078(void),func_002FEE50(int),func_0029F338(void *),func_00300190(void *,void *),func_002A9288(void *,float);
@@ -46,8 +21,8 @@ extern void func_L00_003A9798(void *,void *,void *,int);
 extern void func_0032C700(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
 typedef struct { char pad0[10]; union { short lifetime; unsigned char bytes[2]; } age; } Particle9C58;
 typedef struct { char pad0[4]; int type; char pad8[2]; unsigned char alpha,life; } Payload9C58;
-extern char D_L00_001A8F20[] __attribute__((sda));
-extern char D_L00_001BF220[] __attribute__((sda));
+extern char D_L00_001A8F20[] MACRO_ADDR;
+extern char D_L00_001BF220[] MACRO_ADDR;
 typedef struct { char pad0[0x18]; char *hit; char pad1C[0x14]; float position[4],normal[4]; } Collision9C58;
 extern Collision9C58 D_L00_001BF200;
 extern char D_L00_001B9000[];
@@ -56,19 +31,19 @@ typedef struct {
  int control_mask; char pad1234[0x1248-0x1234]; int state;
  char pad124C[0x2290-0x124C]; int collision_flags; int weapon;
 } Hero9C58;
-extern Hero9C58 D_00189E20 __attribute__((sda));
+extern Hero9C58 D_00189E20;
 typedef struct {
  char pad0[0x108]; float axis_x,axis_y; char pad110[0x1A0-0x110];
  int held,pressed;
 } Pad9C58;
-extern Pad9C58 D_00138180 __attribute__((sda));
+extern Pad9C58 D_00138180;
 extern char D_00188660[];
 extern int D_L00_001ADB2C __attribute__((sda));
 void func_L00_003A9C58(char *m)
 {
  float old[4],direction[4],a[4],b[4],c[4];
- char *d=*(char **)(m+0x68),*p,*q;
- int i,n,prior;float scale,speed,t;
+ char *d=*(char **)(m+0x68),*p;
+ int i,n,prior;float scale,speed,t,bounce;
  func_002AFFD8(m+0x10,direction,1);
  H(d,0x14)++;
  qcopy(old,m+0x10);
@@ -77,23 +52,25 @@ void func_L00_003A9C58(char *m)
  func_00282CC0(m+0x10,m+0x10,d);
  func_00282978(d+0x2C);
  if(H(d,0x2C)) {
- float minimumLifetime=10000.0f;
- int particleType=2;
+ short life=50;
  for(i=0;i<3;i++) {
+   float third=0.3333f; float one=1.0f; int type=2;
    *(Quad9C58 *)b=*(Quad9C58 *)(m+0x10);
-   func_L00_0031D670(a,old,b,func_00283CE0(i)*0.3333f);
+   func_L00_0031D670(a,old,b,func_00283CE0(i)*third);
    n=func_002A77E0(6);if(func_002A77E0(2))n=-n;
-   t=func_00283CE0(50);
-   { Particle9C58 *particle=(Particle9C58 *)func_002BDCE8(a,n,D_L00_001A8F20,0.025f,1.0f,0x80808080,1.0f,H(d,0x2C)/t*70000.0f+minimumLifetime,1);
+   t=H(d,0x2C)/func_00283CE0(50)*70000.0f+10000.0f;
+   { Particle9C58 *particle=(Particle9C58 *)func_002BDCE8(a,0.025f,one,one,n,D_L00_001A8F20,t,0x80808080,1);
    if(particle) {
      Payload9C58 *payload;
-     particle->age.lifetime=50;
+     particle->age.lifetime=life;
      payload=(Payload9C58 *)((char *)particle+32);
-     payload->type=particleType;payload->alpha=127;payload->life=particle->age.bytes[0];
+     payload->type=type;payload->alpha=127;
+     { int l=particle->age.lifetime&0xFF; payload->life=l; }
    } }
  }
  }
- if(H(d,0x14)<7) {scale=func_00283CE0(H(d,0x14));scale/=func_00283CE0(7);scale*=0.45f;
+ /* The do/while weighs scale above the loop constants in global allocation, as in retail. */
+ if(H(d,0x14)<7) {do {scale=func_00283CE0(H(d,0x14));scale/=func_00283CE0(7);scale*=0.45f;} while(0);
  qcopy(a,m+0x10);
  func_00282D30(b,direction,F(d,0x20));func_00282CF0(c,m+0x10,b);
  if(func_002761F8(a,c,18,m,0))func_00282CC0(m+0x10,D_L00_001BF220,b);
@@ -108,7 +85,7 @@ void func_L00_003A9C58(char *m)
  func_00282948(d+0x44);
  if(func_00277258(m+0x10,0,D_00189E20.collision_flags,scale)) {
    qcopy(m+0x10,D_L00_001BF200.position);
-   speed=func_00282DF0(d);scale=speed*0.25f;if(scale<0.033333335f)scale=0.033333335f;
+   speed=func_00282DF0(d);bounce=speed*0.25f;if(bounce<0.033333335f)bounce=0.033333335f;
    if(D_L00_001BF200.hit) {
      func_00282CF0(a,m+0x10,D_L00_001BF200.hit+0x10);
      t=func_00282DB0(direction,a);func_00282D30(b,direction,t);
@@ -116,11 +93,11 @@ void func_L00_003A9C58(char *m)
      func_00282CF0(a,m+0x10,c);func_00283028(d,d,a);
    } else {
      func_00282D30(a,D_L00_001BF200.normal,0.0009765625f);func_00282F20(a,a,1.0f);
-     t=func_00282DB0(a,direction);t=func_00282C48(t);if(t>=0.8f)scale=speed;
+     t=func_00282DB0(a,direction);t=func_00282C48(t);if(t>=0.8f)bounce=speed;
      func_00283028(d,d,a);
    }
    if(!I(d,0x44)) {func_002E5CF8(2,0,m);I(d,0x44)=15;}
-   func_00282F20(d,d,scale);
+   func_00282F20(d,d,bounce);
  }
  func_00282D08(d,d,d+0x50,0.01f);
  p=D_00188660+I(d,0x40)*0x70;
@@ -143,11 +120,11 @@ steer:
    if(D_00189E20.weapon!=49)D_00189E20.control_state=2;
    func_L00_00427078();
    if(D_00138180.axis_x!=0 || D_00138180.axis_y!=0) {
-     speed=func_00282DF0(d);
-     if(speed!=0) {
+     float speed2=func_00282DF0(d);
+     if(speed2!=0) {
        func_00282D30(a,D_L00_001B9000,-D_00138180.axis_x*0.004166667f);func_00282CC0(d,d,a);
-       func_00282D30(a,D_L00_001B9000+16,-D_00138180.axis_y*0.0008333333f);func_00282CC0(d,d,a);
-       func_00282F20(d,d,speed);
+       func_00282D30(a,D_L00_001B9000+16,-D_00138180.axis_y*0.00083333341f);func_00282CC0(d,d,a);
+       func_00282F20(d,d,speed2);
      }
    }
  }
