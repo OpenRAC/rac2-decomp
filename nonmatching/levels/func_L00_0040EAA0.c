@@ -17,6 +17,13 @@
  * See nonmatching/levels/func_L01_00410AD0.c for the previously measured
  * allocation-priority blocker. Reopen with a new source-lifetime hypothesis;
  * do not repeat the rejected redundant pre-test clear from that file's notes.
+ * 1 November 2026, loop dump (-dL) on the L02 copy: loop.c runs twice. The first pass leaves
+ * every life-1 constant ("not desirable" at 60 real insns), the second moves them at 51. That
+ * second pass is what hoists shift-one (or the bitset address, whichever comes first in the
+ * body), so noList loses its register. Retail keeps both in the loop and still hoists -1 and the
+ * queue high half, so retail's loop has more real insns at that pass, or its -1 has life 2.
+ * 56 spellings of the bit test, dep's type and the clear's position did not raise the count;
+ * inline helpers neither. Next: find what adds insns before combine, not more mask spellings.
  * All required declarations are included below.
  */
 #include "common.h"
