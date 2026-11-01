@@ -1,27 +1,3 @@
-/*
- * func_0033FB98 (Opus 5.5, xhigh, task v2059).
- * Best, tools/check.py on this C as src/game/0033F030-menu-g8.c (the name gives it -G8, which it needs):
- * USA v1.01 28 of 28 places, 1720/1720 bytes; PAL 0 of 28; USA v2.00 0 of 28.
- *
- * What differs on PAL and v2.00: exactly four field offsets, the same in both releases.
- *   +0x1D4 self + 0x8B8 -> 0x8D8    +0x200 self + 0x900 -> 0x930
- *   +0x22C self + 0x948 -> 0x988    +0x258 self + 0x990 -> 0x9E0
- * self+0x828 does not move: these are elements 2 to 5 of children from 0x828 whose size is 0x48 in
- * v1.01 and 0x58 in the other two. Measured: this C with the right column gives PAL 28 of 28 and
- * v2.00 28 of 28, and v1.01 0 of 28. So nothing else in the function changes between releases.
- *
- * This is not a wording problem. Each source is compiled once, with flags from config/cflags.txt that
- * do not depend on the release (tools/build.py flags_for, compile_c), so one definition cannot emit
- * both immediates. The PAL and v2.00 catalogues carry the function under its v1.01 name only because
- * tools/levels.py identity() masks large offsets on registers: docs/VERSIONS.md "What the build
- * disproves". func_0033F0A0 and func_0033F218, which use the same four offsets, are in neither catalogue.
- *
- * What would unblock it, as docs/VERSIONS.md describes: tools/carry.py --version pal --demote and
- * --version us2 --demote after a build, recording it in config/<version>/not_carried.tsv. Then this C
- * goes into src/ and the right-column C into src/pal/ and src/us2/ under the release's own names
- * (PAL 00341C18, v2.00 00340AA8). Both of its callers defined in C, func_0029CBE0 and func_0033F218,
- * are already absent from those catalogues.
- */
 #include "include_asm.h"
 
 typedef struct { float x, y; } Pair;

@@ -1,20 +1,3 @@
-/*
- * GPT-6.1 Sol (high effort), task v1491, 29 October 2026.
- * Default game -O2 -G8 -ffunction-sections, isolated *-g8.c unit.
- * USA v1.01: 1488/1488 bytes, 28/28 places match with current compiler.
- * PAL: func_002CAF18 is in neither catalogue of pal.
- * USA v2.00: 1488/1488 bytes, 0/27 places; first difference at +0x30.
- * Its retail menu offset is 0x39160 instead of 0x39140, and its fields are
- * +0x484/+0x4AC instead of +0x414/+0x43C: 18 fixed-immediate differences
- * in level 00 (00345770, 003457C8, etc.), independent of relocations.
- * Changing only those three constants passes check.py at all 27 US2 places.
- * These are two different structure layouts. A single compiled definition
- * cannot encode both sets of fixed offsets. Next: reconcile the US2 shared
- * catalogue identity with the measured release-specific layouts upstream;
- * no compiler/allocation experiments are needed for this difference.
- * No strict linked build run; the cross-release requirement remains unmet.
- * Required declarations follow; retained body is the existing USA draft.
- */
 #include "include_asm.h"
 extern char *D_001A8CFC[] __attribute__((sda));
 extern int D_001AB7A8[1] __attribute__((sda));

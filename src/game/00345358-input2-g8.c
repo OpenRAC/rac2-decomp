@@ -1,15 +1,3 @@
-/* opus-1 (Claude Opus 5.5, xhigh), 31 October 2026: -O2 -G8 -ffunction-sections, own unit
- * (src/game/00345B78-g8.c). Exact bytes for USA v1.01: 28 of 28 places. PAL 0/28, v2.00 0/28:
- * not landed, since one C definition must match every release that carries the function.
- * Only four field offsets differ, in every place of both releases: 0x48C/0x490/0x494/0x498
- * here are 0x4FC/0x500/0x504/0x508 there. C cannot state both. The catalogues still carry
- * this name into both releases; docs/VERSIONS.md's route is tools/carry.py --demote, then
- * each release's own copy (PAL already catalogues func_00345F70 as func_PAL_003480C8).
- * What closed the earlier 472-byte form: func_002E5E58 returns int, so the call's $v0
- * output makes the next temporary avoid $v0 (local-alloc's fake_birth), and D_001A7AF8 is
- * sda, so its address is one unsplit la that cannot fill the zero-id test's delay slot,
- * which then takes li $a0,5 from the error path.
- */
 #include "common.h"
 typedef struct { u8 pad[6]; s16 index; u8 tail[2]; } InputEntry;
 typedef struct { u8 pad[6]; s16 value; u8 tail[216]; } InputRecord;
