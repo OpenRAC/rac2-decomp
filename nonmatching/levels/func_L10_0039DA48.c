@@ -15,6 +15,11 @@
  * Reopen with independent core-loop normalization/constant lifetime evidence;
  * no padding, fabricated volatile accesses or compiler changes were used.
  * All required declarations follow below. Restore the INCLUDE_ASM in src/.
+ *
+ * closer D, 1 November 2026: 1492/1492 bytes, 26 words, all one s7/fp swap, under func_L00_0040D058's flags
+ * (-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels). Local `one` and `zero`, set
+ * before the first loop, give retail's f20 and f22. Retail has points in fp and the &normal copy in s7; a pointer
+ * parameter, statement order and a forced bucket sweep tie. Priority only: a permuter job is worth trying.
  */
 
 #include "common.h"
@@ -33,7 +38,7 @@ void func_L10_0039DA48(void *path, int alpha, int outerAlpha, int count, float c
     StripPacket core, halo;
     StripVector normal, widthStripVector, eye, tangent, first, last, firstRay, lastRay, toEye, extension;
     float length, initialLength, haloLength, firstLength, lastLength;
-    int i;
+    int i; float one, zero;
     u32 coreColor, haloColor;
     core.texture = func_0027C878(14);
     coreColor = innerColor | (alpha << 24);
@@ -59,12 +64,14 @@ void func_L10_0039DA48(void *path, int alpha, int outerAlpha, int count, float c
     func_00282D30(&normal, &normal, coreWidth * initialLength);
     func_00282CC0(&core.vertex[0], points, &normal);
     func_00282CF0(&core.vertex[1], points, &normal);
+    one = 1.0f; zero = 0.0f;
     for (i = 1; i < count - 1; i++) {
         func_00282CF0(&eye, points + i, D_L10_001B9680);
         func_00282CF0(&tangent, points + i + 1, points + i);
         func_00282DD8(&normal, &tangent, &eye);
         length = func_00282DF0(&normal);
-        func_00282D30(&normal, &normal, coreWidth * (length != 0 ? 1.0f / length : length));
+        if (length != zero) length = one / length;
+        func_00282D30(&normal, &normal, coreWidth * length);
         func_00282CC0(&core.vertex[2], points + i, &normal);
         func_00282CF0(&core.vertex[3], points + i, &normal);
         if (i == 1) { core.color[1] = innerColor; core.color[0] = innerColor; }

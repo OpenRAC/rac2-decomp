@@ -19,6 +19,8 @@
  * velocity load, ahead of mul.s/swc1. Retail keeps it after the store, which needs a dependence from
  * the sp+0x14 store to the cfg+0x38 load: base_alias_check sees stack against argument and answers
  * no alias, so cfg's base must be unknown to alias analysis in retail (a pseudo with two sets?).
+ *
+ * closer D successor, 1 November 2026: copying arguments gives cfg a known base; only a pseudo with two sets loses it.
  */
 #include "common.h"
 extern void func_00282CF0(void *, void *, void *);

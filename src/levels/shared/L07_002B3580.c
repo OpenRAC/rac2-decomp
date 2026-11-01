@@ -108,7 +108,6 @@ extern void func_00283098(void *, void *, void *);
 extern float func_00283C80(float, float);
 extern void func_00282CC0(void *, void *, void *);
 
-INCLUDE_ASM("asm/levels", func_L07_002B3580);
 
 /* Update directional movement, including the state-44 yaw spring.
  * Shares the resident views and locomotion arms with func_L01_002B7360. */

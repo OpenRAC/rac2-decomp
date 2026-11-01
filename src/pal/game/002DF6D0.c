@@ -28,6 +28,5 @@ void func_PAL_002DF6D0(int value, int mode)
     }
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002DF760);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002DFE20);

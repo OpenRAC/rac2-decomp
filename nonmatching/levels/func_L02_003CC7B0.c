@@ -12,6 +12,8 @@
  * compiler qcopy pairs tie the relevant differences; disabling sched1 is worse.
  * Next: recover the original initialization subobject/assignment structure.
  * All required declarations follow below.
+ *
+ * closer D, 1 November 2026: 28 words at -G0, but the volatile child field is refused, and the rereads depend on it.
  */
 #include "common.h"
 #define W(p,o) (*(int *)((char *)(p)+(o)))

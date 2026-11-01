@@ -232,7 +232,6 @@ void func_L12_0041BED8(u8 *self)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L12_0041BF88);
 
 /* func_L12_0041CF10 is in L12_0041CF10-g8.c. */
 

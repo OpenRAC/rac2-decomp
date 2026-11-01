@@ -641,7 +641,6 @@ void func_L13_0040CA70(u8 *a0)
 /* func_L13_0040DC20 is defined in L13_0040DC20-g8.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L13_0040DFC0);
 
 char *func_L13_00412748(float size, char *position, int trigger, int kind, int red, int green, int blue, int enabled, int flags, int extra, int control)
 {

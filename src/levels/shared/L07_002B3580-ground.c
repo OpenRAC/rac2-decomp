@@ -1,38 +1,3 @@
-/* GPT-6.1 Sol high, 29 October 2026: retained near miss.
- * Profile: -O2 -G0 -ffunction-sections -frac2-hazard-labels.
- * check.py: 2356/2356 bytes, 0/2 places (levels 07 and 08);
- * first difference +0xA8. Instruction diagnostics find three differing
- * nonrelocation words in both places: +0xA8, +0xB8 and +0xBC swap
- * $v0/$v1 for the mode == 2 comparison. No linked match is claimed.
- * Direct field comparison, an int snapshot, and a long comparison all
- * produce the same remaining allocation. Stop on the tie; the next useful
- * experiment needs a new hypothesis about this comparison's live ranges.
- *
- * The previous assembly blocker is resolved without a new function identity:
- * __asm__("(func_001290BC+36)") emits R_MIPS_26 against func_001290BC
- * with the +36 addend at +0x3A4 and +0x858. The unparenthesized C function
- * pointer/addend spelling was rejected by GNU as. Linked validation of this
- * canonical expression remains pending because the caller does not match.
- *
- * Typed resident fields, float probe arrays, positive collision-hit arm,
- * the three-case axis switch and qcopy recover the body shape. The sda
- * declarations of D_001A79F0 and D_L07_001A8FF4 recover tied absolute
- * loads. D_L07_001A8FF0 keeps its measured mixed absolute/GP accesses at
- * -G0. The hazard-label flag fixes the branch at +0x6A0. The polar-offset
- * declaration interleaves integer/FP arguments without changing either
- * register bank's physical interface. All declarations are included below.
- * Related RAC1 body: src/overlays/l05_rilgar/hero_collision.c,
- * HeroL05_GroundProbe (the RAC2 version has additional ground modes).
- *
- * closer D, 1 November 2026: the $v0/$v1 swap is local-alloc's three-quantity sort. Block 2 holds
- * exactly three quantities: the constant 2 (q0), the 2.2f constant (q1) and the mode load (q2).
- * block_alloc's hand sort for next_qty == 3 calls qty_compare with fixed quantity numbers while it
- * exchanges qty_order, so with q1 and q2 tied the mode load goes last and the constant takes $v0.
- * Retail needs q2 ahead: any fourth quantity in the block (qsort is correct), or q1 out of the
- * block. A multi-block `s = 2.2f; ... s = 2.9f` gives retail's $v1/$v0, but s then prefers $f12
- * through the copy to reach, so the FPRs differ (5 words). Tied: operand order, h local, -g,
- * unsplit edges, keep-block-order.
- */
 #include "common.h"
 
 extern float func_00282DB0(void *, void *);
@@ -57,7 +22,7 @@ extern int func_002AB1F0(unsigned char *);
 extern int func_002AD0B0(unsigned char *);
 extern float func_002B0360(char *);
 extern float func_00282E48(void *, void *);
-extern void normalize_vector(void *, void *) __asm__("(func_001290BC+36)");
+extern void func_001290E0(void *, void *);
 extern float func_L00_002D3EA8(void *);
 extern float func_00283248(float, float);
 extern void func_00282CF0(void *, void *, void *);
@@ -153,7 +118,7 @@ void func_L07_002B3580(void)
     float right[4];
     float angles[2];
     float normal[4];
-    float reach;
+    float reach, scale;
     int side;
     ++D_00189E20.field_34e;
     D_00189E20.vector_2a0.field_2a8 = 1.0f;
@@ -166,9 +131,10 @@ void func_L07_002B3580(void)
     D_00189E20.field_34a = 0;
     D_00189E20.field_31c = 32.0f;
     D_00189E20.field_33c = 0;
+    scale = 2.2f;
     if (D_00189E20.field_338)
         ++D_00189E20.field_338;
-    reach = D_00189E20.field_264 * 2.2f;
+    reach = D_00189E20.field_264 * scale;
     if (D_00189E20.field_229c == 2)
         reach = D_00189E20.field_264 * 2.9f;
     if (func_L00_002ADF80())
@@ -222,7 +188,7 @@ void func_L07_002B3580(void)
                     D_00189E20.field_318 = func_002B0360((char *)D_L07_001BF640.position);
                 D_00189E20.field_31c = func_00282E48(&D_00189E20.vector_80, &D_00189E20.vector_2d0);
                 D_00189E20.field_33c = (int)D_L07_001BF640.object;
-                normalize_vector(&D_00189E20.vector_2a0, D_L07_001BF640.normal);
+                func_001290E0(&D_00189E20.vector_2a0, D_L07_001BF640.normal);
                 D_00189E20.field_320 = func_L00_002D3EA8(D_L07_001BF640.normal);
                 D_00189E20.field_32c = func_00283248(D_L07_001BF640.normal[0], D_L07_001BF640.normal[1]);
                 func_00282CF0(difference, &D_00189E20.vector_2d0, &D_00189E20.vector_80);
@@ -308,7 +274,7 @@ contacts_done:
                 }
                 if (func_00282C48(D_00189E20.footHeight[side]) > 0.4f)
                     D_00189E20.footHeight[side] = 0.0f;
-                normalize_vector(normal, D_L07_001BF640.normal);
+                func_001290E0(normal, D_L07_001BF640.normal);
                 func_L00_002B8E48(normal, angles);
                 if (angles[1] > -0.7853982448577881f && angles[1] < 0.7853982448577881f)
                     D_00189E20.footYaw[side] = angles[1];

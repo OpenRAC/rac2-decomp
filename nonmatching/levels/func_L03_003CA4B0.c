@@ -19,6 +19,12 @@
  * than dot <= 0. All required declarations are retained below.
  * Reopen with evidence for the shared far-branch/packet pointer lifetimes, rather
  * than repeating division padding, camera typing, or algebraic blend experiments.
+ *
+ * closer D, 1 November 2026: sp+0x90 is PRE's reaching pseudo 321, set before the near test, with no hard
+ * register, so reload rematerialises it at each use (retail's s7 and the far loop's addiu). The third loop keeps
+ * a copy, pseudo 200 = 321, that loop.c hoists (life 22) and global allocates to s4. Retail has no such copy: both
+ * a2 loads there are rematerialised and s5-s7, fp stay free. It needs each use to stay a life-1 pseudo (undesirable
+ * to hoist), so cse1 must not merge the two addresses.
  */
 #include "common.h"
 #define F(p,o) (*(float *)((char *)(p)+(o)))
