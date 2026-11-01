@@ -48,6 +48,7 @@ python3 $T/enable_loop_padding.py gcc/config/mips/mips.h
 python3 $T/ti_one_gpr.py gcc/config/mips/mips.h
 python3 $T/count_trap_length.py gcc/config/mips/mips.c
 python3 $T/count_block_move_length.py gcc/config/mips/mips.c
+python3 $T/block_move_quad.py gcc/config/mips/mips.c
 python3 $T/ascending_save_order.py gcc/config/mips/mips.c
 python3 $T/reorder_save_blocks.py gcc/config/mips/mips.c
 python3 $T/u4_mtc1_helper.py gas/config/tc-mips.c
@@ -79,7 +80,7 @@ python3 $T/trap_redundant_barrier.py gcc/reorg.c
 python3 $T/count_asm_words.py gcc/config/mips/mips.c
 python3 $T/no_recombine_givs.py gcc/loop.c
 sha256sum --check --quiet <<'SUMS'
-f8563063b5311e7ab2b2b29e9959afd6d8d79d017e896724483a3b073837d2da  gcc/config/mips/mips.c
+356137f8b9c8a3dc726c914f4c15f88e3215fbc72a5ddb77be01bfea7834d0a0  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
 d75635500f55f4c7c626e925f6e8146c4e33d3865314eca4ae9bb3860fe7eeab  gcc/toplev.c
@@ -142,4 +143,5 @@ python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_block_move_loop.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_block_move_quad.py"
 echo "compiler in $OUT"
