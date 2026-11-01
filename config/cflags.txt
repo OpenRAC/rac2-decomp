@@ -2896,6 +2896,7 @@ src/pal/levels/shared/L00_002A6688-mode.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L00_002B2318.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/shared/L00_002B2230-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/us2/levels/shared/L00_002B2408-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/us2/levels/22_dobbo_orbit/L22_002BF2B8-sw.c	-O2 -G0 -ffunction-sections -g -ffast-math -frac2-zero-ti-por -frac2-keep-block-order -frac2-no-null-pointer-checks -frac2-hazard-labels
 src/levels/shared/L00_003FEEA0.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/levels/shared/L00_003A9C58.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/shared/L00_003AD3F8-own.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
