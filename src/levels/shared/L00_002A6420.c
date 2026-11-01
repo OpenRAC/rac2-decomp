@@ -566,7 +566,6 @@ void func_L00_002AB3E0(void)
 
 /* func_L00_002ACA08 is defined in L00_002ACA08-flags.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002ACF88);
 
 /* func_L00_002AD868 is defined in L00_002AD868-rail.c. */
 

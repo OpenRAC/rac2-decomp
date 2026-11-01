@@ -355,6 +355,21 @@ this: a two-line `getenv` in `alloc_expr_hash_table`, never in the real compiler
 Sched ties: `rank_for_schedule` compares priority, register weight, class against the last insn,
 then the count of dependents, then the original order. An insn that reads the frame register gets
 one more dependent from a following call in its block (`func_L23_0041A3B8`).
+Later the same day: `func_L00_003DCC48` lost its slot rotation with two locals for its `color | K`
+values, set at the top of the loop body. loop.c hoists them only from before the body's first
+conditional; set after it they stay in the loop (1632 bytes). `func_L00_002ACF88`: jump.c turns
+`if (c) goto L; x = a; goto M; L: x = b` into `x = a; if (c) ...` when both arms start by setting
+the same register, so `v0 = 0` took the slot `object = 0` needs. A `goto fail` to the function's last
+`return 0` leaves no such arm; retail's `found` test after the increment is a plain `break`.
+`func_002BBF40`: `optabs.c` swaps a commutative pair when the target is the second operand, so
+`x = y * x` emits `x, y`; a new target keeps `y, x`. A float constant written inline gets a pseudo that
+crosses no call, and sched then keeps it after the call, unlike a named local. Under `-g`, two
+statements on one line share their note, so no `nop` before their `div.s`.
+`func_L00_00421C50`: the unit's copies through `p + 0x60` kept `p` alive and rotated every saved
+register; check each long-lived pointer's last use against retail first. Pseudos of PRE copies at an
+arm's end prefer the next call's argument register, which puts that copy in a branch's slot.
+`func_L00_00420C38`: retail's `lbu`, `andi` at every use and raw `sb` act like an unpromoted QImode
+pseudo; `int state` with `(u8)state` gives only the first `andi`, as combine knows the upper bits.
 
 **Qualified field and call-lifetime remedies, 25 October 2026:**
 `func_002B52A0` is now a 980-byte C implementation at 21 places in each

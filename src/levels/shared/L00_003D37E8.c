@@ -447,7 +447,6 @@ void func_L00_003DCAC8(char *pos, int a1, int a2, float f12, float f13, char *a3
     func_00280B90_1(pkt, m, 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003DCC48);
 
 /* The moving part of a bouncing object: phase, flags and a pointer to its motion state. */
 typedef struct {
