@@ -112,7 +112,6 @@ void func_L13_0038C470(u8 *a0) {
 
 /* func_L13_00397A18 is in L13_00397A18.c. */
 
-INCLUDE_ASM("asm/levels", func_L13_0039CFF8);
 
 
 void func_L13_003E1218(u8 *a0) {

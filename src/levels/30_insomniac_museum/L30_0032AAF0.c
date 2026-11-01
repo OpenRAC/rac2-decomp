@@ -428,7 +428,6 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L30_003941D8);
 
 
 void func_L30_003B3E60(float *a0, float *a1, float *a2, float *a3) {

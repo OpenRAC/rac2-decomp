@@ -549,7 +549,6 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L08_003A35E0);
 
 Moby_L08_003B2DB0 *func_L08_003B2DB0(int owner, float *pos, float *dir, int life)
 {

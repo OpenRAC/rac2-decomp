@@ -149,7 +149,6 @@ int func_L10_0037CC20(void) {
     return (int)r1_D_0012F86C_0037CC20;
 }
 
-INCLUDE_ASM("asm/levels", func_L10_003ABDF8);
 
 
 void func_L10_003F6110(u8 *arg0) {
