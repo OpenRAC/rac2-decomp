@@ -1,36 +1,6 @@
-/* GPT-6.1 Sol (high), worker v1453, USA v1.01, pinned game compiler.
- * Profile: -O2 -G8 -ffunction-sections; use a separate *-g8.c unit.
- * Best: 2472/2472 bytes, 0/27 places, first difference +0xB8.
- * Sixteen instruction words differ after excluding relocation fields:
- * seven at +0xB8..+0xD0 (initial tuning/hero load scheduling), and nine at
- * +0x304..+0x324 (target-selection call setup). This is not a match;
- * relocation consistency and linked symbol bindings remain unvalidated.
- * All declarations are included below. No linked build was run.
- *
- * Corrected two control-flow errors in v1278: func_L00_003B9170 belongs
- * inside the initialization branch (retail +0x44 skips it); the callback
- * condition at +0x880 accepts held-button bits OR inactive/disabled hero,
- * independently of the positive-charge test. A shared target/descriptor
- * scratch recovers old target s3, scratch s0, descriptor s2, direction s4.
- * Scoped sound pointers and saved handle values recover sound-table setup;
- * typed angle, collision and controller globals recover their full bases.
- * The 0x80-byte angle object matches the initialization clear's full extent.
- *
- * Seventeen checker invocations (two C89 declaration-order errors) plus one
- * regalloc run. Debug information and the typed sound view made no change;
- * -fno-gcse grew the body to 2484 bytes. An inline target-point helper
- * reached 2472 but displaced stack-address lifetimes. Reusing candidate
- * as initial scratch rotated s0/s2/s3; independent sound scopes plus a
- * shared descriptor scratch recover the retail allocations instead.
- * A bank-preserving target-selector argument interleaving made no change.
- * Next: establish source ordering/declaration evidence for the two remaining
- * FP setup blocks, without selective volatile accesses or artificial uses.
- *
- * ref_00/ref_01 are GP views of D_L00_001B28E4/D_L00_001B28E0, respectively;
- * the ordinary externs retain absolute accesses. ref_02/ref_03 are GP floats
- * at canonical 001AFCEC/001AFCF0. These aliases still require linked checks.
- */
 #include "common.h"
+
+/* The tuning words are one object in two addressing forms (MACRO_ADDR): a read before a  store of the same word keeps its order. The target is the last parameter of func_L00_003B8E58: integer and FP banks are separate. */
 
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define S(p,o) (*(short *)((char *)(p)+(o)))
@@ -100,9 +70,7 @@ extern AimState *D_L00_001AFD78 __attribute__((sda));
 extern int D_L00_001AFCE8 __attribute__((sda));
 extern int D_L00_001AFCE0 __attribute__((sda));
 extern unsigned short D_L00_001AFCE4 __attribute__((sda));
-extern float D_L00_001B28E4, D_L00_001B28E0;
-extern float ref_L00_003B9310_00 __attribute__((sda));
-extern float ref_L00_003B9310_01 __attribute__((sda));
+extern float D_L00_001B28E4 MACRO_ADDR, D_L00_001B28E0 MACRO_ADDR;
 extern float ref_L00_003B9310_02 __attribute__((sda));
 extern float ref_L00_003B9310_03 __attribute__((sda));
 extern void func_00282A60(void *,int,int);
@@ -110,7 +78,7 @@ extern void func_L00_003B9170(void),func_L00_003B9290(void),func_L00_003B92D0(vo
 extern void func_00282D30(void *,void *,float),func_00282CC0(void *,void *,void *);
 extern void func_0029FCC0(void *,int,void *),func_00282978(short *);
 extern unsigned char *func_002AB1F0(void *);
-extern unsigned char *func_L00_003B8E58(void *,void *,void *,float,float,float,float,float);
+extern unsigned char *func_L00_003B8E58(void *,void *,float,float,float,float,float,void *);
 extern int func_002761F8(void *,void *,int,void *,int),func_00282948(int *);
 extern float func_00282E80(void *,void *),func_00282E48(void *,void *),func_00282C48(float);
 extern void func_002E59F8(int);
@@ -142,10 +110,10 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
     }
     func_L00_003B9290();
     range=D_L00_001B28E4; cone=D_L00_001B28E0;
-    ref_L00_003B9310_00=35.0f;
+    D_L00_001B28E4=35.0f;
     if (D_00189E20.f2294==29 && (U(D_00189E20.f2290,0x34)&1)) {
         qcopy(&state->origin,&D_L00_001B8DC0); qcopy(&origin,&D_L00_001B8DC0);
-        ref_L00_003B9310_01=0.10471976548433304f; angle=0.0872664749622345f;
+        D_L00_001B28E0=0.10471976548433304f; angle=0.0872664749622345f;
         if (!state->special) state->target=0;
         state->special=1;
     } else {
@@ -173,7 +141,7 @@ void func_L00_003B9310(unsigned char *object,AimState *state)
         qcopy(&direction,&D_L00_001B8FF0);
         if (D_00189E20.f2294==29) direction.v[2]=0;
         func_00282D30(&state->direction,&direction,1.0f);
-        candidate=func_L00_003B8E58(&origin,&direction,state->target,angle,cone,range,0.7853982448577881f,0.6108653f);
+        candidate=func_L00_003B8E58(&origin,&direction,angle,cone,range,0.7853982448577881f,0.6108653f,state->target);
         if (!candidate) {
             func_00282F20(&temp,&direction,D_L00_001B28E4);
             func_00282CC0(&temp,&temp,&origin);

@@ -1,3 +1,4 @@
+/* 1 November 2026: still 2 words. Prototype float positions, w[2] = 0.0f, an int-array view, a struct w, a pointer local and a float local for 0.1666 all tie. Next: why sched2 puts the sw between the a0 and a1 moves. */
 /* M33 2026-10-26: -frac2-hazard-labels closes the +0xA4 branch target (profile -O2 -G0 -ffunction-sections -frac2-hazard-labels). Left: 2 words, order only: before the func_00282F20 call retail emits sw $zero,0x28($sp) then daddu $a1,$s1 (a1 in the slot); here a1 then the store. Tried int/float zero, &w[0], pointer local, flags -g/-G8. In the permuter. */
 /* Near miss, 2026-10-25 wave 10: 548 bytes expected, 548 produced, 0 of 1
    place (20_yeedil @0x00443DF0).  Two instructions differ:

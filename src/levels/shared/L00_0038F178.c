@@ -467,7 +467,7 @@ void func_L00_0039D378(char *object)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_0039E158);
+/* func_L00_0039E158 is defined in L00_0038F178-rail.c. */
 
 /* multiply binary32 field2C by exact1.025f then subtract3 modulo256 from byte23; call original pointer helper if updated byte below4; no original semantic field names recovered */
 void func_L00_0039E5B0(NativeUpdate775View *object)
@@ -483,7 +483,7 @@ void func_L00_0039E5B0(NativeUpdate775View *object)
 INCLUDE_ASM("asm/levels", func_L00_0039E7A8);
 
 
-INCLUDE_ASM("asm/levels", func_L00_003A09F8);
+/* func_L00_003A09F8 is defined in L00_0038F178-tile.c. */
 
 /* func_L00_003A0C00 is in L00_003A0C00.c. */
 

@@ -41,4 +41,4 @@ void func_PAL_L00_003A0730(char *object)
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003A0950);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003A1688);
+/* func_PAL_L00_003A1688 is defined in L00_0039E608-rail.c. */

@@ -1,15 +1,3 @@
-/* GPT-6.1 Sol (high), 29 October 2026: retained near miss, not linked.
- * Pinned default -O2 -G0 -ffunction-sections: 940/940 bytes, 0/2 USA v1.01
- * places. Only +0xFC differs: emitted addu s0,s0,s1; retail addu s0,s1,s0.
- * Separate initialization/search curve variables and a separate advance result
- * recover saved-register allocation. An explicitly guarded do-while with three
- * advancing pointers reproduces the entire segment-length loop. Parenthesizing
- * the closing-call offset recovers its argument and store scheduling.
- * Pointer addition in either order and unsigned-address addition retain the
- * final commuted addu. Further algebraic rewording is tied; reopen with new
- * evidence for the closing-segment address model. No other releases or linked
- * builds tested. Required declarations are included below.
- */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef struct { float heading, pitch; int unused; float speed; } RailAngles;
@@ -28,6 +16,7 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00282E20(void *), func_00283248(float, float), func_002AA2E8(float *, float, float), func_00282DF0(void *);
 extern void func_00282F20(void *, void *, float), func_00282D30(void *, void *, float);
 /* Precomputes path segment lengths and steers the hero along the nearest active path. */
+typedef struct { float f[4]; } PV; typedef struct { char h[16]; PV p[1]; } PC;
 void func_L00_0039E158(char *actor) {
     RailState *state = *(RailState **)(actor + 0x68);
     float previous[4], point[4], delta[4], step[4];
@@ -54,7 +43,7 @@ void func_L00_0039E158(char *actor) {
                     current += 16;
                 } while (j < *(int *)initCurve - 1);
             }
-            *(float *)(j * 16 + initCurve + 0x1C) = func_00282E48(initCurve + (j * 16 + 0x10), initCurve + 0x10);
+            ((PC *)initCurve)->p[j].f[3] = func_00282E48(initCurve + (j * 16 + 0x10), initCurve + 0x10);
         }
         *(u8 *)(actor + 0x30) = 0xFF;
     }
