@@ -1,3 +1,7 @@
+/* Closer C, 1 November 2026: 2112/2124, 73 rows. qcopy_nc keeps the child pointer in a0 over the copy, which fixes the
+ * whole child path; every row to +0x390 agrees. Left: retail's `addiu s5,1; daddu s1,s5; xori v0,2; movn s1,zero,v0`
+ * for changed (1 kept in s5 for the first notification store). `one = 1; changed = one; if (...) changed = 0` folds to sltiu.
+ */
 /* GPT-6.1 Sol (high effort), task v1342, 29 October 2026.
  * USA v1.01, default game -O2 -G0 -ffunction-sections; use a separate unit.
  * Best and final check.py: 2112 bytes / retail 2124; 0 of 7 places match.
@@ -115,7 +119,7 @@ int func_003248A8(char *self)
             B(P(d,0x2E0),0x31)=1;
             *(long long *)(P(d,0x2E0)+0x38)=*(long long *)(self+0x38);
             H(P(d,0x2E0),0x34)|=0x41;
-            qcopy(P(d,0x2E0)+0x10,self+0x10);
+            qcopy_nc(P(d,0x2E0)+0x10,self+0x10);
             func_002A0F48(P(d,0x2E0));
         }
         if(I(d,0x288)!=-1) {

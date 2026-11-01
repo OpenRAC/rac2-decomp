@@ -140,6 +140,8 @@ wrong profile with extra operations or knowingly false prototypes.
 | Nop pair before div.s (float rounding helper) | -g | func_002AEAE0 |
 | Register addresses and grouped 16-byte transfer | -frac2-qcopy | func_L20_0039E158, func_L20_0039F210, func_00305058 (with -g for the pre-div.s nop pair) |
 | Correct copy, wrong motion across it | -frac2-qcopy-barrier, with qcopy | func_002B5E48, func_002EE988, func_L01_003BC490, func_L08_003D3D80 |
+| Loop constants hoisted though the loop is over `threshold` for them | -fmove-all-movables on a file of its own | func_L00_004287E8, func_L16_004117A8 |
+| Hoisted addresses, branch joined with an empty edge block | -frac2-gcse-unsplit-edges | func_L00_00370408 |
 | Float min/max expands into compare and branch | -ffast-math; optimization level still affects allocation | func_L01_003BD560, func_L00_002EE050 |
 
 `-G8` can change allocation even without GP accesses: `func_L17_003BCBC8` puts
@@ -452,6 +454,14 @@ bytes and relocations and pass every carrying release's placement checks.
 The complete strict builds remain the acceptance gate. This is a reconstruction
 profile, not evidence of the shipping compiler's flags.
 
+A small-data object read at a nonzero offset is the other tied form. cc1 does not split it (the
+symbol carries `SYMBOL_REF_FLAG`), and `simple_memory_operand` rejects the offset, so the insn has
+length 2: it never fills a slot, and the assembler expands it to `lui $r; lw $r,lo($r)` or
+`lui $at; sw`. Declare the block `extern int D[] __attribute__((sda));` at its real start and read
+`D[1]`, or use an incomplete struct array and its fields. `func_L00_004266E8` (`D_001A7BA0[1]`),
+`func_0029D830` (a three-word block at `D_001B1A50`), retained `func_002FF0D8` and
+`func_L00_0036F488`. A bare `D[0]` has length 1 and does fill slots.
+
 The same size rule applies beyond vectors. The particle emitters
 `func_L18_003FCD70` and `func_L18_003FCC48` declare their measured 24-byte
 settings records and use `-G32 -Wa,-G32`. `func_L00_00396078` keeps its complete
@@ -662,6 +672,29 @@ Combining both switches affects sched1/sched2 differently and needs its own proo
   `(st + 3) & 0xFF < 2` plus one compare. A right-nested spelling
   `st == 0xFE || (st == 0xFD || st == 3)` keeps the three separate compares in
   source order (measured in `func_L08_0042F440`/`0042FAC0`, 544-byte twins).
+- A copy before a loop that gcse's cprop keeps deleting can come from cse2: read the global inside the loop, loop.c
+  hoists the `la`, and cse2 following `-fcse-skip-blocks` around the preceding `if` turns it into a copy of the earlier
+  pseudo (`func_L00_00376600`, `daddu $fp,$s0`). The source of the copy can then share its register with a later local.
+- A constant used in another basic block than its set stays in a body after a `continue`, because loop.c will not
+  move a cross-block set when `maybe_never` holds: `tint = 0xF0F0B0` early in the body (`func_L00_00376600`).
+- `addiu v1,s0,1 / daddu s3,v1 / slt v1,v1,a0` is gcse PRE's reaching copy: write `i + 1` at each use and `i++`
+  in the loop, with no variable for it. The index register can then be reused for the record pointer
+  (`func_002E3BD8`, `func_002E3998`).
+- `sll 3 / srl 3 / addiu 0xF / srl 4 / sll 4` is a plain VLA of bytes, `u8 frame[count]`: bits to bytes, then
+  rounding (`func_002E3BD8`).
+- A body with no loop.c work (constants unhoisted, counter neither reversed nor eliminated) matches row for row
+  when the loop is written with labels, which leave no loop notes (`func_00329488`, near miss: the alignment nop
+  shows retail did have a loop note, so a real loop rejected as invalid is still possible).
+- A value `r` from `if (a || (b && c)) r = 1; else r = 0;` or a helper with `return 1; return 0;` reads
+  `beqz x / r = 0 / r = 1 / beqz r` in retail: reorg steals `r = 0` into each branch slot and the else goes
+  (`func_L00_002D5EB8`, near miss). Flag sets inside a switch or a call stay out of r's life this way.
+- Under `-g` a line label before a division costs the two-word floor. Statements on one source line share a
+  label, so `bb = cos(x); D = aa / bb;` written on one line keeps the locals with no padding, where putting the division
+  in the call's statement changes allocation (`func_L00_00429568`).
+- A branch label on those nops when the division follows a branch group needs `-frac2-hazard-labels`: without it
+  gas moves the label behind the padding (`func_L00_00429568`).
+- `i + 1` written at each use also stops PRE from keeping `(i + 1) << 2`, since each shift then has its own
+  operand pseudo; `i << 2` for the same loop is still kept (`func_L00_00429568`).
 - `x = load; if (flag) x = 0.0f;` differs from a ternary in branch polarity and
   likely slots (`func_L00_0042A460`). Store order affects allocation, but there is
   no universal reversal or permutation rule.
@@ -875,6 +908,14 @@ increments (`n_extra_increment`); that has no retail witness yet and stays on (t
 also changes no matched function). [tests/test_no_recombine_givs.py](../tests/test_no_recombine_givs.py)
 checks the transformer and an authored loop: the digit read stays on the entry pointer
 (`lbu 36(entry)`, not `-1(name + 5)`), and a one-pointer loop is unchanged.
+
+A scalar global read across pointer stores is `fixed_scalar_and_varying_struct_p`: cc1 assumes a
+fixed scalar cannot alias a varying array element, so the load is hoisted or moved over the stores.
+Where retail reloads, declare the global as an array and read `[0]`: `D_L00_001B2B58[0][i] = 0` keeps
+the reload and the integer index in `func_L00_003E4BF0`, and the cursor `D_001B22A8[0]` stays behind
+the `t[]` stores in retained `func_00285030`, with no fence. An integer index that survives inside a
+loop means no loop notes: loop.c reduces every `for` or `do` form, a `goto` loop keeps it (retained
+`func_L00_003769C0`).
 
 ### Compiler control-flow passes
 

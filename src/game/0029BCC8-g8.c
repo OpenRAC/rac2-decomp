@@ -1,3 +1,4 @@
+#include "common.h"
 /* func_0029BCD8 is in 0029BCC8-g8.c (it reaches small data through $gp). */
 
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
@@ -158,4 +159,59 @@ states:
         ref_L00_0030CFE0_01.scale = saved;
         func_0027AB40();
     }
+}
+
+
+typedef struct Entry29D830 {
+    short id;
+    short a;
+    int ka;
+    short b;
+    short pad0A;
+    int kb;
+    unsigned short flags;
+    char pad12[10];
+    int (*fn)(int);
+    int arg;
+    short state;
+    short result;
+} Entry29D830;
+typedef struct { char pad[0x230]; int index; } Base29D830;
+extern Base29D830 D_001C4FA0;
+extern Entry29D830 *D_00258BA0[];
+typedef struct { int unused; int count; Entry29D830 *list; } State29D830;
+extern State29D830 D_001B1A50[] __attribute__((sda));
+extern unsigned char D_001A7BE8[] MACRO_ADDR;
+extern int func_0029D9D0(int, int);
+
+int func_0029D830(void)
+{
+    Entry29D830 *e;
+
+    D_001B1A50[0].list = D_00258BA0[D_001C4FA0.index];
+    if (D_001B1A50[0].list == 0)
+        return 0;
+    e = D_001B1A50[0].list;
+    for (; e->id != 0; e++) {
+        if ((e->flags & 4) && D_001A7BE8[D_001C4FA0.index] == 0) {
+            e->state = 0;
+            continue;
+        }
+        if (func_0029D9D0(e->a, e->ka) == 0)
+            e->state = 0;
+        else if (func_0029D9D0(e->b, e->kb) == 0)
+            e->state = 1;
+        else
+            e->state = 2;
+    }
+    for (e = D_001B1A50[0].list; e->id != 0; e++) {
+        if (e->fn != 0)
+            e->result = e->fn(e->arg);
+    }
+    D_001B1A50[0].count = 0;
+    for (e = D_001B1A50[0].list; e->id != 0; e++) {
+        if (e->state == 1 && (e->flags & 2) == 0)
+            D_001B1A50[0].count++;
+    }
+    return D_001B1A50[0].count == 0;
 }

@@ -1,22 +1,14 @@
-/* func_00329488 - 420 bytes.  Worker attempt, 27 October 2026 (draft below).
-
-   Structure/semantics decoded and right (two loops, 300 x 0x50 particles at
-   D_0022C9A0, callees
-   2820A0/283CE0/283CF0/283180/282CC0/2820D0/2820C8/329630). Not exact:
-   - With `f34 / 2`: 432 bytes vs 420 (srl/addu/sra for /2; retail has a plain
-   sra). With `>> 1`: 448 bytes, gcc hoists ALL float constants out of the
-   loop (retail hoists only 128.0f into $f23, others stay in loop).
-   - Retail keeps an UP counter s3 (addiu at top, slti 0x12C at bottom); mine
-   reverses to a down counter (bgez). Same loop-shape issue as func_00329328.
-   - Retail dumps the stack vec in order sw 8,0,4 (mine 0,8,4).
-   Update: func_00329328 matched with `F328Particle *base = D_0022C9A0; ... p
-   = &base[i];` (indexed through a local base pointer, makes the prologue
-   lui/addiu match) plus `float half = 0.5f;` (the hoisted constant). For this
-   function the same base[i] form gives mult-based indexing (472 B); pointer
-   p++ form hoists ALL constants (468 B, needs 5 callee-saved float regs).
-   Retail has single pointer iv s1, up counter s3, only 128.0f hoisted into
-   $f23. */
-
+/* Closer C3, 1 November 2026: this loop has 57 real insns against a threshold near 61; constants of life 1 move because
+ * 61 * 1 >= 57. Over the threshold they stay in the body and only a long-lived 128.0f moves, which would explain retail with a
+ * real for loop; the counter is still reversed though, so something else keeps its use. No real-loop form under 56 rows yet.
+ */
+/* Closer C2, 1 November 2026: 420/420, 3 rows, plain -O2 -G0. Retail's first loop has no loop.c work at all: up
+ * counter kept, no reversal, no biv elimination, every constant left in the body (128.0f is a local set before it).
+ * Written with labels it matches row for row: for/while/do forms hoist the constants and reverse the counter.
+ * v[2] = v[1] = v[0] gives store order 8, 0, 4. Left: the 8-byte alignment nop before the first loop (a NOTE_INSN_LOOP_BEG
+ * ahead of the label, so the source may be a real loop that loop.c rejects as invalid; no such form found) and an
+ * addiu v0 / daddu s0,v0 copy where retail loads s0 directly in the second loop.
+ */
 typedef struct {
     float v[4];
     float f10;
@@ -49,30 +41,41 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_00329630(char *);
 
 void func_00329488(void *obj) {
+    F328Particle *base;
     F328Particle *p;
     float v[3];
     float scale, s, a, b;
+    float full;
     int i, n;
 
+    i = 0;
     func_002820A0();
-    p = D_0022C9A0;
-    for (i = 0; i < 300; i++, p++) {
+    full = 128.0f;
+    base = D_0022C9A0;
+    p = base;
+loop:
         if (p->t.owner != obj)
-            continue;
+            goto next;
         if (p->t.f30 < (p->t.f34 >> 1))
             scale = func_00283CE0(p->t.f30) / func_00283CE0((p->t.f34 >> 1));
         else
             scale = 1.0f;
-        n = func_00283CF0(scale * 128.0f);
+        n = func_00283CF0(scale * full);
         s = func_00283180(p->t.f14);
         a = (s + 1.0f) * 0.5f;
         b = a * (scale * -0.025f);
-        v[0] = v[1] = v[2] = s * 0.05f;
+        v[2] = v[1] = v[0] = s * 0.05f;
         func_00282CC0(v, v, p);
         func_002820D0((p->t.f18 + p->t.f18) * a, b, 0.08f, v, n, 0);
-    }
+next:
+    i++;
+    p++;
+    if (i < 300)
+        goto loop;
     func_002820C8();
-    for (p = D_0022C9A0; p < D_0022C9A0 + 300; p++)
+    for (i = 0; i < 300; i++) {
+        p = &D_0022C9A0[i];
         if (p->t.owner == obj)
             func_00329630((char *)p);
+    }
 }

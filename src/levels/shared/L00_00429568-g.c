@@ -1,23 +1,5 @@
-/* Tier: sol-high, task v1236, 29 October 2026.
- * USA v1.01, game -O2 -G0 -ffunction-sections: 1704/1712 bytes,
- * 0/11 places. Rechecked with the pinned upstream wrapper.
- * Adapted from RAC1 Camera19_Update in rocket_and_path_camera.c.
- * The descriptor has FOV values at +0x60 and segment IDs at +0x80;
- * an aggregate based at the descriptor recovers the retail loop guards,
- * ID base lifetime, and interpolation value addressing. The initial state
- * logic agrees in opcodes/registers apart from relocation operands and
- * branch displacements. The interpolation loop still caches next*4 across
- * both accumulation loops where retail recomputes it, changing allocation,
- * scheduling and alignment. Reusing the inner induction variable worsens
- * allocation; a for-loop update and block-local next produce identical bytes.
- * -fno-gcse, -fno-rerun-cse-after-loop, -fno-cse-follow-jumps and
- * -fno-rerun-loop-opt did not resolve it. A persistent +0x60 table pointer
- * gives 1712 bytes but changes the frame/register allocation from entry.
- * Next useful experiment: independent loop-invariant-motion/source evidence
- * for why only the next index's scaled offset is recomputed in retail.
- * Required declarations are retained below. No linked build was attempted.
- */
 #include "common.h"
+
 struct CamK_72D8 { int unused[4]; float vals[9]; };
 struct CamKeys { char pad[0x60]; float vals[8]; int ids[8]; };
 extern char *D_L00_001B1844 MACRO_ADDR;
@@ -117,8 +99,7 @@ void func_L00_00429568(char *moby) {
             D_L00_001B18E0 = 1.0f;
             x = k->vals[8] * 0.5f;
             aa = func_00283198(x);
-            bb = func_00283180(x);
-            D_L00_001BD370 = aa / bb;
+            bb = func_00283180(x); D_L00_001BD370 = aa / bb;
             func_0027AB40();
             *(unsigned char *)(e + 0x39) = 1;
             func_L00_002D99A0(15.0f);
@@ -172,8 +153,7 @@ void func_L00_00429568(char *moby) {
         keys = (struct CamKeys *)e;
         i = 0;
         while (i < 7 && keys->ids[i] >= 0 && keys->ids[i + 1] >= 0) {
-            int next = i + 1;
-            if (*(int *)f >= keys->ids[i] && *(int *)f < keys->ids[next]) {
+            if (*(int *)f >= keys->ids[i] && *(int *)f < keys->ids[i + 1]) {
                 char *cam;
                 float sum = 0.0f;
                 float fv = *(float *)(f + 4);
@@ -189,18 +169,16 @@ void func_L00_00429568(char *moby) {
                 }
                 total = sum;
                 sum = sum + fv;
-                for (j2 = *(int *)f; j2 < keys->ids[next]; j2++) {
+                for (j2 = *(int *)f; j2 < keys->ids[i + 1]; j2++) {
                     total = total + *(float *)(g + j2 * 16 + 0x1C);
                 }
-                r = func_002A7C00(keys->vals[i], keys->vals[next], sum / total);
+                r = func_002A7C00(keys->vals[i], keys->vals[i + 1], sum / total);
                 m = r * 0.00872664712369442f;
                 aa = func_00283198(m);
-                bb = func_00283180(m);
-                cam = D_L00_001BD2C0;
-                *(float *)(cam + 0xB0) = aa / bb;
+                bb = func_00283180(m); cam = D_L00_001BD2C0; *(float *)(cam + 0xB0) = aa / bb;
                 func_0027AB40();
             }
-            i = next;
+            i++;
         }
         d = func_00282E48(va, (moby + 0x30));
         nv = *(float *)(f + 0x10) + d;
@@ -231,4 +209,3 @@ void func_L00_00429568(char *moby) {
         func_00282DD8(moby + 0x20, moby + 0x10, moby);
     }
 }
-

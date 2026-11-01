@@ -311,7 +311,6 @@ void func_L00_003E4968(char *a0) {
 
 /* func_L00_003E4B80 is defined in L00_003E4B80-g.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003E4BF0);
 
 /* func_L00_003E51C0 is defined in L00_003E51C0-g8.c. */
 

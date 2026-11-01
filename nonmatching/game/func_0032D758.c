@@ -1,3 +1,9 @@
+/* Closer C, 1 November 2026: the tail is exact with the store order below; 3 rows off, all at +0x38.
+ * sched2 (BUF_LEN 4096 cc1, -dR -fsched-verbose-4): t8 ready 38[p6] 20[p9], so addu a1 (20) goes first.
+ * Retail's order needs insn 20 at t9, one cycle after the mult's latency allows, though nothing else
+ * feeds it. Same symptom as func_0027BA68 item 2 and func_L03_003C1BF0. -g, -G8, gcse, sched flags,
+ * nine spellings of the table access and inline-free offsets all tie.
+ */
 /* func_0032D758 - 756 bytes, boot + 27 levels. Tier: opus-1 (Claude Opus 5.5), task v1660.
  * Best tools/check.py: 756/756 bytes, 0/28 USA v1.01 places (first difference +0x38).
  * Profile: default -O2 -G0 -ffunction-sections; place it in 00327038.c in place of the
@@ -113,11 +119,11 @@ int func_0032D758(char *self, int index, int arg)
             }
         }
         if (!found) func_002A04B8(slot->object, &r, &g, &b);
-        slot->color = (b << 16) + (g << 8) + r;
-        slot->active = 1;
-        slot->flags = 0x8000;
-        slot->tag = arg;
         slot->elapsed = 0;
+        slot->flags = 0x8000;
+        slot->color = (b << 16) + (g << 8) + r;
+        slot->tag = arg;
+        slot->active = 1;
         result = 0;
         break;
     }
