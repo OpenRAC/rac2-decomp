@@ -3,7 +3,8 @@
    Profile: its own unit, `-O2 -G8 -ffunction-sections -malign-loops=2`.
 
    Same opcodes as func_L05_0041EF00 and func_L10_004227A0, and the same result as
-   func_L05_0041EF00 (see its note): exact size, 9 rows of argument setup order. */
+   func_L05_0041EF00 (see its note): exact size, 9 rows of argument setup order, with the same
+   empty do-while that is not admissible in src/. */
 
 #include "common.h"
 

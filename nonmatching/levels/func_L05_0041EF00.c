@@ -4,9 +4,12 @@
 
    Same opcodes as func_L10_004227A0 and func_L15_0042EFE0; this is the func_L10_004227A0
    draft, renamed. Its note found the vanished `if (D_L10_001B2D80 == 1)` test in MENU_ROW and
-   that an empty do-while after it keeps retail's block boundary through sched2, but rejected it
-   for the nops `.p2align 3` puts at the loop labels. -malign-loops=2 removes exactly those, as
-   it does for family F7 (src/levels/06_notak/L06_0041DED8-f7-g8.c): the size is exact.
+   that an empty do-while after it keeps retail's block boundary through sched2, at the cost of
+   the nops `.p2align 3` puts at the loop labels. -malign-loops=2 removes exactly those, as it
+   does for family F7 (src/levels/06_notak/L06_0041DED8-f7-g8.c): the size is exact. The empty
+   do-while is still not a landing form: AGENTS.md rules out source barriers and
+   tests/check_repository.py rejects it in src/ (#257). The block boundary it stands for needs a
+   real construct; func_L02_003D26B0 closed the same kind of boundary with a redundant test.
    What differs (9 rows; the other 52 of check.py's 61 are relocations): argument setup order
    in the two 200.0f rows (0.0f, %hi/%lo of the colour and $f12) and in the last
    func_0027F5B8 call ($a1 and $a3). Moving the colour among the float parameters of
