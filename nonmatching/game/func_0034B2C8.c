@@ -1,3 +1,11 @@
+/* Current retained result, 1 November 2026: 5988/6048 bytes. The variadic formatter returns int. An
+ * initialized four-coordinate union wrapper was measured at 6236 bytes and rejected; the previous compact
+ * bit reinterpretation is retained. The repeated colour constant lowering and pointer spills remain
+ * unresolved.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Near miss / handoff (Opus big14, 2026-10-26): func_0034B2C8, 6,048 bytes, boot + 27 level
  * places, the ammo/bolt HUD setup (one function: one prologue, one jr $ra). Written from m2c
  * and the assembly; no twin found.
@@ -75,7 +83,7 @@ extern s32 func_00336E40(s32 arg);
 extern f32 *func_00336DA8(s32 n, s32 a);
 extern void func_00335F20(char *o, f32 *v);
 extern void func_00335E68(char *o, s32 n);
-extern void func_00115DA8(char *buf, char *fmt, s32 n);
+extern int func_00115DA8(char *buf, char *fmt, ...);
 extern f32 func_00283B98(f32 a, f32 b);
 extern f32 func_00283180(f32 a);
 extern f32 func_00283198(f32 a);

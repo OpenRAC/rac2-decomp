@@ -595,7 +595,7 @@ unsigned char *func_L04_003FA5A8(unsigned char *owner, float *pos,
     return m;
 }
 
-INCLUDE_ASM("asm/levels", func_L04_003FA7E0);
+/* func_L04_003FA7E0 is defined in L04_003FA7E0.c. */
 
 INCLUDE_ASM("asm/levels", func_L04_003FB990);
 

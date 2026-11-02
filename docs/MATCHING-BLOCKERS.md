@@ -3701,8 +3701,8 @@ Still open: reload's spill registers run one step behind retail from `0x1F4` to 
 
 ## Large retained state machines and the level-data loader
 
-Measured against master `2e09b830` on 1 November 2026, using its current game compiler
-and SN assembler. These are corrections to retained C, **not complete matches or
+Measured against master `2e09b830` on 1 November 2026, using its qualified compiler
+and assembler profiles. These are corrections to retained C, **not complete matches or
 functional-port qualifications**. The source headers record the per-unit profiles;
 the implementations remain in `nonmatching/levels/` with their production markers intact.
 
@@ -3760,3 +3760,50 @@ change. A discarded result is not permission to give its callee a false prototyp
 Next useful work is the specific remaining source/ABI or allocation difference above.
 Do not repeat the removed zero placeholders, hand-written template-copy spelling,
 global strength-reduction disable, or branch-tail merging as if they were new trials.
+
+### Caller contracts, scratch records and allocation-only drafts
+
+`func_L04_003FA7E0` is now reconstructed in `src/levels/shared/L04_003FA7E0.c`.
+Its normal aligned 0x50-byte template assignment uses the current compiler's
+quadword block moves. Correct helper return declarations then resolve the one
+remaining store/call scheduling difference. The four carrying USA v1.01/v2.00
+programs pass strict linked builds; PAL has no row with this canonical identity.
+See [prototypes and lifetimes](COMPILER-NOTES.md#prototypes-lifetimes-and-varargs).
+The old nonmatching copy is retired; no ad-hoc assembly or compiler change is needed.
+
+The related retained investigations establish these constraints:
+
+- `func_L12_003E2460`'s path search reads the pair at offsets 0x268/0x26C as one
+  64-bit sentinel, and its first reset writes 0x268. The previous draft read one
+  word and reset the other. Collision calls also need all five integer-bank
+  arguments, and `func_001234F0` returns a software double for the diagnostic call.
+  Correcting these contracts gives 5,764/5,672 bytes, still nonmatching; the smaller
+  earlier source omitted real operations.
+- `func_L00_003C9978`'s 32-byte request view was too short: `func_002A8C00` writes
+  at +0x20, and `func_002A8E20` also consumes +0x24. The retained union now covers
+  that 40-byte request and the direction vector that occupies its tail later,
+  matching the retail stack overlap without overrunning a separate C object.
+  `func_L00_003D1D28` similarly names the request's +0x24 scalar and gets its tail
+  alignment from the real vector member. The meaning/initialization of that scalar
+  remains unresolved; no replacement value is invented, and neither draft is
+  functionally qualified. Its matrix copy/product helpers were checked separately:
+  they operate on three quadwords, so the 48-byte matrices must not be inflated.
+- The unreferenced `vC0`/`vD0` vectors in `func_L08_003C6AB0` and twelve `z0`..`z11`
+  declarations in `func_L08_00429560` are removed. They shaped stack or pseudo
+  numbering without an evidenced source object. Their removal leaves retained C,
+  not matching credit; an unexplained frame gap cannot be filled with dummy data.
+- Explicit `goto` controls do not solve every loop obstruction. In
+  `func_L00_00303990` the final-loop trial loses required control-flow/alignment
+  and gives 3,380 instead of 3,388 bytes; the retained structured form is 3,392.
+  The two strip-loop controls in `func_00284268` remain 2,996/2,988 bytes with worse
+  opcode agreement. Keep the measured earlier source rather than generalizing the
+  successful loader record-copy remedy to these loops.
+- `func_L13_00438D88` has a real 32-byte route record, with its path pointer at
+  +0x10. That view and `-fno-force-addr` retain the seven diagnostic rows in its
+  mode-2 head; `-fno-force-mem` gives 2,700/2,704 bytes and disturbs FP scheduling.
+  The same memory option leaves `func_L11_00444400` unchanged at 4,640/4,684 bytes.
+  These controls do not justify an artificial rounding barrier or register pin.
+
+Current sizes, profiles and applicable-release results are in the existing
+nonmatching index and source headers. Equal sizes, fixed local blocks and typed
+buffer repairs remain distinct from a complete matching or functional build.

@@ -1,3 +1,10 @@
+/* Current retained result, 1 November 2026: 4640/4684 bytes. Current compiler and an additional -fno-force-
+ * mem control retain this result; the scheduling boundary after the rounding chains is unresolved. No empty
+ * wrapper, invented test or barrier is retained.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections -fno-schedule-insns.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* func_L11_00444400 (L11 only, 4,684 B): draws the level's six HUD text boxes (layout table scaled by
  * D_L11_001B3E04 and rounded), then per mode (data + 0x1F0 == 5, 9, 8, 12, else) the titles, the time
  * or count through sprintf (func_00115DA8), and the boss bar (func_L02_003FE768).

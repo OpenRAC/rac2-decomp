@@ -272,6 +272,15 @@ silently changing neighbouring definitions.
 - Preserve actual argument count and return width. A value-returning call defines
   `$v0` and can move the next constant to `$v1` (`func_00339F28`, `func_00343A30`).
   Do not invent a void return or an assembler-name alias to steer allocation.
+  `func_L04_003FA7E0` is a larger witness: the current quadword block-move support
+  closes its template copy, but the retained caller's incorrect `void` declarations
+  still place a camera-timer store before the call-argument moves. Restoring the
+  helpers' actual float, integer and pointer returns closes that last ordering
+  difference. Its 4,516-byte body is shared by Barlow and Joba in both USA releases;
+  it needs no new compiler patch, register pin or artificial dependency.
+  Consuming callers support the scalar/particle contracts; the other factories
+  explicitly move their saved object pointer to `$v0` after their initialization
+  calls, rather than merely leaving an incidental result live.
 - An existing reconstructed declaration is evidence to audit, not an oracle.
   `func_002AE730` writes its packed word through an output pointer; its last
   packing call also leaves that value in v0. Current RAC1 and 146 direct calls

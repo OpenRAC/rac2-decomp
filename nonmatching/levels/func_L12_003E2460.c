@@ -1,3 +1,11 @@
+/* Current retained result, 1 November 2026: 5764/5672 bytes. Restore all five collision arguments and the
+ * software float-to-double return. Test the adjacent waypoint sentinels with the observed 64-bit load,
+ * reset offset 0x268 (not 0x26C), and model the spent-byte table without a one-element bound. Control-
+ * flow/allocation differences remain; the smaller historical draft omitted real work.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections -ffast-math -Wa,-G8.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Opus handoff (big17, 2026-10-26): func_L12_003E2460, 5672 bytes, 2 places (L12 0x003E2460,
  * L17 0x003E52F8). A path-walking enemy's update: pvars at +0x68 (path table D_L12_001FEAC0
  * indexed by pvars+0x158/0x164, a waypoint cursor at +0x264/0x268/0x26C, a 3-bit kill count
@@ -24,8 +32,7 @@
 #include "common.h"
 
 typedef int TI128_L12_003E2460 __attribute__((mode(TI)));
-typedef struct { u8 pad[0x464]; u8 spent[1]; } L12_CellFlags_003E2460;
-extern L12_CellFlags_003E2460 D_L12_0021EDF0;
+extern u8 D_L12_0021EDF0[];
 extern u8 D_0019B4A8[];
 extern int D_001A79F0 MACRO_ADDR;
 extern int D_L12_001A8F00 __attribute__((nosda));
@@ -51,7 +58,7 @@ extern f32 D_L12_001B0B14 __attribute__((sda));
 extern f32 D_L12_001B0B34 __attribute__((sda));
 
 extern void func_0026FEB8(const char *, ...);
-extern int func_002761F8(void *, void *, int, void *);
+extern int func_002761F8(void *, void *, int, void *, void *);
 extern int func_00282978(void *);
 extern float func_00282C48(float);
 extern void func_00282CF0(void *, void *, void *);
@@ -74,11 +81,11 @@ extern int func_002AEB60(void *, float);
 extern int func_002B1C20(void *, void *);
 extern int func_002B3868(void *);
 extern int func_002B3890(void *);
-extern void func_002B60B0(void *, float, float, float, float);
-extern void func_002C2210(float *, int, int, int, int, float *, int, float, float, float);
+extern void * func_002B60B0(void *, float, float, float, float);
+extern void * func_002C2210(float *, int, int, int, int, float *, int, float, float, float);
 extern int func_002E5CF8(int, int, void *);
-extern void func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern int func_001234F0(float);
+extern void * func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern double func_001234F0(float);
 extern int func_L01_00321178(void *, void *);
 extern void func_L12_003E1CB0(void *);
 extern int func_L12_003E1EE8(void *, s32 *);
@@ -104,7 +111,7 @@ void func_L12_003E2460(u8 *obj)
 
     if (*(s32 *)(pv + 0x2A4) != 0) {
         id = *(u16 *)(obj + 0xB2);
-        if (D_L12_0021EDF0.spent[(s16)id] != 0)
+        if (D_L12_0021EDF0[0x464 + (s16)id] != 0)
             goto release;
         v = D_0019B4A8[((s16)id >> 1) + (D_001A79F0 << 10)];
         if (id & 1)
@@ -259,7 +266,7 @@ void func_L12_003E2460(u8 *obj)
         }
         func_0029FC20(obj, 2, v30);
         func_002830C0(v20, D_L12_001B0A90, v30);
-        if (obj[0x95] != 0xF && func_002761F8(v20, pv + 0x130, 2, obj) != 0) {
+        if (obj[0x95] != 0xF && func_002761F8(v20, pv + 0x130, 2, obj, 0) != 0) {
             func_002A7750(obj, obj[0x20], 6);
             func_002B3868(obj);
         }
@@ -287,24 +294,25 @@ void func_L12_003E2460(u8 *obj)
             break;
         }
         path = D_L12_001FEAC0[*(s32 *)(pv + 0x158)];
-        if (*(s32 *)(pv + 0x268) == -1) {
+        /* Retail tests both adjacent waypoint cursors in one 64-bit load. */
+        if (*(s64 *)(pv + 0x268) == -1) {
             cur = *(s32 *)(pv + 0x264);
-            *(s32 *)(pv + 0x26C) = -1;
+            *(s32 *)(pv + 0x268) = -1;
             lo = cur - 1;
             hi = cur + 1;
             if (lo < 0)
                 lo = *path - 1;
             if (hi == *path)
                 hi = 0;
-            if (lo >= 0 && func_002761F8((u8 *)path + lo * 0x10 + 0x10, pv + 0x130, 2, 0) == 0)
+            if (lo >= 0 && func_002761F8((u8 *)path + lo * 0x10 + 0x10, pv + 0x130, 2, 0, 0) == 0)
                 *(s32 *)(pv + 0x26C) = lo;
             if (*(s32 *)(pv + 0x26C) == -1 && hi < *path) {
-                if (func_002761F8((u8 *)path + hi * 0x10 + 0x10, pv + 0x130, 2, 0) == 0)
+                if (func_002761F8((u8 *)path + hi * 0x10 + 0x10, pv + 0x130, 2, 0, 0) == 0)
                     *(s32 *)(pv + 0x26C) = hi;
             }
             if (*(s32 *)(pv + 0x26C) == -1) {
                 for (i = lo - 1; i >= 0; i--) {
-                    if (func_002761F8((u8 *)path + i * 0x10 + 0x10, pv + 0x130, 2, 0) == 0) {
+                    if (func_002761F8((u8 *)path + i * 0x10 + 0x10, pv + 0x130, 2, 0, 0) == 0) {
                         *(s32 *)(pv + 0x26C) = i;
                         break;
                     }
@@ -312,7 +320,7 @@ void func_L12_003E2460(u8 *obj)
             }
             if (*(s32 *)(pv + 0x26C) == -1) {
                 for (i = hi + 1; i < *path; i++) {
-                    if (func_002761F8((u8 *)path + i * 0x10 + 0x10, pv + 0x130, 2, 0) == 0) {
+                    if (func_002761F8((u8 *)path + i * 0x10 + 0x10, pv + 0x130, 2, 0, 0) == 0) {
                         *(s32 *)(pv + 0x26C) = i;
                         break;
                     }
