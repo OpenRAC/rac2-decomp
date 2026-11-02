@@ -1147,6 +1147,8 @@ def states_of(name: str, root: Path | None = None) -> list[Path]:
 def script_program(script: str) -> Program:
     """The program a capture run's level part runs: a script's "level", else the boot."""
     s = SCRIPTS.get(script, {})
+    if re.fullmatch(r"w\d\d[a-z]+\d*x?", script):     # a wide capture run: wNN, NN its level
+        return Program(int(script[1:3]))
     return Program(s["level"]) if "level" in s else BOOT_PROGRAM
 
 
@@ -1300,6 +1302,32 @@ def check(name: str, candidate: Path | None, ulps: int = 0, work: Path | None = 
     return 4
 
 
+def cover(name: str, out: Path) -> int:
+    """Which of NAME's retail instructions its captured calls run, per program, into OUT: lines of
+    "PROGRAM ADDRESS WORDS STATES RETURNED MAP", MAP one digit an instruction. Retail only: an
+    untaken path is what a SAME says nothing about."""
+    groups: dict[Program, list[Path]] = {}
+    for s in states_of(name):
+        groups.setdefault(state_program(name, s), []).append(s)
+    lines = []
+    for prog, states in sorted(groups.items(), key=lambda g: -1 if g[0].level is None else g[0].level):
+        if name not in prog.functions():
+            continue
+        address, size = prog.functions()[name]
+        tmp = out.with_suffix(f".{prog.key}.tmp")
+        r = subprocess.run([str(FCHECK), "--hooks", str(HOOKS), "--disc", str(DISC), "--limit", str(RETAIL_LIMIT),
+                            "--entry", f"{address:x}", "--coverage", str(tmp), "--cover-size", str(size),
+                            *map(str, states)], capture_output=True, text=True)
+        if r.returncode:
+            print(f"{name}: {prog.label}: {(r.stderr or r.stdout).strip()[-200:]}")
+        elif tmp.is_file():
+            lines += [f"{prog.key} {l}" for l in tmp.read_text().splitlines()]
+        if tmp.exists():
+            tmp.unlink()
+    out.write_text("".join(l + "\n" for l in lines))
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1322,6 +1350,9 @@ def main() -> int:
     p.add_argument("--script", default="all", choices=["all", *SCRIPTS])
     p.add_argument("--frames", type=int)
     p.add_argument("--force", action="store_true")
+    p = sub.add_parser("cover", help="which of NAME's retail instructions its captured calls run")
+    p.add_argument("name")
+    p.add_argument("out", type=Path)
     p = sub.add_parser("source", help="NAME's unit, whether it is C or assembly there, and its definition's span")
     p.add_argument("name")
     sub.add_parser("scripts")
@@ -1346,6 +1377,8 @@ def main() -> int:
             got, asked = capture(names, s, a.frames, a.force, wanted=wanted)
             print(f"{s}: {got} of {asked} functions called")
         return 0
+    if a.cmd == "cover":
+        return cover(a.name, a.out)
     if a.cmd == "source":
         if a.name not in sources():
             print(json.dumps({"name": a.name}))
