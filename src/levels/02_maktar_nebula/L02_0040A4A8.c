@@ -793,7 +793,7 @@ void func_L02_00438B90(u8 *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L02_00439CD8);
+/* func_L02_00439CD8 is in L02_0040A4A8-f7-g8.c. */
 
 
 typedef struct { u8 pad[0x464]; u8 spent[1]; } L02_CellFlags;

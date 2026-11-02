@@ -499,7 +499,7 @@ void func_L23_003C1AB0(int arg0) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L23_00415988);
+/* func_L23_00415988 is in L23_0035CE90-f7-g8.c. */
 
 
 void func_L23_00416090(char *arg0) {

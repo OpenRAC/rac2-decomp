@@ -309,7 +309,7 @@ void func_L14_00420B10(int index, void *first, void *second, int clear) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L14_00421BC0);
+/* func_L14_00421BC0 is in L14_003F4F98-f7-g8.c. */
 
 /* func_L14_004221D8 is defined in L14_003F4F98-ribbon-g8.c (it reaches data through $gp and needs -frac2-qcopy). */
 

@@ -78,7 +78,7 @@ extern void func_32C700();
 
 /* func_L11_00432628 is defined in L11_00432628-dust.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_00434580);
+/* func_L11_00434580 lives in L11_00434580-g-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L11_004349F8);
 
@@ -479,7 +479,7 @@ void func_L11_00437EA8(void *object)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00437FD0);
+/* func_L11_00437FD0 lives in L11_00437FD0.c. */
 
 extern void func_002833F0(char *, char *);
 
@@ -574,7 +574,7 @@ void func_L11_004386B8(void *object)
     LINKED_STORE(obj)->flags |= 0x100;
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00438880);
+/* func_L11_00438880 lives in L11_00438880-g-g8.c. */
 
 /* Clears the two 16-bit flags at 0x374/0x376 of the object held at 0x68. */
 void func_L11_00438CD8(char *p)

@@ -281,7 +281,7 @@ void func_L13_0041B260(u8 *a0) {
 
 /* func_L13_0041BDA8 is in L13_0041BDA8.c. */
 
-INCLUDE_ASM("asm/levels", func_L13_0041CD18);
+/* func_L13_0041CD18 is in L13_00306F38-f7-g8.c. */
 
 
 

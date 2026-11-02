@@ -401,7 +401,7 @@ void func_L00_0040D648(unsigned char *object)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_0040EAA0);
+/* func_L00_0040EAA0 is in L00_003D54A8-f7-g8.c. */
 
 
 

@@ -2,7 +2,7 @@
 
 /* Defined in L11_004618C0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_0046D660);
+/* func_L11_0046D660 is in L11_004618C0-f7-g8.c. */
 
 extern void func_00281EB8(void *a0, int a1, unsigned int a2, int a3, float f12, float f13,
                           float f14);
@@ -45,7 +45,7 @@ void func_L11_00472DE8(unsigned char *a0) {
     *(unsigned short *)(a0 + 0x34) = v | 0x41;
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00472E10);
+/* func_L11_00472E10 lives in L11_00472E10-g8.c. */
 
 /* Defined in L11_00474920-g8.c. */
 

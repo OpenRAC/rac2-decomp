@@ -240,7 +240,7 @@ void func_L05_00314E28(void)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L05_00367340);
+/* func_L05_00367340 is defined in L05_00367340-g8.c (it reads its list through $gp). */
 
 void func_L05_003A3CE0(unsigned char *obj) {
     struct {
@@ -441,7 +441,7 @@ finish:
 
 
 
-INCLUDE_ASM("asm/levels", func_L05_00414F90);
+/* func_L05_00414F90 is in L05_00314E28-f7-g8.c. */
 
 /* Per-frame update. On the first frame it initializes the object; afterwards it points the record
    at moby state+0x260, renews the D_00188660 slot in state+0x270 near that target at random and the
