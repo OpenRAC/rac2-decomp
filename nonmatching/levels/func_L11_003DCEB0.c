@@ -11,7 +11,18 @@
      mine:   xori/sltu (flag = cnt >= 0x79), state in $v1
    Tried: flag = cnt>=0x79; flag=1; if (cnt<0x79) flag=0; flag=state; ternary
    `cnt<0x79 ? 0 : flag`; if/else chain instead of switch (worse). cse turns
-   the known state==1 into a constant before combine. */
+   the known state==1 into a constant before combine.
+
+   2 November 2026 (Claude Opus 5.5), current compiler, own -G8 unit: unchanged
+   at 432 bytes. Retail's movn needs flag's base value to be the state register,
+   so cse must not learn state==1 on the case-1 edge. With a `u8 state` switch
+   variable and `flag = state; ... if (cnt < 0x79) flag = 0;`, the per-file
+   option -fno-cse-follow-jumps (used by five other files) does produce a movn
+   from the state register, but inverted (`s3 = 0; movn s3,a0,(0x78 < cnt)`)
+   and 440 bytes. Ternary, if/else, `<= 0x78`, `!(>=)` and pre-increment forms
+   under that option give 432-444 bytes; -fno-cse-skip-blocks,
+   -fno-rerun-cse-after-loop, -fno-gcse and -fno-thread-jumps change nothing.
+   Re-reading a0[0x20] for the flag is not CSE'd (an extra lbu, 440 bytes). */
 
 extern f32 D_L11_001B0170 __attribute__((sda));
 extern f32 D_L11_001B016C __attribute__((sda));
