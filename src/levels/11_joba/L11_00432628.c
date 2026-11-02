@@ -574,7 +574,7 @@ void func_L11_004386B8(void *object)
     LINKED_STORE(obj)->flags |= 0x100;
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00438880);
+/* func_L11_00438880 lives in L11_00438880-g-g8.c. */
 
 /* Clears the two 16-bit flags at 0x374/0x376 of the object held at 0x68. */
 void func_L11_00438CD8(char *p)
