@@ -499,7 +499,7 @@ INCLUDE_ASM("asm/levels", func_L01_0040F5A8);
 
 /* func_L01_0040F958 is in L01_003DA740-destruct.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_00410AD0);
+/* func_L01_00410AD0 is in L01_003DA740-f7-g8.c. */
 
 /* func_L01_00412E00 is defined in L01_00412E00-flags-g8.c. */
 

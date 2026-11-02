@@ -3036,3 +3036,8 @@ src/levels/15_gorn/L15_00315428-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loop
 src/levels/18_damosel/L18_00433460-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/22_dobbo_orbit/L22_00358778-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/23_damosel_orbit/L23_0035CE90-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/00_aranos_tutorial/L00_003D54A8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/01_oozla/L01_003DA740-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/14_aranos_prison/L14_003F4F98-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/17_smolg/L17_003C7C70-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/20_yeedil/L20_0039C448-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2

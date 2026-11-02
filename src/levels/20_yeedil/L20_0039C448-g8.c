@@ -302,7 +302,7 @@ void func_L20_003BFEB8(char *arg0) {
 
 /* func_L20_00408D98 is defined in L20_00408D98-g8.c (its switch owns .rodata). */
 
-INCLUDE_ASM("asm/levels", func_L20_00438F98);
+/* func_L20_00438F98 is in L20_0039C448-f7-g8.c. */
 
 /* func_L20_004395B0 reads three floats through $gp; its near miss is in
    nonmatching/levels/func_L20_004395B0.c and belongs in this -G8 unit. */
