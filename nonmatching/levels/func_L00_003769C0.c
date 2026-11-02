@@ -29,7 +29,7 @@ extern void func_002FC620(int, int, int, int);
 extern int func_00282C30(int);
 extern void func_00285548(int,int,int,int,int,int,unsigned int);
 extern char *func_0028E588(int,int);
-extern void func_0028EA58(char *,int,int,int,int,unsigned int *);
+extern int func_0028EA58(char *,int,int,int,int,unsigned int *);
 #define MW(o) (D_L00_0022F7C0[0].words[(o)/4])
 #define MY(y) ((int)(D_L00_001B25E0[0]*(y)+0.5f)+(D_001A7B90[0]?4:0))
 void func_L00_003769C0(void)

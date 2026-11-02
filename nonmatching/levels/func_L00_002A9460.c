@@ -49,8 +49,8 @@ typedef struct {
 } HeroView_L00_002A9460;
 
 extern char D_00189E20[];
-extern void ref_L00_002A9460_00(void);
-extern void ref_L00_002A9460_01(void);
+extern void func_L00_002A75D8(void);
+extern void func_L00_002A76B8(void);
 extern void func_00282AB0(void *, void *, int);
 extern void func_002A0F48(void *);
 extern void func_L00_002D3778(void *, void *, float);
@@ -67,9 +67,9 @@ void func_L00_002A9460(void)
 
     HERO->moby[0xA8] = 0xFF;
     qcopy(HERO->moby + 0x10, &HERO->position);
-    ref_L00_002A9460_00();
+    func_L00_002A75D8();
     qcopy(HERO->moby + 0xF0, &HERO->unk90);
-    ref_L00_002A9460_01();
+    func_L00_002A76B8();
     func_00282AB0(HERO->moby + 0xC0, D_00189E20, 0x30);
     func_002A0F48(HERO->moby);
     m = HERO->moby;

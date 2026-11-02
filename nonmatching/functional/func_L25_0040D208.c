@@ -87,7 +87,7 @@ extern int func_002ED8A0(int);
 extern int func_00283D38(unsigned int,unsigned int,float);
 extern void func_0027EAE8(int,int,int,int,int,void *);
 extern void *func_0028E588(int,int);
-extern void func_0028EA58(void *,int,int,int,int,void *);
+extern int func_0028EA58(void *,int,int,int,int,void *);
 extern void func_L05_003263F8(int);
 extern int func_L05_00324DB8(void);
 extern void func_L00_0030CF60(void);
