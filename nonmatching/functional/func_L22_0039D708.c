@@ -143,7 +143,7 @@ extern s32 D_0018C0B0 __attribute__((nosda));
 extern u8 D_001A7A68 __attribute__((nosda));
 extern s32 D_L22_001A8F00 __attribute__((nosda));
 extern s32 D_L22_001A903C __attribute__((nosda));
-extern void * D_L22_001AF2E0 __attribute__((sda));
+extern char * D_L22_001AF2E0 __attribute__((sda));
 extern s32 D_L22_001AF2E4 __attribute__((sda));
 extern s32 D_L22_001AF2E8 __attribute__((sda));
 extern f32 D_L22_001AF2F4 __attribute__((sda));
