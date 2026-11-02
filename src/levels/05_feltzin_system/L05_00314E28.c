@@ -240,7 +240,7 @@ void func_L05_00314E28(void)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L05_00367340);
+/* func_L05_00367340 is defined in L05_00367340-g8.c (it reads its list through $gp). */
 
 void func_L05_003A3CE0(unsigned char *obj) {
     struct {
