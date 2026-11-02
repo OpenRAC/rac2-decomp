@@ -1,21 +1,15 @@
-/* GPT-6.1 Sol high, USA v1.01: 1232/1236 bytes, 0/1 places match.
- * Compile in a separate unit with -O2 -G0 -ffunction-sections.
- * This reconstruction fixes the gate's tied absolute load, the final three
- * vector-address forms and the chained float zero. The upper random bound at
- * +0x260 is still scheduled into the call delay slot as a GP load, losing one
- * instruction; retail loads it absolutely before calling and delays the lower
- * GP bound. Explicit upper/lower snapshots and a scalar-struct view tie.
- * The helper func_L11_003DD068 returns u8 *, as its matched definition shows;
- * retaining that interface fixes the loop-limit slti destination to v1.
- * The activation predicate still allocates index/address/byte to v1/v1/a0
- * instead of a0/v0/v1. A shared loop-index local worsens this to s0; the
- * default NOT_SDA scalar hoists the upper address across the loop, even with
- * -fno-gcse. -mno-split-addresses also folds the table base incorrectly.
- * Next: establish a source type/address view that retains the upper absolute
- * load without loop hoisting. Required declarations follow. No volatile casts.
- */
+/* func_L11_00461308: a Joba moby's state machine with a companion moby (class 0xCF6).
+   State 0 spawns the companion; 1 sets or clears flag bits 0x41 on both from a level flag
+   and waits on its linked moby's state and func_002ACBC8; 2 makes three
+   func_L11_003DD068 calls with randomised directions; 3 waits for func_002ACBC8 to clear.
+   In states 1-3 it oscillates its height, places the companion at its offset and emits
+   three particles.
+   Built -O2 -G0 in its own unit. The random bounds are a two-float block: the lower is
+   read through $gp, the upper as the block's second word, a two-instruction absolute
+   load that stays out of the call's delay slot as in retail.
+*/
 #include "common.h"
-typedef int TI __attribute__((mode(TI)));
+typedef int TI128 __attribute__((mode(TI)));
 extern char *func_0029EFD0(int);
 extern void func_002B37E8(char *, char *);
 extern void func_002A7470(char *, int, int, int);
@@ -39,8 +33,10 @@ extern Entry61308 D_L11_002B6D40[];
 extern char *D_L11_001B359C[] NOT_SDA __attribute__((sda));
 extern char *D_L11_001B368C[] NOT_SDA __attribute__((sda));
 extern char D_00189EA0[];
-extern float D_L11_001B238C[] NOT_SDA __attribute__((sda));
+/* The random bounds at 001B2388: lower, upper. Retail reads the lower through $gp and the
+   upper as the block's second word, absolutely. */
 extern float D_L11_001B2388 SDATA(D_L11_001B2388);
+extern float D_L11_001B2388_block[] __asm__("D_L11_001B2388") __attribute__((sda));
 extern char D_L11_001B2378[] NOT_SDA __attribute__((sda));
 extern char D_L11_001B2368[] NOT_SDA __attribute__((sda));
 extern char D_L11_001B2358[] SDATA(D_L11_001B2358);
@@ -77,7 +73,7 @@ void func_L11_00461308(char *p)
         H(P(s,0x10),0x34)&=0xFFBE;
         I(p,0x98)=I(P(p,0x24),0x10);
         ready=1;
-        if(I(s,0xC)!=-1) { ready=0; if((unsigned char)D_L11_001B359C[0][(I(s,0xC)<<8)+0x20]!=3) ready=active; }
+        if(I(s,0xC)!=-1) { char *m=D_L11_001B359C[0]+(I(s,0xC)<<8); ready=0; if((unsigned char)m[0x20]!=3) ready=active; }
         if (ready && func_002ACBC8(D_00189EA0,I(s,0)))
             func_002A7750(p,2,-1);
         break;
@@ -86,15 +82,15 @@ void func_L11_00461308(char *p)
         t=func_002A7878(0.0f,0.333f);
         for(i=0;i<3;i++) {
             func_0029FCC0(p,i==0?3:i==1?2:4,v);
-            *(TI *)tmp = 0;
+            *(TI128 *)tmp = 0;
             tmp[0]=func_002A7878(-1.0f,1.0f);
             tmp[3]=1.0f;
             tmp[1]=t+t-1.0f;
             t+=0.333f;
-            *(TI *)dir=*(TI *)tmp;
+            *(TI128 *)dir=*(TI128 *)tmp;
             func_002830C0(dir,dir,D_L11_001B368C[0]+(I(s,4)<<7));
             {
-                float high = D_L11_001B238C[0];
+                float high = D_L11_001B2388_block[1];
                 float low = D_L11_001B2388;
                 func_L11_003DD068(p,v,dir,func_002A7878(low,high)*0.00027777778f);
             }
@@ -115,7 +111,7 @@ void func_L11_00461308(char *p)
         F(p,0x18)+=F(s,0x18);
         F(p,0xF4)+=cs*0.0015f;
         F(p,0xF0)+=sn*0.0015f;
-        *(TI *)(P(s,0x10)+0xF0)=*(TI *)(p+0xF0);
+        *(TI128 *)(P(s,0x10)+0xF0)=*(TI128 *)(p+0xF0);
         func_00282D30(v,p+0xE0,1.46f);
         func_00282CC0(P(s,0x10)+0x10,p+0x10,v);
         func_002A05A8(P(s,0x10));
