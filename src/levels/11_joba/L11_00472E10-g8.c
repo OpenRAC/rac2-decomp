@@ -1,25 +1,11 @@
-/*
- * GPT-6.1 Sol high worker; current pinned game EE-GCC 2.9-ee-991111b.
- * Profile: -O2 -G8 -ffunction-sections, US v1.01.
- * Best check.py --diff: 896/896 bytes, 0/1 places; first difference +0x30.
- * Both nibble tests now have retail's branch structure. A boolean ternary
- * branching to the shared cleanup preserves the later high/low tests; assigning
- * its result or using switch merges them. Removing the redundant initial mask
- * closes the initial four-byte excess. A typed trailing flag table plus scoped
- * unsigned IDs fixes index operand order and temporary-register assignment.
- * Parenthesizing each counter's complete array index fixes its address schedule;
- * an independent final slot local fixes the last call's argument register.
- * Remaining: state is s4 instead of s3, loop sentinel is s3 instead of s4, and
- * their initializations occupy different guard delay slots. The other loop and
- * counter instructions align. Explicit sentinel initialization before/after the
- * query swaps the saved registers correctly but grows to 904 bytes and changes
- * delay slots. Defining the sentinel and entry in both query arms yields 888
- * bytes by merging the later low-nibble mask/test into the high-nibble path.
- * A full hero struct grew to 908 bytes with an extra saved high-address register.
- * Next useful experiment: independently recover the original sentinel/loop
- * lifetime or an analogous controller; avoid repeating these tied forms.
- * Required declarations follow. No linked build, US2 or PAL check was run.
- */
+/* func_L11_00472E10: per-frame update of a Joba moby tied to a save-data nibble.
+   On its first frame it may call func_L00_002B9D60 with a fixed position; within 32 units
+   of the hero it keeps a func_L00_0035F5A0 slot (level 11 only), otherwise frees it. When
+   func_002B38B8 is true, its level flag is set or its nibble is non-zero, it frees its
+   eight child mobys, increments the 3-bit nibble (saturating at 7), releases the slot
+   and removes itself.
+   Built -O2 -G8 in its own unit. The child loop is a plain index loop over the state
+   words, which gives the loop-invariant -1 $s4 and the state pointer $s3 as retail. */
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -45,7 +31,6 @@ void func_L11_00472E10(u8 *object) {
     float rotation[4];
     int *state = *(int **)(object + 0x68);
     int count, slot;
-    int *entry;
     u8 *record;
     u8 *counter;
     if (object[0x20] == 0) {
@@ -96,9 +81,8 @@ void func_L11_00472E10(u8 *object) {
         }
     }
 cleanup:
-    entry = state;
-    for (count = 7; count >= 0; --count, ++entry) {
-        if (*entry != -1) func_0029F338(D_L11_001B359C + *entry * 0x100);
+    for (count = 0; count < 8; count++) {
+        if (state[count] != -1) func_0029F338(D_L11_001B359C + state[count] * 0x100);
     }
     {
         int counter_id = *(u16 *)(object + 0xB2);
