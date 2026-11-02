@@ -21,6 +21,13 @@
  * where ours spills them; and object/previous/rest take s4/s3/s2 instead of
  * retail's s3/s2/s4. With both shapes: pass++ in the for header 624 bytes
  * (98 rows), forward = 0 632, forward = !forward and a u8 flag 640.
+ * 3 November 2026, second attempt. Retail's pass/forward pattern (a1 = 1 on
+ * entry, stores after each definition, `lw a1,0x14` at each arm's end) is not
+ * caller-save: this cc1's CALLER_SAVE_PROFITABLE is 4*calls < refs with refs
+ * weighted by loop depth and calls not, and pass crosses ~14 calls. Holding
+ * both in a local `int c[2]` (memory) gives loads at every use instead
+ * (632 bytes, 154 rows): calls kill the memory, so gcse cannot move the loads.
+ * The reload placement remains unexplained.
  */
 #include "common.h"
 extern float *func_L11_004417E8(void *);
