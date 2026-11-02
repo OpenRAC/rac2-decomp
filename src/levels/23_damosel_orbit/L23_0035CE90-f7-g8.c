@@ -1,15 +1,5 @@
-/* functional: medium. Near-miss draft, not byte-compared in the latest sweep: paths the captured calls never take are unproven. */
-/* func_L06_00455BC0: family F7, five level members with identical opcodes (L06, L10, L15,
-   L18, L22, 1540 bytes each). Flags: -O2 -G8 -ffunction-sections. 1540/1540, 34 raw rows.
-   Cases 3 and 4 now equal retail: notify = 1 goes after the 0x18 test, and case 4 has its own
-   flag (s0 in retail, s2 in case 3).
-   Not a landing form: `missing = 0` at the loop's end stands in for retail's preheader set, to
-   give the 4 refs that fix the frame. It leaves missing in t2, not s5. Set at the loop's top it
-   is hoisted as in retail, but has 3 refs and is spilled (1548 B, 300 rows).
-   Retail's order is missing s5, fail s6, -1 s7, high fp, with the 1 unallocated, so missing must
-   outrank fail (.0615): 4 refs across 118 insns gives .0678. Where the 4th ref comes from is open.
-   Tried, all worse: a do/for wrapper with breaks, per-arm sets at the p->msg guard, a second
-   test of missing, missing = fail = 1. */
+/* Family F7: one body per level (L02, L05, L06, L10, L11, L12, L13, L15, L18, L22, L23), the
+   same opcodes in each. Built with -malign-loops=2 (config/cflags.txt): see the print below. */
 #include "common.h"
 
 typedef struct {
@@ -25,7 +15,7 @@ typedef struct {
 
 extern void func_0026FEB8(const char *, ...);
 extern int func_00288AA0(void *, int);
-extern void func_00288BE8(void *);
+extern int func_00288BE8(void *);  /* its result is tested elsewhere */
 extern void func_00288CB0(int, int);
 extern void func_0029B3E0(int, int);
 extern void func_0029F338(void *);
@@ -69,7 +59,7 @@ typedef struct {
     char dir[0x10];
 } Thing;
 
-void func_L06_00455BC0(Thing *m)
+void func_L23_00415988(Thing *m)
 {
     TriggerVars *p = m->vars;
     int notify, i, missing, fail;
@@ -104,10 +94,10 @@ void func_L06_00455BC0(Thing *m)
         fail = 1;
         missing = 1;
         if (D_L06_002AA490[D_001A79F0] != 0 && D_L06_002AA490[D_001A79F0][p->idx] != 0) {
-            if (D_L06_002AA490[D_001A79F0][p->idx][0] != -1)
-                missing = 0; /* retail clears it on loop entry, even if every entry is skipped */
             for (i = 0; D_L06_002AA490[D_001A79F0][p->idx][i] != -1; i++) {
                 int e = D_L06_002AA490[D_001A79F0][p->idx][i];
+
+                missing = 0;
                 if (p->tail.b.quiet == 0) {
                     int bit = 1 << (e & 0x1F);
                     if (D_00139768[(unsigned int)e >> 2] & bit)
@@ -118,11 +108,16 @@ void func_L06_00455BC0(Thing *m)
                     return;
                 }
                 fail = 0;
-                missing = 0;
             }
         }
-        if (missing != 0)
-            func_0026FEB8(D_L06_001B1810, D_001A79F0, p->idx);
+        /* Retail keeps missing in $s5 above fail: the test's do-while (a debug-print macro's
+           shape) counts it at loop depth, its fourth reference. Its loop label is not aligned
+           in retail, so the unit turns loop alignment off; the other loop's label is already
+           on an 8-byte boundary. */
+        do {
+            if (missing != 0)
+                func_0026FEB8(D_L06_001B1810, D_001A79F0, p->idx);
+        } while (0);
         if (fail != 0) {
             p->tail.b.had = 0;
             func_002A7750(m, 4, -1);

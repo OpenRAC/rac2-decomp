@@ -292,7 +292,7 @@ s32 func_L17_003E7010(s32 a0) {
 
 INCLUDE_ASM("asm/levels", func_L17_003E8A58);
 
-INCLUDE_ASM("asm/levels", func_L17_00417DB0);
+/* func_L17_00417DB0 is in L17_003C7C70-f7-g8.c. */
 
 
 

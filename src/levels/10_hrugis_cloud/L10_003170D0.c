@@ -169,7 +169,7 @@ void func_L10_003F6110(u8 *arg0) {
 
 /* func_L10_003F61C8 is in L10_003170D0-beam.c. */
 
-INCLUDE_ASM("asm/levels", func_L10_00415A50);
+/* func_L10_00415A50 is in L10_003170D0-f7-g8.c. */
 
 /* func_L10_004166E8 is in L10_004166E8-g8-dbg.c. */
 

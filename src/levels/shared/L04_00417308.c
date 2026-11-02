@@ -16,7 +16,7 @@ INCLUDE_ASM("asm/levels", func_L04_00417308);
 
 /* func_L04_00418A58 is defined in L04_00418A58-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L04_00418BF0);
+/* func_L04_00418BF0 is in L04_00418BF0-g8.c. */
 
 /* func_L04_004195E0 is defined in L04_004195E0-g8.c. */
 

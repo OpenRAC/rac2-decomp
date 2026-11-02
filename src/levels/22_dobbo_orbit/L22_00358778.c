@@ -496,7 +496,7 @@ void func_L22_0040DF28(u8 *a0, u8 *a1) {
 
 /* func_L22_0040E098 uses the profile in L22_0040E098-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L22_0040F1C0);
+/* func_L22_0040F1C0 is in L22_00358778-f7-g8.c. */
 
 /* func_L22_004135F8 is in L22_004135F8-g8.c. */
 

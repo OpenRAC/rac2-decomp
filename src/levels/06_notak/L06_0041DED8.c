@@ -578,7 +578,7 @@ void func_L06_004504C8(char *arg0)
     func_35A550(arg0, 1, -1);
 }
 
-INCLUDE_ASM("asm/levels", func_L06_00455BC0);
+/* func_L06_00455BC0 is in L06_0041DED8-f7-g8.c. */
 
 /* func_L06_00456278 is in L06_00456278.c. */
 

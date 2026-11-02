@@ -174,7 +174,7 @@ void func_L12_004149B8(Ent49B8 *a0)
 
 INCLUDE_ASM("asm/levels", func_L12_004163E8);
 
-INCLUDE_ASM("asm/levels", func_L12_00417690);
+/* func_L12_00417690 is in L12_004149B8-f7-g8.c. */
 
 /* func_L12_00417CA8 is in L12_00417CA8-g16.c. */
 

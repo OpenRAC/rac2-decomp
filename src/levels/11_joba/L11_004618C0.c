@@ -2,7 +2,7 @@
 
 /* Defined in L11_004618C0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_0046D660);
+/* func_L11_0046D660 is in L11_004618C0-f7-g8.c. */
 
 extern void func_00281EB8(void *a0, int a1, unsigned int a2, int a3, float f12, float f13,
                           float f14);

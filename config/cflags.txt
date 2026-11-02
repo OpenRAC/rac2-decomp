@@ -3026,6 +3026,22 @@ src/levels/shared/L02_003C26F0-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/levels/shared/L00_003EEE90-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L03_003C3220-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L04_003FA7E0.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsplit-edges
+src/levels/06_notak/L06_0041DED8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/02_maktar_nebula/L02_0040A4A8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/05_feltzin_system/L05_00314E28-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/10_hrugis_cloud/L10_003170D0-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/11_joba/L11_004618C0-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/12_todano/L12_004149B8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/13_boldan/L13_00306F38-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/15_gorn/L15_00315428-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/18_damosel/L18_00433460-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/22_dobbo_orbit/L22_00358778-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/23_damosel_orbit/L23_0035CE90-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/00_aranos_tutorial/L00_003D54A8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/01_oozla/L01_003DA740-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/14_aranos_prison/L14_003F4F98-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/17_smolg/L17_003C7C70-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/20_yeedil/L20_0039C448-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/11_joba/L11_00434580-g-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/11_joba/L11_00437FD0.c	-O2 -G0 -ffunction-sections -g
 src/levels/11_joba/L11_00438880-g-g8.c	-O2 -G8 -ffunction-sections -g -mno-split-addresses
