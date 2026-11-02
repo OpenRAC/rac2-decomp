@@ -48,7 +48,7 @@ extern void func_00335438(void *, void *, int, int, int);
 extern int func_002B38B8(void *);
 extern int func_00282948(void *);
 extern void func_003355A8(int);
-extern void D_L01_002C1988(int);
+extern void func_L01_002C1988(int);
 extern void func_00335370(void *);
 extern void func_003353C8(void *);
 extern void func_002A0430(int);
@@ -141,7 +141,7 @@ void func_L01_00394240(CamMoby *m)
         if (func_00282948(&v->timer) || m->active != 1) {
             if (v->mode) func_003355A8(2);
             else func_003355A8(0);
-            D_L01_002C1988(0);
+            func_L01_002C1988(0);
             if (v->lock) D_L01_001B22A8[0] = 0;
             D_L01_001B1FA8[0] = 0;
             D_L01_001B9780 = 0;
