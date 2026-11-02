@@ -167,7 +167,7 @@ void func_L26_00324DE8(u8 *a0, int a1) {
     func_002EE440(a0 + 0x20, a0 + 0x10, a0);
 }
 
-INCLUDE_ASM("asm/levels", func_L26_003547D8);
+/* func_L26_003547D8 is defined in L26_003547D8-g8.c (it reads its list through $gp). */
 
 void func_L26_0038BB28(unsigned char *obj) {
     struct {
