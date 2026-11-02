@@ -1,3 +1,10 @@
+/* Current retained result, 1 November 2026: 3604/3604 bytes, not exact. Restore the actual integer return
+ * of func_00288870 even though this caller discards it. The measured mode-3 allocation and loop-induction
+ * differences remain.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /*
  * Tier: Claude Opus 5.5 (xhigh), task v1807 (opus-1), 31 October 2026.
  * Best check.py: 3604/3604 bytes, 0 of 28 places, first difference at +0x150; 48
@@ -138,7 +145,7 @@ extern void func_0029F0C8(void *, int), func_002A0468(void *, int, int, int, int
 extern void func_002A0F48(void *), func_0029F390(void *);
 extern void func_00282A60(void *, int, int), func_0029F978(void *, unsigned int, void *);
 extern void func_002A1130(void *, unsigned int, long long, unsigned int);
-extern void func_00288870(void *, int, int);
+extern int func_00288870(void *, int, int);
 extern short func_002B7CE0(int);
 extern void func_00294BC8(int, int);
 

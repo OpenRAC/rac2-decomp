@@ -1,3 +1,10 @@
+/* Current retained result, 1 November 2026: 5976/6032 bytes. Restore the known pointer/integer helper
+ * returns and remove the empty floating comparison probe, which emitted nothing. The seven-FPR frame,
+ * vector lifetimes and dead retail comparison remain unresolved.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G0 -ffunction-sections -g.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Sonnet first draft (big12 prep), 2026-10-26, for an Opus finish. Starting point: the m2c pass plus
  * the hover-vehicle sibling's idioms (func_L04_00400EE0); structure is a different routine, only helpers match.
  * Unit to test in: src/levels/shared/L04_00414698-x.c, flags -O2 -G0 -ffunction-sections -g
@@ -68,7 +75,7 @@ extern float func_00283198(float);
 extern int func_002A77E0(int);
 extern int func_00283CF0(float);
 extern void *func_L04_00362768(void *, void *, u32, float);
-extern void func_002C19D8(void *, int, int, float, float);
+extern void * func_002C19D8(void *, int, int, float, float);
 extern float func_002AA3A8(float *, float *, float, float, float, float);
 extern float func_002AA140(float, float, float);
 extern float func_002AA898(float *, float, float *, float, float, float, int);
@@ -85,11 +92,11 @@ extern int func_L04_00413A38(u8 *, u8 *, u8 *, u8 *, Vec *, Vec *, u8 *, int *, 
                              float, float, float, float, float);
 extern void func_002A7470(void *, int, int, int);
 extern void func_L04_0040E248(u8 *, u8 *);
-extern void func_L00_002D6900(int);
-extern void func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern int func_L00_002D6900(int);
+extern void * func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void func_L00_00322EC8(void *);
 extern float func_002A7940(void);
-extern void func_L04_00407078(u8 *, int, Vec *, u8 *, int, int, Vec *, char *, char *, float, float);
+extern void * func_L04_00407078(u8 *, int, Vec *, u8 *, int, int, Vec *, char *, char *, float, float);
 extern int func_002761F8(void *, void *, int, void *, int);
 extern float func_00282E20(void *);
 extern float func_00283BE0(float, float);
@@ -435,8 +442,6 @@ void func_L04_00414698(u8 *object, u8 *st)
                                 float f21 = func_00283248(*(float *)(D_001BFAC0 + 0x48), func_00282E20(D_001BFAC0 + 0x40));
                                 float f20 = func_00283B98(func_00283248(*(float *)(D_001BFAC0 + 0x40), *(float *)(D_001BFAC0 + 0x44)), 3.1415927f);
                                 func_00283C80(func_00283248(v80.f[0], v80.f[1]), f20);
-                                if (f21 > 1.2217305f) {
-                                }
                             }
                         }
                     }

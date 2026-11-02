@@ -1,3 +1,11 @@
+/* Current retained result, 1 November 2026: 3392/3388 bytes. Preserve the level loader's heap-pointer
+ * return contract. An explicit goto form of the final loop measured 3380 bytes and lost required control-
+ * flow/alignment; keep the structured loop. GS-word allocation and macro-load loop padding remain
+ * unresolved.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G16 -Wa,-G16 -ffunction-sections.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Retained nonmatching C, Claude Opus 5.5 xhigh, 31 October 2026 (task v1860).
  * USA v1.01: 3392/3388 bytes, 0/27 places. Five rows differ, plus one extra nop.
  * Unit: src/levels/shared/L00_00303990-g16.c, flags -O2 -G16 -Wa,-G16 -ffunction-sections.
@@ -152,7 +160,7 @@ extern void func_00291DE0(void *, int);
 extern void func_L00_002FD480(char *);
 extern void func_00291CA8(void *, char *, void *, int);
 extern void func_0026FEB8(const char *, ...);
-extern int func_L00_00300618(int);
+extern char *func_L00_00300618(int);
 extern void func_L00_003032F0(void);
 extern void func_L00_00303418(int);
 extern void func_L00_00358B30(void);
@@ -418,7 +426,7 @@ int func_L00_00303990(int load, int resume)
         base = (char *)((unsigned int)end & ~0x3F);
         LD->p[0x48 / 4] = base;
     }
-    LD->i[0x68 / 4] = func_L00_00300618(load);
+    LD->p[0x68 / 4] = func_L00_00300618(load);
     if (load)
         D_00152CE4[0] = -1;
     if (TEXBASE->i[0xC / 4] != 0) {

@@ -1,3 +1,10 @@
+/* Current retained result, 1 November 2026: 2996/2988 bytes. Explicit goto alternatives for the two strip
+ * loops kept that size and reduced opcode agreement; retain the structured loops. No new volatile access or
+ * artificial loop was introduced. The preheader and wide-shift scheduling constraints below remain.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G0 -ffunction-sections -fno-rerun-loop-opt.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /*
  * Tier: Opus 5.5 xhigh, task v1829. Flags (a unit of its own, not 0027F128.c):
  *   -O2 -G0 -ffunction-sections -fno-rerun-loop-opt

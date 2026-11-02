@@ -1,3 +1,11 @@
+/* Current retained result, 1 November 2026: 2704/2704 bytes, not exact. The route lookup uses its evidenced
+ * 32-byte record with a path pointer at +0x10. -fno-force-addr ties the original seven diagnostic rows;
+ * -fno-force-mem gives 2700 bytes and loses required FP scheduling/padding. Retain the original flags; no
+ * register pins or synthetic dependencies.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G0 -ffunction-sections -g.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Nonmatching C, Claude Opus 5.5 xhigh, task v1902, 31 October 2026.
  * Samples projected camera paths, smooths the position and builds its frame.
  * Needs a unit of its own (the types clash with L13_0041B670.c) built with
@@ -72,7 +80,12 @@ extern int D_001A79F0 __attribute__((sda));
 
 extern float D_L13_001B9940[4];
 extern char *D_L13_001B22C4[] __attribute__((sda));
-extern char *D_L13_001B2140[] __attribute__((sda));
+typedef struct {
+    char unknown00[0x10];
+    CameraPath *path;
+    char unknown14[0xC];
+} CameraRouteRecord;
+extern CameraRouteRecord *D_L13_001B2140[] __attribute__((sda));
 extern CameraPath *D_L13_001FE580[];
 extern int func_L00_00341820(void *, void *, int *, float *, int, float);
 extern int func_L00_00341FA8(void *, void *, void *, int *, float *, int, float, float, float);
@@ -172,7 +185,7 @@ void func_L13_00438D88(char *settings) {
         CameraPath *route;
         CameraPath *positions;
         path2 = D_L13_001FE580[path_index];
-        route = *(CameraPath **)(D_L13_001B2140[0] + *(int *)(settings + 0x24) * 32 + 0x10);
+        route = D_L13_001B2140[0][*(int *)(settings + 0x24)].path;
         positions = D_L13_001FE580[*(int *)(settings + 0x28)];
         markers = D_L13_001FE580[*(int *)(settings + 0x2C)];
         previous = markers->count - 1;

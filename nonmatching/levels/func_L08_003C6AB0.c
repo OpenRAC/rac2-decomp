@@ -1,3 +1,11 @@
+/* Current retained result, 1 November 2026: 5284/5300 bytes. Remove the two unreferenced vector
+ * declarations previously used to shape the stack. The 32-byte gap has no evidenced C object; do not
+ * restore dummy storage. The current compiler removes the old block-move loop padding, but allocation and
+ * store order still differ.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections -g -ffast-math -frac2-qcopy -frac2-qcopy-barrier.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Opus handoff (big8, 2026-10-26): func_L08_003C6AB0, 5300 bytes, 3 places
  * (L08 0x003C6AB0, L19 0x003B63E0, L30 0x003B5B48). A rideable moby's update: a pvars
  * block at moby+0x68, a seven-entry state jump table jtbl_L08_002B5220 on moby+0x20
@@ -194,8 +202,6 @@ void func_L08_003C6AB0(u8 *moby)
     f32 v90[4] __attribute__((aligned(16)));
     f32 vA0[4] __attribute__((aligned(16)));
     f32 vB0[4] __attribute__((aligned(16)));
-    f32 vC0[4] __attribute__((aligned(16)));
-    f32 vD0[4] __attribute__((aligned(16)));
     struct { f32 turn, speed, pitch, bank, lift, thrust; s32 fire; } in;
     u8 *vars;
     u8 *hit;

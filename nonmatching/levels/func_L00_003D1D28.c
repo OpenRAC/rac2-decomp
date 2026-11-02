@@ -1,3 +1,11 @@
+/* Current retained result, 1 November 2026: 3288/3288 bytes, not exact. The hit request now has its real
+ * aligned vector and the extra float at +0x24 read by func_002A8E20; tail alignment is implicit, not dummy
+ * bytes. Both matrix consumers were checked: they read/write exactly three quadwords, so the 48-byte
+ * matrices are intentional. The PRE spill ordering remains unresolved.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G64 -Wa,-G64 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* func_L00_003D1D28 (27 levels, 3,288 bytes): turret/beam weapon controller. Opus draft (big35), 2026-10-26; not linked.
  * Profile: -O2 -G64 -Wa,-G64 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier, as its own unit
  * (src/levels/shared/L00_003D1D28-g64.c). 822/822 words, every opcode equal; 46 words differ, check.py 0/27
@@ -43,7 +51,7 @@ typedef struct {
 } TurretState;
 
 typedef struct {
-    float pos[4];         /* 0x00 */
+    Vec4 pos;             /* 0x00: copied by the request consumer as one quadword */
     u8 *source;           /* 0x10 */
     int flags;            /* 0x14 */
     u8 b18;               /* 0x18 */
@@ -51,7 +59,7 @@ typedef struct {
     u16 oclass;           /* 0x1A */
     float damage;         /* 0x1C */
     int count;            /* 0x20 */
-    u8 pad[0xC];
+    float extra;          /* 0x24: consumed by func_002A8E20 */
 } Hit;
 
 typedef struct { u8 pad0[0x28]; int id; u8 pad2C[0x28]; float rate; u8 pad58[0x18]; float damage; u8 pad74[0x6C]; } WeaponEntry;

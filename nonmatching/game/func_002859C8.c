@@ -1,3 +1,10 @@
+/* Current retained result, 1 November 2026: 3436/3436 bytes, not exact. Restore func_0027FAA8's integer
+ * return and the 64-bit colour argument of func_0028F410. The remaining panel-call scheduling still
+ * differs.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Opus 5.5 xhigh (opus-1), 31 October 2026: 3436/3436 bytes, 0/28 USA v1.01 places, first difference
  * +0xA50. 32 instruction rows differ once relocated operands are masked (diagnostic count; cdiff.py
  * shows 182 of 859 rows, the rest relocations). PAL and v2.00 not checked; no linked build was run.
@@ -127,14 +134,14 @@ extern void func_0029B888(MenuBox *, int, void *, int, int, int, int, char *, ch
 extern int func_0028E588(int, int);
 extern void func_0028E868(int, int, int, int, int, int);
 extern int func_0028E640(int);
-extern void func_0028F410(float, float, float, float, float, int, int, int);
+extern void func_0028F410(float, float, float, float, float, int, int, long long);
 extern void *func_00115484(void *, int, int);
 extern int func_00288D80(void);
 extern int func_00287E90(void);
 extern int func_00115DA8(char *, const char *, ...);
 extern void func_0027EB88(int, int, int, int, int, int);
 extern int func_00283D38(int, int, float);
-extern void func_0027FAA8(int, int, unsigned long, char *, int);
+extern int func_0027FAA8(int, int, unsigned long, char *, int);
 extern int func_0027C878(int);
 extern void func_0027FC70(MenuBox *, unsigned long, char *, int, int, void *);
 extern void func_002802E0(MenuBox *, int, int, int, int, int, int, int, int);

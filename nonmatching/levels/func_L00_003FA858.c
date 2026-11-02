@@ -1,3 +1,10 @@
+/* Current retained result, 1 November 2026: 5796/5796 bytes, not exact. Alpha packing now shifts unsigned
+ * 32-bit values before storing the packed word, without adding accesses or barriers. The alpha/rotation
+ * live-range and spill-order obstruction remains.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections -ffast-math -g.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* func_L00_003FA858 (shared, 27 places): draws a moby's glow sprites: eight camera-facing quads
  * (two sizes from pvars 0x1C/0x1E, rotations from pvars ang[0..5]), then a screen-edge flare set
  * (func_00282978 / func_00279BD8 gate), a pvars+0x34 quad and a pvars+0x40 quad with clamped UVs.
@@ -107,6 +114,11 @@ extern void func_002AFFD8(void *, void *, int);
 extern float func_002EE238(void *);
 extern void func_002FC560(unsigned int, unsigned long long);
 
+static __inline__ u32 pack_alpha(s32 value)
+{
+    return (u32)value << 24;
+}
+
 void func_L00_003FA858(u8 *moby)
 {
     Quad q;
@@ -180,7 +192,7 @@ void func_L00_003FA858(u8 *moby)
     } else {
         a = func_00283CE0(D_L00_001B0AA8);
     }
-    alpha = func_00283CF0(a * dot * dot) << 24;
+    alpha = pack_alpha(func_00283CF0(a * dot * dot));
 
     if (func_00282C48(pv->ang[0]) > 0.00001f) {
         func_002AB668(rot, (f32 *)(moby + 0xC0), pv->ang[0]);
@@ -249,8 +261,8 @@ void func_L00_003FA858(u8 *moby)
     }
     x = func_00283CF0(func_00283CE0(D_L00_001B0B54) * k * fade);
     a = func_00283CE0(x) * 0.2f;
-    x <<= 24;
-    c = (func_00283CF0(a) << 24) | 0xFFFFFF;
+    x = pack_alpha(x);
+    c = pack_alpha(func_00283CF0(a)) | 0xFFFFFF;
     q.rgba[0] = c;
     q.rgba[3] = c;
     q.rgba[2] = c;
@@ -280,7 +292,7 @@ void func_L00_003FA858(u8 *moby)
             b = 0xFF;
         }
         func_00281DE8(&q, 0x39, 1, 0x80);
-        c = (b << 24) | 0xFFFFFF;
+        c = pack_alpha(b) | 0xFFFFFF;
     }
     q.rgba[0] = c;
     q.rgba[1] = c;
@@ -383,7 +395,7 @@ void func_L00_003FA858(u8 *moby)
     }
     func_00280B90(&q, 0, 0);
 
-    t2 = func_00283CF0(func_00283CE0(x8) * 0.2f) << 24;
+    t2 = pack_alpha(func_00283CF0(func_00283CE0(x8) * 0.2f));
     func_00281DE8(&q, 0x38, 1, 0x80);
     c = t2 | 0xFFFFFF;
     q.rgba[0] = c;
@@ -424,7 +436,7 @@ void func_L00_003FA858(u8 *moby)
             v140[1] -= 28492.0f;
             v140[0] -= 28492.0f;
             span = 8590.0f;
-            t3 = func_00283CF0(D_L00_001B0BA0 * ((f32)pv->t36 * pv->k38)) << 24;
+            t3 = pack_alpha(func_00283CF0(D_L00_001B0BA0 * ((f32)pv->t36 * pv->k38)));
             func_002ACEC0(v150, p130, dir, 0.7853982f);
             func_00281DE8(&q, D_L00_001B0B88, 1, 0x80);
             t = (v140[1] < v140[0] ? v140[1] : v140[0]) * inv;
@@ -495,7 +507,7 @@ void func_L00_003FA858(u8 *moby)
     if (pv->t34 != 0) {
         k = func_00283CE0(pv->t34) * pv->k3C;
         func_00281DE8(&q, 0xB, 4, 0x80);
-        c = (func_00283CF0(k * 255.0f) << 24) | 0x808080;
+        c = pack_alpha(func_00283CF0(k * 255.0f)) | 0x808080;
         q.rgba[0] = c;
         q.rgba[1] = c;
         q.rgba[2] = c;
@@ -533,7 +545,7 @@ void func_L00_003FA858(u8 *moby)
         func_00282CC0(v150, D_L00_001B8DC0, v140);
         func_00281DE8(&q, D_L00_001B0B84, 1, 0x80);
         q.d88 = (0x8000LL << 24) | 0x4A;
-        c = (func_00283CF0(k * 255.0f) << 24) | 0x808080;
+        c = pack_alpha(func_00283CF0(k * 255.0f)) | 0x808080;
         q.rgba[0] = c;
         q.rgba[1] = c;
         q.rgba[2] = c;

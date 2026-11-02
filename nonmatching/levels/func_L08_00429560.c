@@ -1,3 +1,10 @@
+/* Current retained result, 1 November 2026: 2440/2440 bytes, not exact. Remove all twelve z0..z11 dummy
+ * declarations; they existed only to change pseudo numbering. Keep the real buffers and locals. The
+ * previous spill-slot arrangement is not creditable without an evidenced source form.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-barrier -frac2-hazard-labels.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* opus-1 (Claude Opus 5.5, xhigh), task v1950, USA v1.01: 2440/2440 bytes, 0/1 places
  * (check.py: "instruction at +0x68 differs"); 302 cdiff rows differ, 271 excluding call
  * relocations.  Previous best (sol-high) was 2444 bytes / 450 rows.
@@ -70,7 +77,6 @@ void func_L08_00429560(s32 unused,s32 slot) {
     f32 spacing,previous,advance,height,half,angleStep,t,weight,a,b,c,r;
     f32 (*p)[4],(*q)[4];
     char *effect,*data,*owner;
-    s32 z0,z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11;
     s32 index;
     index=slot;
     if(!func_L02_002F1658()) return;

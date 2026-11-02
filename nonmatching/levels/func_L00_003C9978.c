@@ -1,3 +1,11 @@
+/* Current retained result, 1 November 2026: 2792/2800 bytes. Restore the emitter's pointer return and
+ * provide the complete 40-byte collision request footprint. Its tail reuses the direction slot in a 48-byte
+ * union, as the retail stack accesses show, instead of overrunning a separate 32-byte object. The final
+ * countdown loop exists in retail and is retained. PRE allocation still prevents a match.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G0 -ffunction-sections -ffast-math -frac2-zero-ti-por -frac2-hazard-labels.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /* Retained nonmatching C (opus-1, Claude Opus 5.5 xhigh), measured 31 October 2026 on v2/c05.
  * Profile (own unit, e.g. src/levels/shared/L00_003C9978.c, one cflags line):
  *   -O2 -G0 -ffunction-sections -ffast-math -frac2-zero-ti-por -frac2-hazard-labels
@@ -119,12 +127,19 @@ typedef union Info_003C9978 {
     struct {
         Vec4_003C9978 a;
         Vec4_003C9978 b;
+        /* Reused as the collision request tail before the direction is needed. */
+        Vec4_003C9978 direction;
     } v;
     struct {
-        u8 pad0[0x18];
+        Vec4_003C9978 direction;
+        void *source;
+        u32 flags;
         u8 kind;
         u8 count;
         u16 oclass;
+        float damage;
+        int repeats;
+        float extra;
     } hit;
     struct {
         u8 pad0[0x10];
@@ -180,7 +195,7 @@ extern void func_L00_003CA650(Moby_003C9978 *);
 extern void func_L00_00320B70(void *, void *, void *, void *, void *, int, float, float, float, float);
 extern void func_L00_003252A8(void *, void *, int);
 extern void func_L00_00325300(void *, void *);
-extern void func_L00_00341410(void *, void *, void *, int, int, float);
+extern void * func_L00_00341410(void *, void *, void *, int, int, float);
 
 void func_L00_003C9978(Moby_003C9978 *self)
 {
@@ -189,7 +204,6 @@ void func_L00_003C9978(Moby_003C9978 *self)
     Quad_003C9978 off;
     Vec4_003C9978 step;
     Info_003C9978 info;
-    Vec4_003C9978 dir;
     int life;
     int spark;
     int trail_timer;
@@ -325,9 +339,9 @@ void func_L00_003C9978(Moby_003C9978 *self)
                 func_00282D30(&info.v.b, &vars->target->m[2], health[4]);
                 func_00282CC0(&info.v.b, &info.v.b, &vars->target->pos);
             } else if (D_L00_001A8FF0 != 0) {
-                func_L00_00325300(self, &dir);
-                func_00282F20(&dir, &dir, 1.0f);
-                func_00282CC0(&info.v.b, &dir, &vars->target->pos);
+                func_L00_00325300(self, &info.v.direction);
+                func_00282F20(&info.v.direction, &info.v.direction, 1.0f);
+                func_00282CC0(&info.v.b, &info.v.direction, &vars->target->pos);
             } else {
                 qcopy(&info.v.b, &vars->target->pos);
             }

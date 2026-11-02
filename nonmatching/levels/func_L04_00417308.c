@@ -1,3 +1,9 @@
+/* Current retained result, 1 November 2026: 5768/5968 bytes. Correct the float helper returns and 64-bit
+ * text style parameter. The hero pointer allocation and rounding/call scheduling still differ.
+ * Not a functional-port qualification or a complete matching-build result.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Earlier measurements below remain historical where superseded by this note.
+ */
 /*
  * func_L04_00417308 (5,968 B; levels 04 at 0x00417308 and 11 at 0x00406E08): Sonnet first draft,
  * 2026-10-26 (slate big12), for an Opus finish. HUD draw: boss/target bars, the 9-slot scrolling
@@ -89,7 +95,7 @@ extern int func_00115DA8(char *, char *, ...);
 extern void func_0027AB40(void);
 extern void func_0027EAE8(int, int, int, int, int, void *);
 extern void func_0027EB88(int, int, int, int, int, int);
-extern int func_0027F5B8(int, int, int, char *, int);
+extern int func_0027F5B8(int, int, unsigned long long, char *, int);
 extern int func_0027FB40(int, int, unsigned long long, char *, int);
 extern int func_0027FBD8(int, int, unsigned long long, char *, int);
 extern int func_00282948(void *);
@@ -113,10 +119,10 @@ extern void func_0028EA58(int, int, int, int, int, void *);
 extern void func_0028FC48(int, int, int, int, unsigned long long, int);
 extern void func_0029B658(int, int, float, float, float, float);
 extern float func_002AA2E8(float *, float, float);
-extern void func_002AA548(void *, void *, float, float, float, float);
-extern void func_002AAA00(void *, float, float, float, float, void *, int);
+extern float func_002AA548(void *, void *, float, float, float, float);
+extern f32 func_002AAA00(void *, float, float, float, float, void *, int);
 extern int func_002B6D28(void);
-extern void func_002E5CF8(int, int, void *);
+extern int func_002E5CF8(int, int, void *);
 extern void func_002FC560(unsigned int, unsigned long long);
 extern void func_00300A00(void *, int, float, float, float, float, float);
 extern void func_00300AA8(void *, float, float, int, float, void *);
