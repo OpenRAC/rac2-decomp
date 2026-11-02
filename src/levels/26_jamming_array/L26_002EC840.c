@@ -369,7 +369,7 @@ finish:
 
 
 
-INCLUDE_ASM("asm/levels", func_L26_003D4590);
+/* func_L26_003D4590 is defined in L26_003D4590-g8.c (it reaches data through $gp and needs -frac2-zero-ti-por). */
 
 /* func_L26_003D4930 is matched in L26_003D4930-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
