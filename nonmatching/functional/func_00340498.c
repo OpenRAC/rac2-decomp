@@ -24,7 +24,7 @@ extern const Word2_340498 D_001AE078;
 extern const Word2_340498 D_001AE080;
 extern const Word2_340498 D_001AE088;
 extern const Word2_340498 D_001AE090;
-extern char D_0025FF58[];
+extern char D_00259F58[];
 extern char *D_001A8CFC __attribute__((sda));
 extern void func_00336390(void *, void *, int);
 extern void func_00337210(int *);
@@ -50,7 +50,7 @@ void func_00340498(char *o)
     f[9] = (int)&q4;
     f[1] = 4;
     f[2] = 6;
-    f[0] = (int)D_0025FF58;
+    f[0] = (int)D_00259F58;
     f[17] = (int)(o + 0x870);
     f[13] = (int)(o + 0x260);
     f[14] = 0;
