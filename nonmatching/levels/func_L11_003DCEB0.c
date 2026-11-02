@@ -22,7 +22,20 @@
    and 440 bytes. Ternary, if/else, `<= 0x78`, `!(>=)` and pre-increment forms
    under that option give 432-444 bytes; -fno-cse-skip-blocks,
    -fno-rerun-cse-after-loop, -fno-gcse and -fno-thread-jumps change nothing.
-   Re-reading a0[0x20] for the flag is not CSE'd (an extra lbu, 440 bytes). */
+   Re-reading a0[0x20] for the flag is not CSE'd (an extra lbu, 440 bytes).
+
+   3 November 2026 (Claude Opus 5.5), second attempt; body below replaced.
+   Now 436/436 bytes with the default -O2 -G8 profile, 14 rows, all in the final
+   func_002ABBB8 call. Case 1 is solved: a `u8 state` switch variable, flag still 0
+   from entry, and `*(u16 *)(a0 + 0x96) += 1; if (... >= 0x79) flag = state;` give
+   retail's `daddu s3,a0`, separate masked compare, unmasked sh and movn s3,zero.
+   (`flag = state; if (cnt < 0x79) flag = 0` is folded or inverted instead.)
+   Declared prototypes for the three helpers it called undeclared; the u32 second
+   parameter of func_002A9640 adds four bytes, the int one is neutral.
+   Left: the hoisted 0x810001 stack argument takes a0 where retail uses a2, which
+   also moves `a0 = s1` and the D_L11_001A8F20 lui. A u32 last parameter, u8 *
+   pointer parameters, `!= 0`-free conditions, -g, keep-block-order and
+   gcse-unsplit-edges do not change it. */
 
 extern f32 D_L11_001B0170 __attribute__((sda));
 extern f32 D_L11_001B016C __attribute__((sda));
@@ -33,14 +46,18 @@ extern s32 func_002761F8(void *, void *, s32, void *, s32);
 extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void func_002E5CF8(s32, s32, u8 *);
 extern void func_0029F338(u8 *);
+extern void *func_002A9640(void *, int, int);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_002A7750(void *, int, int);
 
 void func_L11_003DCEB0(u8 *a0) {
     u8 vec[16] __attribute__((aligned(16)));
     u8 *s0 = *(u8 **)(a0 + 0x68);
     s32 flag = 0;
     u16 cnt;
+    u8 state = a0[0x20];
 
-    switch (a0[0x20]) {
+    switch (state) {
     case 0:
         func_00282CC0(vec, a0 + 0x10, s0);
         *(f32 *)(s0 + 8) = *(f32 *)(s0 + 8) - *(f32 *)(s0 + 0xC);
@@ -53,12 +70,11 @@ void func_L11_003DCEB0(u8 *a0) {
         }
         break;
     case 1:
-        cnt = *(u16 *)(a0 + 0x96) + 1;
-        *(u16 *)(a0 + 0x96) = cnt;
-        flag = cnt >= 0x79;
+        *(u16 *)(a0 + 0x96) += 1;
+        if (*(u16 *)(a0 + 0x96) >= 0x79) flag = state;
         break;
     }
-    if (func_002A9640((s32)a0, -1, 0) != 0 || flag != 0) {
+    if (func_002A9640(a0, -1, 0) != 0 || flag != 0) {
         func_002ABBB8(a0, D_L11_001A8F20, a0 + 0x10, D_L11_001B0174, 1.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         func_002E5CF8(0, 0, a0);
         func_0029F338(a0);
