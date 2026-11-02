@@ -131,7 +131,7 @@ void func_L14_00328E90(char *arg0, char *arg1, char *arg2) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L14_0035F510);
+/* func_L14_0035F510 is defined in L14_0035F510-g8.c (it reads its list through $gp). */
 
 /* func_L14_00390DF8 is defined in L14_00390DF8-helpers.c. */
 

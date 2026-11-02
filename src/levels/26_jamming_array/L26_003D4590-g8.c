@@ -1,20 +1,6 @@
-/*
- * GPT-6.1 Sol (high), 2026-10-29: 928/928 bytes, 0/1 USA v1.01 places.
- * Profile: -O2 -G8 -ffunction-sections -frac2-zero-ti-por.
- * First check.py difference +0x1E0; residual rows begin at +0x1C8:
- * upper range loads use split v0 addresses instead of retail's AT macros,
- * with different lower/upper load and preceding store scheduling.
- * Reversing the two initialization assignments and using MACRO_ADDR on the
- * center vector fixes the earlier state stores and vector-helper delay slots.
- * The existing union preserves the initialization matrix/motion vectors;
- * the separate motion basis is still the measured complete 48 bytes.
- * -mno-split-addresses fixes the upper loads but changes the initial basis
- * base to +0xC and folds table bases into GP indexed loads (920 bytes);
- * -fno-gcse does not repair that. Plain, sda and MACRO_ADDR upper views
- * give GP delay loads (920); -G0 plus explicit GP views also fails.
- * Reopen with a truthful absolute macro view preserving the other address
- * lifetimes. No volatile access or false helper interface is used.
- * Other releases were not checked.
+/* func_L26_003D4590 reaches its small globals through $gp (-G8) and clears a stack vector with
+ * por (-frac2-zero-ti-por). As in the level-2 state machine (L02_003C43F0-state-g8.c), each
+ * random range reads its upper bound, absolutely, before its lower bound.
  */
 #include "common.h"
 
@@ -24,12 +10,13 @@ extern int D_L26_001A8FF0;
 extern Vector D_L26_002967A0[6];
 extern Vector D_L26_001B1890 MACRO_ADDR;
 extern float D_L26_001B0460 __attribute__((sda));
-extern float D_L26_001B0464 NOT_SDA;
+/* Upper bounds, snapshotted before the lower bounds are read. */
+extern volatile float D_L26_001B0464 MACRO_ADDR;
 extern float D_L26_001B0458 __attribute__((sda));
-extern float D_L26_001B045C NOT_SDA;
+extern volatile float D_L26_001B045C MACRO_ADDR;
 extern int D_L26_001B0468[2] __attribute__((sda));
 extern int D_L26_001B0470[2] __attribute__((sda));
-extern unsigned char D_L26_001B1748;
+extern int D_L26_001B1748;
 extern void func_002833F0(void *, void *);
 extern void func_00283098(void *, void *, void *);
 extern void func_00282CF0(void *, void *, void *);
@@ -118,7 +105,7 @@ void func_L26_003D4590(unsigned char *object) {
         workspace.motion.rotation.q = workspace.motion.rotation_seed.q;
         func_002833F0(matrix, &workspace.motion.rotation);
         func_00283738(object + 0xC0, object + 0xC0, matrix);
-        if (!D_L26_001B1748) func_L26_00324DE8(object + 0xC0, 0);
+        if ((D_L26_001B1748 & 0xFF) == 0) func_L26_00324DE8(object + 0xC0, 0);
         if (func_00282948((int *)(private + 0x18C))) {
             selection = (object[0xBC] + 1) & 1;
             object[0xBC] = selection;

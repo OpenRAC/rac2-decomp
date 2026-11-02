@@ -3018,6 +3018,7 @@ src/levels/23_damosel_orbit/L23_00399C10-tether-g8.c	-O2 -G8 -ffunction-sections
 src/levels/24_ship_shack/L24_00389210-tether-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
 src/levels/25_wupash_nebula/L25_003A2378-tether-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
 src/levels/26_jamming_array/L26_00391520-tether-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/levels/26_jamming_array/L26_003D4590-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/levels/30_insomniac_museum/L30_003941D8-tether-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
 src/levels/03_endako/L03_003F09C0-arc-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/game/00308600-chain-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-hazard-labels

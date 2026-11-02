@@ -903,7 +903,7 @@ void func_L04_00362A50(char *self) {
 
 /* func_L04_00365300 is defined in L04_00365300.c. */
 
-INCLUDE_ASM("asm/levels", func_L04_00378838);
+/* func_L04_00378838 is defined in L04_00378838-g8.c (it reads its list through $gp). */
 
 /* func_L04_003A0FC8 is in L04_003A0FC8-g8.c. */
 
