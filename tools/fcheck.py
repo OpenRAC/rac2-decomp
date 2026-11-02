@@ -944,6 +944,49 @@ def returns(name: str, text: str) -> str:
     return "int"
 
 
+@lru_cache(maxsize=None)
+def call_copy_rows() -> dict[str, list[tuple[str, int, int, int, int, int]]]:
+    """OpenRAC's port/game/rac2-ntsc/call_copies.tsv (hostgen's copycalls.py): per caller, the calls
+    that differ between the places of a folded function, as (callee, home, canon, size, own, exe)."""
+    out: dict[str, list[tuple[str, int, int, int, int, int]]] = {}
+    path = OPENRAC / "port/game/rac2-ntsc/call_copies.tsv"
+    if path.is_file():
+        for line in path.read_text().splitlines():
+            if line.startswith("#") or not line.strip():
+                continue
+            c = line.split("\t")
+            out.setdefault(c[0], []).append((c[1], int(c[2]), int(c[3], 16), int(c[4]), int(c[5], 16), int(c[6], 16)))
+    return out
+
+
+def call_copies(name: str, prog: "Program") -> dict[str, int]:
+    """Callee name -> the address NAME's copy in PROG calls in its place, for the calls the port makes
+    through openrac_call_in_copy (call_copies.tsv): the jal at the same offset of PROG's copy as
+    the home copy's jal to the callee. The port calls what the running copy calls; so does the gate."""
+    out: dict[str, int] = {}
+    rows = call_copy_rows().get(name, [])
+    if not rows or name not in prog.functions():
+        return out
+    here, size = prog.functions()[name]
+    mine = prog.retail(here, size) if prog.level is not None else retail_bytes(here, size)
+    for callee, home, canon, csize, own, exe in rows:
+        if prog.level is None:
+            if exe:
+                out.setdefault(callee, exe)
+            continue
+        ref = Program(home).retail(canon, min(csize, size))
+        targets = set()
+        for k in range(0, min(len(ref), len(mine)) - 3, 4):
+            w = struct.unpack_from("<I", ref, k)[0]
+            if w >> 26 == 3 and (w & 0x3FFFFFF) << 2 == own:
+                m = struct.unpack_from("<I", mine, k)[0]
+                if m >> 26 == 3:
+                    targets.add((m & 0x3FFFFFF) << 2)
+        if len(targets) == 1:
+            out[callee] = targets.pop()
+    return out
+
+
 class Resolver:
     """Retail values of the symbols NAME's candidate (object OBJ) refers to, in program PROG, for
     Placer: OWN and OTHERS are unit_values'. A named symbol, in order: what NAME's own matched C
@@ -987,6 +1030,7 @@ class Resolver:
                     self.boot_derived[k] = copy_map(prog.level, "call")[v]
         self.aligned: dict[str, int] | None = None
         self.from_bytes: list[str] = []
+        self.copy_calls = call_copies(name, prog)
 
     def boot_value(self, n: str) -> int | None:
         """NAME's value in the boot: its function's address, the boot build's value, or the address
@@ -997,6 +1041,8 @@ class Resolver:
         return int(v, 16) if v is not None else build.address_in_name(n)
 
     def named(self, n: str) -> int | None:
+        if n in self.copy_calls:
+            return self.copy_calls[n]
         if n in self.own:
             return self.own[n] & 0xFFFFFFFF
         if self.local:
