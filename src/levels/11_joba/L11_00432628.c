@@ -78,7 +78,7 @@ extern void func_32C700();
 
 /* func_L11_00432628 is defined in L11_00432628-dust.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_00434580);
+/* func_L11_00434580 lives in L11_00434580-g-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L11_004349F8);
 

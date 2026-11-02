@@ -21,10 +21,20 @@
  * Writing func_L11_00434F48 per arm makes the a0 load right but keeps bnel.
  */
 #include "common.h"
+
+/* func_L11_00434580: a thrown projectile's per-frame update. Each frame it advances along its
+   velocity and tests for a hit; frames below 25 always spawn the trail particles, frames 25-33
+   only while the projectile is still moving, and at 34 it expires. On a hit it snaps to the
+   impact point and, unless the predicate says otherwise, bursts (6 or 3 pieces) and is removed.
+   Built -G8 -g in its own unit (the particle colours are $gp-relative).
+   Each arm spells out its own hit tail; jump2's cross-jumping merges them after allocation,
+   which is why the object keeps $s2 and each arm loads the impact pointer before the shared
+   burst call. The particle call's last two arguments are declared float-then-int (the same
+   $t2/$f14 registers) so the $t2 zero lands in the call's delay slot as in retail. */
 typedef int Quad34580 __attribute__((mode(TI)));
 extern void func_00282F20(void *,void *,float);
 extern void func_00282CC0(void *,void *,void *);
-extern float func_00282E48(void *,void *);
+extern float func_00282E80(void *,void *);
 extern void func_002A8C00(void *,void *,int,void *,float);
 extern int func_002761F8(void *,void *,int,void *,void *);
 extern int func_002B38B8(void *);
@@ -33,7 +43,7 @@ extern void func_L00_003294F0(void *,int);
 extern void func_0029F338(void *);
 extern float func_002A7878(float,float);
 extern int func_002A7820(int,int);
-extern void *func_002C2210(void *,int,float,float,unsigned int,int,int,void *,int,float);
+extern void *func_002C2210(void *,int,float,float,unsigned int,int,int,void *,float,int);
 extern void func_L00_002E6EF8(void *,void *);
 extern char D_L11_001C0D20[];
 extern char D_L11_001A8F20[16] MACRO_ADDR;
@@ -46,7 +56,6 @@ void func_L11_00434580(char *obj) {
     float vel[4]; char collision[48]; float pos[4],pos2[4];
     char *st=*(char **)(obj+0x68);
     float scale=*(float *)(st+0x3C);
-    int count;
     float *impact;
     *(float *)(st+0x38)+=1;
     if (*(float *)(st+0x38)<25) {
@@ -60,22 +69,23 @@ void func_L11_00434580(char *obj) {
         if(func_002761F8(st,st+0x10,0,obj,collision)) {
             impact=(float *)D_L11_001C0D20;
             *(Quad34580 *)(st+0x10)=*(Quad34580 *)impact;
-            if(!func_002B38B8(obj)) { count=6; goto burst; }
-            {
-                func_L00_003294F0(obj,1); func_0029F338(obj); return;
-}
+            if(!func_002B38B8(obj)) {
+                func_L11_00434F48(impact,6);
+                func_L00_003294F0(obj,1);
+            }
+            func_0029F338(obj); return;
         }
         size=func_002A7878(1,4);
         sign=func_002A7820(25,35); if(!sign) sign--;
         qcopy(pos,st+0x10); pos[2]-=0.1f;
-        func_002C2210(pos,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0,0);
+        func_002C2210(pos,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
         sign = -sign;
-        func_002C2210(st,10,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0,0);
-        func_002C2210(st,10,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0,0);
+        func_002C2210(st,10,size*0.3f,size,D_L11_001B11E8,0,sign,D_L11_001A8F20,0.0f,0);
+        func_002C2210(st,10,size*0.04f,size*0.4f,D_L11_001B11F0,1,-sign,D_L11_001A8F20,0.0f,0);
         func_L00_002E6EF8(func_L11_00434AA8,obj);
         return;
     } else if (*(float *)(st+0x38)>=25 && *(float *)(st+0x38)<34) {
-        if(func_00282E48(st,st+0x10)>1) {
+        if(func_00282E80(st,st+0x10)>1) {
             float size; int sign;
             *(float *)(st+0x34)+=1;
             func_00282F20(st+0x10,st+0x20,*(float *)(st+0x34));
@@ -87,24 +97,23 @@ void func_L11_00434580(char *obj) {
                 impact=(float *)D_L11_001C0D20;
             *(Quad34580 *)(st+0x10)=*(Quad34580 *)impact;
                 if(!func_002B38B8(obj)) {
-                    count=3;
-                burst:
-                    func_L11_00434F48(impact,count);
+                    func_L11_00434F48(impact,3);
+                    func_L00_003294F0(obj,1);
                 }
-                func_L00_003294F0(obj,1); func_0029F338(obj); return;
+                func_0029F338(obj); return;
             }
             func_00282F20(pos,st+0x20,1.66666675f);
             func_00282CC0(st,st,pos);
             size=func_002A7878(1,4);
             sign=func_002A7820(25,35); if(!sign) sign--;
             qcopy(pos2,st+0x10); pos2[2]-=0.1f;
-            func_002C2210(pos2,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0,0);
-            func_002C2210(pos2,20,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0,0);
+            func_002C2210(pos2,15,size*0.3f,size,D_L11_001B11E0,0,sign,D_L11_001A8F20,0.0f,0);
+            func_002C2210(pos2,20,size*0.4f,size*0.2f,D_L11_001B11F8,1,-sign,D_L11_001A8F20,0.0f,0);
             func_L00_002E6EF8(func_L11_00434AA8,obj);
             return;
 
-        } else goto expire;
-    } else goto expire;
-expire:
+        }
+        return;
+    }
     func_0029F338(obj);
 }
