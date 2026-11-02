@@ -956,6 +956,14 @@ the `t[]` stores in retained `func_00285030`, with no fence. An integer index th
 loop means no loop notes: loop.c reduces every `for` or `do` form, a `goto` loop keeps it (retained
 `func_L00_003769C0`).
 
+The section-8 record copy in retained `func_L00_00300618` is another source-level
+case. A `do` loop turns its four cursor advances into address induction variables;
+an explicit `goto` loop keeps the advances and reproduces the entire 24-word
+sequence in all 27 USA v1.01 placements. Other loops retain their required strength
+reduction. This removes that local obstruction without disabling extra-increment
+conversion in the compiler; the complete loader still does not match (11,280 versus
+11,348 bytes). Absolute macro-global stores and other loops remain separate issues.
+
 ### Compiler control-flow passes
 
 [tidy_condjump_fallthru.py](../tools/compiler/transformers/tidy_condjump_fallthru.py)
