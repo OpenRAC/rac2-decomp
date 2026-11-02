@@ -14,6 +14,17 @@
  * Separate cursor variables add a reload and nop (1116 bytes); one shared
  * cursor stays size-exact but uses a1 where retail uses v1.
  * Next: recover the original flag iterator source/lifetimes.
+ * 2 November 2026 (Claude Opus 5.5), with the current compiler: this body is
+ * still 1108/1108 with 20 differing rows, all in the two flag scans' registers
+ * and order. Retail's second scan forms flags+(next-1) in v0, tests it, then
+ * copies it to v1 for the loop: a separate loop pointer, as strength reduction
+ * would make (-fno-strength-reduce moves 91 rows, so loop.c decides this).
+ * No progress from: index scans `flags[next-1]` (not reduced; flags goes to s7,
+ * 1068 bytes), an index second scan alone (142 rows), `cursor[i]` with a
+ * separate counter (28), `*cursor++` (1100 bytes), pre-increment do/while (21),
+ * a static __inline__ scan helper (1120 bytes), seven local declaration
+ * orders (20-21), and keep-block-order, gcse-unsplit-edges, no-null-pointer-
+ * checks, hazard-labels, qcopy (1156 bytes) as per-file options.
  */
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
