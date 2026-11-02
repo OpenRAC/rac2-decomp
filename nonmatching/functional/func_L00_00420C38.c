@@ -108,7 +108,7 @@ void func_L00_00420C38(char *moby)
         q = *(char **)(moby + 0x70);
         *(short *)(q + 0x20) = D_L00_001B1518;
         q += 0x20;
-        *(float *)(q + 4) = one / func_00283CE0(*(short *)q);
+        *(float *)(q + 0x24) = one / func_00283CE0(*(short *)q);
         qcopy(moby + 0x40, moby);
         return;
     }

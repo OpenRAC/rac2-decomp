@@ -46,7 +46,7 @@ void func_002CA8A8(void)
     S->clear = 0;
     if (S->timer != 0)
         S->timer--;
-    if (D_001393E0.level < 3 && D_001393E0.delta >= 0)
+    if (D_001393E0.level >= 3 || D_001393E0.delta >= 0)
         ((PauseState *)D_001F2840)->step = 0;
     else
         S->step++;

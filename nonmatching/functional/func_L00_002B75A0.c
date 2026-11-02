@@ -41,9 +41,9 @@ void func_L00_002B75A0(float a, float b, float c)
         func_L00_002B39F0(0,1.0f);
         scale=*(float *)(p+0x1a0);
         qcopy(vector,p+0x190);
+        ((HeroTargetState *)p)->active = 1;
+        ((HeroTargetState *)p)->target = 0;
     }
-    ((HeroTargetState *)p)->active = 1;
-    ((HeroTargetState *)p)->target = 0;
     result = func_L00_002AE888(a, scale, b, c, (char *)vector, -1, 0);
     {
         if (result == 0) goto fallback;

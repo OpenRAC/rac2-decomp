@@ -61,7 +61,7 @@ void func_L03_0041CA78(u8 *e) {
         *(float *)(e+0x2c)=*(float *)(*(u8 **)(e+0x24)+0x24)*scale;
         s[0x48]=func_00283CF0(20);
         s[0x4a]=func_00283CF0(6);
-        if(*(int *)(s+0x290)==-1) goto die;
+        if(*(int *)(s+0x290)==-1) { func_0029F338(e); return; }
         { s32 initialMode = 3;
         s[0x150]=7; s[0x28]=initialMode;
         *(float *)(s+0x68)=0.20943955f;

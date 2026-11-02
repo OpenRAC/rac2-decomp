@@ -59,7 +59,7 @@ void func_L01_0041C970(unsigned char *m)
             if(pressing) *(int *)(m+0x98)=0;
             else *(int *)(m+0x98)=*(int *)(*(unsigned char **)(m+0x24)+0x10);
             ease=func_002A7798((F(0x6c)-F(0x64))/G(0));
-            speed=-(G(1)*0.016666668f);
+            speed=-(G(1)*0.016666668f)*ease;
         } else {
             *(int *)(m+0x98)=*(int *)(*(unsigned char **)(m+0x24)+0x10);
             ease=func_002A7798((G(0)-(F(0x6c)-F(0x64)))/G(0));

@@ -86,8 +86,8 @@ int func_L01_002B5EA0(int arg)
             break;
         }
         copy16_002B5EA0(p + 128, D_L01_001BF930);
-        copy16_002B5EA0(p + 304, D_L01_001BF940);
-        copy16_002B5EA0(p + 320, D_L01_001BF920);
+        copy16_002B5EA0(p + 560, D_L01_001BF940);
+        copy16_002B5EA0(p + 576, D_L01_001BF920);
         count++;
         p[647] = 1;
         *(int *)(p + 620) = *(int *)(D_L01_001BF900 + 24);

@@ -62,7 +62,7 @@ void func_L03_0041EAE0(u8 *entity) {
             *(float *)(state+0x33C)=4.5f;
         } else {
             pathIndex=*(int *)(state+0x280);
-            if(pathIndex==-1) goto death;
+            if(pathIndex==-1) goto death_tail;
             qcopy(entity+0x10,D_L03_001FE700[pathIndex]+16);
             *(int *)(state+0x148)|=0x210;
             *(s16 *)(state+0x32C)=1;
@@ -124,9 +124,9 @@ void func_L03_0041EAE0(u8 *entity) {
                 D_L03_001A903C[0]=1;
             }
         }
-death:
         func_002E5CF8(3,0,entity);
         func_002A6C58(entity,0,3);
+death_tail:
         if(*(int *)(state+0x340)!=-1) {
             func_002E59F8(*(int *)(state+0x340));
             *(int *)(state+0x340)=-1;

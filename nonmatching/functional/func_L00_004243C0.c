@@ -120,8 +120,8 @@ void func_L00_004243C0(char *obj)
         timer=(unsigned short)state->timer;
         if(blocked || !(((unsigned)(timer-1)<1999) ||
             (D_00138180.x<0.3f && D_00138180.y<0.3f))) goto hold;
-        if(func_00282978(&state->timer))state->flag=0;
     }
+    if(func_00282978(&state->timer))state->flag=0;
     if(state->flag) {
         if(func_00282978(&state->timer))state->flag=0;
     }
