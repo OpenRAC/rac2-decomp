@@ -25,7 +25,7 @@ extern float func_00283CE0(int);
 extern void func_00282D30(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_002A0F48(unsigned char *);
-extern void ref_L00_00370408_00(void (*)(void *), void *);
+extern void func_0027CFD0(void (*)(void *), void *);
 extern void func_PAL_002EDA88(void *);
 extern void func_002A93B0(void *);
 extern void func_PAL_L00_002D5380(void *, int);
@@ -118,7 +118,7 @@ void func_PAL_L00_00372EA8(void) {
                 func_00282CC0(object + 0x10, first, second);
                 object[0x61] = 0xFF;
                 func_002A0F48(object);
-                if (*(short *)(object + 0xAA) == 0xD54) ref_L00_00370408_00(func_PAL_002EDA88, object);
+                if (*(short *)(object + 0xAA) == 0xD54) func_0027CFD0(func_PAL_002EDA88, object);
                 if (object[0x6F]) func_002A93B0(object);
                 id = *(short *)(object + 0xAA);
                 if (id == 0 || id == 0xF6B) func_PAL_L00_002D5380(object, 0);
