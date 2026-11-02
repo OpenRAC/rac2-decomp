@@ -8,6 +8,19 @@
  * so its pointer return and the +8 float consumed here are directly witnessed.
  * All copied point records16B, live13 points100..1CF; backup13 at1D0..29F;
  * twelve rest lengths2F0..31F. State minimum320 bytes, anchor object minBC.
+ * 2 November 2026 (Claude Opus 5.5), current compiler: body below unchanged
+ * (624 bytes). Two shapes reproduce parts of retail but not the whole:
+ * - The end-of-pass qcopy written at the end of each arm (cross-jumped into
+ *   one lq/sq) puts its addresses in s7/fp, set inside each arm as retail does,
+ *   and spills pass/forward to retail's slots 0x10/0x14 (640 bytes).
+ * - `func_00282CC0(next, next, delta); current = next;` (instead of the
+ *   reverse) gives retail's a0/a1 = next with current = next in the previous
+ *   call's delay slot.
+ * Left: retail keeps pass in v1 and forward in a1 across the passes with
+ * caller-save stores/restores (sw a1,0x14 / lw a1,0x14 at each arm's end),
+ * where ours spills them; and object/previous/rest take s4/s3/s2 instead of
+ * retail's s3/s2/s4. With both shapes: pass++ in the for header 624 bytes
+ * (98 rows), forward = 0 632, forward = !forward and a u8 flag 640.
  */
 #include "common.h"
 extern float *func_L11_004417E8(void *);
