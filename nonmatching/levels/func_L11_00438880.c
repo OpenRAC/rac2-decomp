@@ -25,6 +25,13 @@
  * a static __inline__ scan helper (1120 bytes), seven local declaration
  * orders (20-21), and keep-block-order, gcse-unsplit-edges, no-null-pointer-
  * checks, hazard-labels, qcopy (1156 bytes) as per-file options.
+ * 3 November 2026, second attempt: the index form is not strength-reduced at
+ * all (flags is reloaded every iteration and the -1 folds into the lbu
+ * offset), so retail's explicit `addiu v0,next,-1; addu v0,flags,v0` points at
+ * a pointer start value in its own variable, tested before being copied into
+ * the loop cursor (v1). `if (next<13 && *(cursor=flags+(next-1))) do ...
+ * while` ties the retained 20 rows; a break-inside while (1092 bytes) and a
+ * post-increment break loop (1100) are worse.
  */
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
