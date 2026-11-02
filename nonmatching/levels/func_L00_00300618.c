@@ -1,35 +1,17 @@
-/* func_L00_00300618: near miss, fable tier (task v1624). Best: 11272/11348 bytes, 0/27 places (USA v1.01);
-   1555 of 2837 retail instructions identical in a sequence alignment, 2618/2837 by opcode.
-   Unit: this file as src/levels/shared/L00_00300618-g8.c (-G8 by its name, default flags); the marker
-   in src/levels/shared/L00_002FC7A0.c becomes "func_L00_00300618 is defined in L00_00300618-g8.c".
-   What is settled (matches retail): the whole section walk and heap bumping ((x+0x3F) & 0xFFFFFFC0u gives
-   lui/ori), the header parse, the tie/shrub loops' bodies, the moby record walk with *s++ reads and the
-   save-cell nibble tests as ?: in conditions, the 0x58/0x64/0x54 fix-ups (e[0] >= D_L00_001BF140.i18),
-   the 0x98 group record, the 0x90 occlusion tables, the tail and the level switch (cases 2,5-8,10).
-   Struct grouping (same object => reloaded each iteration): D_L00_001A9014..20, D_L00_001B1AFC/B00,
-   D_L00_001B1F84..A8, D_L00_001B16C0/C4, D_L00_001B20B0..BC; the other small globals must stay scalars.
-   What blocks a match:
-   1. Toolchain: the section-8 record copy loop (retail 0x3017B4-0x301810, four constant increments of the
-      source pointer kept as plain biv increments). This cc1 converts the extra increments into two
-      address givs (-4($a0)/0($a1) forms, "Increment N of biv converted to giv" in -dL). docs/COMPILER-NOTES
-      says the release branch turned that conversion off with no retail witness yet: this loop is one.
-      -fno-strength-reduce reproduces this loop but loses the givs retail has elsewhere (0x50 group-list
-      dst-0x8000 lockstep pointer, the five i*0x30 entry offsets of the 0x98 loop, loop reversals).
-   2. Delay slots: retail never moves the absolute-addressed small globals (D_001A728C, D_L00_001B2500,
-      D_L00_001B2408, D_L00_001B1EB4, D_L00_001B20C0, D_L00_001B18DC, D_001A7BB4 ...) into jal/branch slots
-      (lui $at; sw) while $gp stores (D_L00_001B255C, D_L00_001A8F0C) do go there; here MACRO_ADDR makes
-      them one-word and slot-eligible (then $gp form), NOT_SDA splits them with a hoisted lui.
-   3. Residues: moby-loop spill slots (retail extra 0x1C, count 0x20, next 0x24, n 0x28, w2 0x2C, bolts2
-      0x30, xp2 0x34, cursor 0x3C), the shrub loop's class pointer (retail keeps cls<<2 in $s3 and adds the
-      table base late), the 0x50 inner loop (retail: do{}while(!end) with the end block threaded straight
-      to the exit and a `b inner; src++` stub), the 0x98 loop's five separate i*0x30 givs added to g at
-      each use (this cc1 folds g into pointer givs), mov.s/arg-setup order around the three
-      func_00282DF0 calls, and the hoisted lui 0x1B of the level-table switch is fixed by the sda
-      incomplete arrays. */
-/* func_L00_00300618: loads a level's data image: walks the section table of the level header,
-   copies or relocates each table into the level heap (bumped and aligned to 64 bytes), builds the
-   tie, shrub and moby instance tables and the remaining per-level state, and returns the heap end.
-   Small-data sibling of L00_002FC7A0.c (the file gets -G8 by its name, see config/cflags.txt). */
+/* Level-data loader: relocates section tables, ties, shrubs and mobys into the
+ * aligned level heap. Retained reconstruction, not functional-gated.
+ * USA v1.01: 11,280/11,348 bytes, 0/27 placements, measured 2026-11-01.
+ * Use a separate L00_00300618-g8.c unit with -O2 -G8 -ffunction-sections.
+ * The previous retained source emitted 11,272 bytes. Its section-8 do-loop was
+ * strength-reduced into extra address induction variables. The explicit goto
+ * loop below preserves the four real cursor advances; its complete 24-word copy
+ * sequence now equals retail in every USA placement, without a compiler patch.
+ * This is only a local sequence, not a match of the 11 KB function.
+ * Remaining: absolute macro-global stores enter delay slots, shrub/moby spill
+ * allocation, and group-list induction variables. NOT_SDA hoists the address high
+ * halves; global -fno-strength-reduce loses required reductions elsewhere. Keep
+ * the actual grouped globals and sequential record reads when investigating these.
+ */
 #include "common.h"
 
 typedef int TI128_00618 __attribute__((mode(TI)));
@@ -290,7 +272,7 @@ extern char D_L00_001A8A48[] __attribute__((sda));
 extern char *D_L00_001B18D0 MACRO_ADDR;
 extern char *D_L00_001A8AA8 MACRO_ADDR;
 
-extern void func_002B7C80(void *, int, int);
+extern int func_002B7C80(void *, int, int);
 extern void func_0011AEA0(int);
 extern void func_0029D4D0(void *, void *);
 extern void func_00282A60(void *, int, int);
@@ -318,7 +300,7 @@ extern int func_L00_002E3B38(int);
 extern void func_0029F0C8(void *, int);
 extern float func_002A89A8(void *, int, float);
 extern void func_002A0F48(void *);
-extern void func_002A0468(void *, int, int, int, int);
+extern void func_002A0468(void *, u64, u64, u64, u64);
 extern void func_L00_00309140(void *, int);
 extern Moby00618 *func_0029EFD0(int);
 extern void func_0027B7E0(void);
@@ -826,21 +808,22 @@ char *func_L00_00300618(int reload)
             char *e = D_L00_001B1844;
             int left = D_L00_001B1848;
 
-            do {
-                *(int *)(e + 0xC) = *(int *)s;
-                s += 4;
-                *(float *)e = *(float *)s;
-                *(float *)(e + 4) = *(float *)(s + 4);
-                *(float *)(e + 8) = *(float *)(s + 8);
-                s += 0xC;
-                *(float *)(e + 0x10) = *(float *)s;
-                *(float *)(e + 0x14) = *(float *)(s + 4);
-                *(float *)(e + 0x18) = *(float *)(s + 8);
-                s += 0xC;
-                *(int *)(e + 0x1C) = *(int *)s;
-                s += 4;
-                e += 0x20;
-            } while (--left);
+        copy_record:
+            *(int *)(e + 0xC) = *(int *)s;
+            s += 4;
+            *(float *)e = *(float *)s;
+            *(float *)(e + 4) = *(float *)(s + 4);
+            *(float *)(e + 8) = *(float *)(s + 8);
+            s += 0xC;
+            *(float *)(e + 0x10) = *(float *)s;
+            *(float *)(e + 0x14) = *(float *)(s + 4);
+            *(float *)(e + 0x18) = *(float *)(s + 8);
+            s += 0xC;
+            *(int *)(e + 0x1C) = *(int *)s;
+            s += 4;
+            e += 0x20;
+            if (--left)
+                goto copy_record;
         }
     }
 

@@ -1,36 +1,15 @@
-/* func_L08_003CDF98 (6,736 B; levels 08, 09, 19): Sonnet first draft, 2026-10-26 (slate big12).
- * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -ffast-math, own unit (try
- * src/levels/shared/L08_003CDF98-x.c). The -ffast-math is a guess for case 10's min.s
- * (the draft computes it as a ternary); -G8 is needed because retail reads ~40 tuning
- * floats/ints as one-instruction $gp loads outside delay slots too (at -G0+sda only the
- * delay-slot ones are gp). Level scalars read lui/lw (D_001B29DC, D_001B2094/98,
- * D_001B3414, D_00138324, D_0018B650, D_001B2ACC, D_001A7B0D) are incomplete arrays [0]
- * so -G8 leaves them absolute; the gp ones (D_001AFFD0..D_001B0140, D_001B3410) are
- * `__attribute__((sda))` scalars named by address (gp = 0x1AEFF0 + offset).
- * Step 0: one function (11-case jump table on moby byte 0x20; the hero-NPC state machine,
- * data block at moby+0x68). No matched twin (nearest func_L04_00400EE0 0.26).
- * Numbers: 6,624 of 6,736 bytes; opcodes equal 1,487 of 1,684 (difflib); with-registers
- * equal 1,151 of 1,684. Layout is right: the common tail (clamps of d[0..8], the
- * run-particles loop for states 5-9, the 2-slot scan, the two cooldown calls) sits after
- * the switch (cases `break`; default and case 1 with D_001A7B0D == 0 skip nothing/return).
- * What still differs:
- *  - frame 0xF0 vs ours: retail keeps four pointers at sp+0x70..0x7C (d+0x70/0x98/0xA0/0xB0);
- *    ours are the a70/a98/aA0/aB0 locals and the size now matches only loosely.
- *  - retail takes the D_00189E20 base once per case (`lui v0,0x19; addiu v1,v0,-0x61E0;
- *    daddu s5,v0`) and reuses $s5; ours rematerialises it per GP()/GI() use. Probably a
- *    local `u8 *g = D_00189E20` assigned where retail first needs it (cases 2,3,6).
- *  - case 0/2/10: retail loads D_001B29DC once into a1 and DI(0x6C) once into a0
- *    (`t = (u8 *)D_001B29DC[0] + (n << 8)`); ours rereads the pointer and uses sll later.
- *  - float compares: several `c.lt.s` vs `c.le.s` operand-order flips (DF(0x28) < -k, the
- *    clamps in case 5 and the case 6 `a - b <= c` block); the case 6 blend (0x1028 block,
- *    003CEC1C..) is a different expression tree: retail computes
- *    `t = k*(1/60) + (1 - f) * ((k2*(1/60)) - ...)` with two bnel-skipped arms.
- *  - FX(i, o) table reads: retail does `lbu 0x74(a0)` from a single base register; ours
- *    forms `addu v0,a1,a0; lw -0x14(v0)` (the 0x70-stride record needs a struct array,
- *    see func_L04_00400EE0's D_00188660 spelling).
- *  - case 5 / 7 / 8 float temporaries live in $f20 in retail (t reused across arms).
- * Next steps: add a struct-array view for D_00188660, hoist the base locals above, then
- * walk the diff case by case (cases 3, 5, 6 have the most hunks). */
+/* Hero-NPC state machine shared by Tabora, Dobbo and Grelbin. Retained
+ * reconstruction, not functional-gated. USA v1.01: 6,632/6,736 bytes, 0/3 places
+ * (2026-11-01); the earlier source emitted 6,624 bytes.
+ * Separate-unit profile: -O2 -G8 -ffunction-sections -frac2-qcopy -ffast-math.
+ * The fast-math option is retained from the earlier min.s experiment, not evidence
+ * of a correct complete function. Never promote this solely on equal size.
+ * Voice records now have their real 0x70-byte stride and byte-sized active flag;
+ * case 0 captures the table/index once and passes the missing signed object ID to
+ * the diagnostic call. D_0018A15C is an absolute pointer slot, not small data.
+ * Remaining: per-case hero-base lifetime, state-5/6 floating-point expression and
+ * branch order, missing residual computations, and stack/register allocation.
+ */
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
@@ -92,11 +71,24 @@ extern char D_001B0180[];
 extern u8 D_001A7B0D[];
 extern s32 D_0018B650[];
 extern s32 D_001B2ACC[];
-extern char D_00188660[];
-extern void *D_0018A15C;
+typedef struct {
+    u32 handle;
+    u8 active;
+    u8 unknown05[0x13];
+    void *owner;
+    u8 unknown1C[0x54];
+} VoiceCDF98;
+typedef union {
+    u8 bytes[0x1730];
+    /* The first stride is the header. States 5/6 inspect a slot without first
+     * rejecting -1, so that preceding stride must remain addressable. */
+    VoiceCDF98 records[53];
+} VoiceStateCDF98;
+extern VoiceStateCDF98 D_00188660;
+extern void *D_0018A15C[];
 
 extern int func_001163B0(void);
-extern void func_0026FEB8(void *);
+extern void func_0026FEB8(void *, ...);
 extern void func_0029FCC0(void *, int, void *);
 extern int func_00282948(void *);
 extern void func_00282CC0(void *, void *, void *);
@@ -145,7 +137,7 @@ extern int func_L08_003CDB78(void *, void *);
 #define GI(o) (*(s32 *)(D_00189E20 + (o)))
 #define GF(o) (*(float *)(D_00189E20 + (o)))
 #define GP(o) (*(u8 **)(D_00189E20 + (o)))
-#define FX(i, o) (*(s32 *)(D_00188660 + (i) * 0x70 + (o)))
+#define VOICE(i) (D_00188660.records[(i) + 1])
 
 void func_L08_003CDF98(u8 *obj)
 {
@@ -161,11 +153,13 @@ void func_L08_003CDF98(u8 *obj)
     switch (OB(0x20)) {
     case 0:
         if (DI(0x6C) > 0) {
-            qcopy(d, (u8 *)D_001B29DC[0] + (DI(0x6C) << 8) + 0x10);
-            qcopy(d + 0x10, (u8 *)D_001B29DC[0] + (DI(0x6C) << 8) + 0xF0);
+            u8 *table = (u8 *)D_001B29DC[0];
+            int offset = DI(0x6C) << 8;
+            qcopy(d, table + offset + 0x10);
+            qcopy(d + 0x10, table + offset + 0xF0);
             func_L08_003CDB38(obj);
         } else {
-            func_0026FEB8(D_001B0148);
+            func_0026FEB8(D_001B0148, *(s16 *)(obj + 0xB2));
         }
         DF(8) = DF(8) + D_001AFFD0;
         func_0029FCC0(obj, 8, d + 0x30);
@@ -194,7 +188,7 @@ void func_L08_003CDF98(u8 *obj)
                     func_002A7750(obj, 2, -1);
                 }
             } else {
-                u8 *q = (u8 *)D_0018A15C;
+                u8 *q = (u8 *)D_0018A15C[0];
                 if (q != 0 && *(s16 *)(q + 0xAA) == 0x988 && q == (u8 *)D_001B29DC[0] + (DI(0x6C) << 8)) {
                     if (OB(0x43) != 0)
                         func_002A7470(obj, 0, 0, 0xA);
@@ -297,7 +291,7 @@ void func_L08_003CDF98(u8 *obj)
         }
         break;
     case 5:
-        if (FX(DI(0xAC), 0x88) != (s32)obj || FX(DI(0xAC), 0x74) == 0)
+        if (VOICE(DI(0xAC)).owner != obj || VOICE(DI(0xAC)).active == 0)
             DI(0xAC) = func_002E5DA0(1, 4, obj, 0x988);
         func_L08_003CD488(d + 0xA8, obj);
         DF(0x28) = -func_00283198(DF(0x14)) * DF(0x54);
@@ -353,7 +347,7 @@ void func_L08_003CDF98(u8 *obj)
         break;
     case 6:
         func_L08_003CD488(d + 0xA8, obj);
-        if (FX(DI(0xAC), 0x88) != (s32)obj || FX(DI(0xAC), 0x74) == 0)
+        if (VOICE(DI(0xAC)).owner != obj || VOICE(DI(0xAC)).active == 0)
             DI(0xAC) = func_002E5DA0(1, 4, obj, 0x988);
         func_L08_003CD708(obj, d, 1.0f);
         t = DF(0x5C);
@@ -486,7 +480,7 @@ void func_L08_003CDF98(u8 *obj)
         func_L08_003CD488(d + 0xA8, obj);
         if (func_002B3868(obj) != 0) {
             if (DI(0xAC) != -1) {
-                if (FX(DI(0xAC), 0x88) == (s32)obj && FX(DI(0xAC), 0x74) != 0)
+                if (VOICE(DI(0xAC)).owner == obj && VOICE(DI(0xAC)).active != 0)
                     func_002E59F8(DI(0xAC));
             }
             DI(0xAC) = -1;
@@ -512,7 +506,7 @@ void func_L08_003CDF98(u8 *obj)
         float dist, lim;
         u8 *home;
         if (DI(0xAC) != -1) {
-            if (FX(DI(0xAC), 0x88) == (s32)obj && FX(DI(0xAC), 0x74) != 0)
+            if (VOICE(DI(0xAC)).owner == obj && VOICE(DI(0xAC)).active != 0)
                 func_002E59F8(DI(0xAC));
         }
         home = d + 0x80;
