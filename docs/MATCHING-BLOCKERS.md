@@ -3698,3 +3698,65 @@ Still open: reload's spill registers run one step behind retail from `0x1F4` to 
 `func_0030CCD0` closed at 1888 bytes, 28 of 28 places, in `src/game/00308600-chain-g8.c`. Unused locals in the draft held the pseudo numbers that rotated slots 0x78/0x7C: dropping them closed the slots at the same bucket count. `func_002C2210`'s prototype with the pointer first fixed the `mov.s` order. The preheader needed one more priority-3 insn so that `r175`'s copy issues first in its cycle and `i = 1` pairs with it, since `sched2` keeps `sched1`'s tie order. A local `to = &last` set before `func_00282D30` gives the in-loop copy life 5 or more, so loop.c hoists it; the copy is tied and leaves no code.
 
 `func_L06_00455BC0` (F7), same day: 34 raw rows. `notify = 1` after the 0x18 test lands in the `beq` delay slot through reorg's target thread, and case 4 has its own flag. Only the 4th reference for `missing` is left.
+
+## Large retained state machines and the level-data loader
+
+Measured against master `2e09b830` on 1 November 2026, using its current game compiler
+and SN assembler. These are corrections to retained C, **not complete matches or
+functional-port qualifications**. The source headers record the per-unit profiles;
+the implementations remain in `nonmatching/levels/` with their production markers intact.
+
+| Function | Current / retail bytes | Coverage and remaining obstruction |
+| --- | ---: | --- |
+| `func_L22_0039D708` | 15,528 / 16,068 | USA v1.01, 0/2. Reconstructed conversions, canonical collision/animation calls and shared scratch storage; branch tails and allocation remain, with further semantic review needed. |
+| `func_L11_00420C88` | 15,772 / 15,832 | USA v1.01, 0/1. Projectile paths and selector ordering are closer; shared tails, early-return position and allocation remain. |
+| `func_L00_00300618` | 11,280 / 11,348 | USA v1.01, 0/27. Section-8 copy loop resolved locally; absolute macro stores, spills and group loops remain. |
+| `func_L00_003AE900` | 8,432 / 8,440 | USA v1.01 and v2.00, 0/27 each. Template loops resolved locally; saved FPR count, held-pose matrix pointers and spray-colour constants remain. |
+| `func_L08_003CDF98` | 6,632 / 6,736 | USA v1.01, 0/3. Voice-field widths and diagnostic argument corrected; per-case bases, float expression order and allocation remain. |
+
+These canonical identities are absent from PAL; only `func_L00_003AE900` also exists
+under the same identity in v2.00. That does not assert the absence of related gameplay
+code in either release.
+
+- **Resolve reconstruction errors before tuning registers.** The old `0039D708`
+  draft replaced three unrecognized `cvt.w.s` results and a collision return with
+  zero. Seven calls to level address `002E4708` actually target canonical
+  `func_002761F8`, with five integer-bank arguments; they are not the boot's
+  two-argument `func_002E4708`. The animation query at level `0032DD40` is
+  `func_002B3890`. The corrected draft also completes address halves and groups
+  the observed overlapping matrices/vector components into real scratch storage.
+  The earlier draft must not be treated as a safe functional donor.
+- **A local loop mismatch need not require a compiler patch.** In `00300618`, the
+  section-8 `do` loop becomes extra address induction variables. An explicit `goto`
+  loop preserves all four cursor advances and the full 24-word record-copy sequence,
+  byte-identically at all 27 USA placements. Other loops still receive strength
+  reduction; see [the strength-reduction notes](COMPILER-NOTES.md#loop-no-giv-recombination).
+  This is not a full loader match.
+- **Use the newly supported structure copies.** In `003AE900`, two ordinary
+  assignments of the real aligned 0x50-byte template replace the manual pointer
+  loops. Both quadword copy loops are byte-identical locally in all 54 carrying
+  placements. The collision call's failure path still needs the subsequent state
+  reload; the older nested `if`/`else` skipped it. Register-allocation diagnostics
+  reproduce the normal object, so the remaining FPR/frame and colour-loop problems
+  are genuine candidate differences, not effects of diagnostic flags.
+- **Preserve the real object model and branch structure.** `00420C88` shares one
+  evidenced hero-state base, computes object positions at their uses, and keeps
+  separate projectile paths in cases 38/39. Selector 10 uses strict angle clamps;
+  replacing `>` with the inverse `<=` also changes the unordered path. In
+  `003CDF98`, the voice-active field is a byte at slot +4, not a word, after the
+  runtime's 0x70-byte header and within a 0x70-byte voice stride. The record view
+  includes that header stride because states 5/6 inspect index -1 without a guard;
+  a `voices[-1]` access would introduce an unsupported array-bounds assumption. Its retained
+  fast-math profile is still provisional, not a qualification of the floating-point
+  state machine.
+
+The retained callers also keep the actual integer or pointer return contracts of
+their already-defined helpers, even when the result is ignored. The loader's
+`func_002A0468` command fields are 64-bit arguments, as in the matched callee;
+declaring them as four `int`s conceals that contract. Remeasuring these declarations
+keeps the sizes above and the exact local copy sequences, but some register choices
+change. A discarded result is not permission to give its callee a false prototype.
+
+Next useful work is the specific remaining source/ABI or allocation difference above.
+Do not repeat the removed zero placeholders, hand-written template-copy spelling,
+global strength-reduction disable, or branch-tail merging as if they were new trials.

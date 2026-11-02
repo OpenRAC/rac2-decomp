@@ -1,46 +1,20 @@
-/* func_L00_003AE900 (8440 bytes, 27 places, src/levels/shared/L00_003A8E28.c): near miss, fable tier.
- *
- * Best: 8412/8440 bytes, 0/27 places (USA v1.01); 1571 of 2110 retail instructions identical in a
- * sequence alignment, 2021/2110 by opcode. Unit: this file as src/levels/shared/L00_003AE900-g8.c
- * (-G8 by its name: the body reads D_L00_001AF7B4/B0, D_L00_001B2630/38 through $gp); the marker
- * line in L00_003A8E28.c is replaced by a "defined in" comment. Control flow, stack layout
- * (frame 0x250, every local slot), every call, every constant and the whole collision/attach/
- * idle/effect logic align with retail. What still differs:
- *  - prologue (0x20 words): retail copies the two 0x50-byte effect templates with lq/sq pairs
- *    (src $a0, dst $v1, end $v0, data $a2/$a3) and spills &big to 0x1A0 first; this cc1's block
- *    move has no quadword unit (mips.c expand_block_move: ld/sd only), so the copy is spelled as
- *    a two-quadword pointer loop (COPY_TEMPLATE_AE900), which gives the right loop shape but
- *    other pseudos (dst $a0, src $a1, data $v0/$v1) and a different save-order interleave;
- *  - the held pose (state 1, inlined AlignToOwnerAE900): retail keeps &m1 in $s1 and &m2 in
- *    $s0 and addresses the turn vector from $sp; cc1 keeps &m1 in $s0, recomputes &m2 and
- *    derives &turn from $s0 (tried: plain, float[16], pointer locals, nested inline, two-level
- *    inline with pointer parameters: none reproduce it). The inline is required: only an
- *    inlined frame is freed for the else-block locals (hit at 0xF0 over m1), a nested block is
- *    not reused by this cc1;
- *  - the detach macro: retail loads vars->sound into $a1 and keeps base+i*0x70 in $v1 (cc1
- *    $a0/$a0), 3 x 5 instructions of register naming;
- *  - loop 2/3 colours (spray): retail hoists 0x167F6000 and 0x7F6000 as lui/ori pairs, keeps a
- *    dead `addiu $fp,$zero,0x7F` in loop 2's preheader, and in loop 3 builds 0x7F7F6000 as
- *    (li 0x7F006000) | (li 0x7F0000) plus a spilled `li 0x30`, OR-ing the red byte (0x60)
- *    into the argument register inside the loop. The inline RgbaAE900 with `low`/`high`
- *    locals declared just before loop 2 reproduces loop 2 and the in-loop `ori 0x60`; loop 3
- *    still shifts rematerialised 0x7F/0x60 at run time because this gcse's try_replace_reg
- *    (gcse.c) does not fold (ashift const n) and the definitions are in another block
- *    (defining them again before loop 3 folds the whole constant instead). Note fold-const.c's
- *    Cygnus reduce_expression_tree_depth re-pairs any 4-operand chain, so the packer keeps
- *    three terms plus `| r`;
- *  - consequences of the above in loops 2-4: $s1/$s2/$s4/$s7/$fp naming, the 0.5f (retail $f27)
- *    hoist in loop 2, the weapon-table base kept in $fp in loop 3 where retail reloads it, and
- *    one more saved FPR ($f28 for the camera distance; cc1 $f27), so the frame is 0x240.
- * Everything in the lower 0x1B0 of the frame, the collision record HitAE900 at 0xF0 (its dir
- * vector doubles as the ripple scratch), the qcopy()/qcopy_nc() copies (register-address form
- * only where retail has it), the calibrated literals (1/60 s frame products, 0.4f-20*0.0175f,
- * 0.785398f, 30/45/135 degrees via 0.017453294f) and the PAL/v2 symbol use are settled.
- * Declarations: all in this file. Flags: -O2 -G8 -ffunction-sections (from the -g8.c name).
+/* Per-frame update of the hero-steered bot (class 0x81E): flight, collision,
+ * attachment, idle effects and self-destruct burst. Not functional-gated.
+ * USA v1.01/v2.00: 8,432/8,440 bytes, 0/27 placements in each, 2026-11-01.
+ * Compile separately as L00_003AE900-g8.c: -O2 -G8 -ffunction-sections.
+ * Earlier retained source: 8,412 bytes. Normal assignments of the aligned
+ * 0x50-byte templates use the current compiler's quadword block moves; both copy
+ * loops now reproduce retail. Keep the full templates and real matrix buffers.
+ * The collision test and following state-4 test are separate: the call may change
+ * the state. The old nested-if/else form incorrectly skipped the reload on failure.
+ * Sound slots have a 0x70-byte stride after the runtime's 0x70-byte header.
+ * Remaining: one FPR save/frame size, held-pose matrix pointer allocation, colour
+ * constant folding in the spray loops, and sound-index register allocation.
+ * Byte-sized colour locals do not resolve the constants. Diagnostic regalloc
+ * dumps reproduce the normal object; none of this qualifies the complete body.
+ * Earlier trials with flat matrix arrays, pointer locals and one/two-level inline
+ * helpers did not settle the held-pose registers; do not repeat them unchanged.
  */
-/* func_L00_003AE900: per-frame update of the hero-steered bot (class 0x81E): flight, water,
-   collision, attachment to a target, idle effects and the self-destruct burst.
-   Small-data sibling of L00_003A8E28.c (the file gets -G8 by its name, see config/cflags.txt). */
 #include "common.h"
 
 typedef int TI128_AE900 __attribute__((mode(TI)));
@@ -147,9 +121,16 @@ typedef struct {
 /* 0xE0-byte weapon record: +4 upgraded flag, +0x70 a rate. */
 typedef struct { char pad00[4]; unsigned char upgraded; char pad05[0x6B]; float rate; char pad74[0x6C]; } WeaponAE900;
 
-/* The 0x70-byte sound/effect slots: +0x74 active, +0x88 owner (the fields lie past one stride). */
-typedef struct { char pad00[0x74]; unsigned char active; char pad75[0x13]; MobyAE900 *owner; } SlotAE900;
-#define SLOT_AE900(i) ((SlotAE900 *)(D_00188660 + (i) * 0x70))
+/* Sound state has a 0x70-byte header followed by 52 0x70-byte voices. */
+typedef struct {
+    unsigned int handle;
+    unsigned char active;
+    char unknown05[0x13];
+    MobyAE900 *owner;
+    char unknown1C[0x54];
+} SlotAE900;
+typedef struct { char header[0x70]; SlotAE900 slots[52]; } SoundAE900;
+#define SLOT_AE900(i) (&D_00188660.slots[(i)])
 
 /* 0x50-byte effect template copied to the stack for func_00312B70. */
 typedef struct { VecAE900 v; char rest[0x40]; } TemplateAE900;
@@ -162,25 +143,10 @@ typedef struct { char pad000[0x160]; float amount; char pad164[4]; int frames; i
 
 #define WEAPON_AE900 (D_00262570[D_00139568[0x22]])
 
-/* The retail copies the templates two quadwords per step with a quadword tail. */
-#define COPY_TEMPLATE_AE900(dst, src) \
-    do { \
-        TI128_AE900 *d_ = (TI128_AE900 *)(dst); \
-        TI128_AE900 *s_ = (TI128_AE900 *)(src); \
-        TI128_AE900 *e_ = s_ + 4; \
-        do { \
-            d_[0] = s_[0]; \
-            d_[1] = s_[1]; \
-            s_ += 2; \
-            d_ += 2; \
-        } while (s_ != e_); \
-        d_[0] = s_[0]; \
-    } while (0)
-
 extern HeroAE900 D_00189E20;
 extern unsigned char D_00139568[];
 extern WeaponAE900 D_00262570[];
-extern unsigned char D_00188660[];
+extern SoundAE900 D_00188660;
 extern CollAE900 D_L00_001BF200;
 extern TemplateAE900 D_L00_002A2870;
 extern TemplateAE900 D_L00_002A28C0;
@@ -214,7 +180,7 @@ extern int func_002A77E0(int);
 extern float func_002A90F8(void *, void *);
 extern void func_00282D30(void *, void *, float);
 extern float func_002A7878(float, float);
-extern void func_002BF728(void *, void *, float, float);
+extern void * func_002BF728(void *, void *, float, float);
 extern void func_00282F70(void *, void *, float);
 extern float func_00283CE0(int);
 extern float func_00283198(float);
@@ -226,7 +192,7 @@ extern void func_00282C88(void *);
 extern char *func_00312D58(void *, float);
 extern float func_002A7940(void);
 extern int func_002A7820(int, int);
-extern void func_002BFB38(void *, void *, int, int);
+extern void * func_002BFB38(void *, void *, int, int);
 extern int func_002ABB78(void *);
 extern float func_002A89A8(void *, int, float);
 extern void func_00283028(void *, void *, void *);
@@ -262,16 +228,18 @@ extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, f
 extern int func_00283CF0(float);
 extern char *func_002BCF18(void *, void *, int, int, float, int, int);
 extern void func_002AF000(void *, float, float, float);
-extern void func_00312B70(void *, void *, int, int);
+extern void * func_00312B70(void *, void *, int, int);
 extern void func_002A9288(void *, float);
 
 /* Leaves the current state: stops the owned sound and resets the fall. */
 #define DETACH_AE900() \
     do { \
+        int sound; \
         moby->state = 0; \
-        if (vars->sound != -1) { \
-            if (SLOT_AE900(vars->sound)->owner == moby && SLOT_AE900(vars->sound)->active) \
-                func_002E59F8(vars->sound); \
+        sound = vars->sound; \
+        if (sound != -1) { \
+            if (SLOT_AE900(sound)->owner == moby && SLOT_AE900(sound)->active) \
+                func_002E59F8(sound); \
         } \
         vars->sound = -1; \
         vars->timer34 = 0x78; \
@@ -309,11 +277,12 @@ void func_L00_003AE900(MobyAE900 *moby)
     VecAE900 prev;
     VecAE900 up;
     VarsAE900 *vars;
-    char *landed = 0;
+    char *landed;
     MobyAE900 *owner;
 
-    COPY_TEMPLATE_AE900(&small, &D_L00_002A2870);
-    COPY_TEMPLATE_AE900(&big, &D_L00_002A28C0);
+    small = D_L00_002A2870;
+    big = D_L00_002A28C0;
+    landed = 0;
     impulse.q = 0;
     impulse.f[2] = 2.0f * FRAME_AE900;
     up.q = 0;
@@ -409,124 +378,122 @@ void func_L00_003AE900(MobyAE900 *moby)
             t = 0.0f;
         moby->pos.f[2] -= vars->amp * func_00283198(vars->phase) * t;
 
-        if (!(moby->state & 4)) {
-            if (func_002761F8(&prev, &moby->pos, 0x10, moby, &hit)) {
-                if (vars->inWater == 0 && func_00278E78() == 0 && vars->vel.f[2] < 0.0f) {
-                    char *splash;
-                    int i;
+        if (!(moby->state & 4) && func_002761F8(&prev, &moby->pos, 0x10, moby, &hit)) {
+            if (vars->inWater == 0 && func_00278E78() == 0 && vars->vel.f[2] < 0.0f) {
+                char *splash;
+                int i;
 
-                    func_002FD1B8(D_L00_001B2630, D_L00_001B2638, 1, moby->pos.f[0], moby->pos.f[1], 0.5f, -0.35f);
-                    vars->inWater = 1;
-                    func_00282C88(vars);
-                    vars->vel.f[2] = -1.5f * FRAME_AE900;
-                    t120.f[0] = moby->pos.f[0];
-                    t120.f[1] = moby->pos.f[1];
-                    t120.f[2] = D_L00_001BF200.point.f[2];
-                    splash = func_00312D58(&t120, 2.0f);
-                    if (splash)
-                        splash[0x23] = 0x70;
-                    for (i = 0; i < 16; i++) {
-                        float a = func_002A7940();
-                        float r = func_002A7878(0.0f, 3.0f * FRAME_AE900);
-                        int life;
+                func_002FD1B8(D_L00_001B2630, D_L00_001B2638, 1, moby->pos.f[0], moby->pos.f[1], 0.5f, -0.35f);
+                vars->inWater = 1;
+                func_00282C88(vars);
+                vars->vel.f[2] = -1.5f * FRAME_AE900;
+                t120.f[0] = moby->pos.f[0];
+                t120.f[1] = moby->pos.f[1];
+                t120.f[2] = D_L00_001BF200.point.f[2];
+                splash = func_00312D58(&t120, 2.0f);
+                if (splash)
+                    splash[0x23] = 0x70;
+                for (i = 0; i < 16; i++) {
+                    float a = func_002A7940();
+                    float r = func_002A7878(0.0f, 3.0f * FRAME_AE900);
+                    int life;
 
-                        t130.f[0] = func_00283180(a) * r;
-                        t130.f[1] = func_00283198(a) * r;
-                        t130.f[2] = func_002A7878(3.0f * FRAME_AE900, 6.5f * FRAME_AE900);
-                        life = func_002A7820(90, 120);
-                        func_002BFB38(&t120, &t130, func_002A77E0(2), life);
-                    }
-                } else if (vars->inWater != 0 || func_00278E78() != 0) {
-                    MobyAE900 *hitMoby;
+                    t130.f[0] = func_00283180(a) * r;
+                    t130.f[1] = func_00283198(a) * r;
+                    t130.f[2] = func_002A7878(3.0f * FRAME_AE900, 6.5f * FRAME_AE900);
+                    life = func_002A7820(90, 120);
+                    func_002BFB38(&t120, &t130, func_002A77E0(2), life);
+                }
+            } else if (vars->inWater != 0 || func_00278E78() != 0) {
+                MobyAE900 *hitMoby;
 
-                    if (D_L00_001BF200.hit) {
-                        if (func_002ABB78(D_L00_001BF200.hit) || (D_L00_001BF200.hit->flags & 0x1000)) {
-                            if (D_L00_001BF200.hit->oClass != moby->oClass && D_L00_001BF200.hit != D_00189E20.moby
-                                && D_L00_001BF200.hit != vars->owner) {
-                                moby->bBC = 1;
-                                if (moby->state != 1) {
-                                    qcopy(&moby->pos, &D_L00_001BF200.point);
-                                    moby->pos.f[2] = func_002A89A8(&moby->pos, 0, 0.5f);
-                                }
-                                goto settled;
-                            }
-                        }
-                    }
-                    hitMoby = D_L00_001BF200.hit;
-                    if (hitMoby && hitMoby->oClass == moby->oClass) {
-                        func_00282CF0(&D_L00_001BF200.normal, &moby->pos, &hitMoby->pos);
-                        if (vars->vel.f[2] < -9.8f * FRAME_AE900) {
+                if (D_L00_001BF200.hit) {
+                    if (func_002ABB78(D_L00_001BF200.hit) || (D_L00_001BF200.hit->flags & 0x1000)) {
+                        if (D_L00_001BF200.hit->oClass != moby->oClass && D_L00_001BF200.hit != D_00189E20.moby
+                            && D_L00_001BF200.hit != vars->owner) {
                             moby->bBC = 1;
-                            qcopy(&moby->pos, &D_L00_001BF200.point);
-                            func_00283028(&impulse, &vars->vel, &D_L00_001BF200.normal);
-                            func_00282F20(&impulse, &impulse, 2.0f * FRAME_AE900);
-                            func_00282F20(&up, &D_L00_001BF200.normal, 1.0f);
-                        } else {
-                            qcopy(&moby->pos, &D_L00_001BF200.point);
-                            func_00282F20(&t120, &D_L00_001BF200.normal, 9.7f / 3600.0f);
-                            func_00282CC0(&moby->pos, &moby->pos, &t120);
-                            func_00283028(&vars->vel, &vars->vel, &D_L00_001BF200.normal);
-                            func_00282D30(&vars->vel, &vars->vel, 0.4f);
-                            func_00282F20(&t120, &D_L00_001BF200.normal, 1.0f);
-                            func_00282DB0(&t120, &up);
-                            qcopy(&t130, &D_L00_001BF200.normal);
-                            goto align;
-                        }
-                    } else if ((hitMoby && hitMoby != D_00189E20.moby && hitMoby != vars->owner) || D_L00_001BF200.count > 0) {
-                        if (vars->inWater != 0 || func_00278E78() == 0 || vars->vel.f[2] < -9.8f * FRAME_AE900) {
-                            moby->bBC = 1;
-                            qcopy(&moby->pos, &D_L00_001BF200.point);
-                            func_00283028(&impulse, &vars->vel, &D_L00_001BF200.normal);
-                            func_00282F20(&impulse, &impulse, 2.0f * FRAME_AE900);
-                            func_00282F20(&up, &D_L00_001BF200.normal, 1.0f);
-                        } else {
-                            MobyAE900 *under = D_L00_001BF200.hit;
-
-                            if (under)
-                                landed = func_002AD0B0(under);
-                            qcopy(&moby->pos, &D_L00_001BF200.point);
-                            func_00282F20(&t120, &D_L00_001BF200.normal, 9.7f / 3600.0f);
-                            func_00282CC0(&moby->pos, &moby->pos, &t120);
-                            t150.q = vars->vel.q;
-                            func_00283028(&vars->vel, &vars->vel, &D_L00_001BF200.normal);
-                            func_00282D30(&vars->vel, &vars->vel, 0.6f);
-                            vars->vel.f[2] *= 0.5f;
-                            if (vars->amp == 0.0f) {
-                                vars->amp = func_00282C48(t150.f[2]) * 2.0f;
-                                vars->phase = (t150.f[2] > 0.0f) ? 45.0f * DEG_AE900 : -135.0f * DEG_AE900;
-                                vars->frame = D_L00_001B19C8;
+                            if (moby->state != 1) {
+                                qcopy(&moby->pos, &D_L00_001BF200.point);
+                                moby->pos.f[2] = func_002A89A8(&moby->pos, 0, 0.5f);
                             }
-                            func_00282F20(&t120, &D_L00_001BF200.normal, 1.0f);
-                            if (func_00282DB0(&t120, &up) > 0.707f) {
-                                if (t150.f[2] < 0.0f) {
-                                    float floor = func_002A89A8(&moby->pos, 0, 0.5f);
-
-                                    if (moby->pos.f[2] < floor)
-                                        moby->pos.f[2] = floor;
-                                    vars->vel.f[2] = -vars->vel.f[2];
-                                    if (func_00282DF0(vars) < 0.5f * FRAME_AE900 || landed) {
-                                        func_00282C88(vars);
-                                        moby->state |= 4;
-                                        moby->collData = *(int *)(moby->pClass + 0x10);
-                                        if (D_L00_001BF200.hit && landed)
-                                            vars->ground = D_L00_001BF200.hit;
-                                    }
-                                }
-                            }
-                            qcopy(&t130, &D_L00_001BF200.normal);
-                        align:
-                            t140.f[0] = t130.f[0] * func_00283180(moby->rot[2]) + t130.f[1] * func_00283198(moby->rot[2]);
-                            t140.f[1] = t130.f[1] * func_00283180(moby->rot[2]) - t130.f[0] * func_00283198(moby->rot[2]);
-                            t140.f[2] = t130.f[2];
-                            moby->rot[0] = func_L00_002EF548(moby->rot[0],
-                                -func_00283248(func_00282C10(t140.f[0] * t140.f[0] + t140.f[2] * t140.f[2]), t140.f[1]),
-                                PI_AE900 * FRAME_AE900);
-                            moby->rot[1] = func_L00_002EF548(moby->rot[1], func_00283248(t140.f[2], t140.f[0]), PI_AE900 * FRAME_AE900);
+                            goto settled;
                         }
                     }
                 }
+                hitMoby = D_L00_001BF200.hit;
+                if (hitMoby && hitMoby->oClass == moby->oClass) {
+                    func_00282CF0(&D_L00_001BF200.normal, &moby->pos, &hitMoby->pos);
+                    if (vars->vel.f[2] < -9.8f * FRAME_AE900) {
+                        moby->bBC = 1;
+                        qcopy(&moby->pos, &D_L00_001BF200.point);
+                        func_00283028(&impulse, &vars->vel, &D_L00_001BF200.normal);
+                        func_00282F20(&impulse, &impulse, 2.0f * FRAME_AE900);
+                        func_00282F20(&up, &D_L00_001BF200.normal, 1.0f);
+                    } else {
+                        qcopy(&moby->pos, &D_L00_001BF200.point);
+                        func_00282F20(&t120, &D_L00_001BF200.normal, 9.7f / 3600.0f);
+                        func_00282CC0(&moby->pos, &moby->pos, &t120);
+                        func_00283028(&vars->vel, &vars->vel, &D_L00_001BF200.normal);
+                        func_00282D30(&vars->vel, &vars->vel, 0.4f);
+                        func_00282F20(&t120, &D_L00_001BF200.normal, 1.0f);
+                        func_00282DB0(&t120, &up);
+                        qcopy(&t130, &D_L00_001BF200.normal);
+                        goto align;
+                    }
+                } else if ((hitMoby && hitMoby != D_00189E20.moby && hitMoby != vars->owner) || D_L00_001BF200.count > 0) {
+                    if (vars->inWater != 0 || func_00278E78() == 0 || vars->vel.f[2] < -9.8f * FRAME_AE900) {
+                        moby->bBC = 1;
+                        qcopy(&moby->pos, &D_L00_001BF200.point);
+                        func_00283028(&impulse, &vars->vel, &D_L00_001BF200.normal);
+                        func_00282F20(&impulse, &impulse, 2.0f * FRAME_AE900);
+                        func_00282F20(&up, &D_L00_001BF200.normal, 1.0f);
+                    } else {
+                        MobyAE900 *under = D_L00_001BF200.hit;
+
+                        if (under)
+                            landed = func_002AD0B0(under);
+                        qcopy(&moby->pos, &D_L00_001BF200.point);
+                        func_00282F20(&t120, &D_L00_001BF200.normal, 9.7f / 3600.0f);
+                        func_00282CC0(&moby->pos, &moby->pos, &t120);
+                        t150.q = vars->vel.q;
+                        func_00283028(&vars->vel, &vars->vel, &D_L00_001BF200.normal);
+                        func_00282D30(&vars->vel, &vars->vel, 0.6f);
+                        vars->vel.f[2] *= 0.5f;
+                        if (vars->amp == 0.0f) {
+                            vars->amp = func_00282C48(t150.f[2]) * 2.0f;
+                            vars->phase = (t150.f[2] > 0.0f) ? 45.0f * DEG_AE900 : -135.0f * DEG_AE900;
+                            vars->frame = D_L00_001B19C8;
+                        }
+                        func_00282F20(&t120, &D_L00_001BF200.normal, 1.0f);
+                        if (func_00282DB0(&t120, &up) > 0.707f) {
+                            if (t150.f[2] < 0.0f) {
+                                float floor = func_002A89A8(&moby->pos, 0, 0.5f);
+
+                                if (moby->pos.f[2] < floor)
+                                    moby->pos.f[2] = floor;
+                                vars->vel.f[2] = -vars->vel.f[2];
+                                if (func_00282DF0(vars) < 0.5f * FRAME_AE900 || landed) {
+                                    func_00282C88(vars);
+                                    moby->state |= 4;
+                                    moby->collData = *(int *)(moby->pClass + 0x10);
+                                    if (D_L00_001BF200.hit && landed)
+                                        vars->ground = D_L00_001BF200.hit;
+                                }
+                            }
+                        }
+                        qcopy(&t130, &D_L00_001BF200.normal);
+                    align:
+                        t140.f[0] = t130.f[0] * func_00283180(moby->rot[2]) + t130.f[1] * func_00283198(moby->rot[2]);
+                        t140.f[1] = t130.f[1] * func_00283180(moby->rot[2]) - t130.f[0] * func_00283198(moby->rot[2]);
+                        t140.f[2] = t130.f[2];
+                        moby->rot[0] = func_L00_002EF548(moby->rot[0],
+                            -func_00283248(func_00282C10(t140.f[0] * t140.f[0] + t140.f[2] * t140.f[2]), t140.f[1]),
+                            PI_AE900 * FRAME_AE900);
+                        moby->rot[1] = func_L00_002EF548(moby->rot[1], func_00283248(t140.f[2], t140.f[0]), PI_AE900 * FRAME_AE900);
+                    }
+                }
             }
-        } else {
+        } else if (moby->state & 4) {
             float floor = func_002A89A8(&moby->pos, 0, 0.5f);
 
             if (vars->ground) {
