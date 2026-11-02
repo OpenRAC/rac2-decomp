@@ -76,7 +76,7 @@ void func_L00_00420C38(char *moby)
         s->rate2 = 1.0f / func_00283CE0(s->timer2);
         s->flag = 0; s->timer = 0; s->rate = 1.0f; s->level = D_L00_001B1570;
         func_003349E8(s->sound, 1, D_L00_001B1570);
-        qcopy(s->b, s->a);
+        qcopy(p + 0x80, p + 0x70);
         return;
     }
     if ((u8)(state - 1) < 2 && H_CTRL != 4 && H_CTRL != 2 && H_CTRL != 30 && H_STATE != 0x81) {
@@ -84,7 +84,7 @@ void func_L00_00420C38(char *moby)
         return;
     }
     if ((u8)state == 7) {
-        if (!((Hero *)D_00189E20)->b[0x49E]) AIM(6, D_L00_001B1534, D_L00_001B153C, 1, s->sound, s->a, s->b)
+        if (!((Hero *)D_00189E20)->b[0x49E]) AIM(6, D_L00_001B1534, D_L00_001B153C, 1, s->sound, p + 0x70, p + 0x80)
         if (H_CTRL == 2) GO(1, D_L00_001B1548)
     }
     if ((u8)state == 4 && H_CTRL != state) {
@@ -93,7 +93,7 @@ void func_L00_00420C38(char *moby)
         s->timer = D_L00_001B1548; s->rate = 1.0f / func_00283CE0(s->timer);
         return;
     }
-    if ((u8)state == 3 && H_STATE == 11) AIM(6, D_L00_001B1534, D_L00_001B153C, 1, s->sound, s->a, s->b)
+    if ((u8)state == 3 && H_STATE == 11) AIM(6, D_L00_001B1534, D_L00_001B153C, 1, s->sound, p + 0x70, p + 0x80)
     if ((u8)state == 5 && H_STATE == 12) GO(8, D_L00_001B1554)
     if ((u8)state == 8 && H_STATE != 12) GO(0, D_L00_001B1558)
     if ((u8)state == 6 && H_STATE != 11) GO(0, D_L00_001B1548)
