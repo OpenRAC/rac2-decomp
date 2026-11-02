@@ -1,4 +1,4 @@
-/* functional: high. Same calls, arguments, reads and writes as retail, in retail's order; differs from the near miss in two behaviours it got wrong: the 0x43C store happens before the func_00348578 call (retail's delay slot) and the first func_00336390 call also gets D_001A8CFC + 0x8710. */
+/* functional: high. Same calls, arguments, reads and writes as retail, in retail's order; differs from the near miss in two behaviours it got wrong: the 0x43C store happens before the func_00348578 call (retail's delay slot) and the first func_00336390 call also gets D_001A8CFC + 0x8710. Each colour is stored through the pointer of the element it belongs to: retail stores it in the delay slot of the next element's func_00335E20 call, through the previous result. */
 
 /* Initialises the menu panel `self` (owner may be null): resets its state, allocates its 16-byte origin
  * (250, 190) from the owner's pool, loads the seven sprite elements (D_001ADC10..D_001AE5B8) and the seven
@@ -69,10 +69,10 @@ void func_003486A8(unsigned char *self, void *owner)
     *(int *)func_00335E20(self) = 0x60442D00;
     *(int *)func_00335E20(self + 0x130) = 0x55F0C070;
     *(int *)func_00335E20(self + 0x4C) = 0x55F0C070;
-    *(int *)func_00335E20(self + 0x98) = 0x55F0C070;
-    *(int *)func_00335E20(self + 0xE4) = 0x80FFDE8D;
-    *(int *)func_00335E20(self + 0x17C) = 0x70FFFEED;
-    *(int *)func_00335E20(self + 0x1C8) = 0x60442D00;
+    *(int *)func_00335E20(self + 0x98) = 0x80FFDE8D;
+    *(int *)func_00335E20(self + 0xE4) = 0x70FFFEED;
+    *(int *)func_00335E20(self + 0x17C) = 0x60442D00;
+    *(int *)func_00335E20(self + 0x1C8) = 0x55F0C070;
     func_00336390((char *)self, D_001A8CFC + 0x8710, 0x1C);
     func_00336390((char *)self + 0x130, D_001A8CFC + 0x8710, 0x1D);
     func_00336390((char *)self + 0x4C, D_001A8CFC + 0x8710, 0x1E);
