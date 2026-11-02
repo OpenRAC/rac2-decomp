@@ -1,6 +1,6 @@
 /* functional: high. Same reads, writes and call in the same order. Retail keeps its arguments and ra in the upper halves of $s4-$s7/$ra across the call instead of on the stack; that has no C meaning. The 64-byte copies read each 64-byte scratchpad block whole before writing it, as retail's four lq then four sq. */
 extern unsigned char D_001CD640[];
-extern void func_002A4078(int obj, int flags);
+extern int func_002A4078(int obj, int flags);
 
 /* Mark which bone slots `count` animation parts use: clear the 128-byte table D_001CD640, set byte [slot] = 1 for every slot
    listed by each part (obj+0x24 -> +0x1C table, entry parts[i]: u16 n, then n slot bytes at +4), keep each part's last
