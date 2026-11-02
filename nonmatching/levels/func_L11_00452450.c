@@ -13,6 +13,14 @@
  * result. Default declaration/order retained. Next useful evidence: original
  * initialization field types or compiler scheduling/return-value lifetime.
  * USA v2.00 and PAL were not checked in this attempt.
+ * 2 November 2026 (Claude Opus 5.5), current compiler, own -G8 unit: still the
+ * same seven rows. Declaring func_002B60B0 `void` makes all 956 bytes match
+ * (constant order, store order and the v0 state byte all follow from $v0 being
+ * free after the call). Not used: the callee returns its pointer and
+ * docs/COMPILER-NOTES.md forbids an invented void return. A maintainer ruling
+ * that this caller's original declaration was void would settle it; most
+ * existing callers in src/ already declare it void. Five other orders of the
+ * 0x4A/0x60/0x98 stores, and the integers after the floats, are worse (7-42 rows).
  */
 
 #include "common.h"
