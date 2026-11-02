@@ -76,7 +76,7 @@ extern s32 func_00336E40(s32 arg);
 extern f32 *func_00336DA8(s32 n, s32 a);
 extern void func_00335F20(char *o, f32 *v);
 extern void func_00335E68(char *o, s32 n);
-extern void func_00115DA8(char *buf, char *fmt, s32 n);
+extern int func_00115DA8(char *buf, char *fmt, ...);
 extern f32 func_00283B98(f32 a, f32 b);
 extern f32 func_00283180(f32 a);
 extern f32 func_00283198(f32 a);
