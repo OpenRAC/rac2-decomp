@@ -1,7 +1,6 @@
 /* Joba NPC state machine, retained reconstruction (not functional-gated).
- * USA v1.01, measured 2026-11-03: 15,840/15,832 bytes, 0/1 placement. Every block
- * aligns with retail; about 120 instructions differ, most of them register names in
- * one stretch that is shifted by a single instruction.
+ * USA v1.01, measured 2026-11-03: 15,832/15,832 bytes, 0/1 placement; 18
+ * instructions differ, all register names at three call sites (see Remaining).
  * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier;
  * compile as a separate unit (e.g. src/levels/11_joba/L11_00420C88-big-g8.c).
  * Earlier drafts' byte counts included 47 alignment nops from a do/while(0)
@@ -15,18 +14,33 @@
  * path $s1; case 19 indexes the table with 0x56c (the draft used 0x54c); the second
  * switch has an empty case 1 (retail's jump table starts at 1); case 15 multiplies
  * by a 1.0f local (turn_scale), which survives as lui/mtc1/mul.s like retail.
- * Remaining:
- * - Second-switch case 5 partner loop (label loop, 0x422708): PRE puts the
- *   D_L11_001B359C load at the end of the preheader, but sched1 moves it above the
- *   table load, so it is not in the b delay slot and assembles as lui+lw (retail
- *   lw 0x45AC($gp) in the slot). Retail also copies the loaded id into $a3
- *   (daddu) and keeps the partner in $a1; ours tests the loaded register and uses
- *   bltzl. A local holding D_L11_001B359C (before or after ids =) changed nothing;
- *   a rotated while(cond) loop duplicated the condition.
- * - The extra word shifts case 28's loop head, which then gets an alignment nop
- *   (0x423434); it should disappear once the case 5 loop is one word shorter.
- * - Index/base register order (v0/v1) for D_L11_001FF580[WORD(state, 0x54c)] in
- *   cases 15/17/19, and the case 40 node address (v0/a0).
+ * 2026-11-03, second pass (15,840 -> 15,832 bytes, ~120 -> 18 rows):
+ * - Second-switch case 5 partner search: the for (;;) loop of matched
+ *   func_L11_00424A60 with its static inline moby helpers, the found test ending
+ *   in break and `if (*(short *)ids++ < 0) goto partner_done;`. expand_end_loop
+ *   rotates the loop (entry b into the found test) and the inlined helpers keep
+ *   jump1 from duplicating that exit test, so gcse inserts the D_L11_001B359C
+ *   load after NOTE_INSN_LOOP_BEG; haifa treats the note as a barrier, the load
+ *   stays last before the b and reorg puts it in the slot ($gp form). Reading
+ *   *ids twice gives retail's daddu copy. Incrementing before the test lets
+ *   reorg fill the bltz slot with the addiu backwards; incrementing after it
+ *   needs a fall-through fill that mark_target_live_regs refuses ($a2 looks
+ *   live at the exit; it follows only one conditional branch). The case 28
+ *   alignment nop disappeared with the extra word.
+ * - Case 28 and case 5 declare their own ids (and case 28 its id): retail keeps
+ *   them in different registers.
+ * - Case 40 recomputes the node into a second variable (next): retail gives the
+ *   two node values different registers.
+ * Remaining: cases 14, 15 and 22 (0x422BCC, 0x422C50, 0x423110): retail puts
+ * the WORD(state, 0x54c/0x56c) index in $v0 and the D_L11_001FF580 base in $v1;
+ * ours swaps them. Cause, from private dumps: the index lw is the first insn
+ * after the value-returning func_002B60B0 call (sched1 priority 8 against 7 for
+ * the lui), and local-alloc's INSN_SCHEDULING fake birth then overlaps the
+ * call's $v0, so the index takes $v1. A void prototype would remove this but is
+ * false (src/game/002B60B0.c returns the pointer). A block-local or
+ * function-scope index variable, and -g, did not help. Next lead: whatever in
+ * retail put another insn (the a0 move or the lui) between the call and the
+ * index load before local-alloc.
  */
 #include "common.h"
 
@@ -121,6 +135,37 @@ extern char *func_L11_00450328(void *, void *, void *, int, float);
 extern int func_002A8C28(void *, void *, int, float, float, float, int, int, int);
 extern void func_L11_00425A50(char *);
 
+/* A group's ID list entry names an object; bit 15 only marks the list's last entry. */
+static inline int group_entry_id(unsigned short *entry)
+{
+    return *entry & 0x7fff;
+}
+
+static inline char *moby_at(int id)
+{
+    return (char *)(D_L11_001B359C + id * 0x100);
+}
+
+static inline signed char moby_state(char *moby)
+{
+    return SIGNED_BYTE(moby, 0x20);
+}
+
+static inline short moby_class(char *moby)
+{
+    return HALF(moby, 0xaa);
+}
+
+static inline char *moby_vars(char *moby)
+{
+    return POINTER(moby, 0x68);
+}
+
+static inline int rider_kind(char *moby)
+{
+    return WORD(moby_vars(moby), 0x540);
+}
+
 /* The guarded animation transition is repeated throughout both state machines. */
 #define PLAY(p, animation, start, blend) \
     (BYTE((p), 0x43) != (animation) ? func_002A7470((p), (animation), (start), (blend)) : (void)0)
@@ -129,8 +174,6 @@ void func_L11_00420C88(unsigned char *object)
 {
     Vector offset, side, point;
     char *state, *path;
-    unsigned short *ids;
-    unsigned int id;
     int index, kind;
     float old_z, distance, angle, other_angle, pitch, limit;
     int flags;
@@ -609,19 +652,17 @@ void func_L11_00420C88(unsigned char *object)
             PLAY(object, 0x1e, 0, 30);
             if (WORD(state, 0x540) == 1) PLAY(object, 0x1c, 0, 30);
             if (WORD(state, 0x540) == 3) {
+                unsigned short *ids;
                 char *linked;
 
                 ids = D_L11_001FC420[BYTE(object, 0x21)];
-                goto first_partner;
-            next_partner:
-                if ((short)id < 0) goto partner_done;
-                ++ids;
-            first_partner:
-                id = *ids;
-                linked = (char *)(D_L11_001B359C + (id & 0x7fff) * 0x100);
-                if (SIGNED_BYTE(linked, 0x20) < 0 || HALF(linked, 0xaa) != 0xcf5 ||
-                    WORD(POINTER(linked, 0x68), 0x540) != 1)
-                    goto next_partner;
+                for (;;) {
+                    linked = moby_at(group_entry_id(ids));
+                    if (moby_state(linked) >= 0 && moby_class(linked) == 0xcf5 &&
+                        rider_kind(linked) == 1)
+                        break;
+                    if (*(short *)ids++ < 0) goto partner_done;
+                }
                 POINTER(state, 0x55c) = linked;
             partner_done:;
             }
@@ -809,6 +850,9 @@ void func_L11_00420C88(unsigned char *object)
             func_002B4FF0((char *)object, D_00189E20.position.v, REAL(state, 0x298));
         } else if (func_L11_00425788((char *)object, (char *)&D_00189E20.position, REAL(object, 0xf8), 7.0f, 0.25f, REAL(state, 0x298)) != 0 &&
                    BYTE(object, 0x21) <= D_L11_001B35B8 && func_002A8508(BYTE(object, 0x21), -1) > 1) {
+            unsigned short *ids;
+            unsigned int id;
+
             ids = D_L11_001FC420[BYTE(object, 0x21)];
             do {
                 char *partner;
@@ -934,7 +978,7 @@ void func_L11_00420C88(unsigned char *object)
         break;
     }
     case 40: {
-        char *mount, *node;
+        char *mount, *node, *next;
 
         if (WORD(state, 0x564) == -1) break;
         func_002B60B0(object, 0.00388888898f, 0.1166666746f, 0.001939254929f, 0.005817765370f);
@@ -945,8 +989,8 @@ void func_L11_00420C88(unsigned char *object)
         REAL(object, 0x14) = REAL(mount, 0x14);
         REAL(object, 0x18) = REAL(mount, 0x18) + 1.5f;
         func_002833F0(mount + 0xc0, object + 0xf0);
-        node = D_L11_001FF580[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
-        angle = func_00283248(REAL(node, 0x10) - REAL(object, 0x10), REAL(node, 0x14) - REAL(object, 0x14));
+        next = D_L11_001FF580[WORD(state, 0x564)] + WORD(state, 0x568) * 0x10;
+        angle = func_00283248(REAL(next, 0x10) - REAL(object, 0x10), REAL(next, 0x14) - REAL(object, 0x14));
         if (func_00283C80(REAL(object, 0xf8), angle) <= 0.087266475f) {
             ++WORD(state, 0x568);
             if (WORD(state, 0x568) > 1) WORD(state, 0x568) = 0;
