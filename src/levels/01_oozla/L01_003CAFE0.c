@@ -399,7 +399,7 @@ void func_L01_003CEDA0(u8 *a0)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003D1A48);
+/* func_L01_003D1A48 lives in L01_003D1A48-g8.c. */
 
 /* func_L01_003D1F40 is defined in L01_003D1F40-g8.c. */
 
