@@ -78,7 +78,7 @@ void func_L17_0041F478(char *object)
             if(partner && *(signed char *)(state+0x16)!=-1) U(partner,0x20)=U(state,0x16);
             I(state,0x40)=I(state,0xc);U(object,0x20)=2;
         }
-        break;
+        func_L17_0041F180(object,state);break;
     case 2:
         if(partner && !(I(state,8)&2)) {
             alpha=func_00283CE0(I(state,0x40));

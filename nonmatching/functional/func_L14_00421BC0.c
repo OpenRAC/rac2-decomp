@@ -81,7 +81,7 @@ void func_L14_00421BC0(unsigned char *object) {
                 empty=0;
                 do {
                     entry=D_L14_002A71A0[D_001A79F0][vars->speech_index][i];
-                    if(!vars->tail.flags.force && !(D_00139768[(unsigned int)entry>>2]&(bit=1u<<(entry&31)))) {
+                    if(vars->tail.flags.force || !(D_00139768[(unsigned int)entry>>2]&(bit=1u<<(entry&31)))) {
                         if(!func_00288AA0(D_L14_001BF700,entry) && i==0) {
                             func_0026FEB8(D_L14_002AA2C0,*(short *)(object+0xaa),*(short *)(object+0xb2),D_001A79F0,vars->speech_index,entry);
                             return;
@@ -97,7 +97,7 @@ void func_L14_00421BC0(unsigned char *object) {
         else {
             vars->tail.flags.played=1;
             func_00288BE8(D_L14_001BF700);
-            if(D_L14_001B20C8>=5 && D_001A79F0==6 && vars->speech_index==0) func_002F5CC8();
+            if(D_L14_001B20C8<5 || (D_001A79F0==6 && vars->speech_index==0)) func_002F5CC8();
             func_002A7750(object,3,-1);
         }
         break;
@@ -123,8 +123,8 @@ void func_L14_00421BC0(unsigned char *object) {
                 if(vars->camera!=-1) { char *camera;
                     camera=D_L14_001B268C+(vars->camera<<7);
                     func_002DF3F8(camera+0x30,camera+0x70);
-                }
-            } else func_002DF3F8(object+0x10,object+0xf0);
+                } else func_002DF3F8(object+0x10,object+0xf0);
+            }
         }
         if(vars->tail.flags.speech!=-1) func_00288CB0(vars->tail.flags.speech,1);
         else if(changed || vars->tail.flags.played) func_0029B3E0(0,-1);
@@ -143,8 +143,8 @@ void func_L14_00421BC0(unsigned char *object) {
                 if(vars->camera!=-1) { char *camera;
                     camera=D_L14_001B268C+(vars->camera<<7);
                     func_002DF3F8(camera+0x30,camera+0x70);
-                }
-            } else func_002DF3F8(D_00189EA0,D_00189EA0+0x10);
+                } else func_002DF3F8(D_00189EA0,D_00189EA0+0x10);
+            }
         }
         if(vars->tail.flags.speech!=-1) func_00288CB0(vars->tail.flags.speech,1);
         else if((changed || vars->tail.flags.played) && vars->sound!=-1) func_0029B3E0(0,-1);

@@ -127,7 +127,7 @@ void func_L02_003D91A0(char *self) {
         source = *(char **)(state + 0x264);
         if (source && *(unsigned char *)(source + 0x20) != 254 && *(unsigned char *)(source + 0x20) != 253 &&
             *(unsigned char *)(source + 0x20) >= 3) {
-            func_L02_003D4990(self);
+            func_L02_003D4990(source);
             func_L02_003FC020(*(void **)(self + 0xB8), *(void **)(state + 0x264));
         }
         func_L02_003DB6D8(self);

@@ -54,7 +54,7 @@ void func_L18_0043FC70(u8 *object)
                 func_002A7750(object, 1, -1);
             } else func_0029F338(object);
         }
-        }
+        } else func_0029F338(object);
     } else if (*(int *)state == -1 || D_L18_001B281C[*(int *)state][0x20] == 0xFE ||
                D_L18_001B281C[*(int *)state][0x20] == 0xFD) {
         unsigned short old = *(u16 *)(object + 0x96);

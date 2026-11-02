@@ -93,9 +93,9 @@ int func_00317D78(unsigned char *self)
         *(short *)(data + 0x272) = func_002A77E0(10);
         func_002A7750(self, 2, 0);
         if ((unsigned char)self[0x43]) func_002A7470(self, 0, 0, 0);
-        if ((unsigned char)self[0x31] && func_00282E48(self + 0x10, D_001B5200.pos) < 48.0f) {
-            func_002A93B0(self); self[0x6F] = 45;
-        }
+    }
+    if ((unsigned char)self[0x31] && func_00282E48(self + 0x10, D_001B5200.pos) < 48.0f) {
+        func_002A93B0(self); self[0x6F] = 45;
     }
     dead = (unsigned char)data[0x2E] == 2;
     result = func_002B0ED8(self, data + 0x60, 0);

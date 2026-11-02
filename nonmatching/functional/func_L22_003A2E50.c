@@ -104,7 +104,7 @@ void func_L22_003A2E50(char *obj, int mode, int filter, float bits) {
         }
         break;
     }
-    case 2: {
+    default: {
         float bias = -0.35f;
         float closest = 30000.0f;
         for (i = 0; i < count; i++) {

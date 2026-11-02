@@ -104,6 +104,8 @@ void func_L06_00455BC0(Thing *m)
         fail = 1;
         missing = 1;
         if (D_L06_002AA490[D_001A79F0] != 0 && D_L06_002AA490[D_001A79F0][p->idx] != 0) {
+            if (D_L06_002AA490[D_001A79F0][p->idx][0] != -1)
+                missing = 0; /* retail clears it on loop entry, even if every entry is skipped */
             for (i = 0; D_L06_002AA490[D_001A79F0][p->idx][i] != -1; i++) {
                 int e = D_L06_002AA490[D_001A79F0][p->idx][i];
                 if (p->tail.b.quiet == 0) {

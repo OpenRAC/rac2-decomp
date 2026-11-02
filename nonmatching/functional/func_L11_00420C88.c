@@ -709,8 +709,8 @@ void func_L11_00420C88(unsigned char *object)
             path = D_L11_001FF580[WORD(state, 0x56c)];
             distance = func_00282E80(position, path + 0x10);
             other_angle = func_00282E80(position, path + WORD(path, 0) * 0x10);
-            if (other_angle < distance) func_002B6228(object, D_L11_001FF580[WORD(state, 0x54c)], 0, WORD(path, 0) - 1);
-            else func_002B6228(object, D_L11_001FF580[WORD(state, 0x54c)], WORD(path, 0) - 1, 0);
+            if (other_angle < distance) func_002B6228(object, D_L11_001FF580[WORD(state, 0x56c)], 0, WORD(path, 0) - 1);
+            else func_002B6228(object, D_L11_001FF580[WORD(state, 0x56c)], WORD(path, 0) - 1, 0);
             func_002A7750(object, 22, -1);
             PLAY(object, 0x10, 0, 20);
         }

@@ -252,6 +252,7 @@ int func_L05_0041DF58(void) {
             items[func_002ED8A0(selected)].active=1;
         }
         func_00300968(D_L05_001B1398,x,y,0x80F0F0F0,1.0f,0.0f);
+    }
         func_L00_0030CF60();
         i0=func_00336D50(D_L05_001A904C+0x8710,186);
         i1=func_00336D50(D_L05_001A904C+0x8710,187);
@@ -260,6 +261,5 @@ int func_L05_0041DF58(void) {
         func_00300968(i1,D_L05_001AC4E0[0]+4.0f,(float)(int)((D_L05_001AC4E4[0]+4.0f)*D_L05_001B2D84[0]+.5f),0x60241700,.8f,0.0f);
         func_00300968(i2,D_L05_001AC4E0[0]+4.0f,(float)(int)((D_L05_001AC4E4[0]+4.0f)*D_L05_001B2D84[0]+.5f),0x55F0C070,.8f,0.0f);
         func_L05_0037A5F8();
-    }
     return 1;
 }

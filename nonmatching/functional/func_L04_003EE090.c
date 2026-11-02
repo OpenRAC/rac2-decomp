@@ -118,6 +118,7 @@ void func_L04_003EE090(unsigned char *m)
                 func_00282D30(target,target,0.5f);
                 if(*(float *)(p+0x70)>1.0f) func_00282FB8(target,target,1.0f);
                 if(func_00282DF0(target)<1.0f) func_00282F20(target,target,1.0f);
+                func_00282CC0(target,target,m+0x10);
                 goto targetReady;
             }
         } else {

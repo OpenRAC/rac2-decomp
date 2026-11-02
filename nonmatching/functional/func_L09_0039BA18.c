@@ -138,8 +138,10 @@ void func_L09_0039BA18(u8 *object)
         break;
     case 3:
         handle = *(s8 *)(state+0x2E);
-        if (handle != -1) func_00291450(handle);
-        state[0x2E] = -1; func_0029F338(object);
+        if (handle != -1) {
+            func_00291450(handle);
+            state[0x2E] = -1; func_0029F338(object);
+        }
         break;
     }
 }

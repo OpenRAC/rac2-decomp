@@ -58,16 +58,11 @@ void func_L00_003DF710(char *m)
         func_002A8C00(hit,*(int *)(d+0x10),1,d,*(float *)(d+0x14));
         *(unsigned short *)(hit+0x1a)=*(unsigned short *)(m+0xaa);
         if(func_002761F8(m+0x10,next,0,m,hit) || func_00277258(m+0x10,0,m,0.3f)) {
-            if (D_L00_001BF218) {
-                if (D_L00_001BF218 != *(int *)(d+0x10))
-                    func_002A8C28(*(int *)(d+0x10),0.3f,m+0x10,0x10001,*(float *)(d+0x14),0,0,1,0);
+            if (!D_L00_001BF218 || D_L00_001BF218 != *(int *)(d+0x10)) {
+                func_002A8C28(*(int *)(d+0x10),0.3f,m+0x10,0x10001,*(float *)(d+0x14),0,0,1,0);
                 func_002A7750(m,1,-1);
                 return;
-            } else {
-                func_002A8C28(*(int *)(d+0x10),0.3f,m+0x10,0x10001,*(float *)(d+0x14),0,0,1,0);
             }
-            func_002A7750(m,1,-1);
-            return;
         }
         qcopy(m+0x10,next);
         func_00282D30(velocity,d,-0.5f);

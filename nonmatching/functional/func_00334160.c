@@ -25,7 +25,7 @@ typedef int Quad341 __attribute__((mode(TI)));
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 typedef struct { int active; unsigned char type; char pad[0x47]; short map; char pad2[0x92]; } Weapon1271;
-typedef struct { float cost,a,b; int frames; } Effect1271;
+typedef struct { float cost,a; int frames; float b; } Effect1271;
 typedef struct { int timer,color,alpha; float zero,a,b; char *object; int state,owner,active; char pad[8]; } Slot1271;
 extern Weapon1271 D_00239BA0[];
 extern unsigned char D_001A7A80[],D_00139568[];

@@ -79,7 +79,7 @@ void func_L08_003D39F0(u8 *object)
         if (D_L08_001B0318 == 0) {
             D_L08_001B0318 = func_L00_002D70A0(5);
             if (D_L08_001B0318 == 0)
-                return;
+                goto finish;
         }
         vehicle = D_00189E20.vehicle;
         if (*(short *)(vehicle + 0xaa) == 0x905) {
@@ -118,7 +118,7 @@ void func_L08_003D39F0(u8 *object)
         if (D_L08_001B0318 == 0) {
             D_L08_001B0318 = func_L00_002D70A0(5);
             if (D_L08_001B0318 == 0)
-                return;
+                goto finish;
         }
         D_L08_001B0318->f31 = 1;
         D_L08_001B0318->f0 = 7.0f;

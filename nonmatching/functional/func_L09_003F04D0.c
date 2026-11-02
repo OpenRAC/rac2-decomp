@@ -32,7 +32,7 @@ void func_L09_003F04D0(u8 *object)
 {
     u8 *state = P(object,0x68),*first,*second;
     float point[4],direction[4];
-    int mode = I(D_L09_001C9F80,0xC),side,i,half;
+    int mode = I(D_L09_001C9F80,0xC),side,i,half,kind;
     if (mode) {
         side = I(D_L09_001C9F80,0);
         if (F(object,0x18) < F(D_L09_001C9F80,0x28) && side == 1) return;
@@ -58,8 +58,9 @@ void func_L09_003F04D0(u8 *object)
         }
         break;
     }
-    switch (object[0x20]) {
-    case 0: func_L09_003F0330(object); break;
+    kind = object[0x20];
+    switch (kind) {
+    case 0: break;
     case 1:
         if (!S(state,0x92)) {
             if (object[0x43] != 1) func_002A7470(object,1,0,3);
@@ -120,4 +121,5 @@ void func_L09_003F04D0(u8 *object)
         func_0029F338(object);
         break;
     }
+    if (kind != 6) func_L09_003F0330(object);
 }

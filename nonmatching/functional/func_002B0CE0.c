@@ -23,12 +23,12 @@
    What would unblock it: the unit's profile - `-mno-split-addresses` on a file of its own,
    `src/game/002B00B0-g8.c -O2 -G8 -ffunction-sections -mno-split-addresses` in
    config/cflags.txt, which this wave's assignment does not allow me to add. */
-extern int D_001B8FB4;
-extern int D_001B8FB4_b;
-extern int D_001B8FB0;
-extern int D_001B8FB0_b;
-extern int D_001C2088;
-extern int D_001C2088_b;
+extern int D_001A8C64;
+extern int D_001A8C64_b;
+extern int D_001A8C60;
+extern int D_001A8C60_b;
+extern int D_001B1D48;
+extern int D_001B1D48_b;
 extern int D_001A8FB0 __attribute__((sda));
 extern int func_00288FB8(int);
 extern void func_L00_0030DDB0(int, int);
@@ -41,12 +41,12 @@ int func_002B0CE0(int a0, int a1, int a2)
     if (result != 0)
         return result;
     if (a1 == 0) {
-        D_001A8FB0 = a2;
+        D_001A8C60 = a2;
     } else {
         func_L00_0030DDB0(func_00288FB8(a1), a2);
-        D_001B8FB0_b = a2;
+        D_001A8C60_b = a2;
     }
-    D_001B8FB4_b = a0;
-    D_001C2088_b = a1;
+    D_001A8C64_b = a0;
+    D_001B1D48_b = a1;
     return 3;
 }

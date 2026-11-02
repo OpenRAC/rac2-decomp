@@ -35,7 +35,7 @@ extern u8 D_0018C958[];
 extern int D_L03_001B2A38;
 extern u8 *D_L03_001B2A1C;
 extern u16 *D_L03_001FB5A0[];
-extern float D_L03_001B1DB0[2] __attribute__((sda)), D_L03_001B1DB8[2] __attribute__((sda)), D_L03_001B1DC0[2] __attribute__((sda));
+extern float D_L03_001B1DA0[2] __attribute__((sda)), D_L03_001B1DA8[2] __attribute__((sda)), D_L03_001B1DB0[2] __attribute__((sda));
 void func_L03_00421398(u8 *obj)
 {
     u8 *state = *(u8 **)(obj + 0x68);
@@ -56,7 +56,7 @@ void func_L03_00421398(u8 *obj)
         }}
         index = *(s16 *)(obj + 0xB2);
         if (D_L03_0021EA30[index + 0x464]) {
-            func_002A7750(obj, 1, -1);
+            func_0029F338(obj);
         } else {
             bits = D_0019B4A8[(index >> 1) + (D_001A79F0 << 10)];
             if (index & 1) {
@@ -114,10 +114,10 @@ void func_L03_00421398(u8 *obj)
         }
         *(u16 *)(D_0018C958 + 0x2D0) = 0xFFFF;
         if (*(int *)state)
-            func_L00_0032A530(obj, D_L03_001B1DC0, D_L03_001B1DB8, D_L03_001B1DB0,
+            func_L00_0032A530(obj, D_L03_001B1DB0, D_L03_001B1DA8, D_L03_001B1DA0,
                               0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, func_L03_00421930);
         else
-            func_L00_0032A530(obj, D_L03_001B1DC0, D_L03_001B1DB8, D_L03_001B1DB0,
+            func_L00_0032A530(obj, D_L03_001B1DB0, D_L03_001B1DA8, D_L03_001B1DA0,
                               0xFFFF, 0, -1, 1, 0xFFFF, 0xFF, 0);
         func_0029F338(obj);
         break;
