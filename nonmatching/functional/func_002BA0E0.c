@@ -48,7 +48,7 @@
  X(27, func_002BE928) \
  X(28, func_002BE9B8) \
  X(29, func_002BEBC8) \
- X(30, func_002BEE78) \
+ X(30, func_002BEE70) \
  X(31, func_002BF390) \
  X(32, func_002BF520) \
  X(33, func_002BF6F0) \

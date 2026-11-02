@@ -31,6 +31,6 @@ void func_003384C0(char *obj, int hi, int lo, float a, float b, float c, float d
     func_00300A00(*(void **)(obj + 0x2210), flags, d2, a, 1.0f, 1.0f, t);
     func_00300A00(*(void **)(obj + 0x2210), flags, c2, b, -1.0f, -1.0f, t);
     func_00300A00(*(void **)(obj + 0x2210), flags, d2, b, 1.0f, -1.0f, t);
-    func_0027AB40();
     D_001B9040[44] = saved;
+    func_0027AB40();
 }

@@ -1,0 +1,20 @@
+/* functional: medium. Carried from Ratchet & Clank (func_L00_001FF610, vec_reflect); no addresses involved. A zero b vector gives a finite Q on the VU, so n = b*Q = 0 and the result is a (here the reciprocal is forced to 0 in that case). Otherwise reflects a about the plane with normal b: n = b/|b|, t = -(a.n); when t < 0 dst is a copied whole, otherwise dst.xyz = a.xyz + 2*t*n and dst.w = a.w. VU0 vrsqrt is approximate; this uses an exact sqrt. */
+void func_00283028(float *dst, float *a, float *b) {
+    float len2 = b[0] * b[0] + b[1] * b[1] + b[2] * b[2];
+    float inv = len2 > 0.0f ? 1.0f / __builtin_sqrtf(len2) : 0.0f;
+    float nx = b[0] * inv;
+    float ny = b[1] * inv;
+    float nz = b[2] * inv;
+    float t = -(a[0] * nx + a[1] * ny + a[2] * nz);
+    if (t < 0) {
+        dst[0] = a[0];
+        dst[1] = a[1];
+        dst[2] = a[2];
+        dst[3] = a[3];
+        return;
+    }
+    dst[0] = a[0] + 2 * t * nx;
+    dst[1] = a[1] + 2 * t * ny;
+    dst[2] = a[2] + 2 * t * nz;
+    dst[3] = a[3];
+}

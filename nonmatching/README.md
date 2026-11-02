@@ -34,13 +34,12 @@ flags; on its own when that does not compile), places it at 0x000A0000 and
 runs OpenRAC's test-only interpreter on call states captured from the US
 disc, comparing memory, the result, the kept registers and device accesses
 with retail. It covers boot functions called in the boot, title, menu pages
-and New Game up to the first level's load, and level 00 (Aranos, the
-tutorial): New Game into it, played a while (`level00`). A function with a
-place in level 00's program (a `func_L00_` function, or a boot or shared one
-with a `00:` place in `config/levels/functions.tsv`) is checked at that
-place, its symbols resolved at level 00's addresses; a boot function below
-0x1A7C80 stays resident in the level and is checked as the boot's. Other
-levels are not covered yet. With OpenRAC's interpreter built
+and New Game up to the first level's load, and every level but 30: New Game
+into it, played a while (`level00`, `level01`, ...). A function with a place in
+a level's program (a `func_LNN_` function, or a boot or shared one with an
+`NN:` place in `config/levels/functions.tsv`) is checked at that place, its
+symbols resolved at that level's addresses; a boot function below 0x1A7C80
+stays resident in the level and is checked as the boot's. With OpenRAC's interpreter built
 (`build/interpreter/`) and the compiler reachable through `RAC2_LINUX` (on a
 Mac, `docker run -d --name rac2-gate --platform linux/386 -v $HOME:$HOME
 rac2-build:latest sleep infinity`, then `RAC2_LINUX="docker exec
