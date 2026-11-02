@@ -16,6 +16,11 @@
  * Allocator diagnostics show the fix:SI results combined into call arguments;
  * investigate a naturally different lowering before retrying scheduling flags.
  * All required declarations are included below. No linked build was run.
+ * 3 November 2026 (Claude Opus 5.5): with the current compiler this body is
+ * 1324/1332 bytes and about 175 rows. Writing Y() as a static __inline__
+ * function (int or float parameter, with or without a float local) changes
+ * nothing, so inlining boundaries are not what serializes retail's three
+ * conversions.
  */
 #include "common.h"
 extern void func_L11_00443940(void *,int);

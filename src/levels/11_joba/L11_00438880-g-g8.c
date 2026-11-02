@@ -1,20 +1,19 @@
-/* GPT-6.1 Sol high, task v0887; USA v1.01.
- * Best: 1108/1108 bytes, 0/1 places. Profile: -O2 -G8 -ffunction-sections -g
- * -mno-split-addresses. All required declarations follow.
- * The frame, saved GPRs, UV/following/flags spill slots and vector/corner body
- * agree. Remaining differences are flag iterator allocation/scheduling, loop
- * likely branches, hoisted UV-address registers and following's temporary.
- * Casting the shifted alpha byte to int removes an unsigned-to-float fallback
- * absent in retail. SDATA provides the GP UV base; an incomplete NOT_SDA alpha
- * array with -mno-split-addresses gives the retail absolute lwc1 through at.
- * Explicit UV pointer locals recover spills at 0x100/0x104, following at 0x108,
- * and flags at 0x10C. Initializing those pointers at the UV loop preserves the
- * retail order of saved address setup. The second scan needs an outer next<13
- * guard and flags+(next-1), rather than (flags+next)-1.
- * Separate cursor variables add a reload and nop (1116 bytes); one shared
- * cursor stays size-exact but uses a1 where retail uses v1.
- * Next: recover the original flag iterator source/lifetimes.
- */
+/* func_L11_00438880: skips set entries in the 13-byte flag table at state+0x380,
+ * then for each pair of points state+0x100+prev*16 / state+0x100+next*16
+ * fills a four-corner quad record twice (func_00281DE8 setup, func_00280B90
+ * submit) with different widths, colours and UVs, and
+ * finally advances the scrolling UV offset at state+0x35C, wrapping to [-1,1].
+ * Built -G8 -g -mno-split-addresses in its own unit (SDATA UV base, absolute
+ * NOT_SDA load of 001B12B4).
+ * The flag scans index through a block-local `j = next-1`: as a separate
+ * variable, the C front end cannot fold flags+(next-1) into (flags+next)-1,
+ * so loop.c sees a giv (next-1) feeding the address giv; the summed benefit
+ * makes it strength-reduce the address into a pointer register. That gives
+ * retail's pointer cursor, the pre-loop test through the computed address and
+ * the separate copy into the cursor in the second scan.
+ * Explicit UV pointer locals give the spills at 0x100/0x104, following at
+ * 0x108 and flags at 0x10C. Casting the shifted alpha byte to int avoids an
+ * unsigned-to-float fallback absent in retail. */
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
 extern void func_00282CF0(void *, void *, void *);
@@ -43,11 +42,11 @@ void func_L11_00438880(char *obj) {
     float *uv0, *uv1;
     char *st=*(char **)(obj+0x68);
     int next, prev, following, i;
-    unsigned char *cursor, *flags;
+    unsigned char *flags;
     unsigned int color;
     if (*(unsigned char *)(obj+0x20)<2) return;
     next=1; prev=0; flags=(unsigned char *)(st+0x380);
-    for(cursor=flags; next<13 && *cursor; next++,cursor++);
+    while(next<13) { int j=next-1; if(!flags[j]) break; next++; }
     while (next<12) {
         qcopy(end,st+0x100+next*16);
         qcopy(start,st+0x100+prev*16);
@@ -82,7 +81,7 @@ void func_L11_00438880(char *obj) {
         quad.color[0]=quad.color[1]=quad.color[2]=quad.color[3]=D_L11_001B12A4;
         func_00280B90(&quad,0,0);
         prev=next; next=following;
-        if(next<13) { for(cursor=flags+(next-1); next<13 && *cursor; next++,cursor++); }
+        while(next<13) { int j=next-1; if(!flags[j]) break; next++; }
     }
     *(float *)(st+0x35C)+=D_L11_001B12A8;
     if (*(float *)(st+0x35C)>1) *(float *)(st+0x35C)-=2;

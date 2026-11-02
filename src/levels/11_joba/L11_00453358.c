@@ -775,4 +775,4 @@ void func_L11_004600A0(char *pos, int a1, int a2, char *a3, int t0,
     func_00280B90(pkt, m, 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00461308);
+/* func_L11_00461308 lives in L11_00461308.c. */

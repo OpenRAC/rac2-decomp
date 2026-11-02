@@ -79,7 +79,7 @@ extern f32 func_002AA548(void *, void *, f32, f32, f32, f32);
 /* Defined in L11_003D6270-path.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L11_003DCEB0);
+/* func_L11_003DCEB0 lives in L11_003DCEB0-g8.c. */
 
 /* Defined in L11_003DD068-g8.c. */
 

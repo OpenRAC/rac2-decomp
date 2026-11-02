@@ -3026,3 +3026,6 @@ src/levels/shared/L02_003C26F0-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/levels/shared/L00_003EEE90-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L03_003C3220-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L04_003FA7E0.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsplit-edges
+src/levels/11_joba/L11_00434580-g-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/11_joba/L11_00437FD0.c	-O2 -G0 -ffunction-sections -g
+src/levels/11_joba/L11_00438880-g-g8.c	-O2 -G8 -ffunction-sections -g -mno-split-addresses
