@@ -699,7 +699,6 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 | [`func_L00_003E6030`](levels/func_L00_003E6030.c) | 1220 | 1220/1220 bytes, 9 rows off, two spill slots swapped: `i` needs a high pseudo for `i + 1`'s bucket, the record a higher one still. See the file header. |
 | [`func_L20_004441D8`](levels/func_L20_004441D8.c) | 1744 | 1740/1744 bytes, opcodes aligned: a group-index register, one argument's order, and an increment that reorg moves past two qzero asms. See the file header. |
 | [`func_L00_003C8A90`](levels/func_L00_003C8A90.c) | 2628 | 2624/2628 bytes, frame equal, about 70 rows off, mostly register names. See the file header. |
-| [`func_L06_00455BC0`](levels/func_L06_00455BC0.c) | 1540 | 1 November 2026: family F7 (five members, identical opcodes). 1540/1540, 34 raw rows: cases 3 and 4 equal retail, only the `missing` allocation is left; it needs a 4th reference. |
 | [`func_L15_00430168`](levels/func_L15_00430168.c) | 1064 | 1 November 2026: 1072/1064 bytes, float registers rotated. |
 | [`func_L03_003E4680`](levels/func_L03_003E4680.c) | 2540 | Exact (compiled at -O2 -G8 -frac2-qcopy) but held: reserved in #152 until #385 merges. |
 | [`func_L00_00300618`](levels/func_L00_00300618.c) | 11348 | 11,280/11,348 bytes, US 0/27; US2/PAL identity absent. The section-8 goto loop reproduces the complete 24-word record copy at all 27 places without a compiler change. Absolute macro stores, spills and other group loops remain; not a complete match. |

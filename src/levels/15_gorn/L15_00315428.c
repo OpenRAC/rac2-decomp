@@ -57,7 +57,7 @@ s32 func_L15_00381CF0(char *arg0) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L15_0041F2F8);
+/* func_L15_0041F2F8 is in L15_00315428-f7-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L15_0042DCE0);
 
