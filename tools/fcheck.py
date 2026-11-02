@@ -189,6 +189,13 @@ for _level in sorted(levels.NAMES):
     if _level:
         SCRIPTS[f"level{_level:02d}"] = {**SCRIPTS["level00"], "level": _level, "per_phase": 1,
                                          "writes": [f"900:{NEXT_LEVEL:x}:{_level:x}:740"]}
+# $RAC2_FCHECK_MOVES names a JSON file of scripts laid over these by name: a level's run with its
+# own presses, sticks and writes, plus "keys" (words whose values cut the run instead of phases:
+# openrac-boot --capture-key) and "limit" (most states of a function, --capture-limit). The hero's
+# moves are reached that way; their states go in a root of their own ($RAC2_FCHECK_STATES).
+if os.environ.get("RAC2_FCHECK_MOVES"):
+    for _name, _script in json.loads(Path(os.environ["RAC2_FCHECK_MOVES"]).read_text()).items():
+        SCRIPTS[_name] = {**SCRIPTS.get(_name, {}), **_script}
 SHF_WRITE = 1
 STT_FUNC, STT_SECTION = 2, 3
 SHN_ABS = 0xFFF1
@@ -1245,6 +1252,8 @@ def capture(names: list[str], script: str, frames: int | None = None, force: boo
         cmd += ["--stick", p]
     for p in s.get("writes", []):
         cmd += ["--write", p]
+    if s.get("keys"):
+        cmd += ["--capture-key", ",".join(s["keys"]), "--capture-limit", str(s.get("limit", 0))]
     with open(out / "capture.log", "a") as log:
         log.write("$ " + shlex.join(cmd) + "\n")
         log.flush()
