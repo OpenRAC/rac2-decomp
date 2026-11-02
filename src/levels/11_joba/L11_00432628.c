@@ -479,7 +479,7 @@ void func_L11_00437EA8(void *object)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00437FD0);
+/* func_L11_00437FD0 lives in L11_00437FD0.c. */
 
 extern void func_002833F0(char *, char *);
 
