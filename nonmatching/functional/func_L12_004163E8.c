@@ -32,7 +32,8 @@ extern void func_002B0A68(f32, f32, f32, f32, char *, s32, f32 *, u8);
 /* level 12 data reached through $gp (small-data) */
 extern int D_001A79F0 __attribute__((sda));
 extern u8 *D_L12_001B2E9C MACRO_ADDR;
-extern u8 *actorTable SDATA(D_L12_001B2E9C);
+extern u8 *D_L12_001B2E9C;
+#define actorTable D_L12_001B2E9C
 extern int D_L12_001B18F0 __attribute__((sda));
 
 /* level 12 data reached absolutely: out of the $gp window */

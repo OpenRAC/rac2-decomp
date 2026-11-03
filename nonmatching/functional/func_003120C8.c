@@ -23,7 +23,8 @@
 #include "common.h"
 extern int D_001B1688, D_001B24AC, D_001B24B0;
 extern int D_001B1A80 NOT_SDA;
-extern int rewardScoreGP SDATA(D_001B1A80);
+extern int D_001B1A80;
+#define rewardScoreGP D_001B1A80
 extern int D_001AF0F8 __attribute__((sda)),D_001AF0FC __attribute__((sda));
 extern char *D_0018C0B0 NOT_SDA;
 extern char *D_001AD7EC;

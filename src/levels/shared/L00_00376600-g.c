@@ -12,7 +12,7 @@ extern double func_001234F0(float);
 extern int func_00123028(double, double);
 extern double func_00122A98(double, double);
 extern int func_00123130(double);
-extern void func_0028EA58(int, int, int, int, int, unsigned int *);
+extern int func_0028EA58(int, int, int, int, int, unsigned int *);
 
 void func_L00_00376600(void) {
     unsigned int colors[4];

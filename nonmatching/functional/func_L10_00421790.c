@@ -110,7 +110,7 @@ extern s32 func_002ED8A0(s32);
 extern s32 func_00283D38(u32,u32,f32);
 extern void func_0027EAE8(s32,s32,s32,s32,s32,u32 *);
 extern void *func_0028E588(s32,s32);
-extern void func_0028EA58(void *,s32,s32,s32,s32,Block *);
+extern int func_0028EA58(void *,s32,s32,s32,s32,Block *);
 extern void func_0027F538(s32,s32,u64,char *,s32);
 extern void func_L05_003263F8(s32);
 extern s32 func_L05_00324DB8(void);

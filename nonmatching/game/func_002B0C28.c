@@ -20,32 +20,32 @@
    address CSE across calls, and D_001A8FB0 is small data at $gp-0x6040, so it needs the
    sda attribute. However, -mno-split-addresses alone is not sufficient for a match. The
    candidate remains unlinked until every placement passes. */
-extern int D_001B8FB4;
-extern int D_001B8FB4_b;
-extern int D_001B8FB0;
-extern int D_001C2088;
-extern int D_001C2088_b;
+extern int D_001A8C64;
+extern int D_001A8C64_b;
+extern int D_001A8C60;
+extern int D_001B1D48;
+extern int D_001B1D48_b;
 extern int D_001A8FB0 __attribute__((sda));
 extern int func_00288FB8(int);
 extern void func_L00_0030DDB0(int, int);
 
 int func_002B0C28(int a0, int a1, int a2)
 {
-    int current = D_001B8FB4;
+    int current = D_001A8C64;
 
     if (current == a0) {
         if (a1 != 0)
             func_L00_0030DDB0(func_00288FB8(a1), a2);
-        D_001C2088 = a1;
-        D_001A8FB0 = 2;
+        D_001B1D48 = a1;
+        D_001A8C60 = 2;
     } else {
         if (current != 0)
             return 0;
         if (a1 != 0)
             func_L00_0030DDB0(func_00288FB8(a1), a2);
     }
-    D_001B8FB4_b = a0;
-    D_001B8FB0 = 2;
-    D_001C2088_b = a1;
+    D_001A8C64_b = a0;
+    D_001A8C60 = 2;
+    D_001B1D48_b = a1;
     return 1;
 }

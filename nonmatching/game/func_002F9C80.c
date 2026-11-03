@@ -42,7 +42,7 @@ extern int func_00282C30(int);
 extern void func_00285548(int,int,int,int,int,int,unsigned int);
 extern int func_0028E588(int,int);
 extern unsigned int func_00336EF8(int);
-extern void func_0028EA58(int,int,int,int,int,unsigned int *);
+extern int func_0028EA58(int,int,int,int,int,unsigned int *);
 extern char *func_00288FB8(int);
 extern int func_0027F288(char *,int,float);
 extern void func_002F97A0(float,float,unsigned long,float,char *,int);

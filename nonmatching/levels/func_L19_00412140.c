@@ -115,7 +115,7 @@ extern void func_0027F5B8(int,int,u64,void *,int);
 extern float func_002ABB18(float);
 extern float func_00283198(float);
 extern int func_0028E588(int,int);
-extern void func_0028EA58(int,int,int,int,int,void *);
+extern int func_0028EA58(int,int,int,int,int,void *);
 extern void func_L08_004207D0(void *);
 #define F(p,o) (*(float *)((p)+(o)))
 #define I(p,o) (*(int *)((p)+(o)))
