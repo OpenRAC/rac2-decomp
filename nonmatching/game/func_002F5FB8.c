@@ -1,3 +1,10 @@
+/* 2 November 2026:
+ * Correct the ignored integer returns of func_002B4B70, func_00288A00 and func_002B49E0. The
+ * current matched func_002EF010 returns unsigned long (64 bits on EE); explicitly narrow its
+ * result before the observed 32-bit index shift. This qualified declaration experiment emits
+ * 1192/1184 bytes, 0/28 US placements, rather than the old 1184-byte draft with an int
+ * declaration. The packet frame and descriptor lifetimes remain unresolved; no complete match.
+ */
 /* sol-high, v0961, USA v1.01: 1184/1184 bytes, 0/28 places.
  * Game -O2 -G8 -ffunction-sections. The target frame is 0xD0, this draft
  * uses 0xC0; allocation, startup spills, descriptor-base rematerialization
@@ -32,7 +39,7 @@ extern int D_0014B540[];
 extern char D_001339B0[];
 extern void func_0029CC98(int, int);
 extern void func_00288BB8(void *);
-extern void func_002B4B70(int,int);
+extern int func_002B4B70(int,int);
 extern void func_002FC3C0(unsigned long);
 extern int func_00126288(void *,short,short,short,short,short,short,short);
 extern void func_0011AEA0(int);
@@ -44,11 +51,11 @@ extern int func_00133580(int);
 extern void func_00298F00(void);
 extern int func_002B7C80(char *,int,int);
 extern int func_0034EF58(void *,void *,char *,char *,int,int);
-extern void func_00288A00(void *,int *,int *);
-extern int func_002EF010(int);
+extern int func_00288A00(void *,int *,int *);
+extern unsigned long func_002EF010(int);
 extern void func_00126DC0(void *);
 extern void func_002F0FA0(void);
-extern void func_002B49E0(int,int,int,int,int);
+extern int func_002B49E0(int,int,int,int,unsigned char *);
 void func_002F5FB8(void)
 {
     long packet[12] __attribute__((aligned(16)));
@@ -131,7 +138,7 @@ void func_002F5FB8(void)
             nextFrame = frame;
         }
         {
-            int offset = (func_002EF010(nextFrame) << 4) | 8;
+            int offset = ((int)func_002EF010(nextFrame) << 4) | 8;
             ref_L00_002F5FB8_01 = *(int *)((char *)sectors + offset) + D_0014B540[1];
             ref_L00_002F5FB8_14 = *(int *)((char *)sizes + offset);
         }

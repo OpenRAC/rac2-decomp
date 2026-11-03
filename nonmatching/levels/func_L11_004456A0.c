@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract review (USA v1.01 only).
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current check.py: 752/752 bytes, 0/1 places, first mismatch +0x0C.
+ * Corrected sprintf (func_00115DA8) to its actual int return. Current faithful candidate reaches retail size, but prologue, serial-coordinate scheduling and the retained context-pointer lifetime differ.
+ * Reopen: A real rounding/block and context-lifetime witness; no synthetic barriers or unused saves.
+ * No linked match or cross-release qualification is claimed. Earlier notes follow.
+ */
 /* func_L11_004456A0 - 752 bytes, level 11 only (draws a title line, a box with one of three
    messages chosen by state +0x1E8, and a footer box).  opus-1 (Claude Opus 5.5), 30 October 2026.
    Best tools/check.py (USA v1.01, own -G8 unit, default -O2 -G8 -ffunction-sections):
@@ -45,7 +52,7 @@ extern int func_L11_0043E108(int);
 extern unsigned int func_001157AC(char *);
 extern void func_00280270(char *, long long, char *, int);
 extern void func_00280190(char *, long long, char *, int);
-extern void func_00115DA8(char *, char *, ...);
+extern int func_00115DA8(char *, char *, ...);
 
 extern float D_L11_001B1808 __attribute__((sda));
 extern int D_L11_001B180C __attribute__((sda));

@@ -1,3 +1,8 @@
+/* 2 November 2026, remaining-function review: nonmatching; no linked credit.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * US check: 1200/1200 bytes, 0/3 placements.
+ * Matched func_L04_00358AE8 returns u8*. Correcting its ignored result ties at 1200/1200, first mismatch+0x2D0; four loop-preheader setup rows remain.
+ */
 /* Sol high, v1027, 2026-10-29: 1200/1200 bytes, 0/3 USA v1.01 places.
  * Profile: default game -O2 -G0 -ffunction-sections.
  * Seven check.py compiles (plus one regalloc baseline) improve the prior draft
@@ -53,7 +58,7 @@ extern void func_00283028(void *, void *, void *);
 extern float func_00282DF0(void *);
 extern void func_00282F20(void *, void *, float);
 extern int func_002A7820(int, int);
-extern void func_L04_00358AE8(void *, void *, int, int, float);
+extern u8 *func_L04_00358AE8(void *, void *, int, int, float);
 extern void func_002ABBB8(void *, void *, int, int, int, int, int, int,
     int, int, int, int, float, float, float, float, float, float, float);
 extern void func_00277F48(void *, float, int, void *, void *);

@@ -372,7 +372,7 @@ INCLUDE_ASM("asm/levels", func_L00_0041EE58);
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_0041FC20);
+/* func_L00_0041FC20 is defined in L00_0041FC20.c. */
 
 extern float D_L00_001B8DC0[];
 

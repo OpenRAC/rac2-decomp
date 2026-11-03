@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract review (USA v1.01 only).
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current check.py: 444/444 bytes, 0/1 places, first mismatch +0x0.
+ * Corrected func_002ED578 to its actual integer return. Extra retail s0 save, rematerialized 454.0 and FP allocation remain unresolved.
+ * Reopen: Independent source evidence for the saved-but-unused register and coordinate lifetime.
+ * No linked match or cross-release qualification is claimed. Earlier notes follow.
+ */
 /*
  * Retained manual C reconstruction; not linked or counted.
  * Profile: -O2 -G8 -ffunction-sections, as its own unit src/game/00326A10-g8.c
@@ -27,7 +34,7 @@ extern char D_001B0110[];
 
 extern int func_00336D50(int, int);
 extern void func_00300A00(int, int, float, float, float, float, float);
-extern void func_002ED578(int, int *, int *, int *);
+extern int func_002ED578(int, int *, int *, int *);
 extern int func_00115DA8(char *, const char *, ...);
 extern int func_00283CF0(float);
 extern void func_0027F5B8(int, int, unsigned long long, unsigned char *, int);

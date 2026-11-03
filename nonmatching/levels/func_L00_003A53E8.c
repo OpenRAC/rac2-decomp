@@ -1,3 +1,10 @@
+/* 2 November 2026: retained nonmatching C; no linked matching credit.
+ * Profile: -O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g.
+ * USA v1.01 check: 2516/2516 bytes, 0/27 placements.
+ * Matched func_L00_002C42E0 returns signed int. Correcting its ignored result leaves 2516 bytes
+ * and 0/27 placements, first mismatch +0x4D0. The measured GCSE spill-slot rotation and pulse-
+ * address setup remain. No compiler hash-table override or extra operation is used.
+ */
 /* Closer b, 2026-11-01: 303 buckets now, and 307 needs 8 more insns at gcse (under -G16). Writing the two statements
  * after the timer arms per arm adds exactly that and takes the spill slots to three rotated ones (41 lines to 26), but
  * moves retail's $f20 load and the arms' own layout: the join stays where it is in retail, so the 8 insns are elsewhere.
@@ -88,7 +95,7 @@ extern char *D_L00_001C3280[];
 extern int func_00282978(void *),func_00282948(void *),func_002829D8(void *);
 extern int func_002E5CF8(int,int,char *);
 extern void func_002A75E0(void *,int,int,int,int),func_002A7470(void *,int,int,int);
-extern void func_L00_002C42E0(int,int);
+extern int func_L00_002C42E0(int,int);
 extern int func_L00_002D4040(int),func_L00_002D3F30(int,int);
 extern void func_00273318(void *,unsigned int,void *,int,int,int,float,float,float);
 extern void func_L00_002AF568(void);

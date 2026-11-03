@@ -290,6 +290,7 @@ researching engine quirks, or improving documentation:
 
 - Read [`AGENTS.md`](AGENTS.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md) first; they hold the
   rules.
+- [`docs/PORT_HANDOFF.md`](docs/PORT_HANDOFF.md) hands over the work where this repository meets the native port: functional C, the behaviour gate, the bugs player testing traced here, and what is open.
 - [`docs/AGENT_WORKFLOW.md`](docs/AGENT_WORKFLOW.md) says which tier of model takes which
   function, and how a wave is spread over the workers.
 - `python3 tools/todo.py` sorts the functions still to match into buckets, and

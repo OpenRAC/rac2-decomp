@@ -1,3 +1,4 @@
+/* 2 November 2026: the original 1044/1044-byte -frac2-qcopy -fno-gcse form remains retained, 0/27 US placements. A two-dimensional array with measured 0xD0 stride produces 1032 bytes with GCSE off; enabling GCSE gives 1048 bytes and an extra saved pointer. The existing unsplit-edge option ties that result. Preserving the integer/FP argument banks while putting the direction before the amount does not resolve hit-setup scheduling. These controls do not unblock the address lifetime; original source/profile retained. */
 /* func_L00_00411B30: near miss, 1044/1044 bytes, 0 of 27 places (USA v1.01, 31 October 2026).
 
    Profile: its own unit, `-O2 -G0 -ffunction-sections -frac2-qcopy -fno-gcse`.

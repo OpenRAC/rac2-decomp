@@ -63,7 +63,7 @@ extern int Ff67aa9df_D_001A7350 __attribute__((sda));
 
 extern int Ff67aa9df_D_001A7354 __attribute__((sda));
 
-extern void Ff67aa9df_FUN_0027EA28(void *v, void *x);
+extern void func_0027EA28(void *v, void *x);
 
 void func_0027B948(void)
 {
@@ -549,7 +549,7 @@ void func_0027EAE8(int i0, int i1, int i2, int i3, int tag, void *x)
     v[3] = (((i2 << 4) + Ff67aa9df_D_001A7350) - 8)
          | ((long long)(((i3 << 4) + Ff67aa9df_D_001A7354) - 8) << 16)
          | ((long long)tag << 32);
-    Ff67aa9df_FUN_0027EA28(v, x);
+    func_0027EA28(v, x);
 }
 
 extern void func_0027DE50(int a, int b, int c, int d, unsigned long e);

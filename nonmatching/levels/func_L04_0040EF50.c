@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 faithful-contract review, US object checks only.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current check.py: 1648/1660 bytes,0/2 places.
+ * Restored actual integer iterator/sound/selection returns and projectile-factory pointer returns. The existing state/count/vector allocation and shared sound tail remain.
+ * Reopen: Real state/count and case-local vector lifetime; prior equivalent case guards tie.
+ * No linked or cross-release match is claimed; earlier records follow.
+ */
 /* GPT-6.1 Sol (high effort), task v1212, USA v1.01.
  * Profile: game -O2 -G8 -ffunction-sections (requires a *-g8.c unit).
  * Retained check: 1648/1660 bytes, 0/2 placements (Barlow and Joba).
@@ -67,23 +74,23 @@ extern int func_00277F48(void *,float,int,void *,int);
 extern int func_002ABB78(void *);
 extern void func_002A8F70(void *,void *,int,void *,void *,float);
 extern void func_L04_0040E460(void *);
-extern void func_002A8600(void *,int,int,int);
-extern void func_002A86E8(void *,void *,int,int);
+extern int func_002A8600(void *,int,int,int);
+extern int func_002A86E8(void *,void *,int,int);
 extern void func_00282CF0(void *,void *,void *);
 extern float func_L00_002EE290(void *);
 extern int func_002A7820(int,int);
-extern void func_002E5DA0(int,int,void *,int);
+extern int func_002E5DA0(int,int,void *,int);
 extern void func_L04_0040C0C0(void *,void *,int,int);
 extern int func_00282948(void *);
 extern void func_0029FCC0(void *,int,void *);
 extern void func_002AF000(void *,float,float,float);
 extern void func_00282CD8(void *,void *,void *);
 extern void func_L04_003F9320(void *,void *,void *,int);
-extern void func_002E5CF8(int,int,void *);
+extern int func_002E5CF8(int,int,void *);
 extern unsigned char *func_L04_0040EC80(void *,void *,void *,void *,void *,void *,float,float);
-extern void func_L00_002D6900(int);
-extern void func_L04_003FA5A8(void *,void *,void *,float,float,float,float,float);
-extern void func_L04_003FBD80(void *,void *);
+extern int func_L00_002D6900(int);
+extern void * func_L04_003FA5A8(void *,void *,void *,float,float,float,float,float);
+extern void * func_L04_003FBD80(void *,void *);
 void func_L04_0040EF50(unsigned char *m)
 {
  AttackChoices choices;

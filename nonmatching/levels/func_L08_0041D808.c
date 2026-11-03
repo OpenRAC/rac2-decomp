@@ -1,3 +1,14 @@
+/* 2 November 2026: retained nonmatching C; no linked matching credit.
+ * Profile: -O2 -G8 -ffunction-sections -g.
+ * USA v1.01 check: 3312/3308 bytes, 0/1 placements.
+ * Remove all three forbidden do-while(0) wrappers and their overwritten dead locals; each real
+ * rounded coordinate is assigned directly. Correct the int returns of 00300090, 003000C0 and
+ * 002E5DA0 from their matched definitions. This meaningful natural draft is 3312/3308 bytes,
+ * 0/1 US placement, with the complete 0xE0 frame. HUD coordinate/pack argument scheduling and
+ * allocation remain; the earlier forbidden 3308-byte diagnostic is historical, not the current
+ * source.
+ */
+/* Earlier notes below describe superseded diagnostic variants. */
 /* Claude Opus 5.5 (xhigh effort), task v1821, USA v1.01, 31 October 2026.
  * Best check: 3308 bytes, the retail size, 0/1 places; first difference at +0x1cc. A scratch
  * alignment masking non-sp memory offsets, lui immediates and jal targets counts 53 of 827 rows,
@@ -109,13 +120,14 @@ extern float D_L08_001B1AD0 __attribute__((sda));
 
 extern void func_L08_00389B68(int, int, u64, int, u64);
 extern int func_00282978(void *);
-extern void func_L08_00300090(void), func_L08_00300100(void), func_L08_003000C0(void);
+extern int func_L08_00300090(void), func_L08_003000C0(void);
+extern void func_L08_00300100(void);
 extern int func_00336D50(void *, int);
 extern void func_00300A00(int, int, float, float, float, float, float);
 extern float func_00282C48(float);
 extern int func_00283D38(int, int, float);
 extern void func_0027EAE8(int, int, int, int, int, void *);
-extern void func_002E5DA0(int, int, void *, int);
+extern int func_002E5DA0(int, int, void *, int);
 extern float func_00283CE0(int), func_002A7798(float), func_L08_003277C0(int, float);
 extern int func_00283CF0(float);
 extern u8 *func_00288FB8(int);
@@ -125,7 +137,7 @@ extern int func_001157AC(void *);
 extern void func_0027F5B8(int, int, u64, u8 *, int);
 extern float func_002ABB18(float), func_00283198(float), func_002A7790(float);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, void *);
+extern int func_0028EA58(int, int, int, int, int, void *);
 extern void func_L08_004207D0(void *);
 #define FL(p,o) (*(float *)((u8 *)(p)+(o)))
 #define IN(p,o) (*(int *)((u8 *)(p)+(o)))
@@ -199,16 +211,12 @@ int func_L08_0041D808(void)
         tex = func_00336D50(D_L08_001A904C+0x8710,0xA8);
         sx = D_001A7340/2;
         { int off = (int)(G(001B199C)*D_L08_001B3244+0.5f);
-  int dead = 0, dead2 = 0;
-  if (D_L08_001B3240 == 1) { dead = 2; dead2 = 3; }
-  do { y = dead; y = dead2; y = off; } while (0); }
+          y = off; }
         func_00300A00(tex,mask&0x60442D00,sx,(D_001A7344/2)+y,1.0f,1.0f,0.0f);
         tex = func_00336D50(D_L08_001A904C+0x8710,0xA9);
         sx = D_001A7340/2;
         { int off = (int)(G(001B199C)*D_L08_001B3244+0.5f);
-  int dead = 0, dead2 = 0;
-  if (D_L08_001B3240 == 1) { dead = 2; dead2 = 3; }
-  do { y = dead; y = dead2; y = off; } while (0); }
+          y = off; }
         func_00300A00(tex,mask&0x55F0C070,sx,(D_001A7344/2)+y,1.0f,1.0f,0.0f);
         delta=FL(player,0x183C)-FL(state,0xA4);
         delta*=0.2f;
@@ -300,9 +308,7 @@ int func_L08_0041D808(void)
                 sprite=func_0028E588(0xEAA2,3);
                 x=func_00283CF0((float)D_001A7340-G(001B1A8C)-dy);
                 { int off = (int)((float)func_00283CF0(G(001B1A88)+(float)G(001B1A74)+(float)SH(state,0x8C)+rise)*D_L08_001B3244+0.5f);
-  int dead = 0, dead2 = 0;
-  if (D_L08_001B3240 == 1) { dead = 2; dead2 = 3; }
-  do { y = dead; y = dead2; y = off; } while (0); }
+          y = off; }
                 w=func_00283CF0(height); h=func_00283CF0(height);
                 func_0028EA58(sprite,x,y,w,h,colors);
             }

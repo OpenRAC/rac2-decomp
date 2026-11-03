@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract review (USA v1.01 only).
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current check.py: 740/740 bytes, 0/2 places, first mismatch +0x34.
+ * Corrected func_00132028, func_L04_002E7C08 and func_002E5E58 to their actual integer returns, and the sound helper object argument to a pointer. Absolute stores, object-loop allocation and row-address association remain different.
+ * Reopen: An evidenced store-address and object-loop lifetime shape, preserving the actual returns.
+ * No linked match or cross-release qualification is claimed. Earlier notes follow.
+ */
 /* func_L04_0040BA68 (740 bytes, levels 04 and 11). Tier opus-1, 28 October 2026.
  * Unit: a -G8 file of its own (e.g. L04_00402D90-<topic>-g8.c, default -g8
  * flags). Not L04_00402D90-g8.c: its earlier plain declaration of
@@ -30,11 +37,13 @@ extern int D_L04_001A8EE4 NOT_SDA, D_L04_001A8ED0 NOT_SDA;
 extern char D_00189E20[] NOT_SDA, D_00138180[] NOT_SDA;
 extern char *D_L04_001B24DC, *D_L04_001B08F4 __attribute__((sda));
 extern char D_L04_002C63C0[] NOT_SDA;
-extern void func_00132AF8(int), func_00132028(void), func_00132B28(int);
+extern void func_00132AF8(int), func_00132B28(int);
+extern int func_00132028(void);
 extern void func_002B72E8(int), func_002B7320(void);
-extern void func_L04_0040A3B8(char *, int), func_L04_002E7C08(int,int);
+extern void func_L04_0040A3B8(char *, int);
+extern int func_L04_002E7C08(int,int);
 extern void func_L04_0040E248(char *, char *), func_L04_0040AC30(char *,char *);
-extern void func_002E5E58(int,int,int);
+extern int func_002E5E58(int,int,void *);
 extern int func_L04_0040A1D0(int);
 void func_L04_0040BA68(char *m, char *p)
 {

@@ -1,22 +1,17 @@
-/* Claude Opus 5.5 (xhigh), v1688, 2026-10-31: 980/972 bytes, 0/1 places in USA v1.01, v2.00 and PAL.
- * Profile: -O2 -G0 -ffunction-sections. Not linked. Declarations it needs are included below.
- * Blocker: retail's 192-byte copy is not reachable from C with this compiler. Retail has
- * lq a1,0(v0); lq a2,0x10(v0); sq a1,0(v1); sq a2,0x10(v1); addiu v0; bne v0,a0; addiu v1 with no
- * alignment pad before its label. That is the shape of a block move: src v0, dst v1, end a0 are what
- * this compiler allocates for a struct copy, and a1/a2 are its reload scratch registers. A struct
- * copy here emits only ld/sd (four scratches per 32 bytes), also with aligned(16) or TI members.
- * The explicit pair loop below differs three ways: local-alloc gives its temps v0/v1 before global
- * allocates the pointers, its LOOP_BEG note adds .p2align 3 (the extra nop), and the second sq moves
- * past the addiu. func_00288870 and func_002DE990 hold the same loop; no matched C reproduces it.
- * Fixed here: state loads in the flip branch's delay slot, the packet setup order, and the
- * mul.s/add.s form of the first edge (first += piece * width). 53 instructions differ after
- * alignment, 63 in the previous draft.
- * Still different outside the copy: mode/primitive swap a0/a1 and band follows into a1; phase takes
- * stack slot 0x160 where retail has 0x168 (retail order: stride 0x160, next band 0x164, phase 0x168,
- * so phase behaves like a pseudo numbered above the loop pass's next band); the band head schedules
- * 0x24 and stride differently; retail builds both table addresses in a1/a2 before the add.s.
- * Reopen when the compiler's block move can emit lq/sq for 16-byte-aligned copies, then recheck the
- * allocation from a plain struct assignment of StripGeometry.
+/* Retained reconstruction, updated 2 November 2026; not a linked match.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Current US check: 972/972 bytes, 0/1 placements, first difference +0x7C.
+ * The faithful assignment of the complete aligned 192-byte StripGeometry now
+ * emits retail's full lq/lq/sq/sq/addiu/bne/addiu copy loop without padding.
+ * This supersedes the earlier block-copy refusal: the maintained compiler's
+ * block_move_quad support is the independently verified changed input.
+ * The 0x200 frame and prologue/copy through +0x78 agree. Remaining differences
+ * include flag-mask/float-zero scheduling, mode/primitive register allocation,
+ * phase spill at 0x160 rather than 0x168 and band/texture-loop address lifetimes.
+ * A real flag snapshot and primitive-before-mode assignment still gave 972
+ * bytes and 0/1, changed packet allocation without improving it, and were
+ * reverted. Two bounded checks; US2/PAL not rerun for this nonmatching body.
+ * Reopen on independent packet-field and phase/loop lifetime evidence.
  */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
@@ -39,21 +34,13 @@ extern void func_00280B90(void *, void *, int);
 
 void func_L02_003E7B58(char *actor) {
     StripGeometry geometry;
-    Quad *dst = (Quad *)&geometry;
-    Quad *src = (Quad *)&D_L02_002A52F0;
     StripPacket packet;
     float sample[4] __attribute__((aligned(16)));
     char *state;
     float *phase;
     float flip;
     int band, piece;
-    do {
-        Quad first = src[0], second = src[1];
-        dst[0] = first;
-        dst[1] = second;
-        src += 2;
-        dst += 2;
-    } while (src != (Quad *)(&D_L02_002A52F0 + 1));
+    geometry = D_L02_002A52F0;
     flip = 0.0f;
     state = *(char **)(actor + 0x68);
     if (*(unsigned short *)(actor + 0x34) & 0x8000) flip = 1.0f;

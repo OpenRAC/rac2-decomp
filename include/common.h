@@ -56,6 +56,9 @@ static __inline__ void qzero_nc(void *dst) {
  */
 static __inline__ void CpuSync(void) { __asm__ __volatile__("sync"); }
 
+/* Enable EE interrupts, as in rac1-decomp's shared hardware primitives. */
+static __inline__ void CpuEnableInt(void) { __asm__ __volatile__("ei"); }
+
 /* RAC1's non-clobbering variant: callers must establish that surrounding C
  * accesses do not depend on the copied memory. Keep qcopy as the default.
  */

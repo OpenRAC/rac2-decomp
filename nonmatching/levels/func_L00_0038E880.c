@@ -1,3 +1,4 @@
+/* 2 November 2026: retained 1944/1952 bytes, 0/27 US placements with the current default game compiler. Correct the ignored pointer returns of func_00308600 and func_002BF728, and the integer return of func_002E5DA0, from their current matched definitions. Evaluate the random lifetime before the second weapon-table read, as retail does; this fixes that call/read ordering without a barrier. Channel halving through a shared unsigned local expands to 1980 bytes and is not retained. Remaining: colour packing/spills, height-plus-half hoisting and register allocation. No complete match. */
 /* 1 November 2026 (closer a3): 93 words, 1944/1952 with a pointer local for the second table read (no madd). The
  * colours: `int r = 96;` as the only variable with literal g, b, a gives retail's first loop exactly (hoisted
  * 0x167F6000 and 0x7F6000, ori 0x60 in the body), 1932 bytes until the rest fits. Retail's second loop: 0x7F006000 and
@@ -63,10 +64,10 @@ extern void func_00282F20(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 extern float func_002A7878(float, float);
 extern int func_002A7820(int, int);
-extern void func_00308600(void *, void *, int, int, int);
+extern void *func_00308600(void *, void *, int, int, int);
 extern float func_002A90F8(char *, char *);
-extern void func_002BF728(char *, char *, float, float);
-extern void func_002E5DA0(int, int, void *, int);
+extern void *func_002BF728(char *, char *, float, float);
+extern int func_002E5DA0(int, int, void *, int);
 extern float func_002A89A8(void *, int, float);
 extern float func_002A8A20(void *);
 extern float func_002A7940(void);
@@ -78,7 +79,7 @@ extern void *func_002BCB00(float, void *, void *, int, int, int, int, int, int, 
 extern void *func_00312B70(void *, void *, int, void *);
 extern void func_0029F338(void *);
 
-static __inline__ int BurstColor(int r, int g, int b, int a)
+static __inline__ unsigned int BurstColor(unsigned int r, unsigned int g, unsigned int b, unsigned int a)
 {
     return r | (g << 8) | (b << 16) | (a << 24);
 }
@@ -99,6 +100,7 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
     {
         int i;
         for (i = 9; i >= 0; --i) {
+            int lifetime;
             random.q = 0;
             random.f[0] = func_002A7878(-1.0f, 1.0f);
             random.f[1] = func_002A7878(-1.0f, 1.0f);
@@ -109,8 +111,9 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
             func_00282CC0(&shard, &shard, &projected);
             func_00282F20(&shard, &shard, scale * func_002A7878(3.5f, 6.5f) * (1.0f / 60.0f));
             func_00282CC0(&shard, &shard, velocity);
+            lifetime = func_002A7820(60, 120);
             w = &D_L00_00262570[D_00139568[12]];
-            func_00308600(object + 0x10, &shard, func_002A7820(60, 120), 0,
+            func_00308600(object + 0x10, &shard, lifetime, 0,
             w->enabled != 0);
         }
     }

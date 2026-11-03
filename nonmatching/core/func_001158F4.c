@@ -1,3 +1,7 @@
+/* 2 November 2026 retail recheck; this supersedes conflicting historical notes below.
+ * Fresh US neighborhood startsCDCDCDCD after preceding return. Actual strncmp entry+4=1158F8 is reached by direct external calls299368,299384, contradicting stale no-external-witness blocker. Public upstream assembly identity remains historical evidence, and body contains actual packed psubb/pand/pcpyud instructions beyond plain C. Reopen on reviewed4-byte entry correction and independent upstream assembly classification; no C candidate or ASM_FUNC change.
+ * No matching credit, generator change or ASM_FUNC classification.
+ */
 /* from src/core/00115200.c: two things, both about the row itself.
  *
  * 1. The row starts four bytes early, in the linker fill. The first word of

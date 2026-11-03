@@ -657,9 +657,9 @@ void func_0034FBC8(void *object) {
 
 /* func_0034FE18 is in 0034CEA0-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0034FFC0);
+/* func_0034FFC0 is defined in 0034FFC0.c. */
 
-INCLUDE_ASM("asm/game", func_00350190);
+/* func_00350190 is defined in 00350190.c. */
 
 extern int func_001261F0(int);
 extern int D_001A7BB8 __attribute__((sda));

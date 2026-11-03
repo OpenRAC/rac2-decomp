@@ -204,7 +204,7 @@ void func_L04_00412E38(void *arg0, void *arg1, float fparg0, float fparg1) {
     *(float *)((unsigned char *)arg0 + 0xF4) = temp_f1;
 }
 
-INCLUDE_ASM("asm/levels", func_L04_004135B8);
+/* func_L04_004135B8 is defined in L04_004135B8-g8.c. */
 
 
 INCLUDE_ASM("asm/levels", func_L04_00414698);

@@ -1,3 +1,4 @@
+/* 2 November 2026: retained 792/792 bytes, 0/27 US placements. func_L00_002C42E0 returns int (its matched state-machine definition explicitly returns a status), not void. Correcting that declaration fixes the attachment-publication store in the call delay slot. The initial hero-base register and byte/halfword-store schedule still differ. A typed appearance view and a scoped hero pointer tie the corrected bytes; retain the simpler existing view. No complete match. */
 /* 1 November 2026: 12 words: every order of the six entry stores ties (hi part $v0 here, $v1 in retail), and the attachment store sits before the func_L00_002C42E0 arguments where retail has it in the slot. */
 /* GPT-6.1 Sol (high), 29 October 2026: retained near miss, not linked.
  * USA v1.01, -O2 -G8 -ffunction-sections: 792/792 bytes, 0/27 places;
@@ -42,7 +43,7 @@ extern s32 func_002AD0B0(u8 *);
 extern float func_00282DF0(void *);
 extern void func_L00_00390E10(void *), func_002A0F48(void *);
 extern char *func_L00_004282F0(void *);
-extern void func_L00_002C42E0(int a0, int a1);
+extern int func_L00_002C42E0(int a0, int a1);
 extern void func_00282A60(void *, int, int), func_0029F978(u8 *, u32, u8 *);
 extern char *func_L00_00395240(char *);
 extern void func_002AB650(u8 *);
@@ -88,8 +89,11 @@ char *func_L00_00390FF8(char *owner, char *position, float yaw, float pitch) {
         state->lifetime = 3000;
         func_L00_00390E10(actor);
         func_002A0F48(actor);
-        state->attachment = func_L00_004282F0(actor);
-        func_L00_002C42E0(28, 1);
+        {
+            char *attachment = func_L00_004282F0(actor);
+            state->attachment = attachment;
+            func_L00_002C42E0(28, 1);
+        }
         func_00282A60(state->matrix24, 0, 64);
         func_00282A60(state->matrix28, 0, 64);
         func_0029F978((u8 *)actor, 0, state->matrix24);

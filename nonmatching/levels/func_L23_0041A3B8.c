@@ -1,3 +1,9 @@
+/* 2 November 2026: the current matched helpers 00422540, 004280D8 and
+ * 0032C700 return pointers. Their truthful returns and the explosion helper's
+ * final owner pointer are retained below. The measured G8/no-split profile
+ * remains 652/652 bytes, 0/1 US places, with the same sound-tail branch at +0xC8.
+ * This interface repair does not close the scheduler/control-flow difference.
+ */
 /* Closer B, 2026-11-01. Without the goto (arm ends in its own func_L00_0035F5A0(0x21, 0, 0); return 1)
  * the branch is retail's, and only the la is late. rank_for_schedule at the frame setups: priority and
  * class tie, so the count of dependents decides: la 3 (jump, a0=0x21, call), a1/a2 4 (those, plus the
@@ -62,13 +68,13 @@ extern void func_00282F20(char *, char *, float);
 
 extern void func_00282CF0(char *, char *, char *);
 
-extern void func_L23_00422540(char *, char *, float *);
+extern char *func_L23_00422540(char *, char *, float *);
 
-extern void func_L23_004280D8(char *, char *, char *, int, float);
+extern unsigned char *func_L23_004280D8(char *, char *, char *, int, float);
 
 extern void func_L00_0035F5A0(int, int, int);
 
-extern void func_0032C700(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_0032C700(char *, int, int, int, int, int, int, int, float, float, int, int, int, char *);
 
 extern void func_L23_0041BF18(char *, float, float);
 

@@ -80,7 +80,7 @@ Say which in the commit. A function that is merely hard is a near miss, not hand
 ## When to stop on a function
 
 Some functions cannot be matched from C, and some have cost enough. Know which before another
-attempt; OpenRAC's `docs/workflow/BACKFILL.md` has the measurements and the full procedure.
+attempt; OpenRAC's `docs/port/BACKFILL.md` has the measurements and the full procedure.
 
 - **Not a function.** Establish from the surrounding retail bytes that the catalogue split off
   an internal fragment or padding before proposing a fix in `tools/levels.py`. A missing
@@ -157,7 +157,8 @@ each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
   prototype discs may be cited, naming the build, never as the evidence for a match. OpenRAC's
   docs/policy/SOURCING.md is the full policy.
 - **Follow RAC1's source practices.** Game functions use meaningful C and the reviewed
-  shared EE helpers in `include/common.h` (`qcopy`, `qcopy_nc`, `qzero`, `qzero_nc`). Do not paste
+  shared EE helpers in `include/common.h` (`qcopy`, `qcopy_nc`, `qzero`, `qzero_nc`,
+  `CpuSync`, `CpuEnableInt`). Do not paste
   instruction sequences into individual game functions. Public runtime-library target
   primitives (for example GCC's original `longlong.h` multiplication primitive) may be
   retained with their upstream provenance and licence, as in RAC1. Symbol aliases and

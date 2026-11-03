@@ -1,3 +1,8 @@
+/* 2 November 2026, remaining-function review: nonmatching; no linked credit.
+ * Profile: -O2 -G8 -ffunction-sections -g -mno-split-addresses.
+ * US check: 1288/1300 bytes, 0/28 placements.
+ * Matched002B6D28 and002B49E0 return signed int. Correcting both ignored results ties at 1288/1300,0/28. Mixed macro/GP/split data address and camera lifetime still differ.
+ */
 /* GPT-6.1 Sol worker v0614, 28 October 2026. Not linked.
  * Profile: -O2 -G8 -ffunction-sections -g -mno-split-addresses.
  * Retained: 1288/1300 bytes, 0/28 places; separate early wait arm was
@@ -27,7 +32,8 @@ extern CameraState D_001A63A8, D_001B5200;
 extern float D_001B90F0 NOT_SDA;
 extern short D_0018A000;
 extern int func_00282978(short *);
-extern void func_002B6D28(void), func_00283360(void *), func_0027AB40(void);
+extern int func_002B6D28(void);
+extern void func_00283360(void *), func_0027AB40(void);
 extern float func_00283B98(float,float), func_00283198(float), func_00283180(float), func_00283CE0(int);
 extern int func_00283CF0(float);
 extern void func_0027D098(void (*)(void),int);
@@ -35,7 +41,7 @@ extern void func_002FFCF8(void), func_002FFFE0(void), func_002FF3F8(void);
 extern void func_002FF968(char *), func_002FFD78(char *);
 extern char *func_002FFB68(char *);
 extern void func_00287EB0(int), func_00288508(int), func_002AD860(int);
-extern void func_002B49E0(int,int,int,int,int);
+extern int func_002B49E0(int,int,int,int,int);
 void func_002FF450(void)
 {
     char *object;

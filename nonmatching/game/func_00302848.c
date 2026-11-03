@@ -1,3 +1,8 @@
+/* 2 November 2026, remaining-function review: nonmatching; no linked credit.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * US check: 468/468 bytes, 0/28 placements.
+ * Both particle constructors return pointers in their matched production definitions. Correcting the ignored returns preserves the same 468-byte object and +0x174 first mismatch; call-argument/address scheduling remains.
+ */
 /* func_00302848 (468 bytes, 28 places), closer M2: 464 bytes under
  *     -O2 -G8 -ffunction-sections   (no -mno-split-addresses needed)
  * Fixed against the earlier draft: func_002A77E0 takes one argument (every caller passes
@@ -44,14 +49,14 @@ extern s32 D_001AE90C[4] __attribute__((sda));
 extern float D_001AE8F8[4] __attribute__((sda));
 
 extern s32 func_002A77E0(s32);
-extern void func_002C2210(char *, float, float, s32, s32, float, s32, s32, char *, s32);
+extern void *func_002C2210(char *, float, float, s32, s32, float, s32, s32, char *, s32);
 extern char *func_002C2FD8(char *, s32, s32, s32, s32, s32, s32, float);
 extern void func_002A7A00(void *, float, float);
 extern void func_00282CC0(void *, void *, char *);
 extern float func_002A7878(float, float);
 extern s32 func_002A7820(s32, s32);
 extern s32 func_00283D38(s32, s32, float);
-extern void func_002C3150(void *, void *, int, unsigned char, unsigned char, int, float);
+extern void *func_002C3150(void *, void *, int, unsigned char, unsigned char, int, float);
 
 /* Spawns the object's trail puff; when not suppressed and flag one of the resident word is set it also emits the tinted streak. */
 void func_00302848(char *obj, s32 quiet)

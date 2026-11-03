@@ -10,5 +10,5 @@ int func_00131400(void *arg)
     return 0;
 }
 
-INCLUDE_ASM("asm/core", func_00131424);
+/* func_00131424 is defined in 00131424-sqrt.c. */
 

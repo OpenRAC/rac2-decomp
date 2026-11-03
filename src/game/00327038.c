@@ -534,7 +534,7 @@ void func_0032A978(void)
 
 /* func_0032AE30 is a near miss: see nonmatching/game/func_0032AE30.c. */
 
-INCLUDE_ASM("asm/game", func_0032AE30);
+/* func_0032AE30 is in 0032AE30-qcopy.c. */
 
 
 

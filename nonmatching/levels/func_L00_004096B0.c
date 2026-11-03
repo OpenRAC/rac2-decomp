@@ -1,3 +1,9 @@
+/* 2 November 2026:
+ * Correct func_0032C700 to return its allocated object pointer. Retained 1944/1944 bytes, 0/27
+ * US placements. Moving the range field ahead of radius does not repair the float-constant/store
+ * schedule and is not retained. The small shape-copy HIGH register, range initialization and PRE
+ * spill reloads remain the next constraints. No complete match.
+ */
 /* 1 November 2026 (closer a3): 1944/1944, 28 words, profile -O2 -G8 -ffunction-sections -frac2-hazard-labels -g
  * -frac2-zero-ti-por. From 94 with: no pointer locals for state + 0x10 / + 0x20 (PRE's reaching copies are the two
  * spilled slots 0x11C and 0x120, and s0 is reload's register for the first, inherited over the three calls), plain
@@ -112,7 +118,7 @@ extern int func_002E5CF8(int, int, char *);
 extern int func_00282978(void *);
 extern void func_002A8E20(void *, CollisionImpact *);
 extern void func_0032D758(void *, int, void *);
-extern void func_0032C700(void *, int, int, int, int, int, int, int,
+extern char *func_0032C700(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
 extern void func_002FEE50(int);
 extern void func_0029F338(void *);

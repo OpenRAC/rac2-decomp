@@ -1,3 +1,10 @@
+/* 2 November 2026: retained nonmatching C; no linked matching credit.
+ * Profile: -O2 -G8 -ffunction-sections -g.
+ * USA v1.01 check: 5132/5120 bytes, 0/2 placements.
+ * Matched func_002E4AC8, func_L04_002E7C08 and func_L01_00355BA0 return signed int. Correcting
+ * their ignored results leaves 5132/5120 bytes and 0/2 placements. Seven reset-store scheduling
+ * and hero-state/branch-likely timing remain. No linked or native-runtime validation.
+ */
 /* func_L04_00419918: near miss, 5132/5120 bytes, 0 of 2 places (USA v1.01, 1 November 2026).
 
    Profile: its own `-g8` unit, `-O2 -G8 -ffunction-sections -g` (-g for the nop pair before
@@ -69,7 +76,7 @@ extern Quad D_L04_001BFAF0;
 extern float D_L04_001BDC30;
 extern void func_L00_002B30E8(void);
 extern void func_L00_002B9D60(void *, void *, int, int);
-extern void func_L04_002E7C08(int, int);
+extern int func_L04_002E7C08(int, int);
 extern void func_00272198(float);
 extern int func_00277258(void *, int, void *, float);
 extern void func_0027AB40(void);
@@ -101,13 +108,13 @@ extern int func_002B38B8(void *);
 extern void func_L01_00323310(int, int);
 extern void func_002C96F8(float, float, void *, void *, void *, void *);
 extern void func_002DF3F8(void *, void *);
-extern void func_002E4AC8(void);
+extern int func_002E4AC8(void);
 extern int func_002E59B0(void *, int);
 extern void func_002E59F8(int);
 extern int func_002E5CF8(int, int, void *);
 extern int func_002E5E58(int, int, void *);
 extern int func_L00_0035F5A0(int, int, void *);
-extern void func_L01_00355BA0(int, int);
+extern int func_L01_00355BA0(int, int);
 extern void func_L00_003672F8(void);
 extern int func_L04_00400AB0(void *, void *, int);
 extern int func_L04_0040A1D0(int);

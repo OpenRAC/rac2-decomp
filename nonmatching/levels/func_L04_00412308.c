@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 faithful-contract review, US object checks only.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current check.py: 2032/2032 bytes,0/2 places,first+0xF0.
+ * Restored actual int returns of func_00132028 and func_0029B3E0. Counter/temp allocation and global/address scheduling remain.
+ * Reopen: Independent race-state/global type and address-class evidence.
+ * No linked or cross-release match is claimed; earlier records follow.
+ */
 /* GPT-6.1 Sol (high), 2026-10-29: retained near miss, no matching credit.
  * USA v1.01, default game -O2 -G8 -ffunction-sections (a dedicated -g8.c unit).
  * check.py: 2032/2032 bytes, 0/2 places; instruction at +0xF0 differs.
@@ -66,8 +73,9 @@ extern void func_L04_0040E248(u8 *,u8 *);
 extern void func_L04_0040A2B8(int), func_L04_0040A220(int);
 extern int func_L04_0040A1D0(int), func_L04_0040A268(int);
 extern void func_L01_00323310(int,int);
-extern void func_00132AF8(int), func_00132028(void);
-extern void func_0029B3E0(int,int);
+extern void func_00132AF8(int);
+extern int func_00132028(void);
+extern int func_0029B3E0(int,int);
 extern void func_00282CF0(void *,void *,void *);
 extern float func_L00_002EE290(void *);
 extern int func_002A77E0(int),func_002A7820(int,int);

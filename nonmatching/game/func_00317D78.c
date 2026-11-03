@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract review (USA v1.01 only).
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Current check.py: 1132/1128 bytes, 0/2 places.
+ * Corrected func_002B60B0 to its actual pointer return. The qcopy source self+0x10 remains live in an extra saved register; allocation and initialization stores still differ.
+ * Reopen: A real source lifetime that rematerializes self+0x10 after the copy, not another tied qcopy spelling.
+ * No linked match or cross-release qualification is claimed. Earlier notes follow.
+ */
 /* sol-high v0883 retained attempt, USA v1.01, default game compiler profile.
  * Recompiled on upstream pinned compiler: 1132/1128 bytes, 0/2 places.
  * Qualified native TI qcopy/barrier and -fno-gcse retain the same s4 lifetime.
@@ -29,7 +36,7 @@ extern char *D_001B1B5C __attribute__((sda));
 extern float func_00282E48(void *, void *);
 extern int func_00283CF0(float);
 extern float func_002A78D8(float, float);
-extern void func_002B60B0(char *, float, float, float, float);
+extern void *func_002B60B0(char *, float, float, float, float);
 extern int func_002A77E0(int);
 extern void func_002A7750(char *, int, int);
 extern void func_002A7470(char *, int, int, int);

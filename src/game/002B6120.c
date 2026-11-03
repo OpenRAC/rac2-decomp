@@ -193,8 +193,9 @@ extern void func_0011AED0(int);
    the screen context + 0xC0, 0x25 from D_001A6AF0), counts the frame at D_001B8840 + 0x34,
    lets one of two builders append, then ends the chain and hands it to func_0011AED0.
    The cursor is an integer address, so each word stored through it may alias it and it
-   is read again before every store. */
-void func_002B6480(unsigned int *packet)
+   is read again before every store. The movie callers also supply a mode word;
+   this implementation does not consume it. */
+void func_002B6480(void *packet, int unusedMode)
 {
     D_001B22A8 = (unsigned int)packet;
     *(unsigned int *)(D_001B22A8 + 0x00) = 0x30000009;

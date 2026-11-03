@@ -1,3 +1,4 @@
+/* 2 November 2026: retained 1008/1016 bytes, 0/2 US placements. Profile: -O2 -G0 -ffunction-sections -frac2-zero-ti-por -g, without -frac2-qcopy. A frame of the actual vectors and hit record gives the retail 0xE0 frame and from/w/v offsets 0x50/0x60/0x70. Reviewed qcopy handles the register-address transfers; ordinary TI assignments preserve the offset-based owner and stack copies. func_L04_00358AE8 returns its allocated particle, not void. Pack alpha through unsigned arithmetic. The former scalar/array forms gave 1012/1020 bytes; a shared null/non-null store gave 1000 and is not retained. Allocation, branch shape and scheduling still differ; no match. */
 /* func_L04_003F9320: near miss, 1012/1016 bytes, 0 of 2 places (USA v1.01, 31 October 2026).
 
    Profile: its own unit, `-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-zero-ti-por -g`
@@ -44,7 +45,7 @@ extern float func_00282DF0(void *);
 extern void func_00282F20(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 extern int func_002A7820(int, int);
-extern void func_L04_00358AE8(void *, void *, int, int, float);
+extern u8 *func_L04_00358AE8(void *, void *, int, int, float);
 extern void func_L04_003F9C60(u8 *, int);
 extern void func_0029F338(void *);
 extern void *func_L04_00358868(void *, float, int, int, int);
@@ -59,12 +60,14 @@ extern int func_00283CF0(float);
    Returns the object, or 0. */
 u8 *func_L04_003F9320(u8 *owner, Quad *pos, Quad *dir, s32 target)
 {
-    f32 p[4] __attribute__((aligned(16)));
-    f32 d[4] __attribute__((aligned(16)));
-    Hit3F9320 t __attribute__((aligned(16)));
-    Quad from;
-    f32 w[4] __attribute__((aligned(16)));
-    f32 v[4] __attribute__((aligned(16)));
+    struct {
+        f32 p[4] __attribute__((aligned(16)));
+        f32 d[4] __attribute__((aligned(16)));
+        Hit3F9320 t __attribute__((aligned(16)));
+        Quad from;
+        f32 w[4] __attribute__((aligned(16)));
+        f32 v[4] __attribute__((aligned(16)));
+    } frame;
     f32 *pp;
     f32 *dp;
     u8 *obj;
@@ -74,10 +77,10 @@ u8 *func_L04_003F9320(u8 *owner, Quad *pos, Quad *dir, s32 target)
     f32 e;
     int i;
 
-    pp = p;
-    dp = d;
-    *(Quad *)pp = *pos;
-    *(Quad *)dp = *dir;
+    pp = frame.p;
+    dp = frame.d;
+    qcopy(pp, pos);
+    qcopy(dp, dir);
     obj = func_0029EFD0(0xABC);
     if (obj != 0) {
     st = *(u8 **)(obj + 0x68);
@@ -89,36 +92,36 @@ u8 *func_L04_003F9320(u8 *owner, Quad *pos, Quad *dir, s32 target)
     *(s32 *)(obj + 0xF0) = 0;
     *(f32 *)(obj + 0xF4) = -func_00283248(func_00282E20(dp), dp[2]);
     *(f32 *)(obj + 0xF8) = func_00283248(dp[0], dp[1]);
-    *(Quad *)(obj + 0x10) = *(Quad *)pp;
-    *(Quad *)st = *(Quad *)dp;
+    qcopy(obj + 0x10, pp);
+    qcopy(st, dp);
     *(s32 *)(st + 0x14) = target;
     *(s32 *)(st + 0x10) = target;
-    t.owner = *(s32 *)(st + 0x18);
-    t.flags = 0x30000;
-    t.scale = 13.0f;
-    t.extra = 1;
-    *(Quad *)t.v = *(Quad *)st;
-    func_00282F70(&t, &t, 1.0f);
-    t.v[3] = 5627.9248046875f;
-    t.mode = 1;
-    t.v[2] = 1.0f;
-    t.kind = 1;
-    t.source = *(u16 *)(obj + 0xAA);
-    from = *(Quad *)(owner + 0x10);
-    ((f32 *)&from)[2] = pp[2];
-    if (func_002761F8(&from, pp, 0, owner, &t)) {
-        *(Quad *)(obj + 0x10) = D_L04_001BFAE0;
+    frame.t.owner = *(s32 *)(st + 0x18);
+    frame.t.flags = 0x30000;
+    frame.t.scale = 13.0f;
+    frame.t.extra = 1;
+    qcopy(frame.t.v, st);
+    func_00282F70(&frame.t, &frame.t, 1.0f);
+    frame.t.v[3] = 5627.9248046875f;
+    frame.t.mode = 1;
+    frame.t.v[2] = 1.0f;
+    frame.t.kind = 1;
+    frame.t.source = *(u16 *)(obj + 0xAA);
+    frame.from = *(Quad *)(owner + 0x10);
+    ((f32 *)&frame.from)[2] = pp[2];
+    if (func_002761F8(&frame.from, pp, 0, owner, &frame.t)) {
+        qcopy(obj + 0x10, &D_L04_001BFAE0);
         for (i = 4; i >= 0; i--) {
-            *(Quad *)v = 0;
-            v[0] = func_002A7878(-1.0f, 1.0f);
-            v[1] = func_002A7878(-1.0f, 1.0f);
-            v[2] = func_002A7878(-1.0f, 1.0f);
-            *(Quad *)w = *(Quad *)v;
-            func_00283028(v, st, D_L04_001BFB00);
-            func_00282F20(w, w, func_00282DF0(v) * 0.5f);
-            func_00282CC0(v, v, w);
-            func_00282F20(v, v, func_002A7878(0.05000000447f, 0.10000000894f));
-            func_L04_00358AE8(obj + 0x10, v, 0x7F2F4F6F, func_002A7820(10, 15), 15000.0f);
+            *(Quad *)frame.v = 0;
+            frame.v[0] = func_002A7878(-1.0f, 1.0f);
+            frame.v[1] = func_002A7878(-1.0f, 1.0f);
+            frame.v[2] = func_002A7878(-1.0f, 1.0f);
+            *(Quad *)frame.w = *(Quad *)frame.v;
+            func_00283028(frame.v, st, D_L04_001BFB00);
+            func_00282F20(frame.w, frame.w, func_00282DF0(frame.v) * 0.5f);
+            func_00282CC0(frame.v, frame.v, frame.w);
+            func_00282F20(frame.v, frame.v, func_002A7878(0.05000000447f, 0.10000000894f));
+            func_L04_00358AE8(obj + 0x10, frame.v, 0x7F2F4F6F, func_002A7820(10, 15), 15000.0f);
         }
         func_L04_003F9C60(obj, 0);
         func_0029F338(obj);
@@ -135,7 +138,7 @@ u8 *func_L04_003F9320(u8 *owner, Quad *pos, Quad *dir, s32 target)
         *(f32 *)(q + 0xC) = func_002A7878(15000.0f, 25000.0f);
         e = func_002A7AA8(-1.5f, 0.0f, 1.0f, 0.0f, func_00283CE0(i) / func_00283CE0(16));
         *(f32 *)(q + 0xC) = *(f32 *)(q + 0xC) + (8000.0f - *(f32 *)(q + 0xC)) * e;
-        *(u32 *)(q + 4) = (func_00283CF0(e * -64.0f + 128.0f) << 24) | 0xFFFFFF;
+        *(u32 *)(q + 4) = ((u32)func_00283CF0(e * -64.0f + 128.0f) << 24) | 0xFFFFFF;
         *slot = q;
     }
     }
