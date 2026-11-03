@@ -813,6 +813,7 @@
 #define SetDeathBits                     func_002A6C58
 #define UpdateVisibilityBitmap           func_0027A288
 #define UpdateBeamLinkEmitter            func_L09_003F04D0
+#define UpdateBreakablePickupSpawner     func_L19_004203F0
 #define PlacePointWithPolarJitterFlat    func_L11_0043ACB0
 #define LayOutVerletChain                func_L11_00438248
 #define SpawnStateVectorMoby             func_L11_004349F8
@@ -834,6 +835,12 @@
 #define DrawParticleGlows                func_00328B68
 #define UpdateWaterSheet                 func_L01_003BB9D0
 #define DrawWavyBeamToTarget             func_L02_004129D0
+#define UpdateHomingCollectible          func_L19_00423548
+#define UpdateGornController             func_L15_0042DCE0
 #define DrawGlowBillboardPair            func_L08_0042A980
+#define UpdateMuseumParticleTester       func_L30_004186B0
+#define UpdateLinkedMobyController       func_L17_0041F478
+#define UpdateProximityPickup            func_L17_0041ED58
+#define UpdateTriggeredAnchorMover       func_L17_003C3C50
 
 #endif /* NAMES_H */

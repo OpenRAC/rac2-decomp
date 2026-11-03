@@ -328,3 +328,98 @@ void func_L11_004484A8(JobObject *object)
         func_L11_00448DF8(object);
     }
 }
+
+extern void func_002B60B0(char *, float, float, float, float);
+extern void func_L11_00452DF8(void *);
+extern void func_0029FCC0(void *, int, void *);
+extern void func_0029FC20(void *, int, void *);
+extern void func_00282C88(void *);
+extern void func_002830C0(void *, void *, void *);
+extern s32 func_002B3BA8(void *, s32, s32, s32, float, float);
+
+/* Per-frame update of an L11 object: on its first frame it seeds its state block (a random-sign
+   turn rate of 15 to 40 degrees, the 0.5/0.4 constant set) and runs its setup; then it sets the
+   proximity flag, rebuilds the frame at state + 0x290 and, from stage 3 on, runs its hit, death
+   and tracking checks. */
+void func_L11_00452450(char *object)
+{
+    char *state = *(char **)(object + 0x68);
+    char *aim;
+    char *hit;
+    char *source;
+    float matrix[16];
+    float turnRate;
+    s16 kind;
+
+    if (*(u8 *)(object + 0x20) == 0) {
+        *(char **)(state + 0x18) = state + 0x100;
+        turnRate = func_002A7878(15.0f, 40.0f) * 0.017453294f;
+        if (func_002A77E0(2) != 0)
+            turnRate = -turnRate;
+        *(f32 *)(state + 0x2C8) = turnRate;
+        if (func_002A77E0(2) == 1)
+            *(u16 *)(object + 0x34) |= 0x8000;
+        *(u8 *)(state + 0x48) = func_00283CF0(15.0f);
+        *(u8 *)(state + 0x4A) = func_00283CF0(12.0f);
+        *(u8 *)(state + 0x60) = 0xB;
+        *(s32 *)(state + 0x98) = 4;
+        *(f32 *)(state + 0x100) = 0.8f;
+        *(f32 *)(state + 0x104) = *(f32 *)(state + 0x84) = *(f32 *)(state + 0x80) = 0.5f;
+        *(f32 *)(state + 0x10C) = *(f32 *)(state + 0x108) = *(f32 *)(state + 0x8C) = 0.4f;
+        *(f32 *)(state + 0x110) = 1.5707965f;
+        *(f32 *)(state + 0x130) = 0.52359885f;
+        *(f32 *)(state + 0x12C) = 0.0055555557f;
+        *(f32 *)(state + 0x134) = 2.8f;
+        func_002B60B0(object, 0.004444444552063942f, 0.13333334028720856f,
+                      0.0011635529808700085f, 0.10471977293491364f);
+        *(u8 *)(state + 0x28) = 3;
+        func_L11_00452DF8(object);
+    }
+    if (*(s16 *)(state + 0x2D8) == 0 && *(u8 *)(object + 0x20) != 0xC && D_001A8FF4 == 0) {
+        *(u16 *)(object + 0x34) |= 0x400;
+        if (*(u8 *)(object + 0x31) != 0 && func_00282E48(object + 0x10, D_L11_001BA8C0) < 24.0f) {
+            func_002A93B0(object);
+            *(u8 *)(object + 0x6F) = 0x16;
+        }
+    } else {
+        *(u16 *)(object + 0x34) &= 0xFBFF;
+    }
+    aim = state + 0x290;
+    func_0029FCC0(object, 1, state + 0x270);
+    func_0029FCC0(object, 2, state + 0x280);
+    func_0029FC20(object, 3, matrix);
+    func_00282C88(aim);
+    *(s32 *)(state + 0x298) = 0;
+    *(f32 *)(state + 0x290) = 0.25f;
+    func_002830C0(aim, aim, matrix);
+    func_00282CC0(aim, aim, matrix + 12);
+    if (*(u8 *)(object + 0x20) >= 3) {
+        hit = (char *)func_002A9640(object, 0x10000, 1);
+        if (hit != 0) {
+            source = *(char **)(hit + 0x20);
+            if (source != 0 && *(u8 *)(object + 0x31) == 0) {
+                kind = *(s16 *)(source + 0xAA);
+                if (kind == 0xA03 || kind == 0xB89)
+                    *(s32 *)(hit + 0x2C) = 0;
+            }
+        }
+        if (func_002B0ED8(object, state + 0x50, 0) == 5) {
+            *(s32 *)(state + 0xE0) = 0;
+            *(f32 *)(state + 0xE4) = 0.8377582f;
+        }
+        if (*(s16 *)(state + 0x2D8) != 0) {
+            char *pos;
+            func_00283698(state + 0x230, object + 0xC0);
+            pos = object + 0x10;
+            func_002AFFD8(pos, state + 0x260, 0);
+            if (func_L11_004461C0(*(s32 *)(object + 0xB8), pos) == 0) {
+                *(s32 *)(state + 0x20) = 0;
+                func_002A7750(object, 0xC, 4);
+            }
+        }
+        if (*(u8 *)(object + 0x20) >= 2 && *(u8 *)(state + 0x2E) == 2)
+            func_L11_00452DF8(object);
+        *(s16 *)(state + 0x2D0) = func_002B3BA8(object, *(s32 *)(state + 0x2CC), 0, 0, 100.0f, 100.0f);
+        *(s32 *)(state + 0x2C4) = *(s32 *)(state + 0x220);
+    }
+}

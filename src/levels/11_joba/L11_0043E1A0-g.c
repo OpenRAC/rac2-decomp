@@ -1,23 +1,4 @@
-/* GPT-6.1 Sol (high), 29 October 2026; retained near miss, not linked.
- * Profile: -O2 -G0 -ffunction-sections -g, current pinned compiler/assembler.
- * Best check.py: 1068 compiled / 1068 retail bytes, 0 of 1 US placements.
- * Six instructions differ at +0x60, +0x64, +0x74, +0x7c, +0x8c, +0x90:
- * the entry branch speculates the class-counter clear, swapping it with the
- * FP zero, and the history-energy base is established before the zero FP copy.
- * The entire member scan and weighted-history tail otherwise align, including
- * the strided history base copies and class-specific detail-pointer registers.
- * A typed health view and separate immutable group-list/iterator recover the
- * scan allocation. Struct history fields, inline modulo expressions and named
- * weighted terms recover the loop. The table-base alias preserves tied absolute
- * loads without changing other functions' existing declarations.
- * Debug line layout matters: the denominator has its own line; reciprocal and
- * first weighted term share a line. This emits retail's single pre-div.s nop.
- * Without -g the best equivalent body is 1064 bytes and lacks that nop; separating
- * the reciprocal and first term under -g emits two nops (1072 bytes).
- * Three entry wordings tied: nested/compound gate, initialization order, typed
- * class-count field. Stop here; next useful work needs new entry-scheduling evidence.
- * All required declarations are below; no linked build was run for this near miss.
- */
+#include "include_asm.h"
 #include "common.h"
 
 #define S16(p,o) (*(short *)((p)+(o)))
@@ -25,12 +6,14 @@
 #define I32(p,o) (*(int *)((p)+(o)))
 #define F32(p,o) (*(float *)((p)+(o)))
 extern u8 *D_L11_001FC420[];
-extern u8 *D_L11_001B359C;
-extern u8 *D_L11_001B359C_base[] __asm__("D_L11_001B359C") __attribute__((sda));
+extern u8 *D_L11_001B359C __attribute__((section(".sdata")));
 extern u8 D_00189E20[];
 extern void func_L11_00445DF8(u8 *, int, float, float);
 extern int func_L00_0035F5A0(int, int, int);
 extern int func_00282978(short *);
+/* Tallies the group's living members and their health, records the losses in
+ * the four-slot history and stores their weighted sum at 0x14C. Built with -g:
+ * the debug line layout gives retail's single nop before div.s. */
 void func_L11_00440360(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -44,6 +27,7 @@ void func_L11_00440360(u8 *object)
     typedef struct { float value; int pad[3]; } HistFloat;
     struct HistoryFields { int count; float energy, motion; int pad; };
     struct StateHistory { u8 pad[0x50]; struct HistoryFields history[4]; };
+    struct StateClassCount { u8 pad[0x200]; unsigned short count; };
     u8 *counts;
     u8 *energies;
     u8 *motions;
@@ -53,9 +37,9 @@ void func_L11_00440360(u8 *object)
     if (groupList == 0) return;
     list = groupList;
     if (object[0x20] == 9 && object[0xbc] == 0) return;
-    U16(state,0x200) = 0;
+    ((struct StateClassCount *)state)->count = 0;
     active=0; total=0.0f;
-    members=D_L11_001B359C_base[0];
+    members=D_L11_001B359C;
     do {
         member = members + ((*list & 0x7fff) << 8);
         if (member != 0 && member[0x20] != 254 && member[0x20] != 253 && member[0x20] != 1) {

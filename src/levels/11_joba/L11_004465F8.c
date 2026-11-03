@@ -603,7 +603,7 @@ void func_L11_00450748(char *p, float scale)
 
 INCLUDE_ASM("asm/levels", func_L11_00451178);
 
-INCLUDE_ASM("asm/levels", func_L11_00452450);
+/* func_L11_00452450 is defined in L11_004465F8-g8.c. */
 
 void func_L11_00452810(char *a0)
 {

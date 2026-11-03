@@ -71,7 +71,7 @@ extern float D_L12_001AD234;
 /* func_L12_002FFF88 is in the sibling file L12_002CF7B0-g8.c: it reads a
    small-data global through $gp. */
 
-INCLUDE_ASM("asm/levels", func_L12_00300410);
+/* func_L12_00300410 is in the sibling file L12_00300410-g8.c. */
 
 /* func_L12_0035A838 is defined in L12_0035A838-g8.c (it reads its list through $gp). */
 

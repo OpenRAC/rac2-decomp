@@ -322,8 +322,7 @@ void func_L18_004350E0(char *pos, int count) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L18_004354F8);
-
+/* func_L18_004354F8 is defined in L18_004354F8-g8.c. */
 
 /* func_L18_00435B10 is defined in L18_00435B10-g8.c. */
 
@@ -427,7 +426,7 @@ void func_L18_0043F308(float *out, float *b, float *c, float *a, float *d, float
 
 
 
-INCLUDE_ASM("asm/levels", func_L18_0043FC70);
+/* func_L18_0043FC70 is defined in L18_0043FC70-g8.c. */
 
 /* func_L18_00440718 is defined in L18_00440718-g8.c. */
 

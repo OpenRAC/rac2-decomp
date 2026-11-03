@@ -1,77 +1,7 @@
-/* Retained reconstruction; not linked or counted.
- * Tier: GPT-6.1 Sol (high effort), task v1008, 29 October 2026.
- * Current US profile: -O2 -G8 -ffunction-sections -g -fno-rerun-loop-opt
- * -frac2-qcopy -frac2-qcopy-barrier. Best valid result: 1136/1156 bytes,
- * 0/1 places match. Other releases not checked for this draft.
- * A complete matrix object, independent basis pointer and early alpha-scale
- * snapshot improve the matrix/FP lifetimes. Separating scaledLength from the
- * final ribbonWidth also recovers the retail f0 intermediate and f12 product.
- * Remaining: the alpha word is forwarded into the packed GS value instead of
- * reloaded; global stores, packet colors, pointer allocation and scheduling differ.
- * Signed full-width bitfield and signed/unsigned union views did not restore the
- * alpha reload. A volatile field adds a GPR load/mtc1 sequence instead of lwc1.
- * A 1152-byte diagnostic used qzero_nc(axis), but it was rejected because the
- * later axis Z store overlaps that clear. This retained draft uses qzero(axis).
- * Keep qcopy for row 3, whose W component is then written. qzero_nc on row 3
- * precedes the external matrix call; surrounding C does not access that row.
- * Reopen with evidence for the extra alpha reload and the two matrix lifetimes.
- * All required declarations are included below. The October 22 notes are historical.
- */
-
 #include "common.h"
 
-/* func_L23_0042A438 (1156 bytes, level 23 only) -- NEAR MISS, not integrated.
-   Measured on 22 October 2026 with the compiler built from master (qcopy barrier and the
-   annulled-wide-store switch included): this C compiles to 1140 bytes, 16 short of retail's
-   1156; check.py: "1140 bytes, expected 1156". It belongs in a unit of its own,
-   src/levels/23_damosel_orbit/L23_0042A438-g8.c ($gp data, hence -G8). The best profile today is
-   `-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-barrier`: with an
-   aligned diff that ignores registers, 71 rows differ (88 with the earlier `-frac2-qcopy
-   -frac2-zero-ti-barrier`, 81 with the two qcopy switches alone); -frac2-no-annulled-wide-stores
-   changes nothing. All of retail's copies here are grouped (`addiu; addiu; lq 0; sq 0`), so the
-   plain TI assignments below are the right spelling for them.
-   Right: the frame (0x1F0), the handle release, the three `func_002A7878` jitters with their
-   loads after each call, func_L00_002FCF18 and the handle store, the GS words up to the calls,
-   and the loop body's call sequence with all its constants and tables.
-   What differs, and why it is not (only) a source question:
-   - the two 16-byte clears, retail +0x228 `addiu a0,sp,0xC0; sq $zero,0(a0)` and +0x268
-     `addiu v0,sp,0xE0; ... sq $zero,0(v0)`: this cc1 gives `por v0; sq v0,0xC0(sp)` and
-     `por v0; sq v0,0xE0(sp)`. A 16-byte zero store is not a qcopy pattern, CSE folds the stack
-     offset into it and rac2_fold_zero_ti_store only folds a register address; retail has 57 such
-     register-address clears and no C in src/ reproduces one (see func_L23_0042A018's record,
-     which has the same clear). Retail's clears and copies have the shape of volatile-asm macros,
-     at which CSE also flushes its table: here CSE keeps `mp`'s address (sp+0x90) in s5 from the
-     prologue on (+0x1C), where retail forms it after the first clear (+0x230);
-   - the counter and the matrix address in two stack slots (0x170, 0x174) in retail, a saved
-     register here (unchanged from the earlier record);
-   - D_L23_001B3930's two stores: retail writes them absolute (`lui at; swc1`) before the `bc1f`,
-     with `mul.s f12,f0,f3` in the slot; here the first store fills the slot (unchanged);
-   - retail re-reads vars->alpha from memory after storing it (`sw v1,4(s0)`, then `lw a0,4(s0)`
-     for the ALPHA word and `lwc1 f0,4(s0); cvt.s.w` for D_L23_001B1C18), all after the
-     `sra; beql; break 7` divisor check; this cc1 forwards the stored register to both reads.
-     Storing the field before the `%` statement (a block boundary for CSE) makes the float read a
-     load again but not the int one, and puts the store before the check where retail has it
-     after (74 rows). func_L23_0042A018, whose ALPHA word is the same, does forward the stored
-     value in retail (`daddu v0,a2,zero`), so the difference is in this function's source.
-   What would unblock it: the same opt-in register-address clear (and CSE flush at the macros) as
-   func_L23_0042A018, then the stack-slot loop and the alpha re-reads.
-   Earlier measurements (still valid): `TI16 *mp = m` for func_L03_002EFB60 and func_00283098 (a
-   second name for the matrix) took 136 to 100 rows and +16 bytes; the `%` whose quotient is unused
-   (written `i = ...`, overwritten by the loop) is the only way found to get retail's lone divisor
-   check; a pointer-walk loop and a descending loop with an index expression (151 rows) were
-   worse. */
-
-
-
-
-
-
-
-
-
-
-
-
+/* func_L23_0042A438 is a unit of its own: it reads its globals through $gp (-G8) and needs the
+ * qcopy/qzero macros (see config/cflags.txt). */
 
 typedef int TI16 __attribute__((mode(TI)));
 
@@ -137,6 +67,12 @@ typedef struct {
     float turn;
     s32 alpha;
 } L23Spin3;
+
+/* the object this update runs on */
+typedef struct {
+    u8 pad0[0x68];
+    L23Spin3 *vars;
+} L23Obj;
 
 extern s32 D_L23_0025E8B0[];
 
@@ -224,15 +160,16 @@ void func_L23_0042A438(u8 *moby) {
         D_L23_001B1B94 = func_L00_002FCF18(w, 20.0f, 0.0f, fa, fb, fc);
         D_L23_001B1C00 = D_L23_001B1C00 - D_L23_001B1C04;
         D_L23_001B39D0 = D_L23_001B1470 * 0.94f;
-        vars = *(L23Spin3 **)(moby + 0x68);
+        vars = ((L23Obj *)moby)->vars;
         if (D_L23_001B1C00 <= -6.0f) {
             D_L23_001B1C00 = D_L23_001B1C00 + 6.0f;
         }
         i = *(u16 *)(moby + 0x96) % (D_L23_001B1474 >> 2);
         vars->alpha = D_L23_001B1C24;
-        reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2)
-            | ((s64)D_L23_001B1BB4 << 4) | ((s64)D_L23_001B1BB8 << 6)
-            | ((s64)vars->alpha << 32);
+        reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
+        reg |= (s64)D_L23_001B1BB4 << 4;
+        reg |= (s64)D_L23_001B1BB8 << 6;
+        reg |= (s64)vars->alpha << 32;
         pkt.tail[3] = reg;
         D_L23_001B1C18 = (float)vars->alpha * D_L23_001B1C1C;
         tex = func_0027C878(D_L23_001B1C14);
@@ -250,14 +187,12 @@ void func_L23_0042A438(u8 *moby) {
         qcopy(&matrix.rows[3], D_L23_001B1484_2 + 0x10);
         ((float *)&matrix.rows[3])[3] = 1.0f;
         basis = (float *)mp;
-        qzero(axis);
+        qzero_nc(axis);
         ((float *)axis)[2] = vars->turn;
         func_002833F0(rot, axis);
         func_00283738(basis, basis, rot);
-        pkt.col[0] = D_L23_001B1BC4;
-        pkt.col[2] = D_L23_001B1BC8;
-        pkt.col[1] = D_L23_001B1BC4;
-        pkt.col[3] = D_L23_001B1BC8;
+        pkt.col[0] = pkt.col[1] = D_L23_001B1BC4;
+        pkt.col[2] = pkt.col[3] = D_L23_001B1BC8;
         for (i = 0; i < 0x48; i++) {
             if (D_L23_0025E8B0[i] != 0) {
                 alphaScale = D_L23_001B1C18;
@@ -280,14 +215,12 @@ void func_L23_0042A438(u8 *moby) {
                 func_00282CF0(&pkt.pos[1], v120, v160);
                 func_00282CC0(&pkt.pos[2], v130, v160);
                 func_00282CF0(&pkt.pos[3], v130, v160);
-                pkt.uv[0][0] = D_L23_001B1C00;
                 pkt.uv[0][1] = 0.0f;
-                pkt.uv[1][0] = D_L23_001B1C00;
                 pkt.uv[1][1] = 1.0f;
-                pkt.uv[2][0] = D_L23_001B1C00 + 1.0f;
                 pkt.uv[2][1] = 0.0f;
-                pkt.uv[3][0] = D_L23_001B1C00 + 1.0f;
                 pkt.uv[3][1] = 1.0f;
+                pkt.uv[2][0] = pkt.uv[3][0] = D_L23_001B1C00 + 1.0f;
+                pkt.uv[0][0] = pkt.uv[1][0] = D_L23_001B1C00;
                 func_00280B90(&pkt, 0, 0);
             }
         }
