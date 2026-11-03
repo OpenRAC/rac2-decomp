@@ -3045,4 +3045,5 @@ src/levels/20_yeedil/L20_0039C448-f7-g8.c	-O2 -G8 -ffunction-sections -malign-lo
 src/levels/11_joba/L11_00434580-g-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/11_joba/L11_00437FD0.c	-O2 -G0 -ffunction-sections -g
 src/levels/11_joba/L11_00438880-g-g8.c	-O2 -G8 -ffunction-sections -g -mno-split-addresses
+src/game/002CC528-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/01_oozla/L01_003D1A48-g8.c	-O2 -G8 -ffunction-sections -g

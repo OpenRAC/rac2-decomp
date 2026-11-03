@@ -987,6 +987,10 @@ order and direct conditional store) retain the same allocation: retail's
 using `$a1`, then stores `$v1` instead of `$a1`. A dedicated `-G8` replay is
 32/40 bytes. `tools/check.py func_002CC528 --diff` reports 0/28 placements
 for these attempts; the C remains in `nonmatching/game/func_002CC528.c`.
+**3 November 2026, resolved:** the catalogue row included an 8-byte filler prefix
+(`addiu $sp,$sp,0x60; nop`); with the entry corrected to `0x002CC530` (32 bytes, see
+docs/LEVELS.md) the body is C in `src/game/002CC528-g8.c` under `-G8 -mno-split-addresses`,
+28 of 28 places.
 
 Two documented names may express different addressing forms of one real global. They must derive the same true identity; malformed names, invented addresses or aliases hiding inconsistent bindings are not remedies. PR #244's review corrected such naming defects. Use ref_LNN_XXXXXXXX_kk where a target's identity genuinely varies by placement, not as a substitute for a known correct data name.
 
