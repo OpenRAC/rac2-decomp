@@ -1,18 +1,4 @@
-/* GPT-6.1 Sol high, 29 October 2026; retained near miss.
- * USA v1.01: 324/320 bytes, 0/27 places; ten checker runs in this task.
- * Profile: -O2 -G8 -ffunction-sections -mno-split-addresses -fno-gcse.
- * Splitting the final config paths with a real early return reduces the prior
- * 328-byte draft to 324 bytes. The table-fill loop remains exact in the diff.
- * Remaining: the state +36 sentinel store moves ahead of the zero stores;
- * final scalar config stores use different FP lifetimes, ordering and branches.
- * The first raw instruction difference is +0x38. Equal behavior is not a match.
- * Typed state fields, swapping sentinel source order, preloading the final tag,
- * reversed/duplicated config arms, ordinary split addresses, keep-block-order
- * and disabling the first scheduler did not close these differences.
- * Next: independently evidenced state/config layout and final CFG lifetimes.
- * All required declarations are below; the ref symbol is the GP config view.
- */
-#include "include_asm.h"
+#include "common.h"
 extern float D_L00_001B2868 __attribute__((section(".data")));
 extern float D_L00_001B286C __attribute__((section(".data")));
 extern float D_L00_001B2870 __attribute__((section(".data")));
@@ -30,9 +16,10 @@ void func_L00_003A7AF0(char *object)
     int value, i;
     int index;
     int *table;
+    int kind;
+    float range;
     *(short *)(state + 4) = -1;
     *(float *)(state + 12) = 0.1f;
-    *(int *)(state + 60) = -1;
     *(int *)(state + 0) = 0;
     *(short *)(state + 6) = 0;
     *(short *)(state + 16) = 0;
@@ -41,6 +28,7 @@ void func_L00_003A7AF0(char *object)
     *(int *)(state + 40) = 0;
     *(int *)(state + 44) = 0;
     *(int *)(state + 48) = 0;
+    *(int *)(state + 60) = -1;
     if (*(short *)(object + 0xAA) == 1490)
         *(int *)(state + 52) = D_L00_001AF6C4;
     else
@@ -51,18 +39,19 @@ void func_L00_003A7AF0(char *object)
     if (local[0] == 0) {
         table = (int *)func_L00_0032A088(*(short *)(object + 0xAA), (short)index);
         value = func_L00_00329FF0((int)(table + 16));
-        for (i = 15; i >= 0; --i) {
-            *table = value;
+        for (i = 0; i < 16; i++) {
+            table[i] = value;
             value += 640;
-            table++;
         }
     }
+    kind = *(short *)(object + 0xAA);
     D_L00_001B2868 = 0.104719766f;
-    if (*(short *)(object + 0xAA) == 1490) {
-        D_L00_001B286C = 20.0f;
-        D_L00_001B2870 = 0.104719766f;
-        return;
+    range = 30.0f;
+    if (kind == 1490) {
+        range = 20.0f;
+        D_L00_001B286C = range;
+    } else {
+        ref_L00_003A7AF0_00 = range;
     }
-    ref_L00_003A7AF0_00 = 30.0f;
     D_L00_001B2870 = 0.104719766f;
 }

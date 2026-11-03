@@ -53,7 +53,7 @@ extern char D_L01_00189E20[];
 
 extern char D_L01_002637A0[];
 
-extern int D_L01_001A8F40;
+extern s32 D_L01_001A8F40[] __attribute__((sda));
 
 extern char D_L01_00189E20_sda[] __attribute__((sda));
 
@@ -773,7 +773,51 @@ void func_L01_003208D0(void *a0, float *a1, int a2) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003209F8);
+/* One entity of the group: the kind word is at 0xAA. */
+typedef struct L01Thing {
+    u8 pad[0xAA];
+    s16 kind;
+} L01Thing;
+
+/* The group: the count is at 0x44, the list of entities at 0x18C. */
+typedef struct L01Group {
+    u8 pad[0x44];
+    s16 count;
+    u8 pad46[0x18C - 0x46];
+    L01Thing *items[1];     /* bounded by count */
+} L01Group;
+
+extern L01Group D_L01_001BD1C0;
+extern u8 D_001A7A40[] __attribute__((sda));
+extern u8 D_L01_001B1E60[] __attribute__((sda));
+extern f32 D_L01_001B1E80[] __attribute__((sda));
+extern void func_0029F978(u8 *p, int a1, u8 *a2);
+
+void func_L01_003209F8(L01Thing *entry, s32 arg1, s32 id, f32 value)
+{
+    L01Thing *e;
+    s32 wanted;
+    s32 i;
+
+    if (D_L01_001A8F40[0] != 2)
+        return;
+    if (D_001A7A40[0] == 0)
+        return;
+    wanted = entry->kind;
+    if (id != -1)
+        wanted = id;
+    for (i = 0; i < D_L01_001BD1C0.count; i++) {
+        e = D_L01_001BD1C0.items[i];
+        if (e->kind != wanted)
+            continue;
+        if (D_L01_001B1E60[1] != 0)
+            continue;
+        func_0029F978((u8 *)e, arg1, D_L01_001B1E60);
+        D_L01_001B1E80[0] = value;
+        D_L01_001B1E80[1] = value;
+        D_L01_001B1E80[2] = value;
+    }
+}
 
 int func_L01_00321178(char *a0, char *a1) {
     float v = func_002E3B10(*(float *)(a1 + 0) - *(float *)(a0 + 0x10),
@@ -1235,6 +1279,26 @@ void func_L01_00390C60(char *a0)
         *(unsigned short *)(a0 + 0x34) &= 0xFFBE;
 }
 
-INCLUDE_ASM("asm/levels", func_L01_00394148);
+void func_L01_00394148(void)
+{
+    L01Thing *e;
+    s32 i;
+
+    if (D_L01_001A8F40[0] != 2)
+        return;
+    if (D_001A7A40[0] == 0)
+        return;
+    for (i = 0; i < D_L01_001BD1C0.count; i++) {
+        e = D_L01_001BD1C0.items[i];
+        if (e->kind != 0x398 && e->kind != 0x1BF)
+            continue;
+        if (D_L01_001B1E60[1] != 0)
+            continue;
+        func_0029F978((u8 *)e, 0, D_L01_001B1E60);
+        D_L01_001B1E80[0] = 2.1f;
+        D_L01_001B1E80[1] = 2.1f;
+        D_L01_001B1E80[2] = 2.1f;
+    }
+}
 
 INCLUDE_ASM("asm/levels", func_L01_00394240);

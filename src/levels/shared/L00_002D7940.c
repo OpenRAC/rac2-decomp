@@ -188,7 +188,7 @@ INCLUDE_ASM("asm/levels", func_L00_002E2048);
 
 INCLUDE_ASM("asm/levels", func_L00_002E2958);
 
-INCLUDE_ASM("asm/levels", func_L00_002E2C30);
+/* func_L00_002E2C30 is in L00_002D7940-fade.c. */
 
 /* func_L00_002E30B8 is a near miss: nonmatching/levels/func_L00_002E30B8.c */
 INCLUDE_ASM("asm/levels", func_L00_002E30B8);
@@ -248,4 +248,32 @@ s32 func_L00_002E3A68(f32 a,f32 b,f32 t) {
  return (s32)a;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_002E3A90);
+/* A .sdata flag the compiler addresses through the assembler macro (lui + lbu in one register). */
+extern unsigned char D_L00_001A7A0A __attribute__((section(".sdata")));
+typedef struct {
+    u8 row;
+    u8 col;
+    short weight;
+} WeightTap;
+
+extern WeightTap D_L00_0025EDE0[][16][10];
+extern int D_L00_001A24A8[][16];
+
+int func_L00_002E3A90(int a, int b)
+{
+    WeightTap *tap;
+    int sum;
+    int n;
+
+    if (D_L00_001A7A0A != 0 || a >= 21)
+        return 0;
+    if (b >= 16)
+        return 0;
+    tap = D_L00_0025EDE0[a][b];
+    sum = 0;
+    for (n = 9; n >= 0; n--) {
+        sum += tap->weight * D_L00_001A24A8[tap->row][tap->col];
+        tap++;
+    }
+    return sum;
+}

@@ -105,16 +105,11 @@ func_L00_002A9460	nonmatching/functional/func_L00_002A9460.c
 func_L00_002AED68	nonmatching/functional/func_L00_002AED68.c
 func_L00_002B0968	nonmatching/functional/func_L00_002B0968.c
 func_L00_002B1350	nonmatching/functional/func_L00_002B1350.c
-func_L00_002B75A0	nonmatching/functional/func_L00_002B75A0.c
 func_L00_002D5940	nonmatching/functional/func_L00_002D5940.c
 func_L00_002D5EB8	nonmatching/functional/func_L00_002D5EB8.c
-func_L00_002E3A90	nonmatching/functional/func_L00_002E3A90.c
 func_L00_002EC970	nonmatching/functional/func_L00_002EC970.c
 func_L00_002FF6A8	nonmatching/functional/func_L00_002FF6A8.c
-func_L00_00300378	nonmatching/functional/func_L00_00300378.c
 func_L00_003080D0	nonmatching/functional/func_L00_003080D0.c
-func_L00_003110E8	nonmatching/functional/func_L00_003110E8.c
-func_L00_00323958	nonmatching/functional/func_L00_00323958.c
 func_L00_0032CF60	nonmatching/functional/func_L00_0032CF60.c
 func_L00_00358B30	nonmatching/functional/func_L00_00358B30.c
 func_L00_003603C0	nonmatching/functional/func_L00_003603C0.c
@@ -126,7 +121,6 @@ func_L00_0036D29C	nonmatching/functional/func_L00_0036D29C.c
 func_L00_0036EF40	nonmatching/functional/func_L00_0036EF40.c
 func_L00_0036F488	nonmatching/functional/func_L00_0036F488.c
 func_L00_00382F28	nonmatching/functional/func_L00_00382F28.c
-func_L00_003A7AF0	nonmatching/functional/func_L00_003A7AF0.c
 func_L00_003DF710	nonmatching/functional/func_L00_003DF710.c
 func_L00_003E2510	nonmatching/functional/func_L00_003E2510.c
 func_L00_00420C38	nonmatching/functional/func_L00_00420C38.c
@@ -135,7 +129,6 @@ func_L00_004233F8	nonmatching/functional/func_L00_004233F8.c
 func_L00_004243C0	nonmatching/functional/func_L00_004243C0.c
 func_L00_00425560	nonmatching/functional/func_L00_00425560.c
 func_L00_00425CD0	nonmatching/functional/func_L00_00425CD0.c
-func_L00_00426248	nonmatching/functional/func_L00_00426248.c
 func_L00_00426C78	nonmatching/functional/func_L00_00426C78.c
 func_L00_004291A0	nonmatching/functional/func_L00_004291A0.c
 func_L01_002AE128	nonmatching/functional/func_L01_002AE128.c

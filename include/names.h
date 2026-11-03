@@ -181,6 +181,7 @@
 #define OpenVendorMenu                   func_002F8178
 #define mpeg_init_seq                    func_00130428
 #define SetPalMode                       func_0027B440
+#define PredictMineImpact                func_L00_003AE550
 #define FontPrintWindow                  func_0027FC70
 
 /* descriptive */
@@ -815,6 +816,9 @@
 #define BuildShopChannelList             func_002F73A8
 #define TryClaimNotice                   func_002B0C28
 #define ForceClaimNotice                 func_002B0CE0
+#define ReloadSoundBank                  func_L00_0032D208
+#define KeyOwnerTableInsert              func_L00_0037DD18
+#define ReleaseDeadOrExpiredSlots        func_L00_0037E000
 #define LayoutTextBoxLines               func_00337E98
 #define UpdateRadialMenuSelection        func_0028CCE0
 #define DamageNearbyMobys                func_00327B40

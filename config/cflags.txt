@@ -3030,9 +3030,15 @@ src/levels/shared/L04_003FA7E0.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsp
 src/game/002B00B0-state-g8.c	-O2 -G8 -ffunction-sections
 src/game/002CEBD0-g8.c	-O2 -G8 -ffunction-sections -g
 src/game/0030F7B0-launch-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/levels/shared/L00_003F5870-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/levels/shared/L00_0037DD80-nsr.c	-O2 -G0 -ffunction-sections -fno-strength-reduce -fno-gcse -fno-sched-interblock
+src/levels/shared/L00_002D7940-fade.c	-O2 -G0 -ffunction-sections -g
 src/game/0028BDB0-radial-g8.c	-O2 -G8 -ffunction-sections -g
 src/game/00327038-push-g8.c	-O2 -G8 -ffunction-sections -ffast-math -g
 src/game/0027F128-fpw-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32 -mno-split-addresses
+src/levels/shared/L00_002D4E58-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L00_003A0F30-row.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por -fno-gcse
+src/levels/shared/L00_003A0F30-cfg-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/06_notak/L06_0041DED8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/02_maktar_nebula/L02_0040A4A8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/05_feltzin_system/L05_00314E28-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2

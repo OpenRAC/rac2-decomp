@@ -45,4 +45,33 @@ void func_L00_0037B7B0(void)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_0037DD18);
+typedef struct {
+    Rac2Native_ff971bf89acc2217_u32 field00, field04;
+    int field08;
+    Rac2Native_ff971bf89acc2217_u8 gap0c[4];
+} Rac2Native_ff971bf89acc2217_Entry;
+
+extern Rac2Native_ff971bf89acc2217_Entry D_L00_00231340[32];
+
+void func_L00_0037DD18(int a0, int a1, int a2)
+{
+    int i = 0;
+    Rac2Native_ff971bf89acc2217_Entry *e;
+
+    if (D_L00_00231340[0].field04 == 0) {
+        D_L00_00231340[0].field00 = a1;
+        D_L00_00231340[0].field04 = a0;
+        D_L00_00231340[0].field08 = a2;
+        return;
+    }
+loop:
+    i++;
+    if (i >= 32)
+        return;
+    if (D_L00_00231340[i].field04 != 0)
+        goto loop;
+    e = &D_L00_00231340[i];
+    e->field04 = a0;
+    e->field00 = a1;
+    e->field08 = a2;
+}
