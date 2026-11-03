@@ -266,7 +266,7 @@ void func_002FCF90(int arg0) {
 /* func_002FD828 is in its own G8 unit. */
 
 
-INCLUDE_ASM("asm/game", func_002FDBD8);
+/* func_002FDBD8 is in 002FC8D0-billboard-g8.c. */
 
 /* func_002FDF40 is in 002FDF40-g8.c. */
 
@@ -620,7 +620,7 @@ void func_002FF968(PreviewObjectPrefix *object)
     func_00300048(object);
 }
 
-INCLUDE_ASM("asm/game", func_002FFCF8);
+/* func_002FFCF8 is in 002FC8D0-fade.c. */
 
 typedef struct {
     float velocity[3], gravity, size_delta;

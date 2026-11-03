@@ -1,35 +1,4 @@
-/* Closer C4, 1 November 2026: 2120/2124, 58 rows, nearly all two registers. Found: `changed = 0; if (...) changed = 1;` gives the
- * s5 constant, the search has no base local (PRE's reaching copy makes t0, so read D_001B1B5C inline), and a failed check goes
- * straight to advance. Left: sched1 moves that copy up into a free slot, so peer ties to the a0 of the load; retail has it at the
- * branch, peer in a2 and the class in v1, and a nop more. No flag moves it.
- */
-/* GPT-6.1 Sol (high effort), task v1342, 29 October 2026.
- * USA v1.01, default game -O2 -G0 -ffunction-sections; use a separate unit.
- * Best and final check.py: 2112 bytes / retail 2124; 0 of 7 places match.
- * Functional reconstruction only: neither relocations nor linking qualified,
- * because check.py rejects the section size before deriving symbol values.
- *
- * Initialization assignment order and the child-copy path are improved over
- * v0994 (2068 bytes). Both searches now preserve a separate initial primary
- * class check and two entries into the remaining scan. Retail reuses 1 in s5
- * for changed and the first notification; this compiler uses sltiu and merges
- * that notification store with the final store. Peer data/base/class register
- * choices and the nonzero-notification backedges also differ.
- *
- * Eighteen check.py invocations, including one syntax error, no linked build.
- * Natural while/alternate-class forms measured 2032, 2108 and 2100 bytes;
- * a goto-to-body form was 2012. Directly sending the shared nonzero flag test
- * to advance shrinks this draft to 2088, merging its initial flag check too.
- * Equivalent assignment/OR and explicit changed-boolean spellings tie there.
- * Distinct primary/secondary record types leave the old loop shape at 2068.
- * Reopen with a justified flag/base lifetime that preserves the first store
- * and the direct-to-advance backedges without merging the initial flag test.
- *
- * All declarations are below. One truthful MACRO_ADDR declaration per group
- * global supplies the observed absolute/GP mix at -G0; no GP alias is needed.
- * func_002B3BA8's bank-preserving argument interleaving fixes the first call's
- * delay slot (object, index, point, force remain A0-A3; range/height F12-F13).
- */
+#include "include_asm.h"
 #include "common.h"
 extern int func_00283CF0(float);
 extern int func_002A77E0(int);
@@ -71,7 +40,6 @@ int func_003248A8(char *self)
     float pos[4];
     unsigned short *list;
     char *peer, *pd;
-    int peerClass;
     if (B(self,0x20)==0) {
         F(self,0x2C)*=1.1f;
         B(self,0x7E)|=1;
@@ -125,7 +93,7 @@ int func_003248A8(char *self)
         }
         if(I(d,0x288)!=-1) {
             func_002A7750(self,2,0);
-            qcopy(d+0x300,D_001B1C4C+I(d,0x288)*128+0x30);
+            qcopy(d+0x300,D_001B1C4C+(I(d,0x288)<<7)+0x30);
             B(self,0x30)=128;
         }
         func_00325B70(self,d+0x2A0,0,2);
@@ -142,27 +110,18 @@ int func_003248A8(char *self)
         func_00325320(self);
         if((result==4 || result==5 || changed) && B(self,0x21)<=D_001B1B78 && func_002A8508(B(self,0x21),-1)>=2) {
             list=D_001EE5A0[B(self,0x21)];
-            peer=D_001B1B5C+((*list&0x7FFF)<<8);
-            peerClass=*(short *)(peer+0xAA);
-            if (peerClass==0xB0A) {
-                char *firstData=P(peer,0x68);
-                if (!I(firstData,0x294)) { I(firstData,0x294)=1; goto done1; }
-                goto advance1;
-            }
             for (;;) {
-                if (peerClass==0xB0B) goto check_peer1;
-advance1:
-                if ((short)*list++<0) goto done1;
                 peer=D_001B1B5C+((*list&0x7FFF)<<8);
-                peerClass=*(short *)(peer+0xAA);
-                if (peerClass!=0xB0A) continue;
-check_peer1:
-                pd=P(peer,0x68);
-                if (I(pd,0x294)) goto advance1;
-                break;
+                if (*(short *)(peer+0xAA)==0xB0A) {
+                    pd=P(peer,0x68);
+                    if (!I(pd,0x294)) { I(pd,0x294)=1; break; }
+                } else if (*(short *)(peer+0xAA)==0xB0B) {
+                    pd=P(peer,0x68);
+                    if (!I(pd,0x294)) { I(pd,0x294)=1; goto done1; }
+                }
+                if ((short)*list++<0) goto done1;
             }
-            I(pd,0x294)=1;
-done1:;
+            done1:;
         }
     }
     qcopy(pos,self+0x10);
@@ -170,27 +129,18 @@ done1:;
         I(d,0x2C8)=1;
         if(func_002A8508(B(self,0x21),-1)>=2) {
             list=D_001EE5A0[B(self,0x21)];
-            peer=D_001B1B5C+((*list&0x7FFF)<<8);
-            peerClass=*(short *)(peer+0xAA);
-            if (peerClass==0xB0A) {
-                char *firstData=P(peer,0x68);
-                if (!I(firstData,0x294)) { I(firstData,0x294)=1; goto done2; }
-                goto advance2;
-            }
             for (;;) {
-                if (peerClass==0xB0B) goto check_peer2;
-advance2:
-                if ((short)*list++<0) goto done2;
                 peer=D_001B1B5C+((*list&0x7FFF)<<8);
-                peerClass=*(short *)(peer+0xAA);
-                if (peerClass!=0xB0A) continue;
-check_peer2:
-                pd=P(peer,0x68);
-                if (I(pd,0x294)) goto advance2;
-                break;
+                if (*(short *)(peer+0xAA)==0xB0A) {
+                    pd=P(peer,0x68);
+                    if (!I(pd,0x294)) { I(pd,0x294)=1; break; }
+                } else if (*(short *)(peer+0xAA)==0xB0B) {
+                    pd=P(peer,0x68);
+                    if (!I(pd,0x294)) { I(pd,0x294)=1; goto done2; }
+                }
+                if ((short)*list++<0) goto done2;
             }
-            I(pd,0x294)=1;
-done2:;
+            done2:;
         }
     }
     if(I(d,0x2EC) && F(self,0x10)<170.7f && B(self,0x95)!=6) func_002A7750(self,16,6);

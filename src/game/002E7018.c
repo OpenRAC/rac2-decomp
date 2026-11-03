@@ -144,7 +144,7 @@ void func_002E82C8(int alpha)
 }
 
 
-INCLUDE_ASM("asm/game", func_002E8368);
+/* func_002E8368 is matched in 002E7018-transition-g8.c. */
 
 /* func_002E8BA8 is matched in 002E8BA8-g8.c. */
 
@@ -232,7 +232,7 @@ INCLUDE_ASM("asm/game", func_002EBC70);
 
 /* func_002EC1C0 is matched in 002E7018-g8.c (-G8 small data). */
 
-INCLUDE_ASM("asm/game", func_002EC408);
+/* func_002EC408 is in 002EC408-g8.c (-G8 small data). */
 
 INCLUDE_ASM("asm/game", func_002ECB70);
 

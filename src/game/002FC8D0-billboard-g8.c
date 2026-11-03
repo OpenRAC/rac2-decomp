@@ -1,14 +1,9 @@
-/* Closer C3, 1 November 2026: priorities in the off variant: n 3*15/268, direction 3*11/157, odd 2*6/70. One more depth-1 read of n
- * (weight 2) gives 17 refs and floor_log2 4, enough over both; retail shows no such read.
- */
-/* Closer C, 1 November 2026: 9 rows (arm 2 sets i first). Retail's `sll v1,s0,2` in bnez's plain slot is
- * one value computed before the branch, used as addu v0,v1,fp: `int off = n * 4; ... *(int *)((char *)colors + off)`
- * gives every row of that block, but n then has 15 weighted refs over 268 insns and loses to direction
- * (11/157) and odd (6/70), so the three saved registers rotate (23 rows). Next: one more loop-depth read of n.
- */
-/* GPT-6.1 Sol (low effort), v0552. 868/868 bytes, 0/28 places; first mismatch +0x1bc. Color fill branches differ in shift sharing, branch-likely selection and registers. -O2 -G8 -ffunction-sections -g; physical ABI uses float scale before third integer argument.
-   Declarations are included below. Reopen with a pointer-lifetime hypothesis. */
 #include "common.h"
+
+/* func_002FDBD8 (from 002FC8D0.c): two textured quads at ORIGIN, turned to face
+   DIRECTION and spun in opposite senses, drawn with textures 17 and 18.  Its own
+   -G8 unit, as for func_002FD828 and func_002FDF40. */
+
 extern int D_0018C0B4 NOT_SDA;
 extern int ref_L00_002FDBD8_00;
 extern int ref_L00_002FDBD8_01[] __attribute__((sda));
@@ -29,6 +24,7 @@ typedef struct {
     float tex[8];
     u64 zero, texture, blend, test;
 } DrawPacketDB;
+
 void func_002FDBD8(float *origin, float *direction, float scale, int *colors)
 {
     DrawPacketDB packet;
@@ -48,19 +44,40 @@ void func_002FDBD8(float *origin, float *direction, float scale, int *colors)
         angles[2] = 0;
         angles[3] = 0;
         spin[0] = 0;
-        { float turn = func_00283C28(func_00283CE0(ref_L00_002FDBD8_01[0] % 180) * 0.0349065885f);
-        if (odd) turn = -turn;
-        spin[1] = turn; }
+        {
+            /* Two degrees per tick of the counter, mirrored on odd passes. */
+            float turn = func_00283C28(func_00283CE0(ref_L00_002FDBD8_01[0] % 180) * 0.0349065885f);
+            if (odd)
+                turn = -turn;
+            spin[1] = turn;
+        }
         spin[2] = 0;
         spin[3] = 0;
         func_00283410(rotation, spin);
         func_00283410(transform, angles);
         func_00283788(transform, transform, rotation);
         qcopy(transform + 12, origin);
-        if (!colors) { int color; int *p;
- color = ref_L00_002FDBD8_02[n]; n++; for (i = 3; i >= 0; i--) packet.colors[i] = color;
-        } else { int color; int *p;
- i = 3; color = colors[n]; n++; p = packet.colors; for (; i >= 0; i--) *p++ = color;
+        {
+            int off;
+            int color;
+            int *p;
+            /* The colour comes from the caller's table or the default pair; both arms
+               keep the byte offset in one variable and add it to the table address. */
+            if (!colors) {
+                off = n * 4;
+                color = *(int *)(off + (int)ref_L00_002FDBD8_02);
+                n++;
+                for (i = 3; i >= 0; i--)
+                    packet.colors[i] = color;
+            } else {
+                i = 3;
+                off = n * 4;
+                color = *(int *)(off + (int)colors);
+                n++;
+                p = packet.colors;
+                for (; i >= 0; i--)
+                    *p++ = color;
+            }
         }
         packet.texture = func_0027C878(odd ? 18 : 17);
         packet.blend = 0xFF9000000260ULL;

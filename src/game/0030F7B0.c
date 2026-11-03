@@ -529,7 +529,6 @@ INCLUDE_ASM("asm/game", func_00314CF8);
 
 /* func_00315C78 is in 0030F7B0-nearest.c. */
 
-INCLUDE_ASM("asm/game", func_00315E20);
 
 /* func_00316248 is in 0030F7B0-g8.c. */
 

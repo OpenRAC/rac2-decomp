@@ -488,7 +488,7 @@ void func_0034EDB0(void *unused, char *object)
 
 
 
-INCLUDE_ASM("asm/game", func_0034F048);
+/* func_0034F048 is in 0034CEA0-read-mpeg.c. */
 
 void func_0034F3B8(void) {
     func_0011AAD0(1);
@@ -676,9 +676,33 @@ void func_003501E0(int value)
 /* A19-sda-scalar-store-16 freshly exact-verified under family reservation */
 void func_00350230(void) { D_L00_001AEB10 = 0; }
 
-INCLUDE_ASM("asm/game", func_00350240);
+/* func_00350240 is in 0034CEA0-g8.c. */
 
-INCLUDE_ASM("asm/game", func_00350378);
+extern int func_00350460(char *, int, char *, int, char *, int, char *, int);
+
+int func_00350378(void *unused, int *packet, char *buf)
+{
+    char *first_address;
+    int first_count;
+    char *second_address;
+    int second_count;
+    Ring *r = (Ring *)(buf + 0x50000);
+    char *src = (char *)packet[2] + 4;
+    char *end = buf + r->size;
+    int len = packet[3] - 4;
+    int first, second, result;
+
+    if (src >= end)
+        src -= r->size;
+    first = end - src;
+    if (len < first)
+        first = len;
+    second = len - first;
+    func_0034F960((s32 *)(D_001B23CC[0] + 0xD9100), (s32 *)&first_address, &first_count, (s32 *)&second_address, &second_count);
+    result = func_00350460(first_address, first_count, second_address, second_count, src, first, buf, second);
+    func_0034FA30((s32 *)(D_001B23CC[0] + 0xD9100), result);
+    return result > 0;
+}
 
 
 void func_00350590(u8 *a0) {

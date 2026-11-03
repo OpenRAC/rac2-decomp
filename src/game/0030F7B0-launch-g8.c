@@ -1,20 +1,3 @@
-/* func_00315E20: near miss, 1064/1064 bytes, boot (USA v1.01, 1 November 2026).
-
-   Profile: its own `-g8` unit, `-O2 -G8 -ffunction-sections -frac2-zero-ti-por` (the timer at
-   0x1AF548 is $gp-relative, the stack vector clear stays `por` + `sq`). The jump table runs
-   0..4 in order, case 0 falls into case 1. The two `D_00189E20` reads outside the cases go
-   through their own locals so the offsets stay out of %lo and the hoisted `lui` is shared;
-   the state is a struct so the timer stores do not wait for `st->target` (GCC's fixed
-   scalar against varying struct rule); the two vector copies are qcopy.
-
-   Everything matches but case 2's first block: retail puts the 0xC20 clear in the delay
-   slot of the counter test (here it lands after the increment; written before the test it
-   costs a branch-likely and 4 bytes), and retail stores launch.flags before the levels
-   word while loading D_0013958C ahead of D_001A79F0. Tried: the clear before and after the
-   counter, a typed player struct, the counters as fixed u16/u32 scalars, every order of the
-   five launch/statistics statements and of the five launch tail stores, -fstrict-aliasing
-   (fixes the clear, reorders the launch stores). */
-
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
@@ -51,8 +34,8 @@ extern char D_001B2520[] __attribute__((sda));
 extern char D_001B5340[];
 extern int D_001AF548 __attribute__((sda));
 extern int D_00138324 __attribute__((nosda));
-extern u32 D_001A7390 __attribute__((nosda));
-extern u32 D_001A79F0 __attribute__((nosda));
+extern u32 D_001A7390;
+extern u32 D_001A79F0;
 extern u8 D_0013958C __attribute__((nosda));
 /* One 0xE0-byte entry per weapon level. */
 typedef struct { char pad0[0x70]; float range; char pad74[0x6C]; } Level_00315E20;
@@ -130,18 +113,22 @@ void func_00315E20(u8 *obj)
         obj[0x20] = 2;
         func_0026F758();
         break;
-    case 2:
+    case 2: {
+        char *player;
+        Level_00315E20 *level;
+
         if (!func_00282948(&D_001AF548))
             break;
-        p = D_00189E20;
+        player = D_00189E20;
+        *(int *)(player + 0xC20) = 0;
         if (D_0018C360[36].count < 0xFFFF)
             D_0018C360[36].count++;
-        *(int *)(p + 0xC20) = 0;
-        if (D_0018C360[36].maximum < D_001A7390)
+        if (D_001A7390 > D_0018C360[36].maximum)
             D_0018C360[36].maximum = D_001A7390;
-        D_0018C360[36].levels = D_0018C360[36].levels | (1 << D_001A79F0) | 0x80000000;
+        level = &D_00239BA0[D_0013958C];
         launch.flags = 0x10000;
-        launch.range = D_00239BA0[D_0013958C].range;
+        D_0018C360[36].levels = D_0018C360[36].levels | (1 << D_001A79F0) | 0x80000000;
+        launch.range = level->range;
         launch.count = 1;
         launch.owner = obj;
         qcopy(&launch, dir);
@@ -153,7 +140,7 @@ void func_00315E20(u8 *obj)
         launch.kind = 3;
         func_002A8E20(st->target, &launch);
         obj[0x20] = 3;
-        if (*(int *)(p + 0x340)) {
+        if (*(int *)(player + 0x340)) {
             D_001AF548 = 15;
             func_00316400(obj, st->target, 7);
             func_00316400(obj, st->target, 7);
@@ -166,6 +153,7 @@ void func_00315E20(u8 *obj)
         }
         st->target = 0;
         break;
+    }
     case 3: {
         char *player;
 

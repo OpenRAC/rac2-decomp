@@ -120,6 +120,7 @@
 #define snd_Pump                         func_00132028
 #define snd_BankLoadByLoc                func_00132318
 #define snd_BankLoadFromIOP              func_001326D8
+#define read_mpeg                        func_0034F048
 #define DrawGlowSprites                  func_002824B8
 #define LoadPifAsPSMT8H                  func_0026FC78
 #define vblankHandler                    func_0034FFC0
@@ -174,8 +175,10 @@
 #define GroundAttachedUpdate             func_003116E8
 #define GetNextMobyInGroup               func_002A86E8
 #define CrateUpdate                      func_00310E98
+#define RunLevelTransition               func_002EC408
 #define sceVibSetActParam                func_00128FD0
 #define find_fde                         func_00123B40
+#define OpenVendorMenu                   func_002F8178
 #define mpeg_init_seq                    func_00130428
 #define SetPalMode                       func_0027B440
 #define FontPrintWindow                  func_0027FC70
@@ -804,10 +807,17 @@
 #define RequestVoiceLine                 func_L16_00412BA8
 #define UpdateTwoTriggerPathPlatform     func_L17_003C7680
 #define SelectBestTargetInCone           func_002AF580
+#define DrawVendorItemSelectList         func_002F9C80
 #define SetDeathBits                     func_002A6C58
 #define UpdateVisibilityBitmap           func_0027A288
+#define UpdateItemGridMenu               func_00346C60
+#define GetSelectedShopItemPrice         func_002F6510
+#define BuildShopChannelList             func_002F73A8
 #define TryClaimNotice                   func_002B0C28
 #define ForceClaimNotice                 func_002B0CE0
+#define LayoutTextBoxLines               func_00337E98
 #define UpdateRadialMenuSelection        func_0028CCE0
+#define DamageNearbyMobys                func_00327B40
+#define DrawParticleGlows                func_00328B68
 
 #endif /* NAMES_H */

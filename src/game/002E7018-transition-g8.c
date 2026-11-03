@@ -1,23 +1,3 @@
-/* GPT-6.1 Sol high, task v1359; USA v1.01 -O2 -G8 profile.
- * Best check.py: 2108/2108 bytes, 0/28 places. Only two instructions differ:
- * +0x6C8 lui uses v0 instead of v1; +0x6CC addiu consequently reads v0.
- * All declarations are included below. Compile in a separate -g8.c unit;
- * 002E7018.c has incompatible declarations and different small-data flags.
- * Builds on v1338's typed layouts and complete 64-byte matrix output.
- * Recovered interpolation scheduling by computing the shifted scene tick
- * separately from the parity argument; typed actor fields preserve the result.
- * Initialize the child index in a block after func_0029FC20, before clearing
- * flags, to match matrix-base scheduling. The regular child table needs sda
- * without section(.sdata); adding that section creates an extra saved base.
- * An indexed final entity loop gives retail's pointer loop exactly.
- * Remaining menu-base allocation tied for a local menu pointer, a typed
- * definition, and an explicit first animation-count temporary. Reusing one
- * count temporary worsens allocation. A 2D matrix produces extra GIVs/spills;
- * a named matrix pointer hoists across the call and shortens to 2100 bytes.
- * Next useful input: allocator evidence for the menu high-half pseudo's
- * lifetime, preserving both distinct animation-count reads and the ABI.
- * No linked build performed; retained near miss, not a match.
- */
 #include "common.h"
 #define W(p, o)  (*(int *)((char *)(p) + (o)))
 #define H(p, o)  (*(short *)((char *)(p) + (o)))
@@ -273,8 +253,12 @@ after:
             }
             o->opacity = 0xE8;
         }
-        o->alpha = 0xFF;
         o->cached_frame = 0xFF;
+        {
+            {
+                o->alpha = 0xFF;
+            }
+        }
         func_002A0F48(o);
         {
             char *d = (char *)o->definition;

@@ -154,3 +154,40 @@ void func_0034FE18(void *a0, int a1, int a2, int a3, int t0)
     *(u32 *)(p + 0x04) = addr;
     func_002B6480((void *)(u32)(D_001B23C8 + off), 1);
 }
+
+extern char D_001AE830[];
+extern void func_00351848(unsigned char *, int *, int *, int *, int *);
+extern int func_003518F0(char *, unsigned long long, unsigned long long, int, int);
+extern void func_00351868(char *, int);
+extern void func_0034F780(int);
+extern int func_00350460(u32, int, u32, int, u32, int, int, int);
+
+int func_00350240(u8 *unused, char *src, char *dst)
+{
+    int first_address, first_count, second_address, second_count;
+    int used = *(int *)(src + 8);
+    int remain = *(int *)(src + 0xC);
+    int size;
+    int second;
+    int result;
+
+    size = (int)dst + *(int *)(dst + 0x50008);
+    size -= used;
+    if (remain < size)
+        size = remain;
+    second = remain - size;
+    func_00351848((unsigned char *)(D_001B23CC[0] + 0xD9048),
+                  &first_address, &first_count, &second_address, &second_count);
+    result = func_00350460((first_address & 0x0FFFFFFF) | 0x20000000, first_count,
+                           (second_address & 0x0FFFFFFF) | 0x20000000, second_count,
+                           used, size, (int)dst, second);
+    if (result > 0) {
+        if (func_003518F0(D_001B23CC[0] + 0xD9048,
+                          *(unsigned long long *)(src + 0x10),
+                          *(unsigned long long *)(src + 0x18),
+                          first_address, result) == 0)
+            func_0034F780((int)D_001AE830);
+    }
+    func_00351868(D_001B23CC[0] + 0xD9048, result);
+    return result > 0;
+}

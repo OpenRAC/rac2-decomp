@@ -35,7 +35,7 @@ void func_002F9BC0(char *dst, int value)
         func_00115DA8_1(dst, D_L00_001AD6C8, value);
 }
 
-INCLUDE_ASM("asm/game", func_002F9C80);
+/* func_002F9C80 is in 002F9C80.c. */
 
 INCLUDE_ASM("asm/game", func_002FA270);
 
