@@ -151,7 +151,6 @@ void func_L09_002F8FD8(void) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L09_00352150);
 
 void func_L09_0038B700(unsigned char *obj) {
     struct {

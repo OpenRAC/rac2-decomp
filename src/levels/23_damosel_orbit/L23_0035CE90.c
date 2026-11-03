@@ -27,7 +27,6 @@ extern void func_L23_003C1988(char *arg0);
 
 extern int D_L23_001B36B0 __attribute__((sda));
 
-INCLUDE_ASM("asm/levels", func_L23_0035CE90);
 
 /* func_L23_00394218 is defined in L23_00394218.c. */
 

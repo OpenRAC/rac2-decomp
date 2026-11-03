@@ -132,7 +132,6 @@ void *func_L01_00333FA8(L01_00333FA8_PARENT *arg0, void *arg1, int arg2, float a
     return obj;
 }
 
-INCLUDE_ASM("asm/levels", func_L01_0034B1C0);
 
 /* func_L01_002F2098 is defined in L01_002BEB90-g8.c (it needs a $gp-relative address). */
 
