@@ -808,9 +808,12 @@
 #define RequestVoiceLine                 func_L16_00412BA8
 #define UpdateTwoTriggerPathPlatform     func_L17_003C7680
 #define SelectBestTargetInCone           func_002AF580
+#define UpdateSplinePathCamera           func_L01_0042C8D8
 #define DrawVendorItemSelectList         func_002F9C80
 #define SetDeathBits                     func_002A6C58
 #define UpdateVisibilityBitmap           func_0027A288
+#define UpdateOozlaTiltingLift           func_L01_0041C970
+#define ActivateSplinePathCamera         func_L01_0042C540
 #define UpdateItemGridMenu               func_00346C60
 #define GetSelectedShopItemPrice         func_002F6510
 #define BuildShopChannelList             func_002F73A8
@@ -824,5 +827,7 @@
 #define UpdateRadialMenuSelection        func_0028CCE0
 #define DamageNearbyMobys                func_00327B40
 #define DrawParticleGlows                func_00328B68
+#define UpdateWaterSheet                 func_L01_003BB9D0
+#define DrawWavyBeamToTarget             func_L02_004129D0
 
 #endif /* NAMES_H */

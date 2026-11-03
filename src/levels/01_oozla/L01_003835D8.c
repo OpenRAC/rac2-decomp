@@ -36,8 +36,7 @@ extern void func_00282948();
 
 /* func_L01_003839F0 is defined in L01_003839F0.c. */
 
-
-INCLUDE_ASM("asm/levels", func_L01_003A5BB8);
+/* func_L01_003A5BB8 is defined in L01_003835D8-g8.c. */
 
 /* func_L01_003A6028 is defined in L01_003A6028-g8.c. */
 
@@ -235,7 +234,7 @@ void func_L01_003B5310(u8 *a0) {
     func_002B0990(a0, p + 0x250, 6, 1, 4.0f);
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003B53C8);
+/* func_L01_003B53C8 is defined in L01_003835D8-g8.c. */
 
 /* func_L01_003B57A8 uses the SDA pointer to the position table. */
 extern u8 *D_L01_001B264C __attribute__((sda));

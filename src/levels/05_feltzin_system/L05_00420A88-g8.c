@@ -1,16 +1,3 @@
-/* functional: high. Near-miss draft within a few instructions of retail: differences are register allocation, scheduling and instruction shape. */
-/* Complete C reconstruction; not linked and no matching credit.
- * 2026-10-30, game -O2 -G8 -ffunction-sections -frac2-zero-ti-por -g:
- * 928/928 bytes, USA v1.01 0/1; USA v2.00 and PAL identities absent.
- * Only four non-relocation words differ: first-vector x/y constants and stores
- * use f2/f1 rather than retail f1/f2. The real three 16-byte vector spans, zero
- * stores, separate count/induction lifetimes and incomplete GP address aliases
- * restore all remaining instructions and the 0x90 frame. Regalloc's instrumented
- * object equals its normal object: constant pseudos 92/93/94 have live lengths
- * 12/10/8 and get f2/f1/f0. Six source/profile trials; union and array forms tie.
- * Reopen with independent FP priority/lifetime evidence. Reordering stores or
- * scalar coordinate temporaries changed instruction order without matching it.
- */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
@@ -21,7 +8,7 @@ extern int D_L05_001B13D8 __attribute__((sda));
 extern int D_L05_001B1350 __attribute__((sda));
 extern int D_L05_00221D10[];
 extern int D_L05_001B2048;
-extern char *D_001B251C;
+extern char *D_L05_001B251C;
 extern char D_L05_001B1380[] SDATA(D_L05_001B1380);
 extern char D_L05_001B1370[] SDATA(D_L05_001B1370);
 extern void func_002B7320(void);
@@ -50,6 +37,7 @@ void func_L05_00420A88(char *actor)
     char *state = *(char **)(actor + 0x68);
     char **item;
     int count;
+    int count2;
 
     if (D_L05_001B1364 == 0) {
         D_L05_00221D10[11] = 0;
@@ -101,9 +89,9 @@ void func_L05_00420A88(char *actor)
         c.f[2] = 535.0f;
         func_L05_00445B58(&a, &c);
         item = func_L05_00379EB8();
-        count = func_L00_004272A0();
-        if (count > 0) {
-            int n = count;
+        count2 = func_L00_004272A0();
+        if (count2 > 0) {
+            int n = count2;
             do {
                 switch (*(short *)(*item + 0xAA)) {
                 case 0x957:
@@ -124,7 +112,7 @@ void func_L05_00420A88(char *actor)
             func_L05_004222D8();
             func_0029B3E0(0, -1);
             D_L05_001B1350--;
-            func_L00_003294F0(D_001B251C + (*(int *)(state + 0x2C) << 8), 1);
+            func_L00_003294F0(D_L05_001B251C + (*(int *)(state + 0x2C) << 8), 1);
             D_L05_001B13D8 = 0;
             D_L05_001B13F4 = 0;
             func_L05_00379F48(1);

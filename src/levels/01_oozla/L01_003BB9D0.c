@@ -104,7 +104,7 @@ void func_L01_003BDF28(char *a0)
     func_L01_003BDBE8(s2);
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003BB9D0);
+/* func_L01_003BB9D0 is in L01_003BB9D0-ocean-g8.c. */
 
 /* func_L01_003BBF68 is in L01_003BBF68-g8.c. */
 
@@ -224,7 +224,7 @@ void func_L01_003BDBE8(void *object)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003BE058);
+/* func_L01_003BE058 is in L01_003BB9D0-steer.c. */
 
 /* func_L01_003BE488 */
 

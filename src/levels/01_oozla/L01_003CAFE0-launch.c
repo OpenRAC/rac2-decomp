@@ -1,19 +1,3 @@
-/*
- * Tier: opus-1 (Claude Opus 5.5), task v1066, USA v1.01, default game profile:
- * -O2 -G0 -ffunction-sections (own unit; the switches compile to branches, no .rodata).
- * Best check.py: 932/932 bytes, 0 of 1 places; 5 instructions differ, all in the post-spawn
- * trigger block (+0x234..+0x248): retail puts the entity base in a0 and the timer value in v0,
- * ours swaps them (lui/lw base, lw timer, addu, sw timer).
- * Closer than the sol-high draft: array indexing (state->first[i], state->second[i]) now gives
- * retail's two strength-reduced cursors and preheader order; the sda scalar declaration of
- * D_L01_001B264C gives the tied lui/lw $a1 form; reading the entity base into a local before the
- * timer store and indexing it in the store gives retail's addu operand order and 0xBC offset.
- * Remaining: in sched1's order the base and timer quantities tie in local-alloc (2 refs, equal
- * life), so the earlier-born base takes v0. Retail needs the timer allocated first (born
- * first, or its store before the addu in sched1). Four statement orders of the block (index,
- * base, timer, store) give the same bytes: a tie. Reopen with a new allocation hypothesis.
- * All declarations needed to compile this unit follow.
- */
 #include "common.h"
 
 
@@ -83,19 +67,21 @@ void func_L01_003D2890(unsigned char *self)
             case 1: HALF(0x30) = 1; HALF(0x32) = 1; break;
             case 2: HALF(0x32) = 1; HALF(0x30) = 0; break;
             }
-            { unsigned char *base = D_L01_001B264C;
-            int index;
-            int selection=HALF(0x30);
-            FIELD(0x3c)++;
-            index = state->second[selection];
-            qcopy_nc(&point, base + index * 128 + 0x30);
-            qcopy_nc(&target, base + index * 128 + 0x70);
-            func_L01_003D25B8(self, &point, &target, HALF(0x32) + 0xa9e, HALF(0x30)); }
-            { int triggerIndex = FIELD(8);
-            unsigned char *entities = D_L01_001B255C;
-            int ticks = FIELD(0);
-            FIELD(0x28) = ticks;
-            entities[triggerIndex * 256 + 0xbc] = 1; }
+            {
+                unsigned char *base = D_L01_001B264C;
+                int index;
+                int selection = HALF(0x30);
+                FIELD(0x3c)++;
+                index = state->second[selection];
+                qcopy_nc(&point, base + index * 128 + 0x30);
+                qcopy_nc(&target, base + index * 128 + 0x70);
+                func_L01_003D25B8(self, &point, &target, HALF(0x32) + 0xa9e, HALF(0x30));
+            }
+            {
+                int triggerIndex = FIELD(8);
+                state->timer = FIELD(0);
+                D_L01_001B255C[triggerIndex * 256 + 0xbc] = 1;
+            }
         }
         if (FIELD(0x28) < FIELD(0) - 40)
             D_L01_001B255C[FIELD(8) * 256 + 0xbc] = 0;

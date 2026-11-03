@@ -1,25 +1,7 @@
-/* sol-high v1048 retained near miss, 2026-10-29; not linked.
- * Current pinned profile: -O2 -G16 -Wa,-G16 -ffunction-sections
- * -frac2-qcopy -frac2-qcopy-barrier -g.
- * check.py: 1372/1372 bytes, 0/1 USA v1.01 placements; first mismatch +0x1B0.
- * The explicit context pointer retains the whole-object base and matches the
- * prologue/context accesses. An incomplete sda cursor view reproduces retail's
- * mixed absolute/GP accesses without volatile or separate read/write identities.
- * Header-local pointer snapshots avoid extra cursor reloads. The three larger
- * packet templates use the reviewed SDATA address view without bounding storage.
- * Retail's interpolation header is 0x0800000000000400, not the older draft's
- * 0x0008000000000400. RGB words are sign-extended after their unsigned shifts.
- * -g supplies both measured pre-div.s nop pairs. The camera position is +0x100
- * from its view matrix, corroborated by RAC1 include/camera.h CameraSystem.
- * Remaining: interpolation register allocation and halfword-load order, second
- * division-guard placement, and packet-template base setup near +0x3F8.
- * Explicit typed frame entries, separate index locals and FP-quotient-first
- * wording tie byte-for-byte. -fno-gcse did not improve the earlier candidate;
- * a macro-address context declaration worsened it to 1388 bytes.
- * Reopen with new interpolation operand/pointer-lifetime evidence. Equal size
- * is not a match. Only USA v1.01 was checked; no linked build was run.
- * All declarations required to compile this attempt are included below.
- */
+/* func_L01_003CAFE0 needs -G16 small data, quadword copies and -g line labels
+ * (the nop pairs before both div.s); -frac2-hazard-labels keeps the second
+ * division guard's label on its padding.  The frame entries are block-local,
+ * so local allocation ties them to their index chains. */
 #include "common.h"
 
 
@@ -50,7 +32,7 @@ extern unsigned char *D_L01_001B035C __attribute__((sda)), *D_L01_001B036C __att
 extern Quad D_L01_001B02E0 __attribute__((sda)), D_L01_001B02F0 __attribute__((sda));
 extern unsigned char D_L01_001B0300[] SDATA(D_L01_001B0300);
 extern int D_001A72D0;
-extern unsigned short D_0010FFB0;
+extern unsigned short D_0010FFB0[];
 extern unsigned char D_0010FFC0[];
 extern void func_0027AB40(void), func_00279D18(void);
 extern void func_00282AB0(void *, void *, int), func_00282B50(void *, void *, int);
@@ -66,9 +48,6 @@ void func_L01_003CAFE0(void)
 {
     float matrix[16] __attribute__((aligned(16)));
     unsigned char *packet;
-    FrameEntry *entry0, *entry1;
-    int frame;
-    float fraction;
     u8 *context = D_L01_001BD9C0;
     int mode = D_L01_001B2054[0];
     D_L01_001B31D4 = CONTEXT_FLOAT(0x218);
@@ -100,49 +79,57 @@ void func_L01_003CAFE0(void)
     PACKET_LONG(packet,0x90) = 0x5360a;
     if (D_L01_001B034C < 97) PACKET_LONG(packet,0x90) = 0x5370b;
     {
-    int ticks = D_L01_001B2088;
-    int interval = D_L01_001B0350;
-    fraction = (float)ticks / (float)interval;
-    frame = ticks / interval;
-    fraction -= (float)frame;
-    entry0 = D_L01_001BE0C0 + (D_L01_001B0354 + frame % D_L01_001B0358);
-    entry1 = D_L01_001BE0C0 + (D_L01_001B0354 + (frame + 1) % D_L01_001B0358);
-    {
-        u16 idx0 = entry0->first;
-        u16 idx1 = entry0->second;
-        u16 idx2 = entry1->first;
-        u16 idx3 = entry1->second;
-        u8 *src0 = D_L01_001B2004 + idx0 * 16;
-        u8 *src1 = D_L01_001B2004 + idx1 * 16;
-        u8 *src2 = D_L01_001B2004 + idx2 * 16;
-        u8 *src3 = D_L01_001B2004 + idx3 * 16;
-        PACKET_LONG(D_L01_001B035C,0) = 0x800000000000400UL;
-        PACKET_LONG(D_L01_001B035C,8) = 0;
-        func_L01_003042AC(D_L01_001B035C + 0x10, src0, src1, src2, src3, 4096, fraction);
+        FrameEntry *entry0, *entry1;
+        int frame;
+        float fraction;
+        int ticks = D_L01_001B2088;
+        int interval = D_L01_001B0350;
+        fraction = (float)ticks / (float)interval;
+        frame = ticks / interval;
+        fraction -= (float)frame;
+        entry0 = D_L01_001BE0C0 + (D_L01_001B0354 + frame % D_L01_001B0358);
+        entry1 = D_L01_001BE0C0 + (D_L01_001B0354 + (frame + 1) % D_L01_001B0358);
+        {
+            /* Each entry's second index is read before its first. */
+            u16 idx1 = entry0->second;
+            u16 idx0 = entry0->first;
+            u16 idx3 = entry1->second;
+            u16 idx2 = entry1->first;
+            u8 *src0 = D_L01_001B2004 + idx0 * 16;
+            u8 *src1 = D_L01_001B2004 + idx1 * 16;
+            u8 *src2 = D_L01_001B2004 + idx2 * 16;
+            u8 *src3 = D_L01_001B2004 + idx3 * 16;
+            PACKET_LONG(D_L01_001B035C,0) = 0x800000000000400UL;
+            PACKET_LONG(D_L01_001B035C,8) = 0;
+            func_L01_003042AC(D_L01_001B035C + 0x10, src0, src1, src2, src3, 4096, fraction);
+        }
     }
-    }
     {
-    int ticks = D_L01_001B2088;
-    int interval = D_L01_001B0360;
-    fraction = (float)ticks / (float)interval;
-    frame = ticks / interval;
-    fraction -= (float)frame;
-    D_001A72D0 += 0x4000;
-    entry0 = D_L01_001BE0C0 + (D_L01_001B0364 + frame % D_L01_001B0368);
-    entry1 = D_L01_001BE0C0 + (D_L01_001B0364 + (frame + 1) % D_L01_001B0368);
-    {
-        u16 idx0 = entry0->first;
-        u16 idx1 = entry0->second;
-        u16 idx2 = entry1->first;
-        u16 idx3 = entry1->second;
-        u8 *src0 = D_L01_001B2004 + idx0 * 16;
-        u8 *src1 = D_L01_001B2004 + idx1 * 16;
-        u8 *src2 = D_L01_001B2004 + idx2 * 16;
-        u8 *src3 = D_L01_001B2004 + idx3 * 16;
-        PACKET_LONG(D_L01_001B035C,0) = 0x800000000000400UL;
-        PACKET_LONG(D_L01_001B035C,8) = 0;
-        func_L01_003042AC(D_L01_001B036C, src0, src1, src2, src3, 4096, fraction);
-    }
+        FrameEntry *entry0, *entry1;
+        int frame;
+        float fraction;
+        int ticks = D_L01_001B2088;
+        int interval = D_L01_001B0360;
+        D_001A72D0 += 0x4000;
+        fraction = (float)ticks / (float)interval;
+        frame = ticks / interval;
+        fraction -= (float)frame;
+        entry0 = D_L01_001BE0C0 + (D_L01_001B0364 + frame % D_L01_001B0368);
+        entry1 = D_L01_001BE0C0 + (D_L01_001B0364 + (frame + 1) % D_L01_001B0368);
+        {
+            /* Each entry's second index is read before its first. */
+            u16 idx1 = entry0->second;
+            u16 idx0 = entry0->first;
+            u16 idx3 = entry1->second;
+            u16 idx2 = entry1->first;
+            u8 *src0 = D_L01_001B2004 + idx0 * 16;
+            u8 *src1 = D_L01_001B2004 + idx1 * 16;
+            u8 *src2 = D_L01_001B2004 + idx2 * 16;
+            u8 *src3 = D_L01_001B2004 + idx3 * 16;
+            PACKET_LONG(D_L01_001B035C,0) = 0x800000000000400UL;
+            PACKET_LONG(D_L01_001B035C,8) = 0;
+            func_L01_003042AC(D_L01_001B036C, src0, src1, src2, src3, 4096, fraction);
+        }
     }
     {
         u8 *header = D_L01_001B2CC8[0];
@@ -153,12 +140,15 @@ void func_L01_003CAFE0(void)
     func_00282B50(D_L01_001B2CC8[0], D_L01_001B0300, 0x30);
     D_L01_001B2CC8[0] += 0x30;
     if (D_L01_001B209C != 6) {
-        func_002FC410((unsigned int)D_0010FFC0, D_0010FFB0);
+        func_002FC410((unsigned int)D_0010FFC0, D_0010FFB0[0]);
         D_L01_001B209C = 6;
     }
     packet = D_L01_001B2CC8[0];
-    *(unsigned char **)(D_L01_0026A050 + 4) = D_L01_001AC740;
-    func_00282B50(packet, D_L01_0026A050, 0x50);
+    {
+        unsigned char *tmpl = D_L01_0026A050;
+        *(unsigned char **)(tmpl + 4) = D_L01_001AC740;
+        func_00282B50(packet, tmpl, 0x50);
+    }
     D_L01_001B2CC8[0] += 0x50;
     *(unsigned char **)(packet + 0x24) = D_L01_001B2CC8[0];
     *(unsigned char **)(packet + 0x34) = D_L01_001B2CC8[0];
