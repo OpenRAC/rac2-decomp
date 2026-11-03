@@ -68,7 +68,7 @@ extern int func_00336D50(char *, int);
 extern void func_00300A00(int, int, float, float, float, float, float);
 extern void func_0028FC48(int, int, int, int, unsigned long, int);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, MenuCorners *);
+extern int func_0028EA58(int, int, int, int, int, MenuCorners *);
 extern void func_0028E868(int, int, int, int, int, int);
 extern char *func_00288FB8(int);
 extern int func_0027FB40(int, int, unsigned long long, char *, int);

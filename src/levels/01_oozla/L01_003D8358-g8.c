@@ -1,25 +1,22 @@
-/* functional: high. Near-miss draft within a few instructions of retail: differences are register allocation, scheduling and instruction shape. */
 /*
- * Tier: sol-high, task v0925, USA v1.01, game profile:
- * -O2 -G8 -ffunction-sections. Best check.py: 1108/1108 bytes, 0/1 places.
- * Only two instructions differ: at 003D8580 and 003D8588 the scale multiply
- * (mul.s f20,f20,f21) and direction setup (daddu a2,zero,zero) are swapped.
- * Important semantic correction to the earlier draft: the hero-carrying branch
- * jumps directly to 003D8704, bypassing the unattended height clamp and crossing
- * event. Keep height distinct from the first dot product. Fixing these lifetimes
- * also reproduces retail's initial height-add register assignment and scheduling.
- * qzero_nc clears the real velocity vector and flushes the constant-1 equivalence
- * so the state byte is rematerialized after the random calls, as in retail.
- * That vector is disjoint from the other state fields accessed around the clear.
- * Giving pitch its own temporary fixes the multiply operand order. Computing
- * scale before/after the vector captures, multiple ABI-preserving spring-call
- * interleavings, and -g all leave the final multiply/direction scheduling tie.
- * Stop on the tie; no linked match claimed. Compile as an isolated -g8.c unit.
- * All required declarations follow below; spring signature agrees with its
- * definition in src/game/002AA800.c.
+ * func_L01_003D8358 (oozla, -G8 profile). Case 0 waits for a positive
+ * height from func_L01_003BAFB0, then either picks two random angles and
+ * moves to case 1 (linked object at s+0x8C) or calls func_0026FEB8 and
+ * moves to case 2. Case 1 falls to case 2 once the linked object is gone or
+ * in state 0xFE/0xFD. In case 2, when hero mode (0x34E) is 0 and hero+0x33C
+ * points at this object, two func_002AA898 springs are driven by dot
+ * products of the hero offset and the hero is moved by the resulting change;
+ * otherwise the height eases towards s+0x84, the springs relax and a
+ * one-shot func_002E5CF8 fires when the threshold is crossed.
+ *
+ * Shape notes: height stays distinct from the first dot product. The scale
+ * constant is its own variable (k), read once for -k*y and k*x; reusing one
+ * variable for the constant and the product made sched2 issue the zero
+ * direction argument before k*x. speed*step is added to the height as one
+ * product so the multiply keeps retail's operand order.
  */
 #include "common.h"
-typedef int QuadT __attribute__((mode(TI)));
+typedef int Quad __attribute__((mode(TI)));
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
 #define I(p,o) (*(s32 *)((u8 *)(p)+(o)))
 #define H(p,o) (*(s16 *)((u8 *)(p)+(o)))
@@ -59,7 +56,7 @@ void func_L01_003D8358(u8 *m)
     f32 oldPos[4] __attribute__((aligned(16)));
     f32 move[4] __attribute__((aligned(16)));
     u8 *s = *(u8 **)(m+0x68);
-    f32 height, previous, x, y, pitch, scale, speed, step;
+    f32 k, height, previous, x, y, pitch, scale, speed, step;
     u8 *other;
     func_00282D30(delta,m+0x10,-1.0f);
     qcopy(rotation,m+0xF0);
@@ -92,12 +89,11 @@ void func_L01_003D8358(u8 *m)
             func_00282CF0(relative,HERO+0x80,m+0x10);
             x=func_00282DB0(relative,m+0xC0);
             y=func_00282DB0(relative,m+0xD0);
-            scale=D_L01_001B076C;
-            pitch=-scale;
-            pitch=pitch*y;
-            *(QuadT *)oldAngle=*(QuadT *)(s+0x60);
-            *(QuadT *)oldPos=*(QuadT *)(m+0x10);
-            scale=scale*x;
+            k=D_L01_001B076C;
+            pitch=-k*y;
+            *(Quad *)oldAngle=*(Quad *)(s+0x60);
+            *(Quad *)oldPos=*(Quad *)(m+0x10);
+            scale=k*x;
             func_002AA898(s+0x60,pitch,s+0x70,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
             func_002AA898(s+0x64,scale,s+0x74,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
             func_L01_00316C48(HERO+0x80,move,m+0x10,oldAngle,s+0x60);
@@ -106,8 +102,7 @@ void func_L01_003D8358(u8 *m)
         } else {
             speed=D_L01_001B0774;
             step=(F(s,0x84)-F(m,0x18))*0.016666668f;
-            step=speed*step;
-            F(m,0x18)=F(m,0x18)+step;
+            F(m,0x18)=F(m,0x18)+speed*step;
             if(F(m,0x18)<F(s,0x84)-2.0f) F(m,0x18)+=speed*0.016666668f;
             else {
                 func_002AA898(s+0x60,0.0f,s+0x70,D_L01_001B0788,D_L01_001B078C,D_L01_001B0790,0);

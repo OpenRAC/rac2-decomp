@@ -895,7 +895,7 @@ done:
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_002CC528);
+/* func_002CC528 lives in 002CC528-g8.c. */
 
 /* Near miss: nonmatching/game/func_002CC550.c (316/316 bytes; the two address
    materialisations in the loop preheader keep a separate %hi temporary). */

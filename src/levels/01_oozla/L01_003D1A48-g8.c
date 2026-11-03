@@ -1,17 +1,15 @@
-/* sol-high v1048 recheck, USA v1.01, one placement.
- * Profile: -O2 -G8 -ffunction-sections -g.
- * Best check.py: 1268/1268 bytes, 0/1 places; four non-relocation
- * instructions differ at +0x3DC, +0x3E4, +0x3E8 and +0x3EC.
- * The mask's ori and three pointer preparations are reordered in the inner-loop
- * preheader. Everything else agrees after ignoring relocation payloads; linked
- * switch-table placement and symbol consistency are unverified. Keep this in a
- * separate unit because it owns a five-entry compiler switch table.
- * Current pinned compiler reproduced the four differences. Grouped qcopy,
- * non-clobbering inner copies, unsigned color arithmetic and a 64-bit mask tie;
- * an explicit RGB-mask local moves differences earlier (+0x104). Allocator
- * dumps show the mask rejected on the first loop pass and hoisted on the second,
- * after the pointer preparations. Reopen with independent loop-lifetime evidence.
- * Declarations needed by this attempt are included below.
+/* func_L01_003D1A48: builds GS packet words for a quad strip, then for five
+ * passes (a switch over i, which owns the unit's five-entry jump table) sets a
+ * base point, colour and v offset, and walks t from step to 1 emitting quads
+ * through func_00280B90; each colour's top byte comes from func_00283CF0 of
+ * func_002A7798(func_00283198(t*pi)). Profile -O2 -G8 -ffunction-sections -g;
+ * the copies use qcopy.
+ * The RGB mask is a local constant declared inside the inner loop: its set is
+ * then the first movable in the loop and loop.c hoists it on the first pass,
+ * ahead of the pointer preparations, which gives retail's preheader order
+ * (the 128.0f constant moves to the rerun instead).
+ * Written inline (0xFFFFFF) it was rejected on pass one and hoisted on the
+ * rerun, after them.
  */
 #include "common.h"
 
@@ -129,10 +127,11 @@ void func_L01_003D1A48(u8 *m)
         q.uv[1][1]=q.uv[0][1]=v;
         q.uv[3][1]=q.uv[2][1]=v+1.0f;
         while(t<1.0f) {
+            int rgb = 0xFFFFFF;
             angle=func_002A7798(func_00283198(t*3.14159274f))*128.0f;
             q.color[0]=q.color[1]=q.color[2];
             color=func_00283CF0((D_L01_001B04F4*angle)* *(float *)(s+0xAC));
-            q.color[2]=q.color[3]=(q.color[0]&0xFFFFFF)|(color<<24);
+            q.color[2]=q.color[3]=(q.color[0]&rgb)|(color<<24);
             qcopy(q.p[0],q.p[2]);
             qcopy(q.p[1],q.p[3]);
             func_00282CF0(q.p[2],c,d);

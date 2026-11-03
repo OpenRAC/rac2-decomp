@@ -39,7 +39,7 @@ extern void func_002F9BC0(char *, int);
 extern void func_00288870(void *, int, int);
 extern int func_002F6510(void);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, void *);
+extern int func_0028EA58(int, int, int, int, int, void *);
 
 /* Draws the selected vendor item, its price and the purchase/maximum-ammo prompt. */
 void func_US2_002FB718(void)

@@ -9,7 +9,7 @@ extern int D_001A7B90 __attribute__((sda));
 extern int func_00288FB8(int);
 extern void func_0027FA10(int, int, unsigned long long, unsigned char *, int);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, unsigned int *);
+extern int func_0028EA58(int, int, int, int, int, unsigned int *);
 extern void func_PAL_002FAB40(char *, int);
 extern void func_0027F5B8(int, int, unsigned long long, unsigned char *, int);
 extern unsigned int func_L00_002F3DD0(int);

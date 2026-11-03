@@ -80,7 +80,7 @@ Say which in the commit. A function that is merely hard is a near miss, not hand
 ## When to stop on a function
 
 Some functions cannot be matched from C, and some have cost enough. Know which before another
-attempt; OpenRAC's `docs/workflow/BACKFILL.md` has the measurements and the full procedure.
+attempt; OpenRAC's `docs/port/BACKFILL.md` has the measurements and the full procedure.
 
 - **Not a function.** Establish from the surrounding retail bytes that the catalogue split off
   an internal fragment or padding before proposing a fix in `tools/levels.py`. A missing

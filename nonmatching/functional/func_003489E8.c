@@ -1,4 +1,4 @@
-/* functional: medium. Menu list update: sets the visibility of the seven sub-widgets from the mode flag at +0x44C, positions five widgets from a constant table plus the origin at +0x434, lays out the item rows, then moves the selection on the pad's up/down bits (skipping empty entries), highlights it and returns the selected index. Field names are unknown; stores, calls and branches follow retail. */
+/* functional: medium. Menu list update: sets the visibility of the seven sub-widgets from the mode flag at +0x44C, positions five widgets from a constant table plus the origin at +0x434, lays out the item rows, then moves the selection on the pad's up/down bits (skipping empty entries), highlights it and returns the selected index. Field names are unknown; stores, calls and branches follow retail (func_00335F88 takes four floats: the row scale and three zeros, which an earlier one-float prototype left as garbage in f13-f15). */
 typedef unsigned char u8;
 
 extern float D_001AE5EC;
@@ -8,7 +8,7 @@ extern void func_00335E68(u8 *w, int on);
 extern void func_003363C0(u8 *w, float f);
 extern float *func_00335E10(u8 *w);
 extern unsigned int *func_00335E20(u8 *w);
-extern void func_00335F88(u8 *w, float f);
+extern void func_00335F88(u8 *w, float x, float y, float z, float w2);
 extern void func_002E5E58(int a, int b, int c);
 extern void func_002A9588(int a, int b, int c, int d, int e);
 
@@ -22,7 +22,7 @@ int func_003489E8(u8 *m, int pad)
     u8 *wE4 = m + 0xE4;
     u8 *a, *b, *c, *d;
     float f;
-    int pressed, step, i, n, idx, v, start, lim;
+    int pressed, step, i, idx, v, start, lim;
     float *p;
     float **org = (float **)(m + 0x434);
 
@@ -71,7 +71,6 @@ int func_003489E8(u8 *m, int pad)
     p[0] = D_001AE760[8] + (*org)[0];
     p[1] = D_001AE760[9] + (*org)[1];
 
-    n = *(int *)(m + 0x444);
     for (i = 0; i < *(int *)(m + 0x444); i++) {
         u8 *row = m + 0x218 + i * 0x48;
         float *src;
@@ -80,7 +79,7 @@ int func_003489E8(u8 *m, int pad)
         p[0] = src[0] + (*org)[0];
         src = (float *)(*(int *)(m + 0x414) + i * 12);
         p[1] = src[1] + (*org)[1];
-        func_00335F88(row, ((float *)(*(int *)(m + 0x414) + i * 12))[2]);
+        func_00335F88(row, ((float *)(*(int *)(m + 0x414) + i * 12))[2], 0.0f, 0.0f, 0.0f);
         if (*(int *)(m + 0x418 + i * 4) != 0)
             *func_00335E20(row) = 0x80F0F0F0;
         else
@@ -98,7 +97,7 @@ int func_003489E8(u8 *m, int pad)
     if (step != 0) {
         start = *(int *)(m + 0x43C);
         func_002A9588(0, 0, 1, 0, 1);
-        lim = n - 1;
+        lim = *(int *)(m + 0x444) - 1;
         do {
             v = *(int *)(m + 0x43C) + step;
             if (lim < v)

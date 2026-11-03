@@ -3055,3 +3055,5 @@ src/game/0032AE30-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-
 src/levels/shared/L04_004135B8-g8.c	-O2 -G8 -g -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L00_003B63D8-counter-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/levels/shared/L03_003E4680-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/game/002CC528-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/levels/01_oozla/L01_003D1A48-g8.c	-O2 -G8 -ffunction-sections -g

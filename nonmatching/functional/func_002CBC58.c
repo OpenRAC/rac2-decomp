@@ -1,6 +1,8 @@
 /* functional: medium. Written from the assembly: same reads, writes and calls with the same arguments in the same order; the divide-by-zero checks retail emits for the divisions by 2*h and 2*w are dropped. */
 extern char D_001F2840[];       /* C: the menu block */
 extern char D_00138180[];       /* P: the pad block */
+extern char D_00259018[], D_0025A738[], D_0025A498[], D_0025A190[], D_00259EE0[];
+extern int func_002DBAD0(), func_002DA118(), func_002D84B0(), func_002DA9A8();
 extern int D_001A72DC;
 extern int D_001A7344;
 extern int D_001AB91C;          /* gp-0x36D4 */
@@ -65,26 +67,26 @@ void func_002CBC58(int mode)
 
     if (D_001AB91C != 0) {
         s1 = CW(0x14);
-        if (s1 == 0x259018) {
+        if (s1 == (int)D_00259018) {
             func_0027C540(0);
             ((void (*)(void))D_00210AD0)();
             func_0027C660();
             return;
         }
-        if (s1 == 0x25A738) {
+        if (s1 == (int)D_0025A738) {
             func_0027C540(0);
             func_0028E458();
             func_0029BF08();
             func_0027C660();
             return;
         }
-        if (s1 == 0x25A498) {
+        if (s1 == (int)D_0025A498) {
             if (D_001AB910 == 0) {
                 func_0027C540(0);
                 func_0029C2D0();
                 func_0027C660();
             }
-        } else if (CW(0x14) == 0x25A190) {
+        } else if (CW(0x14) == (int)D_0025A190) {
             if (D_001AB910 == 0) {
                 func_0027C540(0);
                 func_0029C340();
@@ -124,7 +126,7 @@ void func_002CBC58(int mode)
         widget = *(int *)(s7 + 4 * i);
         *(int *)(widget + 0x24) = *(int *)(CW(0x14) + (i << 4) + 0xC);
         widget = *(int *)(s7 + 4 * i);
-        if (widget == 0x259EE0)
+        if (widget == (int)D_00259EE0)
             *(int *)(widget + 0x24) = 0x100;
     }
 
@@ -174,7 +176,7 @@ void func_002CBC58(int mode)
                 s1--;
             {
                 int cb = *(int *)(*(int *)(s7 + 4 * i) + 4);
-                if ((cb == 0x2DBAD0 || cb == 0x2DA118 || cb == 0x2D84B0 || cb == 0x2DA9A8)
+                if ((cb == (int)func_002DBAD0 || cb == (int)func_002DA118 || cb == (int)func_002D84B0 || cb == (int)func_002DA9A8)
                     && !(*(int *)(*(int *)(s7 + 4 * i) + 0x10) & 8)) {
                     func_00280510(1.0f, s2, s1, 0);
                     func_0028FDD8(0, 0, s6 << s2, s6 << s1, D_001AA43C, 0, 0);
