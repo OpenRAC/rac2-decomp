@@ -529,8 +529,6 @@ void func_L03_00339268(unsigned char *a0) {
     func_331270(a0);
 }
 
-INCLUDE_ASM("asm/levels", func_L03_003564C0);
-
 
 INCLUDE_ASM("asm/levels", func_L03_0038AB30);
 

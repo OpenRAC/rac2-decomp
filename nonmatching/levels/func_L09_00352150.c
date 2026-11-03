@@ -1,3 +1,6 @@
+/* 3 November 2026: entry defect resolved in FUNCTION_ENTRY_OFFSETS.
+ * Matching C now lives in src/levels/shared/L09_00352150-g8.c.
+ * The earlier diagnosis below is retained as history. */
 /* func_L09_00352150 - 288 bytes, 1 place, level 09_dobbo, retail at 0x00352150.
    Screened, not attempted in this wave: the extent looks like a catalogue fragment
    rather than a function, so no C was written for it and nothing here is a

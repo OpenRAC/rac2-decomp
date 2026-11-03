@@ -1,3 +1,6 @@
+/* 3 November 2026: entry defect resolved in FUNCTION_ENTRY_OFFSETS.
+ * Matching C now lives in src/levels/shared/L23_0035CE90-g8.c.
+ * The earlier diagnosis below is retained as history. */
 /* func_L23_0035CE90 -- NEAR MISS, not integrated. THE CATALOGUE ROW IS WRONG.
    The row starts at 0x0035CE90 with 288 bytes, but its first 16 bytes are padding after
    the previous function's `jr $ra` at 0x0035CE84: `sw $t3,0x40($v1); nop;

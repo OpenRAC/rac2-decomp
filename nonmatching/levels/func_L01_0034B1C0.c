@@ -1,3 +1,6 @@
+/* 3 November 2026: entry defect resolved in FUNCTION_ENTRY_OFFSETS.
+ * Matching C now lives in src/levels/shared/L01_0034B1C0-g8.c.
+ * The earlier diagnosis below is retained as history. */
 /* No attempt: the extent is not a function - a catalogue split error.
 
    The catalogue's 288-byte extent at 0x0034B1C0 (level 01) holds sixteen bytes of
