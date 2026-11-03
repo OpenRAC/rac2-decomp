@@ -9,7 +9,7 @@
 
 typedef int L14_TI128 __attribute__((mode(TI)));
 
-extern void *func_002B60B0(char *, float, float, float, float);
+extern void func_002B60B0(char *, float, float, float, float);
 extern int func_L02_0032E508(char *, int, void *, int);
 extern int func_002A77E0(int);
 extern void func_002A7750(char *, int, int);

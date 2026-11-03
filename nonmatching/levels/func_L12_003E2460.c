@@ -103,7 +103,7 @@ extern void func_002A7470(void *, int, int, int);
 extern int func_002B3890(void *);
 extern int func_002B3868(void *);
 extern int func_00282978(void *);
-extern void *func_002B60B0(void *, float, float, float, float);
+extern void func_002B60B0(void *, float, float, float, float);
 extern void func_0029FC20(void *, int, void *);
 extern void func_002830C0(void *, void *, void *);
 extern int func_002761F8(void *, void *, int, void *, int);

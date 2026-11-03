@@ -296,6 +296,12 @@ silently changing neighbouring definitions.
   residual result. Correcting the definition and caller declarations together
   preserves matching bytes. Do not infer a returned value solely from a register
   left live at the epilogue, or infer void solely because result paths differ.
+  `func_002B60B0` is the same case: its pointer only stays in `$v0` from
+  `func_002B5D28`. A `void` definition with the stores in parameter order gives the
+  same bytes at all 23 places, and none of its 505 retail calls reads `$v0`. Its
+  callers' allocation depends on it: a value-returning declaration moves the
+  first load after the call from `$v0` to `$v1` (`func_L11_00420C88`,
+  `func_L11_00424A60`).
 - A body that ignores a formal does not prove a zero-argument API.
   `func_001261F0` retains the real 32-bit `sceGsSyncV` mode argument, supported
   by the public OpenGOAL interface and the game's zero-valued callers. The

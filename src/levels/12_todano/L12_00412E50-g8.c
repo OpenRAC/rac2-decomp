@@ -8,7 +8,7 @@ extern f32 D_L12_001B1800 __attribute__((sda));
 extern f32 D_L12_001B1804 __attribute__((sda));
 extern f32 D_L12_001B1808 __attribute__((sda));
 
-extern void *func_002B60B0(u8 *, f32, f32, f32, f32);
+extern void func_002B60B0(u8 *, f32, f32, f32, f32);
 extern void func_002A7470(void *, s32, s32, s32);
 
 typedef struct StateData {

@@ -16,7 +16,7 @@ extern void func_L02_003CD298(struct L02NearObject *), func_L02_003CD4A8(struct 
 extern u8 *func_L02_003CEBB8(int);
 extern void func_0029F338(void *), func_002A7750(u8 *, int, int), func_002A7470(char *, int, int, int), func_US2_002A7AA8(char *, void *, int);
 extern int func_002B3868(u8 *), func_002B3890(u8 *), func_002A77E0(int), func_002A7820(int, int), func_00282978(short *);
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern int func_002B1C20(void *, void *);
 extern void func_L01_003E9CF8(char *, int, void (*)(char *));
 extern int func_L01_00321178(char *, char *), func_L01_00322288(int, float), func_L02_00331440(void *, void *, int, float, float, float), func_L02_00332630(char *, void *);

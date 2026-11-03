@@ -137,7 +137,7 @@ extern void func_L03_003C3220(u8 *);
 extern int func_002B3890(u8 *);
 extern int func_002B3868(u8 *);
 extern int func_002B38B8(u8 *);
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern u32 func_002B1C20(void *, DispatchContext *);
 extern void func_002A7750(u8 *, s32, s32);
 extern int func_00288E18(int, int);

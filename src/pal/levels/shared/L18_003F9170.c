@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern s32 func_00283CF0(float);
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern void func_002A7750(u8 *, s32, s32);
 extern void func_L18_003F7590(u8 *);
 extern s32 func_L18_0032B768(u8 *, s32, s32);

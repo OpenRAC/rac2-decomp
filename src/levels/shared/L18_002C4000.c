@@ -905,7 +905,7 @@ void func_L18_00426F28(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2, 
     }
 }
 
-extern void *func_002B60B0(BatchA_A18_u8 *, float, float, float, float);
+extern void func_002B60B0(BatchA_A18_u8 *, float, float, float, float);
 extern void func_00282948(void *a0);
 
 /* the object's scale angles are re-submitted in degrees, then the matrix is rebuilt */

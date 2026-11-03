@@ -35,7 +35,7 @@ extern void func_L02_0040D180(u8 *);
 extern char *func_L02_003FC098(char *);
 extern s32 func_002B3868(u8 *);
 extern s32 func_002B3890(u8 *);
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern s32 func_L02_003FC0B8(char *);
 extern s32 func_L00_003206B8(void *, s32);
 extern void func_L01_00321178(char *, char *);

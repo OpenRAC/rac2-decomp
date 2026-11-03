@@ -29,7 +29,7 @@ void func_PAL_L18_0042BA90(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 
     }
 }
 
-extern void *func_002B60B0(BatchA_A18_u8 *, float, float, float, float);
+extern void func_002B60B0(BatchA_A18_u8 *, float, float, float, float);
 extern void func_00282948(void *a0);
 extern void func_00282948(void *a0);
 

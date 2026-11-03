@@ -1,48 +1,11 @@
-/* Joba NPC state machine, retained reconstruction (not functional-gated).
- * USA v1.01, measured 2026-11-03: 15,832/15,832 bytes, 0/1 placement; 18
- * instructions differ, all register names at three call sites (see Remaining).
- * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier;
- * compile as a separate unit (e.g. src/levels/11_joba/L11_00420C88-big-g8.c).
- * Earlier drafts' byte counts included 47 alignment nops from a do/while(0)
- * animation macro; PLAY is now a conditional expression.
- * What made the control flow match: an arm that ends in its own func_002A7750 call
- * (and break) per branch, so jump2 cross-jumps only the shared call; nested
- * func_00283248/func_00282E80 calls as arguments, so object+0x10 and &side are
- * formed before them; strict float compares (x < c) instead of !(c <= x); case-local
- * pointers (linked, other_state, the case 40 node and mount, case 1's loop
- * variables, case 2/3's range) so global allocation gives object $s2, state $s3 and
- * path $s1; case 19 indexes the table with 0x56c (the draft used 0x54c); the second
- * switch has an empty case 1 (retail's jump table starts at 1); case 15 multiplies
- * by a 1.0f local (turn_scale), which survives as lui/mtc1/mul.s like retail.
- * 2026-11-03, second pass (15,840 -> 15,832 bytes, ~120 -> 18 rows):
- * - Second-switch case 5 partner search: the for (;;) loop of matched
- *   func_L11_00424A60 with its static inline moby helpers, the found test ending
- *   in break and `if (*(short *)ids++ < 0) goto partner_done;`. expand_end_loop
- *   rotates the loop (entry b into the found test) and the inlined helpers keep
- *   jump1 from duplicating that exit test, so gcse inserts the D_L11_001B359C
- *   load after NOTE_INSN_LOOP_BEG; haifa treats the note as a barrier, the load
- *   stays last before the b and reorg puts it in the slot ($gp form). Reading
- *   *ids twice gives retail's daddu copy. Incrementing before the test lets
- *   reorg fill the bltz slot with the addiu backwards; incrementing after it
- *   needs a fall-through fill that mark_target_live_regs refuses ($a2 looks
- *   live at the exit; it follows only one conditional branch). The case 28
- *   alignment nop disappeared with the extra word.
- * - Case 28 and case 5 declare their own ids (and case 28 its id): retail keeps
- *   them in different registers.
- * - Case 40 recomputes the node into a second variable (next): retail gives the
- *   two node values different registers.
- * Remaining: cases 14, 15 and 22 (0x422BCC, 0x422C50, 0x423110): retail puts
- * the WORD(state, 0x54c/0x56c) index in $v0 and the D_L11_001FF580 base in $v1;
- * ours swaps them. Cause, from private dumps: the index lw is the first insn
- * after the value-returning func_002B60B0 call (sched1 priority 8 against 7 for
- * the lui), and local-alloc's INSN_SCHEDULING fake birth then overlaps the
- * call's REG_UNUSED $v0, so the index takes $v1. Each block has two local
- * quantities, so the three-quantity sort issue is not involved. A void
- * prototype gives 1/1 but is false (src/game/002B60B0.c returns the pointer);
- * 24 matched callers elsewhere already rely on a void declaration. Tied at 18:
- * path, index and object locals, *(index + table), the pointer argument
- * declared among the floats; a table-pointer local hoists the lui (32 rows).
- * See docs/MATCHING-BLOCKERS.md, "func_002B60B0 caller declarations".
+/* func_L11_00420C88: the Joba NPC state machine (two switches over the object's
+ * mode bytes 0x95 and 0x20). Its own unit for the -frac2-qcopy profile
+ * (config/cflags.txt). Control-flow notes: each arm that ends in a
+ * func_002A7750 call has its own call and break, so jump2 cross-jumps only the
+ * shared call; float compares are strict (x < c); case-local pointers keep
+ * object, state and path in $s2, $s3 and $s1. func_002B60B0 returns nothing
+ * (src/game/002B60B0.c; no retail call reads $v0), so the index load after it
+ * may take $v0 (cases 14, 15 and 22).
  */
 #include "common.h"
 
@@ -69,7 +32,7 @@ extern float func_002A89A8(void *, int, float);
 extern void func_0026FEB8(const char *, ...);
 extern int func_002A77E0(int);
 extern void func_L00_003294F0(unsigned char *, int);
-extern void *func_002B60B0(unsigned char *, float, float, float, float);
+extern void func_002B60B0(unsigned char *, float, float, float, float);
 extern void func_002A7750(unsigned char *, unsigned char, int);
 extern void func_002A7470(void *, int, int, int);
 extern char *func_0029EFD0(int);
