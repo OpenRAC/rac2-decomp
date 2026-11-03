@@ -69,7 +69,10 @@ what the retail code does when the port runs it.
     That is why each row alone changed levels 4, 9, 11, 12, 14 and 16. With #236 and no rows,
     the tours are the same as with either row, so these rows were not the culprits.
   - Level 14's retail capture takes states from `func_L00_00358B30`.
-  - **Not yet shown:** a bit-for-bit comparison of those six levels against a retail run.
+  - **Retail comparison, level 14:** with the runs aligned at the hero's first big move, he
+    settles at z `109.9896` in retail, `109.9895` with #236 and `109.9942` without it, for about
+    305 fields each. After the two builds part in level 9 the fix is closer to retail on 828
+    fields and further on 532, which is weaker evidence. The other four levels were not compared.
 - **Level 26's drift no longer reproduces.** On `develop` (`498c04408`) each of the four suspects
   alone matches the build without them on level 26, and all 38 left-out rows together match the
   #236 build on all 26 tours. Tours compare rounded values, so an ulp-sized difference can hide.
@@ -79,10 +82,10 @@ what the retail code does when the port runs it.
 - **11 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.** Ten are
   `unchecked` (loaders, main loops, FMV, code no capture calls) and `func_L03_003E4680` has no
   verdict. A clean tour does not count as SAME; a row returns only when it is proven.
-- **Rows waiting on retail captures:**
-  - `func_L08_003CD708` and `func_L08_003CDB78`;
-  - `func_L20_0036AE68`: #392 moved its entry to `0x36AE78`, 272 bytes; re-capture it at the
-    new entry.
+- **Rows waiting on retail captures:** `func_L08_003CD708` and `func_L08_003CDB78`. Retail never
+  called them in the `fcheck` play of levels 8, 9 and 19, so they need a route that reaches the
+  object using them. They have near misses in `nonmatching/levels/` but no functional files yet.
+  `func_L20_0036AE68` is matched and needs no row.
 - **Contributor PRs #396–#399 are merged** and match 157 functions. 91 of them had functional
   rows; those rows and their files are gone, so `functional.tsv` has 381 rows. Three of the 40
   left-out files are matched now: `func_00293F98`, `func_002EC408` and `func_L00_002B30E8` (one
@@ -159,6 +162,9 @@ rows give the same run, diff the generated code (`games/rac2-ntsc/gen`) for what
   - with each merge reverted.
   
   A one-at-a-time bisect over 30-minute builds wastes hours.
+- **Aligning a port run with retail.** Tick numbers part after a load, because the port doesn't
+  model load time. Hold the level write through the boot, find the hero's first big move in each
+  run, and shift the play inputs by the difference. Level 14 then stays within 0.05 for 685 ticks.
 - **Tours.** OpenRAC's regress tour drives each level to control and compares the runs.
   - "Diverges from the previous build" is not "wrong". Check the diverging level against retail
     before reverting anything: levels 22 and 23 were a fix, and the 14-level change after the
@@ -222,10 +228,8 @@ there come from this repository's code and help when naming progress code:
 
 ## Open items
 
-- Compare one of levels 4, 9, 11, 12, 14 or 16 against a retail run, to confirm #236.
 - Prove and return the 11 rows still left out.
-- Capture and gate the three waiting rows (two in level 8, `func_L20_0036AE68` at its new
-  entry).
+- Find a route to the two level 8 rows, write their functional C, then capture and gate them.
 - Feltzin still splits from retail at about tick 1,937: the port fires one extra projectile.
   Projectile positions are 1–3 ulps off from the first spawn, likely the joint target
   (`func_0029FCC0` → `func_002A3F10`, the bone matrix) on host floats.
