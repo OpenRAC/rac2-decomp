@@ -3027,12 +3027,19 @@ src/levels/shared/L02_003C26F0-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/levels/shared/L00_003EEE90-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L03_003C3220-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L04_003FA7E0.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsplit-edges
+src/levels/shared/L18_003F5650-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
 src/game/002B00B0-state-g8.c	-O2 -G8 -ffunction-sections
 src/game/002CEBD0-g8.c	-O2 -G8 -ffunction-sections -g
 src/game/0030F7B0-launch-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/levels/shared/L00_003F5870-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/levels/shared/L18_002C4000-switch-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/levels/shared/L18_002C4000-quad.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L09_003AE8C8-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_0037DD80-nsr.c	-O2 -G0 -ffunction-sections -fno-strength-reduce -fno-gcse -fno-sched-interblock
 src/levels/shared/L00_002D7940-fade.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L02_00389F70.c	-O2 -G0 -ffunction-sections -mno-split-addresses
+src/levels/shared/L02_00333480.c	-O2 -G0 -ffunction-sections -mno-split-addresses
+src/levels/shared/L22_002A8B98-switch.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order
 src/game/0028BDB0-radial-g8.c	-O2 -G8 -ffunction-sections -g
 src/game/00327038-push-g8.c	-O2 -G8 -ffunction-sections -ffast-math -g
 src/game/0027F128-fpw-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32 -mno-split-addresses

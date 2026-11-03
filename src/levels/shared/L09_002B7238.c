@@ -43,9 +43,9 @@ extern unsigned int D_L09_001FB560[];
 
 extern char *D_L09_001B285C __attribute__((sda));
 
-extern int func_002AD980(void);
+extern int func_002AD980(u8 *object);
 
-extern int D_0018C0B0;
+extern u8 *D_0018C0B0;
 
 extern int func_002B6120(char *object, unsigned int entry);
 
@@ -178,7 +178,18 @@ extern void ref_L09_003F8858_00(char *object, int value);
 
 
 
-INCLUDE_ASM("asm/levels", func_L09_00326E90);
+int func_L09_00326E90(u8 *object)
+{
+    int state;
+
+    if (object == D_0018C0B0)
+        return 1;
+    state = func_002AD980(object);
+    if (state == 255 || state == 10 || state == 18 || state == 53 || state == 14
+        || state == 17 || state == 12)
+        return 1;
+    return 0;
+}
 
 int func_L09_00329028(char *object, int index)
 {
@@ -204,7 +215,7 @@ int func_L09_00329178(char *object, int index, int count, int value)
     return func_002B6228(object, (void *)entry, count, value);
 }
 
-INCLUDE_ASM("asm/levels", func_L09_003364E0);
+/* func_L09_003364E0 is matched in its own unit, src/levels/shared/L09_003364E0.c (default flags). */
 
 /* func_L09_0033E658 is matched in L09_0033E658-rc2.c. */
 
@@ -252,7 +263,7 @@ INCLUDE_ASM("asm/levels", func_L09_003A01D8);
 
 /* func_L09_003A06B0 is defined in L09_003A06B0-helpers.c. */
 
-INCLUDE_ASM("asm/levels", func_L09_003AE8C8);
+/* func_L09_003AE8C8 is matched in its own unit, src/levels/shared/L09_003AE8C8-g8.c (-g). */
 
 /* func_L09_003AEA88 is matched in its own unit, src/levels/shared/L09_003AEA88.c (default flags). */
 

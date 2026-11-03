@@ -816,6 +816,7 @@
 #define BuildShopChannelList             func_002F73A8
 #define TryClaimNotice                   func_002B0C28
 #define ForceClaimNotice                 func_002B0CE0
+#define ResetBoltPointsToLine            func_L11_0046BC08
 #define ReloadSoundBank                  func_L00_0032D208
 #define KeyOwnerTableInsert              func_L00_0037DD18
 #define ReleaseDeadOrExpiredSlots        func_L00_0037E000

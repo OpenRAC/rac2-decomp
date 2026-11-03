@@ -619,7 +619,7 @@ void func_L04_0033CB88(char *p)
     *(float *)(p + 44) = 0.1f;
 }
 
-INCLUDE_ASM("asm/levels", func_L04_0033CC00);
+/* func_L04_0033CC00 is defined in L04_002CC748-movement.c. */
 
 /* func_L04_0033D0C0 is defined in L04_0033D0C0.c. */
 
@@ -1171,7 +1171,28 @@ void func_L04_003A1240(unsigned char *cells, int count)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L04_003A14B8);
+/* Sets the 6-bit tag (bits 24-29) of every word in the state block's sub-array. */
+void func_L04_003A14B8(u8 *object, u32 value) {
+    u8 *state = *(u8 **)(object + 0x98);
+    u32 tag;
+    u8 *base;
+    u32 *p;
+    s32 count;
+    s32 offset;
+    s32 i;
+
+    count = *(s32 *)(state + 0x8) / 4;
+    tag = value & 0x3F;
+    tag <<= 24;
+    offset = *(s32 *)(state + 0xC) / 8;
+    base = state + *(s32 *)(state + 0x4) + 0x10;
+    p = (u32 *)(base + offset * 8);
+
+    for (i = 0; i < count; i++) {
+        p[i] = (p[i] & 0xC0FFFFFF) | tag;
+    }
+}
+
 
 /* returns the packed header's signed rounded sixteen-byte block count in word units */
 s32 func_L04_003A1540(const PackedHeaderCountView *header) {

@@ -1,14 +1,4 @@
-/* GPT-6.1 Sol high, v0711, pinned upstream compiler, USA v1.01.
- * Best: 280/280 bytes, 0/5 placements; default -O2 -G0 profile.
- * Loading/storing class_id before scale leaves two final stores misplaced,
- * instead of the previous four-word scheduling disagreement. The object,
- * value and parameter still occupy S2/S0/S3 instead of retail S3/S2/S0.
- * Class-id snapshot, early return, block-scoped header values and -g did not
- * repair allocation. Reversed header stores put parameter in S0 but reverse
- * retail's first two header stores and leave object/value allocation wrong.
- * Reopen with actual allocator/lifetime evidence. Required types are below.
- * No linked build claimed.
- */
+#include "include_asm.h"
 #include "common.h"
 
 typedef union {
@@ -23,7 +13,7 @@ typedef struct {
     float scale;
 } ParticleContext;
 
-/* B9038 allocates at a 64-byte stride and clears all four quadwords. */
+/* A 64-byte particle slot: four quadwords. */
 typedef struct {
     ParticleHeader header;
     float position[4];
@@ -36,8 +26,10 @@ extern void *func_002B9030(int);
 extern int func_00283CF0(float);
 extern void func_0029FCC0(char *, int, char *);
 
-char *func_L09_003364E0(char *object, int index, u32 value, int parameter,
-                      float first_scale, float second_scale)
+/* Integer arguments stay object, index, value, parameter ($a0-$a3) and float arguments
+   first_scale, second_scale ($f12-$f13); only the interleaving of the two banks is chosen. */
+char *func_L09_003364E0(char *object, int index, float first_scale, u32 value,
+                        float second_scale, int parameter)
 {
     ParticleSlot *slot = func_002B9030(0x37);
     float *position;
@@ -59,11 +51,12 @@ char *func_L09_003364E0(char *object, int index, u32 value, int parameter,
         slot->previous_position[3] = second_scale;
         slot->position[3] = first_scale;
         {
-        ParticleContext *context = &slot->context;
-        context->object = object;
-        context->class_id = *(short *)(object + 0xAA);
-        context->scale = first_scale;
-        context->index = index;
+            ParticleContext *context = &slot->context;
+
+            context->object = object;
+            context->class_id = *(short *)(object + 0xAA);
+            context->index = index;
+            context->scale = first_scale;
         }
     }
     return (char *)slot;

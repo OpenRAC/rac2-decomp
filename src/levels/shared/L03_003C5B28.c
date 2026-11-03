@@ -230,7 +230,7 @@ void func_L03_003D0FC8(u8 *a0, s32 a1, s32 a2) {
 
 /* func_L03_003D9578 is defined in L03_003D9578.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_003D9820);
+/* func_L03_003D9820 is defined in L03_003D9820-g8.c. */
 
 /* func_L03_003E21B0 lives in L03_003E21B0-g8.c. */
 

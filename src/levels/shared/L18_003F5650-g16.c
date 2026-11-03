@@ -1,34 +1,6 @@
 /*
- * GPT-6.1 Sol worker v1617, 2026-10-29: recompiled this retained draft with
- * upstream pinned toolchain, dedicated -O2 -G16 -Wa,-G16 -ffunction-sections
- * unit. USA: 5,716/5,716 bytes, 0/3 places; first mismatch +0xEF0 (case 13
- * a0/a1 setup order). The case 13 loop still hoists the group mask/shift.
- * Independent -g, -frac2-gcse-unsplit-edges and -frac2-keep-block-order probes
- * do not improve the first mismatch (0/3 each). No C body change retained.
- * USA v2.00: 0/3 places, same first mismatch +0xEF0. PAL: neither catalogue.
- * Six checker runs total; no linked build (no match).
- * All required declarations follow below. See older detailed analysis.
- */
-/*
- * func_L18_003F5650 (5,716 B; levels 18, 19, 20): Opus near miss, 2026-10-26 (slates big5,
- * big12). Profile: -O2 -G16 -Wa,-G16 -ffunction-sections, as its own unit
- * (src/levels/shared/L18_003F5650-g16.c). check.py: 5,716 of 5,716 bytes, opcodes 1,424 of
- * 1,429 in place; about 27 instructions differ, all in case 13:
- *  - big12 fixed case 6 (the 0x31 arms each end with the whole 0x48 store, so flow's
- *    (use 0) after the arm's call no longer blocks cross-jumping) and case 10 (a `char *h`
- *    copy of D_00189E20 inside the loop, D_00189EA0 read as h + 0x80: global alloc then gives
- *    $fp to &D_00189E20 and rematerialises 0xB69, as retail does).
- *  - case 13, the call to func_L14_00423CD0: retail sets a1 before a0; no float position
- *    in the prototype (0..5 tried) and no declaration order changes it.
- *  - case 13 group loop: retail recomputes (u8)grp and grp << 2 on each pass. Here PRE
- *    (classic, non-edge LCM) inserts both at the end of the preheader (gcse -dG: "PRE/HOIST
- *    end of bb 177"), which also makes loop.c call the loop phony. Retail inserts only the
- *    %hi of D_L18_001FB320 there ($s3). Rereading the group in the increment, as case 12
- *    does (`grp = *(s32 *)(st + 0x27C), g++`), gives retail's loop shape exactly but keeps
- *    the reload lw (+4 bytes) and moves grp/g/lost to a2/a1/t0 (retail a1/a2/a3): the
- *    reload is fully redundant (no store or call in the loop), yet this PRE does not delete
- *    it; retail did, or the source differs. A loop-carried `id = grp` copy stops the shift
- *    hoist but cprop restores the and. Next step: instrument pre_lcm for the 0x27C load.
+ * func_L18_003F5650 (levels 18, 19, 20), built on its own at -G16. Cases 12 and 13 share
+ * the function-scope `grp`, as retail does: one pseudo, so both loops keep it in $a1.
  */
 #include "common.h"
 
@@ -97,6 +69,7 @@ void func_L18_003F5650(u8 *a0)
     float r[4] __attribute__((aligned(16)));
     s32 n;
     u8 *st;
+    s32 grp;
 
     st = *(u8 **)(a0 + 0x68);
     switch (a0[0x20]) {
@@ -358,7 +331,6 @@ void func_L18_003F5650(u8 *a0)
     }
     case 12: {
         u8 phase;
-        s32 grp;
         if (func_002B3868(a0) != 0) {
             float f;
             if (a0[0x43] != 4) {
@@ -424,7 +396,6 @@ void func_L18_003F5650(u8 *a0)
     }
     case 13: {
         u16 *g;
-        s32 grp;
         s32 lost;
         if (func_002B3868(a0) != 0) {
             float f;
@@ -447,8 +418,8 @@ void func_L18_003F5650(u8 *a0)
         }
         lost = 1;
         for (g = D_L18_001FB320[grp];
-             (u8)grp != 0xFF && grp <= D_L18_001B2838[0] && g != 0
-             && ((g != 0 && (s16)g[-1] >= 0) || g == D_L18_001FB320[grp]);
+             (*(s32 *)(st + 0x27C) & 0xFF) != 0xFF && *(s32 *)(st + 0x27C) <= D_L18_001B2838[0] && g != 0
+             && ((g != 0 && (s16)g[-1] >= 0) || g == D_L18_001FB320[*(s32 *)(st + 0x27C)]);
              g++) {
             u8 *e = D_L18_001B281C[0] + ((*g & 0x7FFF) << 8);
             if (e == 0) {

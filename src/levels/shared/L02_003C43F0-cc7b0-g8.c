@@ -1,21 +1,11 @@
-/* sol-high; USA v1.01: 1304/1304 bytes, 0/2 places.
- * Profile: -O2 -G8 -ffunction-sections -fno-cse-follow-jumps.
- * The typed private data and hero layouts recover the retail 0x60 frame.
- * Separate constructor calls, followed by one child-pointer read used for both
- * the null check and attach call, recover the creation branch. The child field
- * is declared volatile: retail rereads it after publication, calls and the
- * halfword stores through the child pointer; no access casts are used.
- * Remaining: initialization FP store ordering/registers, the post-query
- * integer return allocation, global-mask argument scheduling and final CSE.
- * Corrected the old behavior error: the global mask gates BOTH state tests.
- * Disabling both CSE path controls ties the single-control profile. Grouped
- * compiler qcopy pairs tie the relevant differences; disabling sched1 is worse.
- * Next: recover the original initialization subobject/assignment structure.
- * All required declarations follow below.
- *
- * closer D, 1 November 2026: 28 words at -G0, but the volatile child field is refused, and the rereads depend on it.
- */
+#include "include_asm.h"
 #include "common.h"
+
+/* func_L02_003CC7B0 is a unit of its own: it reads $gp data (-G8) and reaches
+ * D_L02_001B30C8 through an unsplit lui/lw pair (MACRO_ADDR), which conflicts with the
+ * main file's sda declaration of that word. The two constant-store runs keep retail's
+ * order only in the source order below (sched1 issues a shared constant's REG_DEAD
+ * store at its own position and the other one last). */
 #define W(p,o) (*(int *)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 #define U(p,o) (*(unsigned short *)((char *)(p)+(o)))
@@ -29,7 +19,7 @@ struct CC7Hero {
 };
 extern struct CC7Hero D_00189E20;
 extern char D_L02_001BA500[];
-extern int D_L02_001B30C8 __attribute__((nosda));
+extern int D_L02_001B30C8 MACRO_ADDR;
 extern int ref_L02_003CC7B0_00 __attribute__((sda));
 extern int ref_L02_003CC7B0_01(float);
 extern char *ref_L02_003CC7B0_02(int);
@@ -107,7 +97,7 @@ struct CC7Data {
     char pad334[0x8];
     int w33c;
     char pad340[0x30];
-    char * volatile other;
+    char *other;
     char pad374[0x6];
     short h37a;
     char pad37c[0xa];
@@ -128,8 +118,8 @@ int func_L02_003CC7B0(unsigned char *obj) {
         if (data->w318==-1 || data->w31c==-1) return 1;
         {
             qcopy((char *)data+0x340,obj+0x10); qcopy((char *)data+0x350,obj+0x10);
-            data->b60=16; data->f80=0.5f; data->b69=0xfe;
-            data->f8c=0.4f; data->f84=0.5f; data->w98=3;
+            data->b60=16; data->w98=3; data->f80=0.5f;
+            data->f84=0.5f; data->b69=0xfe; data->f8c=0.4f;
             data->f90=F(obj,0x18)-6.0f; data->wcc=data->w330;
             data->b65=19; data->kind=3; data->f30=1.25f;
             if (!data->h310) data->other=ref_L02_003CC7B0_02(0xa20);
@@ -142,9 +132,9 @@ int func_L02_003CC7B0(unsigned char *obj) {
             data->f38c=ref_L02_003CC7B0_04();
             data->f388=ref_L02_003CC7B0_04();
             data->f134=0.05f; data->f104=0.2f; data->f100=0.825f; data->f108=0.4f;
-            data->f110=1.5707964897155762f; data->f130=0.523598849773407f;
+            data->f10c=0.4f; data->f110=1.5707964897155762f; data->f130=0.523598849773407f;
             data->w13c=data->w318; data->p14c=(char *)data+0x210;
-            data->mode=1; data->f10c=0.4f;
+            data->mode=1;
             if (ref_L02_003CC7B0_05(2)) U(obj,0x34)|=0x8000; else U(obj,0x34)&=0x7fff;
             if (data->h312) {
                 ref_L02_003CC7B0_06(obj,23,4);
@@ -171,7 +161,7 @@ int func_L02_003CC7B0(unsigned char *obj) {
         if (value<data->h37a) data->h386=300;
         data->h37a=value;
     }
-    if (((unsigned char)obj[0x95]==3 || (unsigned char)obj[0x20]==23) && !(D_L02_001B30C8&15))
+    if (((unsigned char)obj[0x95]!=3 && (unsigned char)obj[0x20]!=23) || !(D_L02_001B30C8&15))
         ref_L02_003CC7B0_16(obj,data->w31c,0,0,16.0f,0.0f);
     if (data->w204==1) {
         if (data->w33c) {
@@ -179,7 +169,7 @@ int func_L02_003CC7B0(unsigned char *obj) {
             if (D_00189E20.obj26c==obj || D_00189E20.obj270==obj || (D_00189E20.active && !D_00189E20.portal)) allowed=1;
             else if (ref_L02_003CC7B0_18(F(obj,0xf8),ref_L02_003CC7B0_17(F(data,0x1f0)-F(obj,0x10),F(data,0x1f4)-F(obj,0x14)))<1.5707964897155762f) allowed=1;
             if (!allowed) data->w204=0; else data->h386=300;
-        }
+        } else data->h386=300;
     } else if (data->h386) {
         data->w200=D_00189E20.target; qcopy((char *)data+0x1f0,D_00189E20.direction); data->w204=1;
     }
