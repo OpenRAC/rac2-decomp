@@ -158,9 +158,9 @@ Current matched coverage (the three reports from validated builds):
 
 | Version | Release | Functions | Boot code | Level code | Total code |
 | --- | --- | ---: | ---: | ---: | ---: |
-| `SCUS_972.68` | USA v1.01 | 7,793 of 8,580 | 868,332 of 1,044,736 | 3,857,176 of 4,483,104 | 4,725,508 of 5,527,840 (85.49%) |
-| `SCES_516.07` | Europe/Australia v1.00 | 7,006 of 8,672 | 727,328 of 1,054,716 | 2,366,212 of 4,648,872 | 3,093,540 of 5,703,588 (54.24%) |
-| `SCUS_972.68_v2` | USA v2.00 (Greatest Hits) | 7,612 of 8,634 | 817,024 of 1,048,320 | 3,719,676 of 4,531,340 | 4,536,700 of 5,579,660 (81.31%) |
+| `SCUS_972.68` | USA v1.01 | 7,950 of 8,580 | 902,812 of 1,044,728 | 3,944,104 of 4,483,104 | 4,846,916 of 5,527,832 (87.68%) |
+| `SCES_516.07` | Europe/Australia v1.00 | 7,074 of 8,672 | 736,592 of 1,054,708 | 2,386,684 of 4,648,872 | 3,123,276 of 5,703,580 (54.76%) |
+| `SCUS_972.68_v2` | USA v2.00 (Greatest Hits) | 7,741 of 8,634 | 834,252 of 1,048,312 | 3,792,468 of 4,531,340 | 4,626,720 of 5,579,652 (82.92%) |
 
 `tools/progress.py --version us|pal|us2` maintains the corresponding coverage row.
 In the original layout sample, 1,036 of v1.01's then-matched functions differed in
