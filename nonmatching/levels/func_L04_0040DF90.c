@@ -1,3 +1,14 @@
+/* 3 November 2026: bounded sound-phase recheck; still not matching.
+ * Profile: -O2 -G0 -ffunction-sections -g -fno-gcse. US and US2:
+ * 696/696 bytes, 0/2 places each; first difference +0x1D4.
+ * Moving the quotient snapshot before the branch gives 692 bytes; assigning
+ * the quotient in the condition gives 688. Split arithmetic changes FP
+ * destinations without closing the division region. Independent first-phase
+ * locals and a shared threshold both reproduce the baseline object text.
+ * Keep the accurate helper return contracts and retained original source.
+ * Reopen with evidence explaining the denominator/threshold FPR reuse and
+ * branch-local quotient lifetime, not another unchanged phase spelling.
+ */
 /* 2026-11-03 w02 source-contract review (USA v1.01 only).
  * Profile: -O2 -G0 -ffunction-sections -g -fno-gcse.
  * Current check.py: 696/696 bytes, 0/2 places, first mismatch +0x1D4.

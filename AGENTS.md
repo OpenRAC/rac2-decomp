@@ -5,6 +5,11 @@ completely before changing anything; then read README.md, CONTRIBUTING.md, docs/
 docs/LEVELS.md. The repository follows the same structure as rac1-decomp and the other OpenRAC
 decompilations: keep it that way.
 
+Also read `CLAUDE.md` and `.claude/CLAUDE.md` when present, and follow their applicable
+instructions alongside this file.
+Run compiler checks, tests and game builds in the existing build container or image;
+do not install Wine on the host PC.
+
 ## What this repository is
 
 A matching decompilation of Ratchet & Clank: Going Commando (PS2, USA v1.01, `SCUS_972.68`):

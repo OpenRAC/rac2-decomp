@@ -1,3 +1,16 @@
+/* 3 November 2026: bounded shared-effect recheck; still not matching.
+ * Profile: -O2 -G8 -ffunction-sections. US and US2: 1304/1304 bytes,
+ * 0/2 places each, first difference +0x154; the same four spill words remain.
+ * The allocator diagnostic's normal and dump-enabled complete objects agree.
+ * Its GCSE expression table has 133 buckets. An explicit row cursor rotates
+ * preheader scheduling; a next-index loop gives 1300 bytes; an unsigned index
+ * changes the final comparison. Switch selection and a position local tie.
+ * A common qcopy source rotates more spill slots; naming only the first source
+ * preserves the original four-word difference. Keep the original baseline.
+ * Reopen with an independently supported address lifetime/bucket-order change,
+ * not another equivalent spelling, dead initializer or compiler override.
+ * Neither a linked C match nor native behavior has been established.
+ */
 /* 2026-11-03 w02 source-contract/lifetime review (USA v1.01 only).
  * Profile: -O2 -G8 -ffunction-sections.
  * Current check.py: 1304/1304 bytes, 0/2 places, first mismatch +0x154.
