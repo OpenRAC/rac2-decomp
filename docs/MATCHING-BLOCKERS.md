@@ -1701,6 +1701,38 @@ reproduces retail's `sd a2..t3` + `swc1 f12..f18` save prologue **and** the fram
 
 ## 22. Vector copies: address materialisation is only part of the mismatch
 
+**Barlow/Joba storage and phase lifetimes, 3 November 2026 (retained):**
+`func_L04_0040DCA8` now owns its corners as quadword/float unions and its UVs
+as four pairs. Its former second UV cursor advanced beyond the eight-float
+allocation after the final iteration; the vertex walk also crossed member
+arrays. Correct pair/vertex indexing gives 728/740 bytes and 0/6 places in
+each release under default game G0. The historical 740-byte draft is not a
+source remedy: do not restore its invalid pointer advances to recover its size.
+`func_L04_0040D148` retains four aligned matrix rows, complete union vertices
+and unsigned alpha packing; those storage changes preserve its 1568/1584-byte
+instruction listing, with 0/2 in each USA release and no carried PAL identity.
+
+With game G0 and `-fno-expensive-optimizations`, a compound pulse argument in
+`func_L04_0040E460` reproduces its phase at +0x70..+0x90 and call slot +0x94
+in both USA v1.01 places. It preserves the arithmetic order, but the complete
+body is still 2068/2076 bytes, 0/2 in each USA release (PAL absent). Moving
+iterator acquisition before initialization gives 2076 bytes with different
+saved registers; separate iterator scopes and address-at-use forms give
+2068 and 2060 bytes. Keep the phase improvement; iterator/PRE, packed-color
+and later control-flow differences remain, without a full match or native gate.
+
+The other bounded rechecks preserve their baselines. `func_L04_0040C368`
+(game G8) is 1304/1304 bytes, 0/2 in each USA release: four spill words still
+differ. Normal/dump-enabled diagnostic objects agree; the GCSE table has 133
+buckets. A row cursor or shared copy source disturbs additional scheduling or
+spills; a next-index loop gives 1300 bytes, and an unsigned index changes the
+final compare. `func_L04_0040DF90` (game G0, `-g -fno-gcse`) is 696/696 bytes,
+0/2 in each USA release; earlier quotient snapshots and condition assignments
+give 692/688, while independent first-phase locals and a shared threshold tie.
+Both canonical identities are absent from PAL. Reopen on independently
+supported address/quotient lifetimes, not the tied forms or compiler overrides.
+All five markers remain `INCLUDE_ASM`; these are retained findings, not C credit.
+
 **Qualified packet and call-contract remedies, 25 October 2026:**
 The 2,192-byte Damosel beam uses the real 144-byte packet, clobbering
 `qcopy` transfers and corner addresses formed at use. Its color packing

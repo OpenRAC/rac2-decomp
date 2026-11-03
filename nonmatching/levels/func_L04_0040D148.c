@@ -1,3 +1,13 @@
+/* 3 November 2026: complete renderer storage; still not matching.
+ * Profile: -O2 -G0 -ffunction-sections -g. US and US2: 1568/1584 bytes,
+ * 0/2 places each; no carried PAL identity. Four complete, aligned matrix
+ * rows and union-backed packet vertices follow the matched neighboring trail's
+ * storage model. Both storage changes leave the baseline instruction listing
+ * unchanged. Packed alpha now shifts as unsigned 32-bit data.
+ * The 0x190 frame versus retail's 0x180, vertex-address spills and loop
+ * hoists remain. Reopen with a measured matrix-base/vertex-address lifetime
+ * witness. Equal instructions under these storage views are not a match.
+ */
 /* Tier: sol-high. USA v1.01, -O2 -G0 -ffunction-sections -g.
  * Best and final check.py: 1568 bytes / 1584 expected, 0 of 2 places match
  * (Barlow and Joba). All required declarations are included below.
@@ -26,7 +36,8 @@
  */
 #include "common.h"
 typedef unsigned int B1202Quad __attribute__((mode(TI)));
-typedef struct { float vertex[4][4]; unsigned int color[4]; float uv[4][2]; unsigned long long primitive,texture,mode,flags; } B1202Packet;
+typedef union { B1202Quad bits; float f[4]; } RenderVector;
+typedef struct { RenderVector vertex[4]; unsigned int color[4]; float uv[4][2]; unsigned long long primitive,texture,mode,flags; } B1202Packet;
 extern int D_L04_001B2008[] __attribute__((sda));
 extern float func_00283CE0(int),func_00283D00(float,float),func_00283198(float),func_00283180(float),func_00283C28(float),func_00283B98(float,float);
 extern unsigned int func_00283D38(unsigned int,unsigned int,float);
@@ -38,7 +49,7 @@ extern void func_L00_003F8280(void *,float,float,float,float,float,int,int);
 void func_L04_0040D148(unsigned char *m,int alpha)
 {
     B1202Packet packet;
-    float matrix[16];
+    float matrix[4][4] __attribute__((aligned(16)));
     unsigned char *p=*(unsigned char **)(m+0x68);
     float wave,offset,lat0,lat1,lon0,lon1,u0,u1,v0,v1,cos0,cos1;
     unsigned int color;
@@ -48,14 +59,14 @@ void func_L04_0040D148(unsigned char *m,int alpha)
     if(alpha==-1) color=func_00283D38(0x1fb43264,0x1f502800,wave);
     else {
         if(alpha<0) alpha=0;
-        color=func_00283D38(0x1fb43264,(alpha<<24)|0x502800,wave);
+        color=func_00283D38(0x1fb43264,((unsigned int)alpha<<24)|0x502800,wave);
     }
     offset=func_00283D00(func_00283CE0(D_L04_001B2008[0]),30.0f)*0.033333335f;
     func_00283410(matrix,m+0xf0);
-    *(B1202Quad *)(matrix+12)=*(B1202Quad *)(m+0x10);
-    func_00282F20(matrix,matrix,0.4f);
-    func_00282F20(matrix+4,matrix+4,0.35f);
-    func_00282F20(matrix+8,matrix+8,0.35f);
+    *(B1202Quad *)(matrix[3])=*(B1202Quad *)(m+0x10);
+    func_00282F20(matrix[0],matrix[0],0.4f);
+    func_00282F20(matrix[1],matrix[1],0.35f);
+    func_00282F20(matrix[2],matrix[2],0.35f);
     packet.texture=func_0027C878(21);
     packet.mode=0xff9000000260ULL;
     packet.flags=0x8000000048ULL;
@@ -78,11 +89,11 @@ void func_L04_0040D148(unsigned char *m,int alpha)
             packet.uv[3][0]=u1;
             packet.uv[2][0]=u0;packet.uv[0][0]=u0;
             packet.uv[1][0]=u1;
-            func_002AF000(packet.vertex[0],1.0f,lon0,lat0);
-            func_002AF000(packet.vertex[1],1.0f,lon1,lat0);
-            func_002AF000(packet.vertex[2],1.0f,lon0,lat1);
-            func_002AF000(packet.vertex[3],1.0f,lon1,lat1);
-            packet.vertex[0][3]=1.0f;packet.vertex[1][3]=1.0f;packet.vertex[2][3]=1.0f;packet.vertex[3][3]=1.0f;
+            func_002AF000(packet.vertex[0].f,1.0f,lon0,lat0);
+            func_002AF000(packet.vertex[1].f,1.0f,lon1,lat0);
+            func_002AF000(packet.vertex[2].f,1.0f,lon0,lat1);
+            func_002AF000(packet.vertex[3].f,1.0f,lon1,lat1);
+            packet.vertex[0].f[3]=1.0f;packet.vertex[1].f[3]=1.0f;packet.vertex[2].f[3]=1.0f;packet.vertex[3].f[3]=1.0f;
             func_00280B90(&packet,matrix,0);
         }
     }
@@ -96,10 +107,10 @@ void func_L04_0040D148(unsigned char *m,int alpha)
         func_L04_0040DCA8(m+0x10,0.385f,0.35f,*(float *)(p+0x4bc),*(float *)(m+0xf4),54,0x28969600,1);
     } else {
         if(alpha<0) alpha=0;
-        color=(alpha<<24)|0xc8c8c8;
+        color=((unsigned int)alpha<<24)|0xc8c8c8;
         func_L04_0040DCA8(m+0x10,0.495f,0.35f,*(float *)(p+0x4b4),*(float *)(m+0xf4),*(int *)(p+0x648),color,1);
         func_L04_0040DCA8(m+0x10,0.495f,0.35f,*(float *)(p+0x4b8),*(float *)(m+0xf4),*(int *)(p+0x648),color,1);
-        func_L04_0040DCA8(m+0x10,0.385f,0.35f,*(float *)(p+0x4bc),*(float *)(m+0xf4),54,(alpha<<24)|0x969600,1);
+        func_L04_0040DCA8(m+0x10,0.385f,0.35f,*(float *)(p+0x4bc),*(float *)(m+0xf4),54,((unsigned int)alpha<<24)|0x969600,1);
     }
     func_L00_003F8280(m+0x10,0.32f,0.5f,*(float *)(p+0x4c0),0.0f,0.0f,*(int *)(p+0x644),0);
 }

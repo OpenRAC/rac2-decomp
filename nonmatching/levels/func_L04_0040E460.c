@@ -1,3 +1,17 @@
+/* 3 November 2026: pulse expression remedy; retained, not matching.
+ * Profile: -O2 -G0 -ffunction-sections -fno-expensive-optimizations.
+ * US and US2: 2068/2076 bytes, 0/2 places each; no carried PAL identity.
+ * A compound pulse argument preserves arithmetic order and reproduces the
+ * retail phase at +0x70..+0x90 and the +0x94 call delay word in both US
+ * placements. The old multi-statement phase chose the opposite FP roles.
+ * Forming iterators before their initializer gives 2076 bytes but rotates
+ * saved registers; separate iterator scopes give 2068 with more differences;
+ * eliminating iterator locals gives 2060. These are not improvements to the
+ * complete function. Keep the compound phase and the original iterator model.
+ * Iterator address lifetimes, packed color and later control flow remain.
+ * Reopen with an independently supported PRE/iterator or color-packing model;
+ * a matching phase or equal overall size does not qualify the whole body.
+ */
 /* 2026-11-03 w02 faithful-contract review, US object checks only.
  * Profile: -O2 -G0 -ffunction-sections -fno-expensive-optimizations.
  * Current check.py: 2068/2076 bytes,0/2 places.
@@ -67,11 +81,7 @@ void func_L04_0040E460(unsigned char *m)
     red = D_L04_001B2008[0] % period;
     {
         float phase = (float)red;
-        phase /= angle;
-        phase *= 2.0f;
-        phase *= 3.1415927f;
-        phase += -3.1415927f;
-        wave = func_00283198(phase);
+        wave = func_00283198(((phase / angle) * 2.0f) * 3.1415927f + -3.1415927f);
     }
     red = func_00283CF0(wave * 48.0f) + 104;
     green = func_00283CF0(wave * 64.0f) + 208;
