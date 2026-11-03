@@ -79,10 +79,10 @@ what the retail code does when the port runs it.
 - **11 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.** Ten are
   `unchecked` (loaders, main loops, FMV, code no capture calls) and `func_L03_003E4680` has no
   verdict. A clean tour does not count as SAME; a row returns only when it is proven.
-- **Rows waiting on retail captures:**
-  - `func_L08_003CD708` and `func_L08_003CDB78`;
-  - `func_L20_0036AE68`: #392 moved its entry to `0x36AE78`, 272 bytes; re-capture it at the
-    new entry.
+- **Rows waiting on retail captures:** `func_L08_003CD708` and `func_L08_003CDB78`. Retail never
+  called them in the `fcheck` play of levels 8, 9 and 19, so they need a route that reaches the
+  object using them. They have near misses in `nonmatching/levels/` but no functional files yet.
+  `func_L20_0036AE68` is matched and needs no row.
 - **Contributor PRs #396–#399 are merged** and match 157 functions. 91 of them had functional
   rows; those rows and their files are gone, so `functional.tsv` has 381 rows. Three of the 40
   left-out files are matched now: `func_00293F98`, `func_002EC408` and `func_L00_002B30E8` (one
@@ -222,10 +222,11 @@ there come from this repository's code and help when naming progress code:
 
 ## Open items
 
-- Compare one of levels 4, 9, 11, 12, 14 or 16 against a retail run, to confirm #236.
+- Compare one of levels 4, 9, 11, 12, 14 or 16 against a retail run, to confirm #236. Under one
+  script the port reaches levels 9 and 14 at retail's start positions, but the runs then part in
+  time, because the port doesn't model load time. Compare by game event, not by tick.
 - Prove and return the 11 rows still left out.
-- Capture and gate the three waiting rows (two in level 8, `func_L20_0036AE68` at its new
-  entry).
+- Find a route to the two level 8 rows, write their functional C, then capture and gate them.
 - Feltzin still splits from retail at about tick 1,937: the port fires one extra projectile.
   Projectile positions are 1–3 ulps off from the first spawn, likely the joint target
   (`func_0029FCC0` → `func_002A3F10`, the bone matrix) on host floats.
