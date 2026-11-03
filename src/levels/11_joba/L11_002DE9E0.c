@@ -109,7 +109,7 @@ int func_L11_00340500(char *object, void *point)
     return func_L02_00333480(object, target, diff);
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00369700);
+
 
 /* func_L11_00396DC8 is in L11_002DE9E0-g8.c ($gp tuning reads). */
 

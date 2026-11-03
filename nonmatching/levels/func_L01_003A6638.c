@@ -1,3 +1,10 @@
+/* Second-pass layout/ABI review, 2026-11-03; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections -frac2-zero-ti-por -g.
+ * US check.py: 2276/2276 bytes,0/1 places; frame0x230,first mismatch+0x1B4.
+ * The inverse destination was already64 bytes, but its leading pad was unowned storage. It is now the actual postinverse displacement vector at the prior rotation base, preserving the measured16-byte overlap. All3 earlier matrices remain64 because their producers/consumers access64. The state helper retains its actual int return.
+ * Remaining: PRE frame-address spill-slot order remains. The lawful first-pass initializer removals are retained; no dead-value count control.
+ * No linked or functional-port qualification; prior measurements follow.
+ */
 /* 2 November 2026: lawful retained reconstruction, not a match.
  * Removed ten deliberately dead initial values used only to alter the
  * compiler PRE hash-table count. Every actual first-use state assignment
@@ -67,7 +74,7 @@ extern int func_00277F48(void *,int,void *,int,float);
 extern void func_002A9850(void *,void *,void *,int,int,int,int,int,float,float,float);
 extern int func_00282948(void *);
 extern void func_003355A8(int);
-extern void func_L01_002BEB90(int,int);
+extern int func_L01_002BEB90(int,int);
 extern void func_0029F338(void *);
 extern void func_002A9288(void *,float);
 void func_L01_003A6638(u8 *object)
@@ -82,10 +89,11 @@ void func_L01_003A6638(u8 *object)
             } orientation;
             float matrix[16];
         } transform;
-        struct { float pad[4], inverse[16]; } inverse_view;
-    } workspace;
+        struct { float displacement[4], inverse[16]; } inverse_view;
+    } workspace __attribute__((aligned(16)));
 #define rotation workspace.transform.rotation
 #define inverse workspace.inverse_view.inverse
+#define displacement workspace.inverse_view.displacement
 #define basis workspace.transform.orientation.basis
 #define vector workspace.transform.orientation.rows.vector
 #define temporary workspace.transform.orientation.rows.temporary
@@ -185,11 +193,11 @@ void func_L01_003A6638(u8 *object)
         }
         func_L01_003A65B0(object);
         func_00283698(inverse,object+0xC0);
-        func_00282CF0(rotation,object+0x10,previous);
-        func_002830C0(rotation,rotation,inverse);
-        func_L00_002EE4D8(rotation,rotation,func_00282C48(F(state,0x4C)));
-        func_00283098(rotation,rotation,object+0xC0);
-        func_00282CC0(object+0x10,previous,rotation);
+        func_00282CF0(displacement,object+0x10,previous);
+        func_002830C0(displacement,displacement,inverse);
+        func_L00_002EE4D8(displacement,displacement,func_00282C48(F(state,0x4C)));
+        func_00283098(displacement,displacement,object+0xC0);
+        func_00282CC0(object+0x10,previous,displacement);
         if (((OozlaInput *)D_00138180)->flags & 0x20) {
             func_002ABBB8(object,velocity,0,10,3,16,1,1,1,-1,0,0x810001,0.0f,0.0f,4.0f,2.0f,0.0f,1.0f,20.0f);
             count = func_00277F48(object+0x10,16,object,0,D_L01_001AF874);

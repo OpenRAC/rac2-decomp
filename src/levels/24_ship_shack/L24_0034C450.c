@@ -43,7 +43,7 @@ extern void func_L00_0038DE70(void *, void *, void *);
 
 extern void func_00282CC0(char *, char *, char *);
 
-INCLUDE_ASM("asm/levels", func_L24_0034C450);
+
 
 
 void func_L24_00383818(unsigned char *obj) {

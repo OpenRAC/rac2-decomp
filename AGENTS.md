@@ -40,6 +40,13 @@ equals the retail programs.
 If you get close but not exact, move your C to `nonmatching/<area>/func_XXXXXXXX.c` with a line in
 `nonmatching/README.md`, and put the `INCLUDE_ASM` marker back.
 
+Check source ownership in **every carrying release**. A function that is level-specific in
+USA v1.01 may also occur in another level in PAL or v2.00; put its unit in
+`src/levels/shared/` in that case. `tools/check.py` compiles the discovered file directly,
+whereas the program builder only loads shared and that program's own source directories.
+After the linked build, verify that each intended C function is present in every carrying
+program's `placed.json`, not merely that the complete image prints `OK`.
+
 ## Naming in C
 
 - Functions: their catalogue name (`func_XXXXXXXX` for the boot, `func_LNN_XXXXXXXX` for level

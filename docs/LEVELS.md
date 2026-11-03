@@ -103,6 +103,23 @@ the same way. Each prefix follows a completed `jr $ra` and its delay slot, holds
 filler (0xCDCDCDCD) or unreachable leftovers, and every jump, address pair or data pointer that
 reaches the function already targets the shortened entry.
 
+The same named-entry mechanism now covers fourteen further measured extents:
+`func_0012646C` and `func_0012672C` skip four fill bytes; `func_002DB988` and
+eleven level menu initializers skip a sixteen-byte orphan store/stack-release
+prefix. The audit covers all 48 carrying placements (USA 17, v2.00 16, PAL 15).
+Each prefix follows a completed return; no scanned incoming EE reference enters
+it. The core entries have direct-call witnesses at `+4`. Menu-data observations
+corroborate `+16`, but an equal aligned word alone is not treated as a pointer.
+
+Regeneration changes exactly 40 existing catalogue rows. Canonical names, kinds,
+placement counts and original ends stay unchanged, including when shortened
+bodies collide with an already corrected menu initializer. The synthetic
+collision/replay regression exercises that case; regenerating each release twice
+produces the same catalogues. Skipped bytes stay in the rebuilt image. The 200
+distinct USA prefix bytes removed from catalogue accounting are not C progress.
+The StoreImage packet constructor and menu bodies can then be compiled against
+their actual entries; the separate StoreImage executor remains nonmatching.
+
 `func_00282848` is another corrected mixed extent (72 to 16 bytes, skip 56)
 in the boot and all 27 levels. Its prefix follows a completed return and
 contains six positive stack adjustments plus eight nops. Across all 28

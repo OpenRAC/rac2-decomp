@@ -1,3 +1,10 @@
+/* Second-pass layout/ABI review, 2026-11-03; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -ffast-math.
+ * US check.py: 6632/6736 bytes,0/3 places; frame0xF0.
+ * The old isolated16-byte &v30 destination was overrun by the inverse helper. A complete64-byte inverse shares actual later velocity/point/joint storage through a union; all whole-matrix consumers receive that matrix object.
+ * Remaining: Per-case hero bases, state5/6 FP expression/branch order and allocation remain; no unchanged register-wording replay.
+ * No linked or functional-port qualification; prior measurements follow.
+ */
 /* Hero-NPC state machine shared by Tabora, Dobbo and Grelbin. Retained
  * reconstruction, not functional-gated. USA v1.01: 6,632/6,736 bytes, 0/3 places
  * (2026-11-01); the earlier source emitted 6,624 bytes.
@@ -141,7 +148,14 @@ extern int func_L08_003CDB78(void *, void *);
 
 void func_L08_003CDF98(u8 *obj)
 {
-    Vec saved, v30, v40, v50;
+    Vec saved;
+    union {
+        Vec inverse[4];
+        struct { Vec velocity, point, joint; } vectors;
+    } scratch;
+#define v30 scratch.vectors.velocity
+#define v40 scratch.vectors.point
+#define v50 scratch.vectors.joint
     u8 *d, *p, *a70, *a98, *aA0, *aB0;
     int i, n, id;
     float f, t;
@@ -164,8 +178,8 @@ void func_L08_003CDF98(u8 *obj)
         DF(8) = DF(8) + D_001AFFD0;
         func_0029FCC0(obj, 8, d + 0x30);
         func_00282CF0(d + 0x30, obj + 0x10, d + 0x30);
-        func_00283698(&v30, obj + 0xC0);
-        func_002830C0(d + 0x30, d + 0x30, &v30);
+        func_00283698(scratch.inverse, obj + 0xC0);
+        func_002830C0(d + 0x30, d + 0x30, scratch.inverse);
         DF(0x3C) = 1.0f;
         if (OB(0x43) != 0)
             func_002A7470(obj, 0, 0, 0xA);

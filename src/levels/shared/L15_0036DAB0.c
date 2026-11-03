@@ -40,7 +40,7 @@ extern void func_L00_0038DE70(void *, void *, void *);
 
 extern void func_00282CC0(char *, char *, char *);
 
-INCLUDE_ASM("asm/levels", func_L15_0036DAB0);
+
 
 void func_L15_003A9E80(unsigned char *obj) {
     struct {

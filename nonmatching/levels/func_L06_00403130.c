@@ -1,3 +1,17 @@
+/* Second pass, 3 November 2026; retained C, not a linked match.
+ * Current profile: -O2 -G0 -ffunction-sections -g.
+ * US: 1504/1504 bytes, 0/6 places, first instruction difference +0x11C.
+ * Matched renderer L06_00402570 independently reads one UV table as
+ * D_L06_001B3270[k][0/1], k < 2. Keeping both columns in that real owning
+ * array restores the post-V-store U reload and the two UV streams.
+ * This form is 1496 bytes at default or with -g (identical instructions).
+ * Giving the real scale argument its own statement under -g restores the
+ * measured two-nop division floor and reaches the complete retail extent.
+ * Frame 0x90 is unchanged. Initialization address/counter order and the
+ * owner-state branch slot remain different; no matching credit is claimed.
+ * No volatile, extra access or invented storage. Three bounded checks.
+ * The historical header below describes the superseded separate-V draft.
+ */
 /* GPT-6.1 Sol (high), task v1094. Near miss under the current default
  * -O2 -G0 -ffunction-sections: 1488/1504 bytes, 0/6 USA v1.01 places.
  * The entry guards and three vector copies now reproduce retail apart from
@@ -50,7 +64,6 @@ extern AreaVector D_L06_001B3290 __attribute__((sda));
 extern AreaVector D_L06_001B32A0 __attribute__((sda));
 extern AreaVector D_L06_001B32B0 __attribute__((sda));
 extern float D_L06_001B3270[][2] __attribute__((sda));
-extern float D_L06_001B3274[][2] __attribute__((sda));
 extern AreaVector D_L06_001B3260 SDATA(D_L06_001B3260);
 extern char D_L06_001B9840[];
 extern float D_L06_001B0060[] SDATA(D_L06_001B0060);
@@ -86,7 +99,7 @@ void func_L06_00403130(unsigned char *owner)
         qcopy(&D_L06_001B32B0, &D_L06_001B9A70[2]);
         for (i = 1; i >= 0; i--) {
             D_L06_001B3270[1 - i][0] = 0.0f;
-            D_L06_001B3274[1 - i][0] = 0.0f;
+            D_L06_001B3270[1 - i][1] = 0.0f;
         }
         qcopy(&D_L06_001B3260, D_L06_001B9840);
         baselineGP = *(float *)(state + 0x14);
@@ -120,21 +133,22 @@ void func_L06_00403130(unsigned char *owner)
     if (!(*(float *)(D_L06_001B9840 + 8) > *(float *)(state + 0x20)))
         return;
     for (i = 0; i < 2; i++) {
-        func_00282D30(&scaled, &movement, (D_L06_001B0060[i] + D_L06_001B0060[i]) / (range * 5.0f));
+        float scale = (D_L06_001B0060[i] + D_L06_001B0060[i]) / (range * 5.0f);
+        func_00282D30(&scaled, &movement, scale);
         if (scaled.f[0] > 1.0f || scaled.f[0] < 1.0f)
             scaled.f[0] -= func_00283CE0(func_00283CF0(scaled.f[0]));
         if (scaled.f[1] > 1.0f || scaled.f[1] < 1.0f)
             scaled.f[1] -= func_00283CE0(func_00283CF0(scaled.f[1]));
         D_L06_001B3270[i][0] += scaled.f[0];
-        D_L06_001B3274[i][0] += scaled.f[1];
+        D_L06_001B3270[i][1] += scaled.f[1];
         if (D_L06_001B3270[i][0] > 1.0f)
             D_L06_001B3270[i][0] -= 1.0f;
         if (D_L06_001B3270[i][0] < -1.0f)
             D_L06_001B3270[i][0] += 1.0f;
-        if (D_L06_001B3274[i][0] > 1.0f)
-            D_L06_001B3274[i][0] -= 1.0f;
-        if (D_L06_001B3274[i][0] < -1.0f)
-            D_L06_001B3274[i][0] += 1.0f;
+        if (D_L06_001B3270[i][1] > 1.0f)
+            D_L06_001B3270[i][1] -= 1.0f;
+        if (D_L06_001B3270[i][1] < -1.0f)
+            D_L06_001B3270[i][1] += 1.0f;
     }
     fraction = func_00283CE0(D_L06_001B2348 % 360) * 0.017444444820284843f - 3.14f;
     D_L06_001B3280 = D_L06_001B3284 + func_00283198(fraction) * *(float *)(state + 0x3C);
@@ -144,11 +158,11 @@ void func_L06_00403130(unsigned char *owner)
             D_L06_001B3270[i][0] -= 1.0f;
         if (D_L06_001B3270[i][0] < -1.0f)
             D_L06_001B3270[i][0] += 1.0f;
-        D_L06_001B3274[i][0] += D_L06_001B0074[i][0] * D_001A7928;
-        if (D_L06_001B3274[i][0] > 1.0f)
-            D_L06_001B3274[i][0] -= 1.0f;
-        if (D_L06_001B3274[i][0] < -1.0f)
-            D_L06_001B3274[i][0] += 1.0f;
+        D_L06_001B3270[i][1] += D_L06_001B0074[i][0] * D_001A7928;
+        if (D_L06_001B3270[i][1] > 1.0f)
+            D_L06_001B3270[i][1] -= 1.0f;
+        if (D_L06_001B3270[i][1] < -1.0f)
+            D_L06_001B3270[i][1] += 1.0f;
     }
     if (*(int *)state < 0)
         func_L00_002E6DB8(func_L06_00402570, owner);

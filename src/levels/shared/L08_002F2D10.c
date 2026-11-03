@@ -334,7 +334,7 @@ void func_L08_0033CD18(s32 a0, s32 a1, ...) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L08_00363320);
+/* func_L08_00363320 is in L08_00363320-g8.c. */
 
 
 

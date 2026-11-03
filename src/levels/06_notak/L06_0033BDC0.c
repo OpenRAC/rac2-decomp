@@ -110,7 +110,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 /* func_L06_003660F0 is matched in L06_003660F0.c (built with -mno-split-addresses). */
 
 
-INCLUDE_ASM("asm/levels", func_L06_00396268);
+
 
 /* func_L06_003C5ED8 is in L06_003C5ED8.c. */
 

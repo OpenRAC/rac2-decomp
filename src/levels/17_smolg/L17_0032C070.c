@@ -149,7 +149,7 @@ void func_L17_00340EA0(char *s1)
                        + (func_2F00C0(func_00282C48(func_2F00B0(*(int *)(s0 + 0xC)) * t)) << 24);
 }
 
-INCLUDE_ASM("asm/levels", func_L17_003583F8);
+
 
 INCLUDE_ASM("asm/levels", func_L17_00385DE8);
 

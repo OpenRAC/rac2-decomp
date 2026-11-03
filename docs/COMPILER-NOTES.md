@@ -354,6 +354,19 @@ would form a pointer before that array. The inverse needs **four output rows**:
 Its 64-byte output is required even though `func_00283098` reads only the first
 three rows. This is distinct from `func_00283678`/`func_00283738`'s 48-byte operations.
 
+Check each helper's footprint independently. `func_00283658` also reads 48 bytes
+and writes 64, placing the fourth row in its return delay slot. `func_00283410`
+writes 64 bytes; `func_00283788` reads 64 from each input and writes 64;
+`func_002830C0` and `func_002AB6D8` consume all four matrix rows. Input size does
+not establish output size, and adjacent local arrays do not form one C object.
+Use a complete matrix, or a union for an independently measured stack reuse.
+
+For `func_L06_00403130`, the matched renderer proves that the two UV addresses
+are columns of one owning table. That view restores a reload lost with separate
+extern arrays. Separating the real scale computation under the existing `-g`
+profile then restores two division nops. The 1,504-byte draft still has setup and
+branch-slot differences; neither a size tie nor an improved frame is a match.
+
 The public-newlib `func_00131424` square-root wrapper supplies another ordinary
 source remedy: its NaN classifier `func_001313C8` depends only on its argument's
 bits and has no side effects, so a truthful `const` declaration preserves the

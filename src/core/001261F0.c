@@ -55,7 +55,7 @@ int func_001261F0(int unused_mode) {
 
 ASM_FUNC("asm/core", func_00126284);
 
-INCLUDE_ASM("asm/core", func_0012646C);
+/* func_0012646C is defined in 0012646C-store.c. */
 
 /* rac1-decomp src/core/00122818.c: func_00122958 */
 /* sceGsExecLoadImage(src, dst): waits for the GS transfer unit

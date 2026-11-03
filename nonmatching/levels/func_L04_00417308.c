@@ -1,3 +1,10 @@
+/* Second-pass layout/ABI review, 2026-11-03; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * US check.py: 5768/5968 bytes,0/2 places; frame0x1C0.
+ * Both inverse m[4] and marker v90[4] already hold complete64-byte outputs; no inverse overrun was found. Fresh canonical definitions correct the ignored text return to void and sprite lookup to a32-bit address result with explicit pointer conversion. Scalar x/y helper outputs were verified as int pointers.
+ * Remaining: Hero-pointer allocation, serial rounding and call scheduling remain; the equal retail frame does not imply a match.
+ * No linked or functional-port qualification; prior measurements follow.
+ */
 /* Current retained result, 1 November 2026: 5768/5968 bytes. Correct the float helper returns and 64-bit
  * text style parameter. The hero pointer allocation and rounding/call scheduling still differ.
  * Not a functional-port qualification or a complete matching-build result.
@@ -95,7 +102,7 @@ extern int func_00115DA8(char *, char *, ...);
 extern void func_0027AB40(void);
 extern void func_0027EAE8(int, int, int, int, int, void *);
 extern void func_0027EB88(int, int, int, int, int, int);
-extern int func_0027F5B8(int, int, unsigned long long, char *, int);
+extern void func_0027F5B8(int, int, unsigned long long, char *, int);
 extern int func_0027FB40(int, int, unsigned long long, char *, int);
 extern int func_0027FBD8(int, int, unsigned long long, char *, int);
 extern int func_00282948(void *);
@@ -126,7 +133,7 @@ extern int func_002E5CF8(int, int, void *);
 extern void func_002FC560(unsigned int, unsigned long long);
 extern void func_00300A00(void *, int, float, float, float, float, float);
 extern void func_00300AA8(void *, float, float, int, float, void *);
-extern u8 *func_00336D50(int, int);
+extern s32 func_00336D50(void *, int);
 extern void func_L04_0040C880(u8 *);
 extern void func_L04_00416E38();
 extern void func_L04_00417028(u8 *);
@@ -196,9 +203,9 @@ s32 func_L04_00417308(void)
     if (D_L04_001A904C != 0) {
         F(D_L04_001BDB80, 0xB0) = func_00283198(0.56217057f) / func_00283180(0.56217057f);
         func_0027AB40();
-        func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x2D), 0x60442D00, 10.0f,
+        func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2D), 0x60442D00, 10.0f,
                       (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
-        func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x2E), 0x55F0C070, 10.0f,
+        func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2E), 0x55F0C070, 10.0f,
                       (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
         n = I(p, 0x360);
         if (n != 0) {
@@ -225,7 +232,7 @@ s32 func_L04_00417308(void)
             if (D_L04_001B0B74 > 0)
                 D_L04_001B0B74 = D_L04_001B0B74 - 1;
             col = func_00283D38(0x603F00B2, 0x800000FF, (float)D_L04_001B0B74 * 0.022222223f);
-            func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x35), col, 11.0f,
+            func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x35), col, 11.0f,
                           (float)SC(10.0f), 1.0f, 1.0f, (float)D_L04_001B0B70);
         } else {
             D_L04_001B0B70 = 0;
@@ -242,20 +249,20 @@ s32 func_L04_00417308(void)
         vF0.i[2] = 0x603F00B2;
         func_0027EAE8(0x1A, SC((float)(0x62 - (int)(f12 * 74.0f))), 0x26, SC(98.0f), 0xFFFFF0,
                       &vF0);
-        func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x3F), 0x60442D00, 498.0f,
+        func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3F), 0x60442D00, 498.0f,
                       (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
-        func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x40), 0x55F0C070, 498.0f,
+        func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x40), 0x55F0C070, 498.0f,
                       (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
-        func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x41), 0x55F0C070, 498.0f,
+        func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x41), 0x55F0C070, 498.0f,
                       (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
         if (D_001A79F0 == 4)
-            func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x42), 0x55F0C070, 498.0f,
+            func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x42), 0x55F0C070, 498.0f,
                           (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
         else
-            func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x30), 0x55F0C070, 498.0f,
+            func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x30), 0x55F0C070, 498.0f,
                           (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
         if (D_001A79F0 == 4 && (D_L04_002C63C0[D_L04_001B090C].flags & 4))
-            func_00300A00(func_00336D50(D_L04_001A904C + 0x8710, 0x43), 0x60FFDE8D, 498.0f,
+            func_00300A00((void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x43), 0x60FFDE8D, 498.0f,
                           (float)SC(10.0f), 1.0f, 1.0f, 0.0f);
         n = I(p, 0x320);
         if ((u32)(n - 1) >= 0x14)
@@ -316,7 +323,7 @@ s32 func_L04_00417308(void)
         if (f12 < -1.0f)
             f12 = -1.0f;
         sy3 = (int)(f12 * 13.0f) + 0x24;
-        obj = func_00336D50(D_L04_001A904C + 0x8710, 0x3E);
+        obj = (u8 *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3E);
         f21 = func_00283248(*(float *)D_L04_001B31A0, D_L04_001B31A4);
         i = 0;
         do {
