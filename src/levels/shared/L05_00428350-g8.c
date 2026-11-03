@@ -191,3 +191,219 @@ void func_L05_00442880(char *object)
         params->d = D_L05_001B1A6C;
     }
 }
+
+/* A moby in the level's list, linked through +0x28 and tagged by the class id at +0xAA. */
+typedef struct ListMoby_0042C928 {
+    char pad0[0x28];
+    struct ListMoby_0042C928 *next;
+    char pad2C[0x7E];
+    short oclass;
+} ListMoby_0042C928;
+extern u8 D_0019B278[] MACRO_ADDR;
+extern int D_001A79F0_1;
+extern char *D_0018C0B0 NOT_SDA;
+extern float D_L05_001B1748 __attribute__((sda));
+extern float D_L05_001B174C __attribute__((sda));
+extern float D_L05_001B1750 __attribute__((sda));
+extern ListMoby_0042C928 *D_L05_001B1780 __attribute__((sda));
+extern ListMoby_0042C928 *D_L05_001B2528;
+extern char *func_0029EFD0(s32 a0);
+extern float func_002A7940(void);
+extern void func_L01_00397950(char *a0);
+extern void func_002A0488(char *a0, s32 a1, s32 a2, s32 a3);
+
+char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
+{
+    char *moby;
+    char *vars;
+    ListMoby_0042C928 *p;
+    u8 *collected = D_0019B278;
+
+    if (kind >= 4 || collected[kind + (D_001A79F0_1 << 2)] != 0)
+        return 0;
+    moby = func_0029EFD0(0x126C);
+    if (moby != 0) {
+        float x, y, z, r;
+
+        vars = *(char **)(moby + 0x68);
+        *(long *)(moby + 0x38) = *(long *)(D_0018C0B0 + 0x38);
+        qcopy(moby + 0x10, pos);
+        *(s16 *)(moby + 0x32) = 0x40;
+        *(u8 *)(moby + 0x30) = 0x40;
+        *(u8 *)(moby + 0x31) = 1;
+        *(u32 *)vars = kind;
+        qcopy(vars + 0x10, moby + 0x10);
+        *(float *)(vars + 0x1C) = *(float *)(moby + 0xF8);
+        *(float *)(moby + 0xF0) = func_002A7940();
+        *(float *)(moby + 0xF4) = func_002A7940();
+        *(float *)(moby + 0xF8) = func_002A7940();
+        r = func_002A7940();
+        x = D_L05_001B1748;
+        y = D_L05_001B174C;
+        z = D_L05_001B1750;
+        *(float *)(moby + 0xFC) = r;
+        *(s32 *)(vars + 8) = a3;
+        *(s32 *)(vars + 4) = a2;
+        x *= 0.00029088825f;
+        y *= 0.00029088825f;
+        z *= 0.00029088825f;
+        *(float *)(vars + 0x60) = z;
+        *(float *)(vars + 0x68) = x;
+        *(float *)(vars + 0x64) = y;
+        *(u8 *)(moby + 0x20) = 1;
+        func_L01_00397950(moby);
+        func_002A0488(moby, 0x82, 0x82, 0x82);
+        if (D_L05_001B1780 == 0) {
+            for (p = D_L05_001B2528; p != 0; p = p->next) {
+                if (p->oclass == 0xFBF)
+                    D_L05_001B1780 = p;
+            }
+        }
+    }
+    return moby;
+}
+
+extern float D_L05_001B1A10 __attribute__((sda));
+extern float D_L05_001B1A14 __attribute__((sda));
+extern float D_L05_001B1A18 __attribute__((sda));
+extern float D_L05_001B1AC0 __attribute__((sda));
+extern int D_L05_001B1B74 __attribute__((sda));
+extern int D_L05_001B1B78 __attribute__((sda));
+extern void func_00282C88(void *a0);
+extern void func_L05_00441EA0(void *a0);
+extern void func_L00_002E54E0(float a0);
+extern void func_L05_003D1E20(void);
+extern void func_L05_00442720(void);
+
+typedef struct Block_00441D40 {
+    float f00, f04, f08, f0C, f10, f14;
+    int f18;
+    short f1C;
+    u8 f1E, f1F;
+    int pad20;
+    int f24;
+    char pad28[0x28];
+    char v50[0x10];
+    char v60[0x10];
+    int f70;
+    float f74;
+    float f78;
+} Block_00441D40;
+
+typedef struct Tail_00441D40 {
+    char pad0[4];
+    short f04;
+    short f06;
+    char pad8[4];
+    short f0C;
+    char padE[2];
+    short f10;
+} Tail_00441D40;
+
+typedef struct State_00441D40 {
+    float pos[3];
+    int pad0C;
+    char v10[0x30];
+    int f40;
+    int f44;
+    char pad48[8];
+    Block_00441D40 blk;
+    char padCC[8];
+    Tail_00441D40 tail;
+} State_00441D40;
+
+typedef struct Entry_00441D40 {
+    char pad0[0x20];
+    int index;
+    char pad24[0x34];
+    int f58;
+} Entry_00441D40;
+
+typedef struct Slot_00441D40 {
+    char pad0[0x1C];
+    Entry_00441D40 *entry;
+} Slot_00441D40;
+
+typedef struct ActorVars_00441D40 {
+    char pad0[0x38];
+    float rate;
+    char pad3C[0x1D8];
+    int f214;
+} ActorVars_00441D40;
+
+typedef struct Actor_00441D40 {
+    char pad0[0x68];
+    ActorVars_00441D40 *vars;
+    char pad6C[0x94];
+} Actor_00441D40;
+
+typedef struct Object_00441D40 {
+    char pad0[0x70];
+    State_00441D40 *state;
+    char pad74[0xA];
+    short f7E;
+    char pad80[4];
+    short f84;
+} Object_00441D40;
+
+void func_L05_00441D40(Object_00441D40 *object)
+{
+    State_00441D40 *state;
+    State_00441D40 *state2;
+    Block_00441D40 *blk;
+    Tail_00441D40 *tail;
+    Entry_00441D40 *entry;
+    ActorVars_00441D40 *vars;
+    Slot_00441D40 *table;
+    char *actors;
+    float rate;
+
+    state = object->state;
+    state->pos[0] = D_L05_001B1A10;
+    state->pos[1] = D_L05_001B1A14;
+    state->pos[2] = D_L05_001B1A18;
+    func_00282C88(state->v10);
+    state->f40 = 0;
+    state->f44 = 0;
+
+    state2 = object->state;
+    blk = &state2->blk;
+    blk->f00 = D_L05_001B1A4C;
+    blk->f04 = D_L05_001B1A50;
+    blk->f08 = D_L05_001B1A54;
+    blk->f74 = D_L05_001B1A70;
+    blk->f78 = D_L05_001B1A6C;
+    blk->f0C = D_L05_001B1A58;
+    blk->f10 = D_L05_001B1A5C;
+    blk->f14 = D_L05_001B1A64;
+    blk->f70 = 0;
+    blk->f1C = 0;
+    blk->f18 = 0;
+    blk->f24 = 0;
+    blk->f1E = 0;
+    blk->f1F = 0;
+    func_00282C88(state2->blk.v50);
+    func_00282C88(state2->blk.v60);
+    func_L05_00441EA0(object);
+    func_L00_002E54E0(4096.0f);
+
+    table = (Slot_00441D40 *)D_L05_001B1EC4;
+    actors = D_L05_001B251C;
+    tail = &object->state->tail;
+    tail->f06 = 0;
+    tail->f0C = 0;
+    tail->f10 = 0;
+    tail->f04 = 0;
+    rate = D_L05_001B1AC0 * 0.016666668f;
+    entry = table[object->f84].entry;
+    entry->f58 = 0;
+    vars = ((Actor_00441D40 *)(actors + (entry->index << 8)))->vars;
+    vars->rate = rate;
+    vars->f214 = -1;
+    object->f7E = 0;
+    D_L05_001B1B20 = 0;
+    func_L05_003D1E20();
+    D_L05_001B1B74 = 0;
+    D_L05_001B1B78 = 0;
+    func_L05_00442720();
+}

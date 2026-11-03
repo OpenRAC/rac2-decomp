@@ -1,94 +1,68 @@
-/* Safety review, 30 October 2026: historical draft below is NOT valid C.
- * It reads and writes 16 bytes through the addresses of 4-byte pointer
- * parameters a and b. Their retail stack slots are +0x30 and +0x34; the
- * two-argument caller passes ordinary moby pointers, not vector values.
- * Do not compile or promote those out-of-bounds TI dereferences. Retained
- * solely to preserve the previous experiment. Reopen with an independently
- * evidenced complete object and valid R5900 lowering for these operations;
- * register pins, invented padding and fake volatile are not remedies.
+/* func_L00_003ADCD8 - 456 bytes. opus-1 (Claude Opus 5.5), task v2197, 3 November 2026.
+ *
+ * NOT LANDABLE: exact bytes need a quadword-swap helper that include/common.h
+ * does not have. With the local probe helper below the body gives
+ * 27 of 27 places (USA), 27 of 27 (v2.00); not in the PAL catalogue.
+ * Flags: -O2 -G8 -ffunction-sections (put it in L00_003A8E28-g8.c, take the
+ * marker out of L00_003A8E28.c; that file declares
+ * `extern void func_L00_003ADCD8(void *, void *);` at func_L00_003ADEA0, which
+ * must become (char *, char *) or the parameters cast).
+ *
+ * Retail 003ADD64..003ADD70 is `lq v0,0(s6); lq v1,0(s5); sq v0,0(s5); sq v1,0(s6)`
+ * with s6 = &a (sp+0x30), s5 = &b (sp+0x34) hoisted into saved registers: an
+ * asm with "r" operands, like qcopy, not a C TImode move (that would address
+ * 0x30(sp) directly). On the EE both lq round down to sp+0x30, so the retail
+ * "swap" rewrites the same quadword: it never swaps the pointers (an original
+ * bug: a 16-byte swap helper applied to two 4-byte pointer variables).
+ * The helper uses $2 and $3 as qcopy uses $2. Without it, C cannot produce this
+ * sequence without out-of-bounds TImode dereferences (rejected 30 October 2026).
+ * The ignored result of func_002C3150 (it returns the particle pointer, see
+ * src/game/002C3150-qcopy.c) puts the loop bound in $v1 as retail has it.
  */
-/* func_L00_003ADCD8 - 456 bytes.  Worker attempt, 27 October 2026 (draft below).
-
-   Draft is a whole new file L00_003ADCD8-g8-qcopy-dbg.c; flags line to add to
-   config/cflags.txt (copied from L00_003A7C30-g8-qcopy-dbg.c):
-     src/levels/shared/L00_003ADCD8-g8-qcopy-dbg.c<TAB>-O2 -G8 -ffunction-
-   sections -frac2-qcopy -frac2-qcopy-barrier -g
-   460 B vs 456 B. Frame/regs/locals (vecs[3] -> tmp@0, 0x10, 0x20; a,b
-   spilled at 0x30/0x34) match. Retail quirk: `lq a-slot; lq b-slot; sq
-   ->b-slot; sq ->a-slot` on the spilled params (4-byte slots, so it is a no-
-   op swap of two pointers via 16-byte ops) using address regs s6=&a, s5=&b
-   set after the loop guard.
-   Remaining diff: mine loads pb quad before pa quad; the `beql` with lwc1 f12
-   (D_L00_001AF7D8) in the likely delay slot is not reproduced (mine beqz +
-   reloads); 4 extra bytes.
-   Tried: TI deref via &a/&b directly (sp-immediate addressing, wrong), Qword
-   *pa/*pb hoisted at declaration (computed in prologue, wrong), assigned just
-   before the loop (current), qcopy() through temps (+40 B). */
-
 #include "common.h"
-
-typedef int Qword __attribute__((mode(TI)));
-
-typedef struct {
-    char pad0[0x10];
-    Qword pos;
-    unsigned char kind;
-    char pad21[0x89];
-    short group;
-} BurstObj;
-
-extern int D_L00_001AF7D0 __attribute__((sda));
-extern float D_L00_001AF7D4 __attribute__((sda));
-extern float D_L00_001AF7D8 __attribute__((sda));
-extern int func_001163B0(void);
-extern float func_0031A7C0(float, float);
-extern int func_002EF250(float);
-extern float func_002EF240(int);
-extern void func_002EE138(void *, void *, void *);
-extern float func_002EE238(void *);
-extern void func_002EE178(void *, void *, float);
-extern void func_002EE120(void *, void *, void *);
-extern void func_002EE3D0(void *, void *, float);
-extern int func_0031A728(int);
-extern void func_0033A2B0(void *, void *, int, int, int, float, int);
-
-void func_L00_003ADCD8(BurstObj *a, BurstObj *b)
+typedef int TI128 __attribute__((mode(TI)));
+extern int ref_L00_003ADCD8_0 __attribute__((sda));
+extern float ref_L00_003ADCD8_1 __attribute__((sda));
+extern float ref_L00_003ADCD8_2 __attribute__((sda));
+extern int func_1163B0(void);
+extern float func_002A7878(float,float);
+extern int func_00283CF0(float);
+extern float func_00283CE0(int);
+extern void func_00282CF0(void *,void *,void *);
+extern float func_00282DF0(void *);
+extern void func_00282D30(void *,void *,float);
+extern void func_00282CD8(void *,void *,void *);
+extern void func_00282F20(void *,void *,float);
+extern int func_002A77E0(int);
+extern void *func_002C3150(void *,void *,int,int,int,int,float);
+static __inline__ void qswap_probe(void *x, void *y) {
+    __asm__ __volatile__("lq $2,0x0(%0)\n\tlq $3,0x0(%1)\n\tsq $2,0x0(%1)\n\tsq $3,0x0(%0)"
+                         : : "r"(x), "r"(y) : "$2", "$3", "memory");
+}
+void func_L00_003ADCD8(char *a, char *b)
 {
-    Qword vecs[3];
-    Qword *pa;
-    Qword *pb;
-    int i;
-    int life;
-    float len;
-
-    if (b == 0)
-        return;
-    if (a->group != b->group)
-        return;
-    if (b->kind == 0xFE)
-        return;
-    if (b->kind == 0xFD)
-        return;
-    pa = (Qword *)&a;
-    pb = (Qword *)&b;
-    for (i = 0; i < D_L00_001AF7D0; i++) {
-        float spread;
-
-        if (func_001163B0() & 1) {
-            Qword t1 = *pa;
-            Qword t2 = *pb;
-            *pb = t1;
-            *pa = t2;
-        }
-        spread = D_L00_001AF7D8;
-        vecs[1] = a->pos;
-        life = func_002EF250(func_0031A7C0(spread * 0.5f, spread));
-        func_002EE138(&vecs[2], &b->pos, &vecs[1]);
-        vecs[0] = vecs[2];
-        len = func_002EE238(&vecs[0]);
-        func_002EE178(&vecs[0], &vecs[0], func_0031A7C0(0.0f, 0.9f));
-        func_002EE120(&vecs[2], &vecs[1], &vecs[0]);
-        func_002EE3D0(&vecs[0], &vecs[0], func_0031A7C0(0.16666667f, len / func_002EF240(life << 2)));
-        func_0033A2B0(&vecs[1], &vecs[0], 0x604040FF, life & 0xFF, func_0031A728(0xFF) & 0xFF, D_L00_001AF7D4, 0);
-    }
+ float offset[4], position[4], delta[4];
+ int i, count;
+ unsigned char color;
+ float distance;
+ if(!b || *(short *)(b+0xAA)!=*(short *)(a+0xAA)) return;
+ if((unsigned char)b[0x20]!=0xFE) { if((unsigned char)b[0x20]!=0xFD) {
+ for(i=0;i<ref_L00_003ADCD8_0;) {
+   if(func_1163B0()&1)
+     qswap_probe(&a, &b);
+   i++;
+   *(TI128 *)position=*(TI128 *)(a+0x10);
+   count=func_00283CF0(func_002A7878(ref_L00_003ADCD8_1*0.5f,ref_L00_003ADCD8_1));
+   color=count;
+   func_00282CF0(delta,b+0x10,position);
+   *(TI128 *)offset=*(TI128 *)delta;
+   distance=func_00282DF0(offset);
+   func_00282D30(offset,offset,func_002A7878(0,0.9f));
+   func_00282CD8(delta,position,offset);
+   func_00282F20(offset,offset,func_002A7878(1.0f/6.0f,distance/func_00283CE0(count*4)));
+   { int c=func_002A77E0(255);
+   func_002C3150(position,offset,0x604040FF,color,(unsigned char)c,0,ref_L00_003ADCD8_2); }
+ }
+}
+}
 }

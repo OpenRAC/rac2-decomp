@@ -133,7 +133,7 @@ void func_0027F5B8(int x, int y, u64 style, u8 *text, int length)
 
 /* func_0027FBD8 is matched in 0027F980.c. */
 
-INCLUDE_ASM("asm/game", func_0027FC70);
+/* func_0027FC70 is matched in 0027F128-fpw-g8.c. */
 
 extern void func_0027FC70(unsigned short *, u64, u8 *, int, u64, u8 *);
 

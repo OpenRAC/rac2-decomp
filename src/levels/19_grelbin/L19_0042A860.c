@@ -52,7 +52,27 @@ extern u32 D_00139800, D_00138324;
 extern int D_L19_0028E950[];
 extern u8 D_L19_001BFC40[];
 
-INCLUDE_ASM("asm/levels", func_L19_0042A8B8);
+void func_L19_0042A8B8(void)
+{
+    L19Thing *e;
+    s32 i;
+
+    if (D_L19_001A8F00[0] != 2)
+        return;
+    if (D_001A7A40[0] == 0)
+        return;
+    for (i = 0; i < D_L19_001BD740.count; i++) {
+        e = D_L19_001BD740.items[i];
+        if (e->kind != 0xE3E)
+            continue;
+        if (D_L19_001B22E0[1] != 0)
+            continue;
+        func_0029F978((u8 *)e, 0, D_L19_001B22E0);
+        D_L19_001B2300[0] = 1.9f;
+        D_L19_001B2300[1] = 1.9f;
+        D_L19_001B2300[2] = 1.9f;
+    }
+}
 
 /* func_L19_0042A9A0 is in L19_0042A9A0.c. */
 

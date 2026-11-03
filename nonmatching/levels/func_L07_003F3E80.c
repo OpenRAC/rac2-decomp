@@ -1,14 +1,17 @@
-/* func_L07_003F3E80 (1372 B). Opus closer g1, 1 November 2026: 1360/1372 bytes, profile -O2 -G8
- * -ffunction-sections, about 30 rows after normalising registers. The tuning pairs are one word $gp
- * and one word absolute: an SDATA view plus a MACRO_ADDR array read at [1], which keeps the second
- * out of delay slots as retail does.
- * Main gap: retail hoists 210000.0f into $f25 (the extra 12 bytes: one more save, restore and load
- * order) and leaves 1/60 in the loop. loop.c's test is threshold * savings * lifetime >= insn_count,
- * and a move costs 3 of threshold. A scale local at the loop top hoists it first and then 1/60 too;
- * before the loop it hoists 1/60 alone, into $f26. Retail's six earlier moves come first, so this
- * constant needs one more lifetime or the loop one or two fewer insns.
- * The cooldown is a widened post-increment; per-arm `(1/60) * -D` and `D * (1/60)` cross-jump as retail. */
+/* func_L07_003F3E80 (1372 B). Opus xhigh v2090, 3 November 2026: 1368/1372 bytes, 0/1 places.
+ * Tier: build in the -G8 unit L07_00389EB8-g8.c (-O2 -G8 -ffunction-sections); that unit already
+ * declares func_0029F338(int), so drop that extern there. Needs the sda/MACRO_ADDR/SDATA externs below.
+ * Case 0 (the whole particle loop) now matches: `speed` as a Vector (BLK stack MEM) passed as speed.f
+ * is not copied to a pseudo by precompute_register_parameters (an ADDRESSOF f32 was: MEM cost 6 > 2),
+ * so loop pass 2 counts 61 insns and hoists 210000.0f into $f25 like retail. Case-1 stores order
+ * 0x98, 0x34, then 0x18 as retail.
+ * Remaining 4 bytes, all case 1: (a) retail's func_002A77E0 then-arm is mult(C=1/60 in f1, -D in f0)
+ * and its else-arm reloads D (lwc1 f1) before mult(D, C); here both arms fold to X*C and the else-arm
+ * D load is deleted as redundant with the delay-slot load (fold/cse swap REAL_CST to the second
+ * operand, so no plain source keeps C first). (b) retail loads D_L07_001B0E44 above the 0x24 store and
+ * keeps 1/60 in f3; F() casts are not MEM_IN_STRUCT_P, so try struct-member accesses on `state`. */
 #include "common.h"
+
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
 typedef union { s32 q __attribute__((mode(TI))); f32 f[4]; } Vector;
 extern void func_00282C98(void *), func_00282DD8(void *, void *, void *);
@@ -20,7 +23,7 @@ extern s32 func_002A7820(s32, s32), func_00283CF0(f32), func_002761F8(void *, vo
 extern f32 func_002AA2E8(f32 *, f32, f32);
 extern void func_00282F20(void *, void *, f32), func_00282D08(void *, void *, void *, f32);
 extern void *func_002C16C0(void *, void *, s32, s32, s32, s32, f32, f32, f32, f32, f32);
-extern void func_002A7750(void *, s32, s32), func_0029F338(void *);
+extern void func_002A7750(void *, s32, s32), func_0029F338(int);
 extern s32 func_002B3868(void *), func_002AD0E0(void *, void *, void *, void *, void *, void *);
 extern void func_002E5DA0(s32, s32, void *, s32);
 extern s32 func_002A77E0(s32);
@@ -41,8 +44,8 @@ void func_L07_003F3E80(u8 *object)
 {
     Vector axis, up, direction;
     f32 rotation[12];
-    Vector previous, displacement, origin, point, velocity;
-    f32 step, magnitude, life;
+    Vector previous, displacement, origin, point, velocity, speed;
+    f32 magnitude, life;
     u8 *state = *(u8 **)(object + 0x68);
     s32 i, size, count;
     u32 color;
@@ -73,9 +76,9 @@ void func_L07_003F3E80(u8 *object)
             size = func_002A7820(D_L07_001B0E70_gp, D_L07_001B0E70[1]);
             count = func_00283CF0(func_002A78D8(1.0f, 2.0f));
             life = func_002A7878(D_L07_001B0E78_gp, D_L07_001B0E78[1]) * 210000.0f;
-            step = magnitude;
-            func_002AA2E8(&step, 0.0f, func_002A7878(2.0f, 6.0f) * (1.0f / 60.0f));
-            func_00282F20(&velocity, &displacement, step);
+            speed.f[0] = magnitude;
+            func_002AA2E8(speed.f, 0.0f, func_002A7878(2.0f, 6.0f) * (1.0f / 60.0f));
+            func_00282F20(&velocity, &displacement, speed.f[0]);
             func_00282D08(&point, object + 0x10, &origin, func_002A7878(0.0f, 1.0f));
             color = D_L07_001B0E58;
             func_002C16C0(&point, &velocity, size, (s32)color >> 24, color & 0xFFFFFF, count,
@@ -88,15 +91,15 @@ void func_L07_003F3E80(u8 *object)
             unsigned int timer = *(u16 *)(object + 0x96);
             unsigned int old = timer++;
             *(u16 *)(object + 0x96) = timer;
-            if (old >= 301) func_0029F338(object);
+            if (old >= 301) func_0029F338((int)object);
         }
         break;
     case 1:
         if (func_002B3868(object)) {
             func_002E5DA0(4, 0, object, 0xE5F);
-            F(object, 0x18) += 0.333f;
             *(u32 *)(object + 0x98) = 0;
             *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xEFFF;
+            F(object, 0x18) += 0.333f;
             F(state, 0x24) = 0.1f;
             F(state, 0x28) = 1.0f;
             if (func_002A77E0(2)) F(state, 0x30) = (1.0f / 60.0f) * -D_L07_001B0E4C;
@@ -108,7 +111,7 @@ void func_L07_003F3E80(u8 *object)
         F(state, 0x24) += D_L07_001B0E40 * (1.0f / 60.0f);
         if (F(state, 0x24) >= D_L07_001B0E44) {
             func_002AA2E8((f32 *)(state + 0x28), 0.0f, D_L07_001B0E48 * (1.0f / 60.0f));
-            if (F(state, 0x28) <= 0.0f) { func_0029F338(object); return; }
+            if (F(state, 0x28) <= 0.0f) { func_0029F338((int)object); return; }
         }
         F(state, 0x2C) += F(state, 0x30);
         if (F(state, 0x2C) > 1.0f) F(state, 0x2C) -= 1.0f;

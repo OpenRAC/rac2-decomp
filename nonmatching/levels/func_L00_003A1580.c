@@ -1,3 +1,17 @@
+/* Tier: FAILED, Opus 5.5 (v2099), 2026-11-03. Best: 2532/2532 bytes, 0/27 places, only the
+ * 39 spill-slot loads/stores differ (unchanged). Cause, measured: the gcse PRE expression table
+ * size. Reaching-reg pseudos (and so spill slots) follow raw-hash bucket order; the raw hash of
+ * (plus (reg at) (const_int C)) is 14030 + C, bucket = hash % ((max_cuid / 2) | 1). This source
+ * has max_cuid 538 (this index form) or 536 (sibling 003E8A98 pointer loop) -> 269 buckets, so
+ * normal (sp+0xE0) sorts last. Retail's order (normal, points[2..4], attachments[1..4] =
+ * 0x12C..0x148) needs 273 buckets (max_cuid 544-547) or 263 (524-527, untested). Calibration:
+ * the sibling form plus 8 appended dummy calls (273 buckets) matches the whole body except the
+ * dummy tail, so ~8-11 more insns at gcse that vanish later (or ~10 fewer) is all that is missing.
+ * No count change from: decl inits (cse1 drops all but state), 2-D work array, glow constants,
+ * index wordings of points[selected + 1], -frac2-* / -fno-cse-follow-jumps / -ffast-math flags.
+ * -mno-split-addresses gives 265, -fno-expensive-optimizations 253; an inline draw helper flips
+ * the table but breaks allocation. Declarations below are complete for a -g8.c unit
+ * (-O2 -G8 -ffunction-sections -frac2-qcopy). */
 /* Closer B, 2026-11-01: the slot rotation is gcse table size (see MATCHING-BLOCKERS 1). 269 buckets here;
  * forcing 245, 249 or 259 leaves 5 lines, so retail has about 10 to 20 fewer insns at gcse. */
 /* Retained nonmatching C; GPT-6.1 Sol (high), measured 29 October 2026.

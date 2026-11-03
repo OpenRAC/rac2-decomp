@@ -341,15 +341,131 @@ void func_002F6458(void) { char *base = D_00138180 + 0x1260; int index = *(int *
 
 
 
-INCLUDE_ASM("asm/game", func_002F6510);
+/* func_002F6510: the copied records have the measured 0xE0-byte extent. */
+typedef int F6510Quad __attribute__((mode(TI)));
+typedef union {
+    F6510Quad raw[14];
+    struct { char prefix[0x80]; int value; char tail[0x5C]; } fields;
+} F6510Record;
+typedef struct { int type; char pad[12]; int locked; int active; } F6510Row;
+typedef struct { char pad[0x80]; int selected; char pad84[0xBC]; F6510Row rows[1]; } F6510State;
+extern F6510State D_L00_0022F7C0;
+extern unsigned char D_00139568[];
+extern F6510Record D_L00_00262570[];
+extern int func_00288870(void *, int, int);
+
+int func_002F6510(void)
+{
+    F6510Record local;
+    int offset = D_L00_0022F7C0.selected * 24;
+    int result = 0;
+
+    if (*(int *)((char *)&D_L00_0022F7C0 + offset + 0x154) != 0) {
+        int first = 0;
+        switch (*(int *)((char *)&D_L00_0022F7C0 + offset + 0x140)) {
+        case 12:
+        case 14:
+        case 17:
+        case 18:
+        case 53:
+            first = 1;
+            break;
+        default:
+            break;
+        }
+        if (first) {
+            if (func_00288870(&local, *(int *)((char *)&D_L00_0022F7C0 + D_L00_0022F7C0.selected * 24 + 0x140), 1))
+                result = local.fields.value;
+        } else {
+            if (func_00288870(&local, *(int *)((char *)&D_L00_0022F7C0 + D_L00_0022F7C0.selected * 24 + 0x140), 2))
+                result = local.fields.value;
+        }
+    } else if (*(int *)((char *)&D_L00_0022F7C0 + offset + 0x150) == 0) {
+        result = D_L00_00262570[D_00139568[*(int *)((char *)&D_L00_0022F7C0 + offset + 0x140)]].fields.value;
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/game", func_002F7320);
 
-INCLUDE_ASM("asm/game", func_002F73A8);
+extern unsigned char D_001A7AB8[] MACRO_ADDR;
+extern unsigned char D_001A7AF8[] MACRO_ADDR;
+extern unsigned char D_001A7A80[] MACRO_ADDR;
+typedef struct { int active; char pad4[0x10]; int info; char pad18[0x80]; int channels[3]; char padA4[0x3C]; } F73Record;
+extern F73Record D_00239BA0[];
+typedef struct { char pad[0x140]; int rows[96][4]; int count; } F73StateType;
+extern F73StateType D_0021F240_rows __asm__("D_0021F240");
+extern int func_002F7320(int owner, int key, int channel);
+extern int func_00288D58(void);
+extern int D_L00_0022FF00[];
 
-INCLUDE_ASM("asm/game", func_002F8178);
-
-
+void func_002F73A8(void)
+{
+    D_L00_0022FF00[0] = 0;
+    {
+        int key, channel, available;
+        for (key = 0; key < 56; key++) {
+            int offset = D_00139568[key] * 224;
+            if (((F73Record *)((char *)D_00239BA0 + offset))->active != 0) {
+                for (channel = 0; channel < 3; channel++) {
+                    if (func_002F7320(D_001A79F0, key, channel) != 0)
+                        goto mark_available;
+                    switch (channel) {
+                    case 0: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[0]; break;
+                    case 1: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[1]; break;
+                    case 2: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[2]; break;
+                    default: available = 0; break;
+                    }
+                    if (!available) continue;
+                    if (!func_00288D58()) continue;
+mark_available:
+                    D_001A7AB8[key] |= 1 << channel;
+                }
+            }
+        }
+    }
+    {
+        int key, channel, available;
+        char *entry;
+        for (key = 0; key < 56; key++) {
+            if (key == 0) continue;
+            if (D_00239BA0[D_00139568[key]].active == 0) continue;
+            if (D_001A7AF8[key] == 0) continue;
+            for (channel = 0; channel < 3; channel++) {
+                {
+                    unsigned int mask = 1U << channel;
+                    if (!(D_001A7AB8[key] & mask)) continue;
+                }
+                switch (channel) {
+                case 0: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[0]; break;
+                case 1: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[1]; break;
+                case 2: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[2]; break;
+                default: available = 0; break;
+                }
+                if (!available) continue;
+                {
+                    unsigned char mask = 1 << (channel * 2);
+                    if (D_001A7A80[key] & mask) continue;
+                }
+                D_0021F240_rows.rows[D_0021F240_rows.count][0] = channel;
+                {
+                    int stored_value;
+                    switch (channel) {
+                    case 0: stored_value = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[0]; break;
+                    case 1: stored_value = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[1]; break;
+                    case 2: stored_value = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[2]; break;
+                    default: stored_value = 0; break;
+                    }
+                    D_0021F240_rows.rows[D_0021F240_rows.count][2] = stored_value;
+                }
+                entry = (char *)D_00239BA0 + D_00139568[key] * 224;
+                D_0021F240_rows.rows[D_0021F240_rows.count][1] = key;
+                D_0021F240_rows.rows[D_0021F240_rows.count][3] = *(int *)(entry + 0x14);
+                ++D_0021F240_rows.count;
+            }
+        }
+    }
+}
 typedef struct { unsigned char pad0[0x3C]; char *destination; unsigned char pad1[0x24]; int clear; } Func_002F88D8State;
 extern Func_002F88D8State ref_L00_002F88D8_00;
 extern void func_00115DA8(char *, const char *, ...);

@@ -1,22 +1,21 @@
 /*
- * GPT-6.1 Sol (high), USA v1.01, 2026-10-29.
- * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * check.py: 976/984 bytes, 0 of 28 places match; no linked build.
- * Remaining: the far-distance count update reuses its address and occupies
- * branch slots; retail materializes the store address separately and restores
- * s0 in the early exit slot. Byte-store scheduling around the parent/basis
- * setup also differs. Prologue allocation and denomination-case order agree.
- * New ABI evidence: all seven direct boot calls (0x002AE560..0x002AE688)
- * pass signed immediate denominations in t0; existing matched callers declare
- * int, as does RAC1's spawn_bolt_by_value in bolts_and_wrench.c. The old long
- * declaration added two narrowing shifts not present in retail's count update.
- * Data layouts follow the measured offsets and RAC1's Moby/BoltVars views.
- * Seven scalar scale symbols preserve each observed GP load and its schedule.
- * The retained source includes its required declarations. The previous draft
- * recompiles to 992/984 with its recorded G32 profile. This draft improves
- * ordered identical nonrelocated words from 143 to 198 (diagnostic only).
- * Reopen with independently measured count/address or store-lifetime evidence;
- * no flag sweep or added volatile accesses. Existing name: SpawnBoltByValue.
+ * Claude Opus 5.5, USA v1.01, 2026-11-03 (task v2192).
+ * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier (separate unit:
+ * the same-file callee func_003022A0 stays in 00300618.c).
+ * check.py: 984/984 bytes, 0 of 28 places; only 4 register words differ: the two 0x40
+ * constants (byte updateDistance 0x30, halfword drawDistance 0x32) take a2/a3 where retail
+ * has a3/a2. Everything else, including the early exit, agrees.
+ * Early exit: retail's two-word absolute lui/lw + lui/sw with `ld s0` in the b slot is the
+ * sda/MACRO_ADDR symbol at a nonzero offset (D_001A7A10[1], the int at 0x1A7A14 that
+ * src/levels/shared/L00_003EA0E0.c also updates beside D_001A7A10). Plain/sda int = $gp form;
+ * an incomplete array without MACRO_ADDR splits HIGH/LO_SUM and shares the lui.
+ * Store block: the field order life, updateDistance, visible, state, drawDistance gives
+ * retail's store order and t0 for 1 (sched2 orders the stores by later uses of their
+ * registers). Writing drawDistance before updateDistance lets cse merge the two 0x40
+ * constants. All 60 orders with update before draw put the byte 0x40 in a2; local-alloc
+ * would need the halfword constant (born later) to have the shorter life. Reopen with a
+ * different block shape (parent/flags statements, constant sources), not field orders.
+ * Existing name: SpawnBoltByValue.
  */
 #include "common.h"
 
@@ -31,7 +30,7 @@ extern float ref_00302470_08 SDATA(ref_00302470_08);
 extern float ref_00302470_09 SDATA(ref_00302470_09);
 extern int ref_00302470_01 SDATA(ref_00302470_01);
 extern ParticleVector ref_00302470_02 __attribute__((nosda));
-extern int D_001A7A14 __attribute__((nosda));
+extern int D_001A7A10[] MACRO_ADDR;
 extern char *D_0018C0B0 __attribute__((nosda));
 extern float func_00282E48(void *, void *);
 extern char *func_0029EFD0(int);
@@ -95,7 +94,7 @@ BoltSpawnObject *func_00302470(BoltSpawnObject *source, void *position, void *ve
     u32 red, green, blue;
     float scale, spin, angle;
     if (func_00282E48(position,&ref_00302470_02)>=64.0f) {
-        D_001A7A14+=value;
+        D_001A7A10[1]+=value;
         return 0;
     }
     switch (value) {
@@ -116,8 +115,8 @@ BoltSpawnObject *func_00302470(BoltSpawnObject *source, void *position, void *ve
     if (parent) while (parent->parent) parent=parent->parent;
     object->parent=parent;
     object->flags|=0x100;
-    object->life=0x14; object->visible=1; object->state=1;
-    object->updateDistance=0x40; object->drawDistance=0x40;
+    object->life=0x14; object->updateDistance=0x40; object->visible=1; object->state=1;
+    object->drawDistance=0x40;
     object->scale=object->objectClass->scale*scale;
     func_002833F0(orientation,&object->rotation);
     func_002AEC18(object,ref_00302470_01);

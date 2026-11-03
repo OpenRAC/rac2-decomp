@@ -495,7 +495,7 @@ void func_L01_0040F340(u8 *a0) {
 
 /* func_L01_0040F360 is in L01_0040F360-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_0040F5A8);
+/* func_L01_0040F5A8 is in L01_0040F5A8-g8.c. */
 
 /* func_L01_0040F958 is in L01_003DA740-destruct.c. */
 
@@ -519,13 +519,13 @@ void func_L01_0041C960(u8 *a0) {
     *(u16 *)(a0 + 0x34) |= 0x802;
 }
 
-INCLUDE_ASM("asm/levels", func_L01_0041C970);
+/* func_L01_0041C970 is in L01_003DA740-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L01_0042C450);
 
-INCLUDE_ASM("asm/levels", func_L01_0042C540);
+/* func_L01_0042C540 is in L01_003DA740-campath-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_0042C8D8);
+/* func_L01_0042C8D8 is in L01_0042C8D8-g8.c. */
 
 /* func_L01_0042CE78 */
 typedef struct L01_0042CE78_ENTRY {

@@ -144,8 +144,6 @@ u32 func_00294EC8(s32 index) {
 
 INCLUDE_ASM("asm/game", func_00294F10);
 
-INCLUDE_ASM("asm/game", func_002954C0);
-
 /* shared native body of family 9306cc1f965a5c85 */
 int func_00295680(int arg)
 {

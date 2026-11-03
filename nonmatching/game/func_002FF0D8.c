@@ -1,10 +1,12 @@
-/* Closer C, 1 November 2026: 428/428, -O2 -G0 -g, 31 rows. D_001B2310 is one incomplete sda struct array: every field then has
- * retail's absolute form. Left: the constant 1 fills bnez's slot from the target (retail fills from the fall-through),
- * which also moves the D_001AD7E4 stores; first two arms' base/index registers.
- */
-/* Retained reconstruction, USA v1.01.
- * 416/428 bytes, game -O2 -G0 -g, measured on the initial retained copy spelling. Reconstructs transition count/rate, vector snapshots, resident defaults and mode-dependent actor selection with the actual pointer return of func_002FF300. Scalar SDA metadata retains mixed address forms, but copied-vector addressing and later branch/store scheduling differ. A pointer variant with -mno-split-addresses reaches an assembler internal assertion; no tool changes were attempted.
- * No strict linked match.
+/* Closer C, 3 November 2026 (opus-1, task v2129): 428/428 bytes, 0/28 places, 3 rows differ.
+ * Build: its own unit (e.g. src/game/002FC8D0-start.c) with config/cflags.txt line "-O2 -G0 -ffunction-sections -g";
+ * without -g the two nops before div.s go and it is 420 bytes. Declarations below (VoiceRequest = D_001A63A8 as in
+ * 00289178.c; resident block D_00189E20 with model slots at 0x1220; Transition as one incomplete sda array).
+ * Left: in the voice-request block retail stores selection, key, then loads 1 for D_001AD7E4; here sched1 hoists
+ * both constants (priority 2 over the stores) and the reg-weight tie puts key/E4 first. Retail's order needs a
+ * scheduling barrier between the key store and "li 1" (a loop note, as a do { } while (0) macro body would give;
+ * a do-while(0) test changes the size to 432 and is disallowed anyway). volatile on the fields does not give it.
+ * Per-arm scoped record pointers matter: one shared record pointer loses its base value and reorders the else arm.
  */
 #include "common.h"
 
@@ -27,9 +29,28 @@ typedef struct {
 extern Transition D_001B2310[] __attribute__((sda));
 extern int D_001AD7E4[] SDATA(D_001AD7E4);
 extern int D_001AD7E8[] SDATA(D_001AD7E8);
-extern unsigned char D_00189E20[];
-typedef struct { char pad[0x24]; int sound; int volume; char pad2c[0x3C]; int busy; } SoundState;
-extern SoundState D_001A63A8;
+/* The resident block: the preview's start and end vectors and the table of
+   0x50-byte model slots. */
+typedef struct {
+    unsigned char *model;
+    char pad04[0x50 - 0x04];
+} ResidentModelSlot;
+typedef struct {
+    char pad00[0x80];
+    float previewFrom[4];
+    float previewTo[4];
+    char padA0[0x1220 - 0xA0];
+    ResidentModelSlot models[1];
+} ResidentBlock;
+extern ResidentBlock D_00189E20;
+/* The voice player's request block (see 00289178.c). */
+typedef struct {
+    char pad00[0x24];
+    int key, selection;
+    char pad2C[0x3C];
+    int active;
+} VoiceRequest;
+extern VoiceRequest D_001A63A8;
 extern unsigned char D_00139568[];
 extern unsigned char D_00239BA0[];
 extern float func_00283CE0(int);
@@ -37,37 +58,36 @@ extern char *func_002FF300(int, int);
 
 void func_002FF0D8(void)
 {
-    unsigned char *record;
     D_001B2310[0].count = D_001AD7F8;
     D_001B2310[0].rate = 1.0f / func_00283CE0(D_001B2310[0].count);
-    qcopy(D_001B2310[0].from, D_00189E20 + 0x80);
-    qcopy(D_001B2310[0].to, D_00189E20 + 0x90);
+    qcopy(D_001B2310[0].from, D_00189E20.previewFrom);
+    qcopy(D_001B2310[0].to, D_00189E20.previewTo);
     D_001B2310[0].elapsed = 0;
-    {
-        SoundState *sound = &D_001A63A8;
-        if (sound->busy == 0 && sound->sound == -1) {
-            sound->volume = 0;
-            sound->sound = 0xDB7;
-        }
+    if (!D_001A63A8.active && D_001A63A8.key == -1) {
+        D_001A63A8.selection = 0;
+        D_001A63A8.key = 0xDB7;
+        D_001AD7E4[0] = 1;
+        D_001AD7E8[0] = 0;
     }
-    D_001AD7E4[0] = 1;
-    D_001AD7E8[0] = 0;
     D_001B2310[0].flag1C = 0;
     D_001B2310[0].flag1D = 0;
     if (D_001B2310[0].item == 31) {
-        record = D_00139568[31] * 0xE0 + D_00239BA0;
+        unsigned char *record = D_00139568[31] * 0xE0 + D_00239BA0;
         D_001B2310[0].model = (unsigned char *)func_002FF300(*(int *)(record + 0x14), 1);
         D_001B2310[0].owned = 0;
     } else if (D_001B2310[0].item == 45) {
-        record = D_00139568[45] * 0xE0 + D_00239BA0;
+        unsigned char *record = D_00139568[45] * 0xE0 + D_00239BA0;
         D_001B2310[0].model = (unsigned char *)func_002FF300(*(int *)(record + 0x14), -1);
         D_001B2310[0].owned = 0;
     } else if (D_001B2310[0].item == 9) {
         D_001B2310[0].model = (unsigned char *)func_002FF300(601, 0);
         D_001B2310[0].owned = 0;
     } else {
+        unsigned char *record;
+        char *resident;
         D_001B2310[0].owned = 1;
         record = D_00239BA0 + D_00139568[D_001B2310[0].item] * 0xE0;
-        D_001B2310[0].model = *(unsigned char **)(D_00189E20 + *(int *)(record + 0xC) * 0x50 + 0x1220);
+        resident = (char *)&D_00189E20;
+        D_001B2310[0].model = *(unsigned char **)(resident + *(int *)(record + 0xC) * 0x50 + 0x1220);
     }
 }

@@ -1,3 +1,20 @@
+/* Claude Opus 5.5 xhigh, task v2114 (2026-11-03): closer near miss; supersedes v1626 below.
+ * -O2 -G8 -ffunction-sections -frac2-hazard-labels: 5680/5680 bytes, 0 of 2 places (L03/L14).
+ * Four instruction positions differ apart from relocations: +0x1358..+0x1364, where cc1
+ * emits li.s 0.8 (lui/ori/mtc1) before li v0,0x940 and retail reverses them.
+ * What changed from v1626:
+ * - State 22 stores both z components in BOTH real switch arms (0x940 and default),
+ *   other.f[2] first in source. jump2 cross-jumps the identical tails after sched2,
+ *   which gives retail's join block (fixes +0x139C..+0x13A8) and point-then-other order.
+ * - offset = &other after the switch; PRE sets its copy at the end of the dispatch block.
+ * Remaining tie: sched1 orders lh (birthing), fp, &other, li.s, li 0x940; li.s wins on
+ * luid. If the switch index is a twice-set local (type, also used in state 1), the lh
+ * stops being a birthing insn: fp, &other, lh, li 0x940, li.s fixes this, but then
+ * &other's global priority (8/107) falls just below the 0xF2D loop constant's (3/40),
+ * so s6/s7 swap (6 positions). Reopen with a way to order li 0x940 before li.s under a
+ * single-set index, or to cut one RTL insn from &other's range (PRE no-op copies).
+ * All required declarations are included below.
+ */
 /* GPT-6.1 Sol high, task v1626 (2026-10-29): retained improved near miss.
  * Current toolchain, -O2 -G8 -ffunction-sections -frac2-hazard-labels:
  * 5680/5680 bytes; check.py: 0 of 2 USA v1.01 places match (L03/L14),
@@ -231,7 +248,8 @@ void func_L03_003C1BF0(u8 *object)
         switch (object[0x20]) {
         case 1:
             if (func_002B38B8(SP(0x354))) {
-                switch (*(s16 *)(object + 0xAA)) {
+                type = *(s16 *)(object + 0xAA);
+                switch (type) {
                 case 0x940:
                     if (D_0018CB20[0] == 0) func_00288E18(0x9CF, 0x26);
                     break;
@@ -484,14 +502,15 @@ void func_L03_003C1BF0(u8 *object)
             case 0x964:
                 height = 0.3f;
             case 0x940:
+                other.f[2] = height;
                 point.f[2] = height;
                 break;
             case 0x93C:
             default:
+                other.f[2] = height;
                 point.f[2] = height;
                 break;
             }
-            other.f[2] = height;
             offset = &other;
             func_00283098(&point, &point, object + 0xC0);
             if (SF(0x1B8) < 0.0f) {

@@ -1,18 +1,20 @@
-/* GPT-6.1 Sol high, 29 October 2026. Game -O2 -G0 -ffunction-sections.
- * Best retained assigned-unit check: 948/964 bytes, 0/28 USA v1.01 places.
- * Eight exploratory checker invocations this task. Other forms reached 956 bytes but
- * differed more throughout navigation; this one retains its instruction shape.
- * Corrected the older draft: retail always writes handle = -1 after movement,
- * including when it was already -1. The mode field is declared volatile because
- * retail reloads it at 0x002F95E8 and 0x002F9604 with no intervening call/store.
- * Scroll remains ordinary: the mode read already invalidates its earlier value.
- * Separate state/input lifetimes and a named 24-byte stride/kind base recover
- * the saved-register allocation. Animation temporaries, repeated held-button
- * guard, purchase pointer/ID allocation and branch scheduling still differ.
- * Requires the original unit's common.h, D_00138180 declaration, the settings
- * object D_001A79F8 with its MACRO_ADDR declaration, D_0021F240 declaration,
- * and int func_002E5CF8(int, int, void *). Other declarations are below.
- * No linked build run. Next: source structure for the repeated purchase guard.
+/* Tier: Claude Opus 5.5 (xhigh), 3 November 2026. Game -O2 -G8 -ffunction-sections.
+ * Best check: 948/964 bytes, 0/28 USA v1.01 places; 142 of 241 diff rows differ
+ * (previous retained draft: 145). Change from the Sol-high draft: `moved` is now a
+ * block-local in each movement section, which gives section 2 retail's $v1.
+ * What differs:
+ * (1) The animation temporaries are swapped (ours: $a0 = 3, $v1 = 1; retail:
+ *     $v1 = 3, $a0 = 1). A block-local `animation` gets the retail registers but
+ *     moves the `= 3` out of the beqz delay slot (956 bytes, beql).
+ * (2) The purchase guard is 16 bytes short. Retail re-tests the held bit
+ *     (bnez $a1), uses a copy of the state address ($a0 = $v0), reloads mode, and
+ *     compares it with a fresh constant 3. All of this needs block B (the
+ *     mode == 3 check) to be a separate cse block in both cse1 and cse2, with
+ *     gcse PRE making the address copy. A static inline helper is fully cse'd
+ *     (928 bytes). Mode stays volatile only to keep the reload.
+ * Declarations: in 002F5220.c this needs the F73Record D_00239BA0 declaration from
+ * func_002F73A8 (the body casts to char *), the file's D_00139568, D_00138180,
+ * D_001A79F8 (MACRO_ADDR), D_0021F240 and int func_002E5CF8(int, int, void *).
  */
 extern int D_001B2240, D_001B223C;
 extern int D_001B2244 __attribute__((sda));
@@ -21,8 +23,6 @@ extern void func_0028B6C8(int, unsigned int);
 extern int func_002F6510(void);
 extern void func_002F9198(void);
 
-extern char D_00239BA0[];
-extern unsigned char D_00139568[];
 
 typedef struct { int id, kind; int fields[4]; } ShopRow_93;
 typedef struct {
@@ -37,7 +37,7 @@ typedef struct { char pad[0x1C4]; int buttons; } Input_93;
 void func_002F93B0(void)
 {
     ShopInput_93 *state = &F93State;
-    int moved, cost;
+    int cost;
     int *item;
     char *record;
     if (state->busy) return;
@@ -46,7 +46,7 @@ void func_002F93B0(void)
         if ((input->buttons & 0x2000) ||
                 (D_001B2240 >= 16 && D_001B2240 % 10 == 1)) {
             if (state->scroll < 57) {
-                moved = 0;
+                int moved = 0;
                 if (state->selected < state->count - 1) {
                     ++state->selected;
                     moved = 1;
@@ -77,7 +77,7 @@ void func_002F93B0(void)
                 (D_001B223C >= 16 && D_001B223C % 10 == 1)) {
             state = &F93State;
             if (state->scroll >= -56) {
-                moved = 0;
+                int moved = 0;
                 if (state->selected > 0) {
                     --state->selected;
                     moved = 1;
@@ -123,7 +123,7 @@ void func_002F93B0(void)
                     }
                     item = (int *)((char *)kinds + state->selected * stride);
                     if (*item != 1) goto rejected;
-                    record = D_00239BA0 + D_00139568[state->rows[state->selected].id] * 224;
+                    record = (char *)D_00239BA0 + D_00139568[state->rows[state->selected].id] * 224;
                     if (D_00139688[state->rows[state->selected].id] >= *(unsigned short *)(record + 0x8E)) goto rejected;
                     if ((*(int *)&D_001A79F8) < *(unsigned short *)(record + 0x88)) goto rejected;
                 }

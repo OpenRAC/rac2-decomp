@@ -164,7 +164,7 @@ void func_L23_00429FF8(u8 *arg0) {
 
 INCLUDE_ASM("asm/levels", func_L23_0042A018);
 
-INCLUDE_ASM("asm/levels", func_L23_0042A438);
+/* func_L23_0042A438 is defined in L23_0042A438-g8.c. */
 
 /* func_L23_0042A8C0 is defined in L23_0042A8C0-g8.c. */
 

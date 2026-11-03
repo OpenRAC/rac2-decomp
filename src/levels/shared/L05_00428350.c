@@ -143,7 +143,7 @@ char *func_L05_0042BCE0(char *a0, char *a1, float f12, float f13)
 
 /* func_L05_0042BDB0 is defined in L05_0042BDB0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L05_0042C928);
+/* func_L05_0042C928 is defined in L05_00428350-g8.c. */
 
 /* Two bound helpers at the node's +0x68; the second call registers a callback
    and the context, the other branch calls a one-argument helper. */
@@ -293,7 +293,7 @@ void func_L05_00430BF0(Vec16_Fc936841d *object, int index)
 /* func_L05_00432158 is matched in its own unit, src/levels/shared/L05_00432158.c (-frac2-qcopy -frac2-qcopy-barrier -fno-strength-reduce). */
 
 
-INCLUDE_ASM("asm/levels", func_L05_00441D40);
+/* func_L05_00441D40 is defined in L05_00428350-g8.c. */
 
 
 /* func_L05_00441F30 is defined in L05_00441F30-g8.c. */
@@ -355,7 +355,37 @@ int func_L05_00445980(void)
     return *(short *)(*(char **)(base + 0x70) + 0xD8) != 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L05_004459B0);
+typedef struct { char pad[0x1C]; char *entry; } ModelSlot_4459B0;
+typedef struct { char data[256]; } ModelRecord_4459B0;
+typedef struct { char data[128]; } InstanceRecord_4459B0;
+extern ModelSlot_4459B0 *D_L05_001B1EC4 MACRO_ADDR;
+extern ModelRecord_4459B0 *D_L05_001B251C MACRO_ADDR;
+extern InstanceRecord_4459B0 *D_L05_001B260C MACRO_ADDR;
+extern int func_002ACBC8(void *, int);
+extern float func_00282DB0(char *, char *);
+int func_L05_004459B0(void *arg)
+{
+    char *self = arg;
+    char *entry;
+    char *p;
+    char *tbl;
+    int count;
+    float best = 0.0f;
+
+    entry = D_L05_001B1EC4[*(short *)(self + 0x84)].entry;
+    p = entry + 0x24;
+    tbl = D_L05_001B251C[*(int *)(entry + 0x20)].data;
+
+    for (count = 0; count < 12; count++, p += 4) {
+        if (*(int *)p < 0)
+            continue;
+        if (func_002ACBC8(self + 0x30, *(int *)p) || func_002ACBC8(tbl + 0x10, *(int *)p)) {
+            if (func_00282DB0(D_L05_001B260C[*(int *)p].data, self) > best)
+                return 1;
+        }
+    }
+    return 0;
+}
 
 /* func_L05_00445B58 lives in L05_00445B58.c. */
 

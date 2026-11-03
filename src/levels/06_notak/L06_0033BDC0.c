@@ -365,7 +365,7 @@ int func_L06_003F3760(int a0, char *a1)
     return free_slot;
 }
 
-INCLUDE_ASM("asm/levels", func_L06_003F3800);
+/* func_L06_003F3800 is matched in L06_003F3800-g8.c. */
 
 /* func_L06_003F3EF0 is defined in L06_003F3EF0-helpers.c. */
 
@@ -522,8 +522,7 @@ done:
     func_002AD6F0(state->tracker, movement, oldRotation, moby->rotation);
 }
 
-
-INCLUDE_ASM("asm/levels", func_L06_00402230);
+/* func_L06_00402230 is matched in L06_00402230.c (built with -g). */
 
 /* func_L06_00403F60 is matched in L06_0033BDC0-g8.c (it reaches a global through $gp). */
 

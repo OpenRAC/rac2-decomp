@@ -19,7 +19,7 @@ void func_0028BDB0(u8 *object) {
 /* func_0028C6D0 is defined in 0028BDB0-wheel-g8.c. */
 
 
-INCLUDE_ASM("asm/game", func_0028CCE0);
+/* func_0028CCE0 is defined in 0028BDB0-radial-g8.c. */
 
 INCLUDE_ASM("asm/game", func_0028D1E8);
 
@@ -132,4 +132,4 @@ int func_0028E260(void)
     return selected;
 }
 
-INCLUDE_ASM("asm/game", func_0028E2A8);
+/* func_0028E2A8 is defined in 0028BDB0-menu-g8.c. */

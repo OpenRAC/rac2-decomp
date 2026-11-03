@@ -1,16 +1,17 @@
-/* func_L00_00423290 (360 bytes) - near miss (W1, 28 October 2026): 360/360 bytes, 4 lines off at us level 0
- * (was 356/360, 74 lines). Profile: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
- * -mno-split-addresses.
- * What closed the size: the loaded object pointer is one variable that gets +0x60 added in place
- * (`v60 = *(char **)(a0 + 0x70); v160 = v60 + 0x160; obj = v60; v60 += 0x60;`). Retail keeps the
- * loaded pointer in $s1, copies it to $s2 for the later +0xB0/+0xC0/+0xF0 uses and adds 0x60 in
- * place, which a second variable for the same value never produced.
- * Left: the order of the four setup instructions before the first jal. Retail:
- * daddu $s2,$s1 ; addiu $s4,$s1,0x160 ; daddu $a1,$s0 ; addiu $s1,$s1,0x60 ; jal ; daddu $a0,$sp in the
- * slot. Here the in-place add ends in the slot and `daddu $a0,$sp` is before it. All orders of the
- * five head statements and the float position of func_00282D30 tie.
+/* func_L00_00423290 (360 bytes) - near miss (v2142, 3 November 2026): 360/360 bytes, 0/27 places,
+ * one instruction out of place (was five setup positions with -mno-split-addresses).
+ * Profile: own unit, -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+ * (no -mno-split-addresses: split addresses keep `daddu $a0,$sp` in the first jal's slot).
+ * `obj = v60;` before `v160 = v60 + 0x160;` gives retail's daddu $s2,$s1 / addiu $s4,$s1,0x160 order.
+ * Left: `addiu $s1,$s1,0x60` (in-place v60 += 0x60) issues after the first jal instead of before it.
+ * Cause: its only dependent is the post-call qcopy barrier, so its sched priority is 36 against 37
+ * for the a0/a1 argument setups; retail needs the call to depend on it (sched_before_next_call
+ * needs a call-free source pseudo), but a separate temp for the object copy is folded by cse
+ * (356 bytes). -fno-schedule-insns grows to 364, -fno-sched-interblock ties.
+ * Declarations: Hero union view of D_00189E20, TImode V4 type, externs func_00282CF0_2,
+ * func_00282CC0, func_00282D30, func_00282DB0_1 (float), func_00282C88.
  */
-#include "include_asm.h"
+#include "common.h"
 typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
 extern unsigned char D_00189E20[];
@@ -56,8 +57,8 @@ void func_L00_00423290(char *a0)
 
     hero = (&H->c[704]);
     v60 = *(char **)(a0 + 0x70);
-    v160 = v60 + 0x160;
     obj = v60;
+    v160 = v60 + 0x160;
     v60 += 0x60;
 
     func_00282D30(buf0, hero, -1.0f);

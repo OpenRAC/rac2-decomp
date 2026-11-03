@@ -927,9 +927,9 @@ void func_L00_003F56F0(char *p)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003F5750);
+/* func_L00_003F5750 is in L00_003EE100-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003F5870);
+/* func_L00_003F5870 is in L00_003F5870-g8.c. */
 
 /* func_L00_003F5B10 is in L00_003F5B10-g8.c. */
 

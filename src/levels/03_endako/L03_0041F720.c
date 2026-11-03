@@ -2,8 +2,6 @@
 #include "common.h"
 
 
-INCLUDE_ASM("asm/levels", func_L03_00421398);
-
 INCLUDE_ASM("asm/levels", func_L03_00421930);
 
 /* The group count and the entity table's base, read as bare symbols (an `sda` array of unknown

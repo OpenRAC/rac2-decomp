@@ -679,7 +679,54 @@ void func_L00_002B2C58(int a, int b, float x, float y)
 
 /* func_L00_002B2CC8 is in L00_002B2CC8-interact.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002B30E8);
+typedef struct {
+    u8 pad0[0x2294];
+    int mode;
+    u8 pad2298[0x22C1 - 0x2298];
+    u8 visited;
+    u8 pad22C2[0x22C6 - 0x22C2];
+    u8 slot;
+} HeroSlotState;
+
+extern int D_001A79F0[] __attribute__((sda));
+extern int D_001A73D8[] __attribute__((sda));
+extern int D_001A73E0[] __attribute__((sda));
+extern int D_0013A148[];
+extern unsigned char D_0019B2E8[][16];
+extern int D_001A24A8[][16];
+extern void func_L00_002F45B8(void);
+extern void func_0027D330(int);
+
+/* Bumps the current level's counter and a global total, runs a helper, then for a valid slot at 0x22C6 bumps a
+ * per-level per-slot counter (only once the counter at D_L00_001B19C8 reaches 900, or 1800 in modes 0x74 and 0x79,
+ * and while the slot's 0x80 flag is clear) and a 16-entry counter; always bumps the per-slot counter, calls
+ * func_0027D330(0x10) and sets the byte at 0x22C1. */
+void func_L00_002B30E8(void)
+{
+    int threshold;
+    int mode;
+
+    D_0013A148[D_001A79F0[0]]++;
+    D_001A73D8[0]++;
+    func_L00_002F45B8();
+    if (((HeroSlotState *)D_00189E20_1)->slot != 0xFF) {
+        mode = ((HeroSlotState *)D_00189E20_1)->mode;
+        if (mode == 0x74 || mode == 0x79)
+            threshold = 0x708;
+        else
+            threshold = 0x384;
+        if (D_L00_001B19C8[0] >= threshold) {
+            int level = D_001A79F0[0];
+            int slot = ((HeroSlotState *)D_00189E20_1)->slot;
+            if ((D_0019B2E8[level][slot] & 0x80) == 0)
+                D_001A24A8[level][slot & 0xF]++;
+        }
+        D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot & 0xF]++;
+    }
+    D_001A73E0[((HeroSlotState *)D_00189E20_1)->slot]++;
+    func_0027D330(0x10);
+    ((HeroSlotState *)D_00189E20_1)->visited = 1;
+}
 
 /* tests the signed short identifier at offset 0xaa of a nonnull object against 71 */
 s32 func_L00_002B3248(u8 *object) {
@@ -861,6 +908,6 @@ void func_L00_002B6118(f32 a0) {
 /* func_L00_002B6560 is in L00_002B6560.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L00_002B75A0);
+/* func_L00_002B75A0 is in L00_002AFBC0-target.c. */
 
 /* func_L00_002B7718 is in L00_002B7718-g8.c. */

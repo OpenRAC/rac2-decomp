@@ -129,7 +129,7 @@ INCLUDE_ASM("asm/game", func_00327038);
 
 /* func_00327A60 uses small data in 00327038-g8.c. */
 
-INCLUDE_ASM("asm/game", func_00327B40);
+/* func_00327B40 is in 00327038-push-g8.c. */
 
 /* func_00327D08 is matched in 00327038-g8.c (-G8 small data). */
 
@@ -222,7 +222,7 @@ void func_00328918(char *owner)
 
 /* func_00328A20 is in 00328A20.c. */
 
-INCLUDE_ASM("asm/game", func_00328B68);
+/* func_00328B68 is in 00328A20.c. */
 
 void func_00328CA8(char *p)
 {

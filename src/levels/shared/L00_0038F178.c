@@ -57,6 +57,33 @@ extern void func_L00_002F4720(void);
 
 extern void func_L00_00390F28(char *object, int mode);
 
+/* Level state saved by func_L00_00390E10 and restored by func_L00_00390F28. */
+typedef struct {
+    char pad0[0x30];
+    float f30;
+    float f34;
+    float f38;
+    float f3C;
+    unsigned char b40;
+    unsigned char b41;
+    unsigned char b42;
+} LevelSavedState_390E10;
+
+extern int D_L00_001A8A44 __attribute__((section(".sdata")));
+extern float D_L00_001B1984 __attribute__((section(".sdata")));
+extern float D_L00_001B1988 __attribute__((section(".sdata")));
+extern float D_L00_001B198C __attribute__((section(".sdata")));
+extern float D_L00_001B1990 __attribute__((section(".sdata")));
+extern unsigned char D_L00_001B1980 __attribute__((section(".sdata")));
+extern unsigned char D_L00_001B1981 __attribute__((section(".sdata")));
+extern unsigned char D_L00_001B1982 __attribute__((section(".sdata")));
+extern float D_L00_001B2500 __attribute__((section(".sdata")));
+extern float D_L00_001B2408 __attribute__((section(".sdata")));
+extern int D_L00_001B1EB4 __attribute__((section(".sdata")));
+extern int D_L00_001B20C0 __attribute__((section(".sdata")));
+extern int D_L00_001B255C __attribute__((section(".sdata")));
+extern void func_00284E18(int, int, int);
+
 typedef unsigned char u8;
 
 typedef float f32;
@@ -210,7 +237,36 @@ char *func_L00_00390938(char *p)
     return o;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00390E10);
+void func_L00_00390E10(char *object)
+{
+    LevelSavedState_390E10 *st = *(LevelSavedState_390E10 **)(object + 0x68);
+    float f30 = D_L00_001B1984;
+    float f34 = D_L00_001B1988;
+    float f38 = D_L00_001B198C;
+    float f3C = D_L00_001B1990;
+
+    D_L00_001A8A44 = 1;
+    st->f30 = f30;
+    st->f34 = f34;
+    st->f38 = f38;
+    st->f3C = f3C;
+    st->b40 = D_L00_001B1980;
+    st->b41 = D_L00_001B1981;
+    st->b42 = D_L00_001B1982;
+    D_L00_001B1980 = 0x40;
+    D_L00_001B1981 = 0x60;
+    D_L00_001B1982 = 0x40;
+    D_L00_001B1984 = 0.0f;
+    D_L00_001B1988 = 131072.0f;
+    D_L00_001B198C = 255.0f;
+    D_L00_001B2500 = 147456.0f;
+    D_L00_001B2408 = 144.0f;
+    D_L00_001B255C = 144;
+    D_L00_001B1EB4 = 144;
+    D_L00_001B20C0 = 0x50000;
+    D_L00_001B1990 = 0.0f;
+    func_00284E18(D_L00_001B1980, D_L00_001B1981, D_L00_001B1982);
+}
 
 
 INCLUDE_ASM("asm/levels", func_L00_00390FF8);

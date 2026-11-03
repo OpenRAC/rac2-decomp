@@ -28,6 +28,17 @@
    retail's priorities with these births: next, a0, a, init, b, upd, c, page (0x18 [26,36] 3000,
    upd 28, c 32, page 36: init 3125 > 0x18 3000 > upd 2857 > page 2778 > c 2500). The lever is
    sched1's store order (init's store before b, upd's before c), not the statement order.
+   v2160 (opus-1, 2026-11-03, c05 compiler): sched1 -fsched-verbose-5 for block 10: every %hi prio 7
+   (A40 first: 3 dependents via the combined count store), %lo/&D_001F2840/0x18 prio 6, stores and
+   a0 = 0 prio 5; stores rank by weight (later page/next -1; a, b, c, upd 0; earlier page/next and
+   init +1), then LUID. A model over every hi order (locals), 0x18 before/after &D_001F2840, and
+   every store order the weights allow finds no schedule that gives retail's registers; with init's
+   qty at 6 refs instead of 5 (one more reference to the init pointer, no extra code) the current
+   hi order works if upd is stored before c. An inline menu-list helper (params a, b, c, upd, init;
+   init(0) or list->init(0)) and a list pointer compile identically. This draft stores a and b
+   first so 0x18 is issued before &D_001F2840 (0x18 life 10): init $v0 and 0x18 $v1 now match;
+   page $a1, c $a2, upd $a3 remain (retail upd $a1, page $a2, c $a3). check.py: 0/28, first
+   difference +0x168, 126 of 343 rows differ (130 with the earlier case 8).
  */
 #include "common.h"
 
@@ -200,9 +211,9 @@ void func_002CA070(void)
         D_001F2840.next = D_0025A738;
         break;
     case 8:
-        D_001F2840.page = D_00259018;
         D_00210A40.a = 0x18;
         D_00210A40.b = 0x18;
+        D_001F2840.page = D_00259018;
         D_00210A40.c = D_00258D70;
         D_00210A40.upd = func_002CB648;
         D_001F2840.next = D_00259018;

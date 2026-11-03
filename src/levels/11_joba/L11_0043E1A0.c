@@ -60,7 +60,7 @@ void func_L11_004401C0(u8 *obj) {
 }
 
 /* func_L11_00440238 lives in L11_00440238-g8.c (its source unit has the retail small-data view). */
-INCLUDE_ASM("asm/levels", func_L11_00440360);
+/* func_L11_00440360 is in L11_0043E1A0-g.c. */
 
 /* func_L11_00440790 lives in L11_00440238-g8.c (its source unit has the retail small-data view). */
 
@@ -73,7 +73,42 @@ extern void func_L11_003F2F38(u8 *);
 
 extern void func_L11_00439950(u8 *);
 
-INCLUDE_ASM("asm/levels", func_L11_00440868);
+u8 *func_L11_00440868(u8 *obj, s32 id) {
+    u8 *state = *(u8 **)(obj + 0x68);
+    s32 index = *(s32 *)(state + 0xC0);
+    u16 *cursor;
+    u8 *record;
+    u8 *list;
+
+    if (index == 0xFF) {
+        return 0;
+    }
+    list = D_L11_001FC420[index];
+    if (list == 0) {
+        return 0;
+    }
+    cursor = (u16 *)list;
+    do {
+        u16 value = *cursor & 0x7FFF;
+        record = D_L11_001B359C + (value << 8);
+
+        if (record != 0 && record[0x20] != 0xFE && record[0x20] != 0xFD &&
+            *(s16 *)(record + 0xAA) == id && record[0x20] == 1) {
+            *(u32 *)(record + 0xB8) = (u32)obj;
+            switch (id) {
+            case 0xD4A:
+                func_L11_00439950(record);
+                *(s32 *)(state + 0x118) += 1;
+                return record;
+            case 0xB3A:
+                func_L11_003F2F38(record);
+                *(s32 *)(state + 0x11C) += 1;
+                return record;
+            }
+        }
+    } while (*(s16 *)cursor++ >= 0);
+    return 0;
+}
 
 /* func_L11_00440970 lives in the sibling small-data unit (L11_0043E1A0-g8.c). */
 
@@ -871,5 +906,3 @@ int func_L11_004461C0(u8 *object, u8 *arg) {
     u8 *state = *(u8 **)(object + 0x68);
     return func_L00_003206B8(arg, *(int *)(state + 0x1C4));
 }
-
-INCLUDE_ASM("asm/levels", func_L11_004461E8);

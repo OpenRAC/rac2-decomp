@@ -1,88 +1,110 @@
-/* Retained complete C reconstruction, 30 October 2026. NOT MATCHING.
- * Profile: -O2 -G0 -ffunction-sections.
- * us: 09_dobbo: 1196 bytes, expected 1216; us2: ABSENT; pal: ABSENT.
- * Complete region monitor and persistent forty-entry enemy scan, including signed moby state
- * tests, its exceptional cursor-advance path, hint gates and time comparison. External data
- * extents remain open. Global-base allocation, countdown structure and modulo lowering differ.
- * Reopen: Independent global-base and scan-loop source witness.
- * Local placement checks only; no strict linked or native-runtime claim.
+/* func_L09_003E3288 -- NOT MATCHING. Tier opus-1 (Claude Opus 5.5, xhigh), 3 November 2026.
+ * Best check.py: us 09_dobbo 1220 bytes, expected 1216; 0/1 places. Every register, the preheader
+ * (count-up loop puts the 0x27 counter init after the hoisted 0xD0F/0xD30/5) and everything after the
+ * scan loop match. Only difference: the moby state byte is read twice. Retail: bne oClass,$s3 /
+ * lbu v1 (one load) ; bne v1,$s4 / sll v0,v1,24. Here: bnel / lbu v1 ; lbu v0 ; bne v0,$s4 /
+ * daddu v1,v0. gcse PRE inserts the sign-test QI load before the ==5 branch (this is what gives the
+ * constant 5 loop life 2, so it is hoisted), but the compare keeps its own load. Reading the state
+ * once into a local (old 1208-byte form) loads once but leaves 5 unhoisted (life 1, $s6 unsaved).
+ * Declarations: typed structs below; D_L09_001B285C/2860 must stay scalar MACRO_ADDR pointers
+ * (struct-member stores then do not block their loads); D_001A7A60/7B08/7A10 read at nonzero sda
+ * offsets (no $gp delay-slot loads); D_001A7A10[4] as in src/game/00344478-g8.c.
  */
 #include "common.h"
-#define I(p,o) (*(int *)((p)+(o)))
-#define U(p,o) (*(u32 *)((p)+(o)))
-#define H(p,o) (*(u16 *)((p)+(o)))
-#define S(p,o) (*(short *)((p)+(o)))
-#define P(p,o) (*(u8 **)((p)+(o)))
-extern u8 D_001395B8[],D_0018C958[],D_0018C750[],D_00189EA0[];
+extern unsigned char D_001395B8[];
+typedef struct { char pad[0x1bc]; unsigned short flag; char pad2[2]; unsigned int time; } DobboClock;
+extern DobboClock D_0018C750;
+typedef struct { char pad[0x2c0]; int first; char pad2[0x11c]; int second; char pad3[0x20]; int third; char pad4[0x24]; unsigned short flag; } DobboDialogue;
+extern DobboDialogue D_0018C958;
+typedef struct { char pad[0x80]; char position[0x10]; char pad2[0x128]; int field1b8; char pad3[0x20d8]; int field2294; } DobboPlayer;
+extern DobboPlayer D_00189E20;
 extern int D_001397C4;
-extern u8 D_001A7A6C,D_001A7B0D,D_001A7B0F;
-extern short D_001A7A18;
-extern u32 D_001A7390;
-extern int D_L09_001A9040,D_L09_001A903C;
-extern u8 *D_L09_001B285C,*D_L09_001B2860;
-extern int func_002ACBC8(void *,int),func_00288E18(int,int),func_002E5E58(int,int,void *);
-extern void func_002B0A18(int,int);
-
-/* Monitors four hero regions and incrementally counts the active enemy classes.
- * The forty-entry scan cursor and its accumulated count survive across calls.
- */
-void func_L09_003E3288(u8 *object)
+extern unsigned char D_001A7A60[] __attribute__((sda)), D_001A7B08[] __attribute__((sda));
+extern short D_001A7A10[] __attribute__((sda));
+extern unsigned int D_001A7390;
+extern int D_L09_001A9040[] __attribute__((sda)), D_L09_001A903C[] __attribute__((sda));
+typedef struct {
+    int region[4];
+    int entered;
+    int hint14;
+    int hint18;
+    int hint1c;
+    char pad20[0xc];
+    int f2c;
+    char pad30[0x28];
+    int scan;
+    int count;
+} RegionState;
+typedef struct { char pad[0x3d6]; short busy; } ScanVars;
+typedef struct {
+    char pad00[0x20];
+    unsigned char state;
+    char pad21[0xf];
+    unsigned char alpha;
+    char pad31[0x37];
+    ScanVars *vars;
+    char pad6c[0x3e];
+    short oClass;
+    char padac[0x54];
+} ScanMoby;
+extern ScanMoby *D_L09_001B285C MACRO_ADDR, *D_L09_001B2860 MACRO_ADDR;
+extern int func_002ACBC8(void *, int);
+extern void func_00288E18(int, int);
+extern void func_002B0A18(int, int);
+extern void func_002E5E58(int, int, int);
+void func_L09_003E3288(unsigned char *object)
 {
-    u8 *state = P(object,0x68),*moby,*hero = D_00189EA0;
-    int i,index,kind;
-    if (object[0x20] == 0) {
-        object[0x20] = 1; object[0x30] = 255; I(state,0x10) = 0;
-        if (D_001395B8[0x7A] >= 126) D_001395B8[0x7A] = 125;
-        if (D_001395B8[0x79] >= 126) D_001395B8[0x79] = 125;
-        I(state,0x2C) = 0;
+ RegionState *s = *(RegionState **)(object+0x68);
+ ScanMoby *m;
+ int i;
+ if (!object[0x20]) {
+  object[0x20]=1; object[0x30]=255; s->entered=0;
+  if(D_001395B8[0x7a]>=126) D_001395B8[0x7a]=125;
+  if(D_001395B8[0x79]>=126) D_001395B8[0x79]=125;
+  s->f2c=0;
+ }
+ if(object[0x20]!=1) return;
+ if(D_L09_001A9040[0] && !D_001A7A60[12]) {
+  for(i=0;i<40;i++) {
+   m=&D_L09_001B285C[s->scan];
+   if(m->oClass==0xd0f || m->oClass==0xd57 || m->oClass==0xd30 || m->oClass==0xcbc || m->oClass==0xd90) {
+    if(m->oClass==0xd30 && m->vars->busy) {s->scan++;continue;}
+    if(m->oClass==0xd0f && m->state==5) {s->scan++;continue;}
+    if((signed char)m->state>=0) s->count++;
+   }
+   s->scan++;
+   if(&D_L09_001B285C[s->scan]>=D_L09_001B2860) {
+    if(!s->count && !D_001A7A60[12]) {
+     D_001A7A60[12]=1; func_002E5E58(1,0,0);func_002B0A18(0x1233,-1);D_L09_001A903C[0]=1;
     }
-    if (object[0x20] != 1) return;
-    if (D_L09_001A9040 && !D_001A7A6C) {
-        for (i = 39; i >= 0; i--) {
-            index = I(state,0x58);
-            moby = D_L09_001B285C + (index << 8);
-            kind = S(moby,0xAA);
-            if (kind == 0xD0F || kind == 0xD57 || kind == 0xD30 || kind == 0xCBC || kind == 0xD90) {
-                if ((kind == 0xD30 && S(P(moby,0x68),0x3D6)) ||
-                    (kind == 0xD0F && moby[0x20] == 5)) {
-                    I(state,0x58) = index + 1;
-                    continue;
-                }
-                if ((s8)moby[0x20] >= 0) I(state,0x5C)++;
-            }
-            I(state,0x58)++;
-            if ((u32)(D_L09_001B285C + (I(state,0x58) << 8)) >= (u32)D_L09_001B2860) {
-                if (!I(state,0x5C) && !D_001A7A6C) {
-                    D_001A7A6C = 1;
-                    func_002E5E58(1,0,0);
-                    func_002B0A18(0x1233,-1);
-                    D_L09_001A903C = 1;
-                }
-                I(state,0x58) = 0; I(state,0x5C) = 0;
-            }
-        }
-    }
-    if (!H(D_0018C958,0x42C) && D_001397C4 < 0 && !D_001A7B0D &&
-        func_002ACBC8(hero,I(state,0))) func_00288E18(0xA02,0x59);
-    if (func_002ACBC8(hero,I(state,4))) I(state,0x10) = 1;
-    if (I(hero - 0x80,0x2294) == 57 && !I(hero - 0x80,0x1B8) && I(state,0x10))
-        D_001395B8[0x7A]++;
-    if (D_001A7A18 <= 0 && func_002ACBC8(hero,I(state,4)) &&
-        (unsigned)D_001395B8[0x7A] % 5 == 4 && !I(state,0x1C) && I(hero,0x2214) != 57) {
-        if (I(D_0018C958,0x3E0) >= 0) func_00288E18(0x9FB,0x52);
-        I(state,0x1C) = 1; D_001395B8[0x7A]++;
-    }
-    if (func_002ACBC8(hero,I(state,8)) && I(hero - 0x80,0x2294) == 57 && !I(hero - 0x80,0x1B8))
-        D_001395B8[0x79]++;
-    if (!D_001A7B0F && func_002ACBC8(hero,I(state,8)) &&
-        (unsigned)D_001395B8[0x79] % 5 == 4 && !I(state,0x18) && I(hero,0x2214) != 57) {
-        if (I(D_0018C958,0x404) >= 0) func_00288E18(0x9FE,0x55);
-        I(state,0x18) = 1; D_001395B8[0x79]++;
-    }
-    if (func_002ACBC8(hero,I(state,12)) &&
-        (!H(D_0018C750,0x1BC) || D_001A7390 - U(D_0018C750,0x1C0) > 432000u) &&
-        D_001395B8[0x7D] < 3 && !I(state,0x14)) {
-        if (I(D_0018C958,0x2C0) >= 0) func_00288E18(0x9E3,0x3A);
-        D_001395B8[0x7D]++; I(state,0x14) = 1;
-    }
+    s->scan=0; s->count=0;
+   }
+  }
+ }
+ if(!D_0018C958.flag && D_001397C4<0 && !D_001A7B08[5]) {
+  if(func_002ACBC8(D_00189E20.position,s->region[0])) func_00288E18(0xa02,0x59);
+ }
+ if(func_002ACBC8(D_00189E20.position,s->region[1])) s->entered=1;
+ if(D_00189E20.field2294==0x39 && !D_00189E20.field1b8 && s->entered) D_001395B8[0x7a]++;
+ if(D_001A7A10[4]<=0 && func_002ACBC8(D_00189E20.position,s->region[1])) {
+  if(D_001395B8[0x7a]%5==4 && !s->hint1c && D_00189E20.field2294!=0x39) {
+   if(D_0018C958.second>=0) func_00288E18(0x9fb,0x52);
+   s->hint1c=1;D_001395B8[0x7a]++;
+  }
+ }
+ if(func_002ACBC8(D_00189E20.position,s->region[2])) {
+  if(D_00189E20.field2294==0x39 && !D_00189E20.field1b8) D_001395B8[0x79]++;
+ }
+ if(!D_001A7B08[7] && func_002ACBC8(D_00189E20.position,s->region[2])) {
+  if(D_001395B8[0x79]%5==4 && !s->hint18 && D_00189E20.field2294!=0x39) {
+   if(D_0018C958.third>=0) func_00288E18(0x9fe,0x55);
+   s->hint18=1; D_001395B8[0x79]++;
+  }
+ }
+ if(func_002ACBC8(D_00189E20.position,s->region[3])) {
+  if((!D_0018C750.flag || D_001A7390-D_0018C750.time>432000) && D_001395B8[0x7d]<3 && !s->hint14) {
+   if(D_0018C958.first>=0) func_00288E18(0x9e3,0x3a);
+   D_001395B8[0x7d]++;s->hint14=1;
+  }
+ }
 }

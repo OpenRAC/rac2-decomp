@@ -52,7 +52,7 @@ INCLUDE_ASM("asm/levels", func_L19_0041C328);
 
 /* func_L19_0041EE60 is defined in L19_0041EE60.c. */
 
-INCLUDE_ASM("asm/levels", func_L19_004203F0);
+/* func_L19_004203F0 is defined in L19_004203F0-g8.c. */
 
 extern void func_00282F20(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
@@ -349,10 +349,93 @@ void func_L19_00423270(char *obj)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L19_00423548);
+/* func_L19_00423548 is in L19_003E9400-g8.c. */
 
 /* func_L19_00423A98 is in L19_003E9400-g8.c. */
 
 /* func_L19_00423CC0 is defined in L19_00423CC0.c. */
 
-INCLUDE_ASM("asm/levels", func_L19_00423EC0);
+extern struct { u8 pad[0x464]; u8 flags[1]; } D_L19_0021EA30;
+extern int func_00282948(void *);
+extern float func_00283180(float);
+extern void func_00282D30(void *, void *, float);
+extern void func_002AD6F0(void *, void *, void *, void *);
+
+void func_L19_00423EC0(u8 *obj)
+{
+    u8 *s = *(u8 **)(obj + 0x68);
+    float oldPos[4] __attribute__((aligned(16)));
+    float oldRot[4] __attribute__((aligned(16)));
+    float delta[4] __attribute__((aligned(16)));
+    int bits;
+    float t;
+    qcopy(oldPos, obj + 0x10);
+    qcopy(oldRot, obj + 0xF0);
+    switch (obj[0x20]) {
+    case 0: {
+        u8 *other;
+        u16 id;
+        *(int *)(s + 0x5C) |= 1;
+        *(float *)(s + 0x74) = 0;
+        qcopy(s + 0x60, obj + 0x10);
+        if (*(int *)(s + 0x7C) == -1) goto alreadyActive;
+        other = (u8 *)((*(int *)(s + 0x7C) << 8) + (int)D_L19_001B2A1C[0]);
+        if (other[0x20] == 0xFE) goto alreadyActive;
+        if (other[0x20] == 0xFD) goto alreadyActive;
+        id = *(u16 *)(other + 0xB2);
+        if (D_L19_0021EA30.flags[(s16)id]) goto alreadyActive;
+        bits = *((u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8);
+        if (id & 1) {
+            if ((bits >> 4) & 7) goto alreadyActive;
+        } else if (bits & 7) goto alreadyActive;
+        goto initialize;
+    alreadyActive:
+        *(u16 *)(obj + 0x34) |= 2;
+        func_002A7750(obj, 4, -1);
+        break;
+    initialize:
+        obj[0x30] = 0xFF;
+        *(float *)(obj + 0x18) -= 6.0f;
+        func_002A7750(obj, 1, -1);
+        break;
+    }
+    case 1: {
+        u8 *other;
+        u16 id;
+        other = (u8 *)((*(int *)(s + 0x7C) << 8) + (int)D_L19_001B2A1C[0]);
+        id = *(u16 *)(other + 0xB2);
+        if (D_L19_0021EA30.flags[(s16)id]) goto activate;
+        bits = *((u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8);
+        if (id & 1) {
+            if ((bits >> 4) & 7) goto activate;
+        } else if (bits & 7) goto activate;
+        break;
+    activate:
+        if (*(int *)(s + 0x80) != -1)
+            ((u8 *)((*(int *)(s + 0x80) << 8) + (int)D_L19_001B2A1C[0]))[0xBC] = 1;
+        func_002A7750(obj, 2, -1);
+        break;
+    }
+    case 2:
+        if (func_00282948(s + 0x78)) func_002A7750(obj, 3, -1);
+        break;
+    case 3:
+        *(float *)(s + 0x74) += 1.0f / *(float *)(s + 0x70);
+        if (*(float *)(s + 0x74) > 1.0f) *(float *)(s + 0x74) = 1.0f;
+        t = (func_00283180(*(float *)(s + 0x74) * 3.1415927f) + 1.0f) * 0.5f;
+        qzero_nc(delta);
+        delta[2] = -6.0f;
+        func_00282D30(delta, delta, t);
+        func_00282CC0(obj + 0x10, s + 0x60, delta);
+        if (*(float *)(s + 0x74) >= 1.0f) func_002A7750(obj, 4, -1);
+        break;
+    case 4:
+        if (*(int *)(s + 0x80) == -1 || ((u8 *)((*(int *)(s + 0x80) << 8) + (int)D_L19_001B2A1C[0]))[0xBC] == 0)
+            *(u16 *)(obj + 0x34) |= 2;
+        break;
+    }
+    if (obj[0x20] < 4) {
+        func_00282CF0(delta, obj + 0x10, oldPos);
+        func_002AD6F0(s + 0x20, delta, oldRot, obj + 0xF0);
+    }
+}

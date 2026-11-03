@@ -173,7 +173,7 @@ extern void func_00283678(u8 *a, void *b);
 
 /* func_L07_003F8010 is defined in L07_003F8010-copy.c. */
 
-INCLUDE_ASM("asm/levels", func_L07_003F80B8);
+/* func_L07_003F80B8 is defined in L07_003F4578-follow-g8.c. */
 
 /* func_L07_003F8430 is defined in L07_003F8430-g8.c. */
 
@@ -365,9 +365,77 @@ void func_L07_0040F598(u8 *a0)
 /* func_L07_0040F760 is defined in L07_003F4578-g8.c (this unit has no $gp access for it). */
 
 
-INCLUDE_ASM("asm/levels", func_L07_0040F8F8);
+typedef struct { f32 x, y, z, w; } __attribute__((aligned(16))) Vec4;
+extern Vec4 D_L07_002A0100[][18];
+extern void func_2E4310(void *a, void *b, void *c);
+extern void func_2E4398(void *a, void *b, f32 c);
+extern f32 func_2E44D0(void *a, void *b);
 
-INCLUDE_ASM("asm/levels", func_L07_0040FA90);
+void func_L07_0040F8F8(void)
+{
+    s32 i, n, j, k, p;
+    f32 sum[4];
+    f32 d;
+
+    for (i = 0; i < 3; i++) {
+        n = 0;
+        k = 0;
+        p = 0;
+        qzero(sum);
+        /* separate counters for the test (k) and the call (p); n stays for after the loop */
+        while (D_L07_002A0100[i][k].w == 1.0f) {
+            func_2E4310(sum, sum, &D_L07_002A0100[i][p]);
+            n++;
+            p++;
+            k++;
+        }
+        func_2E4398(&D_L07_002A0100[i][n], &D_L07_002A0100[i][n], 1.0f / n);
+        D_L07_002A0100[i][n].w = 0.0f;
+        for (j = 0; j < n; j++) {
+            d = func_2E44D0(&D_L07_002A0100[i][j], &D_L07_002A0100[i][n]) + 4.0f;
+            if (D_L07_002A0100[i][n].w < d)
+                D_L07_002A0100[i][n].w = d;
+        }
+    }
+}
+
+extern u8 *D_L07_001B1F40 MACRO_ADDR;
+extern s32 *D_L07_001FDEC0[];
+extern void func_2E4DD8(void *, void *);
+extern void func_2E47F8(void *, void *, void *);
+
+void func_L07_0040FA90(u8 *obj, s32 index)
+{
+    f32 matrix[16];
+    f32 last[4];
+    u8 *state = *(u8 **)(obj + 0x68);
+    s32 *out;
+    u8 *entry;
+    f32 w;
+    s32 i;
+
+    if (*(s32 *)(state + 0xBC) == -1)
+        return;
+    entry = D_L07_001B1F40 + *(s32 *)(state + 0xBC) * 0x30;
+    out = D_L07_001FDEC0[**(s32 **)(entry + 0x3C)];
+    *out = 0;
+    func_2E4DD8(matrix, obj + 0xC0);
+    qcopy(matrix + 12, obj + 0x10);
+    matrix[15] = 1.0f;
+    for (i = 0; (D_L07_002A0100[index] + i)->w == 1.0f; i++) {
+        func_2E47F8(out + 4 + i * 4, D_L07_002A0100[index] + i, matrix);
+        (*out)++;
+    }
+    qcopy(last, &D_L07_002A0100[index][*out]);
+    w = last[3];
+    last[3] = 1.0f;
+    func_2E47F8(D_L07_001B1F40 + (*(s32 *)(state + 0xBC) * 0x30 + 0x20), last, matrix);
+    {
+        u8 *table = D_L07_001B1F40;
+        table += *(s32 *)(state + 0xBC) * 0x30;
+        ((f32 *)table)[11] = w;
+    }
+}
 
 /* func_L07_0040FC88 is defined in L07_0040FC88-g16.c. */
 

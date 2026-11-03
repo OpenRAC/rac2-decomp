@@ -124,7 +124,7 @@ float func_L08_0032EF80(ti_word *input, int initial, int first, int second, int 
 
 /* func_L08_0032F898 is defined in L08_0032F898.c. */
 
-INCLUDE_ASM("asm/levels", func_L08_003CC750);
+/* func_L08_003CC750 is defined in L08_003CC750-g8.c. */
 
 /* func_L08_003CCC30 is defined in L08_003CCC30-qcopy.c. */
 

@@ -245,10 +245,6 @@ void func_002B0A68(char *self, int mask, float *arg2,
 }
 
 
-INCLUDE_ASM("asm/game", func_002B0C28);
-
-INCLUDE_ASM("asm/game", func_002B0CE0);
-
 s32 func_002B0D60(void) { return D_00139648; }
 
 extern int func_002B0DB8(void);

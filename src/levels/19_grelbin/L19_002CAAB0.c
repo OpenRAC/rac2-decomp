@@ -38,6 +38,8 @@ extern int func_002A77E0(int);
 extern void *func_002BFB38(void *, void *, int, int);
 extern void func_00283028(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
+extern char *D_L19_001B2A1C __attribute__((sda));
+extern void func_0029F338(char *);
 extern int func_00282948(char *);
 extern void func_002FEE50(int);
 extern void func_L00_0038DE70(void *, void *, void *);
@@ -217,7 +219,53 @@ void func_L19_002FA1A8(void)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L19_00380918);
+void func_L19_00380918(char *m)
+{
+    int *d = *(int **)(m + 0x68);
+
+    if (*(unsigned char *)(m + 0x20) == 0) {
+        int *ids = d + 4;
+        int *cls = d + 12;
+        char *base;
+        int i;
+
+        *(unsigned char *)(m + 0x20) = 1;
+        base = D_L19_001B2A1C;
+        for (i = 0; i < 8; i++) {
+            unsigned char *o = (unsigned char *)(base + (ids[i] << 8));
+            if (o != 0 && o[0x20] != 0xFE && o[0x20] != 0xFD)
+                cls[i] = *(short *)(o + 0xAA);
+            else
+                cls[i] = -1;
+        }
+        if (d[0] == 0) {
+            *(unsigned char *)(m + 0x20) = 2;
+            *(unsigned short *)(m + 0x34) |= 2;
+        }
+    } else if (*(unsigned char *)(m + 0x20) == 1) {
+        int *ids = d + 4;
+        int *cls = d + 12;
+        char *base = D_L19_001B2A1C;
+        int n = 0;
+        int i;
+
+        for (i = 0; i < 8; i++) {
+            int id = ids[i];
+            int c;
+            unsigned char *o;
+            if (id != -1 && (c = cls[i]) != -1) {
+                o = (unsigned char *)(base + (id << 8));
+                if (o != 0 && *(short *)(o + 0xAA) == c && o[0x20] != 0xFE && o[0x20] != 0xFD) {
+                    n++;
+                    continue;
+                }
+            }
+            cls[i] = -1;
+        }
+        if (n < d[0])
+            func_0029F338(m);
+    }
+}
 
 void func_L19_00380A98(char *a0)
 {

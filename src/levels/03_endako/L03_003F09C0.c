@@ -374,7 +374,7 @@ void func_L03_0041DCE0(u8 *entity) {
 
 /* func_L03_0041E2D8 lives in L03_0041E2D8-g8.c */
 
-INCLUDE_ASM("asm/levels", func_L03_0041EAE0);
+/* func_L03_0041EAE0 lives in L03_0041EAE0-g8.c */
 
 /* re-arms the entity's two channel counters and its 200-second timer */
 void func_L03_0041EF90(u8 *entity) {

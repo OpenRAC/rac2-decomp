@@ -259,9 +259,82 @@ int func_L02_0032E998(float *position, float *target, float *heading, struct Rou
     return 1;
 }
 
-INCLUDE_ASM("asm/levels", func_L02_0032EC98);
+extern void func_00282F20(float *out, const float *in, float s);
+extern void func_00282CC0(void *a0, void *a1, void *a2);
+extern void func_00282CF0(float *out, const float *a, const float *b);
+extern float func_00283248(float a, float b);
+extern float func_00282C48(float t);
+extern float func_00283BE0(float a, float b);
+extern float func_00283B98(float a, float b);
 
-INCLUDE_ASM("asm/levels", func_L02_0032EDD8);
+/* Clamps a heading towards the gap between two points as seen from the position: its
+   difference from the middle direction is limited by func_00282C48 of half the gap's angle.
+   The heading argument itself holds the clamped difference, so it lives across blocks and is
+   allocated globally, after the block-local first direction has taken $f21, as in retail. */
+float func_L02_0032EC98(void *a0, void *a1, void *position, float angle, float margin) {
+    float v0[4];
+    float v1[4];
+    float v2[4];
+    float half;
+    float start;
+    float mid;
+    float f;
+
+    func_00282CF0(v0, (float *)a1, (float *)a0);
+    func_00282F20(v0, v0, margin);
+    func_00282CC0(v1, a0, v0);
+    func_00282CF0(v2, (float *)a1, v0);
+
+    start = func_00283248(v1[0] - *(float *)position, v1[1] - *(float *)((char *)position + 4));
+    half = func_00283BE0(func_00283248(v2[0] - *(float *)position,
+                                       v2[1] - *(float *)((char *)position + 4)), start) * 0.5f;
+    mid = func_00283B98(half, start);
+    angle = func_00283BE0(angle, mid);
+    f = func_00282C48(half);
+    if (f < angle)
+        angle = f;
+    f = -f;
+    if (angle < f)
+        angle = f;
+    return func_00283B98(angle, mid);
+}
+
+extern int func_002A8AF0(float *p, float *v, int n);
+extern float func_00282E80(void *a, void *b);
+
+/* Finds the route node whose path polygon holds the point: the cached node *index first, then
+   every other node whose position (+0x10) is within its radius (+0x1C) of the point. The
+   position's address is a single-use giv, which loop.c never combines with the node's own
+   address, so retail walks two pointers; walking them by hand lets them fold into one. */
+int func_L02_0032EDD8(void *point, struct RouteNode *nodes, int count, int *index) {
+    int i;
+
+    if (*index != -1) {
+        char *entry;
+        int n;
+        entry = D_L02_001FF1C0[nodes[*index].path];
+        n = *(int *)entry;
+        entry += 0x10;
+        if (func_002A8AF0(point, (float *)entry, n) != 0)
+            return 1;
+    }
+    for (i = 0; i < count; i++) {
+        if (i != *index
+            && func_00282E80(point, (char *)&nodes[i] + 0x10) <= *(float *)((char *)&nodes[i] + 0x1C)) {
+            char *entry;
+            int n;
+            entry = D_L02_001FF1C0[nodes[i].path];
+            n = *(int *)entry;
+            entry += 0x10;
+            if (func_002A8AF0(point, (float *)entry, n) != 0) {
+                *index = i;
+                return 1;
+            }
+        }
+    }
+    *index = -1;
+    return 0;
+}
 
 /* func_L02_0032EF10 is defined in L02_0032EF10-helpers.c. */
 
@@ -469,7 +542,7 @@ void func_L02_00333438(char *arg0, char *arg1) {
     func_L02_00333480(arg0, arg1, tmp);
 }
 
-INCLUDE_ASM("asm/levels", func_L02_00333480);
+/* func_L02_00333480 is matched in its own unit, L02_00333480.c. */
 
 extern void *func_002B9030(int kind);
 extern int func_00283CF0(float f);
@@ -528,7 +601,7 @@ void *func_L02_003449D8(void *a0, void *a1, void *a2, void *a3, int a4) {
 
 /* func_L02_00349BD8 is matched in its own unit, L02_00349BD8.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_00389F70);
+/* func_L02_00389F70 is matched in its own unit, L02_00389F70.c. */
 
 /* func_L02_0038A008 is matched in its own unit, L02_0038A008.c. */
 

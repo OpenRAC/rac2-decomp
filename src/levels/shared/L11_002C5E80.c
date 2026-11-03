@@ -308,7 +308,7 @@ void func_L11_0045FFB0(char *p)
 
 /* func_L11_0046B9F0 lives in L11_0046B9F0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_0046BC08);
+/* func_L11_0046BC08 lives in L11_0046BC08-g8.c. */
 
 /* func_L11_0046BD18 is defined in L11_0046BD18-g8.c. */
 

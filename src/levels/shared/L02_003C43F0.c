@@ -400,11 +400,41 @@ void func_L02_003C51F8(char *obj, u32 color1, u32 color2) {
 
 /* Defined in L02_003CA280-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_003CC7B0);
+/* Defined in L02_003C43F0-cc7b0-g8.c. */
 
+/* The zero vector the boot keeps for the shared helper. */
+extern float D_00189F00[];
 
+void func_L02_003CCEA0(char *a0) {
+    char *s0 = a0;
+    char *s1 = *(char **)(s0 + 0x68);
+    TI128 v[2];
+    float yaw;
+    float pitch;
 
-INCLUDE_ASM("asm/levels", func_L02_003CCEA0);
+    qcopy(&v[1], s0 + 0x10);
+    *(float *)((char *)&v[1] + 8) += 1.0f;
+    if (*(unsigned char *)(s0 + 0x20) == 0xB) {
+        func_00282CF0((float *)&v[0], (float *)(s1 + 0x360), (float *)&v[1]);
+    } else {
+        func_00282CF0((float *)&v[0], D_00189F00, (float *)&v[1]);
+    }
+    func_002AFDD8((unsigned char *)s0, (unsigned char *)&v[0],
+                 (unsigned char *)&v[0], 0);
+    yaw = func_00283248(*(float *)&v[0], *(float *)((char *)&v[0] + 4));
+    if (yaw > 0.7853982448577881f)
+        yaw = 0.7853982448577881f;
+    else if (yaw < -0.7853982448577881f)
+        yaw = -0.7853982448577881f;
+    *(float *)(s1 + 0x278) = yaw;
+    pitch = func_00282E20((char *)&v[0]);
+    pitch = -func_00283248(pitch, *(float *)((char *)&v[0] + 8));
+    if (pitch > 0.523598849773407f)
+        pitch = 0.523598849773407f;
+    else if (pitch < -0.523598849773407f)
+        pitch = -0.523598849773407f;
+    *(float *)(s1 + 0x2F4) = pitch;
+}
 
 /* func_L02_003CCFE8 is defined in L02_003C43F0-g8.c (the -G8 profile reproduces its
    placement-table address reloads; the body itself reads no $gp data). */
@@ -714,7 +744,35 @@ void func_L02_003CEC70(char *a0) {
         *(float *)(p + 0x2C8) = -0.523598849773407f;
 }
 
-INCLUDE_ASM("asm/levels", func_L02_003CED70);
+extern int func_002B6318(unsigned char *object);
+
+void func_L02_003CED70(char *a0, char *a1, char *a2)
+{
+    union { TI128 q; float f[4]; } vectors[2];
+    TI128 *p0 = &vectors[0].q;
+    TI128 *p1 = &vectors[1].q;
+    char *p;
+    unsigned short h;
+
+    vectors[0].q = *(TI128 *)a1;
+    vectors[1].q = *(TI128 *)a2;
+    p = *(char **)(a0 + 0x68);
+    if (*(unsigned char *)(a0 + 0x20) != 0xD)
+        return;
+    h = *(unsigned short *)(a0 + 0x34);
+    h &= 0xFFBE;
+    h |= 0x1000;
+    *(unsigned short *)(a0 + 0x34) = h;
+    *(int *)(a0 + 0x98) = *(int *)(*(char **)(a0 + 0x24) + 0x10);
+    func_002A7750((u8 *)a0, 0xE, -1);
+    qcopy(a0 + 0x10, p0);
+    *(float *)(a0 + 0xF8) = func_00283248(vectors[1].f[0], ((float *)p1)[1]);
+    func_002B6318((unsigned char *)a0);
+    qcopy(p + 0x1A0, p1);
+    *(int *)(p + 0x124) = 0;
+    *(int *)(p + 0x120) = 0;
+    *(int *)(p + 0x138) |= 0x11;
+}
 
 /* The callback func_L02_003CEE40 registers; its body is the INCLUDE_ASM below. */
 extern void func_L02_003CEFD8(char *);

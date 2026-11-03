@@ -245,9 +245,6 @@ void *func_00346670(char *p)
     return p;
 }
 
-
-INCLUDE_ASM("asm/game", func_00346C60);
-
 /* The two menu labels at +0x2E8 and +0x330: shown according to the flags of the highlighted
    grid entry, and placed relative to the owner's position record. */
 typedef struct { int x; int y; } MenuLabelOffset;
