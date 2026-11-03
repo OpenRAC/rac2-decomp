@@ -25,6 +25,26 @@
  * Next: reconstruct the original warp helper/control-flow source boundary
  * and the streaming call's live argument/size-pointer arrangement. Avoid
  * repeating store-order changes or raw-offset rewrites without new evidence.
+ *
+ * Claude Opus 5.5 (xhigh), task v2091, body above left unchanged (still the
+ * closest by size). Two measured findings for the next attempt:
+ * - Put a label (close_map) on the first `return 1` inside the 0xD00/locked
+ *   test and make the invalid-warp tests and the warp's final return
+ *   `goto close_map`. That gives retail's backward branches into that block:
+ *   if the warp keeps its own `return 1`, jump2 cross-jumps the labelled
+ *   block away. On its own this is 1716 bytes.
+ * - Drop warp_map. Use `MapState *warp = &D_001C4FA0;` assigned after the
+ *   prev computation, and write that as
+ *   `if (D_001C4FA0.level) { prev = D_001C4FA0.level; if (prev == 24)
+ *   prev = 0; } else prev = 21;`. This gives retail's CSE boundary at the
+ *   join: a fresh fp+0x4FA0 warp base in s1, a reload of level, and
+ *   D_001F2840 rebuilt into s0 after the bitset test. But reorg then fills
+ *   the beqz slot with the move. Retail has `beqz a1,J [li s2,21]; move
+ *   s2,a1; xori; movz`, so jump.c's "if {x=a; goto l} x=b" hoist of
+ *   prev = 21 must happen only in jump2. With `if (!level) prev = 21; else`
+ *   the post-cse1 jump hoists it already, and cse2 then skips around the
+ *   join and shares the bases. A ternary or a separate local in the else arm
+ *   gives movn. 1720 bytes.
  */
 typedef struct {
     char reserved[0xE0];

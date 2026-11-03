@@ -1,25 +1,35 @@
 /*
- * GPT-6.1 Sol high worker, USA v1.01, -O2 -G8 -ffunction-sections.
- * Best check.py result: 2100/2100 bytes, 0/28 places match.
- * Retained improvement over the 2092-byte draft: the typed page bounds recreate
- * retail's intermediate address copies; computing tw/th before assigning the
- * crop rectangle also recreates the texture-dimension register transfers.
- * Remaining: panels initializes at selection with movz (s5), versus retail's
- * entry zero plus movn (s7); the one and next-index saved registers consequently
- * differ. Bounds-loop null-branch delay slots/page-load scheduling, the callback
- * jalr register, and crop-clamp comparison/move scheduling still differ.
- * Thirteen check.py runs plus one regalloc.py diagnostic (objects identical).
- * Local page variable and self-default ternary tie with the typed if form.
- * Splitting panel assignment into two statements retains entry zero but adds a
- * branch. -fno-expensive-optimizations and -frac2-gcse-unsplit-edges tie with
- * their corresponding defaults; -fno-gcse gives movn but spills panels and
- * shrinks to 2072 bytes. A nested bounds null check worsens allocation.
- * Next useful work needs a new panel-selection/GCSE hypothesis; the recorded
- * equivalent forms do not resolve it. No linked build attempted.
- * All required declarations follow. Compile in a separate -g8.c unit: the
- * 14-entry enabled array requires its SDATA declaration.
- * Crop arithmetic corresponds to current RAC1 src/game/pause.c's renderer;
- * RAC2's screen layout, callbacks, capture gating and fade are retail-derived.
+ * Opus 5.5 xhigh worker (v2069), USA v1.01, -O2 -G8 -ffunction-sections.
+ * Best check.py result: 2100/2100 bytes, 0/28 places match; 58 of 525
+ * aligned instructions differ.
+ * Improvement over the Sol-high draft: declaring the callback D_00210AD0
+ * nosda gives retail's split lui v0 / lw v1 load and its jalr register.
+ * Remaining differences:
+ * - panels: retail zeroes it at entry (daddu s7) and selects with movn. Here
+ *   the jump pass after cse1 turns "if (page) panels = page->panels" into a
+ *   conditional move, and gcse cprop then replaces its panels input with the
+ *   constant 0, giving movz at the selection. Writing "panels = 0" in the
+ *   empty D_0025A058 arm blocks the cprop and reproduces the prologue, the
+ *   movn and the 8-byte loop-alignment nop at 0x2CBEA4. However, that arm
+ *   then loses its volatile load (2108 bytes), so it is not a solution.
+ * - The saved registers s5/s6/s7 are renamed throughout as a result.
+ * - Bounds loop: retail loads page in the delay slot of the panels null
+ *   branch. sched1 never moves loads speculatively, so the source must read
+ *   page before it tests panels; no natural form was found.
+ * - Crop clamp: the order of the slt and movn instructions differs. The order
+ *   of the clamp statements makes no difference.
+ * Also tried: an int-returning callback (no effect) and
+ * "panels = page ? page->panels : 0" (64 rows differ instead of 58).
+ * Sol-high notes still apply: a local page variable and a self-default
+ * ternary give the same output as the if form. Splitting the panel
+ * assignment keeps the entry zero but adds a branch. -fno-gcse gives movn
+ * but spills panels (2072 bytes). A nested bounds null check makes
+ * allocation worse.
+ * All declarations it needs follow. Compile it in a separate -g8.c unit: the
+ * 14-entry enabled array needs its SDATA declaration.
+ * The crop arithmetic follows the renderer in RAC1's src/game/pause.c.
+ * RAC2's screen layout, callbacks, capture gating and fade are derived from
+ * retail.
  */
 #include "common.h"
 
@@ -58,7 +68,7 @@ extern PanelCBC58 D_00259EE0;
 extern char D_001AB920[], D_001AB928[];
 typedef struct { char pad[0x1A0]; int flags; char pad1A4[0x20]; int pressed; } PadCBC58;
 extern PadCBC58 D_00138180;
-extern void (*D_00210AD0)(void);
+extern void (*D_00210AD0)(void) __attribute__((nosda));
 extern void func_00284F40(int);
 extern void func_002FC990(void *, int, int);
 extern void func_0027B858(void);

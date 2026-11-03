@@ -1,16 +1,20 @@
-/* sol-high (v1177), USA v1.01, default -O2 -G0 profile.
- * Best check: 1584/1588 bytes; 0/28 placements match. No linked build run.
- * Typed archive/texture/moby records and distinct loop/arena temporaries recover
- * retail's prologue and registration loops. Incomplete sda views give the tied
- * absolute global accesses; sized aliases retain the measured GP stores.
- * Integer disc-table views recover the extra argument-register copy before the
- * stream-read call. Keep the int returns of func_002B7C10 and func_00133580.
- * Remaining: register/scheduling differences from +0x270, chiefly the UI class
- * insertion (+0x2f4), particle setup and final sound-bank initialization; the
- * body is one instruction short. Global/struct, union/byte and count wordings
- * tied, and sda class/flag-table arrays worsened the long-lived base allocation.
- * The final sound-state store uses D_00188660 + 0x17b4; the older draft wrongly
- * reused the separate engine base D_00189E20_9. All needed declarations follow.
+/* opus-1, Claude Opus 5.5 (xhigh) (v2130), USA v1.01, default -O2 -G0 profile.
+ * Best check: 1588/1588 bytes; 0/28 placements match; ~85 instructions differ.
+ * Builds on sol-high (v1177): typed archive/texture/moby records, incomplete sda
+ * views for tied absolute accesses, int returns of func_002B7C10/func_00133580.
+ * Size fix: retail keeps a copy of the class count (daddu v0,a2,zero) for the
+ * UI-class index; `count = n++` on a user variable n makes that copy survive
+ * cse (make_regs_eqv), giving the exact size. n++ after the uses: 1592 bytes.
+ * Remaining: moby-special D_001D0E00 address reg (t1 vs a3); UI-class block keeps
+ * &loadBuffers in s2 (retail s5), stores loadState.count late and loads
+ * D_001CDB80[0] after the CE300/D0E00 stores (sched1 deps on the reg+reg stores);
+ * D_001B1604 store vs header loads; func_00291CA8 arg order (retail a0 last);
+ * size spill reload reg; C2B40/C2C40/F1D40 address order; sound-state -1/base
+ * regs; 0xC000 in v1 (retail a1). Store reorders in the UI block tied or worse.
+ * Inserting into src/game/002E7018.c: use `#define loadState (*(LoadState *)&D_00152C00)`
+ * and `extern char D_0014B540[];` before the function, and drop the duplicate
+ * D_00152C00/D_001B15A0/D_001B22B0/func_0011AEA0/func_002EAAA8/D_0014B540 externs
+ * below. All other needed declarations follow.
  */
 #include "common.h"
 extern float D_001B15A0 __attribute__((sda));
@@ -114,8 +118,8 @@ void func_002EAB18(void) {
  if(moby->special) {D_001C4DC0[0]=loadState.packet;D_001C4DC0[1]=0xFFA0000000E0ULL;D_001C4DC0[2]=0x0040000400004000ULL;func_00293890(object,0,D_001A91E0,moby->id);D_001D0E00[D_001B1B40[0]-1]=0xfffc0000;}
  else func_00293890(object,(char *)header+header->classes,moby->map,moby->id);
  }
- { int count; loadState.count.value=D_001B1B40[0]; count=D_001B1B40[0];
- D_001CDB80[count]=loadBuffers.uiClass;D_001CE300[count]=0xd54;D_001CE4E0[0xd54]=loadState.count.bytes[0];D_001B1B40[0]++;D_001D0E00[count]=0xfffc0000;loadBuffers.firstClass=D_001CDB80[0]; }
+ { int n=D_001B1B40[0]; int count; loadState.count.value=n; count=n++; D_001B1B40[0]=n;
+ D_001CDB80[count]=loadBuffers.uiClass;D_001CE300[count]=0xd54;D_001CE4E0[0xd54]=loadState.count.bytes[0];D_001D0E00[count]=0xfffc0000;loadBuffers.firstClass=D_001CDB80[0]; }
  if(D_001A7290[0]!=D_001A7A18[0])func_00292328(D_001A7A18[0]);
  func_002934B8((void *)D_001CDB80[0],(void *)loadBuffers.uiInfo);D_001D0E00[0]=0xfffc0000;
  D_001B1604[0]=base+header->textureData;func_00291DE0((char *)header+header->points,header->pointCount);func_00291CA8((char *)header+header->partInfo,(int)base+header->partData,(char *)header+header->parts,header->partCount);

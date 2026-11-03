@@ -176,8 +176,12 @@
 #define GetNextMobyInGroup               func_002A86E8
 #define CrateUpdate                      func_00310E98
 #define RunLevelTransition               func_002EC408
+#define PlayBonusReelWithGameLoop        func_002EBC70
 #define sceVibSetActParam                func_00128FD0
+#define UpdateCollidingEffectParticle    func_002BB100
+#define snd_StartSoundSystem             func_00131DE8
 #define find_fde                         func_00123B40
+#define __ieee754_log                    func_00117CA0
 #define OpenVendorMenu                   func_002F8178
 #define mpeg_init_seq                    func_00130428
 #define SetPalMode                       func_0027B440
@@ -810,9 +814,11 @@
 #define SelectBestTargetInCone           func_002AF580
 #define UpdateSplinePathCamera           func_L01_0042C8D8
 #define DrawVendorItemSelectList         func_002F9C80
+#define render_configured_text_label     func_002CC6B0
 #define SetDeathBits                     func_002A6C58
 #define UpdateVisibilityBitmap           func_0027A288
 #define UpdateBeamLinkEmitter            func_L09_003F04D0
+#define DrawMapScreen                    func_002D6F38
 #define UpdateBreakablePickupSpawner     func_L19_004203F0
 #define PlacePointWithPolarJitterFlat    func_L11_0043ACB0
 #define LayOutVerletChain                func_L11_00438248

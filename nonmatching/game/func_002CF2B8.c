@@ -24,6 +24,39 @@
  * and with `-G0` the address is materialised in `$v0` instead.
  *
  * The unit needs `-G8` for the symbolic load.
+ *
+ * Opus-1 (Claude Opus 5.5, task v2125, 3 November 2026): recompiled here,
+ * this body is still 136/136 bytes, 0/28 places. Both walls come from
+ * sched1. The ref load has an anti-dependence on the func_00288FB8 call, which
+ * raises its priority, so it issues before the 256.0f and local-alloc gives
+ * the 256.0f `$f1`. And the `$a1` copy waits on the cvt latency, so `$a3`/`$a2`
+ * are set first. The following form gives all 28 of 28 places, but only with a
+ * `do { } while (0)` around the call (a forbidden barrier, so not landable):
+ *
+ *     static __inline__ int probe_y(float value)
+ *     { return (int)(value * ref_L00_002CF2B8_01 + 0.5f); }
+ *     ...
+ *     func_0027C540(0);
+ *     func_L00_0030D608();
+ *     {
+ *         int y = probe_y(256.0f);
+ *         do {
+ *             func_0027FAA8(0x1A5, y, 0x80F0F0F0, func_00288FB8(0x2D4F), -1);
+ *         } while (0);
+ *     }
+ *     func_0027C660();
+ *     return 0;
+ *
+ * The loop notes split the float computation from the call setup: the 256.0f
+ * is issued first (it is the inline parameter, so it has the lower LUID), and
+ * `$a1` is copied first in the call block. Writing the y argument inline as
+ * a call to a helper with a real `if (D_001B23A0 != 0)` test, whose two arms
+ * become identical here, gives retail's float registers and argument order.
+ * The only extra code is the `lui`+`lw` of D_001B23A0 (8 bytes). jump2 merges
+ * the arms after flow2 has run, so nothing deletes the dead load. Retail has
+ * no such load, so the original construct must end the block in the same
+ * place without reading memory. Look for a register-only test or a real loop
+ * in the sibling text-draw functions (func_002CDA20.c has the same pattern).
  */
 
 extern void func_0027C540(long);
