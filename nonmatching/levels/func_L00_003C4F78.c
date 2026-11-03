@@ -1,18 +1,21 @@
-/* GPT-6.1 Sol high, v0923, 2026-10-29; not linked.
- * Best check: USA v1.01, -O2 -G8 -ffunction-sections, 912/916 bytes,
- * 0/27 places. Thirteen bounded check.py trials; declarations are included below.
- * Recomputing the history-head argument after the clamp restores the outer/last
- * counters to s5/s4. This draft uses split addresses for the history table and
- * MACRO_ADDR for the axis/count tables. Measured state/particle fields restore most
- * effect-field scheduling. A separate endpoint index preserves subtract-before-
- * shift, matching retail rather than folding it to a -16 byte displacement.
- * Residual: inner-copy pointer registers s1/s2 and row-address association,
- * i+1 temporary, first effect's context/scale load order, texture-table address
- * materialization (one instruction short), and final context-pointer register.
- * Explicit loop pointers, flat/decomposed row arithmetic and grouped TI copies
- * did not improve it; struct/union point and array/row-struct variants tie.
- * Reopen with independently evidenced row/texture pointer lifetimes. Both
- * allocations reuse the endpoint; all three draw-call stack tails are retained.
+/* Claude Opus 5.5 xhigh, v2208, 2026-11-03; not linked.
+ * Best check: USA v1.01, -O2 -G8 -ffunction-sections (the L00_003B9CB8-g8.c unit),
+ * 916/916 bytes, 0/27 places; declarations are included below. Improved from 912:
+ * the texture table is nosda and read through a block-local `tables` pointer,
+ * which gives retail's lui/addiu + lw 0xF8 and also fixes the i+1 temporary,
+ * the first effect's context/scale order and the final context register.
+ * Residual: only the inner copy loop's setup (+0xB8..+0x10C). Retail starts the
+ * source pointer at last*16 + (i*320 + X), X = D-16, like the destination's
+ * last*16 + (i*320 + D). Here cse1's related value rewrites D-16 as D_reg + -16
+ * (the destination already loaded D in the same block), loop.c substitutes that
+ * movable into the giv, and the start comes out as (last*16 + i*320) + (D-16);
+ * a0/a1 and s1/s2 swap as a result. X must stay opaque at loop time (a LO_SUM
+ * movable, related only in cse2). Tied: &D[i][j] - 1, D[i] + j - 1,
+ * D[i] + (j - 1), flat (UiHistoryPoint *)D + i*20 + j - 1. Worse: source
+ * pointer local computed first (952), count-up loop with reversed indices (936),
+ * struct assignment (932, ld/sd pairs), separate prev = j - 1 index (924, no
+ * strength reduction). Reopen with a form that keeps the source's D-16 out of
+ * the destination's cse1 block.
  */
 #include "common.h"
 
@@ -27,7 +30,7 @@ extern int D_L00_001AFF54 __attribute__((sda));
 extern int D_L00_001AFF58 __attribute__((sda));
 extern float D_L00_001AFF5C __attribute__((sda));
 extern float D_L00_001AFF60 __attribute__((sda));
-extern char D_L00_001FE940[] MACRO_ADDR;
+extern char D_L00_001FE940[] __attribute__((nosda));
 extern void func_00282CC0(void *, void *, void *);
 /* The second integer-bank input is forwarded as the axis vector pointer. */
 extern void func_002AB668(void *, void *, float);
@@ -95,9 +98,10 @@ void func_L00_003C4F78(char *owner)
         }
         effect = func_002C36D0(tip, 2, 0, 1);
         if (effect != 0) {
+            char *tables = D_L00_001FE940;
             effect->color = D_L00_001AFF50 | state->flags;
             effect->size = D_L00_001AFF5C * 210000.0f;
-            effect->texture = (*(char **)(D_L00_001FE940 + 0xF8))[1];
+            effect->texture = (*(char **)(tables + 0xF8))[1];
         }
         effect = func_002C36D0(tip, 2, 0, 1);
         if (effect != 0) {

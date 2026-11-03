@@ -1,3 +1,13 @@
+/* v2133 (Opus 5.5): still the closest draft (296/288, 0/27). Retail keeps
+ * la D (s0, set in the miss block) and best<<4 (s1) across the call and adds
+ * them base-first afterwards, so cse never knew the base was a constant.
+ * Natural forms merge the pre- and post-call &D+best*16 (272). A top-level
+ * Cache *c used on one side of the call gives unmerged sums and 5 saved regs
+ * at 284, but the base is the prologue la kept live through the loop and the
+ * post-call add order is swapped. Reassigning c after the call gives 272/276.
+ * The swap quads sit in v1/a0 with the pointer in v0 (retail: v0/v1, a0), and
+ * the tail's %hi goes to v0 (retail shares a0).
+ */
 /* GPT-6.1 Sol high, v0801: 296/288 bytes, 0/27 USA v1.01 places.
  * Default -O2 -G0 -ffunction-sections. Compared with the prior 272-byte draft,
  * the age-origin view plus grouping the data-word offset recovers the five

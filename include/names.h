@@ -812,6 +812,7 @@
 #define RequestVoiceLine                 func_L16_00412BA8
 #define UpdateTwoTriggerPathPlatform     func_L17_003C7680
 #define SelectBestTargetInCone           func_002AF580
+#define DrawAmmoSelectList               func_002FA270
 #define UpdateSplinePathCamera           func_L01_0042C8D8
 #define DrawVendorItemSelectList         func_002F9C80
 #define render_configured_text_label     func_002CC6B0
@@ -829,6 +830,7 @@
 #define UpdateItemGridMenu               func_00346C60
 #define GetSelectedShopItemPrice         func_002F6510
 #define BuildShopChannelList             func_002F73A8
+#define UpdateShopMenuInput              func_002F93B0
 #define TryClaimNotice                   func_002B0C28
 #define ForceClaimNotice                 func_002B0CE0
 #define ResetBoltPointsToLine            func_L11_0046BC08

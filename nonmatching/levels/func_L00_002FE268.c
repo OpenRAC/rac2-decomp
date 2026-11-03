@@ -1,3 +1,12 @@
+/* Opus 5.5, v2133: still 112/108 bytes, 0/27 places (cc1 -fsched-verbose-5 traced).
+ * Cause: sched1 issues the `a3 = block` copy (weight 0) next to the first block
+ * store, ahead of the a1/a2 argument moves (weight +1), so block lives past the
+ * copy and cannot tie to $a3. Reading the word into a local first adds an ALU
+ * copy that delays it: with `extern u64 D_001A72C8[]` (split load) as well, block
+ * lands in $a3 exactly as in retail, but the word load then issues before the
+ * `D_001A72C0 = value` store, so it cannot share $a0 (lw t0 + move a0). Retail
+ * needs that load ordered after the store; no alias-free C found for it.
+ */
 /* GPT-6.1 Sol low, v0351: 112/108 bytes, 0/27 places, -O2 -G8.
  * Corrected actual addresses: lui 0x1d/addiu -0x6e40 = 0x1c91c0;
  * lui 0x1c/lw -0xe4c = 0x1bf1b4. Earlier prose had spurious FF digits.

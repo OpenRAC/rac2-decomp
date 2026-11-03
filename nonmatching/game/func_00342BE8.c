@@ -1,3 +1,9 @@
+/* 3 November 2026 (opus, v2198): still 2 words. Ranking sched1 by hand (priority, then INSN_REG_WEIGHT, class,
+ * depcount, luid) shows retail needs sched1 order 264<261<269 and 256<266<249. With the width load (252, p7, latency 2)
+ * in the block, y1's store (266, p4, weight 0) always takes t3, before li 1 (269, p3, weight +1). Only a width pseudo
+ * set outside the block, with the load put back in front of 254 after sched1, gives retail's order. update_equiv_regs
+ * only adds a MEM REG_EQUIV for a single-block pseudo, so reload can't do that for a global. Reopen with a source
+ * shape that changes 266's weight or the flag store's priority. */
 /* 1 November 2026 (closer a3): sched2 keeps sched1's order on ties, so retail's sched1 had x1's store before y1's: its
  * t3 memory slot stayed empty or y1's li came later, where here 266 goes in at t3. Aggregate initialisers are 32 bytes
  * longer; -fno-sched-interblock, -g, -frac2-hazard-labels and -fno-sched-spec tie. */
