@@ -127,7 +127,7 @@ extern int ref_L22_003A5018_44 __attribute__((sda));
 extern void *func_00336D50(void *, int);
 extern void func_00300A00(void *, unsigned int, float, float, float, float, float);
 extern void *func_0028E588(int, int);
-extern void func_0028EA58(void *, int, int, int, int, void *);
+extern int func_0028EA58(void *, int, int, int, int, void *);
 extern void func_0027EAE8(int, int, int, int, int, void *);
 extern int func_00115DA8(char *, char *, ...);
 extern int func_001157AC(char *);

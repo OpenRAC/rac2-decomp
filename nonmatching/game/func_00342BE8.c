@@ -40,7 +40,7 @@ extern int D_001A7340 MACRO_ADDR, D_001A7344 MACRO_ADDR;
 extern int screenWidthGP SDATA(D_001A7340);
 extern void func_002FC620(int, int, int, int);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, unsigned int *);
+extern int func_0028EA58(int, int, int, int, int, unsigned int *);
 
 
 typedef struct {
