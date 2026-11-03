@@ -1,3 +1,6 @@
+/* 3 November 2026: entry defect resolved in FUNCTION_ENTRY_OFFSETS.
+ * Matching C now lives in src/levels/shared/L03_003564C0-g8.c.
+ * The earlier diagnosis below is retained as history. */
 /* No attempt: the catalogue row does not start at the function. The row
    func_L03_003564C0 covers 288 bytes at 03:003564C0 and 19:00352E18, but its
    first 16 bytes are not part of the body: at 03:003564C0 they are
