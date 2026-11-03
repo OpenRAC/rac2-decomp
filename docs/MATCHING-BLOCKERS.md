@@ -3864,10 +3864,18 @@ The related retained investigations establish these constraints:
   remains unresolved; no replacement value is invented, and neither draft is
   functionally qualified. Its matrix copy/product helpers were checked separately:
   they operate on three quadwords, so the 48-byte matrices must not be inflated.
-- The unreferenced `vC0`/`vD0` vectors in `func_L08_003C6AB0` and twelve `z0`..`z11`
-  declarations in `func_L08_00429560` are removed. They shaped stack or pseudo
-  numbering without an evidenced source object. Their removal leaves retained C,
-  not matching credit; an unexplained frame gap cannot be filled with dummy data.
+- **3 November correction:** `func_L08_003C6AB0`'s apparent C0/D0 gap has a real
+  writer: the inverse beginning at stack `+0xA0` writes through `+0xDF`.
+  The earlier standalone, unreferenced vectors did not describe that object.
+  The retained source now owns one 64-byte inverse/vector-reuse union, a full
+  64-byte basis, and the aligned query sharing its first three rows with a later
+  position at `+0x30`. The query consumer reads 40 bytes, not the old 16-byte
+  vector view. The real `0x180` frame is recovered at 5,292/5,300 bytes, still
+  nonmatching; the query's opaque word is not given an invented initializer.
+  `func_L08_003CDF98` has the same corrected inverse-output ownership, and
+  `func_L01_003A6638` names the real displacement preceding its inverse rather
+  than a padding array. The twelve unused `z0`..`z11` declarations in
+  `func_L08_00429560` remain removed.
 - Explicit `goto` controls do not solve every loop obstruction. In
   `func_L00_00303990` the final-loop trial loses required control-flow/alignment
   and gives 3,380 instead of 3,388 bytes; the retained structured form is 3,392.
@@ -3886,8 +3894,10 @@ buffer repairs remain distinct from a complete matching or functional build.
 
 ### Retained controls and newly identified entry witnesses
 
-The following 2 November 2026 findings change what is worth trying next; they
-do not reclassify an unresolved function or change a catalogue.
+The 2 November 2026 findings below distinguish source problems from boundary
+problems. The fourteen named entry repairs described in [LEVELS.md](LEVELS.md)
+were subsequently verified in every carrying release and added to the existing
+generator mechanism. The other split/residue proposals remain open.
 
 - Remove diagnostic source controls before comparing meaningful C. The eight
   overwritten initializers in `func_L02_00412D50`, ten dead initializers in
@@ -3908,12 +3918,26 @@ do not reclassify an unresolved function or change a catalogue.
   `func_L08_00363320`, `func_L11_00369700`, `func_L17_003583F8`,
   `func_L22_00358778` and `func_L24_0034C450`. The skipped `+0x20` stack restore
   is positive, not a prologue; the old Joba and Ship Shack `+8` descriptions were
-  wrong. The fresh USA data pointers support `+0x10`; retain the bytes and verify
-  the complete carrying-release rule before editing the generator.
+  wrong. The complete carrying-release audit now supports the named `+0x10`
+  repairs; original bytes and canonical identities are preserved. The twelve
+  menu initializer bodies, including the boot's copy, use the existing matched
+  C pattern with their actual data symbols. Their stored payload is an opaque
+  menu-data descriptor, not a guessed function pointer. The volatile list-pointer
+  word is genuinely reloaded during the search, including its initial snapshot.
 - Fresh USA calls target `func_0012646C` at `00126470` and `func_0012672C` at
   `00126730`, after their four-byte fill prefixes. The first body's ordinary
   `por` zeroing and `sq` transfers are compiler-reachable, so its old generic
-  MMI-based handwritten diagnosis is not sufficient.
+  MMI-based handwritten diagnosis was wrong. The packet constructor now has
+  320-byte C adapted from public RAC1, with a complete 112-byte output and seven
+  signed-short inputs. The current RAC1 donors are
+  [gs/load_image.c](https://github.com/OpenRAC/rac1-decomp/blob/4df65fed6ce5121f79660c32fcdf6fe3c1f4f37c/src/core/gs/load_image.c)
+  and [gs/store_image.c](https://github.com/OpenRAC/rac1-decomp/blob/4df65fed6ce5121f79660c32fcdf6fe3c1f4f37c/src/core/gs/store_image.c),
+  selected as EE29 objects by `config/core_text.objects` and `Makefile.sn`.
+  The executor remains a 1,676-byte near miss under the existing SDK branch-slot
+  profile in all three releases. Preserve its actual 64-bit saved IMR and integer
+  diagnostic return; narrowing the IMR or declaring the ignored result void is
+  not a legitimate scheduling remedy. Its equal error-path variants are recorded
+  in the retained source.
 - `func_L00_0042A4E8` contains three independent return stubs: initialized
   pointers reach `+0`, `+8` and `+0x10` in all 27 USA placements. The same
   three-entry pattern has separate witnesses for `func_L13_0043E8C0` in all

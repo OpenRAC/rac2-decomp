@@ -81,7 +81,9 @@ void func_L13_00306F38(void) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L13_0035E890);
+
+
+/* func_L13_0035E890 is in ../shared/L13_0035E890-init-g8.c; v2.00/PAL also use it in Notak. */
 
 /* func_L13_0038C328 is in the -g8 sibling (L13_00306F38-g8.c): it addresses its
    three globals through $gp. */

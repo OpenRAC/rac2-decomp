@@ -78,7 +78,7 @@ extern void func_32AE80(s32, s32);
 extern void func_L22_003E87B8(s32, s32, s32);
 extern void func_L22_003FA1D0(s32, s32, s32);
 
-INCLUDE_ASM("asm/levels", func_L22_00358778);
+
 
 /* func_L22_00385F40 is in L22_00385F40.c. */
 

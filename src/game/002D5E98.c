@@ -1016,7 +1016,7 @@ back_done:
 
 /* func_002DB7F0 is in 002DB7F0.c. */
 
-INCLUDE_ASM("asm/game", func_002DB988);
+/* func_002DB988 is defined in 002DB988-init-g8.c. */
 
 int func_002DBAA8(void)
 {

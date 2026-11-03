@@ -1,3 +1,14 @@
+/* Second pass, 3 November 2026: three defined aggregate/offset trials.
+ * A real QuadPacket cursor deriving fields inside the body gives 712/736
+ * bytes with a 0x360 frame. Whole-array byte-offset streams give 720/736
+ * and the correct 0x350 frame; grouping all genuine Euler/matrix/packet
+ * buffers in one frame aggregate is also 720 bytes, with changed setup
+ * scheduling (18 displayed rows differ), not an instruction-byte tie.
+ * Integer offsets, rather than out-of-subobject pointers, advance after
+ * the final use. None improves on the guarded 748-byte source retained
+ * below. No synthetic data or memory effects, and no old undefined pointer
+ * increments were restored. Reopen with genuine field/cursor lifetimes.
+ */
 /* Retained bounded near miss, 2026-10-28: five forms, best728/736 bytes.
  * Default indexed form720 bytes; real packet/color/vertex cursors plus-g
  * reach728 and retain the real350-byte frame. Pure pointer-loop form spills

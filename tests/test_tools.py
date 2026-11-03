@@ -273,6 +273,58 @@ class Catalogue(unittest.TestCase):
                     levels.catalogue()
                 self.assertEqual((boot.read_bytes(), catalogue.read_bytes()), first)
 
+    def test_core_fill_and_menu_prefix_repairs_keep_colliding_canonical_names(self):
+        # Authored methods: the two core fill repairs and menu entry repairs
+        # must retain their names/ends even when the shortened menu code is
+        # identical to a boot method and an already-corrected level method.
+        def method(size, value):
+            return code(addiu(2, 0, value)) + bytes(size - 12) + code(JR_RA, NOP)
+
+        first = code(0xCDCDCDCD) + method(320, 7)
+        second = code(0xCDCDCDCD) + method(1676, 11)
+        prefix = code(addiu(29, 29, 32), NOP, addiu(29, 29, 32), NOP)
+        short = method(272, 9)
+        menu = prefix + short
+        image = bytearray(0x3000)
+        image[:len(first)] = first
+        image[0x1000:0x1000 + len(second)] = second
+        image[0x2000:0x2000 + len(menu)] = menu
+        names = ("func_L02_0035BD60", "func_L07_0034AEC8", "func_L00_00354DF8")
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            boot, catalogue, dump = root / "boot.tsv", root / "levels.tsv", root / "dump"
+            boot.write_text("# name\taddress\tsize\n"
+                            "func_0012646C\t00001000\t324\n"
+                            "func_0012672C\t00002000\t1680\n"
+                            "func_002DB988\t00003000\t288\n")
+            catalogue.write_text("# name\tkind\tsize\tfingerprint\tlevels\tplaces\n" +
+                f"{names[0]}\tlevel\t288\told\t1\t00:00004000\n" +
+                f"{names[1]}\tshared\t288\told\t2\t00:00004120,01:00006120\n" +
+                f"{names[2]}\tshared\t272\told\t2\t00:00004240,01:00006240\n")
+            for number, base in ((0, 0x4000), (1, 0x6000)):
+                directory = dump / f"{number:02d}_test"
+                directory.mkdir(parents=True)
+                (directory / "manifest.json").write_text(json.dumps({"sections": [
+                    {"name": "text", "address": base}]}))
+                (directory / "text.bin").write_bytes(menu + menu + short)
+            with patch.multiple(levels, BOOT_FUNCTIONS=boot, CATALOGUE=catalogue,
+                                LEVELS=root, BOOT_PAIRS=root / "absent.tsv", DUMP=dump,
+                                NAMES={0: "test", 1: "test"}, BOOT_RESIDUES={}, FUNCTION_RESIDUES={}), \
+                 patch.object(levels, "boot_image", return_value=(bytes(image), [(0x1000, 0, len(image))])), \
+                 patch.object(sys, "argv", ["levels.py", "catalogue"]):
+                levels.catalogue()
+                self.assertEqual(levels.read_boot_functions(), [
+                    ("func_0012646C", 0x1004, 320), ("func_0012672C", 0x2004, 1676),
+                    ("func_002DB988", 0x3010, 272)])
+                rows = {n: (kind, size, places) for n, kind, size, _, places in levels.read_catalogue()}
+                self.assertEqual(rows, {
+                    names[0]: ("level", 272, [(0, 0x4010)]),
+                    names[1]: ("shared", 272, [(0, 0x4130), (1, 0x6130)]),
+                    names[2]: ("shared", 272, [(0, 0x4240), (1, 0x6240)])})
+                original = boot.read_bytes(), catalogue.read_bytes()
+                levels.catalogue()
+                self.assertEqual((boot.read_bytes(), catalogue.read_bytes()), original)
+
     def test_historical_bootstrap_does_not_require_an_existing_catalogue(self):
         raw = code(JR_RA,NOP)
         with tempfile.TemporaryDirectory() as d:

@@ -325,7 +325,7 @@ void func_L02_00300CE8(void) {
 
 /* func_L02_0033C8B8 is matched in L02_0033C8B8-g.c (built with -g). */
 
-INCLUDE_ASM("asm/levels", func_L02_0035BD60);
+
 
 /* func_L02_00363D78 is defined in L02_00363D78.c. */
 

@@ -266,7 +266,7 @@ int func_L07_00338D20(int a0)
     return 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L07_0034AEC8);
+
 
 void func_L07_003844C0(unsigned char *obj) {
     struct {

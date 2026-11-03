@@ -1,3 +1,22 @@
+/* Second-pass complete-object review, 2026-11-03; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections -g -ffast-math -frac2-qcopy -frac2-qcopy-barrier.
+ * Current US check.py: 5292/5300 bytes,0/3 places. Frame0x180 and entry
+ * owner/saved-register roles agree; copy/input/FP scheduling still differs.
+ * 002AB6D8 reads all64 bytes of basis[4][4], including the cleared final row.
+ * 00283698 writes64 bytes at the old A0 address: the C0/D0 span has a real
+ * writer. The older no-writer/unused-local note below is superseded. No dummy
+ * C0/D0 vectors are restored: a full inverse shares later A0/B0 vector views.
+ * The query at the old v50 address requires40 bytes: 002A8C00 writes through
+ * +0x20, and 00277F48 explicitly reads lq+0,lq+0x10,ld+0x20 from that request.
+ * It shares the basis allocation with a later real position at+0x30. Target
+ * compiler debug types verify query size48, position offset48 and both phase
+ * unions size64. Its opaque+0x24 word is not artificially initialized.
+ * Three final clear/query/position variants produce identical checker output;
+ * stop this hypothesis. Reopen on independent input/copy/FP lifetime evidence,
+ * not an unreferenced local, padding array or repeated register wording.
+ * No native-port semantic gate or linked matching credit is claimed.
+ * Earlier measurements follow as historical evidence.
+ */
 /* Current retained result, 1 November 2026: 5284/5300 bytes. Remove the two unreferenced vector
  * declarations previously used to shape the stack. The 32-byte gap has no evidenced C object; do not
  * restore dummy storage. The current compiler removes the old block-move loop padding, but allocation and
@@ -47,6 +66,18 @@
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
+typedef union { TI128 q; f32 f[4]; } RideVector __attribute__((aligned(16)));
+/* The initializer writes through +0x20; consumers also transport +0x24.
+ * Its unknown final word remains opaque, with no invented initialization. */
+typedef struct {
+    RideVector direction;
+    s32 owner, flags;
+    u8 first, second;
+    u16 objectId;
+    f32 distance;
+    s32 enabled;
+    f32 opaque;
+} RideQuery;
 typedef struct { u8 b[0x400]; } Block400;
 typedef union { u8 b[0x400]; u32 w[0x100]; } Pad;
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128 q[0x260]; } Hero;
@@ -195,13 +226,23 @@ void func_L08_003C6AB0(u8 *moby)
     f32 dir[4] __attribute__((aligned(16)));
     f32 v30[4] __attribute__((aligned(16)));
     f32 v40[4] __attribute__((aligned(16)));
-    f32 v50[4] __attribute__((aligned(16)));
-    f32 v60[4] __attribute__((aligned(16)));
-    f32 v70[4] __attribute__((aligned(16)));
-    f32 v80[4] __attribute__((aligned(16)));
+    union {
+        f32 basis[4][4];
+        struct { RideQuery request; RideVector position; } query_view;
+    } basis_work;
+#define basis basis_work.basis
+#define request basis_work.query_view.request
+#define v50 basis[0]
+#define v60 basis[1]
+#define v70 basis[2]
+#define v80 basis_work.query_view.position.f
     f32 v90[4] __attribute__((aligned(16)));
-    f32 vA0[4] __attribute__((aligned(16)));
-    f32 vB0[4] __attribute__((aligned(16)));
+    union {
+        f32 inverse[4][4];
+        struct { f32 first[4], second[4]; } vectors;
+    } inverse_work __attribute__((aligned(16)));
+#define vA0 inverse_work.vectors.first
+#define vB0 inverse_work.vectors.second
     struct { f32 turn, speed, pitch, bank, lift, thrust; s32 fire; } in;
     u8 *vars;
     u8 *hit;
@@ -439,14 +480,14 @@ void func_L08_003C6AB0(u8 *moby)
                 func_00282F20(v70, D_L08_001BFF80, 1.0f);
                 func_00282DD8(v60, moby + 0xC0, v70);
                 func_00282DD8(v50, v60, v70);
-                *(TI128 *)v80 = 0;
-                func_002AB6D8(v50, v90);
+                qzero_nc(basis[3]);
+                func_002AB6D8(basis, v90);
                 *(f32 *)(vars + 0x24) = func_00283B98(*(f32 *)(vars + 0x24),
                     func_00283BE0(func_00283B98(-v90[1], in.pitch * 0.5f * (D_L08_001AFAC8 * (*(f32 *)(vars + 0x78) + 1.0f))),
                         *(f32 *)(vars + 0x24)) * D_L08_001AF9FC);
                 func_00282D30(vars, vars, D_L08_001AF9B8);
-                func_00283698(vA0, moby + 0xC0);
-                func_002830C0(vars, vars, vA0);
+                func_00283698(inverse_work.inverse, moby + 0xC0);
+                func_002830C0(vars, vars, inverse_work.inverse);
                 *(f32 *)(vars + 0x4) *= D_L08_001AF9BC;
                 func_00283098(vars, vars, moby + 0xC0);
             }
@@ -457,7 +498,7 @@ void func_L08_003C6AB0(u8 *moby)
                 func_00282CC0(vars, vars, v30);
             }
         }
-        func_002A8C00(v50, moby, 0x10000, vars, D_L08_001AFA70);
+        func_002A8C00(&request, moby, 0x10000, vars, D_L08_001AFA70);
         *(TI128 *)(moby + 0x10) = *(TI128 *)v40;
         func_0029FCC0(moby, 0, v80);
         v80[2] += D_L08_001AF9D0 - D_L08_001AFAC0;
@@ -511,10 +552,10 @@ void func_L08_003C6AB0(u8 *moby)
         }
         func_0029FCC0(moby, 0, v80);
         v80[2] += D_L08_001AFA78;
-        func_00277F48(D_L08_001AFA14, v80, 0, moby, v50);
+        func_00277F48(D_L08_001AFA14, v80, 0, moby, &request);
         if (D_L08_001AFA7C * 0.016666668f < func_00282DF0(vars)) {
             func_0029FCC0(moby, 3, vA0);
-            func_00277F48(D_L08_001AFA74, vA0, 0, moby, v50);
+            func_00277F48(D_L08_001AFA74, vA0, 0, moby, &request);
         }
         if (in.fire == 0 && ((Hero *)D_00189E20)->ptr[0x1830 / 4] == moby && (((Pad *)D_00138180)->w[0x1A4 / 4] & 0x10)) {
             *(u8 *)(moby + 0x20) = 4;

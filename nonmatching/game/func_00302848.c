@@ -1,3 +1,21 @@
+/* 3 November 2026, second pass, current qualified compiler, default G8:
+ * Fresh baseline: 468/468 bytes, 0/28 USA places, first mismatch +0x174.
+ * The only remaining region is 00283D38's colour-load / f12 call setup.
+ * Its actual contract is two 32-bit GP colours, one float, no stack inputs,
+ * and a packed 32-bit return. The FP-first form used by matched 0027D4B8
+ * produces an identical complete checker listing: ordering the banks does
+ * not change this candidate. Pointer returns of the constructors remain real.
+ * Incomplete MACRO_ADDR views for the two colour words give 464 bytes, 0/28:
+ * the assembler chooses a GP-relative load in the jal slot. Plain incomplete
+ * views give 468 bytes, 0/28, first reported mismatch +0x178, but split the
+ * address bases into v0/v1 rather than retail's argument registers. Neither
+ * is retained. The baseline below remains the closest measured source.
+ * Reopen on a truthful scalar-load/address-class or scheduler explanation;
+ * the legacy 16-byte extern-array bounds also need independent evidence or
+ * faithful replacement before promotion. No new padding, flags or barriers.
+ * Four USA checks (baseline plus three hypotheses); no alternate-release
+ * or linked build was run for these failed candidates. Marker restored.
+ */
 /* 2 November 2026, remaining-function review: nonmatching; no linked credit.
  * Profile: -O2 -G8 -ffunction-sections.
  * US check: 468/468 bytes, 0/28 placements.

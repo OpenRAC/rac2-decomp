@@ -1,3 +1,16 @@
+/* Second pass, 3 November 2026; no linked match.
+ * Retained truthful-return source: 1232/1232 bytes, 0/20 US places, first
+ * difference +0xE4 at the same initial angular multiply/store ordering.
+ * Profile: -O2 -G8 -ffunction-sections -g -frac2-hazard-labels.
+ * Independently matched helpers 0029B3E0 and 002E5CF8 return integer status;
+ * those real returns are retained below even though their values are ignored.
+ * A complete local 12-byte angular aggregate gives 1256/1232 (frame 0x50).
+ * Measured 3-component configuration/output views with G16 for the measured
+ * 12-byte configuration view give 1264/1232 (frame 0x40), not an improvement.
+ * All aggregate variants are private; no dummy lane or padding was used.
+ * No scalar/store permutation or broad flag replay. Reopen with a real
+ * vector-expression/lifetime witness beyond these measured object views.
+ */
 /* Closer C, 1 November 2026: -O2 -G8 -ffunction-sections -g -frac2-hazard-labels, 3 rows off:
  * retail mul x,y,z then stores x,y,z; here mul y,z,x and stores y,z,x. Registers and loads now agree.
  */
@@ -46,9 +59,11 @@ extern float func_00282E80(void*,void*);
 extern float func_00282C48(float);
 extern int func_002A77E0(int);
 extern void func_L01_00397950(void*),func_L01_00397A28(void*),func_L01_00397EB0(void*),func_L01_00397110(void*),func_L01_00397C98(void*),func_L01_00397870(void*);
-extern void func_002B0A18(int,int),func_0029B3E0(int,int),func_002E5CF8(int,int,void*),func_0029F338(void*),func_002A7750(void*,int,int),func_002A7470(void*,int,int,int);
+extern void func_002B0A18(int,int),func_0029F338(void*),func_002A7750(void*,int,int),func_002A7470(void*,int,int,int);
 extern void func_L00_002D2168(int,int,float),func_L00_002B9D60(void*,void*,int,int),func_003355A8(int);
 extern int func_00282948(void*);
+extern int func_0029B3E0(int, int);
+extern int func_002E5CF8(int, int, void *);
 
 void func_L01_003973A0(unsigned char *m)
 {
