@@ -68,9 +68,19 @@ the index/base registers swap.
   local, the pointer last, second or third among the float parameters. A table-pointer
   local hoists the `lui` above the call (32 rows). Earlier ties are listed under
   "bounded source-lifetime check" below.
+- Search for a separating insn or block boundary (4 November): retail has no branch
+  or jump-table entry anywhere in the three call sequences, and every
+  `USE`/`CLOBBER` the expander emits either precedes real moves or serves
+  returns, frame registers or `-noreg`. An unreferenced label is deleted before
+  local-alloc. Inline helpers (call, predicate, or both, with the index passed by
+  pointer), comma expressions, an extra scope and a result local all tie at 18. The
+  call inside the index expression gives 32. The expand order is already retail's
+  (`lui`/`lo_sum` before the index `lw`), and with `-fno-schedule-insns` the three
+  sites take retail's registers but the function falls to 15,820 bytes. The swap is
+  sched1's priority-8 `lw` alone. `-fno-sched-interblock` and `-fno-sched-spec`
+  change nothing.
 - Reopen with a maintainer decision on callers' `func_002B60B0` declaration (24
-  merged matches already declare `void`), or with RTL that puts a non-note insn or
-  a block boundary between the call and the index load.
+  merged matches already declare `void`).
 
 ### Three-quantity local allocation
 
