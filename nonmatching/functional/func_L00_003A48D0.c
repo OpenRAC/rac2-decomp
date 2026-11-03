@@ -10,13 +10,13 @@
  */
 #include "common.h"
 
-typedef struct { float f[4]; } __attribute__((aligned(16))) Vector;
-typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; char *ptr[0x980]; Vector q[0x260]; } Hero;
+typedef struct { float f[4]; } __attribute__((aligned(16))) Vector_3A48D0;
+typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; char *ptr[0x980]; Vector_3A48D0 q[0x260]; } Hero_3A48D0;
 
-typedef struct Moby Moby;
-struct Moby {
+typedef struct Moby_3A48D0 Moby_3A48D0;
+struct Moby_3A48D0 {
     u8 pad00[0x10];
-    Vector position;
+    Vector_3A48D0 position;
     u8 state;
     u8 pad21[3];
     struct { u8 pad00[0x46]; s16 kind; } *model;
@@ -33,41 +33,41 @@ struct Moby {
     u8 pad6C[0x3E];
     s16 objectClass;
     u8 padAC[0x14];
-    Vector right;
-    Vector forward;
-    Vector up;
+    Vector_3A48D0 right;
+    Vector_3A48D0 forward;
+    Vector_3A48D0 up;
 };
 
 typedef struct {
     float cooldown;
     u8 pad04[0xC];
-    Moby *target;
+    Moby_3A48D0 *target;
     int lockTimer;
     float lockHeight;
     s16 light;
     s16 flash;
-    Moby *candidate;
+    Moby_3A48D0 *candidate;
     int candidateTimer;
     int aiming;
     int sound;
-} TurretVars;
+} TurretVars_3A48D0;
 
-typedef struct { float radius, spread, power, reserved; Vector position; } MuzzleLight;
-typedef struct { u8 pad00[0x54]; float rate; u8 pad58[0x88]; } WeaponEntry;
-typedef struct { int unknown00[6]; Moby *hit; } CollisionResult;
+typedef struct { float radius, spread, power, reserved; Vector_3A48D0 position; } MuzzleLight_3A48D0;
+typedef struct { u8 pad00[0x54]; float rate; u8 pad58[0x88]; } WeaponEntry_3A48D0;
+typedef struct { int unknown00[6]; Moby_3A48D0 *hit; } CollisionResult_3A48D0;
 
 extern u8 D_00189E20[], D_00139568[];
 extern u32 D_00138180[];
 extern int D_L00_001A8F00 MACRO_ADDR;
 extern int D_L00_001B2864 MACRO_ADDR;
 extern float D_L00_001B8DC0[];
-extern Moby *D_L00_001C3280[];
-extern CollisionResult D_L00_001BF200;
-extern MuzzleLight D_L00_001C6F40[];
-extern WeaponEntry D_L00_00262570[];
+extern Moby_3A48D0 *D_L00_001C3280[];
+extern CollisionResult_3A48D0 D_L00_001BF200;
+extern MuzzleLight_3A48D0 D_L00_001C6F40[];
+extern WeaponEntry_3A48D0 D_L00_00262570[];
 extern u8 D_L00_00294880[];
 
-extern void func_L00_003A41F0(Moby *);
+extern void func_L00_003A41F0(Moby_3A48D0 *);
 extern int func_002829D8(void *);
 extern void func_L00_002C42E0(int, int);
 extern void func_002A75E0(void *, int, int, int, int);
@@ -77,9 +77,9 @@ extern int func_L00_002D3F30(int, int);
 extern void func_00273318(void *, float, unsigned int, void *, int, float, int, float, int);
 extern void func_00282D30(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
-extern Moby *func_L00_00324D18(void *, void *, int, float, float, float, float, float);
-extern float *func_002AB1F0(Moby *);
-extern int func_002ABB78(Moby *);
+extern Moby_3A48D0 *func_L00_00324D18(void *, void *, int, float, float, float, float, float);
+extern float *func_002AB1F0(Moby_3A48D0 *);
+extern int func_002ABB78(Moby_3A48D0 *);
 extern float func_00282E48(void *, void *);
 extern float func_00282C48(float);
 extern float func_00283CE0(int);
@@ -87,8 +87,8 @@ extern int func_00282948(int *);
 extern int func_00282978(short *);
 extern int func_002E5CF8(int, int, void *);
 extern int func_00277F48(float, void *, int, void *, void *);
-extern void func_L00_003A4480(Moby *);
-extern void func_L00_003A5370(Moby *);
+extern void func_L00_003A4480(Moby_3A48D0 *);
+extern void func_L00_003A5370(Moby_3A48D0 *);
 extern void func_L00_002D2168(int, int, float);
 extern void func_L00_002AF568(void);
 extern void func_L00_002D6B70(int);
@@ -98,17 +98,17 @@ extern int func_L00_002FCF18(void *, float, float, float, float, float);
 extern void func_00291450(int);
 
 
-#define HERO ((Hero *)D_00189E20)
+#define HERO ((Hero_3A48D0 *)D_00189E20)
 
 /* Acquires a stable target, fires and drives the short muzzle light. */
-void func_L00_003A48D0(Moby *moby)
+void func_L00_003A48D0(Moby_3A48D0 *moby)
 {
-    TurretVars *vars = moby->vars;
-    Vector direction, origin, aim, muzzle, offset, lift;
+    TurretVars_3A48D0 *vars = moby->vars;
+    Vector_3A48D0 direction, origin, aim, muzzle, offset, lift;
     float horizontal, vertical;
-    Moby *candidate;
+    Moby_3A48D0 *candidate;
     int ready;
-    Vector *point;
+    Vector_3A48D0 *point;
 
     if (moby->state == 0) {
         moby->state = 1;
@@ -223,7 +223,7 @@ void func_L00_003A48D0(Moby *moby)
                 count = func_00277F48(1.0f, &muzzle, 1, HERO->ptr[0x2290 / 4], 0);
                 if (count != 0) {
                     for (i = 0; i < count; i++) {
-                        Moby *hit = D_L00_001C3280[i];
+                        Moby_3A48D0 *hit = D_L00_001C3280[i];
                         float *hp = func_002AB1F0(hit);
                         if (hit->alive == 0)
                             continue;
@@ -262,7 +262,7 @@ void func_L00_003A48D0(Moby *moby)
             func_002A7470(moby, 2, 0, 0);
             vars->sound = func_L00_002D6998(D_L00_00294880);
             {
-                WeaponEntry *weapon = D_L00_00262570 + D_00139568[0x1B];
+                WeaponEntry_3A48D0 *weapon = D_L00_00262570 + D_00139568[0x1B];
                 vars->cooldown = 1.0f / weapon->rate;
             }
         } else if ((D_00138180[0x1A4 / 4] & HERO->u[0x1230 / 4]) || D_L00_001B2864 == 1) {
@@ -278,8 +278,8 @@ void func_L00_003A48D0(Moby *moby)
 
     if (moby->animation != 2 && vars->flash > 0) {
         float alpha, width, power;
-        Vector *off;
-        Vector *pos;
+        Vector_3A48D0 *off;
+        Vector_3A48D0 *pos;
         if (vars->flash >= 13) {
             float scale = 1.0f / func_00283CE0(3);
             alpha = func_00283CE0(15 - vars->flash) * scale;
@@ -308,7 +308,7 @@ void func_L00_003A48D0(Moby *moby)
         if (vars->light == -1) {
             vars->light = func_L00_002FCF18(pos, 8.0f, 0.0f, alpha, width, power);
         } else {
-            MuzzleLight *light = &D_L00_001C6F40[vars->light];
+            MuzzleLight_3A48D0 *light = &D_L00_001C6F40[vars->light];
             light->position = *pos;
             light->position.f[3] = 8.0f;
             light->radius = alpha;

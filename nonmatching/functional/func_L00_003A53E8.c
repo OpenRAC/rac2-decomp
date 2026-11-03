@@ -10,8 +10,8 @@
  * weapon table's rate.
  */
 #include "common.h"
-typedef struct { float f[4]; } Vec4_53E8;
-#define VCOPY(d, s) (*(Vec4_53E8 *)(d) = *(Vec4_53E8 *)(s))
+typedef struct { float f[4]; } Vec4_53E8_3A53E8;
+#define VCOPY(d, s) (*(Vec4_53E8_3A53E8 *)(d) = *(Vec4_53E8_3A53E8 *)(s))
 struct Rac2Native_5f824a0e369ccf7b_src_record { u8 b0,b1,b2,b3; u16 s4,s6,s8,s10,s12; u8 e,f; };
 extern struct Rac2Native_5f824a0e369ccf7b_src_record D_L00_00294900[];
 extern u8 D_00139568[];
@@ -49,16 +49,16 @@ typedef struct {
     short c30c;
     char pad14[0x46];
     int c354;
-} GameView;
-typedef struct { char pad[0x1A0]; unsigned int b320, b324; } InputView;
-extern GameView D_00189E20 NOT_SDA;
-extern InputView D_00138180 NOT_SDA;
+} GameView_3A53E8;
+typedef struct { char pad[0x1A0]; unsigned int b320, b324; } InputView_3A53E8;
+extern GameView_3A53E8 D_00189E20 NOT_SDA;
+extern InputView_3A53E8 D_00138180 NOT_SDA;
 /* Only this measured prefix of the level's pulse-curve state is used here. */
-typedef struct { float start; int reserved,ticks,mode; float next; int reserved2,nextTicks; } PulseCurvePrefix;
-typedef struct { char pad[0x160]; PulseCurvePrefix pulse; } CameraView;
-extern CameraView D_L00_001B8C80 NOT_SDA;
-typedef struct { char p0[0x28]; unsigned int animation; char p1[0x28]; float rate; char p2[0x18]; float power; char tail[0x6C]; } WeaponEntry;
-extern WeaponEntry D_L00_00262570[];
+typedef struct { float start; int reserved,ticks,mode; float next; int reserved2,nextTicks; } PulseCurvePrefix_3A53E8;
+typedef struct { char pad[0x160]; PulseCurvePrefix_3A53E8 pulse; } CameraView_3A53E8;
+extern CameraView_3A53E8 D_L00_001B8C80 NOT_SDA;
+typedef struct { char p0[0x28]; unsigned int animation; char p1[0x28]; float rate; char p2[0x18]; float power; char tail[0x6C]; } WeaponEntry_3A53E8;
+extern WeaponEntry_3A53E8 D_L00_00262570[];
 extern char *D_L00_001C3280[];
 extern int func_00282978(void *),func_00282948(void *),func_002829D8(void *);
 extern int func_002E5CF8(int,int,char *);
@@ -127,7 +127,7 @@ void func_L00_003A53E8(char *moby)
     if (*(u8 *)(moby + 0x20) == 1 && !D_00189E20.c0dc && *(float *)state == 0.0f &&
         D_00189E20.b060 >= 23 && ready) {
         if ((D_00138180.b320 & D_00189E20.b050) && func_L00_002D3F30(-1,1)) {
-            WeaponEntry *weapon = D_L00_00262570 + D_00139568[0x1A];
+            WeaponEntry_3A53E8 *weapon = D_L00_00262570 + D_00139568[0x1A];
             if (*(u8 *)(D_00189E20.c0b0 + 0x43) == weapon->animation ||
                 D_00189E20.c0bc || D_00189E20.c30c) {
                 unsigned short startup = D_L00_001AF680;
@@ -205,7 +205,7 @@ void func_L00_003A53E8(char *moby)
     *(short *)(state + 4) = 28;
     {
     unsigned short id = *(unsigned short *)(moby + 0xAA);
-    WeaponEntry *weapon = D_L00_00262570 + D_00139568[0x1A];
+    WeaponEntry_3A53E8 *weapon = D_L00_00262570 + D_00139568[0x1A];
     float power = weapon->power;
     *(int *)(damage + 0x14) = 0x10000;
     *(int *)(damage + 0x20) = 1;
@@ -275,7 +275,7 @@ void func_L00_003A53E8(char *moby)
         *(int *)(hits[restoreIndex] + 0x98) = masks[restoreIndex];
     }
     {
-        WeaponEntry *weapon = D_L00_00262570 + D_00139568[0x1A];
+        WeaponEntry_3A53E8 *weapon = D_L00_00262570 + D_00139568[0x1A];
         *(float *)state = 1.0f / weapon->rate;
     }
 }

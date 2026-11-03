@@ -10,13 +10,13 @@
  */
 #include "common.h"
 
-typedef struct { float f[4]; } __attribute__((aligned(16))) Vector;
-typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; char *ptr[0x980]; Vector q[0x260]; } Hero;
+typedef struct { float f[4]; } __attribute__((aligned(16))) Vector_3C8A90;
+typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; u32 u[0x980]; f32 f[0x980]; char *ptr[0x980]; Vector_3C8A90 q[0x260]; } Hero_3C8A90;
 
-typedef struct Moby Moby;
-struct Moby {
+typedef struct Moby_3C8A90 Moby_3C8A90;
+struct Moby_3C8A90 {
     u8 pad00[0x10];
-    Vector position;
+    Vector_3C8A90 position;
     u8 state;
     u8 pad21[3];
     struct { u8 pad00[0x46]; s16 kind; } *model;
@@ -34,41 +34,41 @@ struct Moby {
     u8 pad6C[0x3E];
     s16 objectClass;
     u8 padAC[0xC];
-    Moby *owner;
+    Moby_3C8A90 *owner;
     u8 padBC[4];
-    Vector right;
-    Vector forward;
-    Vector up;
+    Vector_3C8A90 right;
+    Vector_3C8A90 forward;
+    Vector_3C8A90 up;
 };
 
 typedef struct {
     float cooldown;
     u8 pad04[0xC];
-    Moby *target;
+    Moby_3C8A90 *target;
     u8 pad14[8];
     s16 light;
     s16 timer;
     int unknown20;
     int sound;
-} Vars;
+} Vars_3C8A90;
 
-typedef struct { float red, green, blue, pad0C; Vector pos; } Light;
-typedef struct { u8 pad00[0x54]; float rate; u8 pad58[0x88]; } WeaponEntry;
-typedef struct { int unknown00[6]; Moby *hit; } CollisionResult;
-typedef struct { int a, b, c; } AimConfig;
-typedef float Vec[4] __attribute__((aligned(16)));
+typedef struct { float red, green, blue, pad0C; Vector_3C8A90 pos; } Light_3C8A90;
+typedef struct { u8 pad00[0x54]; float rate; u8 pad58[0x88]; } WeaponEntry_3C8A90;
+typedef struct { int unknown00[6]; Moby_3C8A90 *hit; } CollisionResult_3C8A90;
+typedef struct { int a, b, c; } AimConfig_3C8A90;
+typedef float Vec_3C8A90[4] __attribute__((aligned(16)));
 
 extern u8 D_00189E20[];
 extern u32 D_00138180[];
 extern u8 D_00139568[];
 extern int D_L00_001A8F00;
 extern int D_L00_001B2AD0;
-extern AimConfig D_L00_001B00F0;
+extern AimConfig_3C8A90 D_L00_001B00F0;
 extern float D_L00_001B8DC0[];
-extern Moby *D_L00_001C3280[];
-extern CollisionResult D_L00_001BF200;
-extern WeaponEntry D_L00_00262570[];
-extern Light D_L00_001C6F40[];
+extern Moby_3C8A90 *D_L00_001C3280[];
+extern CollisionResult_3C8A90 D_L00_001BF200;
+extern WeaponEntry_3C8A90 D_L00_00262570[];
+extern Light_3C8A90 D_L00_001C6F40[];
 extern u8 D_L00_002960A0[];
 extern u8 D_L00_001A8F20[];
 
@@ -93,9 +93,9 @@ extern void func_L00_003C94D8(void *);
 extern void func_002A75E0(void *, int, int, int, int);
 extern int func_L00_002D6998(void *);
 extern void func_00283098(void *, void *, void *);
-extern Moby *func_L00_0037DEF8(void *, void *, int, int *, int);
+extern Moby_3C8A90 *func_L00_0037DEF8(void *, void *, int, int *, int);
 extern void func_L00_0037DD18(void *, void *, int);
-extern Moby *func_L00_00409E48(void *, void *, void *, void *, float, float, float, float);
+extern Moby_3C8A90 *func_L00_00409E48(void *, void *, void *, void *, float, float, float, float);
 extern int func_L00_002D3F30(int, int);
 extern void func_L00_002D6B70(int);
 extern void func_L00_002AF7D0(void);
@@ -104,17 +104,17 @@ extern int func_L00_002FCF18(void *, float, float, float, float, float);
 extern int func_00282978(void *);
 extern void func_00291450(int);
 
-#define HERO ((Hero *)D_00189E20)
+#define HERO ((Hero_3C8A90 *)D_00189E20)
 
-void func_L00_003C8A90(Moby *moby)
+void func_L00_003C8A90(Moby_3C8A90 *moby)
 {
-    Vars *vars = moby->vars;
-    Vector direction, origin, aim;
-    Moby *list[32];
+    Vars_3C8A90 *vars = moby->vars;
+    Vector_3C8A90 direction, origin, aim;
+    Moby_3C8A90 *list[32];
     int count;
     int ready;
     int i, j;
-    Moby *target;
+    Moby_3C8A90 *target;
     int animation;
 
     if (moby->state == 0) {
@@ -150,7 +150,7 @@ void func_L00_003C8A90(Moby *moby)
     func_L00_0037E000(moby);
     {
     {
-        AimConfig config = D_L00_001B00F0;
+        AimConfig_3C8A90 config = D_L00_001B00F0;
 
         func_002AF580(&moby->position, &direction, 0.436332345f, 0.436332345f, &count, list, 0x20, 0, 48.0f, 0.785398245f, 0.785398245f, 1, &config);
     }
@@ -176,11 +176,11 @@ void func_L00_003C8A90(Moby *moby)
             HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
         {
         if (func_L00_002D4040(-1)) {
-            Vec start, step, muzzle, offset;
+            Vec_3C8A90 start, step, muzzle, offset;
             int hits;
             float strength;
             float *info;
-            Moby *shot;
+            Moby_3C8A90 *shot;
 
             func_L00_002AF568();
             func_00282D30(start, &moby->forward, -1.0f);
@@ -190,7 +190,7 @@ void func_L00_003C8A90(Moby *moby)
             hits = func_00277F48(1.0f, start, 1, HERO->ptr[0x2290 / 4], 0);
             if (hits != 0) {
                 for (j = 0; j < hits; j++) {
-                    Moby *hit = D_L00_001C3280[j];
+                    Moby_3C8A90 *hit = D_L00_001C3280[j];
                     float *hp = func_002AB1F0(hit);
 
                     if (hit->alive != 0 && hit->health > 0 && hit != 0 && hit->state != 0xFE && hit->state != 0xFD &&
@@ -248,7 +248,7 @@ void func_L00_003C8A90(Moby *moby)
                 func_L00_002AF7D0();
             }
         }
-        vars->cooldown = 1.0f / ((WeaponEntry *)(D_00139568[0x2C] * 0xE0 + (char *)D_L00_00262570))->rate;
+        vars->cooldown = 1.0f / ((WeaponEntry_3C8A90 *)(D_00139568[0x2C] * 0xE0 + (char *)D_L00_00262570))->rate;
     }
     animation = moby->animation;
     if (animation == 2) {
@@ -260,7 +260,7 @@ void func_L00_003C8A90(Moby *moby)
     if (vars->timer > 0) {
         float scale, red, green, blue, t;
         float *again, *pf, *po;
-        Vec spot, flash, offset;
+        Vec_3C8A90 spot, flash, offset;
 
         if (vars->timer >= 0xD) {
             t = func_00283CE0(3);
@@ -293,7 +293,7 @@ void func_L00_003C8A90(Moby *moby)
             again = po;
         } else {
             pf = flash;
-            *(Vector *)pf = HERO->q[0x760 / 16];
+            *(Vector_3C8A90 *)pf = HERO->q[0x760 / 16];
             po = offset;
             offset[0] = 0.513000011f;
             offset[1] = -1.0f;
@@ -309,9 +309,9 @@ void func_L00_003C8A90(Moby *moby)
         if (vars->light == -1) {
             vars->light = func_L00_002FCF18(spot, 8.0f, 0.0f, red, green, blue);
         } else {
-            Light *light = &D_L00_001C6F40[vars->light];
+            Light_3C8A90 *light = &D_L00_001C6F40[vars->light];
 
-            light->pos = *(Vector *)spot;
+            light->pos = *(Vector_3C8A90 *)spot;
             light->blue = blue;
             light->pos.f[3] = 8.0f;
             light->red = red;

@@ -13,12 +13,12 @@
 #include "common.h"
 
 #define FIELD(p, type, offset) (*(type *)((char *)(p) + (offset)))
-typedef struct { float f[4]; } __attribute__((aligned(16))) Vec;
-typedef struct { unsigned short count, pad; unsigned int maximum, levels; } Statistics;
-typedef struct { char pad[0x10]; Vec position; } Light;
-typedef struct { char pad[0xE0]; } Weapon;
+typedef struct { float f[4]; } __attribute__((aligned(16))) Vec_3C6298;
+typedef struct { unsigned short count, pad; unsigned int maximum, levels; } Statistics_3C6298;
+typedef struct { char pad[0x10]; Vec_3C6298 position; } Light_3C6298;
+typedef struct { char pad[0xE0]; } Weapon_3C6298;
 typedef struct {
-    char pad000[0x730]; Vec matrix[3];
+    char pad000[0x730]; Vec_3C6298 matrix[3];
     char pad760[0xAD0]; int input;
     char pad1234[0x10]; int weapon;
     char pad1248[0x1048]; char *object;
@@ -26,14 +26,14 @@ typedef struct {
     char pad22A0[0x18]; unsigned char flag;
     char pad22B9[0x233]; short aiming;
     char pad24EE[0x46]; int timer;
-} Hero;
-extern Hero D_00189E20;
-extern Statistics D_0018C360[];
+} Hero_3C6298;
+extern Hero_3C6298 D_00189E20;
+extern Statistics_3C6298 D_0018C360[];
 extern unsigned int D_001A7390;
 extern int D_001A79F0;
 extern unsigned int D_00138320[];
 extern unsigned char D_00139578;
-extern Weapon D_L00_00262570[];
+extern Weapon_3C6298 D_L00_00262570[];
 extern int D_L00_001B2A0C[];
 extern int D_L00_001B2A04[];
 extern int D_L00_001B2A08[];
@@ -48,10 +48,10 @@ extern int D_L00_001AFFB4[];
 extern int D_L00_001B0E30[];
 extern unsigned char D_001A7A76[];
 extern int D_L00_001A903C[];
-extern Light D_L00_001C6F40[];
-typedef struct { char prefix[0x74]; unsigned char active; char pad75[0x13]; char *owner; } SoundView;
+extern Light_3C6298 D_L00_001C6F40[];
+typedef struct { char prefix[0x74]; unsigned char active; char pad75[0x13]; char *owner; } SoundView_3C6298;
 extern char D_00188660[];
-extern Vec D_L00_001B8C80[];
+extern Vec_3C6298 D_L00_001B8C80[];
 extern int func_00282978(void *);
 extern int func_00282948(void *);
 extern void func_002A7470(void *, int, int, int);
@@ -87,10 +87,10 @@ extern void func_002A75E0(void *, int, int, int, int);
 
 void func_L00_003C6298(char *owner)
 {
-    Vec direction;
+    Vec_3C6298 direction;
     union {
-        struct { Vec matrix[3], inverse[4]; } aim;
-        struct { Vec offset, point; } light;
+        struct { Vec_3C6298 matrix[3], inverse[4]; } aim;
+        struct { Vec_3C6298 offset, point; } light;
     } work;
     char *context = FIELD(owner, char *, 0x68);
     int special;
@@ -99,7 +99,7 @@ void func_L00_003C6298(char *owner)
     char *weapon;
     int upgraded;
     float rate, scale;
-    Light *light;
+    Light_3C6298 *light;
 
     special = 1;
     if (D_00189E20.weapon != 3) special = 0;
@@ -147,7 +147,7 @@ void func_L00_003C6298(char *owner)
         }
         FIELD(context, float, 0x48) = func_00283248(direction.f[0], direction.f[1]);
         FIELD(context, float, 0x4C) = func_00283248(func_00282E20(&direction), direction.f[2]);
-        work.aim.matrix[0] = FIELD(context, Vec, 0);
+        work.aim.matrix[0] = FIELD(context, Vec_3C6298, 0);
         target = func_L00_003C5B88(owner, work.aim.matrix, context + 0x48, context + 0x4C);
         func_00282948(context + 0x44);
         if (FIELD(context, char *, 0x10)) {
@@ -260,7 +260,7 @@ sound_cleanup:
         if (D_L00_001B2A0C[0] >= 0) {
             int sound = D_L00_001B2A0C[0];
             if (sound != -1) {
-                SoundView *entry = (SoundView *)(D_00188660 + sound * 0x70);
+                SoundView_3C6298 *entry = (SoundView_3C6298 *)(D_00188660 + sound * 0x70);
                 if (entry->owner == owner && entry->active) func_002E59F8(sound);
             }
             D_L00_001B2A0C[0] = -1;
