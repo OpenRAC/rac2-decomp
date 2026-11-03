@@ -1,6 +1,7 @@
 /* functional: low (SAME on one captured call only, most paths unexercised). Written from the assembly: same reads, writes and calls with the same arguments in the same order; the three func_00294D80 results are stored as 64-bit values as in retail. */
 extern char D_001F2840[];       /* C: the menu/pad block */
 extern char D_001C4FA0[];       /* Q: the selection state */
+extern char D_0025E680[], D_0025A498[];
 extern char D_00138180[];       /* P: the pad block, flags at +0x1C4 */
 extern int D_00139768[];
 extern char D_0014B540[];
@@ -50,7 +51,7 @@ int func_002D6F38(void)
 
     func_00295D00();
 
-    if (CW(0x14) == 0x25E680) {
+    if (CW(0x14) == (int)D_0025E680) {
         QW(0x28) = 1;
     } else {
         s2 = QW(0x230);
@@ -67,7 +68,7 @@ int func_002D6F38(void)
             return CW(0x134) == 0 ? -1 : 0;
         }
         if (PW(0x1C4) & 0x40)
-            CW(0x18) = 0x25A498;
+            CW(0x18) = (int)D_0025A498;
 
         if (PW(0x1C4) & 0x20) {
             a1 = QW(0x230);
@@ -114,7 +115,7 @@ int func_002D6F38(void)
             func_002E5E58(3, 0, 0);
             func_0029D830();
         }
-        if (CW(0x14) == 0x25E680)
+        if (CW(0x14) == (int)D_0025E680)
             QW(0x28) = 1;
     }
 

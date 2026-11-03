@@ -33,7 +33,7 @@ extern int D_L00_001B1BB8[] __attribute__((sda));
 extern int D_001A7340 __attribute__((sda));
 extern int D_001A79FC __attribute__((sda));
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, unsigned int *);
+extern int func_0028EA58(int, int, int, int, int, unsigned int *);
 extern int func_00288FB8(int);
 extern void func_0027FA10(int, int, unsigned long long, unsigned char *, int);
 extern void func_002F9BC0(char *, int);

@@ -1,0 +1,442 @@
+/* functional: high. Unchecked: the level main loop never returns within the gate's 40M instructions (NOTHING COMPARED). Read against all 858 retail instructions of level 00's copy (0x2A3B88-0x2A48EC) and the 13-entry frame-mode jump table at 0x29FEB0 (-2/10 -> func_00282A28, -1/0, 1..9 as written): every callee is level 00's place of the named function, every data name sits on the address retail forms (lui/addiu or $gp), constants (0x755D, 425/250, 7312/4512/272, -2pi/55, 9600/11520, 1/9600 and 1/11520) and branch senses agree. The matching draft is used unchanged; its only byte difference from retail is reorg placing one register clear in a jal delay slot. */
+/*
+ * func_L00_002A3B88 (3432 bytes): the level main loop. Clears the level's
+ * BSS (0x1B1680..0x25BBA0), restores sound settings, runs the level loader
+ * func_L00_00303990(1, 0), updates per-level visit statistics, then each
+ * frame: accumulates T0 into D_001A7200, runs the frame's mode handler
+ * (switch on D_L00_001A8F00), the pause/quit prompt, frame pacing with the
+ * T0 budget (9600 / 11520 ticks at 60 / 50 Hz), and a reload through
+ * func_L00_00303990(0, extra) when the hero asks for a flush; until
+ * D_L00_001A8ED4 is set.
+ */
+/* Claude Opus 5.5 xhigh retry, 2026-10-31 (task v1862). Unmatched: not a linked match.
+ * Goes in src/levels/shared/L00_002A3B88-g8.c (-G8; take the marker out of L00_002A3B80.c).
+ * This body, USA v1.01, -O2 -G8 -ffunction-sections: 3428/3432 bytes, 0/27 places.
+ * PAL and USA v2.00: "in neither catalogue". All declarations it needs follow.
+ *
+ * One real difference: at the first call of the loop header (0x002A404C-0x002A4070)
+ * retail keeps `daddu $s3,$zero,$zero` before the dsll32 and has a nop in the jal slot;
+ * this body lets reorg move that clear into the slot. Every later row is that shift
+ * plus relocated fields; the rest of the function already agrees.
+ *
+ * EXACT-BYTES FORM, 27/27 places, NOT ALLOWED (a volatile cast on one chosen access),
+ * so reported FAILED as WORKER2.md requires. Replace the header's accumulator line with:
+ *     *(volatile long *)&D_001A7200 = D_001A7200 + (unsigned int)*(volatile int *)0x10000800;
+ *
+ * Why: reorg scans back from the jal. resource.c (line 713) overwrites set.volatil at each
+ * store, so a plain `sd` clears what the volatile T0 `sw` set and the clear is eligible;
+ * a volatile `sd` keeps it set and every earlier insn conflicts. Retail's store therefore
+ * behaves as volatile while its `ld` behaves as plain (below).
+ *
+ * Measured and rejected:
+ * - `extern volatile` on D_001A7200: 3432 bytes but T0 is read first; 5 rows differ.
+ *   Reading it into a local first fixes the order, and $a0/$v1 swap (8 rows): volatile
+ *   reads chain, so sched1 issues the ld before the address's ori (seen in the dump). By
+ *   local-alloc's formula (computed, not dumped) address 30/20 then ties total 24/16 and
+ *   the older qty wins. It also breaks the matched func_001339B0 (probed, reverted), so
+ *   the object is not volatile in retail.
+ * - Commuted addition: 10 rows differ. Reordering flush/extra only changes which clear
+ *   lands in the slot.
+ * - Plain T0 read, also through a local: combine folds it to lwu (3424 bytes), so retail's
+ *   read is volatile.
+ * - RAC1's wording (run_level_main_loop, `long ... MACRO_ADDR`, `+=`) is this body.
+ *
+ * Reopen only if the maintainers rule on the cast, or with C that makes the store alone
+ * volatile. No emitted branch targets this range, so a surviving label cannot explain it.
+ */
+
+#include "common.h"
+
+/* Partial views of the resident settings, weapon table and per-level statistics. */
+typedef struct {
+    char reserved00[0x18];
+    int mode;
+    char reserved1c[10];
+    short pending, reset, ready, announce, reserved2e;
+    int output;
+} SoundSettings;
+typedef struct {
+    int active;
+    unsigned char channel;
+    char reserved05[15];
+    int sound;
+    char reserved18[200];
+} WeaponResource __attribute__((aligned(16)));
+typedef struct {
+    unsigned short visits, reserved;
+    unsigned int maximum, visited;
+} LevelStatistics;
+
+extern unsigned char D_L00_0025BBA0[];
+extern const char D_L00_001A7C88[];
+extern int D_L00_001A8F00[] __attribute__((sda));
+extern int D_L00_001A8F04, D_L00_001A8F08;
+extern int D_L00_001A8ED4, D_L00_001A8FE0;
+extern int D_L00_001B19C4[] __attribute__((sda));
+extern int D_L00_001B19D4[] __attribute__((sda));
+extern int D_L00_001B18D8[] __attribute__((sda));
+extern int D_L00_001B1680[] __attribute__((sda));
+extern int D_L00_001B19C0;
+extern float D_L00_001B19CC;
+extern short D_L00_001BCB24 NOT_SDA;
+extern int D_001A7290, D_001A72C0;
+extern short D_001A7A18;
+extern unsigned int D_001A7AF0;
+extern unsigned char D_00139568[];
+typedef struct {
+    unsigned char reserved0000[0x1248];
+    int weapon;
+    unsigned char reserved124c[0x22c1 - 0x124c];
+    unsigned char flush;
+} LevelLoopHero;
+extern LevelLoopHero D_00189E20;
+extern WeaponResource D_L00_00262570[];
+extern SoundSettings D_00152C00;
+extern int D_001A7904, D_001A79F0, D_001A7398, D_001A7A04;
+extern unsigned char D_001A7B1F;
+extern unsigned char D_001A7BE8[] __attribute__((sda));
+extern unsigned char D_0019B3D2 NOT_SDA;
+extern unsigned char D_001395CA NOT_SDA, D_001395E5 NOT_SDA, D_00139629 NOT_SDA;
+extern unsigned int D_001A7390;
+extern LevelStatistics D_0018C360[];
+extern unsigned char D_001A7248[] __attribute__((sda));
+extern long D_001A7200 MACRO_ADDR;
+typedef struct {
+    unsigned char reserved00[0x10];
+    int held;
+    unsigned char reserved14[0x15c-0x14];
+    int pressed;
+    int reserved160;
+    int alternate;
+    int reserved168;
+    int transition;
+    unsigned char reserved170[0x17c-0x170];
+    int counter;
+} LevelLoopInput;
+extern LevelLoopInput D_001393E0;
+extern unsigned short D_0018C9DC NOT_SDA;
+extern struct { char reserved00[0x84]; unsigned short resume; } D_0018C958;
+extern int D_001A7420, D_001A7424, D_001A7B90;
+extern int D_L00_001A7C80 __attribute__((sda));
+extern int D_L00_001A7C84 __attribute__((sda));
+extern unsigned char D_L00_0021DDB0[];
+extern short D_001A63F0 NOT_SDA;
+extern unsigned char D_0018D278[];
+
+/* Current C interfaces and observed argument banks of the retail call sites.
+ * Assembly-only callees with discarded results are declared for their effects;
+ * their original return types are not established by these call sites. */
+extern void func_00282A88(void *, int);
+extern void func_0026FEB8(const char *, ...);
+extern void func_002EED08(void), func_00290758(void);
+extern void func_00292078(int), func_00292408(int), func_002926B8(int), func_002925F0(int);
+extern int func_002AD860(int);
+extern void func_L00_00303990(int, int);
+extern void func_00294F10(void), func_0028AB70(void), func_0029CD48(void);
+extern void func_002C9C20(void);
+extern int func_002B49E0(int, int, int, int, unsigned char *);
+extern void func_0027D330(int), func_002B6E78(int, int, int), func_002B72E8(int);
+extern void func_00133220(void);
+extern int func_0011D620(void *, int, int, void *, int, void *, int, void *, void *);
+extern void func_002B4C18(void), func_002B7320(void);
+extern short func_002B7CE0(int);
+extern void func_00294420(int);
+extern void func_00280710(void), func_002FC280(void), func_002FC220(void);
+extern void func_00284FC0(void), func_L00_002F0930(void), func_00284EA8(void);
+extern int func_00132028(void);
+extern void func_002B9000(void), func_L00_0036F488(void), func_L00_002E6348(void);
+extern void func_L00_0037F7E8(void), func_L00_0037F790(void);
+extern void func_L00_0036FA68(void), func_L00_002E6400(void);
+extern void func_002F5FB8(void), func_L00_00370408(void), func_0027C480(void), func_0027D900(void);
+extern void func_002CA8A8(void), func_L00_002E6448(void), func_00286738(void), func_0027C4A8(void);
+extern void func_L00_00374C18(void), func_L00_0037A610(void), func_002E9268(void), func_002EA8E8(void);
+extern int func_L00_002FC5C8(void), func_L00_002FC5E8(void);
+extern void func_00282A28(void), func_L00_0032B288(void), func_L00_002D6FD8(void);
+extern void func_00298F00(void), func_00298178(void), func_0027C540(int);
+extern void func_002FC560(unsigned int, unsigned long long);
+extern int func_0028E588(int, int);
+/* Retail returns the full 64-bit texture descriptor in v0. */
+extern unsigned long long func_0028E640(int);
+extern void func_0028E868(int, int, int, int, int, int);
+extern void func_0028F410(int, int, long long, float, float, float, float, float);
+extern void func_0027C660(void), func_002FC3C0(unsigned long);
+extern float func_00283CE0(int);
+extern int func_001261F0(int);
+extern void func_L00_003584B0(void), func_0027B948(void), func_002FC1D8(void);
+extern void func_00133230(void), func_002E5FE0(void), func_002B7170(void), func_00288EA0(void);
+extern void func_L00_0032B500(int), func_00297670(void *), func_002EC408(void);
+
+/* Clears level state, restores its settings and services frames until loading ends. */
+#define T0_COUNT (*(volatile unsigned int *)0x10000800)
+void func_L00_002A3B88(void)
+{
+    int i, allowed, oldMode, flush, extra, limit, ticks, sound, period;
+    float spriteSize;
+    float elapsed, angle;
+    if (!(((unsigned int)D_L00_0025BBA0 - (unsigned int)D_L00_001B1680) & 15) && !((unsigned int)D_L00_001B1680 & 15)) {
+        func_00282A88(D_L00_001B1680, (unsigned int)D_L00_0025BBA0 - (unsigned int)D_L00_001B1680);
+    } else {
+        func_0026FEB8(D_L00_001A7C88);
+        for (i = 0; i < (int)((unsigned int)D_L00_0025BBA0 - (unsigned int)D_L00_001B1680); i++) ((unsigned char *)D_L00_001B1680)[i] = 0;
+    }
+    func_002EED08();
+    D_L00_001A8F00[0] = 0;
+    D_L00_001A8F08 = -2;
+    D_L00_001A8F04 = 0;
+    D_L00_001B19C4[0] = 0;
+    func_00290758();
+    if (D_001A7290 != D_001A7A18) func_00292078(D_001A7A18);
+    {
+        int weapon = D_00139568[10];
+        if (D_001A72C0 != D_L00_00262570[weapon].channel)
+            func_00292408(D_L00_00262570[weapon].channel);
+    }
+    {
+        int output = (D_001A7AF0 >> 16) & 31;
+        if (D_00152C00.output != output) func_002926B8(output);
+    }
+    if (D_00152C00.mode != (D_001A7AF0 & 3)) func_002925F0(D_001A7AF0 & 3);
+    if (!D_L00_00262570[D_00139568[D_00189E20.weapon]].active) func_002AD860(10);
+    func_L00_00303990(1, 0);
+    func_00294F10();
+    func_0028AB70();
+    func_0029CD48();
+    func_002C9C20();
+    D_00152C00.ready = 1;
+    if (D_00152C00.reset) D_00152C00.reset = 0;
+    allowed = 1;
+    if (D_00152C00.pending || D_001A7904
+        || D_001A79F0 == 0 || D_001A79F0 == 5 || D_001A79F0 == 10 || D_001A79F0 == 15
+        || (D_001A79F0 > 20 && D_001A79F0 != 24)
+        || (D_001A79F0 == 4 && D_001A7B1F && !D_001395CA)
+        || (D_001A79F0 == 9 && D_001395E5)
+        || (D_001A79F0 == 14 && !D_0019B3D2))
+        allowed = 0;
+    if (allowed && D_00152C00.announce) func_002B49E0(6, 1, 6, 0, 0);
+    D_00152C00.pending = 0;
+    D_001A7904 = 0;
+    func_0027D330(4);
+    D_L00_001B18D8[0] = 0;
+    func_002B6E78(0, 1, 1024);
+    func_002B72E8(0);
+    if (D_001A79F0 < 28 && !D_001A7BE8[D_001A79F0]) D_001A7BE8[D_001A79F0] = 1;
+    if (D_0018C360[D_001A79F0].visits < 65535) D_0018C360[D_001A79F0].visits++;
+    if (D_0018C360[D_001A79F0].maximum < D_001A7390) D_0018C360[D_001A79F0].maximum = D_001A7390;
+    D_0018C360[D_001A79F0].visited = D_0018C360[D_001A79F0].visited | (1u << D_001A79F0) | 0x80000000u;
+    func_00133220();
+    func_0011D620(D_001A7248, 3, 0, 0, 0, 0, 0, 0, 0);
+    func_002B4C18();
+    if (!D_L00_001A8F00[0]) func_002B7320();
+    func_002B7CE0(1);
+    func_00294420(D_L00_00262570[D_00139568[D_001A7398]].sound);
+    func_002B7CE0(1);
+    func_00294420(D_L00_00262570[D_00139568[D_001A7A04]].sound);
+    func_002B7CE0(1);
+    while (!D_L00_001A8ED4) {
+        D_L00_001B19D4[0] = 0;
+        flush = 0;
+        extra = 0;
+        D_001A7200 += (unsigned int)*(volatile int *)0x10000800;
+        *(volatile int *)0x10000800 = 0;
+        func_00280710();
+        func_002FC280();
+        func_002FC220();
+        func_00284FC0();
+        func_L00_002F0930();
+        func_00284EA8();
+        func_00132028();
+        oldMode = D_L00_001A8F00[0];
+        switch (oldMode) {
+        case -1: case 0:
+            func_002B9000();
+            func_L00_0036F488();
+            if (D_L00_001A7C80 == 1) {
+                T0_COUNT = 0;
+                func_002B9000();
+                func_L00_0036F488();
+            }
+            func_L00_002E6348();
+            break;
+        case 8:
+            func_002B9000();
+            func_L00_0037F7E8();
+            func_L00_0037F790();
+            break;
+        case 7:
+            func_002B9000();
+            func_L00_0036FA68();
+            func_L00_002E6400();
+            break;
+        case 1:
+            func_002F5FB8();
+            break;
+        case 2:
+            func_002B9000();
+            func_L00_00370408();
+            func_0027C480();
+            func_0027D900();
+            break;
+        case 3:
+            func_002B9000();
+            func_002CA8A8();
+            func_L00_002E6448();
+            break;
+        case 4:
+            func_002B9000();
+            func_00286738();
+            func_0027C4A8();
+            break;
+        case 5:
+            func_002B9000();
+            func_L00_00374C18();
+            func_L00_0037A610();
+            break;
+        case 6:
+            func_002B9000();
+            func_002E9268();
+            func_002EA8E8();
+            break;
+        case 9:
+            func_002B9000();
+            func_L00_002FC5C8();
+            func_L00_002FC5E8();
+            break;
+        case -2: case 10: default:
+            func_00282A28();
+            break;
+        }
+        D_L00_001B19C4[0]++;
+        func_L00_0032B288();
+        if (!D_L00_001A8F00[0]) func_L00_002D6FD8();
+        func_00298F00();
+        func_00298178();
+        if ((unsigned)(D_001393E0.pressed - 15) < 2 || D_001393E0.alternate == 15 || D_L00_001B1680[0]) {
+            if (D_001393E0.transition || D_001393E0.held) {
+                D_001393E0.counter = 0;
+                D_001A7420 = 21;
+                D_001A7424 = 64;
+                D_L00_001B1680[0] = 0;
+                if (!D_L00_001A8F00[0])
+                    func_002B49E0(4, 1, 1, 0, 0);
+                else
+                    func_002B49E0(4, 2, 1, 0, 0);
+            } else if (D_L00_001B1680[0] == -1) {
+                if (!D_L00_001A8F00[0]) {
+                    if (!D_0018C958.resume) D_0018C958.resume = 1;
+                    D_L00_001B1680[0] = 0;
+                }
+            } else if (!D_L00_001A8F00[0] && !D_0018C9DC) {
+                func_002B49E0(4, 1, 2, 0, 0);
+                D_L00_001B1680[0] = -1;
+            } else {
+                if ((unsigned)(D_001393E0.pressed - 15) < 2 || D_001393E0.alternate == 15)
+                    D_L00_001B1680[0] = 30;
+                else
+                    D_L00_001B1680[0] = D_L00_001B1680[0] - 1;
+                period = 55;
+                func_0027C540(0);
+                spriteSize = 272.0f;
+                func_002FC560(71, 0x2004bULL);
+                func_0028E868(func_0028E588(0x755d, 0), 425, 250, 64, 64, 128);
+                angle = ((float)(D_L00_001B18D8[0] % period) * -6.2831854820251465f) / (float)period;
+                func_0028F410(64, 64, func_0028E640(func_0028E588(0x755d, 1)), 7312.0f, 4512.0f, spriteSize, spriteSize, angle);
+                func_0027C660();
+                if (D_001A7420 == 2) D_L00_001B1680[0] = 0;
+            }
+        }
+        func_002FC3C0(1);
+        elapsed = func_00283CE0(T0_COUNT);
+        D_L00_001B19CC = elapsed * (D_001A7B90 ? 0.00008680556f : 0.00010416667f);
+        if (!D_00189E20.flush && !D_L00_001B19D4[0]) {
+            if (!D_L00_001A8F00[0]) {
+                ticks = T0_COUNT;
+                limit = D_001A7B90 ? 11520 : 9600;
+                if (D_L00_001A7C80 == 0) {
+                    if (limit < ticks) {
+                        D_L00_001A7C84 = 0;
+                        D_L00_001A7C80 = 1;
+                    }
+                } else if (D_L00_001A7C80 == 1) {
+                    if (D_L00_001A7C84 >= 2) {
+                        D_L00_001A7C84 = 0;
+                        D_L00_001A7C80 = 2;
+                    }
+                } else if (D_L00_001A7C80 == 2) {
+                    if (D_L00_001A7C84 >= 4 && ticks <= limit) {
+                        D_L00_001A7C84 = 0;
+                        D_L00_001A7C80 = 3;
+                    }
+                } else if (D_L00_001A7C80 == 3) {
+                    D_L00_001A7C80 = 0;
+                    D_L00_001A7C84 = 0;
+                }
+                D_L00_001A7C84++;
+                if (D_L00_001A7C80 == 0) {
+                    func_001261F0(0);
+                    D_L00_001B18D8[0]++;
+                } else if (D_L00_001A7C80 == 1) {
+                    D_L00_001B18D8[0]++;
+                } else if (D_L00_001A7C80 == 2) {
+                    if (limit < ticks) D_L00_001A7C84 = 0;
+                    if (!D_L00_001A8F00[0]) {
+                        func_002B9000();
+                        func_L00_0036F488();
+                    } else if (D_L00_001A8F00[0] == 2 && !D_L00_001BCB24) {
+                        func_002B9000();
+                        func_L00_00370408();
+                    }
+                    func_L00_002D6FD8();
+                    func_001261F0(0);
+                    D_L00_001B18D8[0]++;
+                } else if (D_L00_001A7C80 == 3) {
+                    func_001261F0(0);
+                    func_001261F0(0);
+                    D_L00_001B18D8[0]++;
+                }
+                func_L00_003584B0();
+            } else if (D_L00_001A8F00[0] == 2) {
+                int now = T0_COUNT;
+                int budget = D_001A7B90 ? 11520 : 9600;
+                if (budget < now && !D_L00_001BCB24) {
+                    func_002B9000();
+                    func_L00_00370408();
+                }
+                func_L00_002D6FD8();
+                func_L00_003584B0();
+                func_001261F0(0);
+                D_L00_001B18D8[0]++;
+            } else {
+                func_001261F0(0);
+                D_L00_001A7C80 = 0;
+                D_L00_001A7C84 = 0;
+                D_L00_001B18D8[0]++;
+                func_L00_003584B0();
+            }
+            D_L00_001A8FE0 = 0;
+        }
+        func_0027B948();
+        if (!D_L00_001A8F00[0] && D_00189E20.flush) { flush = 1; extra = 1; }
+        if (flush) {
+            func_002FC1D8();
+            func_00133230();
+            func_00132028();
+            func_002E5FE0();
+            func_002B7170();
+            sound = D_001A63F0;
+            if (*(int *)D_L00_0021DDB0) sound = *(int *)(D_L00_0021DDB0 + 0xc64);
+            func_00288EA0();
+            func_L00_00303990(0, extra);
+            func_L00_0032B500(0);
+            func_002B6E78(sound, 1, 1024);
+            func_0028AB70();
+        } else {
+            func_002B4C18();
+            if (D_L00_001A8F00[0] != oldMode) D_L00_001B19C4[0] = 0;
+            if (D_L00_001B19D4[0]) func_002FC1D8();
+        }
+        if (D_0018C360[D_001A79F0].maximum < D_001A7390) D_0018C360[D_001A79F0].maximum = D_001A7390;
+    }
+    func_00297670(D_0018D278 + D_001A79F0 * 2048);
+    if (D_L00_001B19C0 != D_001A79F0) D_00139629 = D_001A79F0;
+    func_002EC408();
+}

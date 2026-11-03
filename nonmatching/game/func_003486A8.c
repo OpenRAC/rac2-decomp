@@ -96,10 +96,10 @@ void func_003486A8(u8 *self, void *owner)
     *(int *)func_00335E20(self) = 0x60442D00;
     *(int *)func_00335E20(self + 0x130) = 0x55F0C070;
     *(int *)func_00335E20(self + 0x4C) = 0x55F0C070;
-    *(int *)func_00335E20(self + 0x98) = 0x55F0C070;
-    *(int *)func_00335E20(self + 0xE4) = 0x80FFDE8D;
-    *(int *)func_00335E20(self + 0x17C) = 0x70FFFEED;
-    *(int *)func_00335E20(self + 0x1C8) = 0x60442D00;
+    *(int *)func_00335E20(self + 0x98) = 0x80FFDE8D;
+    *(int *)func_00335E20(self + 0xE4) = 0x70FFFEED;
+    *(int *)func_00335E20(self + 0x17C) = 0x60442D00;
+    *(int *)func_00335E20(self + 0x1C8) = 0x55F0C070;
     func_00336390(self, D_001A8CFC, 0x1C);
     func_00336390(self + 0x130, D_001A8CFC + 0x8710, 0x1D);
     func_00336390(self + 0x4C, D_001A8CFC + 0x8710, 0x1E);

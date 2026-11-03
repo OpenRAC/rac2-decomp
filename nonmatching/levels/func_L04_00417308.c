@@ -122,7 +122,7 @@ extern float func_00283BE0(float, float);
 extern int func_00283D38(int, int, float);
 extern char *func_00288FB8(int);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, void *);
+extern int func_0028EA58(int, int, int, int, int, void *);
 extern void func_0028FC48(int, int, int, int, unsigned long long, int);
 extern void func_0029B658(int, int, float, float, float, float);
 extern float func_002AA2E8(float *, float, float);

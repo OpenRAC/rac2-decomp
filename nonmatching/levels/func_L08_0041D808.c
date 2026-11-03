@@ -137,7 +137,7 @@ extern int func_001157AC(void *);
 extern void func_0027F5B8(int, int, u64, u8 *, int);
 extern float func_002ABB18(float), func_00283198(float), func_002A7790(float);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, void *);
+extern int func_0028EA58(int, int, int, int, int, void *);
 extern void func_L08_004207D0(void *);
 #define FL(p,o) (*(float *)((u8 *)(p)+(o)))
 #define IN(p,o) (*(int *)((u8 *)(p)+(o)))
