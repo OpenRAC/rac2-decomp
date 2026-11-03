@@ -1,3 +1,14 @@
+/* 3 November 2026 contract review; no new compilation or match.
+ * Current 002A8C00 produces fields through +0x20 but not request +0x24.
+ * Current 002A8E20 reads request +0x24 into the persistent queue +0x34.
+ * This caller does not initialize contact.secondaryDamage. Fresh retail
+ * confirms the request at sp+0x20, only kind/source/id stores after its
+ * constructor, and no producer at sp+0x44. Its later meaning has not been
+ * qualified as an opaque transfer. A typed-owner probe was kept private.
+ * Resolve that producer/lifecycle before promotion; do not invent zero.
+ * The original allocation/setup residual is not recompiled past this
+ * unresolved input contract. No callee or reserved donor is changed.
+ */
 /* Claude Opus 5.5 (opus-1), 2026-10-29; upstream pinned game compiler,
  * -O2 -G0 -ffunction-sections (a unit of its own that includes common.h):
  * 688/688 bytes, 0/28 USA v1.01 places. First difference +0x4.

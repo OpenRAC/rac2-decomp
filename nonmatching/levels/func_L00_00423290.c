@@ -1,3 +1,17 @@
+/* 3 November 2026: current RAC1 Camera fields and RAC2 neighbor reviewed.
+ * The actual input is represented by its id +0x86 / state pointer +0x70
+ * prefix. Hero addresses are formed within the incomplete owning byte object,
+ * without the preceding unused large union bounds. All 16-byte objects,
+ * original state capture, calls, widths and full transfers are preserved.
+ * Original G0/qcopy/barrier profile: 360/360 bytes, 0/27 USA, +0x58.
+ * Baseline, first-copy qcopy_nc and this owning-prefix form produce identical
+ * complete checker listings. Keep the full-transfer form, not the weakened
+ * clobber variant. Three equal forms stop this family; the +0x60 advance
+ * still issues after the first call. No source barrier or fake use is added.
+ * Reopen on a real pointer lifetime feeding that call. No alternate-release
+ * or linked build was run for these failed candidates.
+ */
+/* Historical notes describe the preceding retained source. */
 /* func_L00_00423290 (360 bytes) - near miss (v2142, 3 November 2026): 360/360 bytes, 0/27 places,
  * one instruction out of place (was five setup positions with -mno-split-addresses).
  * Profile: own unit, -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -12,11 +26,15 @@
  * func_00282CC0, func_00282D30, func_00282DB0_1 (float), func_00282C88.
  */
 #include "common.h"
-typedef int HeroQ __attribute__((mode(TI)));
-typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
+/* Camera id/state fields are independently observed at the same offsets
+ * as the public RAC1 Camera prefix (origin/main 1d8228cc). */
+typedef struct {
+    unsigned char bytes00[0x70];
+    char *state;
+    unsigned char bytes74[0x12];
+    short id;
+} CameraInitPrefix;
 extern unsigned char D_00189E20[];
-#define H ((Hero *)D_00189E20)
-
 
 #include "include_asm.h"
 
@@ -39,7 +57,7 @@ extern void func_00282C88(void *a);
 
 
 
-void func_L00_00423290(char *a0)
+void func_L00_00423290(CameraInitPrefix *camera)
 {
     char *obj;
     char *v60;
@@ -52,11 +70,11 @@ void func_L00_00423290(char *a0)
     char buf0[16];
     char buf1[16];
 
-    if (*(short *)(a0 + 0x86) != 0)
+    if (camera->id != 0)
         return;
 
-    hero = (&H->c[704]);
-    v60 = *(char **)(a0 + 0x70);
+    hero = (char *)D_00189E20 + 0x2C0;
+    v60 = camera->state;
     obj = v60;
     v160 = v60 + 0x160;
     v60 += 0x60;
@@ -79,10 +97,10 @@ void func_L00_00423290(char *a0)
     func_00282CC0(vF0, buf1, v60);
     dst = (V4_F0fba48d3 *)(obj + 0xA0);
     *dst = *(V4_F0fba48d3 *)vF0;
-    func_00282CF0_2(v160, a0 + 0x30, vB0);
+    func_00282CF0_2(v160, (char *)camera + 0x30, vB0);
     dst = (V4_F0fba48d3 *)(obj + 0x170);
     *dst = *(V4_F0fba48d3 *)v160;
-    *(V4_F0fba48d3 *)obj = *(V4_F0fba48d3 *)(a0 + 0x30);
+    *(V4_F0fba48d3 *)obj = *(V4_F0fba48d3 *)((char *)camera + 0x30);
     func_00282CC0(obj + 0x210, vB0, v160);
     *(int *)(obj + 0x240) = 0;
 }

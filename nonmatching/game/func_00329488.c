@@ -1,3 +1,16 @@
+/* 3 November 2026, current matched draw/particle contracts reviewed.
+ * The local position now owns 16 aligned bytes: 00282CC0 and 002820D0
+ * transfer a whole vector, so the preceding float[3] was too small despite
+ * physical stack padding. The third GP draw input is the actual UV pointer
+ * (null here); all three GP and three FP inputs and void return are retained.
+ * No W initialization is invented for the opaque transferred lane.
+ * Default G0: 420/420 bytes, 0/28 USA places, first mismatch +0x44.
+ * First-loop alignment and the second-loop base/copy lifetime remain.
+ * The already failed bottom-entry loop is not repeated. Reopen on a real
+ * loop/lifetime witness, not counter references or padding added for codegen.
+ * No alternate-release or linked build was run for this failed candidate.
+ */
+/* Historical notes describe the preceding retained source. */
 /* 2 November 2026: a genuine loop entered at its bottom test (goto test; do
  * { body; test: ; } while (i < 300)) retains the constants and loop alignment
  * but adds an entry branch and moves the initial owner load into its bottom.
@@ -17,6 +30,8 @@
  * ahead of the label, so the source may be a real loop that loop.c rejects as invalid; no such form found) and an
  * addiu v0 / daddu s0,v0 copy where retail loads s0 directly in the second loop.
  */
+#include "common.h"
+
 typedef struct {
     float v[4];
     float f10;
@@ -44,14 +59,14 @@ extern int func_00283CF0(float);
 extern float func_00283180(float);
 extern void func_002820A0(void);
 extern void func_002820C8(void);
-extern void func_002820D0(float, float, float, void *, int, int);
+extern void func_002820D0(float, float, float, void *, int, float **);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00329630(char *);
 
 void func_00329488(void *obj) {
     F328Particle *base;
     F328Particle *p;
-    float v[3];
+    float v[4] __attribute__((aligned(16)));
     float scale, s, a, b;
     float full;
     int i, n;

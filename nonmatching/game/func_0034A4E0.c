@@ -1,3 +1,13 @@
+/* 3 November 2026: retained near miss, not linked.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Current size: 804/804 bytes; US 0/28, US2 not rechecked (present), PAL not rechecked (present).
+ * Three distinct forms produce identical complete text/object bytes; 41 aligned masked differing
+ * words remain, mostly the saved-register rotation.
+ * Reopen on independent evidence that changes the actual result-load dependency or owner/left-
+ * widget lifetime, rather than another equivalent spelling.
+ * Earlier measurements below are historical where this note supersedes them.
+ */
+#include "common.h"
 /* Opus 5.5, xhigh: -O2 -G0 -ffunction-sections, own unit. 804/804 bytes, 0/28 places (us).
  * 41 of 201 instructions differ: 39 are one rotation of callee-saved registers, 2 one slot.
  * Retail also differs per release only in the D_001A8CFC %lo, so one C can match all three.
@@ -29,11 +39,13 @@
  * Not tried: nothing was linked. Needs the declarations below.
  */
 extern void func_00336390(char *, char *, int);
+typedef struct { char bytes[0x4C]; } StageSprite;
+typedef struct { char prefix[0x5C]; StageSprite left, right; } StageOwnerPrefix;
 typedef struct { float values[3]; } StageFloatTable;
 typedef struct { int values[3]; } StageIntTable;
 extern const StageFloatTable D_001AE628, D_001AE638;
 extern const StageIntTable D_001AE648, D_001AE658;
-extern void func_003363C0(unsigned char *, float);
+extern void func_003363C0(float position, unsigned char *widget);
 extern char *D_001A8CFC[] __attribute__((sda));
 
 float func_0034A4E0(char *object, int value, int *count, int *group,
@@ -63,11 +75,11 @@ float func_0034A4E0(char *object, int value, int *count, int *group,
         *first = firsts.values[0];
         *second = seconds.values[0];
         *offset = 0.0f;
-        left = object + 0x5C;
-        object += 0xA8;
-        func_003363C0((unsigned char *)left, position);
+        left = (char *)&((StageOwnerPrefix *)object)->left;
+        object = (char *)&((StageOwnerPrefix *)object)->right;
+        func_003363C0(position, (unsigned char *)left);
         result = results.values[0];
-        func_003363C0((unsigned char *)object, position);
+        func_003363C0(position, (unsigned char *)object);
         text = 0x8710;
         func_00336390(left, D_001A8CFC[0] + text, 17);
         func_00336390(object, D_001A8CFC[0] + text, 18);
@@ -81,10 +93,10 @@ float func_0034A4E0(char *object, int value, int *count, int *group,
         *second = seconds.values[1];
         *offset = -0.5f;
         result = results.values[1];
-        left = object + 0x5C;
-        object += 0xA8;
-        func_003363C0((unsigned char *)left, position);
-        func_003363C0((unsigned char *)object, position);
+        left = (char *)&((StageOwnerPrefix *)object)->left;
+        object = (char *)&((StageOwnerPrefix *)object)->right;
+        func_003363C0(position, (unsigned char *)left);
+        func_003363C0(position, (unsigned char *)object);
         text = 0x8710;
         func_00336390(left, D_001A8CFC[0] + text, 19);
         func_00336390(object, D_001A8CFC[0] + text, 20);
@@ -99,10 +111,10 @@ float func_0034A4E0(char *object, int value, int *count, int *group,
         *offset = -0.5f;
         *last = 1;
         result = results.values[2];
-        left = object + 0x5C;
-        object += 0xA8;
-        func_003363C0((unsigned char *)left, position);
-        func_003363C0((unsigned char *)object, position);
+        left = (char *)&((StageOwnerPrefix *)object)->left;
+        object = (char *)&((StageOwnerPrefix *)object)->right;
+        func_003363C0(position, (unsigned char *)left);
+        func_003363C0(position, (unsigned char *)object);
         text = 0x8710;
         func_00336390(left, D_001A8CFC[0] + text, 21);
         func_00336390(object, D_001A8CFC[0] + text, 22);

@@ -1,3 +1,18 @@
+/* 3 November 2026: true quad/UV record and owner-view hypothesis.
+ * Four signed-halfword corner pairs make each 16-byte face; phases/UVs are
+ * pairs of floats. Byte cursors are rooted in the complete packet/frame,
+ * avoiding a final v pointer beyond float uv[8]. The final traversal walks
+ * whole phase records instead of leaving a two-float inner subarray.
+ * Keep the 144-byte packet prefix and all four real matrix rows. The hero
+ * reference offset used by retail is preserved; no RAC1 offset is imported.
+ * Original G8/g profile: 928/928 bytes, 0/28 USA, first mismatch +0x44.
+ * Face+1 PRE/copy and UV allocation remain. No byte improvement is claimed.
+ * The matched billboard donor's counter increments belong to real colour
+ * branches absent here; adding such branches would invent control flow.
+ * Reopen on actual counter/UV lifetimes; no stale permutation/flag sweep.
+ * No alternate-release or linked build was run for this failed candidate.
+ */
+/* Historical notes describe the preceding retained source. */
 /* Claude Opus 5.5 xhigh tier (opus-1), v2195: 928/928 bytes, 0/28 USA places (74 of 232 rows differ).
  * Profile: its own unit (e.g. src/game/00327038-quads-g8.c) built with -O2 -G8 -ffunction-sections -g;
  * -g matters, because the line notes count towards haifa's region size limit.
@@ -12,6 +27,7 @@
  * D_00235D00 address temporaries. Needs extern ints with __attribute__((sda)) in the -G8 unit.
  */
 #include "include_asm.h"
+#include <stddef.h>
 
 typedef struct {
     float x;
@@ -20,10 +36,14 @@ typedef struct {
     float w;
 } RenderVec __attribute__((aligned(16)));
 
+typedef struct { float u, v; } UVPair;
+typedef struct { short vertex, uv; } FaceCorner;
+typedef struct { FaceCorner corner[4]; } QuadFace;
+
 typedef struct {
     RenderVec vertex[4];
     unsigned int color[4];
-    float uv[8];
+    UVPair uv[4];
     long long tag[4];
     RenderVec matrix[4];
 } RenderPacket;
@@ -53,9 +73,9 @@ extern int D_001B05A4 __attribute__((sda));
 extern int D_001B05A8 __attribute__((sda));
 extern int D_001B05AC __attribute__((sda));
 extern unsigned int D_001B05B0 __attribute__((sda));
-extern short D_0026B210[][2];
+extern QuadFace D_0026B210[];
 extern RenderVec D_0026AA00[];
-extern float D_00235D00[][2];
+extern UVPair D_00235D00[];
 
 static inline void ClampUnit(float *value)
 {
@@ -74,10 +94,10 @@ void func_0032C2E8(char *object)
     char *state;
     int face;
     int corner;
-    short (*quad)[2];
-    float *u;
-    float *v;
-    float *phase;
+    FaceCorner *quad;
+    char *u;
+    char *v;
+    UVPair *phase;
 
     state = *(char **)(object + 0x68);
     packet.tag[1] = D_001B2810;
@@ -104,29 +124,29 @@ void func_0032C2E8(char *object)
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = D_001B05B0;
 
     for (face = 0; face < 127; face++) {
-        quad = &D_0026B210[face * 4];
-        u = packet.uv;
-        v = packet.uv + 1;
+        quad = D_0026B210[face].corner;
+        u = (char *)&packet + offsetof(RenderPacket, uv);
+        v = u + sizeof(float);
         for (corner = 0; corner < 4; corner++) {
-            int index = quad[corner][1];
+            int index = quad[corner].uv;
 
-            func_00282D30(&packet.vertex[corner], &D_0026AA00[quad[corner][0]], *(float *)(state + 0x14) * 4.0f);
+            func_00282D30(&packet.vertex[corner], &D_0026AA00[quad[corner].vertex], *(float *)(state + 0x14) * 4.0f);
             func_002830C0(&packet.vertex[corner], &packet.vertex[corner], packet.matrix);
-            func_0027C768(&packet.vertex[corner], &packet.uv[corner * 2], &packet.uv[corner * 2 + 1]);
-            *u += func_00283180(D_00235D00[index][0]) * 0.01f;
-            *v += func_00283180(D_00235D00[index][1]) * 0.02f;
-            ClampUnit(u);
-            ClampUnit(v);
-            u += 2;
-            v += 2;
+            func_0027C768(&packet.vertex[corner], &packet.uv[corner].u, &packet.uv[corner].v);
+            *(float *)u += func_00283180(D_00235D00[index].u) * 0.01f;
+            *(float *)v += func_00283180(D_00235D00[index].v) * 0.02f;
+            ClampUnit((float *)u);
+            ClampUnit((float *)v);
+            u += 8;
+            v += 8;
         }
         func_00280B90(&packet, 0, 0);
     }
 
-    phase = D_00235D00[0];
+    phase = D_00235D00;
     for (face = 136; face >= 0; face--) {
-        phase[0] = func_00283B98(phase[0], 0.6283186078071594f);
-        phase[1] = func_00283B98(phase[1], 0.3141593039035797f);
-        phase += 2;
+        phase->u = func_00283B98(phase->u, 0.6283186078071594f);
+        phase->v = func_00283B98(phase->v, 0.3141593039035797f);
+        phase++;
     }
 }

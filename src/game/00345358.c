@@ -651,7 +651,7 @@ INCLUDE_ASM("asm/game", func_0034A4E0);
 
 /* func_0034A808 is in 0034A808.c. */
 
-INCLUDE_ASM("asm/game", func_0034AA30);
+/* func_0034AA30 is built from 0034AA30.c. */
 
 void func_0034AC10(char *self)
 {

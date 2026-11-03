@@ -369,6 +369,41 @@ class Catalogue(unittest.TestCase):
                 levels.catalogue()
                 self.assertEqual((boot.read_bytes(), catalogue.read_bytes()), first_output)
 
+    def test_core_entry_and_named_residues_preserve_unrelated_rows_on_replay(self):
+        # Synthetic core-only layout. A fill prefix and isolated words are
+        # corrected only by their measured names, never by shared byte identity.
+        method = code(addiu(4, 4, 12)) + bytes(444) + code(JR_RA, NOP)
+        prefixed = code(0xCDCDCDCD) + method
+        remnant = code(addiu(2, 0, 7))
+        named = ("func_001158F4", "func_0011B320", "func_0011B450")
+        base = 0x1158F4
+        entries = [(named[0], base, 460), ("uncorrected", base+460, 460),
+                   (named[1], 0x11B320, 4), (named[2], 0x11B450, 4), ("unrelated", 0x11B458, 4)]
+        raw = bytearray(0x11B45C - base)
+        for _, address, size in entries:
+            raw[address-base:address-base+size] = prefixed if size == 460 else remnant
+        raw = bytes(raw)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            boot, catalogue = root / "boot.tsv", root / "levels.tsv"
+            boot.write_text("# name\taddress\tsize\n" + "".join(
+                f"{name}\t{address:08X}\t{size}\n" for name, address, size in entries))
+            catalogue.write_text("# name\tkind\tsize\tfingerprint\tlevels\tplaces\n")
+            with patch.multiple(levels, BOOT_FUNCTIONS=boot, CATALOGUE=catalogue, LEVELS=root,
+                                BOOT_PAIRS=root / "absent.tsv", NAMES={}, BOOT_RESIDUES={},
+                                FUNCTION_ENTRY_OFFSETS={named[0]:(460,4)},
+                                FUNCTION_RESIDUES={named[1]:4,named[2]:4}), \
+                 patch.object(levels, "boot_image", return_value=(raw, [(base,0,len(raw))])), \
+                 patch.object(sys, "argv", ["levels.py", "catalogue"]):
+                levels.catalogue()
+                self.assertEqual(levels.read_boot_functions(),
+                                 [(named[0],base+4,456), ("uncorrected",base+460,460),
+                                  ("unrelated",0x11B458,4)])
+                self.assertEqual(base+4 + 456, base + 460)
+                first_output = boot.read_bytes(), catalogue.read_bytes()
+                levels.catalogue()
+                self.assertEqual((boot.read_bytes(),catalogue.read_bytes()),first_output)
+
     def test_level_only_entries_keep_distinct_names_after_identity_collisions(self):
         names = ("func_L00_004263A8", "func_L02_003F0788")
         # Identical short methods, with distinct or identical original prefixes.

@@ -1,3 +1,13 @@
+/* 3 November 2026: retained near miss, not linked.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current size: 644/644 bytes; US 0/28, US2 absent, PAL absent.
+ * Complete 72-byte text typing preserves the true 64-bit style. Reusing the descriptor address
+ * shortened the body to 628 bytes; preserving its separately formed address retains the 27-word
+ * centering/setup residual.
+ * Reopen on a real additional lifetime or source/control-flow witness for the centering block;
+ * owner typing and widget-address capture did not resolve it.
+ * Earlier measurements below are historical where this note supersedes them.
+ */
 /* opus-1 (v1334): -O2 -G8 -ffunction-sections (a *-g8.c unit); 644/644 bytes, 0/28 places.
  * The whole loop body, the prologue/epilogue and the frame match retail. Two source facts
  * recovered that: the coordinate stores go through a struct view of the rectangle returned
@@ -34,22 +44,44 @@ extern float D_001AE5E4[] MACRO_ADDR;
 extern float D_001AE5E8 __attribute__((sda));
 
 typedef struct { float x, y, w, h; } ListRect;
+typedef struct {
+    char pad[0x434];
+    ListRect *origin;
+    int unknown438;
+    int selected;
+    int enabled;
+    int count;
+    int showSpecial;
+} ListMenu;
 typedef struct { short pad[4]; short offset; short pad2; void (*call)(char *); } ListVtable;
-typedef struct { char bytes[72]; } ListSlot;
+typedef struct {
+    ListRect *position;
+    ListRect *scale;
+    void *parameter08;
+    unsigned int *colors;
+    float *visibility;
+    char lifetime[0x1C];
+    ListVtable *table;
+    void *metrics;
+    unsigned long style;
+    char *text;
+    int alignment;
+} ListSlot;
 
 void func_00348EC0(char *o)
 {
     int color = func_002A9588(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
     int start, i, n, sp;
+    ListMenu *menu = (ListMenu *)o;
 
-    if (*(int *)(o + 0x440)) {
+    if (menu->enabled) {
         func_00336320(o);
         func_00336320(o + 0x130);
         func_00336320(o + 0x4C);
         func_00336320(o + 0x98);
         func_00336320(o + 0xE4);
         sp = (int)(D_001AE5F0 * D_001B23A4[0] + 0.5f);
-        n = *(int *)(o + 0x444);
+        n = menu->count;
         start = (int)((float)(D_001A7344[0] >> 1) - (float)sp * ((float)n * 0.5f));
         if (n > 0) {
         i = 0;
@@ -59,25 +91,25 @@ void func_00348EC0(char *o)
             ListVtable *v;
             int c;
 
-            if (i == 7 && !*(int *)(o + 0x448))
+            if (i == 7 && !menu->showSpecial)
                 continue;
             p = (ListRect *)func_00335E10(o + 0x17C);
-            p->x = D_001AE5D0 + (*(float **)(o + 0x434))[0];
+            p->x = D_001AE5D0 + menu->origin->x;
             p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
-            c = i == *(int *)(o + 0x43C) ? color : 0x55F0C070;
+            c = i == menu->selected ? color : 0x55F0C070;
             *func_00335E20(o + 0x1C8) = c;
             func_00336320(o + 0x17C);
             p = (ListRect *)func_00335E10(o + 0x1C8);
-            p->x = D_001AE5D0 + (*(float **)(o + 0x434))[0];
+            p->x = D_001AE5D0 + menu->origin->x;
             p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
             func_00336320(o + 0x1C8);
             slot = (char *)&((ListSlot *)(o + 0x218))[i];
             p = (ListRect *)func_00335E10(slot);
-            p->x = D_001AE5E0 + (*(float **)(o + 0x434))[0];
+            p->x = D_001AE5E0 + menu->origin->x;
             p->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)start;
             v = *(ListVtable **)(o + i * 72 + 0x248);
             v->call(slot + v->offset);
-        } while (++i < *(int *)(o + 0x444));
+        } while (++i < menu->count);
         }
     }
 }

@@ -166,6 +166,22 @@ Patch `0059` adds `--r5900-sign-bit=unsigned` for those measured cases;
 64-bit sign-bit constant changes, from `addiu -1; dsll32 31` to
 `ori 0x8000; dsll32 16`. Other constants keep their previous encoding.
 
+Patch `0061` adds the separate opt-in `--r5900-unsigned32-mask=sn` profile.
+For the positive 64-bit value `0x00000000ffffffff`, SN's constant loader uses
+`addiu -1; dsrl32 0`; the default GNU profile uses `lui 0xffff; dsrl32 0`.
+Both produce the same value in two instructions. The option selects only that
+seed when loading a 64-bit constant on the R5900. `--r5900-unsigned32-mask=gnu`
+explicitly restores the unchanged default; SDK objects are not opted in.
+
+The choice follows [RAC1's public assembler model](https://github.com/OpenRAC/rac1-decomp/blob/1d8228cc0c81da7bc2bdc3e77479ee050e0ef434/tools/ps2eeas_dli.py)
+and an independent authored SN assembly control. It does not rewrite compiler
+instructions or depend on a function/address. The `test_dli_masks.py` controls
+cover three spellings of the positive mask, its neighbors, negative and wider
+masks, five registers plus a zero-register selector control, unchanged
+word/address macros, option rejection and
+composition with the isolated sign-bit profile. Use standard per-file
+`-Wa,--r5900-unsigned32-mask=sn` flags and qualify each complete unit and release.
+
 Pass assembler options per file through standard `-Wa,` syntax in
 `config/cflags.txt`, for example:
 

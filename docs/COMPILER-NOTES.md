@@ -1254,6 +1254,43 @@ Two sign-bit loads need a zero-extending seed. Patch 0059 exposes per-object
 same per-file flag table. Explicit signed restores default; invalid/missing values
 fail. Same value does not mean the same retail encoding.
 
+### Positive 32-bit masks in 64-bit registers
+
+The libm word-insertion sequences use a second assembler choice. For the
+positive value `0x00000000ffffffff`, the GNU seed is `lui 0xffff; dsrl32 0`,
+while SN uses `addiu -1; dsrl32 0`. Both produce the same 64-bit value in two
+instructions. The SN form is present at five independent sites in `floor`,
+`fmod`, `log` and `log10` in each release. It also follows
+[RAC1's public assembler model](https://github.com/OpenRAC/rac1-decomp/blob/1d8228cc0c81da7bc2bdc3e77479ee050e0ef434/tools/ps2eeas_dli.py)
+and independently authored SN controls.
+
+Patch 0061 exposes `-Wa,--r5900-unsigned32-mask=sn` per file. The default and
+explicit `gnu` profile retain the previous output, including SDK objects.
+Selection requires a 64-bit R5900 load with an actually zero high word and
+an all-ones low word; a destination of `$zero` must not broaden that condition.
+No compiler-authored operation, register, value or relocation is rewritten.
+The 16 DLI tests cover exact encodings, values, neighbors, wider/signed masks,
+five ordinary registers, zero destinations, unchanged `li`/`la`, invalid options
+and composition with the independent sign-bit profile.
+
+The complete native-double `log` and `log10` bodies use this profile together
+with their existing quad-save/fast-math settings. Their compiler-owned scalar
+pools are 96 and 32 bytes, respectively, contiguous and disjoint in each
+release. In `log10`, `two54` and zero are immediate expressions: declaring
+storage for them produced text that matched but a wrong 48-byte pool overlapping
+`log`. No pool bytes, aliases or padding were invented to fix it. Whole-program
+validation must include these complete pools, not just the text comparisons.
+
+The linked build also encountered an existing 48-byte formatter pool containing
+four string records with padding followed by numeric constants. Its source,
+profile, old assembler object and new assembler object are byte-identical; the
+failure was the numeric-only assembly-input grammar. The interleaver now accepts
+only annotated `.asciz` records whose literal/NUL bytes and explicit zero
+alignment agree. It still requires a whole, byte-equal, relocation-free input
+section and rejects ambiguous or partial records. Bare strings without that
+evidence remain unsupported. Tests cover mixed records, aliases, adjacent pools,
+escaping and rejection cases; no string or compiler section is rewritten.
+
 ## Reading output and identifying limits
 
 Compare R5900 words and resolved relocations, not mnemonics alone. Move can become

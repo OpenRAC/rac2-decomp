@@ -43,6 +43,14 @@ bytes. Mixed relocated/scalar pools, overlapping claims and unplaced destination
 fail closed; no instruction or table value is changed. A local function check alone does not qualify its data:
 run the strict linked build for every applicable release.
 
+The same relocation-free pool may mix numeric data and literal strings. An
+annotated `.asciz` record is accepted only when its bounded ASCII/C-escape
+spelling agrees with the following raw-byte annotation, including the NUL.
+Additional zero bytes require explicit alignment directives that account for
+them exactly. Ambiguous escapes, labels before that padding, nonzero padding,
+partial records and unexplained gaps are rejected. Surrounding data and labels
+remain at their measured addresses; branch tables retain their stricter rules.
+
 ### Build in parallel
 
 The 28 programs do not depend on each other, so `all` and `levels` build several at once

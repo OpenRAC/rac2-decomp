@@ -6,7 +6,7 @@
 # Run it on 32-bit-capable x86-64 Linux (gcc -m32), e.g. in the rac2-linux container
 # (docs/BUILDING.md). It downloads the two inputs to build/downloads/ and checks them,
 # applies the patches in tools/compiler/patches/ (Lombyte's sce-991111b stack, MIT, with its
-# retired 0034 and its earlier 0020), the 0057/0058 compiler profiles, the 0059 assembler option and the
+# retired 0034 and its earlier 0020), the 0057/0058 compiler profiles, the 0059/0061 assembler options and the
 # transformers in tools/compiler/transformers/,
 # refuses to build unless the patched sources hash as listed below, and builds.
 #
@@ -42,6 +42,7 @@ patch -R -p1 -s < "$HERE"/patches/0001-r5900-quad-saves.patch   # the retail sav
 git apply --whitespace=nowarn "$HERE"/patches/0058-*.patch       # the opt-in -mastra-quad-saves switch
 git apply --whitespace=nowarn "$HERE"/patches/0059-*.patch       # per-object sign-bit seed selection
 git apply --whitespace=nowarn "$HERE"/patches/0060-*.patch       # leading-ones dli: lui-anchored first field
+git apply --whitespace=nowarn "$HERE"/patches/0061-*.patch       # opt-in SN positive unsigned32-mask seed
 T=$HERE/transformers
 python3 $T/neutralise_timode_anchor.py gcc/config/mips/mips.c
 python3 $T/enable_loop_padding.py gcc/config/mips/mips.h
@@ -89,7 +90,7 @@ d75635500f55f4c7c626e925f6e8146c4e33d3865314eca4ae9bb3860fe7eeab  gcc/toplev.c
 5bc40b011473cd756c2a6128b6106fd2e96569c8e92bba1a8f9bc00f166feac2  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 ba947e44256e3d5144e353a4976aac931a4941acc8dcb1dc0fda99fa8b7b504a  gcc/flow.c
-319eba2cdeb963cd02b47cc8e2fe2a5d509a36670ecb1f6d8216f817e1fd9cdb  gas/config/tc-mips.c
+226fd7150b8404b59bdf1b480054dc0de745c2e10341955e25739bc58f135445  gas/config/tc-mips.c
 a790ca0e7cc378af98fa3f942734c7217cc91f2d2db2f6c2d62d69de8780e1e6  gcc/reload1.c
 2f6ffa23d379d620ec38db4e527b2cbd5583865195cd8b364aa2c1ce07433faf  gcc/loop.c
 SUMS

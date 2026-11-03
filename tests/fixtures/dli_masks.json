@@ -1,4 +1,10 @@
 [
+  {"name":"unsigned32_mask","literal":"0xffffffff","value":"00000000ffffffff","words_r2":["3c02ffff","0002103e"],"baseline_words_r2":["3c02ffff","0002103e"],"changed_by_fix":false},
+  {"name":"unsigned32_mask_decimal","literal":"4294967295","value":"00000000ffffffff","words_r2":["3c02ffff","0002103e"],"baseline_words_r2":["3c02ffff","0002103e"],"changed_by_fix":false},
+  {"name":"unsigned32_mask_zero_padded","literal":"0x00000000ffffffff","value":"00000000ffffffff","words_r2":["3c02ffff","0002103e"],"baseline_words_r2":["3c02ffff","0002103e"],"changed_by_fix":false},
+  {"name":"unsigned32_mask_lower_neighbor","literal":"0xfffffffe","value":"00000000fffffffe","words_r2":["3402ffff","00021438","3442fffe"],"baseline_words_r2":["3402ffff","00021438","3442fffe"],"changed_by_fix":false},
+  {"name":"unsigned32_mask_upper_neighbor","literal":"0x100000000","value":"0000000100000000","words_r2":["34028000","00021478"],"baseline_words_r2":["34028000","00021478"],"changed_by_fix":false},
+  {"name":"positive_low_mask31","literal":"0x7fffffff","value":"000000007fffffff","words_r2":["3c027fff","3442ffff"],"baseline_words_r2":["3c027fff","3442ffff"],"changed_by_fix":false},
   {"name":"zero","literal":"0","value":"0000000000000000","words_r2":["24020000"],"baseline_words_r2":["24020000"],"changed_by_fix":false},
   {"name":"one","literal":"1","value":"0000000000000001","words_r2":["24020001"],"baseline_words_r2":["24020001"],"changed_by_fix":false},
   {"name":"minus_one","literal":"-1","value":"ffffffffffffffff","words_r2":["2402ffff"],"baseline_words_r2":["2402ffff"],"changed_by_fix":false},

@@ -1,3 +1,15 @@
+/* Complete-owner follow-up, 2026-11-03; no linked match.
+ * One new check under -O2 -G8 -ffunction-sections: int32 byte-offset cursors
+ * over the actual four 20-point rows stay 916/916 bytes, 0/27 US placements.
+ * The first residual moves to +0x4C (stack/cursor capture); equal extent and
+ * frame 0x1F0 do not mean equal code. The earlier indexed body below is kept.
+ * The offset probe formed pointers only inside j>0, so it never needed a
+ * D-16 pointer outside the 1280-byte owner. Both forms use complete 16-byte
+ * points, the 320-byte local vertex array and the measured draw/particle ABI.
+ * No new source witness resolves the existing inner-loop source lifetime.
+ * Reopen with independently grounded ownership/capture evidence, not an
+ * invented alias, spill or before-owner pointer.
+ */
 /* Claude Opus 5.5 xhigh, v2208, 2026-11-03; not linked.
  * Best check: USA v1.01, -O2 -G8 -ffunction-sections (the L00_003B9CB8-g8.c unit),
  * 916/916 bytes, 0/27 places; declarations are included below. Improved from 912:

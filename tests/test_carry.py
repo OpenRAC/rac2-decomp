@@ -76,6 +76,34 @@ class CrossIdentity(unittest.TestCase):
 
 
 class Carry(unittest.TestCase):
+    def test_core_only_repairs_leave_level_rows_and_reject_changed_residue_atomically(self):
+        for base in (0x110000, 0x210008, 0x310010):
+            with self.subTest(base=base), tempfile.TemporaryDirectory() as d:
+                boot, catalogue = Path(d)/"boot.tsv", Path(d)/"levels.tsv"
+                boot.write_text("# name\taddress\tsize\n" +
+                    f"func_001158F4\t{base:08X}\t460\n" +
+                    f"func_0011B320\t{base+0x200:08X}\t4\n" +
+                    f"func_0011B450\t{base+0x300:08X}\t4\n" +
+                    f"unrelated\t{base+0x400:08X}\t4\n")
+                catalogue.write_text("# name\tkind\tsize\tfingerprint\tlevels\tplaces\n"
+                    "untouched\tshared\t4\tsame\t1\t00:00400000\n")
+                with patch.multiple(levels, BOOT_FUNCTIONS=boot, CATALOGUE=catalogue), \
+                     patch.object(levels, "level_text", side_effect=AssertionError("core-only repair read a level")):
+                    carry.refresh_entries()
+                    self.assertEqual(levels.read_boot_functions(),
+                        [("func_001158F4",base+4,456), ("unrelated",base+0x400,4)])
+                    self.assertEqual(levels.read_catalogue(),
+                        [("untouched","shared",4,"same",[(0,0x400000)])])
+                    first = boot.read_bytes(),catalogue.read_bytes()
+                    carry.refresh_entries()
+                    self.assertEqual((boot.read_bytes(),catalogue.read_bytes()),first)
+                    with boot.open("a") as f:
+                        f.write(f"func_0011B450\t{base+0x300:08X}\t8\n")
+                    invalid = boot.read_bytes(),catalogue.read_bytes()
+                    with self.assertRaisesRegex(ValueError,"residue changed"):
+                        carry.refresh_entries()
+                    self.assertEqual((boot.read_bytes(),catalogue.read_bytes()),invalid)
+
     def test_legacy_preprologue_entry_refresh_keeps_load_end_and_identity(self):
         name = "func_L05_0042AFE0"
         load = (0x31 << 26) | (28 << 21) | (1 << 16) | 0x3456

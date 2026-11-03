@@ -1,16 +1,22 @@
-/* Opus 5.5 xhigh, v1693, 31 October 2026. CATALOGUE boundary, not a C near miss.
- * tools/check.py: 848 bytes, expected 856, 0 of 28 places, because the row starts 8 bytes early.
- * Compared from row start + 8 with the same Placement.derive check.py uses (a private script):
- * 28 of 28 places exact, -O2 -G8 -ffunction-sections, boot entry 0x002DC3D0. No linked build run.
- * Nothing differs inside the body. Its jump table, read from retail at 0x0026CDF0, gives the
- * case layout below (0; 1,5,8,12,16; 2,6,9,13,17; 3; 4; 7; 10; 11; 14; 15; 18; 19).
- * The row's first two words are `sw $zero,0x50($a0); nop`, after func_002DC228's completed return.
- * They cannot belong to this body: 0x50 is the state this function switches on and advances, so
- * clearing it on entry would leave states 1 to 19 unreachable. Direct scans of all 28 programs
- * found no pointer, call, jump, branch or lui/addiu pair to +0, +4 or +8, so no caller proves it.
- * To land: add "func_002DC3C8": (856, 8) to FUNCTION_ENTRY_OFFSETS in tools/levels.py, regenerate
- * the catalogue, and move this to src/game/002DC3C8-g8.c (its own unit, for the jump table).
- * Declarations needed follow. */
+/* 3 November 2026: entry hypothesis remains held after a fresh US 28-placement
+ * audit. The canonical name is absent from the PAL and US2 catalogues.
+ * The 856-byte row begins with `sw $zero,0x50($a0); nop`; the previous body's
+ * complete control flow ends before it (boot return 0x002DC3BC, delay slot
+ * 0x002DC3C0, alignment nop 0x002DC3C4). No direct transfer, aligned loaded-word
+ * candidate or straight-line address construction identifies +0, +4 or +8.
+ * EE scans exclude .vutext; arbitrary computed indirect targets are unresolved.
+ * The twenty words at boot 0x0026CDF0 are internal case targets consumed by
+ * the state-indexed load and `jr $a0`, not callback witnesses for the entry.
+ * Resetting state before a multi-state switch is suspicious, but does not prove
+ * that the store belongs to a different function. No entry correction is made.
+ *
+ * Historical retained measurement (31 October): this ordinary C body was
+ * 848 bytes under -O2 -G8 -ffunction-sections, 0/28 against the unchanged row;
+ * a private +8 comparison reported 28/28. That is not boundary or linked-build
+ * proof and was not rerun here. Preserve the complete draft without promotion.
+ * Reopen on an independently traced call/callback entry or object-origin
+ * evidence that distinguishes +8 from the store-prefixed entry.
+ */
 #include "common.h"
 /* The menu system D_001F2840 and the input words at D_00138180. */
 typedef struct { char pad[0x1c0]; u64 held; } InputC3;

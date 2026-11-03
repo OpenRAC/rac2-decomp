@@ -1,3 +1,15 @@
+/* Object and ABI review, 3 November 2026; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections -ffast-math -g.
+ * The latest upstream body below remains unchanged. Its packet is 144 bytes,
+ * transform 64 bytes and vector slots 16 bytes. The fresh typed control used
+ * a real 12-byte screen result sharing its 16-byte vector slot: 5788/5796
+ * bytes, 0/27 US places. It did not close the position/p20 spill residual.
+ * That control is preserved privately; the useful upstream body is retained
+ * with its recorded 5796-byte result, not rerun unchanged in this pass.
+ * Reopen on independent flare-loop position lifetime and spill evidence,
+ * not another pointer permutation or profile sweep. No functional credit.
+ * Earlier measurements follow.
+ */
 /* Opus 5.5 xhigh (opus-1), task v2122, 3 November 2026: best check.py result 5796/5796 bytes (1449 of 1449
  * instructions), 0/27 places, not exact; difflib 1231 opcode+register aligned (was 1180), 480 equal at the
  * same address (was ~450). Profile: -O2 -G8 -ffunction-sections -ffast-math -g, gp scalars need
