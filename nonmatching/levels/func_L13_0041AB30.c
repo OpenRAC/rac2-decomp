@@ -1,17 +1,25 @@
-/* Nonmatching C reconstruction.
- * Profile: game -O2 -G8 -ffunction-sections -frac2-qcopy -g.
- * Measured size: 464 emitted bytes versus 460 retail bytes.
- * US: 0/2 local places; PAL: 0/2; US2: 0/2. All rows are present.
- * These unchanged-body checks remain failures; no strict build was run.
- * Hoisting the destination base at +0x420 across prior loops creates an
- * extra saved register. Copy controls tie. Reopen with independently
- * measured pointer lifetimes and allocator evidence.
+/* Nonmatching C reconstruction (opus-1, v2196, USA v1.01, 2026-11-03).
+ * Tier: near miss. Profile: -O2 -G8 -ffunction-sections -g in its own unit
+ * (-g supplies the two nops before each div.s).
+ * Best cdiff: 460 compiled bytes / 460 retail, 0 of 2 places; one block differs.
+ * Only remaining difference, nested-loop preheader: retail computes the row
+ * v1 = (i<<4) + s, copies it (daddu v0,v1,zero), then s0 = v1+0x460 and
+ * s1 = v0+0x560; here there is no copy and an alignment nop follows.
+ * The integer row sum below fixes the addu operand order (pointer arithmetic
+ * puts s first); `char *p = i * 16 + s;` is otherwise identical.
+ * Computing idx = s + 0x18 inside the last loop reproduces retail's PRE copy
+ * into a2; the current/next index split reproduces v1/s4.
+ * Tied or worse: two pointer bivs, two identical row bases, recomputing the
+ * row inside the inner loop, q = p + j*64, a struct with [4][4] vec arrays.
+ * Likely cause: retail's copy destination is a separate pseudo still live at
+ * cse2 (e.g. a reduced row giv from loop pass 1 re-reduced in pass 2).
+ * All declarations are below.
  */
 #include "common.h"
-typedef int Quad __attribute__((mode(TI)));
-extern void func_00282CC0(void *, void *, void *);
+
+extern void func_00282CC0(char *, char *, char *);
 extern float func_00283CE0(int);
-extern unsigned int func_00283D38(int, int, float);
+extern int func_00283D38(int, int, float);
 extern int D_L13_001B1624 __attribute__((sda));
 extern int D_L13_001B1628 __attribute__((sda));
 extern int D_L13_001B1650 __attribute__((sda));
@@ -19,51 +27,40 @@ extern int D_L13_001B1654 __attribute__((sda));
 extern int D_L13_001B1658 __attribute__((sda));
 void func_L13_0041AB30(char *obj)
 {
-    char *state = *(char **)(obj + 0x68);
-    unsigned char *indices;
-    char *dst, *src;
-    int i, j, k;
-    float numerator, denominator;
-    if (*(short *)(state + 0x12) != 0) {
-        *(short *)(state + 0x12) -= 1;
-        indices = (unsigned char *)state + 0x18;
-        src = state + 0x260;
-        dst = state + 0x60;
-        for (j = 22; j >= 0; --j) {
-            func_00282CC0(dst, dst, src);
-            dst += 16;
-            src += 16;
-        }
-        for (i = 0; (float)i < 4.0f;) {
-            int next = i + 1;
-            char *row = state + i * 16;
-            dst = row + 0x460;
-            src = row + 0x560;
-            for (j = 2; j >= 0; --j) {
-                func_00282CC0(dst, dst, src);
-                dst += 64;
-                src += 64;
-            }
-            i = next;
-        }
-        dst = state + 0x420;
-        for (k = 0; k < 4; ++k) {
-            *(Quad *)dst = *(Quad *)(state + 0x20 + indices[k] * 16);
-            dst += 16;
-        }
-    }
-    if (*(short *)(state + 0x12) > D_L13_001B1624) {
-        numerator = func_00283CE0(*(short *)(state + 0x12) - D_L13_001B1624);
+    char *s = *(char **)(obj + 0x68);
+    int j;
+    if (*(short *)(s + 0x12)) {
+        (*(short *)(s + 0x12))--;
         {
-            int bound = D_L13_001B1624;
-            denominator = func_00283CE0(*(int *)(state + 0x620) - bound);
+            int i;
+            for (i = 0; i < 23; i++)
+                func_00282CC0(s + 0x60 + i * 16, s + 0x60 + i * 16, s + 0x260 + i * 16);
         }
-        *(int *)(state + 0x14) = func_00283D38(D_L13_001B1654, D_L13_001B1650, numerator / denominator);
-    } else if (*(short *)(state + 0x12) > D_L13_001B1628) {
-        numerator = func_00283CE0(*(short *)(state + 0x12) - D_L13_001B1628);
-        denominator = func_00283CE0(D_L13_001B1624 - D_L13_001B1628);
-        *(int *)(state + 0x14) = func_00283D38(D_L13_001B1658, D_L13_001B1654, numerator / denominator);
-    } else {
-        *(int *)(state + 0x14) = 0;
+        {
+            int i = 0;
+            do {
+                int next = i + 1;
+                char *p = (char *)(i * 16 + (int)s);
+                for (j = 0; j < 3; j++)
+                    func_00282CC0(p + 0x460 + j * 64, p + 0x460 + j * 64, p + 0x560 + j * 64);
+                i = next;
+            } while (i < 4.0f);
+        }
+        {
+            int i;
+            for (i = 0; i < 4; i++) {
+                unsigned char *idx = (unsigned char *)s + 0x18;
+                qcopy(s + 0x420 + i * 16, s + 0x20 + idx[i] * 16);
+            }
+        }
     }
+    if (*(short *)(s + 0x12) > D_L13_001B1624) {
+        float a = func_00283CE0(*(short *)(s + 0x12) - D_L13_001B1624);
+        float b = func_00283CE0(*(int *)(s + 0x620) - D_L13_001B1624);
+        *(int *)(s + 0x14) = func_00283D38(D_L13_001B1654, D_L13_001B1650, a / b);
+    } else if (*(short *)(s + 0x12) > D_L13_001B1628) {
+        float a = func_00283CE0(*(short *)(s + 0x12) - D_L13_001B1628);
+        float b = func_00283CE0(D_L13_001B1624 - D_L13_001B1628);
+        *(int *)(s + 0x14) = func_00283D38(D_L13_001B1658, D_L13_001B1654, a / b);
+    } else *(int *)(s + 0x14) = 0;
 }

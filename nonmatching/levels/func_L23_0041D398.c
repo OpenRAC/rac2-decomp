@@ -1,29 +1,31 @@
-/* GPT-6.1 Sol (high), 29 October 2026: retained, unlinked near miss.
- * USA v1.01, -O2 -G8 -ffunction-sections: 1432/1432 bytes, 0/1 places.
- * check.py: first instruction difference +0x50; retail 0xC0 frame and all
- * seven saved-GPR roles recovered. No full linked build was run.
+/* Claude Opus 5.5 (xhigh), 2 November 2026: retained, unlinked near miss.
+ * USA v1.01, -O2 -G8 -ffunction-sections (compile as an L23_0041D398-g8.c
+ * unit): 1432/1432 bytes, 0/1 places; first real difference +0x380, 99 of
+ * 358 cdiff rows (the sol-high draft differed from +0x50). No linked build.
  *
- * Improvements over the 28 October draft: a real union expresses the disjoint
- * state/table-cursor phases without keeping a second state pointer live.
- * The volatile declaration of the flag preserves both observed byte reads
- * at 0041D3C8 and 0041D43C; there are no per-access casts. The true flag path
- * skips entry cleanup when its timer is still below the threshold. Loading
- * the old part only after testing the replacement reproduces the transfer
- * loop's branch-likely and all four qcopy sequences.
+ * Solved here: the opening flag branches. Each arm of the flag test has its
+ * own func_002A6C58/func_L23_0041D9B0 kill sequence and return (no goto):
+ * jump2 cross-jumps the identical call tails and reload_cse deletes the
+ * redundant a0 copy on the true arm, giving retail's beqz/daddu a1 and b/nop
+ * shapes. The second, re-read flag test is real (volatile byte, two lbu).
  *
- * Remaining: the first true-flag branch hoists object/A1 setup differently;
- * post-transfer constant scheduling differs. Both final effect sequences
- * hoist the table offset and index parity too early, choose ordinary rather
- * than likely exit branches, and form the old part's +0xD0 vector address
- * in the following vector call's slot instead of the random call's slot.
- * Their stack-argument setup also schedules differently. Parity temporaries,
- * assignment placement, unsigned indices and nested call spelling did not
- * recover the retail schedule. NOT_SDA on the flag keeps its high half in
- * an extra live register; disabling GCSE does not fix the function.
- * Reopen with independent evidence for the final phase's source/call shape.
+ * Remaining, all after +0x37C: post-transfer constant order (retail sets 10
+ * before 1); both exits `timer & 15` / `timer & 31` use bnez where retail has
+ * bnel with the annulled ld s0; both effect phases differ in schedule (retail:
+ * jal 77E0 [a0=5]; daddu s2,v0; addiu s1,s1,0x358; sll v0,s2,2; ...; addu
+ * s1,s1,v0; lw s0,0(s1); jal rand [addiu s0,0xD0]; ... jal rand [andi
+ * s2,s2,1]) and in stack-argument store order. Index and cursor are
+ * call-crossing, so haifa sched1 gives their in-place updates no anti-dep on
+ * the last call and hoists them.
+ * Tried: per-phase block-scoped `int index, parity; char *old, **base;` with
+ * `base = cursor.state->parts; cursor.parts = base + index; parity = index
+ * & 1` gives exactly retail's effect-phase order (a0=5 slot, andi in the
+ * second rand slot, tied to index), but local-alloc then takes s0/s1 for
+ * old/index, so the cursor moves to s2 and s1/s2 swap function-wide (101
+ * rows). Retail's s1 cursor / s2 index implies index is a global pseudo;
+ * reopen by finding a global-index shape that keeps that schedule.
  * All required declarations follow; the original INCLUDE_ASM stays in src/.
  */
-
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 /* Two five-part windows share this ten-pointer table. */
@@ -62,26 +64,28 @@ void func_L23_0041D398(char *object) {
     float scale;
     cursor.state = *(PartState **)(D_L23_001B1484 + 0x68);
     if (D_001A7AFD) {
-        if (*(unsigned short *)(object + 0x96) <= D_L23_001B1468 + 60) goto update_parts;
+        if (*(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
+            func_002A6C58(object, 0, 3);
+            func_L23_0041D9B0();
+            return;
+        }
     } else {
-        if (*(unsigned short *)(object + 0x96) <= D_L23_001B1468 + 200) goto entry;
-        if (func_002F5D10()) goto entry;
+        if (*(unsigned short *)(object + 0x96) > D_L23_001B1468 + 200 && !func_002F5D10()) {
+            func_002A6C58(object, 0, 3);
+            func_L23_0041D9B0();
+            return;
+        }
+        if (!D_001A7AFD && *(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
+            char *entryState;
+            if (!D_L23_001B13D0) return;
+            entryState = *(char **)(D_L23_001B13D0 + 0x68);
+            entryState[13] = 1;
+            entryState[8] = 0;
+            func_L00_003294F0((unsigned char *)D_L23_001B13D0, 1);
+            D_L23_001B13D0 = 0;
+            return;
+        }
     }
-    func_002A6C58(object, 0, 3);
-    func_L23_0041D9B0();
-    return;
-entry:
-    if (!D_001A7AFD && (unsigned short)*(short *)(object + 0x96) > D_L23_001B1468 + 60) {
-        char *entryState;
-        if (!D_L23_001B13D0) return;
-        entryState = *(char **)(D_L23_001B13D0 + 0x68);
-        entryState[13] = 1;
-        entryState[8] = 0;
-        func_L00_003294F0((unsigned char *)D_L23_001B13D0, 1);
-        D_L23_001B13D0 = 0;
-        return;
-    }
-update_parts:
     if (D_L23_001B1434) {
         int i;
         cursor.parts = cursor.state->parts + 5;
