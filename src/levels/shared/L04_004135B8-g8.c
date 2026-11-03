@@ -1,10 +1,6 @@
-/* GPT-6.1 Sol high worker, USA v1.01, game -O2 -G8 -g -ffunction-sections.
- * 1152/1152 bytes, 0/2 places. Four prologue instructions have reversed object/state copy and save order; the branch at +0xC0 targets the instruction after retail's hazard nop. All other non-relocation instructions agree. Direct member addresses recovered retail's saved registers; explicit long-lived idx/frac/position locals did not. The facing-angle test follows both route-sampling branches.
- * Required declarations and types are included below. No linked match claimed.
- */
 #include "common.h"
 typedef struct {
- int count; char pad4[12]; float points[1][4];
+ int count; char pad4[12]; float points[0][4];
 } Route1006;
 typedef struct {
  char pad0[0x310]; float progress;
@@ -25,7 +21,8 @@ typedef struct {
 
 extern int D_L04_001B08F0 __attribute__((sda));
 extern int D_L04_001A8FE4;
-extern void func_L04_00412EC0(void *,void *);
+/* Route selection takes the object only; it reads its own state pointer. */
+extern void func_L04_00412EC0(void *);
 extern float func_L04_00410788(void *,void *,void *,void *,int,int);
 extern float func_00282E80(void *,void *);
 extern float func_00283CE0(int);
@@ -40,9 +37,10 @@ extern int func_L04_00400AB0(void *,void *,int);
 extern void func_002C96F8(float,float,void *,void *,void *,void *);
 extern void func_00282CD8(void *,void *,void *);
 
+/* Advance the sampled route and update its bounded lateral offset. */
 void func_L04_004135B8(char *m,RouteState1006 *s) {
  int old,i; float d,t; float v[4] __attribute__((aligned(16))); float out[4] __attribute__((aligned(16)));
- func_L04_00412EC0(m,s);
+ func_L04_00412EC0(m);
  s->progress=func_L04_00410788(m,s,&s->pathIndex,&s->pointIndex,D_L04_001A8FE4,D_L04_001B08F0);
  old=s->routeIndex;
  d=func_00282E80(&s->routePos[0],m+0x10);

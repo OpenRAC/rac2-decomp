@@ -1,3 +1,7 @@
+/* 2 November 2026 retail recheck; this supersedes conflicting historical notes below.
+ * Fresh US corrects stale retained note:34C458 is addiu sp,sp,+0x20 (positive residue), not negative prologue. True coherent body starts34C460(+16), with loaded pointer286890->34C460. Prefix follows prior completed return and has no external static entry. Reopen on reviewed16-byte entry correction; old+8/280-byte body hypothesis is superseded.
+ * No matching credit, generator change or ASM_FUNC classification.
+ */
 /* func_L24_0034C450 (288 bytes, 1 place) -- NEAR MISS, not integrated.
    state: the catalogue's extent is eight bytes too long: it starts at 0x34C450
    on a `sw $t3,0x40($v1)` that belongs to the code before this function (the

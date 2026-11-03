@@ -1,3 +1,8 @@
+/* 2 November 2026:
+ * Correct the ignored pointer returns of func_L04_0030C4C0 and func_0032C700 using their matched
+ * definitions. Retained 1840/1840 bytes, 0/2 US placements; real callback/result declarations do
+ * not close the remaining frame-local addressing and allocation differences. No complete match.
+ */
 /* GPT-6.1 Sol (high), task v1282, 29 October 2026.
  * Game -O2 -G8 -ffunction-sections, USA v1.01: 1840/1840 bytes,
  * 0/2 places (Barlow/Notak); frame matches 0x100. All declarations below.
@@ -53,10 +58,10 @@ extern void func_002ACB48(void *,float);
 extern float func_L00_0031CDD0(void *,void *,int,float,float);
 extern unsigned char *func_L04_003EDD40(void *,void *);
 extern void func_002A7A00(void *,float,float);
-extern void func_L04_0030C4C0(void *,void *,void *,void *,void *,void *,int,int,int);
+extern void *func_L04_0030C4C0(void *,void *,void *,void *,void *,void *,int,int,int);
 extern void func_002A7750(void *,int,int);
 extern int func_002E5CF8(int,int,void *);
-extern void func_0032C700(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
+extern char *func_0032C700(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
 extern void func_002A6C58(void *,int,int);
 void func_L04_003EE090(unsigned char *m)
 {

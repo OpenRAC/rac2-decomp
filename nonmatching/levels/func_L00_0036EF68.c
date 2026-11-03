@@ -1,3 +1,11 @@
+/* 2 November 2026: current R5900 retail reads in USA v1.01, PAL and USA v2.00
+ * show a live working $at across lw/and/or/sw, trapping addi/add instructions,
+ * and explicit hazard padding. These are handwritten-assembly signatures,
+ * not just a C register-allocation miss. Keep INCLUDE_ASM pending maintainer
+ * classification. Corrected the reconstructed packed flag to 0x80000000:
+ * retail's lui $t0,0x8000 sets bit 31, not bit 15. This corrected C has not
+ * been compiled; the measurements below belong to the older flag value.
+ */
 /* 0 of 14 places match - last line: 00_aranos_tutorial: 236 bytes, expected 248
  *
  * The attribute writer of func_L00_0036EF68. The body packs three six-bit
@@ -71,7 +79,7 @@ void func_L00_0036EF68(int *a, unsigned int a1, unsigned int a2, unsigned int a3
     rows = (Row *)(*(unsigned int *)ref_L00_0036EF68_00);
     base = (unsigned int)(rows + index);
     record = (Record *)D_L00_00226700[*(unsigned char *)((char *)a + 0x1D)];
-    value = (a1 << 2) | (a2 << 10) | (a3 << 18) | 0x8000u;
+    value = (a1 << 2) | (a2 << 10) | (a3 << 18) | 0x80000000u;
 
     n = *(unsigned short *)((unsigned char *)record + *(unsigned char *)((char *)a + 0x1F) * 2 + 0x78);
     q = (unsigned short *)(record->f34 + n);

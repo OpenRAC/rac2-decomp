@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract/lifetime review (USA v1.01 only).
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current check.py: 1304/1304 bytes, 0/2 places, first mismatch +0x154.
+ * The particle helper now has its actual pointer return. Named offset-count lifetime gives1288/1304; a real named emission-mode lifetime ties the1304-byte candidate with four spill-offset differences.
+ * Reopen: A new GCSE reaching-address count/lifetime that swaps third-vector and m+0x10 spill slots without changing other instructions.
+ * No linked or cross-release match is claimed. Earlier notes follow.
+ */
 /* sol-high, USA v1.01, -O2 -G8 -ffunction-sections.
  * Best check.py: 1304/1304 bytes, 0/2 places, first mismatch +0x154.
  * Four words differ: the third-vector pointer and m+0x10 pointer spill
@@ -21,7 +28,7 @@ extern void func_00283098(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_002ACB48(void *, float);
 extern float func_0033BB18(float, float);
-extern void func_L00_0033C0D0(void *, void *, void *, void *, int);
+extern void *func_L00_0033C0D0(void *, void *, void *, void *, int);
 extern void func_002E59F8(int);
 void func_L04_0040C368(unsigned char *m)
 {

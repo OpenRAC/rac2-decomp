@@ -157,7 +157,8 @@ each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
   prototype discs may be cited, naming the build, never as the evidence for a match. OpenRAC's
   docs/policy/SOURCING.md is the full policy.
 - **Follow RAC1's source practices.** Game functions use meaningful C and the reviewed
-  shared EE helpers in `include/common.h` (`qcopy`, `qcopy_nc`, `qzero`, `qzero_nc`). Do not paste
+  shared EE helpers in `include/common.h` (`qcopy`, `qcopy_nc`, `qzero`, `qzero_nc`,
+  `CpuSync`, `CpuEnableInt`). Do not paste
   instruction sequences into individual game functions. Public runtime-library target
   primitives (for example GCC's original `longlong.h` multiplication primitive) may be
   retained with their upstream provenance and licence, as in RAC1. Symbol aliases and

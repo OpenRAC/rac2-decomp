@@ -1,3 +1,11 @@
+/* 2 November 2026: three new bounded source trials used real named input
+ * masks and row/layout constants across the existing branches, following the
+ * shared PRE hash/spill-slot guidance. None improved the retained one-cause
+ * spill-slot miss: the mask-only and mask/stride forms remain 0/28 US places
+ * at +0x1B0 and alter later scheduling/address operands; naming the row base
+ * and count offset adds a pointer lifetime and regresses from +0xEC. The
+ * original source/profile below is retained. No linked match is claimed.
+ */
 #include "include_asm.h"
 
 /* func_003489E8 (boot, 1240 B): menu list update. G8: belongs at the end of

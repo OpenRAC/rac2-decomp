@@ -1,3 +1,9 @@
+/* 2 November 2026:
+ * Correct the actual ignored pointer returns of func_00308600, func_002BBCB0, func_L00_003A0DA0
+ * and func_00312B70, and the integer result of func_002E5CF8. The 80-byte aligned aggregate
+ * assignment reaches the current compiler quadword-copy lowering. Retained 2564/2572 bytes, 0/27
+ * US placements; the spill frame and FP/loop allocation remain different. No complete match.
+ */
 /* 1 November 2026: with compiler/block-move-quad, packet = D_L00_002A26A0 gives retail's lq/sq copy: 2564/2572,
  * 192 aligned words (412 before). Left: retail saves f26 and has four more spill slots in order; the frame is
  * 0x10 short. func_L00_0038E880 is the same routine family. */
@@ -57,14 +63,14 @@ extern void func_00282FB8(char *, char *, float);
 extern int func_00277F48(char *, int, char *, int, float);
 extern void func_002A9850(char *, char *, char *, int, int, int, int, int, float, float, float);
 extern int func_002A7820(int, int);
-extern void func_00308600(char *, char *, int, int, int);
+extern char *func_00308600(char *, char *, int, int, int);
 extern int func_00283CF0(float);
 extern int func_002AAFA0(int, int);
-extern void func_002BBCB0(char *, char *, int, int, int, int, int, int, float, float);
-extern void func_L00_003A0DA0(char *, char *, char *, int, int, int, int, int, float);
+extern char *func_002BBCB0(char *, char *, int, int, int, int, int, int, float, float);
+extern char *func_L00_003A0DA0(char *, char *, char *, int, int, int, int, int, float);
 extern void func_002AAF40(int *, int *, int *, int);
-extern void func_002E5CF8(int, int, char *);
-extern void func_00312B70(void *, char *, int, int);
+extern int func_002E5CF8(int, int, char *);
+extern char *func_00312B70(void *, char *, int, void *);
 #define V1306_MAT ((V1306Material *)(D_00139568[12] * 224 + (int)D_L00_00262570))
 #define V1306_FLAG (((V1306Material *)((unsigned)D_L00_00262570 + (unsigned)D_00139568[12] * 224))->flag != 0)
 void func_L00_0038DE70(char *object, char *direction, char *axis)

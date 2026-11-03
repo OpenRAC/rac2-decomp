@@ -1,50 +1,14 @@
-/* opus-1 (xhigh), v2041: NOT A MATCH. Best check.py result, default flags
- * (-O2 -G0 -ffunction-sections): 1564/1572 bytes, 0/1 USA places; 84 of 393
- * instructions differ after alignment (the previous draft's 1572-byte form: 109).
- * The raw row count is 280 only because the missing 8 bytes shift the tail.
- *
- * FORBIDDEN CONSTRUCT, DISCLOSED: `int regen = 1; if (regen) { ... } else { ... }`
- * is an always-true test on a placeholder condition. WORKER2 forbids it, so this
- * can only ever be reported as FAILED until the maintainers rule on it. The real
- * condition in the original source is unknown (retail decrements and clamps the
- * timer, then resets it to 2 and the alpha to 64 unconditionally).
- *
- * Why it is here: gcse's first cprop pass may not touch jumps, only the last does,
- * after PRE. The constant test therefore survives PRE and is then deleted. One
- * mechanism reproduces all of retail's: `addiu v1,zero,1` at +4 (cse reuses regen
- * in the dispatch `beq v0,v1`), no sp+0x10 insert in the default arm, `addiu s0,sp,
- * 0x10` per outer iteration, `addiu sN,sp,0x20` in the inner preheader with no spill
- * slot, and `daddu s5,s0,zero`. The else arm gives PRE's i+1 insert a block of its
- * own that dies with the test, so i+1 stays in place (`addiu s1,s1,1; ...; sw s1`).
- *
- * Confirmed by the dumps:
- * - Scan: the start label dies, so loop.c prints "Loop ... is phony": no hoist, no
- *   giv. Retail's `nop` at +324 is the aligned label reorg makes when it steals k++
- *   into the back branch's slot, which needs the LOOP_BEG note. Sequence right.
- * - Clear loop: `off` per row, then `D + off` inside the inner loop. The la in the
- *   loop breaks check_dbra_loop's count equality, so col stays a counter, and the
- *   tree is (m + r) + D, then +0x10. Tree order and registers now match retail.
- *
- * What still differs:
- * 1. +280: ours `mult v1,v1,a2`; retail `mult zero,v1,a2; mflo v1` (the last 8 bytes,
- *    with the alignment nop). m needs a use at its own loop depth so it is allocated
- *    to LO, then copied; the source of that copy was not found.
- * 2. Spill slots swapped: ours o+0x10 at 0x84, i+1 at 0x80; retail the reverse.
- * 3. +074: `daddu a0,sp,zero` and `swc1 f0,0xF0(fp)` in the opposite order.
- * 4. Case 0: ours keeps o+0x10 in s0 for its second use and the query in s1; retail's
- *    second use is `lw a0,0x80(sp)` and the query takes s0.
- * 5. Scan registers: ours first load v0, k a0, loop load v1; retail v1, a1, a0.
- * 6. Outer head: ours `lui v0; addiu v0; sll a0,s1,1`; retail `sll v0,s1,1; lui v1;
- *    addiu v1; addu a1,v0,v1; daddu a0,v0,zero`, a surviving PRE copy of i<<1. A
- *    likely cause is cse2 replacing the copy's uses across the skipped clamp block.
- * 7. Inner preheader: ours s2 axis, s1 offset; retail the reverse.
- *
- * Declarations are below. func_002761F8 and func_002A8C00 take `void *` fifth
- * arguments here, which conflicts with L06_00458138.c, so this needs its own unit.
- * Scratch caveat from the earlier draft stands: collision[112] is inferred, not a
- * recovered type. Corrections it made are kept: an owner hit still copies the new
- * position, a null hit emits at the collision point, the state index is reloaded per
- * segment, the <= 0 guard, the unsigned sound-active byte, the upper angle constant.
+/* 2 November 2026: lawful retained reconstruction, not a match.
+ * Removed the older draft's always-true regen test and unreachable else arm.
+ * Those branches were invented to influence compiler PRE/loop behavior; they
+ * do not describe runtime state and cannot support matching credit. The
+ * unconditional timer/alpha reset and trail regeneration remain explicit.
+ * Current check.py: 1596/1572 bytes, 0/1 USA v1.01 placement. The old
+ * 1564/1572-byte measurement depended on the diagnostic and does not qualify
+ * this source. Scratch collision[112] remains an inferred capacity;
+ * the owner-hit position copy, null-hit emission and real state reloads are
+ * preserved. Reopen matching work with evidence for the genuine original
+ * loop/control-flow and local lifetimes. No linked match is claimed.
  */
 #include "common.h"
 extern short D_L06_001B3790[] __attribute__((sda));
@@ -92,7 +56,6 @@ void func_L06_004587E8(char *o) {
     float pos[4];
     typedef union { NotakQuad q; float f[4]; } Vec;
     union { char collision[112]; struct { Vec velocity, axis; } vectors; } scratch;
-    int regen = 1;
     char *st = *(char **)(o + 0x68);
     int i, j, sign, snd;
     typedef NotakQuad Trail[6][4];
@@ -164,21 +127,17 @@ void func_L06_004587E8(char *o) {
     }
     for (i = 0; i < 6; i++) {
         if (--D_L06_001B3790[i] < 0) D_L06_001B3790[i] = 0;
-        if (regen) {
-            D_L06_001B3790[i] = 2;
-            D_L06_001B37A0[i] = 64;
-            func_002A7988(scratch.vectors.velocity.f, 0.2f, 0.2f);
-            if (func_00282DF0(scratch.vectors.velocity.f) > 0.2f) func_00282F20((char *)scratch.vectors.velocity.f, (char *)scratch.vectors.velocity.f, 0.2f);
-            qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][0], pos);
-            direction = 1.0f;
-            for (j = 1; j < 4; j++) {
-                func_00282CF0(scratch.vectors.axis.f, (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1]), (float *)D_L06_001B9840);
-                func_002ACEC0(scratch.vectors.velocity.f, scratch.vectors.velocity.f, scratch.vectors.axis.f, func_002A7878(0.17453295f, 0.7853982448577881f) * direction);
-                direction = -direction;
-                func_00282CC0(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1], scratch.vectors.velocity.f);
-            }
-        } else {
-            direction = 0.0f;
+        D_L06_001B3790[i] = 2;
+        D_L06_001B37A0[i] = 64;
+        func_002A7988(scratch.vectors.velocity.f, 0.2f, 0.2f);
+        if (func_00282DF0(scratch.vectors.velocity.f) > 0.2f) func_00282F20((char *)scratch.vectors.velocity.f, (char *)scratch.vectors.velocity.f, 0.2f);
+        qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][0], pos);
+        direction = 1.0f;
+        for (j = 1; j < 4; j++) {
+            func_00282CF0(scratch.vectors.axis.f, (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1]), (float *)D_L06_001B9840);
+            func_002ACEC0(scratch.vectors.velocity.f, scratch.vectors.velocity.f, scratch.vectors.axis.f, func_002A7878(0.17453295f, 0.7853982448577881f) * direction);
+            direction = -direction;
+            func_00282CC0(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1], scratch.vectors.velocity.f);
         }
     }
     if (!func_002A77E0(2)) {

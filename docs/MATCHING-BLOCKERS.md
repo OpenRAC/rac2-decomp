@@ -2110,12 +2110,15 @@ Those results do not establish that all retail 64-bit arithmetic differs from th
 
 ## 34. The catalogue's fingerprint merges two bodies
 
-**Unresolved hypothesis:** the 23/27 report was not remeasured here. Its field offsets differ from section 12's description; re-extract current extents before a generator change. The 82 historical candidates are not 82 proven collisions.
+**2 November 2026 recheck:** all 27 USA placements were re-extracted. The ordinary
+23 use the `+0xE4/+0xE8` fields described in section 12; the former `+0xDC/+0xE0`
+figure here was wrong. The four exceptions remain different bodies. This confirms
+this row's immediate mismatch, not all 82 historical collision candidates.
 
 **Suspected mechanism:** address-taint masking can group constants treated as address fields. The current generator compares ordinary untainted small immediates; it does not blindly mask every small immediate. Same-fingerprint candidates require byte-level review.
 
 **Measured:** `func_L00_00424BB8` is the level's float setter in 23 levels (base `q + 0x60`,
-fields at `+0xDC`/`+0xE0`) and another body in levels 16, 22, 23 and 26 (base `q + 0x20`,
+fields at `+0xE4`/`+0xE8`) and another body in levels 16, 22, 23 and 26 (base `q + 0x20`,
 fields at `+0x1C`/`+0x20`); the matching body in level 16 sits at `0x0042FB58` in its own row,
 `func_L16_0042FB58`. No source shape can produce both, because the offsets are constants.
 
@@ -2907,11 +2910,11 @@ probes did not emit those operations; unsupported wide-integer expressions were
 recorded as compilation errors, not evidence of a match. Absence from the C
 control set alone is not a general impossibility proof for arbitrary compilers.
 
-Four entries are deliberately still open: `func_001158F4` has no external witness
-at its current entry, `func_00129410` is an incomplete fallthrough extent, and
+Four entries are deliberately still open: `func_001158F4` has a four-byte fill
+prefix, with fresh USA calls at `00299368` and `00299384` targeting `001158F8`
+rather than the catalogue entry. `func_00129410` is an incomplete fallthrough extent, and
 `func_US2_L01_00305170` / `func_PAL_L01_00305C50` have outgoing-flow/extent
-uncertainty. Their bytes and retained notes remain untouched; none receives
-assembly-completion credit. Other contributors' reservations were excluded.
+uncertainty. No boundary or assembly-completion credit follows from these notes.
 
 Retained attempts stay in `nonmatching/`, with their historical status made
 explicit; this does not turn them into matched C or validated portable replacements.
@@ -2974,7 +2977,25 @@ The old appendix is an investigation record, not a current work queue. Filler re
 - func_L16_00424B48's eight-byte restore/nop prefix is now independently verified and excluded; its 160-byte body starts at 00424B50. func_L11_00440790 remains a separate historical proposal (212 bytes, candidate 192-byte body and an apparently unreachable block). An old size or apparently dead block alone does not establish that second correction or handwritten code.
 - **Differing-callee case resolved:** func_L00_003F5660 now uses ref_L00_003F5660_00 and passes 27/27, including levels 08,09,19,30. The old assertion that no single definition could represent it was wrong. Genuine nonrelocated immediate differences remain a different problem.
 
-The historical full core scan reported 60 fill-starting entries rather than the earlier 26. Many simple cases were subsequently removed; mixed examples such as func_001158F4, func_0011A7F8, func_0011E920, func_0011ED28, func_0011F364, func_0011FB8C, func_00120354, func_00125D94, func_0012646C, func_0012F998 and func_00130A8C need their own boundary evidence. For `func_0012F998`, a 28 October 2026 USA v1.01 scan found no direct boot branch/jump target or aligned loaded-word pointer into the 16-byte row, which follows `func_0012F948`’s completed return and delay slot; PAL and USA v2.00 extents remain unaudited, so no correction is adopted. The old table and prose disagreed on func_0011F364: 28-byte prefix/608-byte body at 11F380 versus 4/632 at 11F368. Neither historical figure is adopted here as a verified correction. Preserve the real code until the discrepancy is resolved. **28 October 2026 follow-up for `func_0011A7F8`:** USA v1.01 decodes its 24-byte body as two `pref 0x0D,-0x3233($t6)` words, `addiu $v1,$zero,0`, `syscall 0`, `jr $ra`, `nop`. It follows the preceding function’s completed return and stack-adjustment delay slot. Scanning catalogued boot functions and aligned loaded words found no direct/pointer reference to the extent, but computed indirect entries are untraced and the syscall body itself is coherent. No C or handwritten classification is proposed; retain the marker pending entry/ABI and compiler review.
+The historical full core scan reported 60 fill-starting entries rather than the earlier 26.
+Many simple cases were subsequently removed. Mixed entries need their own boundary evidence;
+a fill word alone does not identify the following function or every reachable entry.
+
+For `func_0012F998`, the 28 October 2026 USA v1.01 scan found no direct boot branch/jump
+target or aligned loaded-word pointer into the 16-byte row after `func_0012F948`'s completed
+return and delay slot. That audit did not cover PAL or USA v2.00; no correction followed.
+
+**2 November 2026:** fresh representative reads of `func_0011F364` in all three releases
+resolve the earlier conflicting prefix counts: seven fill words, or 28 bytes, precede the
+real code. The following exception/context code uses CP0, the saved arithmetic banks and
+privileged return operations, with additional entries/fragments. This fixes the prefix
+description, not the full entry map; no generator or assembly-classification change is made.
+
+**28 October 2026 follow-up for `func_0011A7F8`:** USA v1.01's 24-byte extent has two
+fill-like words before a syscall/return body. It follows the preceding completed return and
+stack-adjustment delay slot. The scan of catalogued boot functions and aligned loaded words
+found no direct/pointer reference to the extent, but computed indirect entries are untraced
+and the syscall body itself is coherent. Retain the marker pending entry/ABI and compiler review.
 
 A known entry pointer is strong positive evidence; one pointer lookup is not proof that all other entry points or indirect targets are absent. Verify every affected placement and preserve raw bytes.
 
@@ -3776,6 +3797,18 @@ global strength-reduction disable, or branch-tail merging as if they were new tr
 
 ### Caller contracts, scratch records and allocation-only drafts
 
+**2 November 2026 follow-up:** the same contract audit found a concrete delay-slot
+misreading in `func_0032AE30`. The integer lifetime result is stored in both lifetime
+fields; `func_002A7940` then returns a float for a different field, followed by the
+separate scaled-angle sample. Treating the random float as an integer had made a
+semantic error look like a scheduler mismatch. Inspect the instruction in each
+call's delay slot before assigning its result to the called function.
+
+In `func_L00_00390FF8`, correcting `func_L00_002C42E0` to its real integer return
+fixes the attachment store's call delay slot, but the entry register/store ordering
+still differs. It remains a 792-byte near miss. Other ignored-return repairs remain
+near misses too; a corrected declaration alone is not matching credit.
+
 `func_L04_003FA7E0` is now reconstructed in `src/levels/shared/L04_003FA7E0.c`.
 Its normal aligned 0x50-byte template assignment uses the current compiler's
 quadword block moves. Correct helper return declarations then resolve the one
@@ -3820,3 +3853,46 @@ The related retained investigations establish these constraints:
 Current sizes, profiles and applicable-release results are in the existing
 nonmatching index and source headers. Equal sizes, fixed local blocks and typed
 buffer repairs remain distinct from a complete matching or functional build.
+
+### Retained controls and newly identified entry witnesses
+
+The following 2 November 2026 findings change what is worth trying next; they
+do not reclassify an unresolved function or change a catalogue.
+
+- Remove diagnostic source controls before comparing meaningful C. The eight
+  overwritten initializers in `func_L02_00412D50`, ten dead initializers in
+  `func_L01_003A6638`, always-true regeneration guard in `func_L06_004587E8`,
+  and dead-temporary `SCREEN_Y` control in `func_L25_0040DE40` are gone from
+  the retained drafts. Their old small residuals are not valid matches.
+  Current lawful measurements and reopening conditions remain in their headers.
+- `func_L02_003E7B58`'s old block-copy refusal is obsolete under the maintained
+  compiler. Ordinary assignment of its real aligned 192-byte template now
+  reproduces the retail copy loop and prologue: 972/972 bytes, still 0/1 USA.
+  Flag/zero setup and later lifetimes remain different; this is a new useful
+  constraint, not a reason to repeat every unchanged near miss.
+- `func_00131D98` is already an 80-byte main loop in the USA catalogue. Its
+  faithful retained C passes that local check with independently evidenced
+  file-scope alignment, but PAL/USA v2.00 still describe a 656-byte main-plus-sound
+  extent. Those release catalogues need a verified split before promotion.
+- The menu-initializer relatives include real entry witnesses at `+0x10` for
+  `func_L08_00363320`, `func_L11_00369700`, `func_L17_003583F8`,
+  `func_L22_00358778` and `func_L24_0034C450`. The skipped `+0x20` stack restore
+  is positive, not a prologue; the old Joba and Ship Shack `+8` descriptions were
+  wrong. The fresh USA data pointers support `+0x10`; retain the bytes and verify
+  the complete carrying-release rule before editing the generator.
+- Fresh USA calls target `func_0012646C` at `00126470` and `func_0012672C` at
+  `00126730`, after their four-byte fill prefixes. The first body's ordinary
+  `por` zeroing and `sq` transfers are compiler-reachable, so its old generic
+  MMI-based handwritten diagnosis is not sufficient.
+- `func_L00_0042A4E8` contains three independent return stubs: initialized
+  pointers reach `+0`, `+8` and `+0x10` in all 27 USA placements. The same
+  three-entry pattern has separate witnesses for `func_L13_0043E8C0` in all
+  three releases. Do not fabricate a single C function spanning these entries.
+
+Reference scans must separate EE text from `.vutext`: decoding VU microcode as
+R5900 instructions creates false branch witnesses. An aligned word equal to an
+address may instead be scalar data; neither a positive scalar coincidence nor
+absence from a bounded static scan resolves arbitrary indirect control flow.
+Keep per-placement raw scans private and state their coverage. Useful C stays
+in `nonmatching/`; the old dummy-frame and unrelated guessed bodies were removed
+from `func_L03_0041B848` and `func_L00_00309DB0` rather than promoted.

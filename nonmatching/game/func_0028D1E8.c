@@ -1,41 +1,13 @@
-/* Claude Opus 5.5 xhigh tier, USA v1.01, default game -O2 -G8 -ffunction-sections (a -g8.c unit).
- * Best check.py: 3012/3056 bytes, 0/28 places, 670 of 764 rows differ (the previous draft
- * recompiled here: 3028 bytes, 755 rows differ, needing f27). Not linked. All declarations below.
- *
- * Reproduced by this wording: an inline draw helper rematerializes 129.0f into f12 at all 13
- * draws, and floats set just after the clamps give retail's f20-f26 assignment and seven saves.
- * Setting them at the top of the function loses those registers (direct li.s at each draw).
- * Also reproduced: colors[2]=colors[1]=colors[0]=colors[3] store order, case 3 sharing case 0's
- * tail, and the tied lui/lh form (incomplete sda short arrays).
- *
- * Still differs:
- * 1. 0x8710: retail uses s0 for lookups 1-10, s1 for 11, s2 for 12, a fresh a0 for 13; this has
- *    one register. i/available/special allocation (s3/s2/s0 in retail) follows from it.
- * 2. Retail keeps 208.0/0.5 behind the first func_00336D50 call; here sched1 lifts them above it.
- * 3. final colour: retail branches (beql, lui/ori in the arms), this gives movn. if/else gives
- *    the same movn; a ternary stored straight into the chain moved allocation and was worse.
- *
- * Measured probes, NOT in this draft (each uses a construct the worker rules forbid):
- * - A skip-around test on a live register in the Y helper, in every lookup, whose body is dead:
- *     int r = (int)(v * S + 0.5f);
- *     if (mode != 0) { int dead = r + adj; dead = dead * adj; }
- *     return r;
- *   After cse1 (.loop dump) the lookups use pseudos 130 x10, 147, 164, 181: the setters of lookups
- *   1, 2, 3, 4. Those early setters cross calls, so sched1 lifts them, which is retail's extra-ori
- *   shape. The 10 looks like cse.c's jump path limit (from memory of GCC's source, not read here).
- *   cse2 then merges them all back into one register.
- * - The same probe with -fno-rerun-cse-after-loop gives s0 x10, s1, s2, a0 and the second ori in
- *   the func_00300A00 delay slot, exactly retail's pattern. That flag is not the answer: the clamps
- *   become bc1tl, and retail has bc1f/nop/b. So retail runs cse2, and something must flush its
- *   table between lookups 4 and 11, then vanish before sched1.
- * - do { } while (0), while (1) { break; } or a flag-cleared while after the first texture call
- *   gives retail's first-segment shape (lw, ori, addiu, jal, addu) as a sched barrier. A real
- *   test surviving sched1 at that point, gone by jump2, would do the same.
- * - if (mode != 0) return X + adj; return X; on a live register survives to jump2 in every lookup
- *   and keeps nothing shared; on a local set to 0 it splits the lookups 2/11. Neither fits.
- *
- * Next idea: a real helper test on one live value that keeps a boundary in lookup 1 through
- * sched1 while the later tests go away in cse1/cse2. Retail reads no D_001B23A0 here.
+/* 2 November 2026: corrected physical interface, not a match.
+ * Current 0027F980.c defines func_0027FAA8 with an int return and a complete
+ * 64-bit style argument; the old draft declared void and a 32-bit style.
+ * Packed 32-bit colors now explicitly widen through u32 into u64. The text
+ * lookup keeps its actual integer stored-address return (00336A78.c), with
+ * explicit pointer casts at the drawing calls.
+ * Default G8 check.py: 3020/3056 bytes, 0/28 USA v1.01 placements. The old
+ * 3012-byte draft had the narrower, false interface. Shared lookup bases,
+ * FP constants and final color-branch lowering remain different. No further
+ * equivalent source or flag sweep was run; no linked match is claimed.
  */
 #include "common.h"
 
@@ -58,7 +30,7 @@ extern float func_00283CE0(int);
 extern float func_00283B98(float,float);
 extern float func_00283180(float);
 extern float func_00283198(float);
-extern char *func_00336D50(char *,int);
+extern int func_00336D50(char *,int);
 extern void func_00300A00(char *,int,float,float,float,float,float);
 extern int func_002A9588(int,int,int,int,int);
 extern void func_0028FC48(int,int,int,int,unsigned long,int);
@@ -67,7 +39,7 @@ extern int func_0028EA58(int,int,int,int,int,int *);
 extern char *func_00288FB8(int);
 extern int func_001157AC(char *);
 extern int func_00283D38(int,int,float);
-extern void func_0027FAA8(int,int,int,char *,int);
+extern int func_0027FAA8(int,int,u64,char *,int);
 
 static __inline__ void draw_background(char *tex, int color, float x, float y, float sx, float sy, float rot)
 {
@@ -93,23 +65,23 @@ int func_0028D1E8(unsigned char *o)
     one = 1.0f;
     zero = 0.0f;
     minus = -1.0f;
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 8), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 9), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 10), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 11), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 12), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 13), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 14), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 15), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, minus, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, 129.0f, 208.0f, one, one, zero);
-    draw_background(func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, 129.0f, 208.0f, minus, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 8), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 9), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 10), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 11), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 12), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 13), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 14), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 15), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, minus, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, 129.0f, 208.0f, minus, one, zero);
     if (*(int *)(o+0x74) >= 0) {
         colors[0] = func_002A9588(0x80442D00,0x80FFDE8D,25,0,0);
         previous = *(int *)(o+0x74)-1;
         if (previous < 0) previous = 7;
-        draw_background(func_00336D50(D_001A8CFC + 0x8710, 16), colors[0], 129.0f, 208.0f, one, one, (float)previous);
+        draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 16), colors[0], 129.0f, 208.0f, one, one, (float)previous);
         i = *(int *)(o+0x74);
         func_0028FC48(positions.xy[i][0],(int)((float)positions.xy[i][1]*D_001B23A4+0.5f),
             positions.xy[i][0]+33,(int)((float)(positions.xy[i][1]+7)*D_001B23A4+0.5f),colors[0],0);
@@ -180,8 +152,8 @@ int func_0028D1E8(unsigned char *o)
             text *= open;
             color=func_00283D38(0x00E0C0A0,0x80E0C0A0,text);
             previous=func_00283D38(0,0x80000000,text);
-            func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,label,-1);
-            func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,label,-1);
+            func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),(u64)(u32)previous,label,-1);
+            func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),(u64)(u32)color,label,-1);
         }
     }
     return *(int *)(o+0x58);

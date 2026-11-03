@@ -1,6 +1,20 @@
-/* func_L15_00430168: HUD panel. Flags tried: -O2 -G8 -ffunction-sections. 1072/1064 bytes.
-   Control flow and tables read right; float registers rotated (alpha is f20 in retail), and
-   retail keeps the constant 1 in s0, s2 across calls ahead of each D_L15_001B2E80 test. */
+/* Retained contract-corrected HUD near miss, 2 November 2026.
+ * Profile: -O2 -G8 -ffunction-sections, in an isolated -g8.c unit.
+ * Current USA check:1064/1064 bytes,0/1, first mismatch+0xC; frame0xD0.
+ * The older draft was1072/1064. Actual callee definitions establish void
+ * func_0027F5B8 and the seven-int func_L05_00303000 wrapper, whose color
+ * is32-bit. The other text renderer still consumes the full64-bit style.
+ * Resource and text lookups return32-bit address words; explicit pointer
+ * conversions preserve their actual integer return contracts. These three
+ * corrected declaration forms retain the same instruction listing.
+ * Shared function-scope half/one/zero constants instead gave1020 bytes and
+ * frame0xC0; that variant is not retained. Five checker calls include one
+ * rejected source-substitution typo, not a compiler or matching finding.
+ * Remaining: FP-register allocation (alpha isf20 in retail), retained
+ * integer-one lifetimes, and conversion/argument scheduling. Reopen with
+ * independent original scalar/control-flow lifetime evidence. No linked,
+ * USA v2.00 or PAL qualification; production marker restored.
+ */
 #include "common.h"
 extern int D_001A7340;
 extern unsigned char D_001A7A0A;
@@ -17,10 +31,10 @@ extern void func_0027F5B8(int, int, unsigned long long, char *, int);
 extern int func_0027FB40(int, int, unsigned long long, char *, int);
 extern float func_00283CE0(int);
 extern int func_00283CF0(float);
-extern char *func_00288FB8(int);
+extern int func_00288FB8(int);
 extern void func_00300968(char *, int, float, float, float, float);
-extern char *func_00336D50(char *, int);
-extern void func_L05_00303000(int, int, int, int, unsigned long long, char *, int);
+extern int func_00336D50(char *, int);
+extern void func_L05_00303000(int, int, int, int, int, int, int);
 
 int func_L15_00430168(void)
 {
@@ -32,24 +46,24 @@ int func_L15_00430168(void)
         int shade, x, n;
         float y;
 
-        text = func_00336D50(D_L15_001A904C + 0x8710, 0x45);
+        text = (char *)func_00336D50(D_L15_001A904C + 0x8710, 0x45);
         y = (int)(D_L15_001B2E84 * 200.0f + 0.5f);
         func_00300968(text, 0x60442D00, alpha, y, 1.0f, 0.0f);
-        text = func_00336D50(D_L15_001A904C + 0x8710, 0x44);
+        text = (char *)func_00336D50(D_L15_001A904C + 0x8710, 0x44);
         y = (int)(D_L15_001B2E84 * 200.0f + 0.5f);
         func_00300968(text, 0x55F0C070, alpha, y, 1.0f, 0.0f);
-        func_00115DA8(buf, func_00288FB8(0x2F72), D_L15_001B15C8 + 1);
-        text = func_00288FB8(0x2F93);
+        func_00115DA8(buf, (char *)func_00288FB8(0x2F72), D_L15_001B15C8 + 1);
+        text = (char *)func_00288FB8(0x2F93);
         shade = func_00283CF0(alpha);
         y = D_L15_001B2E84 * 46.0f + 0.5f;
         if (D_L15_001B2E80 == 1)
             x = y + -2.0f;
         else
             x = y;
-        func_0027FB40(shade, x, 0x80F0F0F0ULL, text, func_001157AC(text));
-        text = func_00288FB8(0x31CB);
+        func_0027FB40(shade, x, 0x80F0F0F0, (int)text, func_001157AC(text));
+        text = (char *)func_00288FB8(0x31CB);
         x = D_L15_001B2E84 * 131.0f + 0.5f;
-        func_L05_00303000(0x75, x, 0x118, 0x190, 0x80F0F0F0ULL, text, func_001157AC(text));
+        func_L05_00303000(0x75, x, 0x118, 0x190, 0x80F0F0F0, (int)text, func_001157AC(text));
         n = D_L15_001B1520[D_L15_001B36A4] - 1;
         if (n >= 3)
             n = 2;
@@ -57,23 +71,23 @@ int func_L15_00430168(void)
         if (D_001A7A0A != 0)
             n *= 10;
         if (n == 0)
-            func_00115DA8(buf, func_00288FB8(0x11FF));
+            func_00115DA8(buf, (char *)func_00288FB8(0x11FF));
         else
-            func_00115DA8(buf, func_00288FB8(0x2FC6), n);
+            func_00115DA8(buf, (char *)func_00288FB8(0x2FC6), n);
         x = D_L15_001B2E84 * 210.0f + 0.5f;
-        func_L05_00303000(0x75, x, 0x118, 0x190, 0x80F0F0F0ULL, buf, func_001157AC(buf));
+        func_L05_00303000(0x75, x, 0x118, 0x190, 0x80F0F0F0, (int)buf, func_001157AC(buf));
         y = D_L15_001B2E84 * 294.0f + 0.5f;
         if (D_L15_001B2E80 == 1)
             x = y + 3.0f;
         else
             x = y;
-        func_0027F5B8(0x75, x, 0x80F0F0F0ULL, func_00288FB8(0x31CC), -1);
+        func_0027F5B8(0x75, x, 0x80F0F0F0ULL, (char *)func_00288FB8(0x31CC), -1);
         y = D_L15_001B2E84 * 294.0f + 0.5f;
         if (D_L15_001B2E80 == 1)
             x = y + 3.0f;
         else
             x = y;
-        func_0027F5B8(0x112, x, 0x80F0F0F0ULL, func_00288FB8(0x31CD), -1);
+        func_0027F5B8(0x112, x, 0x80F0F0F0ULL, (char *)func_00288FB8(0x31CD), -1);
     }
     return 1;
 }

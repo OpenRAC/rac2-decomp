@@ -1,3 +1,11 @@
+/* 2 November 2026: a genuine loop entered at its bottom test (goto test; do
+ * { body; test: ; } while (i < 300)) retains the constants and loop alignment
+ * but adds an entry branch and moves the initial owner load into its bottom.
+ * Current default profile: 428/420 bytes, 0/28 US placements. This does not
+ * improve the retained 420-byte label loop below. No fabricated operation used.
+ * Reopen with evidence for a real loop rejected by loop.c without that entry
+ * branch, or the actual counter/address lifetime witness.
+ */
 /* Closer C3, 1 November 2026: this loop has 57 real insns against a threshold near 61; constants of life 1 move because
  * 61 * 1 >= 57. Over the threshold they stay in the body and only a long-lived 128.0f moves, which would explain retail with a
  * real for loop; the counter is still reversed though, so something else keeps its use. No real-loop form under 56 rows yet.

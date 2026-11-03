@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 faithful-contract review, US object checks only.
+ * Profile: -O2 -G0 -ffunction-sections -fno-expensive-optimizations.
+ * Current check.py: 2068/2076 bytes,0/2 places.
+ * Restored actual float pulse-smoothing return plus integer iterator/sound returns. Same real ABI; pulse-phase FP, local-address and packed-color scheduling remain.
+ * Reopen: Actual address-of-local rematerialization and packed-color RTL, not equivalent pulse spellings.
+ * No linked or cross-release match is claimed; earlier records follow.
+ */
 /* sol-high (v1322), USA v1.01: 2072 bytes versus 2076 retail, 0/2 places.
  * Required profile: -O2 -G0 -ffunction-sections -fno-expensive-optimizations.
  * The pinned compiler's default profile reproduces the earlier 2036-byte draft.
@@ -27,20 +34,20 @@ extern int D_00138320;
 extern float D_L04_001BDC30;
 extern float func_00283198(float);
 extern float func_00283180(float);
-extern void func_002AA2E8(void *, float, float);
+extern float func_002AA2E8(void *, float, float);
 extern int func_00282948(void *);
 extern int func_002829A8(void *);
 extern void func_L00_00322BE0(void *, int);
 extern void func_L00_00322A98(void *, void *);
 extern void func_L00_00322AC0(void *, float, int, int);
 extern void func_L00_00322EC8(void *);
-extern void func_002E5DA0(int, int, void *, int);
+extern int func_002E5DA0(int, int, void *, int);
 extern int func_002E59B0(void *, int);
 extern int func_002E5CF8(int, int, void *);
-extern void func_L01_00355BA0(int, int);
+extern int func_L01_00355BA0(int, int);
 extern void func_0027AB40(void);
-extern void func_002A8600(void *, int, int, int);
-extern void func_002A86E8(void *, void *, int, int);
+extern int func_002A8600(void *, int, int, int);
+extern int func_002A86E8(void *, void *, int, int);
 extern void func_00283388(void *);
 extern void func_00283698(void *, void *);
 extern void func_002830C0(void *, void *, void *);

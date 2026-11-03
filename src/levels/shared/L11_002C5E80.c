@@ -345,7 +345,7 @@ void func_L11_00472008(char *p)
     *(float *)(p + 60) = 1.0f;
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00472090);
+/* func_L11_00472090 is defined in L11_00472090-curve.c. */
 
 void func_L11_00474888(char *a0)
 {

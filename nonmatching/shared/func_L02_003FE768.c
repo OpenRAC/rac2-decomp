@@ -1,3 +1,10 @@
+/* 2 November 2026, bounded scheduling check on the pinned workspace compiler:
+ * -fno-schedule-insns: 332/332 bytes, 0/2 USA places, same mode-load hoist
+ * (checker first mismatch +0xE4). -fno-schedule-insns2: 332/332, 0/2, first
+ * mismatch +0x4 and changed prologue/order. Neither scheduler-off profile
+ * closes the load ordering; default -G8 retained. No alternate-release or
+ * linked build was run for these failed trials.
+ */
 /* Retained nonmatching reconstruction, 27 October 2026.
  * Profile: -O2 -G8 -ffunction-sections. Candidate and retail: 332 bytes. USA v1.01, USA v2.00 and PAL each reject both carrying places. The lui/lw of D_001A7B90 is hoisted across four FP conversion operations; all other words and registers agree after relocation. The 64-bit packet value and colour ABI were checked against current definitions. Computing the real right edge before the bottom conversion repaired the remaining tail. Reopen with evidence for the mode-load scheduling; preserve NaN guards and conversion order.
  */

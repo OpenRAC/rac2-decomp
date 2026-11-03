@@ -1,3 +1,11 @@
+/* 2 November 2026: retained nonmatching C; no linked matching credit.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * USA v1.01 check: 2008/2016 bytes, 0/5 placements.
+ * Matched func_002AA2E8 returns float; func_002A8C28 and func_002C9218 return int. Correcting
+ * their ignored results leaves 2008/2016 bytes and 0/5 placements. The retail discarded
+ * floating comparison before the zero velocity store still lacks a supported source
+ * explanation.
+ */
 /* GPT-6.1 Sol (high), v1301, USA v1.01 default game -O2 -G0 profile.
  * Best: 2008/2016 bytes, 0/5 placements, frame 0x1B0. Retained after 13
  * check.py invocations; the earlier draft was 1984 bytes. All declarations
@@ -75,11 +83,11 @@ extern void func_00282F20(void *, void *, float);
 extern void func_00282F70(void *, void *, float);
 extern void func_00283098(void *, void *, void *);
 extern void func_002833F0(void *, void *);
-extern void func_002A8C28(void *, void *, int, int, int, int, float, float, float);
-extern void func_002AA2E8(void *, float, float);
+extern int func_002A8C28(void *, void *, int, int, int, int, float, float, float);
+extern float func_002AA2E8(void *, float, float);
 extern void func_002AC9F8(void *, float);
 extern int func_002ACBC8(void *, int);
-extern void func_002C9218(int, void *, void *, float);
+extern int func_002C9218(int, void *, void *, float);
 extern void func_002E59F8(int);
 extern int func_002E5CF8(int, int, void *);
 extern int func_L00_002E0200(void *, float, float, int, void *);

@@ -1,3 +1,8 @@
+/* 2 November 2026: use the current matched spawner's real pointer return,
+ * 32-bit value input and byte colour/flag arguments. Under the retained
+ * profile this still gives 1332 bytes and 0/27 US placements; the frame is
+ * still 0x110 rather than 0x120. A false void return is not retained.
+ */
 /* Reconstruction retained 30 October 2026; not a linked match.
  * Profile: -O2 -G0 -ffunction-sections -frac2-zero-ti-por -g.
  * Equal 1332-byte extent, but frame is 0x110 instead of 0x120; floating constant lifetimes and prologue differ.
@@ -28,7 +33,7 @@ extern int func_002A7820(int, int);
 extern int func_002AAFA0(u32, int);
 extern void func_002AAF40(int *, int *, int *, int);
 extern char *func_002BBCB0(void *, void *, int, int, int, int, int, int, float, float);
-extern void func_L00_003A0DA0(void *, void *, void *, int, int, int, int, int, float);
+extern char *func_L00_003A0DA0(int, void *, void *, int, u8, u8, u8, u8, float);
 
 /* Burst at the centroid of a consumed trail group. Palette records are complete
  * 24-byte objects, and the query result uses the helper's shared object list. */
@@ -65,23 +70,23 @@ void func_L00_003B14D0(float x, float y, float z)
         func_002BBCB0(&position, &velocity, c0, c1, life, age, 0, 0, 400000.0f, jitter);
     }
     if (distance > 9.0f) {
-        func_L00_003A0DA0(*(void **)(D_00189E20 + 0x2290), &position,
+        func_L00_003A0DA0(*(int *)(D_00189E20 + 0x2290), &position,
             &velocity, 15, 127, 127, 127, 32, 4.0f);
         red = 127; green = 32; blue = 0;
         func_002AAF40(&red, &green, &blue, D_L00_00262570[D_00139568[0x23] * 0xe0 + 4] != 0);
-        func_L00_003A0DA0(*(void **)(D_00189E20 + 0x2290), &position,
+        func_L00_003A0DA0(*(int *)(D_00189E20 + 0x2290), &position,
             &velocity, 24, (u8)red, (u8)green, (u8)blue, 32, 4.0f);
     }
     rr = 127; gg = 63; bb = 0;
     func_002AAF40(&rr, &gg, &bb, D_L00_00262570[D_00139568[0x23] * 0xe0 + 4] != 0);
-    func_L00_003A0DA0(*(void **)(D_00189E20 + 0x2290), &position,
+    func_L00_003A0DA0(*(int *)(D_00189E20 + 0x2290), &position,
         &velocity, 20, (u8)rr, (u8)gg, (u8)bb, 48, 4.0f);
     rr = 96; gg = 16; bb = 0;
     func_002AAF40(&rr, &gg, &bb, D_L00_00262570[D_00139568[0x23] * 0xe0 + 4] != 0);
-    func_L00_003A0DA0(*(void **)(D_00189E20 + 0x2290), &position,
+    func_L00_003A0DA0(*(int *)(D_00189E20 + 0x2290), &position,
         &velocity, 27, (u8)rr, (u8)gg, (u8)bb, 64, 3.5f);
     rr = 32; gg = bb = 0;
     func_002AAF40(&rr, &gg, &bb, D_L00_00262570[D_00139568[0x23] * 0xe0 + 4] != 0);
-    func_L00_003A0DA0(*(void **)(D_00189E20 + 0x2290), &position,
+    func_L00_003A0DA0(*(int *)(D_00189E20 + 0x2290), &position,
         &velocity, 29, (u8)rr, (u8)gg, (u8)bb, 32, 3.0f);
 }
