@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 faithful-contract review, US object checks only.
+ * Profile: -O2 -G8 -ffunction-sections -g.
+ * Current check.py: 3008/3008 bytes,0/2 places,first+0x3E8.
+ * Restored real32-bit address-word results for font/sprite lookups with explicit pointer conversions, plus actual int message helper interface. Serial-rounding/control boundary and later saved roles remain unchanged.
+ * Reopen: Natural rounding boundary surviving sched2 without a wrapper or invented condition.
+ * No linked or cross-release match is claimed; earlier records follow.
+ */
 /* Claude Opus 5.5 xhigh tier, task v1817, 31 October 2026.
  * Retained complete behavioural draft: USA v1.01, 3008/3008 bytes, 0/2 places
  * (levels 22 and 23); 129 of 752 rows still differ beyond relocated values, none
@@ -124,16 +131,16 @@ extern u8 ref_L22_003A5018_42[] SDATA(ref_L22_003A5018_42);
 extern int ref_L22_003A5018_43 __attribute__((sda));
 extern int ref_L22_003A5018_44 __attribute__((sda));
 
-extern void *func_00336D50(void *, int);
+extern int func_00336D50(void *, int);
 extern void func_00300A00(void *, unsigned int, float, float, float, float, float);
-extern void *func_0028E588(int, int);
+extern int func_0028E588(int, int);
 extern void func_0028EA58(void *, int, int, int, int, void *);
 extern void func_0027EAE8(int, int, int, int, int, void *);
 extern int func_00115DA8(char *, char *, ...);
 extern int func_001157AC(char *);
 extern int func_0027FB40(int, int, u64, char *, int);
 extern char *func_00288FB8(int);
-extern void func_L00_0030DD70(char *, int);
+extern int func_L00_0030DD70(int, int);
 extern void func_0029CC50(int, int, int);
 extern int func_00282948(void *);
 extern void func_002802E0(void *, int, int, int, int, int, int, int, int);
@@ -165,44 +172,44 @@ int func_L22_003A5018(void) {
     char *label, *hint;
 
     {
-        void *sprite = func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
+        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
         float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
         sy = (float)Y3(sy);
         func_00300A00(sprite, 0x60442D00, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
+        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
         float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
         sy = (float)Y3(sy);
         func_00300A00(sprite, 0x60241700, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
+        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
         float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
         sy = (float)Y3(sy);
         func_00300A00(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
+        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
         float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
         sy = (float)Y3(sy);
         func_00300A00(sprite, 0x60442D00, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
+        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
         float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
         sy = (float)Y3(sy);
         func_00300A00(sprite, 0x60241700, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
+        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
         float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
         sy = (float)Y3(sy);
         func_00300A00(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     one = 1;
-    func_0028EA58(func_0028E588(0xEAA4, one), ref_L22_003A5018_14, Y0(ref_L22_003A5018_15), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42);
-    func_0028EA58(func_0028E588(0xEAA4, 0), ref_L22_003A5018_18, Y0(ref_L22_003A5018_19), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42);
+    func_0028EA58((void *)(u32)func_0028E588(0xEAA4, one), ref_L22_003A5018_14, Y0(ref_L22_003A5018_15), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42);
+    func_0028EA58((void *)(u32)func_0028E588(0xEAA4, 0), ref_L22_003A5018_18, Y0(ref_L22_003A5018_19), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42);
 
     {
         float ratio = (float)D_0018B694 / (float)*(short *)(ctl + 0x324);
@@ -228,12 +235,12 @@ int func_L22_003A5018(void) {
     }
 
     {
-        void *sprite = func_0028E588(0xEAA5, 0);
+        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
         float sy = (float)ref_L22_003A5018_23 * D_L22_001B2984 + 0.5f;
         func_0028EA58(sprite, ref_L22_003A5018_22, Y1(sy), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
     }
     {
-        void *sprite = func_0028E588(0xEAA5, 0);
+        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
         float sy = (float)ref_L22_003A5018_27 * D_L22_001B2984 + 0.5f;
         func_0028EA58(sprite, ref_L22_003A5018_26, Y1(sy), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
     }
@@ -252,30 +259,30 @@ int func_L22_003A5018(void) {
     func_0027FB40(ref_L22_003A5018_34, value, colour, text, func_001157AC(text));
     }
     if (D_L22_001B1910.leftIcons) {
-        void *sprite = func_0028E588(0xEAA5, one2);
+        void *sprite = (void *)(u32)func_0028E588(0xEAA5, one2);
         float sy = (float)ref_L22_003A5018_37 * D_L22_001B2984 + 0.5f;
         func_0028EA58(sprite, ref_L22_003A5018_36, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.leftIcons >= 2) {
-        void *sprite = func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
         int x = ref_L22_003A5018_36 + ref_L22_003A5018_44;
         float sy = (float)ref_L22_003A5018_37 * D_L22_001B2984 + 0.5f;
         func_0028EA58(sprite, x, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons) {
-        void *sprite = func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
         float sy = (float)ref_L22_003A5018_39 * D_L22_001B2984 + 0.5f;
         func_0028EA58(sprite, ref_L22_003A5018_38, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons >= 2) {
-        void *sprite = func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
         int x = ref_L22_003A5018_38 - ref_L22_003A5018_44;
         float sy = (float)ref_L22_003A5018_39 * D_L22_001B2984 + 0.5f;
         func_0028EA58(sprite, x, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B2AC8 != -1 && obj[0x95] != 10) {
         switch (D_L22_001B2AC8) {
-        case 0: func_L00_0030DD70(func_00288FB8(0x2FA3), -1); break;
+        case 0: func_L00_0030DD70((int)func_00288FB8(0x2FA3), -1); break;
         case 2: func_00288FB8(0x1241); func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); break;
         case 1: func_00288FB8(0x1240); func_0029CC50(0x1240, D_L22_001B2ACC, -1); break;
         }

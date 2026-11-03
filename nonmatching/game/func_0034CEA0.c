@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 faithful-contract review, US object checks only.
+ * Profile: -O2 -G8 -ffunction-sections -ffast-math.
+ * Current check.py: 3328/3316 bytes,0/28 places.
+ * Restored float func_003495A0 and integer func_003495C8 contracts. The extra saved widget pointer/spill and0x110 frame remain; synthetic pseudo/bucket manipulations stay excluded.
+ * Reopen: Real widget and color-loop source lifetimes producing the actual0x100 frame and reaching-address order.
+ * No linked or cross-release match is claimed; earlier records follow.
+ */
 /* Claude Opus 5.5 (xhigh effort), task v1844, USA v1.01. FAILED; not a match.
  * Best check.py: 3328 bytes against 3316, 0 of 28 places; frame 0x110 against 0x100.
  * The sol-high draft had retail's size (3316) by coincidence; this one aligns better
@@ -119,8 +126,8 @@ extern void func_00349678(void *, float);
 extern float *func_00336318(void *);
 extern int func_00115DA8(char *, const char *, ...);
 extern int func_001157AC(const char *);
-extern void func_003495A0(void *);
-extern void func_003495C8(void *, int);
+extern float func_003495A0(void *);
+extern int func_003495C8(void *, int);
 #define ITEM(n) (&D_00239BA0[D_00139568[n]])
 
 void func_0034CEA0(void *object)

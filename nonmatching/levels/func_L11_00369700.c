@@ -1,3 +1,9 @@
+/* Corrected current US boundary review, 2026-11-03.
+ * Joba pointer0029E5C0 reaches00369710 (+0x10), not+8. Prefix is orphan sw t3,0x40(v1),nop,+0x20 stackrestore,nop after completed return/delay/padding. Real leaf body is272 bytes.
+ * Correct existing note: entry repair is16 bytes, not8; review other releases before catalogue work.
+ * The older +8/prologue claim below is superseded: +8 is a positive stack adjustment.
+ * No catalogue edit or C-match credit.
+ */
 /* No attempt: the retail bytes at the catalogue's start are not the function's
    first code. The extent starts at 0x00369700 with `sw $t3, 0x40($v1)`
    (40006BAC) and a `nop` after it: $v1 is never set there, and the two words

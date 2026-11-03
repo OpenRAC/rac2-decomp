@@ -1,3 +1,10 @@
+/* 2 November 2026: retained nonmatching C; no linked matching credit.
+ * Profile: -O2 -G0 -ffunction-sections -g -frac2-hazard-labels.
+ * USA v1.01 check: 2708/2708 bytes, 0/27 placements.
+ * Matched func_L00_002C42E0 returns signed int. Correcting its ignored result leaves 2708 bytes
+ * and 0/27 placements, first mismatch +0x1A4. The pre-copy origin-address setup and shared-tail
+ * scheduling remain; no fabricated dependency is added.
+ */
 /* Near miss: unit of its own, -O2 -G0 -ffunction-sections -g -frac2-hazard-labels. us 0/27, 2708/2708 bytes,
  * 6 raw lines: one insn out of place. PAL has no such function. Measured 2026-11-01:
  * func_002829D8 returns int; declaring it void was the whole of the old +0x88 $v0/$v1 swap, so no pin is needed.
@@ -75,7 +82,7 @@ extern u8 D_00294880[];
 
 extern void func_L00_003A41F0(Moby *);
 extern int func_002829D8(void *);
-extern void func_L00_002C42E0(int, int);
+extern int func_L00_002C42E0(int, int);
 extern void func_002A75E0(void *, int, int, int, int);
 extern void func_002A7470(void *, int, int, int);
 extern int func_L00_002D4040(int);

@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 faithful-contract review, US object checks only.
+ * Profile: -O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
+ * Current check.py: 2528/2528 bytes,0/1 places,first+0x56C.
+ * Removed all eight overwritten initializer values that existed solely to affect GCSE buckets, and corrected the actual int hero-state return. Current honest source has the expected size but swapped frame-address spills and final point-load order. The historical two-word result depended on inadmissible initializers and is not carried forward.
+ * Reopen: A genuine source lifetime preserving real spill/address and yaw scheduling; no dummy values or synthetic dependencies.
+ * No linked or cross-release match is claimed; earlier records follow.
+ */
 /*
  * Claude Opus 5.5 (xhigh) tier, task v1936, 31 October 2026.
  * Profile: -O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -110,7 +117,7 @@ extern float func_00282E20(void *);
 extern void func_002AFDD8(char *, char *, char *, char *);
 extern double func_001234F0(float);
 extern void func_0026FEB8(const char *, ...);
-extern void func_L00_002C42E0(s32, s32);
+extern int func_L00_002C42E0(s32, s32);
 extern float func_00282E80(void *, void *);
 extern void func_003355A8(s32);
 extern s32 func_002B3868(u8 *);
@@ -144,16 +151,16 @@ void func_L02_00412D50(u8 *object)
     LiftVector launch;
     LiftVector rotation;
     LiftState *state = *(LiftState **)(object + 0x68);
-    s32 side = 0;
-    float distance = 0.0f;
-    float target = 0.0f;
-    s32 i = 0;
+    s32 side;
+    float distance;
+    float target;
+    s32 i;
 
     qcopy_nc(&old_position, (object + 0x10));
     qcopy_nc(&old_rotation, (object + 0xF0));
     switch (object[0x20]) {
     case 0: {
-        s32 index = 0;
+        s32 index;
         object[0x30] = 0xFF;
         state->sound = -1;
         if (state->stops[0] == -1 || state->stops[1] == -1) {
@@ -192,7 +199,7 @@ void func_L02_00412D50(u8 *object)
         }
         break;
     case 1: {
-        LiftNode *record = 0;
+        LiftNode *record;
         if (state->flag != -1 && D_001A7B00[0x1E]) {
             func_0029F338(object);
             return;
@@ -213,7 +220,7 @@ void func_L02_00412D50(u8 *object)
                 func_002A7750(object, 2, -1);
             }
         } else if ((D_L02_001B30C8[0] & 0x3F) == 0) {
-            float current = 0.0f;
+            float current;
             side = (state->side + 1) & 1;
             record = &D_L02_001B368C[state->stops[side]];
             distance = func_00282E80(D_00189E20.position, &record->position);
@@ -232,7 +239,7 @@ void func_L02_00412D50(u8 *object)
         break;
     }
     case 2: {
-        LiftNode *record = 0;
+        LiftNode *record;
         if (D_00189E20.active == 0) {
             func_003355A8(0);
             break;

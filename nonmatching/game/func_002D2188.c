@@ -1,3 +1,8 @@
+/* 2 November 2026, remaining-function review: nonmatching; no linked credit.
+ * Profile: -O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin.
+ * US check: 580/592 bytes, 0/28 placements.
+ * Matched0027FAA8 returns signed int. Correcting the ignored text-draw result ties at 580/592,0/28. Missing retail unused saved s1/0x30 frame and FP rounding lifetimes remain.
+ */
 /*
  * v1665 (Claude Opus 5.5, xhigh, 30 October 2026): 580/592 bytes, 0/28 USA v1.01 places.
  * Profile: -O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin, as func_002D1E70.
@@ -23,7 +28,7 @@
 
 extern void func_0027C540(s32);
 extern void func_0027C660(void);
-extern void func_0027FAA8(s32, s32, u64, s32, s32);
+extern s32 func_0027FAA8(s32, s32, u64, s32, s32);
 extern s32 func_00288FB8(s32);
 extern void func_0028FC48(s32, s32, s32, s32, u64, s32);
 extern void func_002CE5D0(s32, s32);

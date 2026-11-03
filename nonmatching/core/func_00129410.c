@@ -3,22 +3,22 @@
  * The row is 64 bytes at 0x00129410, the last twelve of them the
  * linker's 0xCDCDCDCD fill:
  *
- *   0x00129410  F8860000  sdc2  $6, 0x0($a0)      COP2 (VU0)
+ *   0x00129410  F8860000  sqc2  $vf6, 0x0($a0)    COP2 (VU0)
  *   0x00129414  00000000  nop
  *   0x00129418  27BD00A0  addiu $sp, $sp, 0xA0
  *   0x0012941C  00000000  nop
- *   0x00129420  F88A0000  sdc2  $10, 0x0($a0)     COP2 (VU0)
+ *   0x00129420  F88A0000  sqc2  $vf10, 0x0($a0)   COP2 (VU0)
  *   0x00129424  00000000  nop
  *   0x00129428  E4800008  swc1  $f0, 0x8($a0)
  *   0x0012942C  00000000  nop
- *   0x00129430  F8890000  sdc2  $9, 0x0($a0)      COP2 (VU0)
+ *   0x00129430  F8890000  sqc2  $vf9, 0x0($a0)    COP2 (VU0)
  *   0x00129434  00000000  nop
  *   0x00129438  00000000  nop
  *   0x0012943C  00000000  nop
- *   0x00129440  7CA30000  ext   $v1, $t1, 0       (a move; decoded by hand, splat prints a word)
+ *   0x00129440  7CA30000  sq    $v1, 0x0($a1)     ordinary EE quadword store
  *   0x00129444  CDCDCDCD  ...                     linker's fill to 0x00129450
  *
- * The first wall alone is enough: the three `sdc2` stores are COP2 (VU0)
+ * The first wall alone is enough: the three `sqc2` stores are COP2 (VU0)
  * instructions, which no C compiler emits - the same wall as
  * func_001291A0, func_001244B8 and func_L03_002EFB60. All three write to
  * the same address, 0x0($a0), which no compiler emits either.
@@ -42,4 +42,10 @@
  * here - it counts the function as finished, and this is not a function.
  * The catalogue-side fix (a tools/levels.py split that tells the 52
  * bytes of code from the 12 bytes of fill) is a maintainer's call.
+ *
+ * 2 November 2026: the existing read_boot.py R5900 decoder confirms these
+ * words in USA v1.01, PAL and USA v2.00. Corrected the earlier generic-MIPS
+ * sdc2/ext labels: 0x7CA30000 is sq, which is ordinary compiler-supported EE
+ * code and is not itself evidence of handwritten assembly. The COP2 stores,
+ * inter-function boundary and incoming-reference evidence remain the blockers.
  */

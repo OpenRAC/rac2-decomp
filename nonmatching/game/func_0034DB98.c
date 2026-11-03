@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract/lifetime review (USA v1.01 only).
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current check.py: 1088/1088 bytes, 0/28 places, first mismatch +0x4.
+ * The font lookup now returns its full64-bit texture descriptor with int input; text draw retains full64-bit style and pointer metrics; final draw helper has its actual int return. Same-size code still rotates saved object/array/vtable registers and differs in font-field/format scheduling.
+ * Reopen: Independent paired-array, text-field storage and format-call lifetime evidence with full64-bit font/style contracts.
+ * No linked or cross-release match is claimed. Earlier notes follow.
+ */
 /* GPT-6.1 Sol high, USA v1.01, pinned v2 game -O2 -G8 profile.
  * Retained attempt: 1076/1088 bytes, 0/28 places (check.py --diff).
  * Advancing the first array's completed object/vtable cursors by 0x4C
@@ -23,9 +30,9 @@ extern float *func_00335E18(void *);
 extern float *func_00335E10(void *);
 extern unsigned int *func_00335E20(void *);
 extern void func_0034AD10(void *);
-extern void *func_0027C878(long long);
-extern void func_0027F640(unsigned long long, char *, int, void *, int, float, float, float);
-extern void func_0027FBD8(int, int, unsigned int, char *, int);
+extern unsigned long long func_0027C878(int);
+extern void func_0027F640(unsigned long long, char *, int, unsigned long long, void *, float, float, float);
+extern int func_0027FBD8(int, int, unsigned long long, char *, int);
 extern int func_00115DA8(char *, const char *, ...);
 extern int D_001A8C64[] __attribute__((sda));
 extern int D_001A79F8[] __attribute__((sda));
@@ -109,7 +116,7 @@ void func_0034DB98(char *object)
             step += 3.0f;
             scale = func_00335E18(p);
             func_0027F640((unsigned long long)color, text, -1, func_0027C878((long long)(int)*(long long *)(p + 0x38)),
-                         *(int *)(p + 0x34), drawX, y + (float)yoffset, *scale);
+                         *(void **)(p + 0x34), drawX, y + (float)yoffset, *scale);
         } while (step < digits);
     }
     if (D_001A7A32[0] >= 2) {

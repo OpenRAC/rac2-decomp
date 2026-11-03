@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract review (USA v1.01 only).
+ * Profile: -O2 -G0 -ffunction-sections -g -fno-gcse.
+ * Current check.py: 696/696 bytes, 0/2 places, first mismatch +0x1D4.
+ * Corrected func_L01_00355BA0 and func_002E5F40 to their actual integer returns, verified in matched definitions. Division scheduling and the amount/original FP copies still differ.
+ * Reopen: Independent division expression and FP-lifetime evidence.
+ * No linked match or cross-release qualification is claimed. Earlier notes follow.
+ */
 /* Retained readable C; not matching and no exact-C credit.
  * 2026-10-28 profile: -O2 -G0 -ffunction-sections -g -fno-gcse.
  * 696/696 bytes; local check fails at +0x1d4. Branch-shaped effect selection fixed the original conditional moves. Remaining division scheduling and value-copy choices differ. -g and -fno-gcse do not close the remaining gap.
@@ -12,8 +19,8 @@ extern void func_002E59F8(int);
 extern int func_00282948(void *);
 extern int func_002E59B0(void *, int);
 extern int func_002E5CF8(int, int, void *);
-extern void func_L01_00355BA0(int, int);
-extern void func_002E5F40(int, int);
+extern int func_L01_00355BA0(int, int);
+extern int func_002E5F40(int, int);
 
 void func_L04_0040DF90(unsigned char *m, unsigned char *p)
 {

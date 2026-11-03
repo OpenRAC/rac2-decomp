@@ -1,3 +1,11 @@
+/* 2 November 2026: retained nonmatching C; no linked matching credit.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * USA v1.01 check: 2428/2468 bytes, 0/28 placements.
+ * Matched text functions 0027FAA8/0027FB40 and helper 002D3D88 return int. The rectangle helper
+ * 0028FC48 takes a full 64-bit unsigned-long style argument, and 0027C540 takes int. Restoring
+ * these actual contracts leaves 2428/2468 bytes and 0/28 placements. Rounding boundaries, FP
+ * hoisting and the saved-register set remain unresolved.
+ */
 /*
  * func_002D3FA0 (2468 bytes, boot + 27 levels). Tier: Opus 5.5 xhigh (opus-1), task v1900.
  * Build it as its own -G8 unit (src/game/002D3FA0-g8.c): $gp is needed for D_001ABA74 outside delay
@@ -58,20 +66,20 @@ extern char D_001AB998[];
 extern int func_002A9588(int, int, int, int, int);
 extern int func_00336D50(char *, int);
 extern void func_00300A00(int, int, float, float, float, float, float);
-extern void func_0028FC48(int, int, int, int, int, int);
+extern void func_0028FC48(int, int, int, int, unsigned long, int);
 extern int func_0028E588(int, int);
 extern void func_0028EA58(int, int, int, int, int, MenuCorners *);
 extern void func_0028E868(int, int, int, int, int, int);
 extern char *func_00288FB8(int);
-extern void func_0027FB40(int, int, unsigned long long, char *, int);
-extern void func_0027FAA8(int, int, unsigned long long, char *, int);
+extern int func_0027FB40(int, int, unsigned long long, char *, int);
+extern int func_0027FAA8(int, int, unsigned long long, char *, int);
 extern int func_00115DA8(char *, char *, ...);
-extern void func_002D3D88(int, int);
+extern int func_002D3D88(int, int);
 extern void func_002FC620(int, int, int, int);
 extern void func_002A0250(void), func_002A01C8(void), func_002A01F0(void);
 extern void func_002A0300(char *, int), func_002A0220(void), func_002A0380(void);
 extern void func_002ECB70(char *);
-extern void func_0027C540(long), func_0027C660(void);
+extern void func_0027C540(int), func_0027C660(void);
 extern char *D_001A8CFC[] __attribute__((sda));
 int func_002D3FA0(void)
 {

@@ -1,3 +1,10 @@
+/* 2026-11-03 w02 source-contract review (USA v1.01 only).
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Current check.py: 276/276 bytes, 0/1 places, first mismatch +0x78.
+ * Corrected func_002AA548 to its actual float return. The modulo and 120/tau FP scratch-register choices remain different.
+ * Reopen: Independent sched1 constant-creation/lifetime evidence; documented tau/wrapper controls tie.
+ * No linked match or cross-release qualification is claimed. Earlier notes follow.
+ */
 /* Claude Opus 5.5 xhigh (opus-1), v2049, 2026-11-01: NOT MATCHING.
  * USA v1.01: 276/276 bytes, 0 of 1 places; 13 of 69 check rows differ, 4 of them
  * relocation-only jal rows and 9 registers. Profile: default L16_00403900.c flags
@@ -30,7 +37,7 @@
 extern s32 func_00283CF0(float);
 extern s32 D_L16_001B2648 MACRO_ADDR;
 extern float func_00283198(float);
-extern void func_002AA548(void *, void *, float, float, float, float);
+extern float func_002AA548(void *, void *, float, float, float, float);
 extern void func_L16_00412F48(u8 *);
 static inline s32 func_L16_00411368_period(float seconds)
 {

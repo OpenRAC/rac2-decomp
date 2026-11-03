@@ -1,3 +1,9 @@
+/* 2 November 2026:
+ * func_L00_00384D40 returns its allocated object pointer. Correct that ignored return
+ * declaration from the matched callee. The current qualified profile still emits 1448/1448
+ * bytes, 0/27 US placements; table HIGH reuse, copied-pointer allocation and FP constant
+ * ordering remain. No complete match.
+ */
 /* GPT-6.1 Sol high, v1127, USA v1.01: 1448/1448 bytes, 0/27 places.
  * Profile: -O2 -G8 -ffunction-sections -frac2-zero-ti-por
  *          -frac2-qcopy -frac2-qcopy-barrier -g -frac2-gcse-unsplit-edges.
@@ -72,7 +78,7 @@ extern void func_L00_003851A0(char *, void *);
 extern void func_002A05A8(char *);
 extern void func_002A0F48(char *);
 extern s32 func_L00_0031D620(s32, s32, f32);
-extern void func_L00_00384D40(char *, void *, void *);
+extern char *func_L00_00384D40(char *, void *, void *);
 
 void func_L00_00384678(char *obj)
 {

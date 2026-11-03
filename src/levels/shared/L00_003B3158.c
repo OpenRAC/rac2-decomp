@@ -118,7 +118,7 @@ INCLUDE_ASM("asm/levels", func_L00_003B5BF8);
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_003B63D8);
+/* func_L00_003B63D8 is defined in L00_003B63D8-counter-g8.c. */
 
 
 extern void func_L00_003B6B70();

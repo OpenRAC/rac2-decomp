@@ -1,17 +1,10 @@
-/* func_L25_0040DE40: near miss, 1840/1852 bytes, 0 of 1 place (USA v1.01, 2 November 2026).
-
-   Profile: its own unit, `-O2 -G8 -ffunction-sections`.
-
-   Family F35 (func_L05_00421B98, func_L10_00424CD0, func_L15_00431590, same opcodes): the HUD
-   icon pairs and the countdown. This is the func_L05_00421B98 draft (1836/1852 on the current
-   compiler, 418 rows) with every icon row written through SCREEN_Y, the vanished-test macro
-   func_L10_004227A0's note describes: `dst = (int)scaled; if (D_L05_001B2D80 == 1) scaled +=
-   1.0f;`. 1840 bytes and 305 rows. The countdown box keeps its real +1.0f.
-   What differs: retail loads the -1/1/0 constants again in each icon block and issues the y
-   chain before them, with $a0 = v0 last; here they are shared from the first block. Tried,
-   worse: an empty do-while after the test, with or without -malign-loops=2 (389 rows), and a
-   statement-expression SCREEN_Y inside the call (304 rows, 1840 bytes; with the do-while 367). */
-
+/* 2 November 2026: lawful retained reconstruction, not a match.
+ * SCREEN_Y now expresses only its used rounded coordinate. Removed the
+ * invented mode test that changed an already-dead temporary solely to affect
+ * compiler scheduling. The countdown's genuine mode-dependent +1 remains.
+ * Current check.py: 1836/1852 bytes, 0/1 USA v1.01 placement. Prior
+ * 1840/1852-byte measurements used that diagnostic and do not qualify this body. Use a separate default G8 unit; no linked match is claimed.
+ */
 #include "common.h"
 
 extern char *D_L05_001B13B0 __attribute__((sda));
@@ -42,8 +35,6 @@ extern void func_0027F5B8(int, int, unsigned long long, unsigned char *, int);
     {                                              \
         float scaled = (y0) * D_L05_001B2D84 + 0.5f;   \
         dst = (int)scaled;                         \
-        if (D_L05_001B2D80 == 1)                   \
-            scaled = scaled + 1.0f;                \
     }
 
 #define DRAW(sprite, color, x0, y0, a, b, c)                               \

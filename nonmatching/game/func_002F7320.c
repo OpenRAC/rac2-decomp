@@ -1,3 +1,4 @@
+/* 2 November 2026: the signed 32-bit index/result form remains 132/132 bytes, 0/28 US placements. An unsigned index changes the retail signed bound test; a 64-bit result expands to 140 bytes without preserving the required zero copy. Neither is retained. The entry zero-copy/CSE constraint remains; do not repeat width probes without new compiler evidence. */
 /*
  * func_002F7320 (boot 0x002F7320, 132 bytes, 28 places).
  * Tier: control flow solved, allocation open.

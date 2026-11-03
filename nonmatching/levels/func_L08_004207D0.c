@@ -1,3 +1,8 @@
+/* 2 November 2026, remaining-function review: nonmatching; no linked credit.
+ * Profile: -O2 -G8 -ffunction-sections -g -frac2-zero-ti-por.
+ * US check: 1144/1156 bytes, 0/2 placements.
+ * Current matched projection-state helpers00300090/003000C0 return s32;00300100 is void. Correcting the first two ties at 1144/1156,0/2. Full48-byte matrix buffers and wide colors are preserved.
+ */
 /* func_L08_004207D0: retained near miss, 30 October 2026.
    Profile: -O2 -G8 -ffunction-sections -g -frac2-zero-ti-por.
    Complete radar UI with two 48-byte matrices. Retail func_002833F0 and func_002836E8 each write exactly three quadwords. Signed 32-bit dynamic color is sign-extended into the actual 64-bit RGBA parameter; texture descriptors retain 64 bits. Frame/allocation and rounding/scheduling remain.
@@ -17,7 +22,8 @@ extern f32 D_L08_001B1BA4 __attribute__((sda));
 extern u32 D_L08_001B1BA8 __attribute__((sda));
 extern u16 *D_L08_001FB660[];
 extern u8 D_L08_001B9D30[];
-extern void func_L08_00300090(void), func_L08_00300100(void), func_L08_003000C0(void);
+extern s32 func_L08_00300090(void), func_L08_003000C0(void);
+extern void func_L08_00300100(void);
 extern char *func_00336D50(void *, s32);
 extern void func_00300A00(char *, u32, f32, f32, f32, f32, f32);
 extern u64 func_0027C878(s32);

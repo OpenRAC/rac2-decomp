@@ -18,6 +18,14 @@ inline assembly, pin registers or invent barriers/interfaces. Keep upstream
 provenance and licences, and recheck every affected function through the strict
 linked build.
 
+`CpuSync` and `CpuEnableInt` are shared EE hardware primitives, not compiler
+patches or replacements for entire functions. The interrupt-enable primitive
+is taken unchanged from [RAC1's common header at `868f8114`](https://github.com/OpenRAC/rac1-decomp/blob/868f81145904e021802a7dffa4a3addd33b7c97c/include/common.h).
+The movie callbacks `func_00350190` and `func_0034FFC0` call these helpers around
+their real interrupt epilogues. A local instruction helper inside a game unit
+is unnecessary. Their MMIO/interrupt dependencies remain target-specific; a
+matching rebuild does not establish a native implementation of those services.
+
 Check the current RAC1 source **and its active build inputs** before rejecting a
 source method or adding a compiler mechanism. At revision
 [`e7e787ed`](https://github.com/OpenRAC/rac1-decomp/tree/e7e787ed94f0d56c1ab617e7abdb83ac6db787ec),
@@ -294,6 +302,11 @@ silently changing neighbouring definitions.
   matched preview helper `func_00300048` similarly retains its observed unused
   object argument. Check callers or an independent interface before changing a
   canonical declaration, and never add a synthetic use of an unused formal.
+  The packet builder `func_002B6480` similarly retains its unused mode word:
+  the movie callback supplies zero, and the frame builders in all three releases
+  supply one. Its definition and caller views now agree on pointer plus mode;
+  the body does not invent a use of that argument.
+
 - A 64-bit colour/result must keep its ABI width. `func_001175F0` forwards a long
   result; explicit 32-bit truncation adds two instructions.
 - A colour constant's declared argument width selects its materialisation. Through
@@ -325,6 +338,28 @@ silently changing neighbouring definitions.
 - This compiler is C89: declarations precede statements in their block. Put
   typedefs before externs using them. Do not name a typedef `TI`: it conflicts
   with a later `mode(TI)` attribute. `TI128` avoids the collision.
+
+The unsigned widened postfix pattern is useful beyond a single counter. In
+`func_L00_003B63D8`, load the 16-bit timer into an unsigned 32-bit local, retain
+the old value while incrementing, then store the narrowed value back. This
+preserves the retail comparison and wrap without the unwanted HImode mask.
+Its query call also uses the documented bank-preserving argument interleaving;
+the six integer/pointer and three FP arguments keep their order within each bank.
+
+Pointer lifetime changes must preserve the actual C objects. The camera prefix
+used there starts at `D_L00_001B8DC0`, with its position at zero and its three-row
+basis at `+0x230`; subtracting `0x230` from a separately declared basis array
+would form a pointer before that array. The inverse needs **four output rows**:
+`func_00283698` reads three input rows but also writes an identity row at `+0x30`.
+Its 64-byte output is required even though `func_00283098` reads only the first
+three rows. This is distinct from `func_00283678`/`func_00283738`'s 48-byte operations.
+
+The public-newlib `func_00131424` square-root wrapper supplies another ordinary
+source remedy: its NaN classifier `func_001313C8` depends only on its argument's
+bits and has no side effects, so a truthful `const` declaration preserves the
+cached library mode across that call. Keep newlib's Sun permission notice.
+The complete generated NaN constant pool still needs the strict linked build;
+text equality alone does not qualify it.
 
 The recipe installs its public `gcc/ginclude/*.h`. Here `va_start` uses
 `__builtin_next_arg(last)`, the **stack arguments**, while some retail shims pass

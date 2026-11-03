@@ -1,5 +1,15 @@
-/*
- * func_L01_003A6638: exact bytes in USA v1.01 with 10 dead initial values at declarations, whose only effect is gcse's insn count (the PRE spill-slot order). Over the limit of five per function ruled on 31 October 2026, so not linked; a maintainer can rule on it. Everything below is the whole unit `src/levels/01_oozla/L01_003A6638-g8.c` as it matched, with flags `-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g` (batch v1980).
+/* 2 November 2026: lawful retained reconstruction, not a match.
+ * Removed ten deliberately dead initial values used only to alter the
+ * compiler PRE hash-table count. Every actual first-use state assignment
+ * remains. Current default G8/zero-ti-por/debug check: 2276/2276 bytes,
+ * 0/1 USA v1.01 placement, first difference +0x1B4 (spill-slot ordering).
+ * Three additional controls named real used material/attack constants,
+ * angular/timestep constants, or both. None recovered the retail slots:
+ * integer-only remains nonmatching; the two float forms emit 2272 bytes,
+ * with the float-only form also growing the frame to 0x240.
+ * The earlier exact-byte dead-initializer diagnostic is privately preserved
+ * and provides no accepted C credit. Reopen on genuine PRE-copy lifetimes.
+ * Use -O2 -G8 -ffunction-sections -frac2-zero-ti-por -g in a separate unit.
  */
 #include "common.h"
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
@@ -82,13 +92,9 @@ void func_L01_003A6638(u8 *object)
 #define matrix workspace.transform.matrix
     float start[4], angles[4], finish[4], shift[4], offset[4], hit[4], normal[4], force[4], adjustment[4], edge[4];
     float horizontal, vertical;
-    /* Ten of the initial values here (none of them reaches a use) fix the insn count gcse sees: PRE numbers its
-     * reaching registers in hash-bucket order, bucket = hash % ((max_cuid/2)|1), and the five spilled pointers
-     * take their stack slots in that order. Retail's order needs 269 buckets; these give max_cuid 536.
-     * A float initial value of 0.0f is not used here: measured, it leaves a live mtc1 $zero at entry. */
-    float maximum = 1.0f, speed = 1.0f, progress, sign = 1.0f, angle, half = 1.0f, cosine = 1.0f;
+    float maximum, speed, progress, sign, angle, half, cosine;
     u8 *state = *(u8 **)(object+0x68);
-    int collision = 0, count = 0, blocked = 0, level = 0, level2 = 0;
+    int collision, count, blocked, level, level2;
     qcopy(previous, (object+0x10));
     switch (object[0x20]) {
     case 0:
