@@ -1,3 +1,25 @@
+/* v2169 (opus-2, 3 November 2026): the saved-but-unused $s2 is explained; still no landable source.
+   Level 2's display mode is D_L02_001B3E00 (the word before the scale D_L02_001B3E04; 66 loads in
+   level 2, compared with a constant held in a saved register, e.g. `bne $v0,$fp` at 0x0034E6AC).
+   MEASURED PROBE (not acceptable source: invented dead store), 696/696 bytes, retail's 0xF0 frame,
+   $s2 saved and never used, state in $s3, `addiu $a0,$sp,0x10` rebuilt at every call:
+       static __inline__ int hud_scaled(int mode, float v, int adjust)
+       { float y; if (D_L02_001B3E00 == 1) y = 1.0f; y = v * D_L02_001B3E04 + 0.5f; return (int)y; }
+   used for all seven scaled coordinates (`hud_scaled(mode, (float)D_L02_001B1444, 0)` etc., the
+   three per call written as arguments of func_002802E0, no ctx variable, buf1 passed directly).
+   Mechanism (read in the dumps): cse shares one constant-1 pseudo for the `== 1` tests of the first
+   two draws, global-alloc gives it $s2 (it crosses calls), the arms are emptied by flow1, the tests
+   survive to greg and vanish at flow2's block cleanup, which then deletes the mode loads and the
+   constant: $s2 stays in regs_ever_live.  Left: scheduling (sched2 sees one block, so the colour
+   and int argument loads rise into the chains) and 0.5/x swapped between $f21 and $f22.  The
+   original construct must be a mode==1 test whose arm is dead after flow1 but not after cse (a
+   never-read target dies in cse: test after the chain with `z = 1.0f` gave 688 bytes, no $s2).
+   Also measured: the guide's 002D3D88 helper (`if (mode != 0) return (int)(..)+adjust; return
+   (int)(..);`, mode in a local) vanishes only at jump2 and leaves `lw $s2,mode` (760 bytes, 0.5 no
+   longer shared); `int r = (int)(..); if (mode != 0) return r + adjust; return r;` folds before
+   gcse (700 bytes, mode load left in $s3 by combine's (use)).  So the overseer's lead is right
+   about the mechanism, but the vanished test is `mode == 1` with a dead arm, not the 002D3D88 form.
+
 /* NEAR MISS (measured 22 October 2026).  Needs a `-G8` unit (built here with
    `-O2 -G8 -ffunction-sections`; the $gp reads of D_L02_001B143C..1460 and 1470 are outside delay
    slots).  This body is 700 bytes against retail's 696, with retail's 0xF0 frame and retail's

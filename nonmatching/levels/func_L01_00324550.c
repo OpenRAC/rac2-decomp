@@ -1,3 +1,17 @@
+/* opus-1 (v2139, 2026-11-03): FAILED, 132/132 bytes, 0/11 places with -mastra-quad-saves (frame 0x2A0 and the
+ * varargs spill area exact; 5 save/restore instructions differ), default profile 0x290 frame with sd/ld s0.
+ * Why s0 is `sq` but ra `sd`: the EE cc1 (stock 2.9-ee mips.c) keeps a per-register save mode, mips_reg_mode[],
+ * set once in override_options and only widened by mips_check_reg_mode() when an insn sets that GPR in a wider
+ * mode; it is never reset between functions. So a function compiled EARLIER in the same original unit that set
+ * $s0 in TImode makes every later function in that unit save $s0 with sq, while $ra stays DImode (sd).
+ * Measured on this checkout's cc1 with a scratch unit (a TImode value held in $s0 across a call, then this body):
+ * the default profile then emits `sq $16,512($sp)` / `sd $31,520($sp)` on a 0x290 frame, i.e. the mixed widths
+ * but 8-byte slot spacing (the sq overlaps ra's slot). Retail uses 16-byte slots with $ra at 0x200 below $s0 at
+ * 0x210 (0x2A0 frame); -mastra-quad-saves gives the 0x2A0 frame but $s0 at 0x200 and $ra as sq at 0x210.
+ * Needed: compiler support for 16-byte slots with per-register widths in retail's order (tools change), plus
+ * the earlier TImode $s0 user of the same unit. Not handwritten: the shape is the compiler's own.
+ */
+
 /* Current retained result, 28 October 2026: 132/132 bytes with game -mastra-quad-saves, but
  * mixed s0/ra save widths and order differ. The SDK profile emits 116/132 and lacks FP spills.
  * The real variadic forwarding body is retained without fabricated frame padding. No strict

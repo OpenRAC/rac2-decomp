@@ -183,6 +183,7 @@
 #define find_fde                         func_00123B40
 #define __ieee754_log                    func_00117CA0
 #define OpenVendorMenu                   func_002F8178
+#define DrawGadgebotSpawnContainer       func_L03_003CA4B0
 #define mpeg_init_seq                    func_00130428
 #define SetPalMode                       func_0027B440
 #define PredictMineImpact                func_L00_003AE550
@@ -836,6 +837,7 @@
 #define ResetBoltPointsToLine            func_L11_0046BC08
 #define ReloadSoundBank                  func_L00_0032D208
 #define KeyOwnerTableInsert              func_L00_0037DD18
+#define follow_camera_setup              func_L00_004233F8
 #define ReleaseDeadOrExpiredSlots        func_L00_0037E000
 #define LayoutTextBoxLines               func_00337E98
 #define UpdateRadialMenuSelection        func_0028CCE0
@@ -850,5 +852,7 @@
 #define UpdateLinkedMobyController       func_L17_0041F478
 #define UpdateProximityPickup            func_L17_0041ED58
 #define UpdateTriggeredAnchorMover       func_L17_003C3C50
+#define DrawSegmentedBeam                func_L07_003F4CC0
+#define UpdateCollisionRing              func_L07_003F4578
 
 #endif /* NAMES_H */

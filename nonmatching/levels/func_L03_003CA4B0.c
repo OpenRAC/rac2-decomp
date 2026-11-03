@@ -1,30 +1,19 @@
-/* Tier: GPT-6.1 Sol (high effort), v1009, 29 October 2026.
- * Best check.py: 1156/1156 bytes, 0/2 USA v1.01 places.
- * Profile: -O2 -G8 -ffunction-sections -g, dedicated -g8 unit.
- * The 0x180 frame and all instructions before +0x25C agree after relocation:
- * the typed camera fixes its base and -g supplies the division padding.
- * Pointer-based transformed-position/UV loops and separate u/v divisions recover
- * the complete near-camera reflection loop. Signed widening matches retail lw.
- * First difference +0x25C: the far-loop destination high half uses v1, not a0;
- * its shared scratch preparation and argument moves are differently scheduled.
- * In packet setup, GCC hoists the matrix address into s4; retail forms it at use
- * and retains the face-table base in s4 (ours s5). This adds one early instruction,
- * shifts the otherwise corresponding flag/store sequence and consumes a later nop.
- * Scalar/aggregate matrix views and aligned vector unions do not fix this.
- * -fno-gcse worsens size to 1132; -frac2-gcse-unsplit-edges is byte-neutral.
- * closer D successor, 1 November 2026: the s4 address is insn 900, hoisted only by the second
- * loop pass (regno 330, life 20, savings 2); forcing gcse bucket counts changes nothing (17 words).
- * Both placements fail at the same first instruction; bindings remain unvalidated.
- * The culling guard is !(dot > 0), preserving retail unordered behavior, rather
- * than dot <= 0. All required declarations are retained below.
- * Reopen with evidence for the shared far-branch/packet pointer lifetimes, rather
- * than repeating division padding, camera typing, or algebraic blend experiments.
- *
- * closer D, 1 November 2026: sp+0x90 is PRE's reaching pseudo 321, set before the near test, with no hard
- * register, so reload rematerialises it at each use (retail's s7 and the far loop's addiu). The third loop keeps
- * a copy, pseudo 200 = 321, that loop.c hoists (life 22) and global allocates to s4. Retail has no such copy: both
- * a2 loads there are rematerialised and s5-s7, fp stay free. It needs each use to stay a life-1 pseudo (undesirable
- * to hoist), so cse1 must not merge the two addresses.
+/* Tier: Claude Opus 5.5 (opus-1, xhigh effort), v2145, 3 November 2026.
+ * Best check.py: 1156/1156 bytes, 0/2 USA v1.01 places; cdiff 67 of 289 rows differ, all of them
+ * register names (every instruction corresponds after relocation).
+ * Profile: -O2 -G8 -ffunction-sections -g, dedicated unit src/levels/shared/L03_003CA4B0-g8.c.
+ * RAC1 counterpart: draw_gadgebot_spawn_container (overlays/shared/gadgebot_containers_and_frog.c).
+ * Fixed since v1009: the face loop now uses RAC1's static inline TransformPoint wrapper, a do/while
+ * and a `center` pointer, so no sp+0x90 copy is hoisted into s4 (the face-table base is back in s4).
+ * The far loop is RAC1's indexed for (i < 57) over the two tables, which fixes its preheader order.
+ * An index form of the near loop is far worse (138 rows), so the near loop keeps its pointers.
+ * Remaining: reload register choice. The spilled `near` (sp+0x110, pseudo 85) reloads into v1 where
+ * retail uses v0. The .greg dump says "Spilling reg 2" for its test (insn 118), but choose_reload_regs
+ * gives v1. The rematerialised in-loop HIGH parts alternate v1/v0 where retail uses v0 throughout
+ * (a0 for the D_L03_00240CF0 high in both preheaders). The last one makes retail's loop-end branch a
+ * bnel, because its slot sets the tested v0; ours is a bnez.
+ * Next: trace reload's per-insn used_spill_regs and its last_spill_reg round-robin in the .greg dump.
+ * Find what makes retail's first reload after the near=1 store (insn 1052, v0) land on v0 again.
  */
 #include "common.h"
 #define F(p,o) (*(float *)((char *)(p)+(o)))
@@ -49,6 +38,10 @@ typedef struct {
 } ReflectPacket;
 typedef struct {char pad[0x140];float pos[4];} ReflectCamera;
 extern ReflectCamera D_L03_001B9840;
+
+/* Transform src by the matrix into dst (RAC1 TransformPoint). */
+static inline void TransformPoint(float *dst,void *src,void *m){func_002830C0(dst,src,m);}
+
 void func_L03_003CA4B0(char *m){
  ReflectPacket packet __attribute__((aligned(16)));
  typedef unsigned int ReflectQ __attribute__((mode(TI)));
@@ -80,9 +73,7 @@ void func_L03_003CA4B0(char *m){
  (*uv)[1]=v+0.5f;(*uv)[0]=u+0.5f;}
  }
  }else{
- float (*source)[4]=D_L03_0029A920;
- float (*dest)[4]=D_L03_00240CF0;
- for(i=56;i>=0;i--){func_002830C0(dest,source++,&transform);dest++;}
+ for(i=0;i<57;i++){float *world=D_L03_00240CF0[i];func_002830C0(world,D_L03_0029A920[i],&transform);}
  }
  {u64 texture=func_0027C878(D_L03_001B0330);
  flags=(u64)D_L03_001B031C;
@@ -96,17 +87,21 @@ void func_L03_003CA4B0(char *m){
  packet.color2=D_L03_001B0334;
  packet.color1=D_L03_001B0334;
  packet.color0=D_L03_001B0334;
- for(i=0;i<42;i++){
- func_002830C0(normal.f,D_L03_0029B750[i],&transform);
- func_00282CF0(dir.f,normal.f,D_L03_001B9980);func_00282F20(dir.f,dir.f,1);
- func_00283098(normal.f,D_L03_0029B120[i],&transform);
- if(!(func_00282DB0(dir.f,normal.f)>0)){
- for(j=0;j<4;j++){
- index=D_L03_0029ACB0[i][j][0];qcopy(packet.position[j],D_L03_00240CF0[index]);
+ i=0;
+ do{
+ float *center=normal.f;
+ TransformPoint(center,D_L03_0029B750[i],&transform);
+ func_00282CF0(dir.f,center,D_L03_001B9980);func_00282F20(dir.f,dir.f,1);
+ func_00283098(center,D_L03_0029B120[i],&transform);
+ if(!(0.0f<func_00282DB0(dir.f,center))){
+ short *idx=D_L03_0029ACB0[i][0];
+ for(j=0;j<4;j++,idx+=2){
+ index=idx[0];qcopy(packet.position[j],D_L03_00240CF0[index]);
  if(near){packet.uv[j][0]=D_L03_00240B20[index][0];packet.uv[j][1]=D_L03_00240B20[index][1];}
- else {int textureIndex=D_L03_0029ACB0[i][j][1];packet.uv[j][0]=D_L03_0029AF50[textureIndex][0];packet.uv[j][1]=D_L03_0029AF50[textureIndex][1];}
+ else {packet.uv[j][0]=D_L03_0029AF50[idx[1]][0];packet.uv[j][1]=D_L03_0029AF50[idx[1]][1];}
  }
  func_00280B90(&packet,0,0);
  }
- }
+ i++;
+ }while(i<42);
 }

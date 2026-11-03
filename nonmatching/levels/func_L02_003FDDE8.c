@@ -1,4 +1,24 @@
 /*
+ * Opus 5.5 (xhigh), task v2169, 2026-11-03: body below unchanged (944/964 bytes
+ * recompiled in its own -G8 unit here). Measured probe (NOT acceptable
+ * source): replacing each of the four y conversions with
+ *   static __inline__ int hud_scaled(float v)
+ *   { float y; if (D_L02_001B3E00 == 1) y = 1.0f;
+ *     y = v * D_L02_001B3E04 + 0.5f; return (int)y; }
+ * gives 964/964 bytes with retail's whole allocation (object s0, 0x8710 s1,
+ * state s2, enabled s3, 0.5/1.0/0.0 in f22/f20/f21, label kept in a2); only
+ * the four draw sections still schedule differently. The skipped arm keeps
+ * cse's path running (constants stay shared from section 1 to 2) and the
+ * test vanishes at flow2. Retail additionally has a sched2 block boundary
+ * between each y fix (cvt.w/mfc1) and the 1.0/0.0 argument setup: the
+ * f13 conversion is issued first there and 1.0 never fills a chain stall.
+ * Retail never loads D_L02_001B3E00, so a real test there must compare live
+ * registers. The 002D3D88 if/else form after the y chain (tested on a live
+ * register) gives that boundary (968 bytes) but its join label ends cse's
+ * path, so 0.5/1.0/0.0/0x8710 are rematerialised per section. Needed: a
+ * construct that cse skips (no else) yet survives to sched2.
+ */
+/*
  * GPT-6.1 Sol high tier, task v0936, 2026-10-29.
  * USA v1.01, pinned game -O2 -G8 -ffunction-sections.
  * Retained check.py: 944/964 bytes, 0 of 1 places match; no linked check.
