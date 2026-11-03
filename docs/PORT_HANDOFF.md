@@ -41,8 +41,8 @@ what the retail code does when the port runs it.
 
 ## State at this handoff
 
-- **master** merges #396–#399 on top of #393 (functional C round 2). OpenRAC #212 still pins
-  `2990ba7e1`, branch `port/backfill-2`; the next repin carries the changes below.
+- **master** merges #396–#399 on top of #393 (functional C round 2). OpenRAC's default branch is
+  `develop`; it pins `99f35ac2`, branch `master`. The next repin carries the 27 rows returned below.
 - **Reports after #399:**
 
   | Release | Functions in C |
@@ -61,17 +61,24 @@ what the retail code does when the port runs it.
     callee read register garbage.
   - One more row differs by 1 ulp: `func_00283028`, a VU `rsqrt` against an exact sqrt. It is
     left as it is.
-- **40 rows written but left out of `functional.tsv`** until each is proven. Their files stay in
-  `nonmatching/functional/`.
-  - **13 unchecked rows:** loaders, main loops, FMV, menu state entry, glow sprites. Retail
-    never returns from them within the gate's budget.
-    - Leaving all 13 out fixes play drift in levels 4, 9, 11, 12, 14 and 16. The culprit
-      narrowed to `func_L00_00303990` (the level loader driver) or `func_L00_002B30E8`.
-  - **27 hand-written helper rows.** Level 26 drifts with them in. There are two culprits, each
-    narrowed to a pair:
-    - `func_00283430` (Euler rotation) or `func_002A04E8`;
-    - `func_00282EB0` or `func_00283098`.
-    - The other 25 rows are innocent and can return once the two culprits are settled.
+- **The drift blamed on left-out rows was a generator bug, fixed in OpenRAC #236.**
+  - hostgen ignored an argument saved to the frame, so `func_L00_00303990` lost its second
+    argument. Retail tests that argument at `0x304610` to choose its resume path,
+    `func_L00_00358B30`. The port always passed 0, so it could never take that path.
+  - `func_L00_00303990` and `func_L00_002A3B88` each declare two arguments, which restored it.
+    That is why each row alone changed levels 4, 9, 11, 12, 14 and 16. With #236 and no rows,
+    the tours are the same as with either row, so these rows were not the culprits.
+  - Level 14's retail capture takes states from `func_L00_00358B30`.
+  - **Not yet shown:** a bit-for-bit comparison of those six levels against a retail run.
+- **Level 26's drift no longer reproduces.** On `develop` (`498c04408`) each of the four suspects
+  alone matches the build without them on level 26, and all 38 left-out rows together match the
+  #236 build on all 26 tours. Tours compare rounded values, so an ulp-sized difference can hide.
+  The cause was not traced.
+- **27 helper rows are back, 408 rows in all.** Each has a current SAME verdict in OpenRAC's
+  `fcheck.tsv`.
+- **11 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.** Ten are
+  `unchecked` (loaders, main loops, FMV, code no capture calls) and `func_L03_003E4680` has no
+  verdict. A clean tour does not count as SAME; a row returns only when it is proven.
 - **Rows waiting on retail captures:**
   - `func_L08_003CD708` and `func_L08_003CDB78`;
   - `func_L20_0036AE68`: #392 moved its entry to `0x36AE78`, 272 bytes; re-capture it at the
@@ -122,13 +129,14 @@ repository or in a functional row.
 | Feltzin ship fight drifts from retail at tick 613 | Sound callbacks ran a tick early, collision and steering ran on host floats, and the generator stripped all-digit addresses as a suffix | Port host and generator, plus `ps2_float` |
 | Same drift came back at tick 837 after a repin | New functional C for `func_002761F8` (CollLine) and `func_00277258` (CollSphere) did its maths in static helpers and `sqrtf`, which `ps2_float` didn't reach | **Decomp + port**: the generator now covers a candidate's helpers |
 | Maktar arena entrance froze | `func_00132318` (snd_BankLoadByLoc) busy-waits on the 989snd loader's reply word; the port only answered SIF server 0x11 | Port host (`libraries.tsv` row) |
-| Six levels' play drifted after a repin | An unchecked functional row: the level loader driver (`func_L00_00303990`) or a sibling | **Decomp** (rows left out) |
-| Level 26 play drifted after a repin | Two hand-written vector helpers | **Decomp** (rows left out) |
+| Six levels' play drifted after a repin | hostgen dropped the loader's second argument; the rows that declared it restored the argument and changed play | Port generator (OpenRAC #236) |
+| Level 26 play drifted after a repin | Not traced; no longer reproduces on `develop` | Unknown |
 | Weapon upgrade trails, vendor view covered, Lancer trail lines, ship exhaust ahead of the ship, arena curtain flat, cockpit screen empty, shield flicker, letterbox 1–2 px short | Frame composition in the port's renderer | Port renderer (OpenRAC #212) |
 
 **The pattern:** when a repin changes play, suspect the newest rows first, especially unchecked
 ones and anything with float maths. A row is innocent only after a retail comparison, not after
-a clean build.
+a clean build. A row can also be right where the build without it is wrong: when two unrelated
+rows give the same run, diff the generated code (`games/rac2-ntsc/gen`) for what they share.
 
 ## Methods that worked
 
@@ -214,9 +222,8 @@ there come from this repository's code and help when naming progress code:
 
 ## Open items
 
-- Settle the two level-26 helper culprits and the loader-driver culprit. Gate each one or
-  rewrite it, then return the 25 innocent helpers and as many of the 13 unchecked rows as can
-  be proven.
+- Compare one of levels 4, 9, 11, 12, 14 or 16 against a retail run, to confirm #236.
+- Prove and return the 11 rows still left out.
 - Capture and gate the three waiting rows (two in level 8, `func_L20_0036AE68` at its new
   entry).
 - Feltzin still splits from retail at about tick 1,937: the port fires one extra projectile.
