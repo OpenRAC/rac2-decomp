@@ -3395,7 +3395,7 @@ with the level's own tables. The same repair covers `func_L04_00378838` (levels 
 (pointer at `14:0028D180`) and `func_L20_0036AE68`: each starts with the same 16 bytes, has no
 reference to them, and matches in every release that has it as its level's copy of the same body.
 
-**3 November 2026, initialization-family follow-up (locally matched; pending review):**
+**3 November 2026, initialization-family follow-up ([draft PR #405](https://github.com/OpenRAC/rac2-decomp/pull/405), pending review):**
 `func_L01_0034B1C0`, `func_L03_003564C0` (levels 3 and 19),
 `func_L09_00352150` and `func_L23_0035CE90` have the same 16-byte entry
 residue. `FUNCTION_ENTRY_OFFSETS` preserves their names and original ends;
