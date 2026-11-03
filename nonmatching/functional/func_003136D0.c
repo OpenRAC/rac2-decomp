@@ -61,7 +61,12 @@ extern char D_00189E20[], D_00189EA0[];
 extern Vec D_L00_0023A670[];
 extern float D_001AF180_gp[] SDATA(D_001AF180);
 extern char D_L00_001B8DC0[];
-extern Moby *D_L00_001B1AEC;
+/* OpenRAC: the orb that turns the shared orbit table (func_00313600) is the executable's 0x001B17AC, at each
+   level's own place (level 3 0x001B266C). D_L00_001B1AEC is level 0's place: run as that address in every level,
+   no orb became the master in level 3 (a word of its own held there), the table never turned and the crates'
+   sparks stood still. */
+extern Moby *D_001B17AC;
+#define D_L00_001B1AEC D_001B17AC
 extern int D_001A7A00;
 extern unsigned char D_001A7A44[] MACRO_ADDR;
 extern unsigned char D_001A7A0A;

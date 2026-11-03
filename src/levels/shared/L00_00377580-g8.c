@@ -33,7 +33,7 @@ extern int func_0027FB40(int, int, unsigned long long, unsigned char *, int);
 extern void func_002F9BC0(char *, int);
 extern int func_0028E588(int, int);
 extern int func_L00_002E9120(unsigned char *, int);
-extern void func_0028EA58(int, int, int, int, int, unsigned int *);
+extern int func_0028EA58(int, int, int, int, int, unsigned int *);
 extern int func_002B0D70(void);
 
 void func_L00_00377580(void) {

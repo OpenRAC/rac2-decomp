@@ -93,7 +93,7 @@ extern int D_L23_001B1780 __attribute__((sda));
 extern int func_00336D50(unsigned char *, int);
 extern void func_00300A00(char *, int, float, float, float, float, float);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, int *);
+extern int func_0028EA58(int, int, int, int, int, int *);
 extern void func_0027EAE8(int, int, int, int, int, void *);
 extern int func_00115DA8(char *, char *, ...);
 extern int func_001157AC(char *);

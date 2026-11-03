@@ -147,7 +147,7 @@ extern void func_00300A00(int, int, float, float, float, float, float);
 extern int func_00282948(void *);
 extern float func_00283CE0(int);
 extern int func_0028E588(int, int);
-extern void func_0028EA58(int, int, int, int, int, void *);
+extern int func_0028EA58(int, int, int, int, int, void *);
 typedef struct { u8 bytes[16]; } Packed16;
 extern Packed16 D_L10_001B1520;
 extern char D_L10_001B1530[];

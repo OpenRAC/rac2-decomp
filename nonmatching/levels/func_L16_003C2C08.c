@@ -48,7 +48,7 @@ extern u8 *D_L16_001B2B1C __attribute__((sda));
 extern float D_L16_001B02B0 __attribute__((sda));
 extern float D_L16_001B02B8 __attribute__((sda));
 extern u32 D_L16_001B02C0[] MACRO_ADDR;
-extern u32 colorFirst SDATA(D_L16_001B02C0);
+#define colorFirst D_L16_001B02C0[0]
 extern float D_L16_001B02BC MACRO_ADDR;
 
 extern char D_L16_001B02D0[];

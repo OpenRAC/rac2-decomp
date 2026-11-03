@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern void func_002A0F48(p);
+extern void func_002A0F48(u8 *p);
 
 void func_L08_003CDB38(u8 *p) {
     u8 *s = *(u8 **)(p + 0x68);

@@ -51,13 +51,16 @@ extern AreaVector D_L06_001B32A0 __attribute__((sda));
 extern AreaVector D_L06_001B32B0 __attribute__((sda));
 extern float D_L06_001B3270[][2] __attribute__((sda));
 extern float D_L06_001B3274[][2] __attribute__((sda));
-extern AreaVector D_L06_001B3260 SDATA(D_L06_001B3260);
+extern AreaVector D_L06_001B3260;
+#define D_L06_001B3260 D_L06_001B3260
 extern char D_L06_001B9840[];
 extern float D_L06_001B0060[] SDATA(D_L06_001B0060);
 extern float D_L06_001B0070[][2] SDATA(D_L06_001B0070);
 extern float D_L06_001B0074[][2] __attribute__((sda));
-extern int levelIndexGP SDATA(D_001A79F0);
-extern float baselineGP SDATA(D_L06_001B3284);
+extern int D_001A79F0;
+#define levelIndexGP D_001A79F0
+extern float D_L06_001B3284;
+#define baselineGP D_L06_001B3284
 extern float D_001A7928 __attribute__((sda));
 extern int D_L06_001B2348 __attribute__((sda));
 
