@@ -2316,6 +2316,7 @@ src/game/0032EB28-track.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsplit-edg
 
 src/game/00300618-vectors.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g -frac2-zero-ti-por
 src/core/00118460.c	-O2 -G2 -ffunction-sections
+src/core/001184D0.c	-O2 -G2 -ffunction-sections
 src/levels/shared/L00_00333F90.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L00_003D4A20-g8.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-gcse-unsplit-edges
 src/levels/05_feltzin_system/L05_00422540-qcopy.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por
@@ -3026,6 +3027,10 @@ src/levels/shared/L02_003C26F0-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/levels/shared/L00_003EEE90-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L03_003C3220-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L04_003FA7E0.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsplit-edges
+src/game/002B00B0-state-g8.c	-O2 -G8 -ffunction-sections
+src/game/002CEBD0-g8.c	-O2 -G8 -ffunction-sections -g
+src/game/0028BDB0-radial-g8.c	-O2 -G8 -ffunction-sections -g
+src/game/0027F128-fpw-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32 -mno-split-addresses
 src/levels/06_notak/L06_0041DED8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/02_maktar_nebula/L02_0040A4A8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/05_feltzin_system/L05_00314E28-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2

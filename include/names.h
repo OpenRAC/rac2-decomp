@@ -174,6 +174,11 @@
 #define GroundAttachedUpdate             func_003116E8
 #define GetNextMobyInGroup               func_002A86E8
 #define CrateUpdate                      func_00310E98
+#define sceVibSetActParam                func_00128FD0
+#define find_fde                         func_00123B40
+#define mpeg_init_seq                    func_00130428
+#define SetPalMode                       func_0027B440
+#define FontPrintWindow                  func_0027FC70
 
 /* descriptive */
 #define QueueMobyImpact                  func_002A8E20
@@ -799,5 +804,10 @@
 #define RequestVoiceLine                 func_L16_00412BA8
 #define UpdateTwoTriggerPathPlatform     func_L17_003C7680
 #define SelectBestTargetInCone           func_002AF580
+#define SetDeathBits                     func_002A6C58
+#define UpdateVisibilityBitmap           func_0027A288
+#define TryClaimNotice                   func_002B0C28
+#define ForceClaimNotice                 func_002B0CE0
+#define UpdateRadialMenuSelection        func_0028CCE0
 
 #endif /* NAMES_H */

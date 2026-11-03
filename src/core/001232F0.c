@@ -527,20 +527,86 @@ void func_00123978(int *record, RecordOutput *output, unsigned int *minimum, uns
 }
 
 
-INCLUDE_ASM("asm/core", func_00123B40);
+/* libgcc.a frame.o: find_fde, verbatim from the gcc/frame.c of
+   gnu-ee-binutils-gcc-1.1 with gthr-single.h's object mutex. The inline
+   __gthread_mutex_lock/unlock calls return 0 and leave no code, but the
+   unlock's inline body ends a block between the object walk and the
+   `ob == 0` test: jump threading sends the walk's initial null exit
+   straight to `return 0` while the break path keeps the test, as in
+   retail. Without them both exits share the test and it is deleted. */
+
+struct dwarf_fde {
+    unsigned int length;
+    int CIE_delta;
+    void *pc_begin;
+    unsigned int pc_range;
+};
+
+typedef struct dwarf_fde fde;
+
+struct object {
+    void *pc_begin;
+    void *pc_end;
+    struct dwarf_fde *fde_begin;
+    struct dwarf_fde **fde_array;
+    unsigned int count;
+    struct object *next;
+};
+
+typedef int __gthread_mutex_t;
+
+static __inline__ int __gthread_mutex_lock(__gthread_mutex_t *mutex __attribute__ ((__unused__))) {
+    return 0;
+}
+
+static __inline__ int __gthread_mutex_unlock(__gthread_mutex_t *mutex __attribute__ ((__unused__))) {
+    return 0;
+}
+
+static __gthread_mutex_t object_mutex = 0;
+
+extern struct object *D_00141838;
+extern void func_00123A00(struct object *);
+
+fde *func_00123B40(void *pc) {
+    struct object *ob;
+    unsigned int lo, hi;
+
+    __gthread_mutex_lock(&object_mutex);
+
+    for (ob = D_00141838; ob; ob = ob->next) {
+        if (ob->pc_begin == 0)
+            func_00123A00(ob);
+        if (pc >= ob->pc_begin && pc < ob->pc_end)
+            break;
+    }
+
+    __gthread_mutex_unlock(&object_mutex);
+
+    if (ob == 0)
+        return 0;
+
+    /* Standard binary search algorithm.  */
+    for (lo = 0, hi = ob->count; lo < hi;) {
+        unsigned int i = (lo + hi) / 2;
+        fde *f = ob->fde_array[i];
+
+        if (pc < f->pc_begin)
+            hi = i;
+        else if (pc >= f->pc_begin + f->pc_range)
+            lo = i + 1;
+        else
+            return f;
+    }
+
+    return 0;
+}
 
 /* libgcc.a frame.o: extract_cie_info, verbatim from the gcc/frame.c of
    gnu-ee-binutils-gcc-1.1 - the same public source the qualified compiler is
    built from. The CIE is reached back through f->CIE_delta, and the unaligned
    pointer read is read_pointer's packed union, which is why retail shows an
    lwl/lwr pair rather than a plain lw. */
-
-typedef struct {
-    unsigned int length;
-    int CIE_delta;
-    void *pc_begin;
-    unsigned int pc_range;
-} fde;
 
 struct dwarf_cie {
     unsigned int length;

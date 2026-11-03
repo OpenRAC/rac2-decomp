@@ -2,10 +2,7 @@
 # Each does what the retail function does without matching its bytes; the matching build never reads it.
 # Files under nonmatching/functional/ are C written for the port only (no matching attempt behind them).
 # name	file
-func_00128FD0	nonmatching/functional/func_00128FD0.c
 func_001325E0	nonmatching/functional/func_001325E0.c
-func_0027B440	nonmatching/functional/func_0027B440.c
-func_0027FC70	nonmatching/functional/func_0027FC70.c
 func_00280710	nonmatching/functional/func_00280710.c
 func_00283CB8	nonmatching/functional/func_00283CB8.c
 func_00283CF0	nonmatching/functional/func_00283CF0.c
@@ -17,7 +14,6 @@ func_002933D0	nonmatching/functional/func_002933D0.c
 func_00294F10	nonmatching/functional/func_00294F10.c
 func_002B6828	nonmatching/functional/func_002B6828.c
 func_002BA0E0	nonmatching/functional/func_002BA0E0.c
-func_002CA8A8	nonmatching/functional/func_002CA8A8.c
 func_002CBC58	nonmatching/functional/func_002CBC58.c
 func_002D6F38	nonmatching/functional/func_002D6F38.c
 func_002E3998	nonmatching/functional/func_002E3998.c
@@ -78,24 +74,19 @@ func_00283BE0	nonmatching/functional/func_00283BE0.c
 func_00283C80	nonmatching/functional/func_00283C80.c
 func_00285030	nonmatching/functional/func_00285030.c
 func_0028A670	nonmatching/functional/func_0028A670.c
-func_0028E2A8	nonmatching/functional/func_0028E2A8.c
 func_00294420	nonmatching/functional/func_00294420.c
 func_00294C40	nonmatching/functional/func_00294C40.c
-func_002954C0	nonmatching/functional/func_002954C0.c
 func_0029CF58	nonmatching/functional/func_0029CF58.c
 func_0029CF78	nonmatching/functional/func_0029CF78.c
 func_0029F840	nonmatching/functional/func_0029F840.c
 func_002A0488	nonmatching/functional/func_002A0488.c
 func_002A04B8	nonmatching/functional/func_002A04B8.c
-func_002B0C28	nonmatching/functional/func_002B0C28.c
-func_002B0CE0	nonmatching/functional/func_002B0CE0.c
 func_002B44C0	nonmatching/functional/func_002B44C0.c
 func_002B6F70	nonmatching/functional/func_002B6F70.c
 func_002B9030	nonmatching/functional/func_002B9030.c
 func_002B9380	nonmatching/functional/func_002B9380.c
 func_002CC6B0	nonmatching/functional/func_002CC6B0.c
 func_002D7698	nonmatching/functional/func_002D7698.c
-func_002DA9A8	nonmatching/functional/func_002DA9A8.c
 func_002EEBC8	nonmatching/functional/func_002EEBC8.c
 func_002F3CF8	nonmatching/functional/func_002F3CF8.c
 func_00301F18	nonmatching/functional/func_00301F18.c
@@ -325,7 +316,6 @@ func_L09_00326E90	nonmatching/functional/func_L09_00326E90.c
 func_L09_003EA798	nonmatching/functional/func_L09_003EA798.c
 func_L15_0042DCE0	nonmatching/functional/func_L15_0042DCE0.c
 func_L00_00411B30	nonmatching/functional/func_L00_00411B30.c
-func_0027A288	nonmatching/functional/func_0027A288.c
 func_L04_004045E0	nonmatching/functional/func_L04_004045E0.c
 func_L01_002B5EA0	nonmatching/functional/func_L01_002B5EA0.c
 func_L06_0041EF08	nonmatching/functional/func_L06_0041EF08.c

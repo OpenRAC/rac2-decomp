@@ -1,20 +1,3 @@
-/* GPT-6.1 Sol high, worker v0960, USA v1.01, pinned game compiler.
- * Best check.py: 1228/1228 bytes, 0 of 28 places match.
- * Profile: -O2 -G8 -ffunction-sections -g, dedicated unit.
- * Four non-address words differ: offsets +0x114/+0x124 and +0x1F8/+0x208
- * load/add D_001AB9E4 through f13 instead of retail f3. Everything else,
- * including the 0x80 frame and repeated coordinate-conversion blocks, has
- * matching non-address instruction fields.
- * Scalar offset, eagerly loaded pointer offset, and an extra float-returning
- * inline wrapper give identical bytes; -fno-regmove also leaves them unchanged.
- * The inline early returns plus -g recover the rounding block structure;
- * an earlier shared-return/default-profile trial emitted only 1044 bytes.
- * A full u64 color prototype for func_0028FC48 fixes all four rectangle calls'
- * argument scheduling. New experiment needed: recover the source lifetime or
- * preference that prevents the screen offset from sharing the final f13 arg.
- * regalloc.py reports offset pseudos 116/154 preferring hard register 45.
- * Required declarations and helpers follow. Not linked.
- */
 #include "common.h"
 extern int D_001B23A0;
 extern float D_001B23A4;
@@ -38,8 +21,8 @@ static __inline__ float menu_vector_offset(float value, float offset)
 static __inline__ int menu_screen_y(float value, float offset)
 {
     float y = value * D_001B23A4 + 0.5f;
-    if (D_001B23A0 != 1) return (int)y;
-    return (int)(y + offset);
+    if (D_001B23A0 == 1) return (int)(y + offset);
+    return (int)y;
 }
 
 void func_002CEBD0(void) {

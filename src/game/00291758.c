@@ -624,7 +624,46 @@ int func_00293CA8(int index)
     return 1;
 }
 
-INCLUDE_ASM("asm/game", func_00293F98);
+/* The streamed parts table: the base sector at 0x3E24 and a sector/size
+   pair per set of parts. */
+typedef struct { int sector, size; } PartsFile;
+typedef struct {
+    char pad0[0x3E24];
+    int base;              /* 0x3E24 */
+    PartsFile files[1];    /* 0x3E28 */
+} PartsToc;
+extern PartsToc parts_toc __asm__("D_0014B540");
+/* The record a part load reads: per part, its offset and a count. */
+typedef struct { int offset, count; } PartEntry;
+typedef struct {
+    char pad0[0x30];
+    int index;             /* 0x30 */
+    char pad34[0x70 - 0x34];
+    PartEntry *rec;        /* 0x70 */
+    int parts[0x46];       /* 0x74 */
+} PartsState;
+extern PartsState parts_state __asm__("D_001B8840");
+extern int func_002B7B18(int, int, int);
+extern void func_0027D330(int);
+
+void func_00293F98(int index, int flag)
+{
+    PartEntry *r;
+    int i;
+
+    func_002B7B18((int)parts_state.rec, parts_toc.files[index].sector + parts_toc.base,
+                  parts_toc.files[index].size);
+    if (flag != 0) {
+        func_002B7CE0(0);
+        func_0027D330(flag);
+    }
+    parts_state.index = index;
+    func_002B7CE0(1);
+    for (i = 0, r = parts_state.rec; i < 0x46 && r->count != 0; i++, r++) {
+        int offset = r->offset + 0x800;
+        parts_state.parts[i] = (int)parts_state.rec + offset;
+    }
+}
 
 struct SegTable {
     int pad[0x1C];
