@@ -1,3 +1,21 @@
+/* 3 November 2026, Opus 5.5 xhigh (opus-1), task v2126, on v2/c04 (upstream + #348):
+ * best rule-compliant result unchanged: 140/140 bytes, 0 of 28 places (the plain C below).
+ * The wrapper form is still exact here, 28 of 28 (cdiff.py): with the file's own
+ * `extern float D_001B23A4[] __attribute__((sda));`, write `float scale;` and assign
+ * `scale = 329.0f;` on the line before `y = (int)(D_001B23A4[0] * scale + 0.5f);`
+ * (initialising it at the declaration hoists 329.0f above both calls into $f20), then
+ * `do { func_0027FAA8(0x1A6, y, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1); } while (0);`.
+ * Why it works (sched1 dumps, -fsched-verbose-5): the LOOP_BEG note makes `a0 = 0x2D4F` truly
+ * depend on the fix_truncsfsi2 (latency 3), so the func_00288FB8 call issues 3 cycles later and
+ * the `a1 = y` copy is ready with the other argument moves (rank: lowest reg weight, then LUID
+ * gives a1, a3, a2, t0, a0). Without it the call follows the fix at once (only a cost-0 anti
+ * dependence) and the a1 copy waits two cycles, giving a3, a2, a1. The FP colours follow:
+ * with the note, 329.0f is set first and lives 8 insns against 0.5f's 6, so 0.5f wins $f1.
+ * Nothing but a loop note or a real block boundary between the fix and `a0 = 0x2D4F` can do
+ * this; the only integer in a register there is y itself (func_0029C530 is void), so a
+ * vanishing display-mode test would leave its load. An if/else on y with the call in both
+ * arms does not cross-jump (the branch stays). Lands only if the wrapper is ruled acceptable.
+ */
 /* 31 October 2026: exact (28 of 28 places) with `float scale = 329.0f;` held in a local AND
  * the func_0027FAA8 call wrapped in a non-empty `do { ... } while (0);`, whose loop notes keep
  * the argument setup after func_00288FB8 in retail's order and put 329.0f in $f2. Either change

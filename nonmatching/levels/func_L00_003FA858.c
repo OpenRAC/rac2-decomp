@@ -1,3 +1,27 @@
+/* Opus 5.5 xhigh (opus-1), task v2122, 3 November 2026: best check.py result 5796/5796 bytes (1449 of 1449
+ * instructions), 0/27 places, not exact; difflib 1231 opcode+register aligned (was 1180), 480 equal at the
+ * same address (was ~450). Profile: -O2 -G8 -ffunction-sections -ffast-math -g, gp scalars need
+ * __attribute__((sda)); declarations as below (Quad/Pv typedefs, sda externs, pack_alpha inline).
+ * New in this version (each measured):
+ *  - alpha, x and t3 are ONE variable (`alpha`): the merged refs rank it above rot's/up's reaches, giving
+ *    retail's $s7 for alpha/x, $fp for rot's reach and up spilled; x8 is an s32 `alpha >> 24` used as (u8)x8.
+ *  - p10/p20 are user pointers to q.corner[1]/[2] declared just before pos (slot 0x1C0 = p10 as retail).
+ *  - matrix w column chain written m[0][3] = m[1][3] = m[2][3] = 0.0f (stores m[2] first as retail).
+ *  - size = A + (CE0(t) * k) * (B - A): operand order fixes the k20/k24 load order.
+ *  - `a *= dot;` then CF0(a * dot): retail's first product stays in $f0.
+ *  - one s32 `b` for the CF0(a) << 24 colour and the 0x39 block's clamp (both $s0 in retail).
+ *  - rgba stores as `q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = v;` (value straight into the chain in
+ *    the CF0(a) and 0x39 blocks so the or result is block-local): sched puts the REG_DEAD-last store first,
+ *    giving retail's [0],[3],[2],[1] order.
+ *  - `o = pos` in the flare block is a no-op copy (gcse cprop removes it); kept only because it was compiled.
+ * Still differs: in the flare loop retail keeps a copy of pos in $s4 (lw $s4,0x1C8 in the preheader) and
+ *   spills p20 at 0x1C4; here p20 takes $fp, so every slot after p10 is 4 bytes lower (pos 0x1C4 vs 0x1C8,
+ *   up 0x1E4 vs 0x1E8 ...), the source of most remaining hunks. A plain copy cannot survive gcse cprop
+ *   (copy available at loop entry), so the original must create that pseudo another way (inline helper
+ *   parameter? loop.c movable?). Also: v1/pos first-block address (retail addiu $v1,$s5,0x10 then sw 0x1C8),
+ *   sll-before-arg-load order after pack_alpha in block 1, the 0x39 block's x arm (retail f20 = 1.0f),
+ *   the t2 block's rgba order (not yet checked with the chain rule), and the edge-flare block.
+ */
 /* Current retained result, 1 November 2026: 5796/5796 bytes, not exact. Alpha packing now shifts unsigned
  * 32-bit values before storing the packed word, without adding accesses or barriers. The alpha/rotation
  * live-range and spill-order obstruction remains.
@@ -146,10 +170,9 @@ void func_L00_003FA858(u8 *moby)
     f32 a;
     f32 k;
     s32 alpha;
-    s32 x;
     s32 c;
     s32 t2;
-    s32 t3;
+    s32 b;
     s32 i1;
     s32 i2;
     s32 i3;
@@ -161,9 +184,11 @@ void func_L00_003FA858(u8 *moby)
     s32 i9;
     s32 i10;
     s32 i11;
+    TI128 *p10;
+    TI128 *p20;
     f32 *pos;
     void *p36;
-    u8 x8;
+    s32 x8;
     f32 *pF0;
     f32 *p100;
     f32 *p110;
@@ -185,14 +210,15 @@ void func_L00_003FA858(u8 *moby)
         }
     }
     dot = func_00282DB0(dir, (f32 *)(moby + 0xC0));
-    size = D_L00_001B0A9C + (D_L00_001B0A98 - D_L00_001B0A9C) * (func_00283CE0(pv->t1C) * pv->k20);
+    size = D_L00_001B0A9C + (func_00283CE0(pv->t1C) * pv->k20) * (D_L00_001B0A98 - D_L00_001B0A9C);
     if (pv->t1C < pv->n28) {
         k = func_00283CE0(pv->t1C) * pv->k2C;
         a = func_00283CE0(D_L00_001B0AA8) * k;
     } else {
         a = func_00283CE0(D_L00_001B0AA8);
     }
-    alpha = pack_alpha(func_00283CF0(a * dot * dot));
+    a *= dot;
+    alpha = pack_alpha(func_00283CF0(a * dot));
 
     if (func_00282C48(pv->ang[0]) > 0.00001f) {
         func_002AB668(rot, (f32 *)(moby + 0xC0), pv->ang[0]);
@@ -208,7 +234,7 @@ void func_L00_003FA858(u8 *moby)
     func_00282D30(m[0], (f32 *)(moby + 0xC0), size);
     func_00282D30(m[1], m[1], size);
     func_00282D30(m[2], m[2], size);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     func_00281DE8(&q, 0x38, 1, 0x80);
     p130 = v130;
@@ -217,10 +243,7 @@ void func_L00_003FA858(u8 *moby)
     p100 = v100;
     p110 = v110;
     c = alpha | D_L00_001B0AA4;
-    q.rgba[0] = c;
-    q.rgba[1] = c;
-    q.rgba[2] = c;
-    q.rgba[3] = c;
+    q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
     q.uv[0][0] = 0.0f;
     q.uv[0][1] = 0.0f;
     q.uv[1][0] = 0.0f;
@@ -246,27 +269,24 @@ void func_L00_003FA858(u8 *moby)
     func_00282D30(m[0], (f32 *)(moby + 0xC0), size);
     func_00282D30(m[1], m[1], size);
     func_00282D30(m[2], m[2], size);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i2 = 0; i2 < 4; i2++) {
         func_002830C0(&q.corner[i2], &D_L00_001AA310[i2], m);
     }
     func_00280B90(&q, 0, 0);
 
-    size = D_L00_001B0B5C + (D_L00_001B0B58 - D_L00_001B0B5C) * (func_00283CE0(pv->t1E) * pv->k24);
+    size = D_L00_001B0B5C + (func_00283CE0(pv->t1E) * pv->k24) * (D_L00_001B0B58 - D_L00_001B0B5C);
     if (pv->t1E < pv->n2A) {
         k = func_002A7AA8(1.0f, 0.0f, 1.0f, 2.0f, func_00283CE0(pv->t1E) * pv->k30);
     } else {
         k = 1.0f;
     }
-    x = func_00283CF0(func_00283CE0(D_L00_001B0B54) * k * fade);
-    a = func_00283CE0(x) * 0.2f;
-    x = pack_alpha(x);
-    c = pack_alpha(func_00283CF0(a)) | 0xFFFFFF;
-    q.rgba[0] = c;
-    q.rgba[3] = c;
-    q.rgba[2] = c;
-    q.rgba[1] = c;
+    alpha = func_00283CF0(func_00283CE0(D_L00_001B0B54) * k * fade);
+    a = func_00283CE0(alpha) * 0.2f;
+    alpha = pack_alpha(alpha);
+    b = pack_alpha(func_00283CF0(a));
+    q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = b | 0xFFFFFF;
     if (func_00282C48(pv->ang[1]) > 0.00001f) {
         func_002AB668(rot, (f32 *)(moby + 0xC0), pv->ang[1]);
         func_002ACDE8(m[1], (f32 *)(moby + 0xD0), rot);
@@ -275,11 +295,11 @@ void func_L00_003FA858(u8 *moby)
         qcopy(m[1], (f32 *)(moby + 0xD0));
         qcopy(m[2], (f32 *)(moby + 0xE0));
     }
-    x8 = x >> 24;
+    x8 = alpha >> 24;
     func_00282D30(m[0], (f32 *)(moby + 0xC0), size * 1.5f);
     func_00282D30(m[1], m[1], size * 1.5f);
     func_00282D30(m[2], m[2], size * 1.5f);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i3 = 0; i3 < 4; i3++) {
         func_002830C0(&q.corner[i3], &D_L00_001AA310[i3], m);
@@ -287,17 +307,13 @@ void func_L00_003FA858(u8 *moby)
     func_00280B90(&q, 0, 0);
 
     {
-        s32 b = func_00283CF0(func_00283CE0(D_L00_001B0B54) * k * fade * 1.5f);
+        b = func_00283CF0(func_00283CE0(D_L00_001B0B54) * k * fade * 1.5f);
         if (b >= 0x100) {
             b = 0xFF;
         }
         func_00281DE8(&q, 0x39, 1, 0x80);
-        c = pack_alpha(b) | 0xFFFFFF;
+        q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = pack_alpha(b) | 0xFFFFFF;
     }
-    q.rgba[0] = c;
-    q.rgba[1] = c;
-    q.rgba[2] = c;
-    q.rgba[3] = c;
     q.uv[0][0] = 0.0f;
     q.uv[0][1] = 0.0f;
     q.uv[1][0] = 0.0f;
@@ -318,7 +334,7 @@ void func_L00_003FA858(u8 *moby)
     func_00282D30(m[0], (f32 *)(moby + 0xC0), size * 1.25f);
     func_00282D30(m[1], m[1], size * 1.25f);
     func_00282D30(m[2], m[2], size * 1.25f);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i4 = 0; i4 < 4; i4++) {
         func_002830C0(&q.corner[i4], &D_L00_001AA310[i4], m);
@@ -337,18 +353,15 @@ void func_L00_003FA858(u8 *moby)
     func_00282D30(m[0], (f32 *)(moby + 0xC0), size);
     func_00282D30(m[1], m[1], size);
     func_00282D30(m[2], m[2], size);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i5 = 0; i5 < 4; i5++) {
         func_002830C0(&q.corner[i5], &D_L00_001AA310[i5], m);
     }
     func_00280B90(&q, 0, 0);
 
-    c = x | 0xFFFFFF;
-    q.rgba[0] = c;
-    q.rgba[3] = c;
-    q.rgba[2] = c;
-    q.rgba[1] = c;
+    c = alpha | 0xFFFFFF;
+    q.rgba[0] = q.rgba[1] = q.rgba[2] = q.rgba[3] = c;
     func_00282CF0(rot, D_L00_001B8DC0, pos);
     func_00282F20(rot, rot, 0.25f);
     func_00282CC0(m[3], pos, rot);
@@ -370,7 +383,7 @@ void func_L00_003FA858(u8 *moby)
     func_00282D30(m[0], pF0, size);
     func_00282D30(m[1], m[1], size);
     func_00282D30(m[2], m[2], size);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i6 = 0; i6 < 4; i6++) {
         func_002830C0(&q.corner[i6], &D_L00_001AA310[i6], m);
@@ -388,14 +401,14 @@ void func_L00_003FA858(u8 *moby)
     func_00282D30(m[0], pF0, size * 0.75f);
     func_00282D30(m[1], m[1], size * 0.75f);
     func_00282D30(m[2], m[2], size * 0.75f);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i7 = 0; i7 < 4; i7++) {
         func_002830C0(&q.corner[i7], &D_L00_001AA310[i7], m);
     }
     func_00280B90(&q, 0, 0);
 
-    t2 = pack_alpha(func_00283CF0(func_00283CE0(x8) * 0.2f));
+    t2 = pack_alpha(func_00283CF0(func_00283CE0((u8)x8) * 0.2f));
     func_00281DE8(&q, 0x38, 1, 0x80);
     c = t2 | 0xFFFFFF;
     q.rgba[0] = c;
@@ -413,7 +426,7 @@ void func_L00_003FA858(u8 *moby)
     func_00282D30(m[0], pF0, size * 1.5f);
     func_00282D30(m[1], m[1], size * 1.5f);
     func_00282D30(m[2], m[2], size * 1.5f);
-    m[2][3] = m[1][3] = m[0][3] = 0.0f;
+    m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
     for (i8 = 0; i8 < 4; i8++) {
         func_002830C0(&q.corner[i8], &D_L00_001AA310[i8], m);
@@ -426,6 +439,7 @@ void func_L00_003FA858(u8 *moby)
             f32 t;
             f32 r;
             f32 *s;
+            f32 *o;
             f32 inv;
             f32 one;
             f32 span;
@@ -436,11 +450,11 @@ void func_L00_003FA858(u8 *moby)
             v140[1] -= 28492.0f;
             v140[0] -= 28492.0f;
             span = 8590.0f;
-            t3 = pack_alpha(func_00283CF0(D_L00_001B0BA0 * ((f32)pv->t36 * pv->k38)));
+            alpha = pack_alpha(func_00283CF0(D_L00_001B0BA0 * ((f32)pv->t36 * pv->k38)));
             func_002ACEC0(v150, p130, dir, 0.7853982f);
             func_00281DE8(&q, D_L00_001B0B88, 1, 0x80);
             t = (v140[1] < v140[0] ? v140[1] : v140[0]) * inv;
-            c = t3 | D_L00_001B0B98;
+            c = alpha | D_L00_001B0B98;
             q.d70 = 5;
             r = D_L00_001B0B94 / D_L00_001B0B90;
             q.uv[3][0] = one;
@@ -482,18 +496,21 @@ void func_L00_003FA858(u8 *moby)
             }
             func_00282F20(v170, dir, D_L00_001B0B8C);
             s = v160;
+            p10 = &q.corner[1];
+            p20 = &q.corner[2];
+            o = pos;
             for (i9 = 0; i9 < 4; i9++) {
                 func_00282F20(v150, v150, *s);
                 func_00282DD8(v180, dir, v150);
                 func_00282F20(v180, v180, D_L00_001B0B90);
                 func_00282CC0(v190, D_L00_001B8DC0, v170);
-                func_00282CF0(v1A0, v190, pos);
+                func_00282CF0(v1A0, v190, o);
                 func_00282CC0(&q.corner[0], v190, v180);
-                func_00282CF0(&q.corner[1], v190, v180);
-                func_00282CC0(v190, pos, v150);
+                func_00282CF0(p10, v190, v180);
+                func_00282CC0(v190, o, v150);
                 func_00282CC0(v190, v1A0, v190);
                 func_00282D30(v180, v180, r);
-                func_00282CC0(&q.corner[2], v190, v180);
+                func_00282CC0(p20, v190, v180);
                 func_00282CF0(&q.corner[3], v190, v180);
                 func_00280B90(&q, 0, 0);
                 if (i9 < 3) {

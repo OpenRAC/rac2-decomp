@@ -98,14 +98,47 @@ void func_L11_00425A50(char *object)
     func_00338398(object, p + 0x2A0, 4, 1, 3.5f);
 }
 
-extern char *D_L11_001FC420[] __attribute__((sda));
+extern s16 *D_L11_001FC420[];
 extern int D_L11_001B359C __attribute__((sda));
 
-/* func_L11_00425AF8: 228 bytes against retail's 228, and every branch target is
-   retail's; the kind byte and the 0xFF constant land in $v0/$v1 the other way round,
-   and retail's three annulling branches (bltzl/bltzl/bnel) come out as plain ones.
-   Deposited in nonmatching/levels/func_L11_00425AF8.c. */
-INCLUDE_ASM("asm/levels", func_L11_00425AF8);
+/* Walks the object's group list and, for every live member of class 0xCF5 or 0xCF6,
+   marks it (0x266 = 1) and counts the visit at 0x560; class 0xCF5 members also count
+   at 0x584 while the object's own state value at +0x20 is at most zero. */
+void func_L11_00425AF8(char *object)
+{
+    s16 *list;
+    s16 *p;
+    char *base;
+    char *o;
+    char *vars;
+
+    if (((u8 *)object)[0x21] == 0xFF) {
+        return;
+    }
+    list = D_L11_001FC420[((u8 *)object)[0x21]];
+    object = *(char **)(object + 0x68);
+    if (list == 0) {
+        return;
+    }
+    base = (char *)D_L11_001B359C;
+    p = list;
+    do {
+        o = base + ((*(u16 *)p & 0x7FFF) << 8);
+        if (((s8 *)o)[0x20] >= 0 && *(s16 *)(o + 0xAA) == 0xCF5) {
+            vars = *(char **)(o + 0x68);
+            *(u16 *)(vars + 0x266) = 1;
+            *(int *)(vars + 0x560) += 1;
+            if (*(f32 *)(object + 0x20) <= 0.0f) {
+                *(int *)(vars + 0x584) += 1;
+            }
+        }
+        if (((s8 *)o)[0x20] >= 0 && *(s16 *)(o + 0xAA) == 0xCF6) {
+            vars = *(char **)(o + 0x68);
+            *(u16 *)(vars + 0x266) = 1;
+            *(int *)(vars + 0x560) += 1;
+        }
+    } while (*p++ >= 0);
+}
 
 extern char *func_0032F000(char *p, int a1, int a2);
 

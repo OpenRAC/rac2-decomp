@@ -10,9 +10,9 @@ extern void func_002AEC48(u8 *a0, void *a1, f32 f12, f32 f13, s32 a2);
 
 extern void func_002B0990(u8 *a0, void *a1, f32 f12, s32 a2, s32 a3);
 
-extern void *D_L11_001FC420[] __attribute__((sda));
+extern void *D_L11_001FC420[];
 
-extern u8 *D_L11_001B359C;
+extern u8 *D_L11_001B359C[] __attribute__((sda));
 
 extern void func_0029FCC0(u32 a0, s32 a1, f32 *a2);
 
@@ -97,7 +97,37 @@ void func_L11_0042A420(u8 *arg0) {
     func_002B0990(arg0, s0 + 0x2A0, 3.5f, 4, 1);
 }
 
-INCLUDE_ASM("asm/levels", func_L11_0042A4C8);
+void func_L11_0042A4C8(u8 *arg0) {
+    void *list;
+    u16 *p;
+    u8 *rec;
+    u8 *owner;
+    u8 *base;
+
+    if (arg0[0x21] == 0xFF)
+        return;
+    list = D_L11_001FC420[arg0[0x21]];
+    arg0 = *(u8 **)(arg0 + 0x68);
+    if (list == 0)
+        return;
+    base = D_L11_001B359C[0];
+    p = list;
+    do {
+        rec = base + ((*p & 0x7FFF) << 8);
+        if (*(s8 *)(rec + 0x20) >= 0 && *(s16 *)(rec + 0xAA) == 0xCF6) {
+            owner = *(u8 **)(rec + 0x68);
+            *(u16 *)(owner + 0x266) = 1;
+            (*(u32 *)(owner + 0x560))++;
+        }
+        if (*(s8 *)(rec + 0x20) >= 0 && *(s16 *)(rec + 0xAA) == 0xCF5) {
+            owner = *(u8 **)(rec + 0x68);
+            *(u16 *)(owner + 0x266) = 1;
+            (*(u32 *)(owner + 0x560))++;
+            if (*(f32 *)(arg0 + 0x20) <= 0.0f)
+                (*(u32 *)(owner + 0x584))++;
+        }
+    } while (*(s16 *)p++ >= 0);
+}
 
 extern char D_L11_001BA8C0[];
 extern float func_002A7878_range(float, float) __asm__("func_002A7878");

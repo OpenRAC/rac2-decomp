@@ -1,21 +1,23 @@
-/* GPT-6.1 Sol high, v0719, USA v1.01, 2026-10-29.
- * Best check.py: 1380 compiled bytes / 1376 retail, 0 of 2 placements.
- * Required profile: -O2 -G8 -ffunction-sections -frac2-qcopy
- * -frac2-qcopy-barrier. This compiler accepts all these options.
- * Separate initialization/main-strip/branch-strip counters, grouped node
- * offsets, sequential flag accumulation and TI copies reduced the original
- * 1456-byte current-toolchain baseline. The measured frame is 0x310 rather
- * than retail's 0x320; allocation, spills and scheduling still differ.
- * The state pointer spills where retail retains it in s7. Vertex addresses
- * become an induction pointer and i/4*4 stays in a GPR across calls, whereas
- * retail recomputes vertex addresses and spills the quotient. Recover those
- * local lifetimes next. Explicit UV/color pointer induction with
- * -fno-strength-reduce reached 1400 bytes; unsigned vertex indices tied 1380.
- * Disabling the repeated loop pass with a separate branch-age pointer was
- * 1420 bytes. Do not repeat these forms without new evidence.
- * The ABS and GP UV views below use the same canonical storage, following
- * the existing L13_004095F8-g8.c pattern; no fabricated data identity.
- * All declarations are below. No linked build was run for this near miss.
+/* Nonmatching C reconstruction (opus-1, v2196, USA v1.01, 2026-11-03).
+ * Tier: far. Profile: -O2 -G8 -ffunction-sections -frac2-qcopy
+ * -frac2-qcopy-barrier. Best cdiff: 1420 compiled bytes / 1376 retail,
+ * 0 of 2 places.
+ * Semantics fix over the earlier 1380-byte draft: retail's j=1 corner calls
+ * func_00282CC0(v, v, &previous) (a2 = fp), not &side. Each corner is row0
+ * -/+ previous (j=0,1) or row1 -/+ side (j=2,3), with the j&1 test inside
+ * each arm. That gives retail's control flow: the sll is shared before the
+ * j<2 branch (PRE), per-arm vertex address, CC0 tails cross-jumped.
+ * The earlier draft's size was closer only because its j=1 call was wrong.
+ * Testing j&1 once after the if/else (with a dir variable) gave 1364 bytes
+ * and fewer copies, but lost the per-arm tests retail has.
+ * The idx pointer in the branch loop reproduces retail's s+0x18 spill before
+ * the i loop; nested index<31 / index>=0 tests keep retail's two slti tests.
+ * Remaining: v lands in v1 (extra a0 copies) instead of a0; the state
+ * pointer spills where retail keeps it in s7 (retail spills the quotient
+ * and next index instead); retail copies the row (X = i*16 + s; Y = X;
+ * Y += 0x20; X += 0x30), the same copy pattern as func_L13_0041AB30;
+ * frame 0x310 versus 0x320.
+ * All declarations are below.
  */
 #include "common.h"
 typedef int Vector128 __attribute__((mode(TI)));
@@ -75,23 +77,29 @@ void func_L13_0041AD00(char *obj) {
             func_00282F20(&side,&side,0.1f);
         } else func_00282C88(&side);
         for (j=0;j<4;j++) {
+            ADVector *v;
             if (j<2) {
-                q[0].vertex[j].q = *(Vector128 *)(s+(0x20+i*16));
-                if (!(j&1)) { func_00282CF0(&q[0].vertex[j],&q[0].vertex[j],&previous); goto uv1; }
+                v = &q[0].vertex[j];
+                v->q = *(Vector128 *)(s+(0x20+i*16));
+                if (j&1) func_00282CC0(v,v,&previous);
+                else func_00282CF0(v,v,&previous);
             } else {
-                q[0].vertex[j].q = *(Vector128 *)(s+(0x30+i*16));
+                v = &q[0].vertex[j];
+                v->q = *(Vector128 *)(s+(0x30+i*16));
+                if (j&1) func_00282CC0(v,v,&side);
+                else func_00282CF0(v,v,&side);
             }
-            if (j&1) func_00282CC0(&q[0].vertex[j],&q[0].vertex[j],&side);
-            else func_00282CF0(&q[0].vertex[j],&q[0].vertex[j],&side);
-uv1:
             q[0].uv[j][0]=D_L13_001B1660_gp[j][0]+func_00283CE0(i-(i/4)*4)*0.25f;
         }
         func_00280B90(q,matrix,0);
     }
     for (branch=0;branch<4;branch++) {
         func_00282C88(&side);
-        index = ((unsigned char *)s)[0x18+branch];
-        if (index<31 && index>=0) {
+        {
+        unsigned char *idx = (unsigned char *)s + 0x18;
+        index = idx[branch];
+        }
+        if (index<31) if (index>=0) {
             for (k=0;k<3;k++) {
                 previous.q = side.q;
                 if (k<2) {
@@ -102,15 +110,18 @@ uv1:
                 } else func_00282C88(&side);
                 if (!k) previous.q = side.q;
                 for (j=0;j<4;j++) {
+            ADVector *v;
                     if (j<2) {
-                        q[0].vertex[j].q = *(Vector128 *)(s+(0x420+k*64)+branch*16);
-                        if (!(j&1)) { func_00282CF0(&q[0].vertex[j],&q[0].vertex[j],&previous); goto uv2; }
+                        v = &q[0].vertex[j];
+                        v->q = *(Vector128 *)(s+(0x420+k*64)+branch*16);
+                        if (j&1) func_00282CC0(v,v,&previous);
+                        else func_00282CF0(v,v,&previous);
                     } else {
-                        q[0].vertex[j].q = *(Vector128 *)(s+(0x460+k*64)+branch*16);
+                        v = &q[0].vertex[j];
+                        v->q = *(Vector128 *)(s+(0x460+k*64)+branch*16);
+                        if (j&1) func_00282CC0(v,v,&side);
+                        else func_00282CF0(v,v,&side);
                     }
-                    if (j&1) func_00282CC0(&q[0].vertex[j],&q[0].vertex[j],&side);
-                    else func_00282CF0(&q[0].vertex[j],&q[0].vertex[j],&side);
-uv2:
                     q[0].uv[j][0]=D_L13_001B1660_gp[j][0]+func_00283CE0(k-(k/4)*4)*0.25f;
                 }
                 func_00280B90(q,matrix,0);

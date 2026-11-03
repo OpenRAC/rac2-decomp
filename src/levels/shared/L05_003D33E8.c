@@ -569,7 +569,7 @@ void func_L05_00426348(unsigned char *a0)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L05_00426568);
+/* func_L05_00426568 is defined in L05_00426568-g8.c (it reaches D_L05_001B1500 through $gp). */
 
 /* func_L05_00426658 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B1500 through $gp). */
 

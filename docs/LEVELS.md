@@ -135,6 +135,13 @@ previous body's completed return) in the boot and its 27 level copies, in USA v1
 v2.00 (PAL has no such row). Each prefix follows a completed `jr $ra` and its delay slot.
 `func_L00_00428EE0` skips 24 bytes of filler in all 15 of its levels and in every release,
 leaving an 8-byte `return 0` method that a data pointer in each level reaches.
+On 3 November 2026 `func_002CC528` was corrected the same way: it skips 8 bytes
+(`addiu $sp,$sp,0x60; nop`, after `func_002CC490`'s completed return and one padding nop),
+leaving a 32-byte body at `0x002CC530`. In USA v1.01 an aligned data word points at the
+shortened entry in all 28 programs (the boot's at `0x00260988`, each level's in its
+`data.bin`), and none at the old start. The PAL and v2.00 rows had the same 40-byte
+fingerprint, so the prefix words are identical there; their rows were moved by the same
+8 bytes by hand, because those dumps are not in this checkout for `tools/carry.py --entries`.
 
 One open row is two functions and still needs a split: `func_00115E28` (64 bytes) is
 `abort` at +0 followed by a separate noreturn assert-style printer at `00115E38`, which

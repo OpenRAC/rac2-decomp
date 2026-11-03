@@ -29,7 +29,7 @@ INCLUDE_ASM("asm/core", func_001182B8);
 
 /* func_00118548 is in 00118548.c with the game compiler profile. */
 
-INCLUDE_ASM("asm/core", func_001184D0);
+/* func_001184D0 is in 001184D0.c with the game compiler profile. */
 
 INCLUDE_ASM("asm/core", func_001185E8);
 

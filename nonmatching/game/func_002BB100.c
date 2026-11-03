@@ -1,3 +1,29 @@
+/* Claude Opus 5.5 (xhigh), task v2092; USA v1.01, default game profile.
+ * Body below unchanged (legal best, recompiled here): 1684/1684 bytes, 0/28 places,
+ * first rejection +0xA4, 14 real positions differ. Both remaining differences are
+ * diagnosed; each is fixed only by a construct the guide forbids, so FAILED.
+ * Exact bytes (28/28 places, checked) with BOTH of these changes:
+ * (A) +0x9C..+0xB0, beqz delay slot after func_002761F8: retail fills it with
+ *     `addiu a0,sp,0x10` because $s0 is live at the else target in flow2's view.
+ *     sched2 order already matches; only reorg differs. RAC1 form:
+ *       } else {
+ *           unsigned char *u;
+ *           if (u) *(Quad_BB100 *)p->position=*(Quad_BB100 *)next;
+ *           else *(Quad_BB100 *)p->position=*(Quad_BB100 *)next;
+ *       }
+ *     (uninitialised u gets $s0; jump2 merges the arms after flow2).
+ * (B) +0x338..+0x394, 65535 in f21 and 255 in f20: a flow1 block split right after
+ *     the 65535 set makes it global and leaves 255 local (local-alloc gives it f20 first):
+ *       float c65 = 65535.0f, c255;
+ *       if (PB(p,4) & 0x100) q->fractional[0] = 0;   (never taken; combine folds it)
+ *       c255 = 255.0f;   then the seven conversions use c65/c255.
+ *     This is RAC1's update_colliding_effect_particle hack too.
+ * Needed for a legal match: (A) a real value already in $s0 tested on the else path
+ * (nothing sets $s0 before the call in retail); (B) a real test between the two
+ * constant sets that vanishes at jump2 (live register vs zero, arms differing in source).
+ * None found: p/q/cfg null tests are always-true; flags tests leave their loads.
+ * Inside src/game/002B7E28.c write `typedef TI Quad_BB100;` (the file already has TI).
+ */
 /* GPT-6.1 Sol, high effort; USA v1.01, default game profile.
  * Best check.py: 1684/1684 bytes, 0/28 places; first rejection +0xA4.
  * Fourteen instruction positions differ after disregarding relocation values:

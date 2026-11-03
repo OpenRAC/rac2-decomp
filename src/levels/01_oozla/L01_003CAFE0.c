@@ -52,7 +52,7 @@ extern void func_0029B3E0(int, int);
 extern void func_L00_00429020(int);
 extern void func_00288E18(int, int);
 
-INCLUDE_ASM("asm/levels", func_L01_003CAFE0);
+/* func_L01_003CAFE0 is in L01_003CAFE0-ctx-g16.c. */
 
 
 /* func_L01_003CB668 is in L01_003CB668-g16.c. */
@@ -399,7 +399,7 @@ void func_L01_003CEDA0(u8 *a0)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003D1A48);
+/* func_L01_003D1A48 lives in L01_003D1A48-g8.c. */
 
 /* func_L01_003D1F40 is defined in L01_003D1F40-g8.c. */
 
@@ -407,15 +407,15 @@ INCLUDE_ASM("asm/levels", func_L01_003D1A48);
 
 /* func_L01_003D26C0 is in L01_003D26C0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_003D2890);
+/* func_L01_003D2890 is in L01_003CAFE0-launch.c. */
 
 /* func_L01_003D2E50 is in L01_003D2E50.c. */
 
 /* func_L01_003D68C0 is defined in a sibling -g8.c unit. */
 
-INCLUDE_ASM("asm/levels", func_L01_003D8358);
+/* func_L01_003D8358 lives in L01_003D8358-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_003D8830);
+/* func_L01_003D8830 is in L01_003CAFE0-burst.c. */
 
 /* func_L01_003D8AD0 is defined in a sibling -g8.c unit. */
 

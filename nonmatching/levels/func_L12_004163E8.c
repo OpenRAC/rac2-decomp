@@ -1,20 +1,26 @@
-/* GPT-6.1 Sol high, 29 October 2026: retained near miss, not linked.
- * Pinned -O2 -G8 -ffunction-sections, USA: 1044/1044 bytes, 0/1 places.
- * Best check: first mismatch +0x78; ten instructions differ after relocations:
- * eight case-0 packed-counter address registers and two effect argument moves.
- * MACRO_ADDR on the canonical actor-table pointer fixes the absolute load and
- * its complete burst-call schedule. The measured flags-record layout fixes
- * the flags address addition; Actor indexing fixes the rising child access.
- * A shifted integer offset plus the table address fixes cleanup allocation.
- * Block-local IDs fix terminal halfword registers. Splitting the case-0
- * pointer into a scalar fixes that case but swaps all four terminal pointer/
- * byte register pairs (22 residual instructions, first +0x24C). Named packed
- * values and integer terminal addresses tie that variant. FP-first and mixed
- * typed interleavings preserve the helper ABI but tie the final two setup
- * moves. Fifteen checker calls, including one rejected syntax trial, plus
- * one allocator diagnostic. No US2/PAL or linked check claimed for this body.
- * Reopen with original packed-counter pointer/value lifetimes or argument
- * evaluation evidence. Required declarations follow; use a dedicated -G8 unit.
+/* Claude Opus 5.5 xhigh, task v2228, 3 November 2026: retained near miss, not linked.
+ * Build as a dedicated -G8 unit (src/levels/12_todano/L12_004163E8-g8.c, which gets
+ * -O2 -G8 -ffunction-sections by name) and replace the INCLUDE_ASM marker in
+ * L12_004149B8.c with a pointer comment.
+ * USA: 1044/1044 bytes, 0/1 places; 2 instructions differ, first +0x24C (0x416634):
+ * the effect call sets a1 = 0x3F before a0 = self, but retail sets a0 first.
+ * Cause (from -fsched-verbose-5): with `base` declared before the if, its actorTable load
+ * into $a1 stays in the effect-call block. In sched2 that load is an extra output dependent
+ * of `$a1 = 63`, which ranks that insn above `$a0 = $s2`.
+ * Retail fills the beq delay slot with the base load ($a1), keeps base untied, and ties
+ * the reloaded index to the sum: addu $a0,$a1,$a0.
+ * Tried:
+ *   - Moving base inside the if fixes the argument order, but base becomes block-local.
+ *     Pointer arithmetic puts ptr first in the PLUS, so the sum ties to base ($a0) and the
+ *     index goes to $v1: 6 diffs.
+ *   - Operand order `(s1->f0 << 8) + base` vs `base + ...` gives identical bytes.
+ *   - An unused label before the release call does not split the block: still 6 diffs.
+ *   - The real func_002B0A68 prototype order (self, mask, vec, u8, f0..f3) gives 14 diffs.
+ * Fixed versus the sol-high draft: case 0 reads the packed counter as a scalar
+ * `bits = D_0019B4A8[((s16)f >> 1) + (D_001A79F0 << 10)]`, and each terminal arm uses a
+ * block-local `u8 *cell`. Together these remove the 8 case-0 address-register diffs.
+ * Reopen with a construct that keeps base live across blocks (global) while its load
+ * sits in the if body.
  */
 #include "common.h"
 
@@ -65,7 +71,6 @@ typedef struct Node {
 
 void func_L12_004163E8(Actor *self)
 {
-    u8 *p;
     Node *s1 = self->f68;
 
     switch (self->f20) {
@@ -78,9 +83,8 @@ void func_L12_004163E8(Actor *self)
         f = self->fB2;
         if (D_L12_0021EDF0.flags[(s16)f] != 0)
             goto Destroy;
-        p = ((s16)f >> 1) + (D_001A79F0 << 10) + D_0019B4A8;
         {
-            s32 bits = *p;
+            s32 bits = D_0019B4A8[((s16)f >> 1) + (D_001A79F0 << 10)];
             if (f & 1) {
                 if (((bits >> 4) & 7) != 0)
                     goto Destroy;
@@ -153,13 +157,13 @@ void func_L12_004163E8(Actor *self)
         }
         f = self->fB2;
         if (f & 1) {
-            p = ((s16)f >> 1) + (D_001A79F0 << 10) + D_0019B4A8;
-            if (((*p >> 4) & 7) != 7)
-                *p += 0x10;
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            if (((*cell >> 4) & 7) != 7)
+                *cell += 0x10;
         } else {
-            p = ((s16)f >> 1) + (D_001A79F0 << 10) + D_0019B4A8;
-            if ((*p & 7) != 7)
-                *p += 1;
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            if ((*cell & 7) != 7)
+                *cell += 1;
         }
 Destroy:
         func_0029F338(self);
@@ -175,13 +179,13 @@ Destroy:
 
         f = self->fB2;
         if (f & 1) {
-            p = ((s16)f >> 1) + (D_001A79F0 << 10) + D_0019B4A8;
-            if (((*p >> 4) & 7) != 7)
-                *p += 0x10;
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            if (((*cell >> 4) & 7) != 7)
+                *cell += 0x10;
         } else {
-            p = ((s16)f >> 1) + (D_001A79F0 << 10) + D_0019B4A8;
-            if ((*p & 7) != 7)
-                *p += 1;
+            u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
+            if ((*cell & 7) != 7)
+                *cell += 1;
         }
         func_0029F338(self);
         return;

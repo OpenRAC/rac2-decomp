@@ -1,17 +1,16 @@
-/* sol-high retained draft, USA v1.01, game compiler -O2 -G8.
- * check.py: 1128/1128 bytes, 0 of 1 places match.
- * Six non-relocation instructions differ: the +0x24 and +0x78 context
- * stores are exchanged (+0xE4/+0xF4), the callback flag's constant remains
- * live from entry instead of being rematerialized at +0x158, and the second
- * vector-pair clear uses v0 rather than v1 (+0x304/+0x358/+0x35C).
- * Typed context/inventory views and MACRO_ADDR scalar declarations recover
- * retail's high-address lifetimes and the empty wait loop's bgez. A named
- * u32 completion-test result preserves sllv/and rather than srav/andi.
- * The four timer initializations are ordered to reproduce retail scheduling.
- * Callback arguments are 001B0CC0/001B0CB0, corrected from the earlier draft.
- * Explicit initialization pointer and chained second clear did not close
- * the remaining differences. No linked build was run. Required declarations
- * are included below; next useful input is independent lifetime/clear evidence.
+/* opus-1 (Claude Opus 5.5) retained draft, USA v1.01, game compiler -O2 -G8.
+ * Belongs in src/levels/25_wupash_nebula/L25_00373ED0-g8.c (same-file callees
+ * func_L25_003752D8/00376FE0/00377608 are defined there as void (u8 *[, f32])).
+ * check.py: 1128/1128 bytes, 0 of 1 places match; 3 instructions differ:
+ * the second quadword clear's reload register is v0 instead of retail v1
+ * (por/sq/sq at +0x304/+0x358/+0x35C).  reload's find_reg takes v0 at that
+ * insn because nothing is live in v0 there; retail must have v0 live or
+ * costed at the clear, cause not found (calls before it are same-file voids).
+ * Fixed versus sol-high's draft: the D_L25_001B3060 = 540 store is placed
+ * before ctx->owner (+0xE4/+0xF4 exchange), and case 1 re-sets active = 1
+ * before func_L05_00379B60: two sets stop update_equiv_regs sinking the
+ * constant, reproducing retail's addiu s2,zero,1 at +0x158 (this re-set is
+ * redundant at source level; a more natural form may exist).
  */
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
@@ -62,9 +61,6 @@ extern int func_002E5DA0(int,int,char *,int);
 extern int func_L25_0040D208(void);
 extern void func_0029B758(int,void *);
 extern void func_L05_00442828(void *,void *,int);
-extern void func_L25_003752D8(void *);
-extern void func_L25_00376FE0(void *,float);
-extern void func_L25_00377608(void *,float);
 extern void func_L05_00445B58(void *,void *);
 extern void func_L05_0037B210(void);
 extern void func_00288CB0(int,int);
@@ -74,6 +70,10 @@ extern int func_L05_00442860(void);
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
+
+extern void func_L25_003752D8(u8 *);
+extern void func_L25_00376FE0(u8 *, f32);
+extern void func_L25_00377608(u8 *, f32);
 
 
 void func_L25_0040CDA0(char *obj)
@@ -100,8 +100,8 @@ void func_L25_0040CDA0(char *obj)
         I(state,0x38)=180; I(state,0x34)=720; I(state,0x24)=0;
         ctx->health=*(float **)state;
         ctx->enabled=1;
-        ctx->owner=obj;
         D_L25_001B3060=540;
+        ctx->owner=obj;
         if (D_0018C0B0) H(D_0018C0B0,0x34)|=0x41;
     case 1:
         
@@ -109,6 +109,7 @@ void func_L25_0040CDA0(char *obj)
         
         if (func_00282948(state+0x34)) D_L25_00221850.timerVisible=0;
         else D_L25_00221850.timerVisible=1;
+        active = 1;
         func_L05_00379B60();
         func_L05_0030C930((int)(D_L25_001B2904*-224.0f+0.5f),2);
         qcopy(obj+0x10,(void *)((I(state,0x20)<<8) + D_L25_001B209C + 0x10));
@@ -128,8 +129,8 @@ void func_L25_0040CDA0(char *obj)
             B(obj,0x20)=3;
             a[0]=359.0f; a[1]=440.0f; a[2]=524.0f;
             b[0]=403.0f; b[1]=456.0f; b[2]=524.0f;
-            func_L25_003752D8((void *)1);
-            func_L25_00376FE0(a,10.0f); func_L25_00377608(b,10.0f);
+            func_L25_003752D8((u8 *)1);
+            func_L25_00376FE0((u8 *)a,10.0f); func_L25_00377608((u8 *)b,10.0f);
             *(Quad *)d = *(Quad *)c = 0;
             c[0]=417.18f; c[1]=454.03f; c[2]=532.6f;
             d[0]=420.93f; d[1]=413.79f; d[2]=534.54f;

@@ -1,7 +1,3 @@
-/* 3 November 2026 integration note: the diagnostic caller view of func_0028EA58
- * now follows upstream int declarations; its return remains under contract review.
- * Earlier NMC measurements precede this merge-only declaration change. No new
- * match or portable-runtime claim follows from it. */
 /* 2026-11-03 w02 faithful-contract review, US object checks only.
  * Profile: -O2 -G8 -ffunction-sections -g.
  * Current check.py: 3008/3008 bytes,0/2 places,first+0x3E8.
@@ -138,7 +134,7 @@ extern int ref_L22_003A5018_44 __attribute__((sda));
 extern int func_00336D50(void *, int);
 extern void func_00300A00(void *, unsigned int, float, float, float, float, float);
 extern int func_0028E588(int, int);
-extern int func_0028EA58(void *, int, int, int, int, void *);
+extern void func_0028EA58(void *, int, int, int, int, void *);
 extern void func_0027EAE8(int, int, int, int, int, void *);
 extern int func_00115DA8(char *, char *, ...);
 extern int func_001157AC(char *);

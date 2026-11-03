@@ -200,6 +200,25 @@ extern char D_001BADC0[];
 extern void func_00282A60(void *, int, int);
 extern void func_0027A288(void);
 
+/* Occlusion state read by func_0027A288: the camera position, the current and
+   merged visibility bitmaps, and the two fallback tables (octant and
+   directional, both a 16-byte origin followed by 128-byte bitmaps). */
+typedef struct { float origin[4]; char visibility[0][128]; } OcclDirectional;
+typedef struct { char pad[0x140]; float position[3]; } OcclCamera;
+extern OcclCamera D_001B5200;
+extern char D_001BAE40[128];
+extern float *D_001B1704 __attribute__((sda));
+extern float *D_001B1708 __attribute__((sda));
+extern int D_001B170C __attribute__((sda));
+extern int D_001B1714 __attribute__((sda));
+extern unsigned char *D_001B1718 __attribute__((sda));
+extern int func_00283CF0(float);
+extern void func_00282B50(void *, const void *, int);
+extern void func_00282A88(void *, int);
+extern void func_00282B78(void *, const void *, const void *, int);
+extern float func_00283248(float, float);
+extern float func_00282E80(const void *, const void *);
+
 /* The screen extent record: size, half size and the four <<4 edges around 0x800. Its
    fields are stored as symbol+offset, which this cc1 counts as two-instruction macro
    stores, so none of them takes a call's delay slot (retail's order). */
@@ -568,7 +587,142 @@ int func_0027A1D0(float x, int a, int b, int c, int d, int e, int g)
     return Fcdb4d905_FUN_0027A0F8(p, q, s);
 }
 
-INCLUDE_ASM("asm/game", func_0027A288);
+/* Fills the visibility bitmap D_001BADC0 for the camera's grid cell (position / 4).
+   Without an entry for the cell, mode 0 merges the nearer neighbor along each axis;
+   otherwise the mode in D_001B170C picks a fallback: the previous bitmap, all visible,
+   an octant table around an origin, or a directional table indexed by azimuth and
+   elevation. The last bit is always set. */
+void func_0027A288(void)
+{
+    float origin[4], delta[4];
+    float scale = 0.25f;
+    int x, y, z, bx, by, bz, index;
+    int xm, xp, ym, yp, zm, zp;
+    float fraction;
+    unsigned char *vis, *gx, *gy, *gz, *previous;
+    float *p;
+
+    x = func_00283CF0(D_001B5200.position[0] * scale);
+    y = func_00283CF0(D_001B5200.position[1] * scale);
+    z = func_00283CF0(D_001B5200.position[2] * scale);
+    vis = (unsigned char *)Fcdb4d905_FUN_0027A0F8(x, y, z);
+    if (vis) {
+        D_001B1714 = 0;
+        func_00282B50(D_001BADC0, vis, 128);
+        D_001B1718 = vis;
+    } else {
+        D_001B1714 = 1;
+        if (D_001B170C == 0) {
+            xm = x - 1;
+            xp = x + 1;
+            fraction = func_00283CE0(x);
+            yp = y + 1;
+            zp = z + 1;
+            ym = y - 1;
+            zm = z - 1;
+            gx = (unsigned char *)func_0027A1D0(D_001B5200.position[0] * scale - fraction, xm, y, z, xp, y, z);
+            fraction = func_00283CE0(y);
+            gy = (unsigned char *)func_0027A1D0(D_001B5200.position[1] * scale - fraction, x, ym, z, x, yp, z);
+            fraction = func_00283CE0(z);
+            gz = (unsigned char *)func_0027A1D0(D_001B5200.position[2] * scale - fraction, x, y, zm, x, y, zp);
+            if (gx || gy || gz) {
+                func_00282A88(D_001BAE40, 128);
+                if (gx) func_00282B78(D_001BAE40, D_001BAE40, gx, 128);
+                if (gy) func_00282B78(D_001BAE40, D_001BAE40, gy, 128);
+                if (gz) func_00282B78(D_001BAE40, D_001BAE40, gz, 128);
+                vis = D_001BAE40;
+                D_001B1718 = vis;
+                func_00282B50(D_001BADC0, vis, 128);
+            }
+        }
+        if (!vis) {
+            switch (D_001B170C) {
+            case 0:
+                previous = D_001B1718;
+                if (previous) func_00282B50(D_001BADC0, previous, 128);
+                else func_00282A60(D_001BADC0, -1, 128);
+                break;
+            case 2:
+                p = D_001B1704;
+                if (p) {
+                    bx = 0.0f < D_001B5200.position[0] - p[0];
+                    by = 0.0f < D_001B5200.position[1] - p[1];
+                    bz = 0.0f < D_001B5200.position[2] - p[2];
+                    func_00282B50(D_001BADC0, (char *)p + ((bz + by * 2 + bx * 4) * 128 + 16), 128);
+                    break;
+                }
+                if (D_001B1718) {
+                    func_00282B50(D_001BADC0, D_001B1718, 128);
+                    break;
+                }
+                /* fall through */
+            case 1:
+                func_00282A60(D_001BADC0, -1, 128);
+                break;
+            case 3: {
+                float *directional = D_001B1708;
+                if (directional) {
+                    origin[0] = directional[0];
+                    origin[1] = directional[1];
+                    origin[2] = directional[2];
+                    origin[3] = 0;
+                    delta[0] = D_001B5200.position[0] - origin[0];
+                    delta[1] = D_001B5200.position[1] - origin[1];
+                    delta[2] = D_001B5200.position[2] - origin[2];
+                    delta[3] = 0;
+                    index = 0;
+                    if (delta[0] > 0 && delta[1] > 0) {
+                        index = func_00283CF0(func_00283248(delta[0], delta[1]) * 10.185916f) << 6;
+                        delta[0] = func_00282E80(D_001B5200.position, origin);
+                    } else if (delta[0] <= 0 && delta[1] > 0) {
+                        index = 1024;
+                        if (delta[0] == 0) {
+                            delta[0] = delta[1];
+                        } else {
+                            index += func_00283CF0(func_00283248(delta[1], -delta[0]) * 10.185916f) << 6;
+                            delta[0] = func_00282E80(D_001B5200.position, origin);
+                        }
+                    } else if (delta[0] < 0 && delta[1] < 0) {
+                        index = func_00283CF0(func_00283248(-delta[0], -delta[1]) * 10.185916f) << 6;
+                        delta[0] = -func_00282E80(D_001B5200.position, origin);
+                    } else if (delta[0] >= 0 && delta[1] < 0) {
+                        index = 1024;
+                        if (delta[0] == 0) {
+                            delta[0] = delta[1];
+                        } else {
+                            index += func_00283CF0(func_00283248(-delta[1], delta[0]) * 10.185916f) << 6;
+                            delta[0] = -func_00282E80(D_001B5200.position, origin);
+                        }
+                    }
+                    if (delta[2] > 0 && delta[0] > 0) {
+                        index += func_00283CF0(func_00283248(delta[2], delta[0]) * 10.185916f);
+                    } else if (delta[2] <= 0 && delta[0] > 0) {
+                        index += 16;
+                        if (delta[2] != 0) index += func_00283CF0(func_00283248(delta[0], -delta[2]) * 10.185916f);
+                    } else if (delta[2] < 0 && delta[0] <= 0) {
+                        index += 32;
+                        if (delta[0] != 0) index += func_00283CF0(func_00283248(-delta[2], -delta[0]) * 10.185916f);
+                    } else if (delta[2] >= 0 && delta[0] < 0) {
+                        index += 48;
+                        if (delta[2] != 0) index += func_00283CF0(func_00283248(-delta[0], delta[2]) * 10.185916f);
+                    }
+                    func_00282B50(D_001BADC0, ((OcclDirectional *)D_001B1708)->visibility[index], 128);
+                } else {
+                    previous = D_001B1718;
+                    if (previous) {
+                        func_00282B50(D_001BADC0, previous, 128);
+                    } else {
+                        func_00282A60(D_001BADC0, -1, 128);
+                    }
+                }
+                break;
+            }
+            }
+        }
+    }
+    D_001BADC0[127] |= 128;
+}
+
 
 void func_0027A9A0(void)
 {
@@ -643,4 +797,143 @@ void func_0027B2F8(int width, int height, float scale, float a, float b, float c
     func_0027AB40();
 }
 
-INCLUDE_ASM("asm/game", func_0027B440);
+/* The full-screen anti-aliasing buffer record behind the screen dimensions above: the
+   display size at 0x150 and the storage size at 0x158. */
+typedef struct {
+    char disp_and_contexts[0x150];
+    s16 display_width;
+    s16 display_height;
+    s16 psm;
+    s16 fbp0;
+    s16 storage_width;
+    s16 storage_height;
+} FsAaBuf;
+#define FsAaBuffer (*(FsAaBuf *)&D_001A6480)
+
+/* The drawing environment's GS register values, each followed by its register address. */
+typedef struct {
+    u64 pad0[2];
+    u64 frame1;
+    u64 pad18;
+    u64 frame2;
+    u64 pad28;
+    u64 zbuf1;
+    u64 pad38;
+    u64 zbuf2;
+    u64 pad48;
+    u64 xyoffset1;
+    u64 pad58;
+    u64 xyoffset2;
+    u64 pad68;
+    u64 scissor1;
+    u64 pad78;
+    u64 scissor2;
+} GsDrawEnvRegs;
+
+typedef struct {
+    char b[0x60];
+} GsLoadImage;
+
+extern GsDrawEnvRegs D_00139120;
+extern u64 D_00139310;
+extern u64 D_00139380;
+extern unsigned char D_001BB000[];
+extern int D_001A7B90 __attribute__((sda));
+extern int D_001A7BB8 __attribute__((sda));
+extern int D_001A72D0 __attribute__((sda));
+extern int D_001A72D8 __attribute__((sda));
+extern int D_001A72DC __attribute__((sda));
+extern int D_001A72E0 __attribute__((sda));
+extern int D_001A72E4 __attribute__((sda));
+extern int D_001A72E8 __attribute__((sda));
+extern int D_001A72EC __attribute__((sda));
+extern int D_001A72F0 __attribute__((sda));
+extern int D_001A72F4 __attribute__((sda));
+extern void func_0011AEA0(int);
+extern int func_001244B8(int, int);
+extern void func_00284268(int, int, int, int, int, int);
+extern void func_00284EA8(void);
+extern void func_00284F40(int);
+extern void func_00284E80(void);
+extern int func_00126288(GsLoadImage *, s16, s16, s16, s16, s16, s16, s16);
+extern int func_001265B0(GsLoadImage *, unsigned char *);
+
+/* Adapted from RAC1 SetPalMode (GPL-3.0), with RAC2's mode selection, texture cursors
+   and optional image clearing.
+   Adapted from Lombyte's project (GPL-3.0): src/video/display/set_pal_mode.c, set_pal_mode. */
+void func_0027B440(int clear) {
+    GsLoadImage image;
+    int n;
+    int i;
+    u64 zbuf;
+    u64 frame;
+    u64 scissor;
+    s16 w;
+
+    func_0011AEA0(0);
+    if (D_001A7B90 != 0) {
+        D_001A72E0 = 0x100000;
+        D_001A72DC = 0x1E0000;
+        D_001A72D8 = 0;
+        D_001A72E4 = 0x2C0000;
+        func_00284268(0x200, 0x1C0, 0x200, 0x200, 4, 0);
+    } else if (D_001A7BB8 != 0) {
+        D_001A72E0 = 0x118000;
+        D_001A72DC = 0x1E8000;
+        D_001A72D8 = 0;
+        D_001A72E4 = 0x2C0000;
+        func_00284268(0x200, 0x1A0, 0x280, 0x1C0, 0, 0);
+    } else {
+        D_001A72E0 = 0x118000;
+        D_001A72DC = 0x1E8000;
+        D_001A72D8 = 0;
+        D_001A72E4 = 0x2C0000;
+        func_00284268(0x200, 0x1A0, 0x200, 0x1C0, 0, 0);
+    }
+    D_001A72E8 = D_001A72E4;
+    D_001A72EC = D_001A72E4 + 0x1000;
+    D_001A72F0 = D_001A72E4 + 0x1400;
+    D_001A72F4 = D_001A72E4 + 0x1800;
+    w = FsAaBuffer.display_width;
+    D_001A7340.width = w;
+    D_001A7340.height = FsAaBuffer.display_height;
+    D_001A7340.half_width = w >> 1;
+    D_001A7340.half_height = D_001A7340.height >> 1;
+    D_001A7340.left = (0x800 - D_001A7340.half_width) << 4;
+    D_001A7340.top = (0x800 - D_001A7340.half_height) << 4;
+    D_001A7340.right = (D_001A7340.half_width + 0x800) << 4;
+    D_001A7340.bottom = (D_001A7340.half_height + 0x800) << 4;
+    frame = (D_001A72DC >> 13) | ((u64)(D_001A7340.width >> 6) << 16);
+    D_00139120.frame1 = frame;
+    zbuf = (D_001A72E0 >> 13) | 0x1000000;
+    D_00139120.frame2 = frame;
+    D_00139120.xyoffset1 = D_001A7340.left | ((u64)D_001A7340.top << 32);
+    D_00139120.zbuf1 = zbuf;
+    D_00139120.zbuf2 = zbuf;
+    D_00139120.xyoffset2 = D_001A7340.left | ((u64)D_001A7340.top << 32);
+    scissor = ((u64)(D_001A7340.width - 1) << 16) | ((u64)(D_001A7340.height - 1) << 48);
+    D_00139310 = zbuf;
+    D_00139120.scissor1 = scissor;
+    D_00139120.scissor2 = scissor;
+    D_00139380 = zbuf | ((u64)0x8000 << 17);
+    if (clear) {
+        D_001A72D0 = D_001A72E4;
+        D_001A72D4 = D_001A72E4;
+        func_0011AEA0(0);
+        func_001244B8(0, 0);
+        func_0011AEA0(0);
+        func_00284EA8();
+        func_00284F40(0);
+        func_0011AEA0(0);
+        func_001244B8(0, 0);
+        func_00284E80();
+        func_00282A60(D_001BB000, 0, 0x1000);
+        n = (FsAaBuffer.storage_width * FsAaBuffer.storage_height) >> 10;
+        for (i = 0; i < n; i++) {
+            func_00126288(&image, i << 4, 1, 0, 0, 0, 32, 32);
+            func_0011AEA0(0);
+            func_001265B0(&image, D_001BB000);
+            func_001244B8(0, 0);
+        }
+    }
+}

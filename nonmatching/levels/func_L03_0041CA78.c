@@ -1,18 +1,25 @@
-/* Tier: GPT-6.1 Sol high, v0826. USA v1.01, game compiler.
- * Corrected draft: 1068/1076 bytes, 0 of 1 places match (level 03).
- * Baseline was 1076/1076 but had inaccurate return declarations and a one-bit
- * FP constant error. Required profile: -O2 -G8 -ffunction-sections
- * -frac2-qcopy -frac2-qcopy-barrier (separate unit).
- * Initialization stores and f3/f4 allocation differ. Explicit block-local mode
- * shares the byte/int 3 and restores retail's copy-address registers. Named
- * product locals restore most post-initialization FP allocation, but the paired
- * 0x70/0x74 and 0x64/0x68 stores are reversed. The 0xFFFFFFFFULL sentinel is
- * materialized with lui FFFF; dsrl32, retail uses addiu -1; dsrl32.
- * The angular constant must be 0x36A2AD2F, not the older draft's 0x36A2AD2E.
- * qcopy helper vs ordinary TI with qcopy profiles tied; measured field wrappers
- * and -fno-gcse did not repair the initialization. No linked check of this C.
- * All declarations are below. func_002E5CF8 / func_002E5E58 and func_002B3BA8
- * return int in the existing game source; do not restore their void declarations.
+/* Tier: Claude Opus 5.5 xhigh, v2216. USA v1.01, game compiler.
+ * Best check.py: 1076/1076 bytes, 0 of 1 places match (first difference +0x94);
+ * 22 differing rows of 269, two of them relocation addends only (D_001A7A60+0x1C).
+ * Profile: separate unit L03_0041CA78-g8.c with
+ * -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
+ * Fixed since v0826: death path written out (no goto, so the beq lands on the
+ * jal func_0029F338 and the cleanup calls are skipped); D_001A7A60[0x1C] with
+ * MACRO_ADDR for the absolute byte flag; D_L03_001A8F20 MACRO_ADDR (unsplit la keeps
+ * lui/addiu adjacent after a0/a1); func_002B0A68 prototype (...,float x4,u8) as in
+ * the matched func_L03_0041EAE0 (fills a3=0xFF into the jal slot); product stores
+ * written 70,74,78,64,6C,68 (last use issues first) -> retail 74,70,78,68,6C,64.
+ * Still differs:
+ * 1. Sentinel: cc1 emits dli $2,0xffffffff; our assembler expands it to
+ *    lui 0xFFFF; dsrl32 0. Retail always uses addiu -1; dsrl32 0 (45 sites in
+ *    31 functions, no lui form anywhere). No as option selects it: assembler
+ *    class gap (tools), not C.
+ * 2. Init stores 0x150..0x58: retail issues them in exact source order; our sched1
+ *    puts stores whose source dies first (INSN_REG_WEIGHT), then the rest. Both
+ *    constant-load orders are identical; f3/f4 (0.5 vs 0.5236) follow from the
+ *    store order through local-alloc spans. -fno-schedule-insns is far worse.
+ *    Needs a construct giving every store equal weight (or a store chain).
+ * Declarations are all below; func_002E5CF8/func_002E5E58/func_002B3BA8 return int.
  */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
@@ -28,9 +35,10 @@ extern float D_L03_001B1B84 __attribute__((sda));
 extern float D_L03_001B1B88 __attribute__((sda));
 extern float D_L03_001B1B8C __attribute__((sda));
 extern float D_L03_001B1BB0[4] SDATA(D_L03_001B1BB0) __attribute__((sda));
-extern u8 D_00189EA0[], D_L03_001A8F20[], D_L03_001B9980[];
+extern u8 D_00189EA0[], D_L03_001B9980[];
+extern u8 D_L03_001A8F20[] MACRO_ADDR;
 extern int D_L03_001A9044, D_L03_001A9040, D_L03_001A903C;
-extern u8 D_001A7A7C;
+extern u8 D_001A7A60[] MACRO_ADDR;
 extern int func_00283CF0(float);
 extern void func_002A7470(void *,int,int,int);
 extern int func_002B0ED8(void *,void *,int);
@@ -38,7 +46,7 @@ extern void func_00282CC0(void *,void *,void *);
 extern void func_002AC728(void *,void *,int,float,float);
 extern void func_00282CF0(void *,void *,void *);
 extern void func_00282F20(void *,void *,float);
-extern void func_002B0A68(void *,int,void *,u8,float,float,float,float);
+extern void func_002B0A68(void *,int,void *,float,float,float,float,u8);
 extern int func_002E5E58(int,unsigned int,void *);
 extern void func_002B0A18(int,int);
 extern void func_L03_0041D0A8(void *);
@@ -60,7 +68,10 @@ void func_L03_0041CA78(u8 *e) {
         *(float *)(e+0x2c)=*(float *)(*(u8 **)(e+0x24)+0x24)*scale;
         s[0x48]=func_00283CF0(20);
         s[0x4a]=func_00283CF0(6);
-        if(*(int *)(s+0x290)==-1) goto die;
+        if(*(int *)(s+0x290)==-1) {
+            func_0029F338(e);
+            return;
+        }
         { s32 initialMode = 3;
         s[0x150]=7; s[0x28]=initialMode;
         *(float *)(s+0x68)=0.20943955f;
@@ -90,12 +101,12 @@ void func_L03_0041CA78(u8 *e) {
             float v3 = D_L03_001B1B84*v1;
             float v4 = D_L03_001B1B88*0.000004848137343f;
             float v5 = D_L03_001B1B8C*0.00029088825f;
-            *(float *)(s+0x74)=v2;
             *(float *)(s+0x70)=v2;
+            *(float *)(s+0x74)=v2;
             *(float *)(s+0x78)=v3;
-            *(float *)(s+0x68)=v4;
-            *(float *)(s+0x6c)=v5;
             *(float *)(s+0x64)=v4;
+            *(float *)(s+0x6c)=v5;
+            *(float *)(s+0x68)=v4;
         }
     }
     if(func_002B0ED8(e,s+0x140,0) && *(float *)(s+0x20)<=0) {
@@ -106,11 +117,11 @@ void func_L03_0041CA78(u8 *e) {
         func_00282CF0(&b,e+0x10,D_00189EA0);
         b.f[2]=0;
         func_00282F20(&b,&b,0.10000001f);
-        func_002B0A68(e,31,D_L03_001A8F20,255,3,6,3,6);
+        func_002B0A68(e,31,D_L03_001A8F20,3,6,3,6,255);
         if(*(int *)(D_00189EA0+0x2214)==49) {
             D_L03_001A9044++;
-            if(D_L03_001A9044>=10 && !D_001A7A7C) {
-                D_001A7A7C=1;
+            if(D_L03_001A9044>=10 && !D_001A7A60[0x1C]) {
+                D_001A7A60[0x1C]=1;
                 func_002E5E58(1,0,0);
                 func_002B0A18(0x1233,-1);
                 D_L03_001A903C=1;
@@ -118,7 +129,6 @@ void func_L03_0041CA78(u8 *e) {
         }
         func_002E5CF8(2,0,e);
         func_L03_0041D0A8(e);
-    die:
         func_002A6C58(e,0,3);
         func_0029F338(e);
         return;

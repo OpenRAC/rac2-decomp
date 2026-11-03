@@ -216,7 +216,7 @@ void func_L18_00303A58(void *a0, void *a1) {
 
 /* func_L18_003044B8 is defined in L18_003044B8.c. */
 
-INCLUDE_ASM("asm/levels", func_L18_00307C60);
+/* func_L18_00307C60 is defined in L18_002C4000-quad.c. */
 
 BatchA_A18_s32 func_L18_0032B768(BatchA_A18_u8 *s, BatchA_A18_s32 a1, BatchA_A18_s32 a2) {
     BatchA_A18_u8 *p = *(BatchA_A18_u8 **)(s + 0x98);
@@ -300,7 +300,7 @@ f32 func_L18_0035D5F8(void *out, void *origin, void *direction, char *path, floa
 
 
 
-INCLUDE_ASM("asm/levels", func_L18_003F5650);
+/* func_L18_003F5650 is matched in L18_003F5650-g16.c (built with -G16). */
 
 INCLUDE_ASM("asm/levels", func_L18_003F6CA8);
 
@@ -644,8 +644,7 @@ void func_L18_003F8FA8(BatchA_A18_u8 *a0) {
     *(BatchA_A18_s32 *)(a0 + 0x98) = 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L18_003F9DA0);
-
+/* func_L18_003F9DA0 is defined in L18_002C4000-switch-g8.c. */
 
 extern void func_L18_003FC9B8(unsigned char *a0);
 extern void func_L18_003F7988(unsigned char *a0);
@@ -690,7 +689,34 @@ void func_L18_003F9FB0(unsigned char *a0) {
 
 INCLUDE_ASM("asm/levels", func_L18_003FA180);
 
-INCLUDE_ASM("asm/levels", func_L18_003FA7C0);
+/* The bank base and group count again, read-only here: this walk calls nothing, and retail loads
+   both once before the walk of each group (the count also once for the whole function) instead of
+   rereading them after the stores, as const data lets loop.c hoist them. */
+extern char *const D_L18_001B281C_1[] __attribute__((sda));
+extern const int D_L18_001B2838_1[] __attribute__((sda));
+
+/* Walks the id list of each of the object's eight groups like func_L18_003F9FB0 and, for every
+   entity in it, clears its word at +0x98 and sets bits 0, 1 and 6 of its flags at +0x34 while
+   clearing bit 12. */
+void func_L18_003FA7C0(unsigned char *a0) {
+    unsigned char *p = *(unsigned char **)(a0 + 0x68);
+    unsigned short *q;
+    unsigned char *e;
+    int i;
+
+    for (i = 0; i < 8; i++) {
+        for (q = D_L18_001FB320[L18_GroupId(p, i)];
+             (L18_GroupId(p, i) & 0xFF) != 0xFF && L18_GroupId(p, i) <= D_L18_001B2838_1[0] &&
+             q != 0 && ((short)q[-1] >= 0 || q == D_L18_001FB320[L18_GroupId(p, i)]);
+             q++) {
+            e = (unsigned char *)(D_L18_001B281C_1[0] + ((*q & 0x7FFF) << 8));
+            if (e == 0)
+                break;
+            *(int *)(e + 0x98) = 0;
+            *(unsigned short *)(e + 0x34) = (*(unsigned short *)(e + 0x34) & 0xEFFF) | 0x43;
+        }
+    }
+}
 
 BatchA_A18_s32 func_L18_003FA8E0(BatchA_A18_u8 *s) {
     BatchA_A18_s32 p = *(BatchA_A18_s32 *)(s + 0x68);

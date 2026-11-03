@@ -458,4 +458,41 @@ INCLUDE_ASM("asm/levels", func_L00_00425560);
 INCLUDE_ASM("asm/levels", func_L00_00425CD0);
 
 /* Walks the 64x64 owner table and dispatches every type-5 entry of each populated block. */
-INCLUDE_ASM("asm/levels", func_L00_00426248);
+/* One 0x30-byte entry of a collision-grid cell (layout as in L00_002D7940-grid.c);
+ * entries of type 5 carry an index into the 0x80-byte records at D_L00_001B1F94. */
+typedef struct GridCellEntry {
+    unsigned char unknown_00[16];
+    int type;
+    int index;
+    unsigned char unknown_18[24];
+} GridCellEntry;
+
+/* The grid base pointer uses the measured absolute macro-address form. */
+extern char *D_L00_001B1880[] __attribute__((sda));
+extern char *D_L00_001B1F94[] __attribute__((sda));
+
+/* Visits every cell of the 64x64 collision grid and passes each type-5 entry's record to func_00282DF0. */
+void func_L00_00426248(void)
+{
+    int y, x, k;
+
+    for (y = 0; y < 64; y++) {
+        for (x = 0; x < 64; x++) {
+            int idx = y * 64 + x;
+            char *base = D_L00_001B1880[0];
+            int cell = ((int *)base)[idx];
+
+            if (cell == 0) {
+                continue;
+            }
+            cell += (int)base;
+            for (k = 0; k < *(int *)cell; k++) {
+                GridCellEntry *entry = (GridCellEntry *)((char *)cell + 16) + k;
+
+                if (entry->type == 5) {
+                    func_00282DF0(D_L00_001B1F94[0] + (entry->index << 7));
+                }
+            }
+        }
+    }
+}

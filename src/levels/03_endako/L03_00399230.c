@@ -70,7 +70,7 @@ typedef struct {
 
 /* func_L03_003C6208 is defined in L03_003C6208-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_003C6A28);
+/* func_L03_003C6A28 is defined in L03_00399230-6a28-g8.c. */
 
 /* func_L03_003C6E50 is defined in L03_003C6E50-g8.c. */
 
@@ -99,7 +99,7 @@ void func_L03_003C7A88(char *a0)
 
 /* func_L03_003C7AA0 is matched in its own unit, src/levels/03_endako/L03_003C7AA0-qcopy.c (-frac2-qcopy). */
 
-INCLUDE_ASM("asm/levels", func_L03_003C7AC0);
+/* func_L03_003C7AC0 is matched in its own unit, src/levels/03_endako/L03_003C7AC0-g8.c (-G8). */
 
 /* func_L03_003C7E20 is matched in its own unit, src/levels/03_endako/L03_003C7E20-g8.c (-G8). */
 
@@ -312,4 +312,4 @@ u8 *func_L03_003E18D8(char *owner, void *position, void *first, void *second,
     return object;
 }
 
-INCLUDE_ASM("asm/levels", func_L03_003E1C88);
+/* func_L03_003E1C88 is defined in L03_00399230-1c88-g8.c. */

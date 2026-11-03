@@ -417,7 +417,7 @@ void func_L00_00322EC8(Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *owner
 
 /* func_L00_00323448 is defined in L00_00323448-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_00323958);
+/* func_L00_00323958 is defined in L00_00316F60-g8.c. */
 
 /* Write a payload pointer in the first selector/key record before the list terminator */
 void func_L00_00323E48(GornRecordWrite64 *record, u32 selector,
@@ -469,7 +469,15 @@ Lzero:
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_00324E48);
+extern u8 *func_L00_00324D18(void *, void *, f32, f32, f32, f32, f32, int);
+
+u8 *func_L00_00324E48(void *a0, int flag, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5) {
+    u8 *b = D_00189E20;
+    float buf[4];
+    func_00282D30(buf, *(u8 **)(b + 0x2290) + 0xE0, 0.75f);
+    func_00282CC0(buf, b + 0x80, buf);
+    return func_L00_00324D18(buf, a0, f1, f2, f3, f4, f5, flag);
+}
 
 
 void func_L00_00324F18(char *a0, char *a1, float f12, float f13, float f14) {

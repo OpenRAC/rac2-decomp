@@ -1,22 +1,25 @@
-/* GPT-6.1 Sol (high), 29 October 2026: FAILED, 1472/1496 bytes,
- * 0/1 USA v1.01 places. Standalone game unit profile:
- * -O2 -G2 -ffunction-sections -mastra-quad-saves.
- * Corrected the older draft's arithmetic against retail: the fraction digit
- * multiplier remains 10.0; only eps grows each iteration. The rounding limit
- * remains len, with len + 1 passed to func_00118460. Keep the original ndigits
- * for decimal-point handling and a separate precision for the small-value case.
- * The small-value loop decrements e once per multiplication, including exit.
- * Reusing digit in the reversal and n for the signed special-value switch
- * improves lifetimes. Same-size loop forms still differ in register allocation,
- * entry save/extraction scheduling and loop rotation. Character stays in $fp
- * here; retail spills it and keeps the invariant 10.0 in $s7. The integer
- * extraction loop also loses retail's explicit top bound check after GCC
- * rotates it. No flags tested repaired this: no-sched1 gives equal size only,
- * no-rerun-cse-after-loop and no-gcse still leave broad differences.
- * Next useful experiment: preserve the digit-loop invariant's lifetime while
- * spilling the format character, without artificial dependencies or volatility.
- * Reconstructed from retail; this is the SDK vfprintf object's static-buffer
- * conversion helper, not the public newlib cvt. All declarations follow.
+/* Claude Opus 5.5 (xhigh), 3 November 2026: FAILED, 1496/1496 bytes,
+ * 0/1 USA v1.01 places (142 cdiff lines). Standalone game unit profile:
+ * -O2 -G2 -ffunction-sections -mastra-quad-saves (src/core/001185E8.c).
+ * Same size as retail; every block's code shape matches. Fixes over the
+ * 1472-byte draft: the fraction loop exits with `goto round` (a break as last
+ * insn rotated it and lost the hoisted 10.0 in $s7); the integer loop keeps
+ * its top test as `while (++e < 163) { ...; if (f < 1.0) break; }`; the
+ * scale-down loop is a rotated `while ((value *= 10.0) < 1.0 && e >= -1020)
+ * e--; e--;` (beql slot); `if (ndigits != 0)` / `if (ch != 'f')` arm order;
+ * the '.' shift loop reuses n (retail $s2, giv len + p); `n = u.i[0];
+ * n &= ~0xFFFF;` truncates straight into $s2.
+ * Left: (1) retail has a once-through loop note before the switch (no back
+ * edge): it is a sched2 barrier, so param spills and all saves precede the
+ * extraction, and $L17 at 0x678 gets the .p2align 3 nop at 0x674. A
+ * diagnostic do { ... } while (0) around the dispatch reproduces both (60
+ * lines left) but is forbidden; the original construct is unknown.
+ * (2) e is $s5 and eps/precision $s4, retail the reverse: eps (9 refs, live
+ * 70) outranks e (34 refs, live 472) in the global queue. (3) Integer loop
+ * store `p[n] = digit + '0'`: retail emits the value (v1) before the address
+ * (v0) and puts the floatsidf a0 move in the jal slot, n++ after the call;
+ * here sched1 keeps address first and n++ fills the slot. n++ position and
+ * p[n++] made no difference. All declarations follow.
  */
 #include "common.h"
 
@@ -41,9 +44,7 @@ char *func_001185E8(double value, int ndigits, char ch, int dot) {
         int i[2];
     } u;
     char *p;
-    char *q;
     char c;
-    double w;
     double f;
     double eps;
     int e;
@@ -55,7 +56,8 @@ char *func_001185E8(double value, int ndigits, char ch, int dot) {
     int precision;
 
     u.d = value;
-    n = u.i[0] & ~0xFFFF;
+    n = u.i[0];
+    n &= ~0xFFFF;
     switch (n) {
     case 0x7FF00000:
         return D_0013A490;
@@ -83,32 +85,27 @@ char *func_001185E8(double value, int ndigits, char ch, int dot) {
     if (value >= 1.0) {
         f = func_00117650(value);
         value = value - f;
-        for (; ++e < 163;) {
+        while (++e < 163) {
             digit = (int)func_00117848(f, 10.0);
             p[n] = digit + '0';
-            n++;
             f = (f - (double)digit) * 0.1;
+            n++;
             if (f < 1.0)
                 break;
         }
-        j = n - 1;
-        digit = 0;
-        while (digit < j) {
+        for (digit = 0, j = n - 1; digit < j; digit++, j--) {
             c = p[digit];
             p[digit] = p[j];
             p[j] = c;
-            digit++;
-            j--;
         }
-        e = n;
     }
+    e = n;
 
     if (e == 0) {
         if (ch != 'f') {
             if (value != 0) {
-                do {
-                    value = value * 10.0;
-                } while (value < 1.0 && e >= -1020 && (--e, 1));
+                while ((value *= 10.0) < 1.0 && e >= -1020)
+                    e--;
                 e--;
             }
             if (value >= 1.0) {
@@ -130,16 +127,16 @@ char *func_001185E8(double value, int ndigits, char ch, int dot) {
     }
 
     eps = 5.5511151231257827e-17;
-    w = 10.0;
-    fraction_digits:
-    value *= w;
-    digit = (int)value;
-    value -= (double)digit;
-    eps *= w;
-    if (n < len && value >= eps && value <= 1.0 - eps) {
+    for (;;) {
+        value *= 10.0;
+        digit = (int)value;
+        value -= (double)digit;
+        eps *= 10.0;
+        if (n >= len || value < eps || value > 1.0 - eps)
+            goto round;
         p[n++] = digit + '0';
-        goto fraction_digits;
     }
+round:
     if (value >= 0.5)
         digit = digit + 1;
     p[n] = digit + '0';
@@ -153,31 +150,22 @@ char *func_001185E8(double value, int ndigits, char ch, int dot) {
         e = e + 1;
         len = len + 1;
     }
-    if (ndigits == 0) {
-        len = len - 1;
-    } else {
+    if (ndigits != 0) {
         i = 1;
         if (ch == 'f' && e > 0)
             i = e;
-        if (i < len) {
-            q = p + len;
-            j = len;
-            do {
-                j--;
-                *q = q[-1];
-                q--;
-            } while (i < j);
-        }
+        for (n = len; i < n; n--)
+            p[n] = p[n - 1];
         p[i] = '.';
+    } else {
+        len = len - 1;
     }
     if (dot == 0)
         goto skip;
     while (len != 0 && p[len] == '0') len--;
     if (p[len] == '.') len--;
 skip:
-    if (ch == 'f') {
-        p[len + 1] = 0;
-    } else {
+    if (ch != 'f') {
         p[++len] = ch;
         if (e >= 0) {
             if (e != 0) e--;
@@ -189,6 +177,8 @@ skip:
             e = -e;
         }
         func_00118548(e, p + ++len, 10);
+    } else {
+        p[len + 1] = 0;
     }
     return D_0013C080;
 }

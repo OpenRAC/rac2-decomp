@@ -80,7 +80,40 @@ extern void func_32C700();
 
 /* func_L11_00434580 lives in L11_00434580-g-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_004349F8);
+/* func_L11_00434580 is defined in L11_00432628-g8.c. */
+
+extern char *func_0029EFD0(int);
+
+/* Spawns a class 0xD1B moby: its position is the first vector of its own state, which then
+   takes the vectors at a (at +0x00) and b (at +0x20) and the float f (at +0x3C). */
+char *func_L11_004349F8(char *obj, void *a, void *b, float f)
+{
+    typedef int Quadword __attribute__((mode(TI)));
+    Quadword t[2];
+    Quadword *saved = &t[1];
+    char *n;
+    char *st;
+
+    t[0] = *(Quadword *)a;
+    *saved = *(Quadword *)b;
+    n = func_0029EFD0(0xD1B);
+    if (n != 0) {
+        *(unsigned char *)(n + 0x30) = 0xFF;
+        *(unsigned short *)(n + 0x32) = 0xFF;
+        *(unsigned char *)(n + 0x31) = 1;
+        *(unsigned char *)(n + 0x20) = 0;
+        st = *(char **)(n + 0x68);
+        *(unsigned long long *)(n + 0x38) = *(unsigned long long *)(obj + 0x38);
+        qcopy(n + 0x10, st);
+        *(Quadword *)st = t[0];
+        qcopy(st + 0x20, saved);
+        *(float *)(st + 0x3C) = f;
+        *(int *)(st + 0x38) = 0;
+        *(int *)(st + 0x34) = 0;
+    }
+    return n;
+}
+
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -483,7 +516,36 @@ void func_L11_00437EA8(void *object)
 
 extern void func_002833F0(char *, char *);
 
-INCLUDE_ASM("asm/levels", func_L11_00438248);
+/* Lays the thirteen chain points out from the object's position: the step starts as the
+   reversed first basis axis, each segment takes its length from the twelve floats at 0x2F0,
+   and each old point takes the new point's value. */
+void func_L11_00438248(void *object)
+{
+    struct RotorObject *obj = object;
+    struct RotorState *state = obj->state;
+    float (*pos)[4];
+    float (*old)[4];
+    float (*next)[4];
+    float (*nextOld)[4];
+    Quad step;
+    int i;
+
+    func_002833F0((char *)obj->basis, (char *)obj + 0xF0);
+    qcopy(state->points[0], obj->pos);
+    qcopy(state->oldPoints[0], obj->pos);
+    func_00282D30(&step, obj->basis, -1.0f);
+    pos = state->points;
+    old = state->oldPoints;
+    for (i = 0; i < 12; i++) {
+        func_00282F20(&step, &step, ((float *)state->pad2F0)[i]);
+        next = pos + 1;
+        func_00282CC0(next, pos, &step);
+        nextOld = old + 1;
+        qcopy(nextOld, next);
+        pos = next;
+        old = nextOld;
+    }
+}
 
 extern void func_00282DD8(void *a, void *b, void *c);
 
@@ -912,7 +974,26 @@ void func_L11_0043AB28(char *obj)
         func_0029F9F0(obj, state + 0x260);
 }
 
-INCLUDE_ASM("asm/levels", func_L11_0043ACB0);
+extern float func_00283248(float, float);
+extern float func_00283198(float);
+
+/* Places out at src plus dist along the heading from src to out's old position, the heading
+   and the distance each jittered at random; z comes from src. */
+void func_L11_0043ACB0(float *out, TI128 *src, float dist, float ang_jit, float dist_jit) {
+    TI128 vec = *src;
+    TI128 *p = &vec;
+    float *v = (float *)&vec;
+    float ang;
+
+    ang = func_00283248(out[0] - v[0], out[1] - v[1]);
+    ang_jit *= 0.017453294f;
+    ang += func_002A7878(-ang_jit, ang_jit);
+    dist += func_002A7878(-dist_jit, dist_jit);
+    qcopy(out, p);
+    out[0] += dist * func_00283180(ang);
+    out[1] += dist * func_00283198(ang);
+    out[2] = v[2];
+}
 
 /* Maps the measured selector onto its small index. */
 /* func_L11_0043E090 is defined in L11_0043E090.c. */

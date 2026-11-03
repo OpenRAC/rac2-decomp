@@ -49,11 +49,11 @@ Decompilation progress is tracked live on **[openrac.dev](https://openrac.dev)**
 <!-- progress -->
 | | Functions | Code |
 | --- | ---: | ---: |
-| Boot executable | 2,824 of 3,127 | 868,332 of 1,044,736 bytes |
-| Levels | 4,969 of 5,453 | 3,857,176 of 4,483,104 bytes |
-| **Total** | 7,793 of 8,580 | 4,725,508 of 5,527,840 bytes (85.49%) |
+| Boot executable | 2,868 of 3,127 | 902,812 of 1,044,728 bytes |
+| Levels | 5,082 of 5,453 | 3,944,104 of 4,483,104 bytes |
+| **Total** | 7,950 of 8,580 | 4,846,916 of 5,527,832 bytes (87.68%) |
 
-The 27 levels hold 100,903 function placements; C covers 87,308 of them.
+The 27 levels hold 100,903 function placements; C covers 89,097 of them.
 337 of the matched functions are the original's own assembly (`ASM_FUNC`), kept as assembly.
 <!-- /progress -->
 
@@ -290,6 +290,7 @@ researching engine quirks, or improving documentation:
 
 - Read [`AGENTS.md`](AGENTS.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md) first; they hold the
   rules.
+- [`docs/PORT_HANDOFF.md`](docs/PORT_HANDOFF.md) hands over the work where this repository meets the native port: functional C, the behaviour gate, the bugs player testing traced here, and what is open.
 - [`docs/AGENT_WORKFLOW.md`](docs/AGENT_WORKFLOW.md) says which tier of model takes which
   function, and how a wave is spread over the workers.
 - `python3 tools/todo.py` sorts the functions still to match into buckets, and

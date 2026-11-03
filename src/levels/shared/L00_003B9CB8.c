@@ -243,8 +243,6 @@ void func_L00_003BB668(char *a0)
 
 INCLUDE_ASM("asm/levels", func_L00_003BB8B8);
 
-INCLUDE_ASM("asm/levels", func_L00_003BBF48);
-
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
 void func_L00_003BC080(char *p)
 {
@@ -690,8 +688,6 @@ void func_L00_003C37A0(char *p)
         *(unsigned char *)(p + 0x20) = 1;
     }
 }
-
-INCLUDE_ASM("asm/levels", func_L00_003C37C8);
 
 /* Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43. */
 void func_L00_003C3920(char *unused, char *arg)

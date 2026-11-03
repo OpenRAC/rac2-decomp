@@ -691,9 +691,185 @@ int func_002DA2D0(Handles_2DCB28 *object) {
 
 /* func_002DA328 is in 002D5E98-stream.c. */
 
-INCLUDE_ASM("asm/game", func_002DA9A8);
+/* A menu panel: drawn as a texture rectangle (at its own position with flag 8 of the first
+   flags word, else at the screen size in D_001A6480), or for modes 0 and 1 as a message. */
+typedef struct {
+    char pad0[0x10];
+    unsigned int placement;
+    char pad14[4];
+    int x, y;
+    int width, height;
+    char pad28[0xC];
+    unsigned int flags;
+    int u_width, v_height;
+    char pad40[4];
+    int mode;
+    int texture[2];
+    int choice[2];
+    int active;
+} MenuPanel2DA9A8;
 
-INCLUDE_ASM("asm/game", func_002DAD18);
+/* RAC1's font window (pause.c struct TextRegion). */
+typedef struct {
+    short top, bottom, left, right;
+    short anchor_x, anchor_y;
+    short measured_width, rendered_height;
+    short line_advance;
+    unsigned short flags;
+    short subpixel_x, subpixel_y;
+} TextWindow2DA9A8;
+
+typedef struct { short pad0[2]; short type; short id; short pad8; } MenuRow2DA9A8;
+typedef struct { char pad0[0x48]; MenuRow2DA9A8 *rows; } MenuRows2DA9A8;
+typedef struct { char pad0[0xE8]; MenuRows2DA9A8 *rows; } MenuOwner2DA9A8;
+
+typedef struct { char pad0[8]; int state; char padC[0x150]; int stage; char pad160[4]; int status; } Scene2DA9A8;
+extern Scene2DA9A8 D_001393E0;
+
+/* D_001F2840 seen through the fields this function reads. */
+typedef struct {
+    char pad0[0x14];
+    MenuOwner2DA9A8 *owner;
+    char pad18[0x120];
+    int message_override, message;
+    char pad140[0x24];
+    int age;
+} Menu2DA9A8;
+#define Menu_2DA9A8 (*(Menu2DA9A8 *)&D_001F2840)
+
+extern unsigned char D_001A7AF8[];
+extern unsigned char D_001395B8[];
+extern int func_002B49C8(int);
+extern unsigned char *func_00288FB8(int);
+extern void func_0027C540(int);
+extern void func_0027C660(void);
+extern void func_00280200(TextWindow2DA9A8 *, long, unsigned char *, int);
+extern unsigned long long func_00294C40(int);
+
+/* Draws the menu panel. Modes 0 and 1 print message 0x2E00 (or the menu's override) centred
+   in the panel, as a black shadow and then in colour one pixel up and left, and return 2
+   (1 when the panel's 0x100 flag is clear). Other modes draw the chosen texture and return 16,
+   or 1 when flag 4 is set and the chosen row's entry is not available. */
+int func_002DA9A8(MenuPanel2DA9A8 *menu)
+{
+    unsigned long long texture;
+    unsigned char *text;
+    MenuRow2DA9A8 *row;
+    int message;
+
+    if (menu->active < 0 || func_002B49C8(6)) return 0;
+    if (menu->mode < 2) {
+        if (!(menu->flags & 0x100)) return 1;
+        if (D_001393E0.state == 2
+            && !(D_001393E0.stage < 3 && D_001393E0.status < 0 && Menu_2DA9A8.age > 10)) {
+            func_0027C540(0);
+            message = 0x2E00;
+            if (Menu_2DA9A8.message_override) message = Menu_2DA9A8.message;
+            text = func_00288FB8(message);
+            {
+                TextWindow2DA9A8 window = {1, menu->height + 1, 1, menu->width + 1,
+                                           menu->width >> 1, 5, 0, 0, 16, 5};
+                func_00280200(&window, 0x80000000L, text, -1);
+                window.anchor_y = (menu->height - window.rendered_height) >> 1;
+                window.flags ^= 4;
+                func_00280200(&window, 0x80000000L, text, -1);
+                window.top--;
+                window.bottom--;
+                window.left--;
+                window.right--;
+                window.anchor_x--;
+                window.anchor_y--;
+                func_00280200(&window, 0x80FFA888L, text, -1);
+            }
+            func_0027C660();
+        }
+        return 2;
+    }
+    if (menu->flags & 4) {
+        unsigned int selection = (menu->mode < 4) ^ 1;
+        row = &Menu_2DA9A8.owner->rows->rows[menu->choice[selection]];
+        if (row->type == 0) {
+            short id = row->id;
+            if (!D_001A7AF8[id]) return 1;
+        }
+        if (row->type == 1 && !D_001395B8[row->id]) return 1;
+    }
+    func_0027C540(0);
+    if (menu->mode < 4) texture = func_00294C40(menu->texture[0]);
+    else texture = func_00294C40(menu->texture[1]);
+    if (menu->placement & 8)
+        func_0027E018(menu->x, (char *)menu->y, menu->width, menu->height, 0, 0,
+                      menu->u_width, menu->v_height, 0x80808080ULL, texture);
+    else
+        func_0027E018(0, 0, D_001A6480.x, D_001A6480.y, 0, 0,
+                      menu->u_width, menu->v_height, 0x80808080ULL, texture);
+    func_0027C660();
+    return 16;
+}
+
+/* The stream block D_0014B540 seen as its two tables of five {start, length} reads,
+   picked by D_001A7BB4 modulo 5. */
+typedef struct { int start, length; } StreamRead2DAD18;
+typedef struct {
+    char pad0[0x36C];
+    int offset;
+    char pad370[0xDD0 - 0x370];
+    StreamRead2DAD18 first[5];
+    StreamRead2DAD18 second[5];
+} StreamReads2DAD18;
+
+/* Starts the read of the object's first, then its second stream once D_001A63AC is clear:
+   states 0 to 4, or -1 when a read is refused. */
+int func_002DAD18(Handles_2DCB28 *object)
+{
+    switch (object->state) {
+    case 0:
+        if (object->first != 0) {
+            if (D_001A63AC != 0)
+                break;
+            {
+                StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&D_0014B540;
+                int offset = reads->offset;
+
+                if (func_002B7B18(object->first,
+                                  reads->first[D_001A7BB4 % 5].start + offset,
+                                  reads->first[D_001A7BB4 % 5].length) != 0)
+                    object->state++;
+                else
+                    object->state = -1;
+            }
+        }
+        break;
+    case 1:
+        if (D_001A63AC != 0)
+            break;
+        object->state = 2;
+        break;
+    case 2:
+        if (object->second != 0) {
+            if (D_001A63AC != 0)
+                break;
+            {
+                StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&D_0014B540;
+                int offset = reads->offset;
+
+                if (func_002B7B18(object->second,
+                                  reads->second[D_001A7BB4 % 5].start + offset,
+                                  reads->second[D_001A7BB4 % 5].length) != 0)
+                    object->state++;
+                else
+                    object->state = -1;
+            }
+        }
+        break;
+    case 3:
+        if (D_001A63AC != 0)
+            break;
+        object->state = 4;
+        break;
+    }
+    return 0;
+}
 
 /* func_002DAE90 is in 002D5E98-g8.c. */
 

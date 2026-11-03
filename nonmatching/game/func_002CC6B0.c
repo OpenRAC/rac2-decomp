@@ -1,34 +1,33 @@
-/* GPT-6.1 Sol, high effort, 29 October 2026 (task v1320).
+/* Claude Opus 5.5, xhigh effort, 2 November 2026 (task v2080).
  * USA v1.01, current pinned game compiler, -O2 -G8 -ffunction-sections:
- * 2072/2076 bytes, 0/28 places match. Sixteen compiler checks, including
- * one C89 declaration fix; no linked build (this remains a near miss).
+ * check.py: 2072/2076 bytes, 0/28 places match (53 differing rows, all of the
+ * shortfall is the one deleted store). Builds on GPT-6.1 Sol's v1320 draft
+ * (adapted from RAC1 src/game/pause.c render_configured_text_label, GPL-3.0).
  *
- * Adapted from RAC1 src/game/pause.c render_configured_text_label (GPL-3.0).
- * Improvements over the earlier draft: the font/variant initialization order,
- * an independent fade temporary and pre-decrement condition reproduce the
- * retail saturation sequence; MACRO_ADDR table declarations preserve address
- * pairs and the skill-point branch nop; a measured item record keeps its
- * availability load at +4; the print call takes 64-bit integer arguments.
- * The small inline coordinate helpers preserve the observed window stores.
+ * Fixed here: the item-table lookup at +0x164 (index the two tables directly
+ * from the cell, with no table variable, so no global pseudo takes $a1). The
+ * scroll tail now follows RAC1: the span is computed inside the %= (after the
+ * add) and the field is written as a struct member (LabelSO). Through reload
+ * this keeps the intermediate store between the div and the trap, which is
+ * retail's order, and every register in the tail matches retail.
  *
- * Remaining: table lookup swaps v0/v1 at +0x164; the help-result test uses
- * v0 instead of v1 at +0x474; marquee coordinate and call-argument allocation
- * differs from +0x6A0. Retail stores the updated scroll offset before the
- * remainder and its final store; the compiler deletes that first store here.
- * No volatile local or selected volatile access is used. Making the entire
- * scroll field volatile was tested and rejected: it adds a reload absent in
- * retail and changes earlier control flow. Pointer/integer table forms and
- * inline indexing share the remaining register swap.
- *
- * Semantic corrections: empty help ID returns 1 (retail retains v0=1), and
- * the fast scroll step requires (input & 0xF) == 0xF, not == 0.
- * Next: source/allocator evidence for the remaining table and marquee forms,
- * especially a faithful scroll update that retains the intermediate store.
- * Required declarations are included below. Restore in a dedicated -g8.c
- * unit and replace the marker before running check.py.
+ * Remaining: (1) flow2 still deletes the intermediate `sw v0,0x3C(s1)`.
+ * sched1 hoists the fixed-scalar D_001AB984 load above the struct store
+ * (true_dependence allows that), so at flow2 nothing reads memory between
+ * the two stores (the b1013 pattern). Retail must have kept that load below
+ * the store until after flow2 and hoisted it only in sched2. The span-first
+ * or cast `*(int *)(w + 0x3C)` forms lose the store in flow1, or keep it with
+ * the load scheduled after it. (2) The marquee window sets at +0x6A0..+0x6EC
+ * put the scroll chain in v0 and s[0] in a0, where retail is the reverse.
+ * Argument order, store order and a temporary did not change this. (3) At
+ * +0x73C..+0x780, s[0] is loaded early into t1, where retail loads it late
+ * into v0.
+ * No volatile, register pins or barriers. Needs a dedicated -g8.c unit
+ * (sda declarations); replace the marker before running check.py.
  */
 #include "common.h"
 typedef struct { short s[12]; } Win;
+typedef struct { char pad[0x3C]; int so; } LabelSO;
 extern char D_001AB988[], D_001AB990[], D_001AB998[], D_001AB9A0[];
 extern unsigned char D_00263B50[], D_00264290[], D_00263EF0[], D_00139568[];
 extern unsigned char D_001A7AF8[] MACRO_ADDR, D_001395B8[] MACRO_ADDR, D_001A7A60[] MACRO_ADDR;
@@ -60,7 +59,7 @@ extern void func_0027ECC8(int, int, int, int, int);
 #define TEXT(id) func_00288FB8(id)
 #define DRAW(c,t) func_0027FC70(&win,c,t,-1,tex,glyphs)
 static inline int translated_edge(int extent, int origin) { return extent + origin; }
-static inline void set_window_vertical(Win *p, unsigned short anchor, unsigned short top) { p->s[0] = top; p->s[5] = anchor; }
+static inline void set_window_vertical(Win *p, unsigned short top, unsigned short anchor) { p->s[5] = anchor; p->s[0] = top; }
 int func_002CC6B0(unsigned char *w) {
     char buf[0x40];
     int id;
@@ -112,15 +111,13 @@ int func_002CC6B0(unsigned char *w) {
         }
     } else if (flags & 0x100) {
         char *cell;
-        unsigned char *tbl;
         content = *(int *)(ST + 0x3C);
         cell = *(char **)(ST + 0x48) + content * 10;
         if (*(short *)(cell + 4) == 0) {
-            tbl = (unsigned char *)(*(short *)(cell + 6) + (int)D_001A7AF8);
+            id = D_001A7AF8[*(short *)(cell + 6)];
         } else {
-            tbl = (unsigned char *)(*(short *)(cell + 6) + (int)D_001395B8);
+            id = D_001395B8[*(short *)(cell + 6)];
         }
-        id = *tbl;
         if (id == 0) {
             content = -1;
             t = 0;
@@ -260,7 +257,10 @@ int func_002CC6B0(unsigned char *w) {
         *(int *)(w + 0x3C) = 0;
     }
 
-    set_window_vertical(&win, a21 - (*(int *)(w + 0x3C) >> 4), win.s[0]);
+    {
+        int y = a21 - (*(int *)(w + 0x3C) >> 4);
+        set_window_vertical(&win, win.s[0], y);
+    }
     if (*(int *)(w + 0x30) & 0x20000) {
         func_0027F120();
     }
@@ -269,12 +269,11 @@ int func_002CC6B0(unsigned char *w) {
         func_0027F110();
     }
     if (*(int *)(w + 0x30) & 0x400) {
-        set_window_vertical(&win, win.s[5] + (win.s[7] + *(int *)&D_001AB984 * 3), win.s[0]);
+        set_window_vertical(&win, win.s[0], win.s[5] + (win.s[7] + *(int *)&D_001AB984 * 3));
         DRAW(colour, text);
         if (*(int *)(w + 0x30) & 0x400) {
-            int span = (win.s[7] + *(int *)&D_001AB984 * 3) << 4;
-            *(int *)(w + 0x3C) += (D_00138320[0] & 0xF) == 0xF ? 10 : 3;
-            *(int *)(w + 0x3C) %= span;
+            ((LabelSO *)w)->so += (D_00138320[0] & 0xF) == 0xF ? 10 : 3;
+            ((LabelSO *)w)->so %= (win.s[7] + *(int *)&D_001AB984 * 3) << 4;
         }
     }
     func_0027C660();

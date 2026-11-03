@@ -1,19 +1,18 @@
 /*
- * GPT-6.1 Sol high, 2026-10-29: USA v1.01, 1052/1052 bytes, 0/1 places.
- * Standalone L23_0042A018-g8.c, -O2 -G8 -ffunction-sections -g
- * -frac2-hazard-labels. Other releases were not checked this time.
- * 19 instruction rows remain: the alpha addition swaps its source registers at
- * +0x130; color allocation and outer-loop setup differ at +0x22C..+0x274.
- * qzero_nc fixes the matrix/state lifetime and argument-address regeneration;
- * the first three independent matrix rows use qcopy_nc, while the fourth uses
- * qcopy because its W component is overwritten. The grouped first ALPHA pair
- * fixes the load/shift schedule. -g plus hazard-labels fixes the division guard.
- * Explicit UV start pointers, 2D pointers and named U/V fields tie. Reversing
- * alpha addition changes its load/result registers; unsigned addition ties.
- * MACRO_ADDR on the UV table changes its hoisted base and worsens the loop.
- * Reopen with new color/loop lifetime evidence; retained packet/matrix extents
- * are unchanged. This is closer than the historical 25 October draft.
- * Required declarations follow below; no custom helper or volatile cast.
+ * Claude Opus 5.5 (opus-1), task v2219, 2026-11-03: USA v1.01, 1052/1052 bytes,
+ * 0/1 places; 4 instruction rows remain (+0x25C..+0x284). Other releases not checked.
+ * Standalone L23_0042A018-g8.c, -O2 -G8 -ffunction-sections -g -frac2-hazard-labels.
+ * Only the two spilled UV start pointers differ: retail keeps sp+0x54 in slot 0x110
+ * and sp+0x50 in 0x114; ours is the reverse. Both are gcse PRE reaching registers
+ * numbered in hash-bucket order (raw hashes 14110/14114, table size (max_cuid/2)|1).
+ * Retail's order needs a table of 103, 137 or 147 buckets; this source gives 111
+ * (about 220 insns at gcse), so retail had about 15 fewer (or ~50 more) RTL insns.
+ * Fixed since the 2026-10-29 draft: the two-step alpha store (cvt then += D_147C)
+ * ties the add to the D_147C load like retail; writing the colour stores in both
+ * arms (jump2 cross-jumps them) gives the colour v0; the block-local table pointer
+ * `tab` is spilled with a REG_EQUIV and rematerialised as lui+addiu in one register,
+ * and setting it in the loop body lets cse1 put the index first in the addu.
+ * No volatile casts or helper tricks; required declarations follow below.
  */
 #include "common.h"
 
@@ -146,7 +145,8 @@ void func_L23_0042A018(u8 *moby) {
         D_L23_001B39D0 = D_L23_001B1470 * 1.1f;
         vars->turn = func_00283B98(vars->turn, (float)D_L23_001B1480 * 0.00029088825f);
         f = func_00283198((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
-        vars->alpha = D_L23_001B147C + (s32)(f * D_L23_001B1478);
+        vars->alpha = (s32)(f * D_L23_001B1478);
+        vars->alpha += D_L23_001B147C;
         reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
         reg |= (s64)D_L23_001B1BB4 << 4;
         reg |= (s64)D_L23_001B1BB8 << 6;
@@ -171,15 +171,20 @@ void func_L23_0042A018(u8 *moby) {
         func_00283738(m, m, rot);
         if (D_L23_001B3714 == 0) {
             col = (vars->alpha << 24) + (D_L23_001B1BC4 & 0xFFFFFF);
+            pkt.col[3] = col;
+            pkt.col[2] = col;
+            pkt.col[1] = col;
+            pkt.col[0] = col;
         } else {
             col = (vars->alpha << 24) + (D_L23_001B1BC8 & 0xFFFFFF);
+            pkt.col[3] = col;
+            pkt.col[2] = col;
+            pkt.col[1] = col;
+            pkt.col[0] = col;
         }
-        pkt.col[3] = col;
-        pkt.col[2] = col;
-        pkt.col[1] = col;
-        pkt.col[0] = col;
         for (i = 0; i < 0x48; i++) {
-            L23Corner *e = D_L23_002A68D0[i];
+            L23Corner (*tab)[4] = D_L23_002A68D0;
+            L23Corner *e = tab[i];
             float *uvy = &pkt.uv[0][1];
             float *uvx = &pkt.uv[0][0];
             TI16 *pos = pkt.pos;

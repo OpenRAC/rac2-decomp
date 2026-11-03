@@ -768,7 +768,71 @@ INCLUDE_ASM("asm/game", func_002CA070);
 
 /* func_002CA790 is defined in 002CA790.c. */
 
-INCLUDE_ASM("asm/game", func_002CA8A8);
+/* Pause-menu state at D_001F2840 (RAC1 update_menu_system: update_count, timer, ...). */
+typedef struct {
+    int mode;
+    char pad04[0x10];
+    int arg;
+    char pad18[4];
+    int pending;
+    char pad20[0x100];
+    int update_count;
+    char pad124[0x34];
+    int timer;
+    char pad15C[8];
+    int card_error_frames;
+    int clear;
+} PauseState;
+/* Memory-card state: state and error code (RAC1 memory_card_state). */
+typedef struct {
+    char pad[0x15C];
+    int state;
+    int pad160;
+    int err;
+} PauseCardState;
+#define PAUSE ((PauseState *)D_001F2840)
+extern PauseCardState D_001393E0;
+extern int D_001A7424 __attribute__((sda));
+extern int D_001B1684 __attribute__((sda));
+extern s32 D_001B18A4[] __attribute__((sda));
+extern void func_002DDEC8(void);
+extern void func_002CAA58(void);
+extern void func_002CAA88(void);
+extern void func_002CAAA0(void);
+extern void func_002CAB00(void);
+extern void func_002CADB0(void);
+extern int func_002E4AC8(void);
+extern void func_002B6658(void);
+extern void func_002CA5D0(void);
+
+void func_002CA8A8(void)
+{
+    PAUSE->update_count = PAUSE->update_count > 31999 ? 32000 : PAUSE->update_count + 1;
+    PAUSE->clear = 0;
+    if (PAUSE->timer) --PAUSE->timer;
+    if (D_001393E0.state < 3 && D_001393E0.err < 0) ++PAUSE->card_error_frames;
+    else PAUSE->card_error_frames = 0;
+    func_002DDEC8();
+    if ((D_001A7424 & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
+        if (!func_002B49E0(4, 1, 1, PAUSE->arg, 0)) return;
+    }
+    switch (PAUSE->mode) {
+    case 1: func_002CAA58(); break;
+    case 2: func_002CAA88(); break;
+    case 3: func_002CAAA0(); break;
+    case 4: func_002CAB00(); break;
+    case 5:
+        func_002CADB0();
+        func_002E4AC8();
+        D_0018A000[0] = 10;
+        D_001B18A4[1] = 0;
+        return;
+    }
+    func_002B6658();
+    func_002E4AC8();
+    if (PAUSE->pending) func_002CA5D0();
+}
+#undef PAUSE
 
 void func_002CAA58(void)
 {
@@ -895,7 +959,7 @@ done:
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_002CC528);
+/* func_002CC528 lives in 002CC528-g8.c. */
 
 /* Near miss: nonmatching/game/func_002CC550.c (316/316 bytes; the two address
    materialisations in the loop preheader keep a separate %hi temporary). */

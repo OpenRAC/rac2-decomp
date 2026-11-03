@@ -210,7 +210,7 @@ void func_L12_00400B28(s32 a0, s32 a1, s32 a2, s32 a3) {
 
 /* func_L12_00407DE8 is defined in L12_00407DE8-qcopy.c. */
 
-INCLUDE_ASM("asm/levels", func_L12_00408050);
+/* func_L12_00408050 is defined in L12_00408050-g8.c. */
 
 
 
