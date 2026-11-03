@@ -1,9 +1,8 @@
-/* PR #361 reconstruction, withheld from C integration. The retail call at
- * +0x36C normalizes the hit packet at sp+0x40 before its first identified
- * initialization at +0x3CC. This reads meaningful uninitialized XYZ values;
- * do not invent zero initialization to claim a match. Resolve the packet
- * lifetime/producer first. Original draft and tests remain in PR history.
- * Profile: -O2 -G8 -ffunction-sections. Not requalified after interface review.
+/* func_00333048: an explosion's sparks, pushed particles, ring effect and area hit.
+ * In the hit loop the packet's vector is normalized before func_002A8C00 fills it, as
+ * retail does at +0x36C: nothing writes sp+0x40 before that call (the slot is not shared),
+ * and func_002A8C00 overwrites the whole vector from `direction` without reading it, so the
+ * normalize result is dead. Its own -G8 unit (default -O2 -G8 -ffunction-sections).
  */
 #include "common.h"
 extern void func_00282F20(void *, void *, float);
