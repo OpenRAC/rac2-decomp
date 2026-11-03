@@ -169,6 +169,22 @@ instruction with a different name is left alone. Removed bytes remain in assembl
 and surviving identities remain stable when the number of identical copies changes.
 The rule does not classify arbitrary code without a return as filler.
 
+The core cache remnants `func_0011B320` and `func_0011B450` are individually
+qualified four-byte exclusions in all three releases. Their predecessors have
+complete returns, restored frames and delay slots followed by alignment nops;
+the following cache routines establish their own inputs. The first remnant's
+`v0` assignment would be overwritten by the next routine, and the second reads
+`v0` without a standard incoming-argument contract. Direct-transfer, loaded-word
+and straight-line address scans found no entry into either extent. Only these
+named rows are removed; the retail bytes remain in assembly without match credit.
+
+`func_001158F4` retains its canonical name while skipping four fill bytes before
+the actual `strncmp` entry. Direct calls reach `001158F8` in every release.
+The complete public newlib R5900 `strncmp.S`, assembled independently by SN and
+GNU, reproduces all 456 bytes in US, US2 and PAL without relocations. Its original
+MMI body is marked `ASM_FUNC`, not counted as C. This is complete public-source
+origin evidence; the differently padded 440-byte RAC1 body is not byte-identical.
+
 `func_00335E28` is a measured 12-byte residue in the boot and all 27 levels. The
 preceding function returns at `0x00335E20`, with `lw $v0,0xC($a0)` in its delay
 slot at `0x00335E24`. The extent then adjusts `$sp` upward by `0x20`, has a nop,

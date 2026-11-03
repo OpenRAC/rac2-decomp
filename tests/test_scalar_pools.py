@@ -244,6 +244,47 @@ class ScalarPoolSplitting(unittest.TestCase):
         text += record(0x1004, "word", "0x04050607")
         self.assertEqual(self.split(text, 0x1001, 7), ([("c", "object(.rodata)")], {}))
 
+    def test_proved_string_padding_and_numeric_records_preserve_names_and_surroundings(self):
+        before = '.section .data\n' + record(0xFFC, "word", "9")
+        first = record(0x1000, "asciz", '"item%d"') + "/* 6974656D25640000 */\n.align 2\n"
+        empty = record(0x1008, "asciz", '""') + "/* 00000000 */\n.align 2\n.align 2\n"
+        data = "formats:\n" + first + "empty:\n" + empty + record(0x100C, "word", "7")
+        after = "next:\n" + record(0x1010, "word", "8")
+        pieces, labels = self.split(before + data + after, size=16)
+        self.assertEqual(pieces, [("asm", before), ("c", "object(.rodata)"), ("asm", after)])
+        self.assertEqual(labels, {"formats": "0x1000", "empty": "0x1008"})
+
+    def test_adjacent_scalar_pools_accept_proved_c_escapes(self):
+        first = record(0x1000, "word", "1")
+        second = record(0x1004, "asciz", r'"A\n\101"') + "/* 410A4100 */\n"
+        pieces, labels = build.split_table_data(
+            "number:\n" + first + "message:\n" + second,
+            {0x1000: (4, "number(.rodata)"), 0x1004: (4, "message(.rodata)")}, scalar=True)
+        self.assertEqual(pieces, [("c", "number(.rodata)"), ("c", "message(.rodata)")])
+        self.assertEqual(labels, {"number": "0x1000", "message": "0x1004"})
+
+    def test_string_bytes_padding_and_boundaries_must_be_proved(self):
+        cases = [
+            record(0x1000, "asciz", '"abc"') + "/* 61626400 */\n",
+            record(0x1000, "asciz", '"x"') + "/* 78000100 */\n.align 2\n",
+            record(0x1000, "asciz", '"x"') + "/* 78000000 */\n",
+            record(0x1000, "asciz", '"abc"') + "/* 6162630000000000 */\n.align 2\n.align 2\n",
+            record(0x1000, "asciz", '"x"') + "/* 78000000 */\nlabel_before_padding:\n.align 2\n",
+            record(0x1000, "asciz", '"x"') + "/* 78000000 */\n.align 0\n",
+            record(0x1000, "asciz", '"abcd"') + "/* 6162636400000000 */\n.align 2\n",
+            record(0x1000, "asciz", '"abc"') + "/* 6162630 */\n",
+            record(0x1000, "asciz", r'"\x41bc"') + "/* 41626300 */\n",
+            record(0x1000, "asciz", '"abc"; .byte 0') + "/* 61626300 */\n",
+        ]
+        for text in cases:
+            with self.subTest(text=text), self.assertRaises(SystemExit):
+                self.split(text)
+
+    def test_proved_strings_do_not_relax_branch_table_records(self):
+        text = record(0x1000, "asciz", '"abc"') + "/* 61626300 */\n"
+        with self.assertRaises(SystemExit):
+            build.split_table_data(text, {0x1000: (4, "object(.rodata)")})
+
     def test_gaps_partial_records_and_missing_spans_fail(self):
         for text in (record(0x1000, "byte", "0"), record(0x1001, "word", "0"),
                      record(0x1000, "byte", "0") + record(0x1002, "byte", "0, 0"),

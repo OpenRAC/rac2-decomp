@@ -1,3 +1,19 @@
+/* 3 November 2026: use the real owning 32-byte slot array, as consumed by
+ * matched func_L00_003F87B0, instead of an opaque search record cast to an
+ * unrelated type. Phase at +0x0C has a float/word union: creation clears its
+ * bits, the consumer reads a float. The two colours, pointer +0x14, owner
+ * +0x18 and hold word +0x1C keep their actual widths and accesses.
+ * Default G0: 756/756 bytes, 0/28 USA, first mismatch +0x38. The same three
+ * entry scheduling words remain; the later slot loop/tail do not close them.
+ * Fresh retail dataflow confirms the status result: 1 until allocation,
+ * 0 after filling a slot, returned through v0. Ignore-value donor declarations
+ * are not independent evidence for changing this definition to void.
+ * This body needs its own unit because the parent also declares an opaque
+ * search view. Reopen on the real input delaying the entry address operation;
+ * do not replay the nine stopped kind-table spellings or invent an insn.
+ * No alternate-release or linked build was run for this failed candidate.
+ */
+/* Historical notes describe the preceding retained source. */
 /* Closer C, 1 November 2026: the tail is exact with the store order below; 3 rows off, all at +0x38.
  * sched2 (BUF_LEN 4096 cc1, -dR -fsched-verbose-4): t8 ready 38[p6] 20[p9], so addu a1 (20) goes first.
  * Retail's order needs insn 20 at t9, one cycle after the mult's latency allows, though nothing else
@@ -42,8 +58,6 @@
 #include "common.h"
 
 /* Declarations */
-typedef struct { u8 field00[0x14]; void *field14; u8 field18[8]; } NativeObjectSearchRecord32;
-extern NativeObjectSearchRecord32 D_L00_002533B0[];
 extern s32 func_0032D700(void *object);
 /* func_0032D758's effect type rows, kind flags and per-bank effect parameters. */
 typedef struct { int active; unsigned char type; char pad[0x47]; short kind; char tail[0x92]; } EffectType;
@@ -52,7 +66,15 @@ extern unsigned char D_001A7A80[], D_00139568[];
 typedef struct { float scale; int ticks; char pad[8]; } EffectParams;
 extern EffectParams D_00236510[2][119];
 extern float *func_002AB1F0(void *);
-typedef struct { int remaining, color, flags, elapsed; float rate; char *object; int tag, active; } EffectSlot;
+/* The matched slot consumer reads +0x0C as phase; creation clears its bits. */
+typedef struct {
+    int remaining, color, flags;
+    union { float value; unsigned int bits; } phase;
+    float rate;
+    char *object;
+    int tag, active;
+} EffectSlot;
+extern EffectSlot D_L00_002533B0[];
 extern void func_002A04B8(void *, int *, int *, int *);
 
 static __inline__ int EffectAlternate(int kind)
@@ -101,9 +123,9 @@ int func_0032D758(char *self, int index, int arg)
         EffectSlot *slot;
         int found;
         unsigned int flags;
-        if (D_L00_002533B0[i].field14)
+        if (D_L00_002533B0[i].object)
             continue;
-        slot = (EffectSlot *)&D_L00_002533B0[i];
+        slot = &D_L00_002533B0[i];
         found = 0;
         slot->object = self;
         slot->remaining = D_00236510[alternate][index].ticks * 60;
@@ -119,7 +141,7 @@ int func_0032D758(char *self, int index, int arg)
             }
         }
         if (!found) func_002A04B8(slot->object, &r, &g, &b);
-        slot->elapsed = 0;
+        slot->phase.bits = 0;
         slot->flags = 0x8000;
         slot->color = (b << 16) + (g << 8) + r;
         slot->tag = arg;

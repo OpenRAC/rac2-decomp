@@ -27,6 +27,7 @@ give each program running at once a prefix of its own, build/wine/<slot> (made o
 wineboot, then reused): a 32-job build runs 32 wineservers instead of queueing behind one.
 A WINEPREFIX already set, or RAC2_ONE_PREFIX=1, keeps every program on that one prefix.
 """
+import ast
 import hashlib
 import json
 import os
@@ -704,24 +705,70 @@ def level_reference(number: int) -> Path:
     return path
 
 
+def scalar_string_width(lines: list[str], index: int, address: int) -> int | None:
+    """Size of an annotated asciz record, including explicitly proved zero padding.
+
+    Splat prints the exact bytes on the next comment line. Accept a bounded
+    ASCII/C-escape spelling only when it agrees with those bytes. Extra zeros
+    require a following explicit alignment; a label before that padding would
+    have a different address, so leave such a record unsupported.
+    """
+    quoted = r'"(?:[\x20-\x21\x23-\x5B\x5D-\x7E]|\\(?:[\\\"abfnrtv]|[0-3][0-7]{2}))*"'
+    literal = re.fullmatch(r"\s*/\*\s+[0-9A-Fa-f]+\s+[0-9A-Fa-f]{8}\s*\*/\s*"
+                           r"\.asciz\s+(" + quoted + r")\s*", lines[index])
+    if literal is None or index + 1 >= len(lines):
+        return None
+    annotation = re.fullmatch(r"\s*/\*\s*([0-9A-Fa-f]+)\s*\*/\s*", lines[index + 1])
+    if annotation is None or len(annotation[1]) % 2:
+        return None
+    try:
+        payload = ast.literal_eval(literal[1]).encode("latin1") + b"\0"
+    except (SyntaxError, ValueError, UnicodeError):
+        return None
+    encoded = bytes.fromhex(annotation[1])
+    if not encoded.startswith(payload) or any(encoded[len(payload):]):
+        return None
+    if len(encoded) == len(payload):
+        return len(encoded)
+    cursor, end = address + len(payload), address + len(encoded)
+    for following in lines[index + 2:]:
+        alignment = re.fullmatch(r"\s*\.align\s+([1-4])\s*", following)
+        if alignment:
+            boundary = 1 << int(alignment[1])
+            cursor = (cursor + boundary - 1) & -boundary
+            if cursor == end:
+                return len(encoded)
+            if cursor > end:
+                return None
+        elif (following.strip()
+              and not re.fullmatch(r"\s*/\*.*?\*/\s*", following)
+              and not re.fullmatch(r"\s*\.globl\s+[A-Za-z_.$][\w.$]*\s*", following)):
+            return None
+    return None
+
+
 def split_table_data(text: str, tables: dict[int, tuple[int, str]], *, scalar: bool = False
                      ) -> tuple[list[tuple[str, str]], dict[str, str]]:
     """Replace measured whole-word data spans with compiler section inputs.
 
     Keep all surrounding assembly and retain names defined inside a replaced span
     at their measured addresses. Branch tables require one .word per annotated
-    record. Relocation-free scalar pools also accept numeric .byte/.short records;
-    records must be contiguous and fully contained, with no implicit padding.
+    record. Relocation-free scalar pools also accept numeric .byte/.short records
+    and asciz records whose literal bytes and explicit padding are proved.
+    Records must be contiguous and fully contained; no padding is inferred.
     """
     lines = text.splitlines(keepends=True)
     pieces, aliases, current, pending = [], {}, [], []
     active, seen, consumed = None, set(), set()
+    string_annotations = set()
     spans = sorted((a, a + n) for a, (n, _) in tables.items())
     if any(end <= a or (not scalar and (a % 4 or end % 4)) for a, end in spans):
         sys.exit("invalid compiler jump table span")
     if any(end > following for (_, end), (following, _) in zip(spans, spans[1:])):
         sys.exit("overlapping compiler jump tables")
-    for line in lines:
+    for line_index, line in enumerate(lines):
+        if line_index in string_annotations:
+            continue
         ins = (re.search(r"/\*\s+[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})(?:\s+[0-9A-Fa-f]+)?\s*\*/", line)
                if scalar else INSTRUCTION.search(line))
         if not ins:
@@ -755,12 +802,16 @@ def split_table_data(text: str, tables: dict[int, tuple[int, str]], *, scalar: b
             width = 4
             if scalar:
                 directive = re.search(r"\*/\s*\.(byte|short|half|word)\s+([^;#\n]+)\s*$", line.rstrip())
-                if not directive:
-                    sys.exit("compiler scalar pool span is not fixed-size numeric data")
-                fields = [field.strip() for field in directive[2].split(",")]
-                if any(not re.fullmatch(r"-?(?:0[xX][0-9A-Fa-f]+|[0-9]+)", f) for f in fields):
-                    sys.exit("compiler scalar pool span is not fixed-size numeric data")
-                width = {"byte": 1, "short": 2, "half": 2, "word": 4}[directive[1]] * len(fields)
+                if directive:
+                    fields = [field.strip() for field in directive[2].split(",")]
+                    if any(not re.fullmatch(r"-?(?:0[xX][0-9A-Fa-f]+|[0-9]+)", f) for f in fields):
+                        sys.exit("compiler scalar pool span is not fixed-size numeric data")
+                    width = {"byte": 1, "short": 2, "half": 2, "word": 4}[directive[1]] * len(fields)
+                else:
+                    width = scalar_string_width(lines, line_index, address)
+                    if width is None:
+                        sys.exit(f"compiler scalar pool record at {address:#x} is not proved literal data")
+                    string_annotations.add(line_index + 1)
             if address != start + sum(1 for a in consumed if start <= a < start + size):
                 sys.exit("noncontiguous compiler jump table span")
             if address + width > start + size:
@@ -771,6 +822,9 @@ def split_table_data(text: str, tables: dict[int, tuple[int, str]], *, scalar: b
                 label = re.fullmatch(r"\s*([A-Za-z_.$][\w.$]*):\s*", previous)
                 if label:
                     aliases[label.group(1)] = f"{address:#x}"
+                elif scalar and (alignment := re.fullmatch(r"\s*\.align\s+([1-4])\s*", previous)):
+                    if address % (1 << int(alignment[1])):
+                        sys.exit("unproved alignment inside compiler scalar pool")
                 elif (previous.strip()
                       and not re.fullmatch(r"\s*\.globl\s+[A-Za-z_.$][\w.$]*\s*", previous)
                       and not re.fullmatch(r"\s*/\*.*?\*/\s*", previous)):

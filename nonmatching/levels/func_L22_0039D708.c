@@ -1,3 +1,15 @@
+/* Object and ABI review, 3 November 2026; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections -g -frac2-qcopy
+ *          -frac2-qcopy-barrier -frac2-keep-block-order.
+ * Fresh US check: 15528/16068 bytes, 0/2 places.
+ * The 128-byte workspace now owns complete 64-byte matrices at offsets
+ * 0, +0x10 and +0x40, and complete 40-byte query views at 0 and +0x50.
+ * Wide callees receive whole objects rather than 16-byte q subobjects.
+ * Real vector/byte stores and opaque fields remain; no extra storage or
+ * initialization is introduced. Branch tails, allocation and wider semantic
+ * review remain. No exact or functional qualification is claimed.
+ * Earlier measurements follow.
+ */
 /* Dobbo/Damosel orbit state machine, retained reconstruction (not functional-gated).
  * USA v1.01: 15,528/16,068 bytes, 0/2 placements, measured 2026-11-01.
  * Profile: -O2 -G8 -ffunction-sections -g -frac2-qcopy
@@ -15,6 +27,20 @@
 #include "common.h"
 typedef int s128 __attribute__((mode(TI)));
 typedef union { s128 q; float f[4]; unsigned char b[16]; unsigned short h[8]; } ScratchD708;
+typedef struct { ScratchD708 rows[4]; } MatrixD708;
+typedef struct {
+    ScratchD708 direction;
+    s32 owner, flags;
+    u8 first, second;
+    u16 objectId;
+    float amount;
+    s32 enabled;
+    u32 opaque;
+} QueryD708;
+typedef union {
+    MatrixD708 matrix;
+    struct { QueryD708 query; ScratchD708 direction; } query_view;
+} FirstD708;
 #define M2C_FIELD(expr, type, offset) (*(type)((s8 *)(expr) + (offset)))
 #define NULL ((void *)0)
 
@@ -201,7 +227,13 @@ extern s32 D_L22_003A6858 __attribute__((nosda));
 void func_L22_0039D708(s8 *arg0) {
     /* The two matrices and the collision record reuse these eight vectors.
      * Component stores must address their vectors, not unrelated scalar locals. */
-    ScratchD708 scratch[8];
+    union {
+        ScratchD708 vectors[8];
+        struct { FirstD708 first; MatrixD708 second; } pair;
+        struct { ScratchD708 rotation; MatrixD708 basis; } shifted;
+        struct { MatrixD708 basis; ScratchD708 rotation; QueryD708 query; } collision;
+    } workspace;
+#define scratch workspace.vectors
     ScratchD708 spA0;
     ScratchD708 spB0;
     s32 spC0;
@@ -408,8 +440,8 @@ block_20:
                 if (D_L22_001AF318 != 0) {
                     func_00282F20(&scratch[3].q, arg0 + 0xC0, -10.0f);
                     scratch[3].f[3] = 5627.925f;
-                    func_002A8C00((s32) &scratch[0].q, D_0018C0B0, 0x10000, 20.0f, (s32) &scratch[3].q);
-                    func_002A8E20(arg0, &scratch[0].q);
+                    func_002A8C00((s32) &workspace.pair.first.query_view.query, D_0018C0B0, 0x10000, 20.0f, (s32) &scratch[3].q);
+                    func_002A8E20(arg0, &workspace.pair.first.query_view.query);
                     D_L22_001AF318 = 0;
                 }
             }
@@ -786,7 +818,7 @@ block_101:
                         scratch[5].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x10);
                         scratch[6].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
                         scratch[7].q = 0;
-                        func_002AB6D8(&scratch[4].q, &scratch[0].q);
+                        func_002AB6D8(&workspace.pair.second, &scratch[0].q);
                         temp_s2 = arg0 + 0x10;
                         func_00335438(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
                         func_L22_003A45F0(arg0, 0xE, 0, 4, 3, 0.6f);
@@ -804,7 +836,7 @@ block_101:
                         scratch[3].q = 0;
                         var_fp_2 = temp_s6 + 0xE0;
                         func_00282DD8(&scratch[2].q, &scratch[0].q, &scratch[1].q);
-                        func_002AB6D8(&scratch[0].q, &scratch[4].q);
+                        func_002AB6D8(&workspace.pair.first.matrix, &scratch[4].q);
                         func_003353C8(&scratch[4].q);
                         func_00335370(&scratch[5].q);
                     } else if (temp_v0_10 < (s32) temp_a0_13) {
@@ -812,7 +844,7 @@ block_101:
                         scratch[2].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x10);
                         scratch[3].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
                         scratch[4].q = 0;
-                        func_002AB6D8(&scratch[1].q, &scratch[0].q);
+                        func_002AB6D8(&workspace.shifted.basis, &workspace.shifted.rotation);
                         func_00335438(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
                         func_00282CF0(&scratch[0].q, spCC, D_L22_001B9C80);
                         func_00282F20(&scratch[0].q, &scratch[0].q, 1.0f);
@@ -824,34 +856,34 @@ block_101:
                         func_00282F20(&scratch[2].q, &scratch[2].q, 1.0f);
                         func_00282DD8(&scratch[1].q, &scratch[0].q, &scratch[2].q);
                         func_00282F20(&scratch[1].q, &scratch[1].q, 1.0f);
-                        func_002AB6D8(&scratch[0].q, &scratch[4].q);
+                        func_002AB6D8(&workspace.pair.first.matrix, &scratch[4].q);
                         func_003353C8(&scratch[4].q);
                         func_0027D330(1);
-                        func_002A8BD0(&scratch[5].q, M2C_FIELD(temp_s3_2, s32 *, 0x2290), 0xB0000, 50.0f);
+                        func_002A8BD0(&workspace.collision.query, M2C_FIELD(temp_s3_2, s32 *, 0x2290), 0xB0000, 50.0f);
                         scratch[6].b[9] = 1;
                         scratch[6].b[8] = 7;
                         scratch[6].h[5] = M2C_FIELD(M2C_FIELD(temp_s3_2, s32 *, 0x2290), u16 *, 0xAA);
                         func_002A8C28((s32) arg0, (s32) D_L22_001B9C80, 0x90000, 10.0f, 100.0f, 0.0f, 0, 1, 0);
                         temp_s4 = D_L22_001B9C80 + 0x240;
-                        func_002761F8(D_L22_001B9C80, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &scratch[5].q);
+                        func_002761F8(D_L22_001B9C80, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         temp_s5 = D_L22_001B9C80 + 0x250;
                         func_00282D30(&spA0, M2C_FIELD(temp_s3_2, s32 *, 0x2290) + 0xE0, 4.0f);
                         func_00282CC0(&spA0, &spA0, temp_s3_2 + 0x80);
-                        func_002761F8(&spA0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &scratch[5].q);
+                        func_002761F8(&spA0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         temp_f20 = D_L22_001AF2F4 * 6.875f;
                         temp_f21 = -temp_f20;
                         func_00282D30(&spB0, temp_s4, temp_f20);
                         func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &scratch[5].q);
+                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         func_00282D30(&spB0, temp_s4, temp_f21);
                         func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &scratch[5].q);
+                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         func_00282D30(&spB0, temp_s5, temp_f20);
                         func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &scratch[5].q);
+                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         func_00282D30(&spB0, temp_s5, temp_f21);
                         func_00282CC0(&spB0, &spB0, D_L22_001B9C80);
-                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &scratch[5].q);
+                        func_002761F8(&spB0, M2C_FIELD(temp_s6, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                     } else {
                         func_0027D330(1);
                         var_fp_2 = temp_s6 + 0xE0;

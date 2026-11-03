@@ -1,3 +1,12 @@
+/* 3 November 2026; retained C, no linked match.
+ * Real operand captures and a choice write cursor, following current RAC1
+ * pick_idle_fidget, remain 944/948 bytes and 0/27 US places (frame 0xD0).
+ * Both stack vectors are complete 16-byte objects, and the second qcopy
+ * still reads the first stack copy. RAC1 independently uses choices[20].
+ * The actual hero-origin operand is captured before the candidate loop.
+ * This does not resolve the origin/-1 hoist threshold or the sampling
+ * numerator copy. No scalar/flag sweep or dummy references were added.
+ */
 /* opus-1 (Claude Opus 5.5 xhigh), v1781: 944/948 bytes, 0/27 USA v1.01 places, 0/27 v2.00.
  * Profile: -O2 -G0 -ffunction-sections -frac2-hazard-labels. All declarations are below.
  *
@@ -24,6 +33,7 @@
  */
 #include "common.h"
 typedef int Vector __attribute__((mode(TI)));
+typedef union { Vector q; float f[4]; } ChoiceVector;
 typedef struct {
     unsigned char pad0[0xE0]; float origin[4];
     unsigned char pad1[0x1B8 - 0xF0]; int count;
@@ -55,7 +65,10 @@ int func_L00_002CA4E0(int *selected)
 {
     int choices[20], count = 0, index;
     ChoiceRecord *entry, *records;
-    float raised[4], origin[4];
+    ChoiceVector raised, origin;
+    ChoiceVector *startp, *endp;
+    float *origin_source;
+    int *next;
     float sum, draw;
     if (D_00189E20.gate != 0) return 0;
     if (D_00189E20.state == 1) {
@@ -65,6 +78,10 @@ int func_L00_002CA4E0(int *selected)
         return func_002A7878(0.0f, 1.0f) < 0.33f;
     }
     records = D_L00_0025BC00;
+    startp = &origin;
+    endp = &raised;
+    origin_source = D_00189E20.origin;
+    next = choices;
     for (index = 0; index < 4; index++) {
         float zero = 0.0f;
         int area;
@@ -75,13 +92,15 @@ int func_L00_002CA4E0(int *selected)
         if (index == 2) {
             if (D_001A79F0 != 7 && D_001A79F0 != 0x13) continue;
             if (D_00189E20.byte_22bb == 2) continue;
-            qcopy(origin, D_00189E20.origin);
-            qcopy(raised, origin);
-            raised[2] += 8.0f;
-            if (func_002761F8(origin, raised, 2, D_00189E20.object, 0)) continue;
+            qcopy(startp, origin_source);
+            qcopy(endp, startp);
+            raised.f[2] += 8.0f;
+            if (func_002761F8(startp, endp, 2, D_00189E20.object, 0)) continue;
         }
         if (index == 3 && (D_00189E20.mode != 1 || D_00189E20.count > 50 || D_00189E20.state > 1)) continue;
-        choices[count++] = index;
+        *next = index;
+        count++;
+        next++;
     }
     if (!count) return 0;
     sum = 0.0f;

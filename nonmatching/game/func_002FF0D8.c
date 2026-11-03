@@ -1,3 +1,16 @@
+/* 3 November 2026: owning resident-view repair, original G0/g profile.
+ * The resident byte object remains incomplete; only its actual preview-vector
+ * prefix is typed. Model lookup preserves the observed 0x1220 + index*0x50
+ * addressing without declaring the owner as a made-up one-slot model array.
+ * All captures, request stores, inputs and pointer results are unchanged.
+ * Fresh GNU-default check: 428/428 bytes, 0/28 USA, first mismatch +0x90.
+ * The voice selection/key/constant scheduling residual remains. No matching
+ * published macro was established in the consulted current RAC1 interfaces;
+ * no do/while wrapper, volatility or dependency is invented to simulate one.
+ * Reopen on actual request-source/control-flow evidence. No alternate-release
+ * or linked build was run for this failed candidate.
+ */
+/* Historical notes describe the preceding retained source. */
 /* Closer C, 3 November 2026 (opus-1, task v2129): 428/428 bytes, 0/28 places, 3 rows differ.
  * Build: its own unit (e.g. src/game/002FC8D0-start.c) with config/cflags.txt line "-O2 -G0 -ffunction-sections -g";
  * without -g the two nops before div.s go and it is 420 bytes. Declarations below (VoiceRequest = D_001A63A8 as in
@@ -29,20 +42,14 @@ typedef struct {
 extern Transition D_001B2310[] __attribute__((sda));
 extern int D_001AD7E4[] SDATA(D_001AD7E4);
 extern int D_001AD7E8[] SDATA(D_001AD7E8);
-/* The resident block: the preview's start and end vectors and the table of
-   0x50-byte model slots. */
+/* Real preview vectors in the owning resident byte object. The model-slot
+ * table is addressed from that complete object, without a made-up one-slot bound. */
 typedef struct {
-    unsigned char *model;
-    char pad04[0x50 - 0x04];
-} ResidentModelSlot;
-typedef struct {
-    char pad00[0x80];
-    float previewFrom[4];
-    float previewTo[4];
-    char padA0[0x1220 - 0xA0];
-    ResidentModelSlot models[1];
-} ResidentBlock;
-extern ResidentBlock D_00189E20;
+    unsigned char pad00[0x80];
+    float previewFrom[4], previewTo[4];
+} ResidentPreviewPrefix;
+extern unsigned char D_00189E20[];
+#define PREVIEW ((ResidentPreviewPrefix *)D_00189E20)
 /* The voice player's request block (see 00289178.c). */
 typedef struct {
     char pad00[0x24];
@@ -60,8 +67,8 @@ void func_002FF0D8(void)
 {
     D_001B2310[0].count = D_001AD7F8;
     D_001B2310[0].rate = 1.0f / func_00283CE0(D_001B2310[0].count);
-    qcopy(D_001B2310[0].from, D_00189E20.previewFrom);
-    qcopy(D_001B2310[0].to, D_00189E20.previewTo);
+    qcopy(D_001B2310[0].from, PREVIEW->previewFrom);
+    qcopy(D_001B2310[0].to, PREVIEW->previewTo);
     D_001B2310[0].elapsed = 0;
     if (!D_001A63A8.active && D_001A63A8.key == -1) {
         D_001A63A8.selection = 0;
@@ -87,7 +94,7 @@ void func_002FF0D8(void)
         char *resident;
         D_001B2310[0].owned = 1;
         record = D_00239BA0 + D_00139568[D_001B2310[0].item] * 0xE0;
-        resident = (char *)&D_00189E20;
+        resident = (char *)D_00189E20;
         D_001B2310[0].model = *(unsigned char **)(resident + *(int *)(record + 0xC) * 0x50 + 0x1220);
     }
 }

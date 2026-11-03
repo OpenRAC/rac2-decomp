@@ -1,3 +1,13 @@
+/* 3 November 2026: retained near miss, not linked.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Current size: 5988/6048 bytes; US 0/28, US2 absent, PAL absent.
+ * The ignored memset return is correctly pointer32. Complete sprite/icon arrays normalize to the
+ * same 5988-byte body; bank-preserving setter spellings do not close the 0x150/0x160 frame and
+ * color-value lifetimes.
+ * Reopen on a complete independently evidenced HUD/color-row source that explains the two
+ * additional retail pointer spills or the repeated float-bit color lifetime.
+ * Earlier measurements below are historical where this note supersedes them.
+ */
 /* Current retained result, 1 November 2026: 5988/6048 bytes. The variadic formatter returns int. An
  * initialized four-coordinate union wrapper was measured at 6236 bytes and rejected; the previous compact
  * bit reinterpretation is retained. The repeated colour constant lowering and pointer spills remain
@@ -44,6 +54,16 @@
  */
 #include "common.h"
 
+typedef struct { char bytes[0x4C]; } HudSprite;
+typedef struct { char bytes[0x3C]; } HudIcon;
+typedef struct {
+    char prefix[0x358];
+    HudSprite selections[8];
+    HudSprite experience;
+    HudIcon icons[8];
+    float *origin;
+} HudSelectionPrefix;
+
 typedef union {
     s32 i;
     f32 f;
@@ -73,14 +93,14 @@ extern void func_00335F88(char *o, f32 x, f32 y, f32 z, f32 w);
 extern s32 *func_00335E20(char *o);
 extern s32 *func_00335E18(char *o);
 extern s32 *func_00335E10(char *o);
-extern void func_00115484(void *dst, s32 c, s32 n);
+extern void *func_00115484(void *dst, s32 c, unsigned int n);
 extern void func_003369A8(char *o, char *text, s32 arg);
 extern void func_00336A38(char *o, char *buf);
 extern void func_00336A30(char *o, s32 n);
 extern void func_00336710(char *o, char *text, s32 arg);
 extern void func_00336920(char *o, s32 id, s32 n);
-extern s32 func_00336E40(s32 arg);
-extern f32 *func_00336DA8(s32 n, s32 a);
+extern void *func_00336E40(void *pool);
+extern f32 *func_00336DA8(void *size, void *cell);
 extern void func_00335F20(char *o, f32 *v);
 extern void func_00335E68(char *o, s32 n);
 extern int func_00115DA8(char *buf, char *fmt, ...);
@@ -163,7 +183,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_00336920(self + 0x280, 0x7567, 0);
 
     if (arg != 0) {
-        v = func_00336DA8(0x10, func_00336E40(arg));
+        v = func_00336DA8((void *)0x10, func_00336E40((void *)arg));
         *(f32 **)(self + 0x7E4) = v;
         v[0] = 0.0f;
         v[1] = 0.0f;
@@ -198,7 +218,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
         f32 x;
 
         func_00115DA8(buf, D_001AE010, i);
-        w = self + (i * 0x4C + 0x358);
+        w = (char *)&((HudSelectionPrefix *)self)->selections[i];
         func_003361E0(w, buf, arg);
         func_00336390(w, font + 0x8710, i + 8);
         func_00335F88(w, 1.0f, 1.0f, 0.0f, 0.0f);
@@ -207,7 +227,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
         color = 0x442D00;
         *func_00335E20(w) = color;
         func_00115DA8(buf, D_001AE020, i);
-        w = self + (i * 0x3C + 0x604);
+        w = (char *)&((HudSelectionPrefix *)self)->icons[i];
         func_00336710(w, buf, arg);
         func_00335E68(w, 0);
         angle = func_00283B98((f32)i * 2.0f * 0.39269909f - 3.14159274f, 1.57079637f);

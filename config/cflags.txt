@@ -169,6 +169,8 @@ src/core/00115CF0.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
 src/core/00115D48.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
 src/core/00115DA8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
 src/core/001163B0.c	sdk -O2 -G2 -ffunction-sections
+src/core/00117CA0.c	-O2 -G2 -ffunction-sections -mastra-quad-saves -ffast-math -Wa,--r5900-unsigned32-mask=sn
+src/core/001182B8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves -ffast-math -Wa,--r5900-unsigned32-mask=sn
 src/core/00119BC8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
 src/core/0011B1E8.c	sdk -O2 -G2 -ffunction-sections
 src/core/0011B588.c	sdk -O2 -G2 -ffunction-sections

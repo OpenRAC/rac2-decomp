@@ -1,3 +1,21 @@
+/* Object and ABI review, 3 November 2026; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections -ffast-math -Wa,-G8.
+ * US checks: 5664/5672 bytes, 0/2 places, frame 0xF0. The canonical
+ * constructor-bank control with the current GNU-default assembler is still
+ * 5664 bytes and does not close the residual. Stop this source hypothesis.
+ * The vector read at D_L12_001B0A90 needs 16 bytes; its incomplete SDATA
+ * view replaces the false 8-byte bound without inventing an object size.
+ * The projectile factory's actual pointer result is declared; retail's
+ * unused fourth integer input remains explicitly zero. The current matched
+ * definition omits that unused formal, so no native-ABI compatibility is
+ * inferred merely from the independent EE banks.
+ * The particle call now uses its canonical three-FP/seven-integer bank
+ * interface, preserving all inputs and widths. Path data retains the actual
+ * 64-bit adjacent-sentinel read and complete 64-byte joint matrix.
+ * Reopen on genuine position-copy, branch-tail and setup lifetime evidence;
+ * do not repeat source-equivalent pointer/profile permutations.
+ * No exact, linked or functional qualification. Earlier measurements follow.
+ */
 /* func_L12_003E2460 (tier opus-1, task v2113, 3 November 2026): best check.py result
  * 5664/5672 bytes, 0 of 2 places (1416 vs 1418 instructions; 52 aligned rows still differ).
  * Profile: own unit, -O2 -G8 -ffunction-sections -ffast-math -Wa,-G8 (cflags line
@@ -47,7 +65,7 @@ extern u8 D_L12_0019B4A8[];
 extern int D_L12_001A8F00[3] __attribute__((sda));
 extern int D_L12_001A79F0_bare __asm__("D_L12_001A79F0") __attribute__((nosda));
 extern u8 *D_L12_001FEAC0[];
-extern u8 D_L12_001B0A90[8] __attribute__((sda));
+extern u8 D_L12_001B0A90[] SDATA(D_L12_001B0A90);
 extern float D_L12_001B0AA8 __attribute__((sda));
 extern float D_L12_001B0AAC __attribute__((sda));
 extern float D_L12_001B0AB0 __attribute__((sda));
@@ -99,9 +117,11 @@ extern void func_00282F20(void *, void *, float);
 extern int func_002AEB60(void *, float);
 extern float func_002A7878(float, float);
 extern int func_002A77E0(int);
-extern void *func_002C2210(void *, int, float, float, int, int, int, void *, int, float);
+/* Matches the canonical constructor: three FP and seven integer/pointer inputs. */
+extern void *func_002C2210(float, float, float, void *, int, int, int, int, void *, int);
 extern void func_00282CF0(void *, void *, void *);
-extern void func_L12_00408050(void *, void *, void *, int, float);
+/* Retail supplies the unused fourth integer-bank argument as zero. */
+extern u8 *func_L12_00408050(void *, void *, void *, int, float);
 
 void func_L12_003E2460(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
@@ -540,8 +560,8 @@ destroy:
 smoke:
             limit = func_002A7878(D_L12_001B0A80, D_L12_001B0A84);
             i = func_002A77E0(D_L12_001B0A8C);
-            func_002C2210(&pos, (int)D_L12_001B0A88, limit * 0.3f, limit,
-                         D_L12_001B0A58, 0, i, D_L12_001A8F20, 0, 0.0f);
+            func_002C2210(limit * 0.3f, limit, 0.0f, &pos, (int)D_L12_001B0A88,
+                         D_L12_001B0A58, 0, i, D_L12_001A8F20, 0);
             break;
         }
         if (func_00282C48(func_00283BE0(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {

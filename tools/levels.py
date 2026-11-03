@@ -415,6 +415,7 @@ def level_extent(number: int, address: int, size: int) -> tuple[int, int]:
 # Measured mixed extents shared by the boot and level copies. Canonical names
 # stay stable; only the callable entry moves, with the original end preserved.
 FUNCTION_ENTRY_OFFSETS = {
+    "func_001158F4": (460, 4),
     "func_0011E740": (232, 96),
     "func_0011F9E4": (52, 4),
     "func_0011FB8C": (188, 12),
@@ -859,6 +860,8 @@ def function_extent(name: str, address: int, size: int) -> tuple[int, int]:
 # names have no incoming reference at any measured placement. Keep the selection
 # named: an identical store in another extent is not evidence to cut it.
 FUNCTION_RESIDUES = {
+    "func_0011B320": 4,
+    "func_0011B450": 4,
     "func_0011F864": 4,
     "func_00335E60": 4,
     "func_L00_002DA390": 4,

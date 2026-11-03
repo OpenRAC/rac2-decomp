@@ -9,6 +9,10 @@ assembler model (GPL-3.0), commit 813090403fe822acd929616da0fee2081131f92e:
 https://github.com/OpenRAC/rac1-decomp/blob/813090403fe822acd929616da0fee2081131f92e/tools/ps2eeas_dli.py
 The shifted-mask interval matrix and fixed constant cases are authored
 independently; no game bytes, SDK sources, or assembler-output rewriting are used.
+
+The positive 32-bit mask profile follows the same public RAC1 model, checked at
+1d8228cc0c81da7bc2bdc3e77479ee050e0ef434, and an independent authored SN control:
+addiu -1; dsrl32 0. The default GNU seed and every other constant stay unchanged.
 """
 import json
 import os
@@ -24,8 +28,17 @@ sys.path.insert(0, str(ROOT / "tools"))
 import elf
 
 STATIC_CASES = json.loads((ROOT / "tests/fixtures/dli_masks.json").read_text())
-REGISTERS = (2, 8, 16, 31)
+REGISTERS = (2, 3, 8, 16, 31)
+ASSEMBLER_REGISTERS = (0, *REGISTERS)
 MASK64 = (1 << 64) - 1
+PROFILE_OPTIONS = {
+    "default": [],
+    "signed": ["--r5900-sign-bit=signed"],
+    "unsigned": ["--r5900-sign-bit=unsigned"],
+    "mask_gnu": ["--r5900-unsigned32-mask=gnu"],
+    "mask_sn": ["--r5900-unsigned32-mask=sn"],
+    "mask_sn_unsigned": ["--r5900-unsigned32-mask=sn", "--r5900-sign-bit=unsigned"],
+}
 
 
 def shifted_family_cases():
@@ -119,7 +132,10 @@ class FixtureTests(unittest.TestCase):
                      "width16_shift17", "existing_width20_shift36", "internal_hole",
                      "target_minus1", "target_plus1", "unshifted_width33",
                      "touch_sign_width59", "touch_sign_width33",
-                     "leading_ones_pure_shift_unchanged"):
+                     "leading_ones_pure_shift_unchanged", "unsigned32_mask",
+                     "unsigned32_mask_decimal", "unsigned32_mask_zero_padded",
+                     "unsigned32_mask_lower_neighbor", "unsigned32_mask_upper_neighbor",
+                     "positive_low_mask31"):
             with self.subTest(control=name):
                 self.assertFalse(cases[name]["changed_by_fix"])
                 self.assertEqual(cases[name]["words_r2"], cases[name]["baseline_words_r2"])
@@ -159,19 +175,24 @@ class AssemblerOutputTests(unittest.TestCase):
                 raise RuntimeError("RAC2_COMPILER_ROOT must contain the newly built as")
             raise unittest.SkipTest("EE assembler absent; compiler build must run with RAC2_COMPILER_ROOT")
         cls.assembler = assembler
-        cls.profiles = {name: {} for name in ("default", "signed", "unsigned")}
+        cls.profiles = {name: {} for name in PROFILE_OPTIONS}
         with tempfile.TemporaryDirectory() as directory:
             temporary = Path(directory)
             lines = [".text", ".set noreorder", ".set noat"]
             for case in CASES:
-                for reg in REGISTERS:
+                for reg in ASSEMBLER_REGISTERS:
                     symbol = f'dli_{case["name"]}_r{reg}'
                     lines += [f".globl {symbol}", f".type {symbol},@function", f"{symbol}:",
                               f'dli ${reg},{case["literal"]}', f".size {symbol},.-{symbol}"]
+            for mnemonic in ("li", "la"):
+                for reg in REGISTERS:
+                    symbol = f"control_{mnemonic}_r{reg}"
+                    lines += [f".globl {symbol}", f".type {symbol},@function", f"{symbol}:",
+                              f"{mnemonic} ${reg},0xffffffff", f".size {symbol},.-{symbol}"]
             source, output = temporary / "authored.s", temporary / "authored.o"
             source.write_text("\n".join(lines) + "\n")
             for profile, bodies in cls.profiles.items():
-                options = [] if profile == "default" else [f"--r5900-sign-bit={profile}"]
+                options = PROFILE_OPTIONS[profile]
                 result = subprocess.run([str(assembler), *options, "-o", str(output), str(source)],
                                         capture_output=True, text=True)
                 if result.returncode:
@@ -179,15 +200,67 @@ class AssemblerOutputTests(unittest.TestCase):
                 obj = elf.read_object(output)
                 symbols = {symbol["name"]: symbol for symbol in obj["symbols"]}
                 for case in CASES:
-                    for reg in REGISTERS:
+                    for reg in ASSEMBLER_REGISTERS:
                         name = f'dli_{case["name"]}_r{reg}'
                         symbol = symbols[name]
                         data = obj["sections"][symbol["section"]]["data"]
                         bodies[case["name"], reg] = data[symbol["value"]:symbol["value"] + symbol["size"]]
+                for mnemonic in ("li", "la"):
+                    for reg in REGISTERS:
+                        symbol = symbols[f"control_{mnemonic}_r{reg}"]
+                        data = obj["sections"][symbol["section"]]["data"]
+                        bodies[mnemonic, reg] = data[symbol["value"]:symbol["value"] + symbol["size"]]
         cls.outputs = cls.profiles["default"]
 
     def test_explicit_signed_profile_preserves_every_default_output(self):
         self.assertEqual(self.profiles["signed"], self.outputs)
+
+    def test_explicit_gnu_mask_profile_preserves_every_default_output(self):
+        self.assertEqual(self.profiles["mask_gnu"], self.outputs)
+
+    def test_sn_mask_profile_changes_only_positive_unsigned32_mask(self):
+        for case in CASES:
+            value = int(case["value"], 16)
+            for reg in REGISTERS:
+                with self.subTest(case=case["name"], reg=reg):
+                    expected = self.outputs[case["name"], reg]
+                    if value == 0xffffffff:
+                        expected = b"".join(struct.pack("<I", word) for word in
+                                            retarget(["2402ffff", "0002103e"], reg))
+                    body = self.profiles["mask_sn"][case["name"], reg]
+                    self.assertEqual(body, expected)
+                    self.assertEqual(execute_constant(
+                        [word[0] for word in struct.iter_unpack("<I", body)], reg), value)
+
+    def test_unsigned_sign_bit_and_sn_mask_profiles_compose(self):
+        for case in CASES:
+            reference = "mask_sn" if int(case["value"], 16) == 0xffffffff else "unsigned"
+            for reg in REGISTERS:
+                with self.subTest(case=case["name"], reg=reg):
+                    self.assertEqual(self.profiles["mask_sn_unsigned"][case["name"], reg],
+                                     self.profiles[reference][case["name"], reg])
+
+    def test_zero_destination_does_not_broaden_the_mask_selector(self):
+        # The loader also uses the register number as a temporary sentinel.
+        # A zero destination must not confuse a nonzero high word with zero.
+        for case in CASES:
+            with self.subTest(case=case["name"]):
+                expected = self.outputs[case["name"], 0]
+                if int(case["value"], 16) == 0xffffffff:
+                    expected = b"".join(struct.pack("<I", word) for word in
+                                        retarget(["2402ffff", "0002103e"], 0))
+                body = self.profiles["mask_sn"][case["name"], 0]
+                self.assertEqual(body, expected)
+                self.assertEqual(execute_constant(
+                    [word[0] for word in struct.iter_unpack("<I", body)], 0), 0)
+
+    def test_word_and_address_macros_keep_their_original_bytes(self):
+        for mnemonic in ("li", "la"):
+            for reg in REGISTERS:
+                for profile in PROFILE_OPTIONS:
+                    with self.subTest(mnemonic=mnemonic, reg=reg, profile=profile):
+                        self.assertEqual(self.profiles[profile][mnemonic, reg],
+                                         self.outputs[mnemonic, reg])
 
     def test_unsigned_profile_changes_only_the_isolated_sign_bit(self):
         for case in CASES:
@@ -212,7 +285,18 @@ class AssemblerOutputTests(unittest.TestCase):
                                              str(source), option], capture_output=True, text=True)
                     self.assertNotEqual(result.returncode, 0)
 
-    def test_forms_encodings_and_sizes_in_four_registers(self):
+    def test_bad_or_missing_unsigned32_mask_profile_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source, output = Path(directory) / "control.s", Path(directory) / "control.o"
+            source.write_text(".text\nnop\n")
+            for option in ("--r5900-unsigned32-mask=typo", "--r5900-unsigned32-mask=",
+                           "--r5900-unsigned32-mask"):
+                with self.subTest(option=option):
+                    result = subprocess.run([str(self.assembler), "-o", str(output),
+                                             str(source), option], capture_output=True, text=True)
+                    self.assertNotEqual(result.returncode, 0)
+
+    def test_forms_encodings_and_sizes_in_five_registers(self):
         for case in STATIC_CASES:
             for reg in REGISTERS:
                 with self.subTest(case=case["name"], reg=reg):

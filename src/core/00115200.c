@@ -29,7 +29,10 @@ ASM_FUNC("asm/core", func_00115690);
 
 ASM_FUNC("asm/core", func_001157AC);
 
-INCLUDE_ASM("asm/core", func_001158F4);
+/* Newlib's original r5900/strncmp.S, Cygnus Solutions (1999), from the
+ * public SSXModding/ps2-ee-toolchain snapshot b595ded. Its complete MMI
+ * body assembles byte-identically in all three releases; it is not C. */
+ASM_FUNC("asm/core", func_001158F4);
 
 ASM_FUNC("asm/core", func_00115AC0);
 

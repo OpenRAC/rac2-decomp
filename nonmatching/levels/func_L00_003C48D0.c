@@ -1,3 +1,15 @@
+/* Complete-strand offset reconstruction, 2026-11-03; not linked.
+ * Check: USA v1.01, -O2 -G0 -ffunction-sections -fno-rerun-loop-opt,
+ * 696/708 bytes, 0/27 placements; frame 0x130 rather than retail 0x120.
+ * Two int32 byte-offset streams describe previous/current points within the
+ * one real 800-byte owner. Pointers form only at accessed points, not at a
+ * synthetic pre-array symbol. The scalar color contract is u32 in the matched
+ * renderer; its six GPR and three FP arguments consume exactly 160 input bytes.
+ * This form is 696 bytes (prior indexed form 680), and still misses retail's
+ * address re-materialization, loop scheduling or register allocation.
+ * Reopen with independent source evidence for those operand lifetimes.
+ */
+
 /* Retained strand refresh/draw, 2026-10-28: best680/708B,0/27US.
  * Six bounded trials. Cached record pointer612; narrow no-rerun-loop-opt632;
  * explicit owner indexing680. Adding no-strength-reduce656; broad no-gcse680
@@ -18,8 +30,8 @@ extern void func_00282CF0(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 extern float func_00283CE0(int);
 extern int func_00283CF0(float);
-extern void func_L00_002EBE88(void *, int, int, int, int, int, float, float, float);
-extern Vector D_L00_00240080[][10];
+extern void func_L00_002EBE88(void *, int, int, int, u32, u32, float, float, float);
+extern Vector D_L00_00240080[5][10];
 extern s16 D_L00_001B2990[], D_L00_001B29A0[], D_L00_001B29B0[];
 extern float D_L00_001AFF8C_gp SDATA(D_L00_001AFF8C);
 extern int D_L00_001AFF24_gp SDATA(D_L00_001AFF24);
@@ -39,13 +51,30 @@ void func_L00_003C48D0(u8 *object)
     qcopy(anchor, *(u8 **)(object + 0x68) + 0x30);
     for (i = 0; i < 5; i++) {
         if (D_L00_001B2990[i]) {
-            for (j = 1; j < 10; j++)
-                func_00282CF0(delta[j], D_L00_00240080[i][j], D_L00_00240080[i][j - 1]);
+            {
+                int previous_offset = i * (int)sizeof(D_L00_00240080[0]);
+                int current_offset = previous_offset + (int)sizeof(Vector);
+                for (j = 1; j < 10; j++) {
+                    void *current = (u8 *)&D_L00_00240080 + current_offset;
+                    void *previous = (u8 *)&D_L00_00240080 + previous_offset;
+                    func_00282CF0(delta[j], current, previous);
+                    previous_offset = current_offset;
+                    current_offset += (int)sizeof(Vector);
+                }
+            }
             qcopy(D_L00_00240080[i][0], anchor);
             D_L00_00240080[i][0][3] = 0.03999999910593033f;
-            for (j = 1; j < 10; j++) {
-                func_00282CC0(D_L00_00240080[i][j], D_L00_00240080[i][j - 1], delta[j]);
-                D_L00_00240080[i][j][3] = 0.03999999910593033f;
+            {
+                int previous_offset = i * (int)sizeof(D_L00_00240080[0]);
+                int current_offset = previous_offset + (int)sizeof(Vector);
+                for (j = 1; j < 10; j++) {
+                    void *current = (u8 *)&D_L00_00240080 + current_offset;
+                    void *previous = (u8 *)&D_L00_00240080 + previous_offset;
+                    func_00282CC0(current, previous, delta[j]);
+                    ((float *)current)[3] = 0.03999999910593033f;
+                    previous_offset = current_offset;
+                    current_offset += (int)sizeof(Vector);
+                }
             }
             if (D_L00_001B2990[i] > 0) {
                 numerator = func_00283CE0(D_L00_001B2990[i]);

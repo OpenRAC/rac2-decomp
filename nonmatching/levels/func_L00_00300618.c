@@ -1,3 +1,14 @@
+/* Object and ABI review, 3 November 2026; retained, not linked.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Fresh US check: 11288/11348 bytes, 0/27 places.
+ * Both vector transforms now pass the actual 64-byte instance matrix as
+ * third argument. Retail explicitly establishes a2 before the tie transform.
+ * Class +0x50 is a 16-byte centre/radius sphere; variable-count group entries
+ * use genuine trailing storage. The remaining 60-byte gap involves absolute
+ * store slots, shrub/moby spills and group loops. Do not omit real inputs
+ * to recover the historical smaller result. No functional-port credit.
+ * Earlier measurements follow.
+ */
 /* Level-data loader: relocates section tables, ties, shrubs and mobys into the
  * aligned level heap. Retained reconstruction, not functional-gated.
  * USA v1.01: 11,280/11,348 bytes, 0/27 placements, measured 2026-11-01.
@@ -72,8 +83,7 @@ typedef struct {
     unsigned short h3E;
     float f40;
     char pad44[0xC];
-    char matrix[0xC];             /* 0x50 */
-    float f5C;
+    Vec00618 sphere;              /* 0x50: centreXYZ and radius */
 } TieClass00618;
 
 typedef struct {
@@ -148,7 +158,7 @@ typedef struct {
     char *p10;
     char *p14;
     char pad18[0x18];
-    GroupEntry00618 entries[1];   /* 0x30 */
+    GroupEntry00618 entries[0];   /* 0x30 */
 } Groups00618;
 
 typedef struct { int p14; int i18; int p1C; int i20; } Reloc00618;
@@ -286,7 +296,7 @@ extern void func_002FC070(void *);
 extern void func_0026FEB8(const char *, ...);
 extern void func_00282AB0(void *, void *, int);
 extern void func_002F0468(void *);
-extern void func_00283098(void *, void *);
+extern void func_00283098(void *, void *, void *);
 extern float func_00282DF0(void *);
 extern float func_L00_002EE050(float, float);
 extern void func_00282D60(void *, void *, float);
@@ -579,8 +589,8 @@ char *func_L00_00300618(int reload)
             s += 0x50;
             tie->h12 = i;
             m->row[3].f[3] = D_L00_00226700[tie->b1D]->f40;
-            func_00283098(tie, D_L00_00226700[tie->b1D]->matrix);
-            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->f5C
+            func_00283098(tie, &D_L00_00226700[tie->b1D]->sphere, m);
+            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3]
                 * func_L00_002EE050(func_L00_002EE050(func_00282DF0(&m->row[0]), func_00282DF0(&m->row[1])), func_00282DF0(&m->row[2]));
             func_00282D60(tie, tie, m->row[3].f[3]);
             func_00282CC0(tie, tie, &m->row[3]);
@@ -725,7 +735,7 @@ char *func_L00_00300618(int reload)
             m->row[0].i[3] = ((bl << 16) | ((g << 8) | 0x80000000)) | r;
             shrub->h1C = *(unsigned short *)s;
             s += 0x10;
-            func_00283098(shrub, D_L00_0021EA20[cls]);
+            func_00283098(shrub, D_L00_0021EA20[cls], m);
             shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC
                 * func_L00_002EE050(func_L00_002EE050(func_00282DF0(&m->row[0]), func_00282DF0(&m->row[1])), func_00282DF0(&m->row[2]));
             func_00282D60(shrub, shrub, m->row[3].f[3]);

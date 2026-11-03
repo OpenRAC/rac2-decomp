@@ -1,3 +1,13 @@
+/* 3 November 2026; no linked match.
+ * Actual scorer L00_002AE388 writes only one 32-bit blocked flag and has
+ * two GPR/four FP inputs. Its canonical bank-preserving interleaving and
+ * the real scalar output are retained below: 524/544 bytes, 0/25 US,
+ * frame 0x80 versus retail 0x90. Capturing the complete hero owner gives
+ * 508/544, also frame 0x80, and is not retained. Two grounded checks.
+ * The diagnosed loop-hoist threshold remains; no diagnostic call-used
+ * register flags, fake storage or altered register banks were used.
+ * The older diagnostic comparison below is historical, not qualification.
+ */
 /* Claude Opus 5.5 (opus-1), v1321: USA v1.01 524/544 bytes, 0/25 places under the pinned
  * toolchain (-O2 -G8 -ffunction-sections, approved qcopy helper; sibling -g8 unit).
  * This plain form is retail's source shape: compiled with -fcall-used-hi1 -fcall-used-lo1
@@ -31,7 +41,7 @@ extern HeroSelectionState D_00189E20;
 
 extern unsigned char *D_L00_001B1EA8 __attribute__((sda));
 extern int func_002B38B8(void *);
-extern float func_L00_002AE388(void *, int *, float, float, float, float);
+extern float func_L00_002AE388(char *, float, float, int *, float, float);
 extern float func_00282E80(void *, void *);
 extern int func_002761F8(void *, void *, int, void *, int);
 
@@ -40,7 +50,7 @@ int func_L00_002C40C0(void)
     unsigned char *node, *best;
     float score, closest;
     float first[4], second[4];
-    int blocked[4];
+    int blocked;
     if (D_00189E20.state == 0x21) return D_00189E20.ready_b14;
     best = 0;
     closest = 100000000.0f;
@@ -58,8 +68,8 @@ int func_L00_002C40C0(void)
                 horizontal = vertical = 0.087266474962234497f;
             heading = D_00189E20.heading;
             if (D_00189E20.state == 0xF) heading = D_00189E20.alternate_heading;
-            score = func_L00_002AE388(node, blocked, heading, 30.0f, horizontal, vertical);
-            if (blocked[0] != 0) continue;
+            score = func_L00_002AE388((char *)node, heading, 30.0f, &blocked, horizontal, vertical);
+            if (blocked != 0) continue;
             if (func_00282E80(D_00189E20.position, node + 0x10) < 4.0f) continue;
             if ((unsigned char)node[0x31] == 0) score += 10.0f;
             if (score < closest) { closest = score; best = node; }

@@ -1,0 +1,70 @@
+--- a/gas/config/tc-mips.c
++++ b/gas/config/tc-mips.c
+@@ -196,6 +196,9 @@
+
+ /* Select the measured seed for the R5900 isolated sign-bit constant. */
+ static int r5900_sign_bit_signed = 1;
++
++/* Preserve GNU unsigned32-mask seeds unless a unit selects the SN profile. */
++static int r5900_unsigned32_mask_sn = 0;
+
+ /* The argument of the -mabi= flag. */
+ static char* mips_abi_string = 0;
+@@ -3308,8 +3311,21 @@
+
+       if ((freg == 0) && (lo32.X_add_number == 0xffffffff))
+         {
+-	  macro_build ((char *) NULL, counter, &lo32, "lui", "t,u", reg,
+-		       (int) BFD_RELOC_HI16);
++          if (mips_cpu == 5900 && dbl && r5900_unsigned32_mask_sn
++              && hi32.X_add_number == 0)
++            {
++              /* SN seeds the positive 32-bit all-ones mask with signed -1;
++                 the unchanged logical shift yields the same 64-bit value. */
++              expressionS seed = lo32;
++              seed.X_op = O_constant;
++              seed.X_add_number = (offsetT) -1;
++              seed.X_unsigned = 0;
++              macro_build ((char *) NULL, counter, &seed, "addiu", "t,r,j",
++                           reg, 0, (int) BFD_RELOC_LO16);
++            }
++          else
++            macro_build ((char *) NULL, counter, &lo32, "lui", "t,u", reg,
++                         (int) BFD_RELOC_HI16);
+           macro_build ((char *) NULL, counter, NULL, "dsrl32", "d,w,<", reg,
+                        reg, 0);
+           return;
+@@ -9391,6 +9407,9 @@
+ #define OPTION_R5900_SIGN_BIT (OPTION_MD_BASE + 39)
+   {"r5900-sign-bit", required_argument, NULL, OPTION_R5900_SIGN_BIT},
+
++#define OPTION_R5900_UNSIGNED32_MASK (OPTION_MD_BASE + 43)
++  {"r5900-unsigned32-mask", required_argument, NULL, OPTION_R5900_UNSIGNED32_MASK},
++
+ #define OPTION_CALL_SHARED (OPTION_MD_BASE + 7)
+ #define OPTION_NON_SHARED (OPTION_MD_BASE + 8)
+ #define OPTION_XGOT (OPTION_MD_BASE + 19)
+@@ -9416,6 +9435,15 @@
+ {
+   switch (c)
+     {
++    case OPTION_R5900_UNSIGNED32_MASK:
++      if (strcmp (arg, "gnu") == 0)
++        r5900_unsigned32_mask_sn = 0;
++      else if (strcmp (arg, "sn") == 0)
++        r5900_unsigned32_mask_sn = 1;
++      else
++        as_fatal (_("invalid R5900 unsigned32-mask profile: %s"), arg);
++      break;
++
+     case OPTION_R5900_SIGN_BIT:
+       if (strcmp (arg, "signed") == 0)
+         r5900_sign_bit_signed = 1;
+@@ -9786,6 +9814,7 @@
+
+   fprintf(stream, _("\
+ MIPS options:\n\
++--r5900-unsigned32-mask=gnu|sn  select the positive 32-bit mask seed [gnu]\n\
+ --r5900-sign-bit=signed|unsigned  select the isolated sign-bit seed [signed]\n\
+ -membedded-pic		generate embedded position independent code\n\
+ -EB			generate big endian output\n\
