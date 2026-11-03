@@ -42,7 +42,8 @@ what the retail code does when the port runs it.
 ## State at this handoff
 
 - **master** merges #396–#399 on top of #393 (functional C round 2). OpenRAC's default branch is
-  `develop`; it pins `99f35ac2`, branch `master`. The next repin carries the 27 rows returned below.
+  `develop`; it pins `c2f2807f`, branch `master`, which carries the 27 rows returned below. `master`
+  has moved on since, so a repin is due.
 - **Reports after #399:**
 
   | Release | Functions in C |
