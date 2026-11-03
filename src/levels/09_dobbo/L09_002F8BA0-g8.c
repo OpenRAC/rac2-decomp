@@ -29,9 +29,39 @@ void func_L09_003F6AB8(unsigned char *a0) {
     func_00282CC0((char *)(s0 + 0x10), (char *)(s0 + 0x10), (char *)s1);
 }
 
-/* func_L09_003FE2D8 belongs in this file too: it reads D_L09_001B11D8
-   (0x21E8($gp)); its closest attempt is in
-   nonmatching/levels/func_L09_003FE2D8.c. */
+/* The pulse table's entry count, reached as 0x21E8($gp). */
+extern int D_L09_001B11D8 __attribute__((sda));
+extern int D_L09_002A2658[];
+extern int D_L09_002A27A0[];
+extern int func_00283CF0(float);
+
+/* Advances the object's pulse timer by half a step (wrapping it to zero at 1.0) and adds its integer
+   part (FloatToInt, so one step every other frame) to every live phase in the D_L09_002A27A0 table.
+   A phase above 0x90 falls back by 0x80; the phase, folded back above 0x50, becomes the alpha byte of
+   the matching D_L09_002A2658 colour. */
+void func_L09_003FE2D8(unsigned char *a0) {
+    unsigned char *state = *(unsigned char **)(a0 + 0x68);
+    float *timer = (float *)(state + 0x384);
+    float t = *timer + 0.5f;
+    int step;
+    int i;
+    *timer = t;
+    step = func_00283CF0(t);
+    if (*timer >= 1.0f)
+        *timer = 0.0f;
+    for (i = 0; i < D_L09_001B11D8; i++) {
+        int phase = D_L09_002A27A0[i];
+        if (phase != 0) {
+            phase += step;
+            if (phase >= 0x91)
+                phase -= 0x80;
+            D_L09_002A27A0[i] = phase;
+            if (phase >= 0x51)
+                phase = 0xA0 - phase;
+            D_L09_002A2658[i] = (D_L09_002A2658[i] & 0xFFFFFF) | (phase << 24);
+        }
+    }
+}
 
 /* The walk below reads the group count through $gp; the group table of id lists is absolute and
    the entity base (the level's record table, D_L09_001B285C) is the bare `lui`/`lw` pair here, a

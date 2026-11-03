@@ -1,41 +1,3 @@
-/*
- * Tier: Claude Opus 5.5 (xhigh effort), task v2021, 2026-11-01.
- * Profile: -O2 -G8 -ffunction-sections. Needs a unit of its own with a -g8.c
- * name; it was compiled as src/levels/06_notak/L06_0033BDC0-spawner-g8.c.
- * All the declarations it needs are below.
- *
- * Best check.py: the form below is EXACT BYTES. 1776/1776 bytes, 1 of 1 USA
- * v1.01 places, 1 of 1 USA v2.00 places; PAL: in neither catalogue.
- * linkcheck level 06: loaded bytes equal. Its strict step fails on
- * func_L00_003A0C00 (D_001A8A44 needs two values), and fails the same way with
- * this function back in assembly.
- *
- * Not landed: SpawnerRegion's `index == -1` test is known false at its only
- * call, because the caller has just tested `index != -1`, and it emits no
- * instruction. WORKER2.md forbids such tests when they only change code shape,
- * so this is reported as FAILED. The condition is a real value and the arms
- * differ, as the vanishing-test idiom asks, but it needs a maintainers' ruling.
- *
- * What the test does: expand_end_loop moves the region from the i < 4 test to
- * the break (the last exit within 30 insns) to the end of the loop.
- * duplicate_loop_exit_test then copies it before the loop, unless it holds a
- * label or a call, or more than 30 insns. Retail has no copy. The helper's label
- * survives jump1, which refuses the copy, and cse1 then folds the test.
- *
- * Without the test: 1868 bytes, 0 of 1 places, with the region duplicated.
- * Three plain inline accessors (entry, rotate, region), with up to four named
- * locals in them, all gave those same 1868 bytes. Their raw insn counts were not
- * measured. By the source, 29..31 raw insns in the region should refuse the copy
- * with no label, so a plain form may still exist.
- *
- * Other choices the bytes need:
- *  - Nine really-used locals declared before `state` put its pseudo number in
- *    94..127, which gives retail's PRE spill order.
- *  - func_L02_0032B468 returns a pointer, as its matched definition does. The
- *    resulting call_value gives sched2 retail's order in case 2.
- *  - D_L06_001A8F20 is MACRO_ADDR, which keeps its lui and addiu adjacent.
- */
-
 #include "common.h"
 typedef int VectorBits __attribute__((mode(TI)));
 typedef float Vector[4] __attribute__((aligned(16)));
@@ -74,14 +36,13 @@ extern void func_0029F338(void *);
 extern int func_002A8600(void *, int, int, int);
 extern void func_002A93B0(void *);
 
-typedef struct { char pad[0xA0]; char *children[20]; } SpawnerSlots;
-
-static inline char *SpawnerRegion(int index)
-{
-    if (index == -1)
-        return 0;
-    return D_L06_001B290C + (index << 7);
-}
+/* regions[] holds indices into the 0x80-byte region table at D_L06_001B290C,
+ * -1 for an empty slot. */
+typedef struct {
+    char pad[0x90];
+    int regions[4];
+    char *children[20];
+} SpawnerSlots;
 
 /* Select a spawn point, launch a child and retire the spawner when destroyed. */
 void func_L06_003F3800(char *moby)
@@ -143,7 +104,6 @@ void func_L06_003F3800(char *moby)
         }
         if (*(int *)(state + 0x134) == 2)
             break;
-        {
         slot = func_L06_003F3760(moby, state);
         if (*(unsigned char *)(state + 0x81) >= *(unsigned char *)(state + 0x80) || slot == -1)
             break;
@@ -176,11 +136,13 @@ void func_L06_003F3800(char *moby)
         } else {
             int i;
             first = func_002A7820(0, 3);
+            /* regions[k] is read twice (cse merges the loads): that keeps the
+             * search at 30 insns at expand time, so jump1 does not copy the
+             * loop's exit test in front of the loop. */
             for (i = 0; i < 4; i++) {
                 int k = (i + first) % 4;
-                int index = *(int *)(state + (k << 2) + 0x90);
-                if (index != -1) {
-                    region = SpawnerRegion(index);
+                if (((SpawnerSlots *)state)->regions[k] != -1) {
+                    region = D_L06_001B290C + ((SpawnerSlots *)state)->regions[k] * 0x80;
                     break;
                 }
             }
@@ -207,20 +169,19 @@ void func_L06_003F3800(char *moby)
         }
         func_00282CF0(delta, point, moby + 0x10);
         {
-        float distance = func_00282DF0(delta) * 0.01000000071f;
-        func_00282F20(delta, delta, distance);
-        func_0029FCC0(moby, 0, origin);
-        func_00282F20(step, delta, 0.05f);
-        func_002ACB48(step, 0.025f);
-        func_00282CC0(origin, origin, step);
-        delta[2] = func_L00_0031CDD0(origin, point, 0, distance, -0.002722222358f);
+            float distance = func_00282DF0(delta) * 0.01000000071f;
+            func_00282F20(delta, delta, distance);
+            func_0029FCC0(moby, 0, origin);
+            func_00282F20(step, delta, 0.05f);
+            func_002ACB48(step, 0.025f);
+            func_00282CC0(origin, origin, step);
+            delta[2] = func_L00_0031CDD0(origin, point, 0, distance, -0.002722222358f);
         }
         ((SpawnerSlots *)state)->children[slot] = func_L06_003F3EF0(moby, origin, delta,
                                            *(unsigned char *)(state + 0x83), (unsigned char)slot);
         func_002E5CF8(0, 0, moby);
         *(short *)(state + 0x7E) = *(short *)(state + 0x7C);
         (*(unsigned char *)(state + 0x81))++;
-        }
         break;
     }
     case 2:

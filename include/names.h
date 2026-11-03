@@ -812,6 +812,11 @@
 #define DrawVendorItemSelectList         func_002F9C80
 #define SetDeathBits                     func_002A6C58
 #define UpdateVisibilityBitmap           func_0027A288
+#define UpdateBeamLinkEmitter            func_L09_003F04D0
+#define PlacePointWithPolarJitterFlat    func_L11_0043ACB0
+#define LayOutVerletChain                func_L11_00438248
+#define SpawnStateVectorMoby             func_L11_004349F8
+#define MarkGroupClassCF5CF6Members      func_L11_0042A4C8
 #define UpdateOozlaTiltingLift           func_L01_0041C970
 #define ActivateSplinePathCamera         func_L01_0042C540
 #define UpdateItemGridMenu               func_00346C60
@@ -829,5 +834,6 @@
 #define DrawParticleGlows                func_00328B68
 #define UpdateWaterSheet                 func_L01_003BB9D0
 #define DrawWavyBeamToTarget             func_L02_004129D0
+#define DrawGlowBillboardPair            func_L08_0042A980
 
 #endif /* NAMES_H */

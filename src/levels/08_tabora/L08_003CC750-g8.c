@@ -1,32 +1,14 @@
-/*
-Tier: sol-high, task v0981, USA v1.01, game -O2 -G8 -ffunction-sections.
-Best check.py: 1240/1244 bytes, 0 of 1 places match (Tabora); this retained
-sol-low draft was recompiled unchanged with the current pinned toolchain.
-Thirteen bounded checks did not improve it. Scale-update comparison scheduling,
-flag-table byte/register allocation, state reloads, counter and store order differ.
-Removing descriptor volatile recovers retail's branch-likely descriptor loads at
-+0x258/+0x268, but loses its second descriptor reload. An int type temporary with
-u8 indexing recovers the redundant narrowing, without closing allocation/reloads.
-Separate scale/shrink locals, reordered short-circuit tests, block-local pointers,
-and -fno-expensive-optimizations with -fno-strict-aliasing did not improve it.
-The retained descriptor/scale qualifiers are unverified layout hypotheses, not
-permission to use selected volatile casts or to integrate this draft into src/.
-Next: establish faithful object/state field aliasing and the flag byte's lifetime.
-All required declarations follow. No linked-build claim.
-*/
-#include "include_asm.h"
+#include "common.h"
 #define F(p,T,o) (*(T *)((char *)(p)+(o)))
-typedef unsigned char u8;
-typedef unsigned short u16;
 typedef struct { char pad[0x2294]; int mode; int unused; int action; } Globals;
 extern Globals D_00189E20;
-typedef struct { char pad0[0x24]; char * volatile descriptor; char pad1[4]; volatile float scale; } ObjectView;
+typedef struct { char pad0[0x24]; char *descriptor; char pad1[4]; float scale; } ObjectView;
 extern char D_00189EA0[], D_0019B2E8[], D_0019B4A8[];
-extern u8 D_L08_001B2840[];
+extern u8 D_L08_001B2840[] MACRO_ADDR;
 extern struct { char pad[0x464]; u8 flags[0]; } D_L08_0021DE80, D_L08_0021EAF0;
 extern int D_001A79F0;
 extern u16 D_001A7A1A;
-extern u8 D_001A7A65;
+extern u8 D_001A7A60[] MACRO_ADDR;
 extern int D_L08_001A903C __attribute__((sda));
 extern float D_L08_001AFED0 __attribute__((sda)), D_L08_001AFED4 __attribute__((sda)), D_L08_001AFED8 __attribute__((sda));
 extern float D_L08_001AFEDC __attribute__((sda)), D_L08_001AFEE4 __attribute__((sda)), D_L08_001AFEE8 __attribute__((sda));
@@ -34,7 +16,9 @@ extern void func_002A7750(void *,int,int), func_002A7470(void *,int,int,int);
 extern void func_L08_003CC4B8(void *);
 extern float func_00282E80(void *,void *), func_00282E20(void *);
 extern void func_00282CF0(void *,void *,void *), func_00282FB8(void *,void *,float), func_00282CC0(void *,void *,void *);
-extern void func_002E5DA0(int,int,void *,int),func_0029F338(void *),func_002E5E58(int,int,int),func_002B0A18(int,int);
+extern int func_002E5DA0(int,int,void *,int);
+extern int func_002E5E58(int, int, void *);
+extern void func_0029F338(void *), func_002B0A18(int, int);
 extern int func_L08_00435938(void);
 void func_L08_003CC750(char *object) {
     char *state;
@@ -75,25 +59,19 @@ void func_L08_003CC750(char *object) {
         } else speed = F(state,float,0) + F(state,float,0);
         func_00282FB8(vector,vector,speed);
         func_00282CC0(object+0x10,object+0x10,vector);
-        if (((ObjectView *)object)->scale > 0.1f || distance < threshold || distance < speed) {
+        if (((ObjectView *)object)->scale > 0.1f || distance < threshold || distance < speed)
             ((ObjectView *)object)->scale -= D_L08_001AFEE8 * F(((ObjectView *)object)->descriptor,float,0x24);
-            if (distance < speed && ((ObjectView *)object)->scale < F(((ObjectView *)object)->descriptor,float,0x24)*0.01f) goto collected;
-        }
-        if (D_00189E20.action == 0x14 || D_00189E20.action == 0x19 ||
+        if ((distance < speed && ((ObjectView *)object)->scale < F(((ObjectView *)object)->descriptor,float,0x24)*0.01f) ||
+            D_00189E20.action == 0x14 || D_00189E20.action == 0x19 ||
             D_00189E20.mode == 0x39 || D_00189E20.mode == 0x6F) {
-        collected:
             func_002E5DA0(3,0,object,0x96A);
             D_001A7A1A++;
             if (F(state,char *,4)) {
-                char *part;
                 D_L08_0021DE80.flags[F(F(state,char *,4),short,0xB2)] = F(F(state,char *,4),u8,0xB0)+2;
-                part = F(state,char *,4);
-                if (F(part,u8,0xB0) == 0xFF) goto flags_done;
-                if (D_L08_001B2840[F(part,u8,0xB0)] & 0x80) goto set_flag;
-                if (!(F(D_0019B2E8,u8,(D_001A79F0<<4)+F(part,u8,0xB0)) & 0x80)) goto flags_done;
-            set_flag:
-                D_L08_0021EAF0.flags[F(part,short,0xB2)] = F(part,u8,0xB0)+2;
-            flags_done:;
+                if (F(F(state,char *,4),u8,0xB0) == 0xFF ||
+                    (!(D_L08_001B2840[F(F(state,char *,4),u8,0xB0)] & 0x80) &&
+                     (F(D_0019B2E8,u8,F(F(state,char *,4),u8,0xB0)+(D_001A79F0<<4)) & 0x80)))
+                    D_L08_0021EAF0.flags[F(F(state,char *,4),short,0xB2)] = F(F(state,char *,4),u8,0xB0)+2;
                 {
                     u16 index = F(F(state,char *,4),u16,0xB2);
                     if (index & 1) {
@@ -106,8 +84,8 @@ void func_L08_003CC750(char *object) {
                 }
             }
             func_0029F338(object);
-            if (!func_L08_00435938() && !D_001A7A65) {
-                D_001A7A65 = 1;
+            if (!func_L08_00435938() && !D_001A7A60[5]) {
+                D_001A7A60[5] = 1;
                 func_002E5E58(1,0,0);
                 func_002B0A18(0x1233,-1);
                 D_L08_001A903C = 1;

@@ -181,7 +181,6 @@ void func_L09_00403378(char *a0) {
 /* func_L09_00403270 reads small data through $gp, so it is defined in
    L09_003FEA48-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L09_00403398);
 
 /* func_L09_00403700: 152 bytes, one register off - the loop's trip test compares
    into $v0 where retail compares into $v1.  Deposited in
