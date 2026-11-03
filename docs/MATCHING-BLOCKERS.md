@@ -34,6 +34,44 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### `func_002B60B0` caller declarations and the call's `$v0`
+
+**3 November 2026, retained near miss; cause measured.** `func_L11_00420C88` is
+15,832/15,832 bytes, USA v1.01 0/1, with 18 rows at three sites (cases 14, 15, 22;
+`0x422BCC`, `0x422C50`, `0x423110`). Retail and candidate order are identical:
+`jal func_002B60B0` (delay slot `daddu a0,s2`), index `lw`, `lui`/`addiu` table
+base, `daddu a0`, `sll`, `addu`, `jal func_002B6120` with `lw a1` in its slot. Only
+the index/base registers swap.
+
+- Mechanism, from the project cc1's `-dl` and `-dS -fsched-verbose-5` (a private
+  `haifa-sched.o` without `_FORTIFY_SOURCE`, output identical to production): sched1
+  issues the index `lw` (priority 8, load latency 2) before the `lui` (7) directly
+  after the call. The call's `$v0` is `REG_UNUSED`, so `wipe_dead_reg` marks it live
+  at the call's slot. Each block has two local quantities (index chain born at slot
+  16, base at 18, call at 14), so the three-quantity sort issue below does not apply.
+  The index's `fake_birth` (14) meets `$v0` and takes `$v1`; the base takes `$v0`.
+- The project local-alloc keeps upstream's `flag_schedule_insns_after_reload &&
+  !optimize_size && !SMALL_REGISTER_CLASSES` fake lifetimes. Disabling them in a
+  private cc1 gives 15,824 bytes and thousands of rows; `-Os` gives 15,872 bytes.
+- Retail does model unused call results. A private cc1 that drops an unused call's
+  `$v0` from local-alloc moves 19 other rows of this function (after `func_002B6120`
+  and other calls) and makes `func_00339F28` 0/28. No compiler change is proposed:
+  it would have to single out one callee.
+- Only `func_002B60B0` acts as `void` at its call sites. Of the matched USA callers on
+  master, 24 functions in 11 levels (including Joba's `func_L11_00424A60`) match only
+  with a `void` declaration and fail with `void *` at the first load after the call;
+  none of the 20 declaring `void *` needs it. A `void` declaration gives this function
+  1/1. The definition needs its `return p` (a `void` one reorders its stores, 0/23).
+  Under [the prototype rules](COMPILER-NOTES.md#prototypes-lifetimes-and-varargs) the
+  draft keeps `void *`.
+- Tied at 18 rows: path temporary, index local, `*(index + table)`, object-argument
+  local, the pointer last, second or third among the float parameters. A table-pointer
+  local hoists the `lui` above the call (32 rows). Earlier ties are listed under
+  "bounded source-lifetime check" below.
+- Reopen with a maintainer decision on callers' `func_002B60B0` declaration (24
+  merged matches already declare `void`), or with RTL that puts a non-note insn or
+  a block boundary between the call and the index load.
+
 ### Three-quantity local allocation
 
 **1 November 2026, retained near miss.** `block_alloc` sorts two or three quantities by hand:
@@ -3920,7 +3958,7 @@ the implementations remain in `nonmatching/levels/` with their production marker
 | Function | Current / retail bytes | Coverage and remaining obstruction |
 | --- | ---: | --- |
 | `func_L22_0039D708` | 15,528 / 16,068 | USA v1.01, 0/2. Reconstructed conversions, canonical collision/animation calls and shared scratch storage; branch tails and allocation remain, with further semantic review needed. |
-| `func_L11_00420C88` | 15,772 / 15,832 | USA v1.01, 0/1. Projectile paths and selector ordering are closer; shared tails, early-return position and allocation remain. |
+| `func_L11_00420C88` | 15,832 / 15,832 | USA v1.01, 0/1 (3 November). 18 register rows after three `func_002B60B0` calls; see [its entry](#func_002b60b0-caller-declarations-and-the-calls-v0). |
 | `func_L00_00300618` | 11,280 / 11,348 | USA v1.01, 0/27. Section-8 copy loop resolved locally; absolute macro stores, spills and group loops remain. |
 | `func_L00_003AE900` | 8,432 / 8,440 | USA v1.01 and v2.00, 0/27 each. Template loops resolved locally; saved FPR count, held-pose matrix pointers and spray-colour constants remain. |
 | `func_L08_003CDF98` | 6,632 / 6,736 | USA v1.01, 0/3. Voice-field widths and diagnostic argument corrected; per-case bases, float expression order and allocation remain. |

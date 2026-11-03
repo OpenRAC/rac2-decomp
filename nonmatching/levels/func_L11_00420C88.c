@@ -36,11 +36,13 @@
  * ours swaps them. Cause, from private dumps: the index lw is the first insn
  * after the value-returning func_002B60B0 call (sched1 priority 8 against 7 for
  * the lui), and local-alloc's INSN_SCHEDULING fake birth then overlaps the
- * call's $v0, so the index takes $v1. A void prototype would remove this but is
- * false (src/game/002B60B0.c returns the pointer). A block-local or
- * function-scope index variable, and -g, did not help. Next lead: whatever in
- * retail put another insn (the a0 move or the lui) between the call and the
- * index load before local-alloc.
+ * call's REG_UNUSED $v0, so the index takes $v1. Each block has two local
+ * quantities, so the three-quantity sort issue is not involved. A void
+ * prototype gives 1/1 but is false (src/game/002B60B0.c returns the pointer);
+ * 24 matched callers elsewhere already rely on a void declaration. Tied at 18:
+ * path, index and object locals, *(index + table), the pointer argument
+ * declared among the floats; a table-pointer local hoists the lui (32 rows).
+ * See docs/MATCHING-BLOCKERS.md, "func_002B60B0 caller declarations".
  */
 #include "common.h"
 
