@@ -1094,6 +1094,27 @@ remain beside the retained C in `nonmatching/`.
 
 ## 11. MMI and undecodable words
 
+**3 November 2026, current RAC1 identity qualification (locally validated; review pending):**
+37 remaining routines, each longer than 16 bytes, match routines that current
+[RAC1 at `1d8228cc`](https://github.com/OpenRAC/rac1-decomp/tree/1d8228cc0c81da7bc2bdc3e77479ee050e0ef434/src)
+explicitly marks `ASM_FUNC`. Each source marker now names its donor file and
+function. This uses the first handwritten-assembly acceptance rule, rather than
+classifying a routine because a C attempt failed. Their combined size is 3,136
+bytes. All 2,787 carrying placements across US/PAL/US2 were checked against the
+corresponding complete donor extent: lengths, registers, operation bits, branch
+conditions, constants, field offsets and stack accesses agree. The only differing
+fields are jump targets, paired absolute address halves and GP-relative address
+fields. No instruction is changed and no retail assembly is committed.
+
+The 40-byte float-conversion routines have the same donor in RAC1; the 16-byte
+min/max and conversion rows are deliberately outside this qualification because
+the identity rule requires more than 16 bytes. The earlier VU0 review notes below
+remain historical; the newly evidenced `func_00283698`, `func_00283738` and
+`func_002A0558` no longer depend on the alternative instruction-evidence rule.
+This is original-assembly completion credit, not newly reconstructed C.
+`tools/build.py all --strict` passes all 28 programs in each of US/PAL/US2
+(84 total); 340 unit tests, repository and progress checks pass in the container.
+
 `func_002A0A28` has a retained review observation about working-register `$at`
 use and trapping arithmetic. The proposed `nonmatching/` file contained only
 that note, not a C reconstruction, so the observation belongs here instead.
@@ -3087,6 +3108,18 @@ attributed for provenance, not exclusive ownership.
 | `_fpadd_parts`, `func_00122800` | **Merged, #265** | 576 bytes, 1/1 boot placement with the SDK profile. The assembler's bounded positive shifted-mask rule reduced two constants from seven to three instructions each. Full 28-program strict build passed. |
 | `dpmul`, `func_00122B00` | **Merged, #267** | 680 bytes, 1/1 boot placement. Restoring the public fraction union restores the real alias dependence and the rounding `bnel`/store slot. Two sign-bit loads use the per-file unsigned assembler seed; the signed default remains unchanged. All 80 tests and 28 strict programs passed. |
 | Late-issued ALU insn, `func_0032D758`, `func_0027BA68`, `func_L03_003C1BF0` | **Open, 1 November** | Each is 3 to 5 rows off with the structure exact. sched2's ready lists show the insn ready at t with the highest priority (`func_0032D758`: insn 20 p9 against p6), while retail's order needs it at t+1. The same compiler sources can only give that from a different RTL input, so a hidden insn is the likely cause, as in `func_002EE000` and `func_L00_00426C78`. To read the lists, rebuild `haifa-sched.o` privately with `BUF_LEN` 4096 and `-U_FORTIFY_SOURCE`, and print `INSN_PRIORITY` in `debug_ready_list`: `-dR -fsched-verbose-4` then works where `-dS` aborts. Tied: nine spellings of the table read, inline helpers, `-g`, `-frac2-qcopy`, sched flags. |
+
+**3 November 2026, bounded source-lifetime check:** for `func_L03_003C1BF0`,
+a twice-set class selector plus per-arm offset assignment gives 5,680 bytes with
+six differing slots (the saved-register roles); reusing the selector in the member
+loop gives eight, a single-case member dispatch ties at six, and capturing the
+offset during its real zeroing gives 93. The retained four-slot candidate is still
+best. For `func_L11_00420C88`, grouping configuration/path setup in an inline
+helper, representing each table entry as a pointer field, and using unsigned
+path indices all reproduce the existing 15,832-byte, 18-slot result. Both real
+callee return contracts were preserved. No new C match or native qualification;
+reopen with a measured scheduler/allocator input beyond these tied forms.
+
 | Spill-slot order, `func_L00_003E5BD8` | **Open, 1 November** | 1108/1108, only 19 stack offsets differ. A private cc1 overriding `expr_hash_table_size` shows the slots follow gcse's bucket order: 133 buckets gives 7 rows, no odd size from 101 to 501 gives 0, and declaration order has no effect. Three pseudos remain rotated, so retail differs in more than the table size. |
 | Weighted refs, `func_002FDBD8` | **Open, 1 November** | Global-alloc priority is `floor_log2(refs) * refs / live`, refs weighted by loop depth. With the shared `off` the colour block is exact but `n` falls to 15 refs; 16 would pass `direction`. One more read of `n` inside the loop is what is missing. |
 | Copy epilogue, `func_00335370` | **Qualified C, 25 October** | Default game profile plus the reviewed shared `qcopy`: 88 bytes, 28/28 per release, all 84 strict programs pass. Prior TI-only measurements are historical; source is `src/game/00335370-copy.c`. |

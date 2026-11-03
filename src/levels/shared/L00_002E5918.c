@@ -261,15 +261,18 @@ void func_L00_002ED808(void) {
     } while (i >= 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_002EDC90);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
+ASM_FUNC("asm/levels", func_L00_002EDC90);
 
 INCLUDE_ASM("asm/levels", func_L00_002EDCB8);
 
-INCLUDE_ASM("asm/levels", func_L00_002EDCC8);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
+ASM_FUNC("asm/levels", func_L00_002EDCC8);
 
 INCLUDE_ASM("asm/levels", func_L00_002EDCF0);
 
-INCLUDE_ASM("asm/levels", func_L00_002EDD00);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
+ASM_FUNC("asm/levels", func_L00_002EDD00);
 
 INCLUDE_ASM("asm/levels", func_L00_002EDD28);
 

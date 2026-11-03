@@ -487,9 +487,11 @@ int func_0029CF08(int value) {
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_0029CF58);
+/* Original assembly: RAC1 game/render/miscproc.c, func_0020C210. */
+ASM_FUNC("asm/game", func_0029CF58);
 
-INCLUDE_ASM("asm/game", func_0029CF78);
+/* Original assembly: RAC1 game/render/miscproc.c, func_0020C230. */
+ASM_FUNC("asm/game", func_0029CF78);
 
 INCLUDE_ASM("asm/game", func_0029CFB0);
 

@@ -217,7 +217,8 @@ INCLUDE_ASM("asm/game", func_00280710);
 
 ASM_FUNC("asm/game", func_002808F8);
 
-INCLUDE_ASM("asm/game", func_00280A70);
+/* Original assembly: RAC1 game/render/drawquad.c, func_001F7DD8. */
+ASM_FUNC("asm/game", func_00280A70);
 
 INCLUDE_ASM("asm/game", func_00280B30);
 
@@ -229,7 +230,8 @@ ASM_FUNC("asm/game", func_002811D4);
 
 ASM_FUNC("asm/game", func_00281214);
 
-INCLUDE_ASM("asm/game", func_00281810);
+/* Original assembly: RAC1 overlays/shared/glint_effects.c, func_L00_001FDE48. */
+ASM_FUNC("asm/game", func_00281810);
 
 INCLUDE_ASM("asm/game", func_00281A08);
 
@@ -281,15 +283,18 @@ void func_002820C8(void)
 
 INCLUDE_ASM("asm/game", func_00282848);
 
-INCLUDE_ASM("asm/game", func_00282890);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
+ASM_FUNC("asm/game", func_00282890);
 
 INCLUDE_ASM("asm/game", func_002828B8);
 
-INCLUDE_ASM("asm/game", func_002828C8);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
+ASM_FUNC("asm/game", func_002828C8);
 
 INCLUDE_ASM("asm/game", func_002828F0);
 
-INCLUDE_ASM("asm/game", func_00282900);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
+ASM_FUNC("asm/game", func_00282900);
 
 INCLUDE_ASM("asm/game", func_00282928);
 
@@ -299,7 +304,8 @@ ASM_FUNC("asm/game", func_00282948);
 
 ASM_FUNC("asm/game", func_00282978);
 
-INCLUDE_ASM("asm/game", func_002829A8);
+/* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_001FEF78. */
+ASM_FUNC("asm/game", func_002829A8);
 
 INCLUDE_ASM("asm/game", func_002829D8);
 
@@ -372,21 +378,26 @@ ASM_FUNC("asm/game", func_00282DB0);
 
 ASM_FUNC("asm/game", func_00282DD8);
 
-INCLUDE_ASM("asm/game", func_00282DF0);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9CB8. */
+ASM_FUNC("asm/game", func_00282DF0);
 
 ASM_FUNC("asm/game", func_00282E20);
 
-INCLUDE_ASM("asm/game", func_00282E48);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9D10. */
+ASM_FUNC("asm/game", func_00282E48);
 
-INCLUDE_ASM("asm/game", func_00282E80);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9D48. */
+ASM_FUNC("asm/game", func_00282E80);
 
 ASM_FUNC("asm/game", func_00282EB0);
 
 ASM_FUNC("asm/game", func_00282ED8);
 
-INCLUDE_ASM("asm/game", func_00282F20);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9DC0. */
+ASM_FUNC("asm/game", func_00282F20);
 
-INCLUDE_ASM("asm/game", func_00282F70);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9E10. */
+ASM_FUNC("asm/game", func_00282F70);
 
 INCLUDE_ASM("asm/game", func_00282FB8);
 
@@ -394,7 +405,8 @@ INCLUDE_ASM("asm/game", func_00283028);
 
 ASM_FUNC("asm/game", func_00283098);
 
-INCLUDE_ASM("asm/game", func_002830C0);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9EE8. */
+ASM_FUNC("asm/game", func_002830C0);
 
 ASM_FUNC("asm/game", func_002830F0);
 
@@ -408,15 +420,19 @@ ASM_FUNC("asm/game", func_00283180);
 
 ASM_FUNC("asm/game", func_00283198);
 
-INCLUDE_ASM("asm/game", func_002831B0);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9FC0. */
+ASM_FUNC("asm/game", func_002831B0);
 
 INCLUDE_ASM("asm/game", func_00283248);
 
-INCLUDE_ASM("asm/game", func_00283360);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA168. */
+ASM_FUNC("asm/game", func_00283360);
 
-INCLUDE_ASM("asm/game", func_00283388);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA190. */
+ASM_FUNC("asm/game", func_00283388);
 
-INCLUDE_ASM("asm/game", func_002833B8);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA1C0. */
+ASM_FUNC("asm/game", func_002833B8);
 
 ASM_FUNC("asm/game", func_002833F0);
 
@@ -426,25 +442,32 @@ ASM_FUNC("asm/game", func_00283430);
 
 ASM_FUNC("asm/game", func_00283658);
 
-INCLUDE_ASM("asm/game", func_00283678);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA480. */
+ASM_FUNC("asm/game", func_00283678);
 
-INCLUDE_ASM("asm/game", func_00283698);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA4A0. */
+ASM_FUNC("asm/game", func_00283698);
 
 INCLUDE_ASM("asm/game", func_002836E8);
 
-INCLUDE_ASM("asm/game", func_00283738);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA4F0. */
+ASM_FUNC("asm/game", func_00283738);
 
 ASM_FUNC("asm/game", func_00283788);
 
-INCLUDE_ASM("asm/game", func_002837D0);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA588. */
+ASM_FUNC("asm/game", func_002837D0);
 
 INCLUDE_ASM("asm/game", func_00283810);
 
-INCLUDE_ASM("asm/game", func_00283898);
+/* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_001FFED8. */
+ASM_FUNC("asm/game", func_00283898);
 
-INCLUDE_ASM("asm/game", func_00283958);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA648. */
+ASM_FUNC("asm/game", func_00283958);
 
-INCLUDE_ASM("asm/game", func_002839D0);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA6C0. */
+ASM_FUNC("asm/game", func_002839D0);
 
 INCLUDE_ASM("asm/game", func_00283A58);
 
@@ -455,15 +478,18 @@ INCLUDE_ASM("asm/game", func_00283B48);
 /* Byte-identical 72-byte copy of RAC1 func_001FA748, which RAC1 marks ASM_FUNC. */
 ASM_FUNC("asm/game", func_00283B98);
 
-INCLUDE_ASM("asm/game", func_00283BE0);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA790. */
+ASM_FUNC("asm/game", func_00283BE0);
 
 INCLUDE_ASM("asm/game", func_00283C28);
 
-INCLUDE_ASM("asm/game", func_00283C80);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA850. */
+ASM_FUNC("asm/game", func_00283C80);
 
 INCLUDE_ASM("asm/game", func_00283CB8);
 
-INCLUDE_ASM("asm/game", func_00283CC8);
+/* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_002001D8. */
+ASM_FUNC("asm/game", func_00283CC8);
 
 /* SECOND LOT -- 16 to 32 bytes. */
 /* integer-to-float conversion; byte-identical across all 27 levels. */
@@ -471,9 +497,11 @@ f32 func_00283CE0(s32 a0) { return (f32)a0; }
 
 INCLUDE_ASM("asm/game", func_00283CF0);
 
-INCLUDE_ASM("asm/game", func_00283D00);
+/* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_00200210. */
+ASM_FUNC("asm/game", func_00283D00);
 
-INCLUDE_ASM("asm/game", func_00283D38);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001FA8A8. */
+ASM_FUNC("asm/game", func_00283D38);
 
 INCLUDE_ASM("asm/game", func_00283D80);
 

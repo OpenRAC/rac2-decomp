@@ -325,7 +325,8 @@ INCLUDE_ASM("asm/game", func_002B9030);
 
 ASM_FUNC("asm/game", func_002B9038);
 
-INCLUDE_ASM("asm/game", func_002B9180);
+/* Original assembly: RAC1 overlays/shared/particle_create_kill.c, func_L00_002688A8. */
+ASM_FUNC("asm/game", func_002B9180);
 
 INCLUDE_ASM("asm/game", func_002B9288);
 
