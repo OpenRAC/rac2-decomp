@@ -41,17 +41,18 @@ what the retail code does when the port runs it.
 
 ## State at this handoff
 
-- **master** `93f76357e` merges #393 (functional C round 2). OpenRAC #212 pins `2990ba7e1`,
-  branch `port/backfill-2`.
-- **Reports at #393:**
+- **master** merges #396–#399 on top of #393 (functional C round 2). OpenRAC #212 still pins
+  `2990ba7e1`, branch `port/backfill-2`; the next repin carries the changes below.
+- **Reports after #399:**
 
   | Release | Functions in C |
   |---|---|
-  | US | 7,793 of 8,580 |
-  | PAL | 7,006 of 8,672 |
-  | US2 | 7,612 of 8,634 |
+  | US | 7,950 of 8,580 (87.68% of code) |
+  | PAL | 7,074 of 8,672 (54.76%) |
+  | US2 | 7,741 of 8,634 (82.92%) |
 
-  `tools/progress.py --check` passes: the three reports agree on every function they share.
+  At #393 they were 7,793, 7,006 and 7,612. `tools/progress.py --check` passes: the three
+  reports agree on every function they share.
 - **472 functional rows.** Each was re-checked with the corrected gate (below). Two real slips
   turned up and are fixed:
   - `func_003486A8`: read a chain of `func_00335E20` results one element late, so the pause
@@ -75,8 +76,12 @@ what the retail code does when the port runs it.
   - `func_L08_003CD708` and `func_L08_003CDB78`;
   - `func_L20_0036AE68`: #392 moved its entry to `0x36AE78`, 272 bytes; re-capture it at the
     new entry.
-- **Contributor PRs #396–#399** (about 160 newly matched functions) were in review when this
-  was written. Any of them that matches a functional row retires that row at the next repin.
+- **Contributor PRs #396–#399 are merged** and match 157 functions. 91 of them had functional
+  rows; those rows and their files are gone, so `functional.tsv` has 381 rows. Three of the 40
+  left-out files are matched now: `func_00293F98`, `func_002EC408` and `func_L00_002B30E8` (one
+  of the two suspects for the level 4/9/11/12/14/16 drift). The matching C replaces them at the
+  next repin. #397 moved `func_002CC528`'s catalogue entry 8 bytes later, to `0x002CC530`
+  (32 bytes), in all three releases.
 - **Levels 22 and 23 changed on purpose.** `func_L00_00424BB8` has a split variant for the
   levels whose copy writes `+0x3C/+0x40`. It gates SAME against retail states from both levels;
   level 0's form differs on all 8. So a tour that "diverges" there against an older build is
