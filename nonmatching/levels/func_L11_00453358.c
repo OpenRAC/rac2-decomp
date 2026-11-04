@@ -1,3 +1,9 @@
+/* 4 November 2026 source audit: removed the ten dead float stores used only to raise the instruction count.
+ * The previous controlled result below is historical and cannot qualify this
+ * revised draft. Production remains assembly; no linked or native credit.
+ * Current cleaned body is uncompiled: inherited standalone declarations/types
+ * are incomplete. Recover them and review the state machine before new trials.
+ */
 /*
  * func_L11_00453358: strict build rejected it: ten consecutive dead stores to dist with counting values (dist = 2.0f ... 11.0f), padding that only raises gcse's insn count; overseer ruling: not landable. Near miss without them: only four spill slots permuted
  */
@@ -171,17 +177,6 @@ void func_L11_00453358(u8 *self)
                 func_002A7470(self, 3, 0, 5);
             func_002A7750(self, 11, -1);
         }
-        /* Dead stores; see the header. */
-        dist = 2.0f;
-        dist = 3.0f;
-        dist = 4.0f;
-        dist = 5.0f;
-        dist = 6.0f;
-        dist = 7.0f;
-        dist = 8.0f;
-        dist = 9.0f;
-        dist = 10.0f;
-        dist = 11.0f;
         break;
     case 11: {
         s32 k;

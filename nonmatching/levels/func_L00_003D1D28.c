@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 3288/3288 bytes, 0/27 placements; first difference 0x7ac.
+ * Profile: -O2 -G64 -Wa,-G64 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Current retained result, 1 November 2026: 3288/3288 bytes, not exact. The hit request now has its real
  * aligned vector and the extra float at +0x24 read by func_002A8E20; tail alignment is implicit, not dummy
  * bytes. Both matrix consumers were checked: they read/write exactly three quadwords, so the 48-byte
@@ -120,7 +128,7 @@ extern float func_002A7878(float, float);
 extern void func_002AB668(void *, void *, float);
 extern void func_002ACDE8(void *, void *, void *);
 extern float func_00283B98(float, float);
-extern u8 *func_L00_003D2A00(u8 *, void *, void *, Hit *);
+extern int func_L00_003D2A00(u8 *, void *, void *, Hit *);
 
 #define HERO ((Hero *)D_00189E20)
 
@@ -345,7 +353,7 @@ void func_L00_003D1D28(u8 *self)
                     func_00282D30(dir, dir, 38.0f);
                     func_00282CC0(from, origin, offs);
                     func_00282CC0(to, from, dir);
-                    p = func_L00_003D2A00(self, from, to, &hit);
+                    p = ((u8 *)func_L00_003D2A00(self, from, to, &hit));
                     if (p) {
                         saved[count] = *(int *)(p + 0x98);
                         list[count] = p;

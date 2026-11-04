@@ -1,3 +1,11 @@
+/* 4 November 2026: faithful retained C; no linked match.
+ * Replace the per-function cvt.w.s/mfc1 inline assembly with an ordinary C cast.
+ * us: 732/736 bytes, 0/2 places; us2: absent; pal: absent.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Reopen: Find an independently evidenced original rounding/control-flow boundary; do not restore instruction primitives or dummy branches.
+ * Earlier measurements below are historical, including any diagnostic-only
+ * constructs they describe; those constructs are no longer active C.
+ */
 /* func_L04_00417028 - 736 bytes, places 04:00417028 and 11:00406B28.
  * Tier opus-2 (v1823), 31 October 2026: C below retained, not admissible, recompiled here: 736/736
  * bytes, 0/2 places, 63 cdiff rows differ, link values included. The overseer's lead (a test that vanishes, as in func_002D3D88)
@@ -59,10 +67,7 @@ extern float D_L04_001B2D44 __attribute__((sda));
 extern int D_001A7340 __attribute__((sda));
 
 static __inline__ int ftoi(float f) {
-    int i;
-    float t;
-    __asm__ __volatile__("cvt.w.s %1,%2\n\tmfc1 %0,%1" : "=r"(i), "=&f"(t) : "f"(f));
-    return i;
+    return (int)f;
 }
 
 void func_L04_00417028(void) {

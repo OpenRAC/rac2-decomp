@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1860/1860 bytes, 0/28 placements; first difference 0x1e8.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * The arena accessors keep their actual pointer returns and pointer arguments. Widget getters
+ * keep signed32 stored-address returns, converted to pointers only at use. The packed-color/FPR
+ * lifetime residual remains unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Tier sol-high, task v1286, USA v1.01, default -O2 -G0 profile.
  * Best: 1860/1860 bytes; 0/28 places match. Frame 0x70 and prologue GPRs agree.
  * 95/465 instruction words differ after ignoring relocation values.
@@ -21,8 +29,8 @@ static __inline__ float ColorBits(unsigned int bits)
     return color.value;
 }
 
-extern int func_00336E40(void *);
-extern void *func_00336DA8(int,int);
+extern void *func_00336E40(void *);
+extern void *func_00336DA8(void *, void *);
 extern void func_003361E0(void *,void *,void *);
 extern void func_00336408(void *,int,int,void *,void *);
 extern void func_00336390(void *,void *,int);
@@ -31,8 +39,8 @@ extern void func_003364B0(void *,unsigned int,unsigned int);
 extern void func_00336CE0(void *,unsigned int);
 extern void func_00336B90(void *,int);
 extern void func_00336CC8(void *,int);
-extern int *func_00335E20(void *);
-extern void *func_00335E18(void *);
+extern int func_00335E20(void *);
+extern int func_00335E18(void *);
 extern void func_003494D0(void *,void *);
 extern void func_00349628(void *,int);
 extern void func_00349590(void *,void *);
@@ -59,11 +67,11 @@ void func_00349D58(char *object,char *data,void *context)
     float packed;
     *(void **)(object+0x13c)=context;
     if(context) {
-        p=func_00336DA8(16,func_00336E40(context));
+        p=func_00336DA8((void *)16,func_00336E40(context));
         *(int **)(object+8)=p;
         parent=*(void **)(object+0x13c);
         p[1]=0;p[2]=0;p[3]=0;p[0]=0;
-        p=func_00336DA8(16,func_00336E40(parent));
+        p=func_00336DA8((void *)16,func_00336E40(parent));
         *(int **)(object+0x1c8)=p;
         p[1]=0;p[2]=0;p[3]=0;p[0]=0;
     }
@@ -80,8 +88,8 @@ void func_00349D58(char *object,char *data,void *context)
     func_00336B90(label,100);
     value=3.0f*D_001B23A4+0.5f;
     func_00336CC8(label,D_001B23A0==1?(int)(value+1.0f):(int)value);
-    *func_00335E20((object+0x5c))=0x60442d00;
-    *func_00335E20((object+0xa8))=0x55f0c070;
+    *((int *)func_00335E20((object+0x5c)))=0x60442d00;
+    *((int *)func_00335E20((object+0xa8)))=0x55f0c070;
     parameters=object+0x140;
     func_003494D0(parameters,context);
     func_00349628(parameters,2);
@@ -102,7 +110,7 @@ void func_00349D58(char *object,char *data,void *context)
     func_003495D8(parameters1,1,0.3f,packed,0.0f,0.0f,0.0f);
     func_003495D8(parameters1,2,1.0f,packed,0.0f,0.0f,0.0f);
     func_00349610(parameters1,1,0.0f,2.0f);
-    func_00349590(parameters1,func_00335E20((object+0x5c)));
+    func_00349590(parameters1,((int *)func_00335E20((object+0x5c))));
     func_00349670(parameters1,0);
     func_003495C0(parameters1,object+0x1cc);
     func_00349630(parameters1,-1);
@@ -113,7 +121,7 @@ void func_00349D58(char *object,char *data,void *context)
     func_003495D8(parameters2,0,0.0f,0.0f,0.0f,0.0f,0.0f);
     func_003495D8(parameters2,1,0.3f,1.0f,1.0f,0.0f,0.0f);
     func_003495D8(parameters2,2,1.0f,1.0f,1.0f,0.0f,0.0f);
-    func_00349590(parameters2,func_00335E18((object+0x5c)));
+    func_00349590(parameters2,((void *)func_00335E18((object+0x5c))));
     func_00349670(parameters2,0);
     func_003495C0(parameters2,object+0x1d0);
     func_00349630(parameters2,-1);
@@ -127,7 +135,7 @@ void func_00349D58(char *object,char *data,void *context)
     func_003495D8(parameters3,1,0.3f,packed,0.0f,0.0f,0.0f);
     func_003495D8(parameters3,2,1.0f,packed,0.0f,0.0f,0.0f);
     func_00349610(parameters3,1,0.0f,3.0f);
-    func_00349590(parameters3,func_00335E20((object+0xa8)));
+    func_00349590(parameters3,((int *)func_00335E20((object+0xa8))));
     func_00349670(parameters3,0);
     func_003495C0(parameters3,object+0x1cc);
     func_00349630(parameters3,-1);
@@ -138,7 +146,7 @@ void func_00349D58(char *object,char *data,void *context)
     func_003495D8(parameters4,0,0.0f,1.2000000476837158f,1.2000000476837158f,0.0f,0.0f);
     func_003495D8(parameters4,1,0.3f,1.0f,1.0f,0.0f,0.0f);
     func_003495D8(parameters4,2,1.0f,1.0f,1.0f,0.0f,0.0f);
-    func_00349590(parameters4,func_00335E18((object+0xa8)));
+    func_00349590(parameters4,((void *)func_00335E18((object+0xa8))));
     func_00349670(parameters4,0);
     func_003495C0(parameters4,object+0x1d0);
     func_00349630(parameters4,-1);

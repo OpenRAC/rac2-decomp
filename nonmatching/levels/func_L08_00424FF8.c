@@ -1,3 +1,10 @@
+/* 4 November 2026 source audit: removed the dead pointer initializer used only to block loop motion.
+ * The previous controlled result below is historical and cannot qualify this
+ * revised draft. Production remains assembly; no linked or native credit.
+ * Fresh check: 808/812 bytes, US and US2 0/1 each; PAL name absent.
+ * Profile: -O2 -G0 -ffunction-sections -fno-gcse -frac2-qcopy
+ * -frac2-qcopy-barrier -frac2-zero-ti-barrier. Reopen on a genuine extra-vector lifetime.
+ */
 /* Opus 5.5 xhigh, task v1727, USA v1.01, one Tabora placement.
  * Best check.py: 812/812 bytes, 0/1 places; 15 instructions differ (all listed below).
  * Profile (dedicated unit): -O2 -G0 -ffunction-sections -fno-gcse -frac2-qcopy
@@ -75,7 +82,7 @@ void func_L08_00424FF8(char *a,float *position,int count,float speed,float lift,
     int remaining;
     float *inherited;
     char *p;
-    float *e = 0;
+    float *e;
     float *v2;
     if(count<=0)return;
     inherited=(float *)(q+0xD0);

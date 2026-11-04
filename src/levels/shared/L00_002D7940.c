@@ -193,9 +193,81 @@ INCLUDE_ASM("asm/levels", func_L00_002E2958);
 /* func_L00_002E30B8 is a near miss: nonmatching/levels/func_L00_002E30B8.c */
 INCLUDE_ASM("asm/levels", func_L00_002E30B8);
 
-INCLUDE_ASM("asm/levels", func_L00_002E3340);
+#ifndef MACRO_ADDR
+#define MACRO_ADDR __attribute__((section(".sdata")))
+#endif
 
-INCLUDE_ASM("asm/levels", func_L00_002E3520);
+typedef struct {
+    int key, firstKey;
+    int reserved08, reserved0C, width;
+    int origin;
+    int reserved18, reserved1C, step, reserved24;
+} TextGroup;
+typedef struct {
+    char reserved00[0x20];
+    short group;
+    char reserved22[0x384 - 0x22];
+    int anchor;
+} TextContextPrefix;
+
+extern TextGroup D_L00_001BC588[];
+extern char D_L00_001BC200[];
+extern int D_001A7340 MACRO_ADDR;
+extern int func_002798A0(int, int *, int *);
+extern int func_L00_002E36F8(int);
+extern void func_0027DE50(int, int, int, int, unsigned long long);
+extern void func_002802E0(unsigned short *, int, int, int, int, int, int, int, int);
+extern void func_00280190(unsigned short *, unsigned long, unsigned char *, int);
+
+/* The layout constructor initializes all twelve halfwords consumed by FontPrint. */
+void func_L00_002E3340(int row, float alpha)
+{
+    unsigned short layout[12];
+    int group, index;
+    unsigned char *text;
+    TextContextPrefix *context;
+    int origin;
+    if (!func_002798A0(row, &group, &index)) return;
+    text = (unsigned char *)func_L00_002E36F8(D_L00_001BC588[group].firstKey + index);
+    if (!text) return;
+    context = (TextContextPrefix *)D_L00_001BC200;
+    origin = D_L00_001BC588[context->group].origin + row * D_L00_001BC588[context->group].step;
+    func_0027DE50(origin + 2, origin + D_L00_001BC588[context->group].step - 2,
+        0, D_001A7340, (unsigned long long)((int)(alpha * 96.0f) << 24));
+    func_002802E0(layout, origin, origin + D_L00_001BC588[context->group].step, 0,
+        D_001A7340, D_001A7340 / 2 + 2,
+        origin + D_L00_001BC588[context->group].step / 2 + 1, context->anchor, 3);
+    func_00280190(layout, 0x80000000UL, text, -1);
+    func_002802E0(layout, origin, origin + D_L00_001BC588[context->group].step, 0,
+        D_001A7340, D_001A7340 / 2,
+        origin + D_L00_001BC588[context->group].step / 2, context->anchor, 3);
+    func_00280190(layout, 0xFFFFFFFFUL, text, -1);
+}
+
+/* Draw the current caption over six successively shaded bars. */
+void func_L00_002E3520(void)
+{
+    int text = func_L00_002E36F8(D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].key);
+    unsigned short layout[12];
+    int i, y, bottom;
+
+    if (text) {
+        func_002802E0(layout, 0, D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin, 0,
+            D_001A7340, D_001A7340 / 2,
+            D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].width, 18, 1);
+        func_00280190(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
+        bottom = D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin - 2;
+        y = D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin - 4;
+        for (i = 0; i < 6; i++) {
+            func_0027DE50(bottom - y, bottom, -D_001A7340, D_001A7340 * 2, 0x18000000);
+            y = y * 5 / 6;
+        }
+        func_002802E0(layout, 0, D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].origin, 0,
+            D_001A7340, D_001A7340 / 2,
+            D_L00_001BC588[((TextContextPrefix *)D_L00_001BC200)->group].width, 18, 1);
+        func_00280190(layout, 0xFFFFFFFFUL, (unsigned char *)text, -1);
+    }
+}
 
 #ifndef RAC2_T_REC_2E36F8
 #define RAC2_T_REC_2E36F8

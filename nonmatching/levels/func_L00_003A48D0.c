@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 2708/2708 bytes, 0/27 placements; first difference 0x1a4.
+ * Profile: -O2 -G0 -ffunction-sections -g -frac2-hazard-labels.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* 2 November 2026: retained nonmatching C; no linked matching credit.
  * Profile: -O2 -G0 -ffunction-sections -g -frac2-hazard-labels.
  * USA v1.01 check: 2708/2708 bytes, 0/27 placements.
@@ -91,7 +99,7 @@ extern void func_00273318(void *, float, unsigned int, void *, int, float, int, 
 extern void func_00282D30(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 extern Moby *func_L00_00324D18(void *, void *, float, float, float, float, float, int);
-extern float *func_002AB1F0(Moby *);
+extern int func_002AB1F0(Moby *);
 extern int func_002ABB78(Moby *);
 extern float func_00282E48(void *, void *);
 extern float func_00282C48(float);
@@ -177,7 +185,7 @@ void func_L00_003A48D0(Moby *moby)
     candidate = func_L00_00324D18(point, &direction, horizontal, vertical, 75.0f, horizontal, horizontal, 1);
 
     if (vars->target != 0) {
-        float *hp = func_002AB1F0(vars->target);
+        float *hp = ((float *)func_002AB1F0(vars->target));
         if (vars->target == 0 || vars->target->state == 0xFE || vars->target->state == 0xFD ||
             (hp != 0 && *hp <= 0.0f) || vars->target->alive == 0 || HERO->h[0x24EC / 2] != 0) {
             vars->target = 0;
@@ -192,7 +200,7 @@ void func_L00_003A48D0(Moby *moby)
             float *health;
             vars->lockTimer = 5;
             distance = func_00282E48(D_L00_001B8DC0, &candidate->position) * 0.006666667f;
-            health = func_002AB1F0(candidate);
+            health = ((float *)func_002AB1F0(candidate));
             vars->lockHeight = health ? health[4] : 0.1f;
             func_00282D30(&aim, &candidate->up, vars->lockHeight);
             func_00282CC0(&aim, &candidate->position, &aim);
@@ -204,7 +212,7 @@ void func_L00_003A48D0(Moby *moby)
             float *health;
             vars->target = candidate;
             vars->lockTimer = 5;
-            health = func_002AB1F0(candidate);
+            health = ((float *)func_002AB1F0(candidate));
             if (health == 0)
                 vars->lockHeight = 0.1f;
             else
@@ -240,7 +248,7 @@ void func_L00_003A48D0(Moby *moby)
                 if (count != 0) {
                     for (i = 0; i < count; i++) {
                         Moby *hit = D_L00_001C3280[i];
-                        float *hp = func_002AB1F0(hit);
+                        float *hp = ((float *)func_002AB1F0(hit));
                         if (hit->alive == 0)
                             continue;
                         if (hit->health <= 0)

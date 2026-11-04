@@ -1,3 +1,9 @@
+/* 4 November 2026 source audit: removed the call wrapper used only as a scheduling barrier.
+ * The previous controlled result below is historical and cannot qualify this
+ * revised draft. Production remains assembly; no linked or native credit.
+ * Fresh check: 140/140 bytes, US 0/28, first mismatch +0x24. US2/PAL name absent.
+ * Profile: -O2 -G0 -ffunction-sections. Reopen on a real rounding/call block witness.
+ */
 /* Maintainer ABI correction, 29 October 2026: the qualified EE compiler
  * measures sizeof(long) == sizeof(long long) == 8 and sizeof(void *) == 4.
  * The PR #365 trials narrowing the style argument to u32 used a false
@@ -71,9 +77,7 @@ int func_002CDA20(void)
     func_0029C4C0();
     k = 293.0f;
     y = (int)(D_001B23A4 * k + 0.5f);
-    do {
-        func_0027FAA8(0x1A5, y, 0x80F0F0F0, func_00288FB8(0x2D4F), -1);
-    } while (0);
+    func_0027FAA8(0x1A5, y, 0x80F0F0F0, func_00288FB8(0x2D4F), -1);
     func_0027C660();
     return 0;
 }

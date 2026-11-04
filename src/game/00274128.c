@@ -449,7 +449,9 @@ ASM_FUNC("asm/game", func_00277F48);
 
 ASM_FUNC("asm/game", func_00278870);
 
-INCLUDE_ASM("asm/game", func_00278CE0);
+/* Original VU0 macro implementation: vector/Q/ACC operations and trapping addi.
+   The complete 408-byte body is present in boot and all 27 levels of each release. */
+ASM_FUNC("asm/game", func_00278CE0);
 
 ASM_FUNC("asm/game", func_00278E78);
 

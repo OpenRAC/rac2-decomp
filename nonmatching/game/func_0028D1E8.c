@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 3020/3056 bytes, 0/28 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* 2 November 2026: corrected physical interface, not a match.
  * Current 0027F980.c defines func_0027FAA8 with an int return and a complete
  * 64-bit style argument; the old draft declared void and a 32-bit style.
@@ -35,8 +43,8 @@ extern void func_00300A00(char *,int,float,float,float,float,float);
 extern int func_002A9588(int,int,int,int,int);
 extern void func_0028FC48(int,int,int,int,unsigned long,int);
 extern int func_0028E588(int,int);
-extern int func_0028EA58(int,int,int,int,int,int *);
-extern char *func_00288FB8(int);
+extern void func_0028EA58(int,int,int,int,int,int *);
+extern int func_00288FB8(int);
 extern int func_001157AC(char *);
 extern int func_00283D38(int,int,float);
 extern int func_0027FAA8(int,int,u64,char *,int);
@@ -147,7 +155,7 @@ int func_0028D1E8(unsigned char *o)
         RadialLabels labels=D_001A8E70;
         int id=labels.ids[*(int *)(o+0x74)];
         if (id==0x2F34 && D_001B189E[0]) id=0x2F35;
-        label=func_00288FB8(id);
+        label=((char *)func_00288FB8(id));
         if (label && func_001157AC(label)) {
             text *= open;
             color=func_00283D38(0x00E0C0A0,0x80E0C0A0,text);

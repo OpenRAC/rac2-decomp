@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1756/1740 bytes, 0/1 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current source/profile reproduces 1756 bytes in all three releases. The older 1716-byte index
+ * entry does not describe this retained body. Corner/giv allocation, split-mask reload store and
+ * pointer spills remain unresolved.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Claude Opus 5.5 xhigh, v2027, 2026-11-01: 1756/1740 bytes, 0/1 USA places.
  * Profile: -O2 -G8 -ffunction-sections, separate unit L15_00437B68-g8.c; the
  * older -fno-strength-reduce is no longer needed. All declarations follow.

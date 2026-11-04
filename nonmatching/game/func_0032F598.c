@@ -1,3 +1,11 @@
+/* 4 November 2026: faithful retained C; no linked match.
+ * Remove the unused leading two-vector padding; the remaining complete vectors and call arguments are unchanged.
+ * us: 2072/2084 bytes, 0/28 places; us2: absent; pal: absent.
+ * Profile: -O2 -G8 -ffunction-sections -ffast-math.
+ * Reopen: Find a genuine owner/callee use explaining retail's leading stack space and the effect-store lifetime; no dummy local may recreate the frame.
+ * Earlier measurements below are historical, including any diagnostic-only
+ * constructs they describe; those constructs are no longer active C.
+ */
 /*
  * func_0032F598 -- NONMATCHING (tier: Claude Opus 5.5, task v2070).
  * Best: 2084/2084 bytes, 0/28 places; 6 rows differ, but ONLY with the
@@ -40,7 +48,6 @@ extern void func_002FDF40(void *,void *,void *,float,float,float,float,void *);
 #define B598(p,o) (*(unsigned char *)((p)+(o)))
 void func_0032F598(char *obj)
 {
-    V598 pad[2]; /* FORBIDDEN unused local: only reproduces retail's 32 unused bytes at sp+0x00 */
     V598 hit, origin;
     P598 params;
     V598 angles, matrix[3], work[8];

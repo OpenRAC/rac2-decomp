@@ -1,3 +1,14 @@
+/* 4 November 2026: correct the storage contract without register steering.
+ * RegionGeometry owns runtime-count trailing points rather than one point.
+ * The backwards link-byte cursor is based on the complete RegionRecord;
+ * after the last decrement it remains within that record's representation.
+ * A direct indexed reset changes seven local rows and is not retained.
+ * This complete-record cursor gives the identical full USA checker listing
+ * as the preceding draft: 1200/1200 bytes, 0/2 placements, first +0x0.
+ * US2 and PAL also give 1200/1200 bytes, 0/2 each, first +0x0.
+ * The 0x1E0 frame versus retail's 0x1D0 and existing allocation blockers
+ * remain. No linked or native behavior qualification is claimed.
+ */
 /* GPT-6.1 Sol high, 29 October 2026. Upstream pinned GNU game compiler.
  * Best US check: 1200/1200 bytes, 0/2 placements, -O2 -G0 -ffunction-sections -g.
  * Phase-local loop counters, byte-offset visited-array access and qcopy recover
@@ -15,7 +26,7 @@
 #include "common.h"
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) RegionPoint;
 typedef struct { int id; unsigned char links[4]; unsigned char edges[4]; int reserved; RegionPoint sphere; } RegionRecord;
-typedef struct { int count; int reserved[3]; RegionPoint points[1]; } RegionGeometry;
+typedef struct { int count; int reserved[3]; RegionPoint points[0]; } RegionGeometry;
 extern float (*D_L03_001FE700[])[4];
 extern void func_00282C88(void *);
 extern void func_00282CC0(void *, void *, void *);
@@ -64,7 +75,8 @@ int func_L03_00329EF0(void *unused, int *ids, RegionRecord *records, int capacit
     }
     { int i, j;
     for (i = 0; i < count; i++) {
-        unsigned char *link = &records[i].links[3];
+        /* The cursor remains inside the complete record after the final decrement. */
+        unsigned char *link = (unsigned char *)&records[i] + 7;
         for (j = 3; j >= 0; j--)
             *link-- = 255;
     }

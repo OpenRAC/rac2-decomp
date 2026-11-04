@@ -1,3 +1,10 @@
+/* Faithful-source review, 4 November 2026; retained, not linked.
+ * 1720/1720 bytes, 0/1 USA placement, first mismatch +0xD8.
+ * Remove the three overwritten declaration values of i, spin and value. The earlier two-word result depended on their GCSE bucket effects and is superseded. Genuine saved-pointer spill lifetimes and final spark argument scheduling remain open.
+ * Measured in the assigned production unit with the profile recorded below.
+ * Other-release checks were not rerun for this nonmatching source.
+ * Earlier diagnostic measurements below are historical where superseded.
+ */
 /*
  * func_L02_003E91F0, tier opus-1 (task v2033).
  * Best check.py: 1720/1720 bytes, 0/1 places, 2 instructions differ.
@@ -65,7 +72,7 @@ void func_L02_003E91F0(char *actor) {
     float endpoint[4], direction[4], delta[4], blended[4], tangent[4], sideways[4], toward[4];
     float length = D_L02_001B0BA8 * 0.05f;
     float phase, span, distance, oscillation, lateral, radius;
-    int i = 0, spin = 0;
+    int i, spin;
     D_L02_001B0C28 = func_00283B98(D_L02_001B0C28, D_L02_001B0C2C);
     D_L02_001B0C30 = func_00283BE0(D_L02_001B0C30, D_L02_001B0C34);
     D_L02_001B0C44 = func_00283B98(D_L02_001B0C44, D_L02_001B0C48);
@@ -86,7 +93,7 @@ void func_L02_003E91F0(char *actor) {
     qcopy(D_L02_00249090[0][0], state->start);
     qcopy(D_L02_00249090[1][0], state->start);
     for (i = 1; i < 20; i++) {
-        float value = 1.0f, height, zero;
+        float value, height, zero;
         float *point;
         height = func_00283CE0(i);
         height = D_L02_001B0C20 + (D_L02_001B0C24 - D_L02_001B0C20) * (height * 0.05f);

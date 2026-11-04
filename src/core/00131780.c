@@ -192,7 +192,7 @@ void func_00131CA8(void) {
 
 INCLUDE_ASM("asm/core", func_00131CB0);
 
-INCLUDE_ASM("asm/core", func_00131D98);
+/* func_00131D98 is defined in 00131D98.c. */
 
 INCLUDE_ASM("asm/core", func_00131DE8);
 

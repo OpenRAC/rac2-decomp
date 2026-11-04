@@ -1,3 +1,10 @@
+/* Faithful-source review, 4 November 2026; retained, not linked.
+ * 1064/1064 bytes, 0/1 USA placement, first mismatch +0xC.
+ * Remove all three do/while(0) wrappers and their dead conditional float assignments. Keep the real display-mode adjustments that affect a consumed coordinate. FP save/allocation, rounding and argument scheduling remain open.
+ * Measured in the assigned production unit with the profile recorded below.
+ * Other-release checks were not rerun for this nonmatching source.
+ * Earlier diagnostic measurements below are historical where superseded.
+ */
 /* Opus-2 tier (v0777); USA v1.01. Needs a -G8 unit: measured as an appended function of
    src/levels/10_hrugis_cloud/L10_003170D0-g8.c (default -O2 -G8 -ffunction-sections, no
    .rodata, no same-file callee). Declarations below are the ones needed.
@@ -64,12 +71,10 @@ s32 func_L10_004239A0(void) {
         sprite = func_00336D50(D_L10_001A904C[0] + 0x8710, 0x45);
         sy = (s32)(D_L10_001B2D84[0] * 200.0f + 0.5f);
         fy = sy;
-        if (D_L10_001B2D80[0] == 1) do { scaled = sy - 2; } while (0);
         func_00300968(sprite, 0x60442D00, center, fy, 1.0f, 0.0f);
         sprite = func_00336D50(D_L10_001A904C[0] + 0x8710, 0x44);
         sy = (s32)(D_L10_001B2D84[0] * 200.0f + 0.5f);
         fy = sy;
-        if (D_L10_001B2D80[0] == 1) do { scaled = sy - 2; } while (0);
         func_00300968(sprite, 0x55F0C070, center, fy, 1.0f, 0.0f);
         func_00115DA8(buf, func_00288FB8(0x2F72), D_L10_001B143C + 1);
         text = func_00288FB8(0x2F93);
@@ -91,7 +96,6 @@ s32 func_L10_004239A0(void) {
         if (count == 0) func_00115DA8(buf, func_00288FB8(0x11FB));
         else func_00115DA8(buf, func_00288FB8(0x2FC6), count);
         y = (s32)(D_L10_001B2D84[0] * 210.0f + 0.5f);
-        if (D_L10_001B2D80[0] == 1) do { scaled = D_L10_001B2D84[0] * 210.0f + 0.5f + -2.0f; } while (0);
         func_L05_00303000(117, y, 280, 400, 0x80F0F0F0, text, func_001157AC(text));
         scaled = D_L10_001B2D84[0] * 294.0f + 0.5f;
         if (D_L10_001B2D80[0] == 1) y = (s32)(scaled + 3.0f);

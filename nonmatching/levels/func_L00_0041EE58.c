@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1804/1812 bytes, 0/27 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections -g.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Closer B, 2026-11-01: fresh draft from retail, replaces the screened stub. Profile -O2 -G8 -ffunction-sections -g.
  * 1804/1812 bytes, 40 aligned lines, register choice only. Left: 1) retail keeps the first frame address in a
  * call-clobbered temp (addiu v0, sp, 0x20; a0 = v0; s6 = v0 in the delay slot) and every later use is s6; ours
@@ -50,7 +58,7 @@ extern void func_0029F338(void *);
 extern int func_002A77E0(int);
 extern float func_002A7878(float, float);
 extern float func_002A78D8(float, float);
-extern char *func_002AB1F0(char *);
+extern int func_002AB1F0(char *);
 extern void func_002AFFD8(void *, void *, int);
 extern int func_002B4038(int, int);
 extern char *func_002C65A0(void *, void *, int, int, int, int, int, float, float, float, int);
@@ -97,7 +105,7 @@ void func_L00_0041EE58(char *moby)
         else if (k != 0xFD && func_L00_00420310(s->target) == 0) {
             char *c;
             func_00282CF0(a, s->target + 0x10, moby + 0x10);
-            c = func_002AB1F0(s->target);
+            c = ((char *)func_002AB1F0(s->target));
             if (c) {
                 func_00282D30(b, s->target + 0xE0, *(float *)(c + 0x10));
                 func_00282CC0(a, a, b);

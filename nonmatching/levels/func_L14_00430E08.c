@@ -1,3 +1,10 @@
+/* Faithful-source review, 4 November 2026; retained, not linked.
+ * 912/920 bytes, 0/1 USA placement.
+ * Remove i/j/color declaration values: each is overwritten by its loop or complete if/else before any read. The older header's claim that these were real-use initializers is incorrect. Keep the consumed count=32 and corners=4. Genuine cursor/spill lifetimes remain open.
+ * Measured in the assigned production unit with the profile recorded below.
+ * Other-release checks were not rerun for this nonmatching source.
+ * Earlier diagnostic measurements below are historical where superseded.
+ */
 /* func_L14_00430E08: near miss, 3 November 2026 (opus-1, Claude Opus 5.5 xhigh).
    Profile: needs its own unit, -O2 -G0 -ffunction-sections -frac2-hazard-labels
    (retail branches land on the hazard nop after bc1fl at 0x430F98).
@@ -40,7 +47,7 @@ void func_L14_00430E08(void *arg)
     float right[4], rotated[4], delta[4], axis[4];
     char *state=*(char **)(object+0x68);
     float scale;
-    int i=0,j=0,color=0,count=32,corners=4;
+    int i,j,color,count=32,corners=4;
     for(i=0;i<count;i++) {
         D_L14_002602F0[i]+=1.0f/ *(int *)(state+0xa8);
         if(D_L14_002602F0[i]>1.0f) { D_L14_002602F0[i]=0; D_L14_00260270[i]=func_002A7878(-1.57079637f,1.57079637f); }

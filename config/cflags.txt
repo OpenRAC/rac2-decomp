@@ -3100,3 +3100,5 @@ src/core/0012646C-store.c	sdk -O2 -G2 -ffunction-sections
 src/game/002CC528-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/01_oozla/L01_003D1A48-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/11_joba/L11_00420C88-state-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L00_002D7940.c	-O2 -G0 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
+src/levels/02_maktar_nebula/L02_003D0408-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels

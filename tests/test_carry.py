@@ -33,6 +33,98 @@ def lw(rt: int, rs: int, imm: int) -> int:
     return 0x23 << 26 | rs << 21 | rt << 16 | (imm & 0xFFFF)
 
 
+class BootSplits(unittest.TestCase):
+    def fixture(self, root, corrupt=None, length=656, named_callee="callee"):
+        main, sound = "func_00131D98", "func_00131DE8"
+        start, other = 0x00131D98, 0x00131DF8
+        primary = code(0x24020001, 0x0C000000 | (0x00150000 >> 2), *([0x24020001] * 18))
+        tail = code(0x24030002, 0x0C000000 | (0x00150000 >> 2), *([0x24030002] * 142))
+        target = bytearray(primary + tail)
+        struct.pack_into("<I", target, 4, 0x0C000000 | (0x00150100 >> 2))
+        struct.pack_into("<I", target, 84, 0x0C000000 | (0x00150100 >> 2))
+        if corrupt is not None:
+            target[corrupt] ^= 1
+        path = root / "config/boot/functions.tsv"
+        path.parent.mkdir(parents=True)
+        path.write_text(f"{main}\t{start:08X}\t80\n{sound}\t{start + 80:08X}\t576\n"
+                        "callee\t00150000\t8\n")
+        rows = [(main, other, length), (named_callee, 0x00150100, 8)]
+        return rows, other, primary + tail, bytes(target)
+
+    def run_fixture(self, root, rows, other, reference, target, target_sections=None):
+        def sections(path):
+            if path == root / "baserom/SCUS_972.68":
+                return [("core.text", 0x00131D98, reference)]
+            return target_sections if target_sections is not None else [("core.text", other, target)]
+        with patch.object(carry, "ROOT", root), \
+             patch.object(carry, "boot_sections", side_effect=sections), \
+             patch.object(levels, "BOOT", root / "secondary"):
+            return carry.correct_boot_splits(rows)
+
+    def test_split_preserves_end_and_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            rows, other, reference, target = self.fixture(root)
+            fixed = self.run_fixture(root, rows, other, reference, target)
+            self.assertEqual(fixed[:2], [("func_00131D98", other, 80), ("func_00131DE8", other + 80, 576)])
+            self.assertEqual(fixed[1][1] + fixed[1][2], other + 656)
+            self.assertEqual(self.run_fixture(root, fixed, other, reference, target), fixed)
+
+    def test_changed_body_or_callee_is_rejected(self):
+        for corrupt, named in ((0, "callee"), (80, "callee"), (None, "different")):
+            with self.subTest(corrupt=corrupt, callee=named), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                rows, other, reference, target = self.fixture(root, corrupt=corrupt, named_callee=named)
+                with self.assertRaises(ValueError):
+                    self.run_fixture(root, rows, other, reference, target)
+
+    def test_partial_or_unexpected_extent_is_rejected(self):
+        for size in (80, 652):
+            with self.subTest(size=size), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                rows, other, reference, target = self.fixture(root, length=size)
+                with self.assertRaises(ValueError):
+                    self.run_fixture(root, rows, other, reference, target)
+
+    def test_unrelated_rows_are_untouched(self):
+        rows = [("another", 0x1000, 656)]
+        self.assertIs(carry.correct_boot_splits(rows), rows)
+
+    def test_conflicting_target_metadata_is_rejected(self):
+        for conflict in ("duplicate", "overlap", "sound"):
+            with self.subTest(conflict=conflict), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                rows, other, reference, target = self.fixture(root)
+                if conflict == "duplicate":
+                    rows.append(rows[0])
+                elif conflict == "overlap":
+                    rows.append(("inside", other + 40, 8))
+                else:
+                    rows.append(("func_00131DE8", other + 80, 576))
+                with self.assertRaises(ValueError):
+                    self.run_fixture(root, rows, other, reference, target)
+
+    def test_changed_primary_boundary_is_rejected(self):
+        for old, new in (("00131DE8", "00131DEC"), ("\t576", "\t572")):
+            with self.subTest(new=new), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                rows, other, reference, target = self.fixture(root)
+                path = root / "config/boot/functions.tsv"
+                path.write_text(path.read_text().replace(old, new))
+                with self.assertRaises(ValueError):
+                    self.run_fixture(root, rows, other, reference, target)
+
+    def test_target_data_or_section_crossing_is_rejected(self):
+        for kind in (".data", ".vutext", "crossing"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                rows, other, reference, target = self.fixture(root)
+                sections = [(kind, other, target)] if kind != "crossing" else [
+                    ("core.text", other, target[:80]), (".text", other + 80, target[80:])]
+                with self.assertRaises(ValueError):
+                    self.run_fixture(root, rows, other, reference, target, target_sections=sections)
+
+
 class Identity(unittest.TestCase):
     def test_a_packed_constant_is_compared_and_an_address_is_not(self):
         def packed(high):

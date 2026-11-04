@@ -1,3 +1,10 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 772/772 bytes, 0/28 placements; first difference 0x78.
+ * Profile: -O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
+ * func_002A0380 keeps its defined int return even though this caller ignores it. The view-
+ * pointer register roles and flag/argument scheduling residual remain unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* func_0027BA68 - 772 bytes, 28 places. Claude Opus 5.5 (xhigh), task v1962, USA v1.01.
  * Best check: 772/772 bytes, 0/28 places, check.py first mismatch +0x78, 12 rows really differ
  * (cdiff prints 53 of 193, the rest being masked relocations), in a unit of its own built with
@@ -75,7 +82,8 @@ extern void func_00129368(void *, void *, float);
 extern void func_00129218(void *, void *, float);
 extern void func_00279D18(void);
 extern void func_002A0468(void *, int, int, int, int);
-extern void func_0027AB40(void), func_002FC748(void), func_002A0220(void), func_002A0380(void), func_002A03C0(void);
+extern void func_0027AB40(void), func_002FC748(void), func_002A0220(void), func_002A03C0(void);
+extern int func_002A0380(void);
 extern void func_00280B90(void *, int, int);
 
 void func_0027BA68(void)

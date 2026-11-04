@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1452/1452 bytes, 0/28 placements; first difference 0x4c.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* sol-high, USA v1.01, game -O2 -G8 -ffunction-sections.
  * Best: 1452/1452 bytes, 0/28 places; first mismatch +0x4C.
  * Retail 0xE0 frame and saved-register assignments are reproduced. Explicit
@@ -14,7 +22,7 @@
  */
 #include "include_asm.h"
 extern void func_00335E68(void *,int);
-extern int *func_00335E20(void *);
+extern int func_00335E20(void *);
 extern void func_00335E38(void *,float,float,float,float);
 extern void func_00336320(void *),func_00336A78(void *),func_00336828(void *);
 extern void func_00336920(void *,int,int);
@@ -49,14 +57,14 @@ void func_003478F0(char *o)
    short *id=ids+(row<<2)*5;
    for(col=0;col<4;col++,id+=5) {
 
-    { int *color=func_00335E20(o+0x3b4);
+    { int *color=((int *)func_00335E20(o+0x3b4));
       float x=D_L00_001AE758*(float)col+(float)D_L00_001AE750;
       float y=D_L00_001AE75C*(float)row+(float)D_L00_001AE754;
       *color=0x60241700;
       func_00335E38(o+0x3b4,x+(*(float **)(o+0x498))[0],y+(*(float **)(o+0x498))[1],0.0f,0.0f);
     }
-    *func_00335E20(o+0x98)=0x30f0c070;
-    *func_00335E20((o+0x3b4))=0x60241700;
+    *((int *)func_00335E20(o+0x98))=0x30f0c070;
+    *((int *)func_00335E20((o+0x3b4)))=0x60241700;
     func_00335E68((o+0x1c8),0);func_00335E68((o+0x378),0);
     if(D_001A7AF8[*id]) {
      MenuWeaponRecord *weapons=D_L00_00239BA0;
@@ -66,7 +74,7 @@ void func_003478F0(char *o)
 
      func_00335E38((o+0x378),(53.5f*(float)col+(float)D_L00_001AE748)+(*(float **)(o+0x498))[0],(47.0f*(float)row+(float)D_L00_001AE74C)+(*(float **)(o+0x498))[1],0.0f,0.0f);
      if(weapons[slots[*id]].icon==0xea7e) {
-      *func_00335E20((o+0x378))=0x80808080;
+      *((int *)func_00335E20((o+0x378)))=0x80808080;
      } else {
       MenuIntegerPair base=D_L00_001AE588[0],stride=D_L00_001AE590[0];
       int a,b,color;
@@ -77,16 +85,16 @@ void func_003478F0(char *o)
       func_00335E68((o+0x1c8),1);
       a=0;b=0;color=0;
       func_00336F20(*id,&a,&b,&color);func_00336498((o+0x1c8),a,b);
-      *func_00335E20((o+0x378))=color;
+      *((int *)func_00335E20((o+0x378)))=color;
       if(weapons[slots[*id]].max<=0) {func_00336B90((o+0x1c8),100);func_00336B98((o+0x1c8),100);}
      }
      if(D_00139688[*id]==0) {
       unsigned char *currentSlots=D_00139568;
       MenuWeaponRecord *currentWeapons=D_L00_00239BA0;
-      if(currentWeapons[currentSlots[*id]].ammo!=0) *func_00335E20(o+0x3b4)=0x60202080;
+      if(currentWeapons[currentSlots[*id]].ammo!=0) *((int *)func_00335E20(o+0x3b4))=0x60202080;
      }
      func_00335E68((o+0x378),1);
-     if(func_0026F7A0(D_L00_001F2880[0])==*id) *func_00335E20(o+0x98)=0x80ffde8d;
+     if(func_0026F7A0(D_L00_001F2880[0])==*id) *((int *)func_00335E20(o+0x98))=0x80ffde8d;
     }
     {
      MenuFloatPair stride=D_L00_001AE598[0],base=D_L00_001AE5A0[0];

@@ -1,3 +1,11 @@
+/* 4 November 2026: a genuine two-vector anchor aggregate was tested with
+ * the existing qcopy/qcopy-barrier profile in the assigned production unit.
+ * It remains 900/900 bytes, 0/28 USA placements, first mismatch +0x60:
+ * grouping angles/position changes their stack slots as well as address
+ * pseudos, so it does not improve the retained independent-vector source.
+ * Keep the complete source below; no synthetic pointer-to-local copy used.
+ * Other-release and linked checks were not run for this failed hypothesis.
+ */
 /* 31 October 2026: decomp-permuter (asm passes off) matches 28/28 with one change, the else
    branch's first copy written through the address of `state`:
        char **slot = &state; qcopy(&position, *slot);

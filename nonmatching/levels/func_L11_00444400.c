@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 4640/4684 bytes, 0/1 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections -fno-schedule-insns.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Current retained result, 1 November 2026: 4640/4684 bytes. Current compiler and an additional -fno-force-
  * mem control retain this result; the scheduling boundary after the rounding chains is unresolved. No empty
  * wrapper, invented test or barrier is retained.
@@ -127,18 +135,18 @@ extern void func_00280200(Rect *, u64, char *, s32);
 extern void func_00280270(Rect *, u64, char *, s32);
 extern void func_002802E0(Rect *, s32, s32, s32, s32, s32, s32, s32, s32);
 extern f32 func_00283CE0(s32);
-extern char *func_00288FB8(s32);
+extern int func_00288FB8(s32);
 extern void func_002FC560(u32, u64);
 extern void func_L00_0037B7B0(void);
 extern void func_00300A00(char *, s32, f32, f32, f32, f32, f32);
 extern void func_L02_003FE768(f32);
-extern char *func_00336D50(s32, s32);
+extern int func_00336D50(s32, s32);
 extern s32 func_001157AC(char *);
 extern s32 func_00115DA8(char *, char *, ...);
 
 #define Scale(v) ((s32)((f32)(v) * D_L11_001B3E04 + 0.5f))
 #define LBL(id, c, xv, yv, a1, a2, a3) { \
-        char *ls = func_00336D50(D_L11_001A904C[0] + 0x8710, id); \
+        char *ls = ((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, id)); \
         s32 ly = Scale(yv); \
         func_00300A00(ls, c, xv, ly, a1, a2, a3); }
 #define TITLE() \
@@ -205,33 +213,33 @@ void func_L11_00444400(u8 *moby)
         TITLE();
         sprintf_n(buf, D_L11_001B17E8, 0x5A - *(s32 *)(data + 0x188) / 60);
         DRAWBUF(func_00280270, &r90);
-        DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
+        DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         LABEL();
         SUM();
         sprintf_n(buf, D_L11_001B17E8, D_L11_001B14B8[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
         DRAWBUF(func_00280270, &r50);
-        DRAW(func_00280190, &r70, func_00288FB8(0x2F61));
+        DRAW(func_00280190, &r70, ((char *)func_00288FB8(0x2F61)));
     } else if (*(s16 *)(data + 0x1F0) == 9) {
         TITLE();
         tm = *(s32 *)(data + 0x188);
         sprintf_n(buf, D_L11_001B17F0, 2 - tm / 3600, 0x3B - tm / 60 % 60);
         DRAWBUF(func_00280200, &r90);
-        DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
+        DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         LABEL();
         LABEL50();
         pv = *(u8 **)(*(u8 **)(data + 0x180) + 0x68);
         func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-        func_00300A00(func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+        func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
     } else if (*(s16 *)(data + 0x1F0) == 8) {
         TITLE();
         sprintf_n(buf, D_L11_001B17E8, 0x3C - *(s32 *)(data + 0x188) / 60);
         DRAWBUF(func_00280270, &r90);
-        DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
+        DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         LABEL();
         SUM();
         sprintf_n(buf, D_L11_001B17E8, D_L11_001B14D0[*(s16 *)(data + 0x1F2)] + sum - *(s32 *)(data + 0x140));
         DRAWBUF(func_00280270, &r50);
-        DRAW(func_00280190, &r70, func_00288FB8(0x2F61));
+        DRAW(func_00280190, &r70, ((char *)func_00288FB8(0x2F61)));
     } else if (*(s16 *)(data + 0x1F0) == 0xC) {
         TITLE();
         n = 100 - *(s32 *)(data + 0x188) / 60;
@@ -241,7 +249,7 @@ void func_L11_00444400(u8 *moby)
         } else {
             DRAWBUF(func_00280270, &r90);
         }
-        DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
+        DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         if (moby[0xBC] != 0) {
             LABEL();
             SUM();
@@ -252,7 +260,7 @@ void func_L11_00444400(u8 *moby)
                 sprintf_n(buf, D_L11_001B17E8, 100);
                 DRAWBUF(func_00280190, &r50);
             }
-            DRAW(func_00280190, &r70, func_00288FB8(0x2F61));
+            DRAW(func_00280190, &r70, ((char *)func_00288FB8(0x2F61)));
         }
     } else {
         if (*(u8 **)(data + 0x180) != 0) {
@@ -263,14 +271,14 @@ void func_L11_00444400(u8 *moby)
             case 0xB3A:
                 pv = *(u8 **)(obj + 0x68);
                 func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-                func_00300A00(func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
+                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
                 break;
             case 0xD4A:
                 pv = *(u8 **)(obj + 0x68);
                 if (*(f32 *)(pv + 0x20) > 0.0f) {
                     func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
                 }
-                func_00300A00(func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
                 break;
             }
         }
@@ -282,7 +290,7 @@ void func_L11_00444400(u8 *moby)
             sprintf_n(buf, D_L11_001B1800, *(s16 *)(data + 0x1F2) + 1, *D_L11_001B14F8[*(s16 *)(data + 0x1F0)]);
         }
         DRAWBUF(func_00280270, &rF0);
-        DRAW(func_00280190, &rD0, func_00288FB8(0x2F60));
+        DRAW(func_00280190, &rD0, ((char *)func_00288FB8(0x2F60)));
     }
     func_002FC560(0x47, 0x5360B);
     func_002FC560(0x47, 0x5360B);

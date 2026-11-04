@@ -571,7 +571,7 @@ u8 *func_L02_003CD5B0(int group) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L02_003D0408);
+/* func_L02_003D0408 is defined in L02_003D0408-g8.c. */
 
 extern int func_00283CF0(float);
 

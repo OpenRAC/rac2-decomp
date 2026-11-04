@@ -1,3 +1,10 @@
+/* Faithful-source review, 4 November 2026; retained, not linked.
+ * 1748/1756 bytes, 0/1 USA placement.
+ * Remove seven overwritten declaration initializers; keep count=0 because its value is consumed by the entity walk. The earlier 1756-byte five-row diagnostic depended on the removed values. Frame/PRE spills and geometry-loop scheduling remain open.
+ * Measured in the assigned production unit with the profile recorded below.
+ * Other-release checks were not rerun for this nonmatching source.
+ * Earlier diagnostic measurements below are historical where superseded.
+ */
 /* Nonmatching, Claude Opus 5.5 xhigh, task v2023 (1 November 2026).
  * Best check: 1756/1756 bytes, 0/1 USA v1.01 places; frame 0xB70. check.py's first
  * difference is at +0x494. cdiff shows 83 of 439 rows differing: 78 are relocation
@@ -97,9 +104,9 @@ void func_L02_003E80F8(char *actor) {
     unsigned short *entry;
     unsigned short id;
     float frame;
-    int count = 0, i = 0, layer = 0, pass = 0, nextLayer = 0, nextPass = 0;
-    int uvIndex = 0;
-    unsigned int color = 0;
+    int count = 0, i, layer, pass, nextLayer, nextPass;
+    int uvIndex;
+    unsigned int color;
     *(Quad *)probe = 0;
     probe[0] = 30.0f;
     probe[3] = 1.0f;

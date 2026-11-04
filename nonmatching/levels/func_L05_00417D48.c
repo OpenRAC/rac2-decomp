@@ -1,3 +1,12 @@
+/* 4 November 2026, measured object-field follow-up; not linked.
+ * The retained note's proposed moby-struct experiment was tested at -O2 -G8
+ * -ffunction-sections: 1204/1204 bytes, 0/4 USA v1.01 places. Its measured
+ * position/mode/flags/state fields and child +0x98 timer fields preserve the
+ * accesses, but move the first mismatch earlier, from +0xEC to +0xCC, and
+ * rotate the selector register to a1. The better original C is retained.
+ * Do not repeat that whole-object typing as an untested remedy. US2/PAL
+ * compilation was not repeated after the US mismatch; no linked match.
+ */
 /* Complete C near miss; not linked and no matching credit.
  * Tier: opus-2 (Claude Opus 5.5, xhigh), task v2201, 2026-11-03 (supersedes opus-1's v2143 draft, 109 rows).
  * Build as src/levels/shared/L05_00417D48-g8.c (game -O2 -G8; no extra flags).

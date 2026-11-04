@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1368/1372 bytes, 0/1 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * The measured state fields fix the final growth/threshold load ordering and keep 1/60 in f3.
+ * The earlier false-path tuning reload is still deleted and the multiply operands differ. The
+ * event helper keeps its actual int return.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* func_L07_003F3E80 (1372 B). Opus xhigh v2090, 3 November 2026: 1368/1372 bytes, 0/1 places.
  * Tier: build in the -G8 unit L07_00389EB8-g8.c (-O2 -G8 -ffunction-sections); that unit already
  * declares func_0029F338(int), so drop that extern there. Needs the sda/MACRO_ADDR/SDATA externs below.
@@ -25,7 +33,7 @@ extern void func_00282F20(void *, void *, f32), func_00282D08(void *, void *, vo
 extern void *func_002C16C0(void *, void *, s32, s32, s32, s32, f32, f32, f32, f32, f32);
 extern void func_002A7750(void *, s32, s32), func_0029F338(int);
 extern s32 func_002B3868(void *), func_002AD0E0(void *, void *, void *, void *, void *, void *);
-extern void func_002E5DA0(s32, s32, void *, s32);
+extern int func_002E5DA0(s32, s32, void *, s32);
 extern s32 func_002A77E0(s32);
 extern void func_L07_003F4578(u8 *);
 extern void func_L00_002E6CF0(void (*)(u8 *), u8 *);
@@ -39,6 +47,13 @@ extern s32 D_L07_001B0E70[] MACRO_ADDR;
 extern s32 D_L07_001B0E70_gp SDATA(D_L07_001B0E70);
 extern f32 D_L07_001B0E78[] MACRO_ADDR;
 extern f32 D_L07_001B0E78_gp SDATA(D_L07_001B0E78);
+
+typedef struct {
+    f32 position[4];
+    f32 direction[4];
+    u8 *attachment;
+    f32 growth, strength, phase, phase_step;
+} SiberiusTrailState;
 
 void func_L07_003F3E80(u8 *object)
 {
@@ -59,7 +74,7 @@ void func_L07_003F3E80(u8 *object)
         func_00283958(&axis, rotation);
         func_00283738(object + 0xC0, rotation, object + 0xC0);
         qcopy(&previous, object + 0x10);
-        F(state, 0x18) -= F(state, 0x1C);
+        ((SiberiusTrailState *)state)->direction[2] -= ((SiberiusTrailState *)state)->direction[3];
         if (*(u8 **)(state + 0x20)) {
             func_00282CC0(state, state, state + 0x10);
             func_00283098(object + 0x10, state, *(u8 **)(state + 0x20) + 0xC0);
@@ -100,22 +115,22 @@ void func_L07_003F3E80(u8 *object)
             *(u32 *)(object + 0x98) = 0;
             *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xEFFF;
             F(object, 0x18) += 0.333f;
-            F(state, 0x24) = 0.1f;
-            F(state, 0x28) = 1.0f;
-            if (func_002A77E0(2)) F(state, 0x30) = (1.0f / 60.0f) * -D_L07_001B0E4C;
-            else F(state, 0x30) = D_L07_001B0E4C * (1.0f / 60.0f);
-            F(state, 0x2C) = func_002A7878(0.0f, 1.0f);
+            ((SiberiusTrailState *)state)->growth = 0.1f;
+            ((SiberiusTrailState *)state)->strength = 1.0f;
+            if (func_002A77E0(2)) ((SiberiusTrailState *)state)->phase_step = (1.0f / 60.0f) * -D_L07_001B0E4C;
+            else ((SiberiusTrailState *)state)->phase_step = D_L07_001B0E4C * (1.0f / 60.0f);
+            ((SiberiusTrailState *)state)->phase = func_002A7878(0.0f, 1.0f);
             if (*(u8 **)(state + 0x20))
                 func_002AD0E0(object, *(u8 **)(state + 0x20), object + 0x10, object + 0xF0, object + 0x10, object + 0xF0);
         }
-        F(state, 0x24) += D_L07_001B0E40 * (1.0f / 60.0f);
-        if (F(state, 0x24) >= D_L07_001B0E44) {
+        ((SiberiusTrailState *)state)->growth += D_L07_001B0E40 * (1.0f / 60.0f);
+        if (((SiberiusTrailState *)state)->growth >= D_L07_001B0E44) {
             func_002AA2E8((f32 *)(state + 0x28), 0.0f, D_L07_001B0E48 * (1.0f / 60.0f));
-            if (F(state, 0x28) <= 0.0f) { func_0029F338((int)object); return; }
+            if (((SiberiusTrailState *)state)->strength <= 0.0f) { func_0029F338((int)object); return; }
         }
-        F(state, 0x2C) += F(state, 0x30);
-        if (F(state, 0x2C) > 1.0f) F(state, 0x2C) -= 1.0f;
-        else if (F(state, 0x2C) < 0.0f) F(state, 0x2C) += 1.0f;
+        ((SiberiusTrailState *)state)->phase += ((SiberiusTrailState *)state)->phase_step;
+        if (((SiberiusTrailState *)state)->phase > 1.0f) ((SiberiusTrailState *)state)->phase -= 1.0f;
+        else if (((SiberiusTrailState *)state)->phase < 0.0f) ((SiberiusTrailState *)state)->phase += 1.0f;
         func_L00_002E6CF0(func_L07_003F4578, object);
         break;
     }

@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 2624/2628 bytes, 0/27 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections -g -frac2-zero-ti-por.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* func_L00_003C8A90, 2628 bytes, 27 places. USA v1.01, -O2 -G8 -ffunction-sections -g
  * -frac2-zero-ti-por: 2624/2628 bytes, frame 0x190, about 70 rows off, mostly register names.
  * Nested blocks around the two sets of vectors give retail's shared slots. Left:
@@ -76,14 +84,14 @@ extern u8 D_L00_002960A0[];
 extern u8 D_L00_001A8F20[] __attribute__((sda));
 
 extern void func_002829D8(void *);
-extern void func_L00_002C42E0(int, int);
+extern int func_L00_002C42E0(int, int);
 extern int func_00282948(void *);
 extern void func_00282D30(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00282A88(void *, int);
 extern void func_L00_0037E000(void *);
-extern int func_002AF580(void *, void *, float, float, void *, void *, int, int, float, float, float, int, void *);
-extern float *func_002AB1F0(void *);
+extern char * func_002AF580(void *, void *, float, float, void *, void *, int, int, float, float, float, int, void *);
+extern int func_002AB1F0(void *);
 extern float func_00282E48(void *, void *);
 extern float func_00282C48(float);
 extern void func_00273318(void *, float, unsigned int, void *, int, float, int, float, int);
@@ -96,7 +104,7 @@ extern void func_L00_003C94D8(void *);
 extern void func_002A75E0(void *, int, int, int, int);
 extern int func_L00_002D6998(void *);
 extern void func_00283098(void *, void *, void *);
-extern Moby *func_L00_0037DEF8(void *, void *, int, int *, int);
+extern int func_L00_0037DEF8(void *, void *, int, int *, int);
 extern void func_L00_0037DD18(void *, void *, int);
 extern Moby *func_L00_00409E48(void *, void *, void *, void *, float, float, float, float);
 extern int func_L00_002D3F30(int, int);
@@ -160,7 +168,7 @@ void func_L00_003C8A90(Moby *moby)
     }
     for (i = 0; i < count; i++) {
         float height = 0.0f;
-        float *info = func_002AB1F0(list[i]);
+        float *info = ((float *)func_002AB1F0(list[i]));
 
         if (info != 0)
             height = info[4];
@@ -194,7 +202,7 @@ void func_L00_003C8A90(Moby *moby)
             if (hits != 0) {
                 for (j = 0; j < hits; j++) {
                     Moby *hit = D_L00_001C3280[j];
-                    float *hp = func_002AB1F0(hit);
+                    float *hp = ((float *)func_002AB1F0(hit));
 
                     if (hit->alive != 0 && hit->health > 0 && hit != 0 && hit->state != 0xFE && hit->state != 0xFD &&
                         hit->objectClass != 0xC87 && hit->objectClass != 0xECC && hp != 0 &&
@@ -222,13 +230,13 @@ void func_L00_003C8A90(Moby *moby)
             if (target == 0) {
                 int locked = 0;
 
-                target = func_L00_0037DEF8(moby, list, count, &locked, -1);
+                target = ((Moby *)func_L00_0037DEF8(moby, list, count, &locked, -1));
                 if (target == 0)
                     goto fire;
                 if (locked != 0)
                     func_L00_0037DD18(moby, target, 0x14);
             }
-            info = func_002AB1F0(target);
+            info = ((float *)func_002AB1F0(target));
             if (info != 0)
                 strength = info[4];
         fire:

@@ -1,3 +1,14 @@
+/* 4 November 2026, current-profile follow-up; not linked.
+ * With -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+ * -Wa,--r5900-unsigned32-mask=sn: 1076/1076 bytes, 0/1 USA v1.01 places.
+ * The qualified assembler option resolves the two sentinel instructions below.
+ * Twenty initialization store/FPR rows still differ, first at +0x94. A sparse
+ * measured state struct produces byte-identical checker output, so merely
+ * replacing cast accesses with fields does not resolve that scheduling.
+ * The better original C is retained. US2/PAL compilation was not repeated
+ * after the US mismatch; no cross-release or strict-build match is claimed.
+ * Earlier v2216 measurements follow as history, before the mask option.
+ */
 /* Tier: Claude Opus 5.5 xhigh, v2216. USA v1.01, game compiler.
  * Best check.py: 1076/1076 bytes, 0 of 1 places match (first difference +0x94);
  * 22 differing rows of 269, two of them relocation addends only (D_001A7A60+0x1C).
@@ -12,8 +23,8 @@
  * Still differs:
  * 1. Sentinel: cc1 emits dli $2,0xffffffff; our assembler expands it to
  *    lui 0xFFFF; dsrl32 0. Retail always uses addiu -1; dsrl32 0 (45 sites in
- *    31 functions, no lui form anywhere). No as option selects it: assembler
- *    class gap (tools), not C.
+ *    31 functions, no lui form anywhere). At that time no as option selected it;
+ *    the qualified unsigned32-mask option above now resolves this item.
  * 2. Init stores 0x150..0x58: retail issues them in exact source order; our sched1
  *    puts stores whose source dies first (INSN_REG_WEIGHT), then the rest. Both
  *    constant-load orders are identical; f3/f4 (0.5 vs 0.5236) follow from the

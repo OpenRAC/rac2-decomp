@@ -1,3 +1,10 @@
+/* Faithful-source review, 4 November 2026; retained, not linked.
+ * 528/528 bytes, 0/6 USA placements, first mismatch +0xC.
+ * Remove the do/while(0) wrapper around the forced-trigger arm. Its loop notes were only an allocation barrier. Preserve the label reached by the actual volume scan and every state/list transition. A genuine flag/settings lifetime witness is needed.
+ * Measured in the assigned production unit with the profile recorded below.
+ * Other-release checks were not rerun for this nonmatching source.
+ * Earlier diagnostic measurements below are historical where superseded.
+ */
 /*
  * func_L01_00390A50: exact in 6 of 6 places, all releases, but only with a non-empty do { } while (0) around the forced arm, not landed: that wrapper stays disallowed pending the maintainers' open question (docs/MATCHING-BLOCKERS.md). Without it: 528/528 bytes, 0/6 places, 25 instructions differ, all flag/settings s3/s4 swaps. local-alloc doubles flag's live length (first set is a constant), so flag needs 16 weighted refs, has 14; find retail's own source of those 2 refs.
  */
@@ -40,14 +47,14 @@ void func_L01_00390A50(char *object)
             }
             goto set;
         }
-    } else do {
+    } else {
         if (forced == 1) {
 set:
             flag = 1;
         } else {
             flag = 0;
         }
-    } while (0);
+    }
 done:
     if ((flag && !*(unsigned char *)(object + 0xBC)) ||
         (!flag && *(unsigned char *)(object + 0xBC)) ||

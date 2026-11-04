@@ -1,63 +1,22 @@
-/* functional: medium. Near-miss draft, not byte-compared in the latest sweep: paths the captured calls never take are unproven. */
-/*
- * Claude Opus 5.5 (xhigh), v1841, 31 October 2026: retained near miss.
- * Unit: a sibling src/levels/02_maktar_nebula/L02_003D0408-g8.c with its own
- * config/cflags.txt line: -O2 -G8 -ffunction-sections -frac2-hazard-labels
- * Best permitted check: 3296/3304 bytes, 0/1 US places, 0/1 US2 places;
- * PAL reports neither catalogue contains this function. No linked check.
- *
- * Remaining difference, and only this: the attack-flag load in cases 14 and 17.
- *   here:   c.lt.s; nop; bc1x; lbu $v1,0x60($s1)
- *   retail: lbu $v0,0x60($s1); c.lt.s; nop; bc1x; daddu $v1,$v0,$zero
- * at retail +0xAF0 and +0xC48: one extra word at each site, 8 bytes in all.
- *
- * Exact-bytes form, NOT permitted (a volatile cast on chosen accesses, so this
- * is reported FAILED, not matched). Declare `int attackFlags;` and write both
- * loads as:
- *   attackFlags = *(volatile u8 *)(self + 0x60); previous = attackFlags;
- * With the profile above this gives 1 of 1 places on US and on US2. A volatile
- * load survives combine as load + copy, and reorg keeps it out of a delay slot.
- * A volatile field declaration used at all six reads also gives 1 of 1 here, but
- * it is not a whole-object truth: applying the same volatile access to `& 2` tests
- * in 74 other units (scratch copies; 9 did not compile after the textual rewrite)
- * changed the code of 35 of the 65 compared, all of which match with a plain read.
- * Retail: 225 `lbu; andi` tests of offset 0x60 in levels 1 and 2, none in a delay
- * slot, against 5 of 229 at other offsets; suggestive only.
- *
- * 1 November 2026: the copy follows the branch in RTL (reorg fills the slot from the
- * fall-through). Loading into a separate local before `distance > 4` and copying after
- * it is still merged (51 rows, same size).
- *
- * Recovered in this attempt (effects measured, mechanisms inferred from dumps):
- * - A separate heading call in each target-selection arm. jump2 cross-jumps them
- *   but sched1 still sees the block boundary after them, which gives retail's
- *   mov.s/addiu/daddu order and the $s3 copy in the distance call's slot.
- * - func_002B5278 and break written out in one animation arm only (4 here; 5 gives
- *   the same result). Its call then
- *   ends a block, find_basic_blocks adds a (use (const_int 0)) there, and
- *   find_cross_jump stops, keeping the animation-5 tail inline as retail does.
- * - -frac2-hazard-labels: the case 8 branch at +0x950 lands on the hazard nop.
- * - One `long previous` for flag value and counter: `$v1` and the andi registers.
- *
- * Tied without a copy (same bytes): int/u8/u32/short intermediates, a chained
- * assignment, a one-byte union read directly or by copy, and a second local after
- * the branch (that one merges into `andi $v0,$v0,2`). Next useful experiment: a
- * source shape that keeps the load and the copy apart through combine without
- * volatile, such as a real test or label between them; combine merged every
- * same-block pair tried. -frac2-keep-block-order, -frac2-gcse-unsplit-edges,
- * -frac2-no-null-pointer-checks and -g did not change the starting draft's
- * differences. No toolchain, catalogue or shared-header changes.
- */
 #include "common.h"
-typedef int QuadS __attribute__((mode(TI)));
-typedef union { QuadS quad; float f[4]; } Vector;
+/* The animation flag byte belongs to the incoming actor. All six measured
+ * reads use this one field view, including the two snapshots taken before the
+ * distance comparison even on its abandon path. This is a partial view, never
+ * an owning allocation. */
+typedef struct {
+    unsigned char reserved[0x60];
+    volatile unsigned char animation_flags;
+} ActorAnimationFlags;
+
+typedef int Quad __attribute__((mode(TI)));
+typedef union { Quad quad; float f[4]; } Vector;
 typedef struct { float x, y, z, w; } Position;
 typedef struct { char pad[0x10]; Position position; } ActorPosition;
 typedef struct { char pad[0x80]; Vector position; } PlayerPosition;
 extern char D_00189E20[] NOT_SDA;
 extern int D_L02_001B0148 __attribute__((sda));
 extern void func_L02_003D10F0(char *), func_L02_003D14F8(char *), func_L02_003D1588(char *), func_L02_003D1610(char *), func_L02_003D1430(char *), func_L02_003D1C38(char *);
-extern void func_L02_003D25C8(char *, float *), func_L02_003D1ED0(char *, QuadS *), func_L02_003D2390(char *), func_L02_003FC248(void *, int, int);
+extern void func_L02_003D25C8(char *, float *), func_L02_003D1ED0(char *, Quad *), func_L02_003D2390(char *), func_L02_003FC248(void *, int, int);
 extern int func_L02_003D26B0(char *), func_L02_003D1698(char *), func_002B3868(u8 *), func_002B3890(u8 *), func_002A77E0(int), func_L02_003FC0B8(char *), func_L00_003206B8(void *, int), func_L00_0042AB40(char *);
 extern char *func_L02_003FC098(char *);
 extern float func_00283248(float, float), func_00282E80(void *, void *), func_00283C80(float, float), func_0029F530(char *);
@@ -65,10 +24,13 @@ extern float func_00283248(float, float), func_00282E80(void *, void *), func_00
 extern float func_L02_003D1820(char *, char *);
 extern void func_002A7750(u8 *, int, int), func_002A7470(char *, int, int, int);
 extern int func_L01_00321178(char *, char *);
-extern int func_002B50E0(char *, int, float), func_002B4FF0(char *, float *, float);
+extern int func_002B50E0(void *, void *, float);
+extern int func_002B4FF0(char *, float *, float);
 extern void func_002B5258(char *), func_002B5278(u8 *, float), func_0029F978(u8 *, u32, u8 *), func_00282A60(char *, int, int), func_002A7A00(float *, float, float);
 extern unsigned long func_002B1C20(void *, void *);
-extern void func_002B0A68(char *, int, int, float, float, float, float, u8), func_L01_003E9CF8(char *, int, void (*)(char *));
+/* This interleaving preserves the four integer and four FP argument banks. */
+extern void func_002B0A68(char *, int, float *, float, float, float, float, u8);
+extern void func_L01_003E9CF8(char *, int, void (*)(char *));
 extern void func_002B60B0(u8 *, float, float, float, float);
 /* Runs the armed enemy's target selection and combat animation state machines. */
 void func_L02_003D0408(char *self) {
@@ -78,6 +40,7 @@ void func_L02_003D0408(char *self) {
     float heading, distance, turn, time, saved, targetX, targetY, selfX, selfY;
     unsigned long flags;
     long previous;
+    int animationFlags;
     int stateByte = (u8)self[0x20];
     if (stateByte == 1 || !self || stateByte == 0xFE || stateByte == 0xFD) return;
     state = *(char **)(self + 0x68);
@@ -91,7 +54,7 @@ void func_L02_003D0408(char *self) {
     }
     targetObject = *(char **)(state + 0x2E0);
     if (targetObject) {
-        target.quad = *(QuadS *)(targetObject + 0x10);
+        target.quad = *(Quad *)(targetObject + 0x10);
         selfX = ((ActorPosition *)self)->position.x;
         selfY = ((ActorPosition *)self)->position.y;
         targetX = ((ActorPosition *)*(char **)(state + 0x2E0))->position.x;
@@ -100,7 +63,7 @@ void func_L02_003D0408(char *self) {
         targetY -= selfY;
         heading = func_00283248(targetX, targetY);
     } else {
-        target.quad = *(QuadS *)(D_00189E20 + 0x80);
+        target.quad = *(Quad *)(D_00189E20 + 0x80);
         selfX = ((ActorPosition *)self)->position.x;
         selfY = ((ActorPosition *)self)->position.y;
         targetX = ((PlayerPosition *)D_00189E20)->position.f[0];
@@ -129,10 +92,10 @@ void func_L02_003D0408(char *self) {
         if (!*(u8 *)(self + 0xBC)) {
             if (func_00282E80(self + 0x10, point) < 0.5f) { self[0xBC] = 1; break; }
         }
-        func_002B50E0(self, (int)point, heading);
+        func_002B50E0(self, point, heading);
         break;
     case 5:
-        if ((u8)self[0x60] & 2) func_L02_003D1610(self);
+        if (((ActorAnimationFlags *)self)->animation_flags & 2) func_L02_003D1610(self);
         break;
     case 3:
         if (!func_L02_003D26B0(self)) {
@@ -156,13 +119,13 @@ void func_L02_003D0408(char *self) {
     case 7:
         flags = func_002B1C20(self, state + 0x50);
         if (*(float *)(state + 0x20) <= 1 && *(char **)(state + 0x2E4)) {
-            scratch.quad = *(QuadS *)(*(char **)(state + 0x2E4) + 0x10); func_L02_003D1ED0(self, &scratch.quad);
+            scratch.quad = *(Quad *)(*(char **)(state + 0x2E4) + 0x10); func_L02_003D1ED0(self, &scratch.quad);
         }
         if (*(float *)(state + 0x20) <= 0 && !*(u8 *)(state + 0x291)) {
             func_00282A60(state + 0x290, 0, 64); func_0029F978((u8 *)self, 3, (u8 *)(state + 0x290));
             *(float *)(state + 0x2B8) = 0.0001f; *(float *)(state + 0x2B4) = 0.0001f; *(float *)(state + 0x2B0) = 0.0001f; state[0x292] = 1;
             func_002A7A00(scratch.f, 0.016666668f, 0.050000004f);
-            func_002B0A68(self, 0x20, (int)&scratch, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            func_002B0A68(self, 0x20, scratch.f, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
         }
         if (!(flags & 1UL)) {
             if (!(*(float *)(state + 0x20) <= 0 && *(u16 *)(self + 0x96) > 60)) break;
@@ -230,14 +193,14 @@ face_target:
         if (flags & 2UL) func_L02_003D14F8(self);
         break;
     case 13:
-        if ((u8)self[0x60] & 2) { *(float *)(self + 0x48) = 0.5f; func_002A7750((u8 *)self, 14, -1); if ((u8)self[0x43] != 9) func_002A7470(self, 9, 0, 10); }
+        if (((ActorAnimationFlags *)self)->animation_flags & 2) { *(float *)(self + 0x48) = 0.5f; func_002A7750((u8 *)self, 14, -1); if ((u8)self[0x43] != 9) func_002A7470(self, 9, 0, 10); }
         break;
     case 14:
         if (distance < 4) {
             D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; func_002A7750((u8 *)self, 15, -1);
             if ((u8)self[0x43] != 10) func_002A7470(self, 10, 10, 10);
         } else {
-            previous = (u8)self[0x60];
+            animationFlags = ((ActorAnimationFlags *)self)->animation_flags; previous = animationFlags;
             if (distance > 4) goto abandon_attack;
             if (!(previous & 2)) break;
             previous = D_L02_001B0148++;
@@ -247,7 +210,7 @@ face_target:
         }
         break;
     case 15: case 18:
-        if ((u8)self[0x60] & 2) {
+        if (((ActorAnimationFlags *)self)->animation_flags & 2) {
             *(short *)(state + 0x2F8) = 0;
             if (*(char **)(D_00189E20 + 0x249C) == self) {
                 func_002A7750((u8 *)self, 12, 5); if ((u8)self[0x43] != 7) func_002A7470(self, 7, 0, 10);
@@ -255,14 +218,14 @@ face_target:
         }
         func_L02_003D1C38(self); break;
     case 16:
-        if ((u8)self[0x60] & 2) { *(float *)(self + 0x48) = 0.5f; func_002A7750((u8 *)self, 17, -1); if ((u8)self[0x43] != 12) func_002A7470(self, 12, 0, 10); }
+        if (((ActorAnimationFlags *)self)->animation_flags & 2) { *(float *)(self + 0x48) = 0.5f; func_002A7750((u8 *)self, 17, -1); if ((u8)self[0x43] != 12) func_002A7470(self, 12, 0, 10); }
         break;
     case 17:
         if (distance < 4) {
             D_L02_001B0148 = 0; *(float *)(self + 0x48) = 1; func_002A7750((u8 *)self, 18, -1);
             if ((u8)self[0x43] != 13) func_002A7470(self, 13, 10, 10);
         } else {
-            previous = (u8)self[0x60];
+            animationFlags = ((ActorAnimationFlags *)self)->animation_flags; previous = animationFlags;
             if (distance > 4) {
 abandon_attack:
                 *(float *)(self + 0x48) = 1; func_L02_003D14F8(self);

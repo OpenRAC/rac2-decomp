@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 3604/3604 bytes, 0/28 placements; first difference 0x150.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Current retained result, 1 November 2026: 3604/3604 bytes, not exact. Restore the actual integer return
  * of func_00288870 even though this caller discards it. The measured mode-3 allocation and loop-induction
  * differences remain.
@@ -138,7 +146,7 @@ extern unsigned char D_00139568[];
 typedef struct { char pad[0x46]; short text; char pad48[0x98]; } PreviewInfo;
 extern PreviewInfo D_00239BA0[];
 extern void func_002FB170(void), func_002F88D8(char *);
-extern char *func_00288FB8(int);
+extern int func_00288FB8(int);
 extern void func_002923C0(void *), func_002926B8(int);
 extern float func_00283248(float, float), func_00283B98(float, float), func_00283BE0(float, float);
 extern void func_0029F0C8(void *, int), func_002A0468(void *, int, int, int, int);
@@ -170,11 +178,11 @@ void func_002FB1A0(void)
         D_0021F240.objectCount = 0;
         classes = D_001AD500;
         if (D_0021F240.rows.armor[D_0021F240.selected].value == 0) {
-            func_002F88D8(func_00288FB8(0x3188));
+            func_002F88D8(((char *)func_00288FB8(0x3188)));
         } else {
             if (D_001A7290[0] != D_0021F240.rows.armor[D_0021F240.selected].value)
                 func_002923C0((void *)D_0021F240.rows.armor[D_0021F240.selected].value);
-            func_002F88D8(func_00288FB8(D_001AD250[D_0021F240.rows.armor[D_0021F240.selected].value]));
+            func_002F88D8(((char *)func_00288FB8(D_001AD250[D_0021F240.rows.armor[D_0021F240.selected].value])));
         }
         facing = func_00283B98(func_00283248(D_001B5200.x, D_001B5200.y), 1.7453294f);
         while (classes.ids[D_0021F240.objectCount] >= 0) {
@@ -328,7 +336,7 @@ void func_002FB1A0(void)
         }
         state = &D_0021F240;
         state->modelActive = 1; state->field9c = 0; state->resourceActive = 0; state->field90 = 0;
-        func_002F88D8(func_00288FB8(state->rows.equipment[state->selected].extra));
+        func_002F88D8(((char *)func_00288FB8(state->rows.equipment[state->selected].extra)));
         armor = ((unsigned)state->equipment >> 16) & 0x1F;
         if (D_00152C00[12] != armor) func_002926B8(armor);
     } else if (mode == 0) {
@@ -352,9 +360,9 @@ void func_002FB1A0(void)
                 case 12: case 14: case 17: case 18: case 53: special = 1;
                 }
                 func_00288870(&info, D_0021F240.rows.item[D_0021F240.selected].id, special ? 1 : 2);
-                func_002F88D8(func_00288FB8(info.text));
+                func_002F88D8(((char *)func_00288FB8(info.text)));
             } else {
-                func_002F88D8(func_00288FB8((D_00139568[D_0021F240.rows.item[D_0021F240.selected].id] + D_00239BA0)->text));
+                func_002F88D8(((char *)func_00288FB8((D_00139568[D_0021F240.rows.item[D_0021F240.selected].id] + D_00239BA0)->text)));
             }
             func_002B7CE0(1);
             state = &D_0021F240;
@@ -363,7 +371,7 @@ void func_002FB1A0(void)
         }
     } else if (mode == 1) {
         if (D_0021F240.count) {
-            func_002F88D8(func_00288FB8(D_001A8B00[D_0021F240.rows.ammo[D_0021F240.selected][0]]));
+            func_002F88D8(((char *)func_00288FB8(D_001A8B00[D_0021F240.rows.ammo[D_0021F240.selected][0]])));
             func_002B7CE0(1);
             func_00294BC8(D_0021F240.rows.ammo[D_0021F240.selected][3], D_0021F240.buffer);
             D_0021F240.resourceActive = 1; D_0021F240.previous = D_0021F240.selected; D_0021F240.modelActive = 0;

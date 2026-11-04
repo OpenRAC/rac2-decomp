@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1108/1108 bytes, 0/27 placements; first difference 0x4c.
+ * Profile: -O2 -G8 -ffunction-sections -ffast-math.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* GPT-6.1 Sol high, v0825, 2026-10-29: USA v1.01, 1108/1108
  * bytes, 0/27 placements. Profile: -O2 -G8 -ffunction-sections -ffast-math.
  * Exactly 19 stack-slot offsets differ; all other instructions match apart
@@ -48,7 +56,7 @@ extern void func_00282CF0(void *,void *,void *);
 extern void func_00282F20(void *,void *,float);
 extern void func_00282DD8(void *,void *,void *);
 extern float func_00282DB0(void *,void *);
-extern int func_L00_003E6778(char *,int,float,float,void *);
+extern char * func_L00_003E6778(char *,int,float,float,void *);
 extern void func_00280B90(void *,int,int);
 void func_L00_003E5BD8(char *object)
 {

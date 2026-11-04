@@ -1,3 +1,11 @@
+/* 4 November 2026: faithful retained C; no linked match.
+ * Retain only the two actually used local vectors instead of the ten-vector diagnostic allocation.
+ * us: 2292/2292 bytes, 0/1 places; us2: absent; pal: absent.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Reopen: Qualify genuine local-storage ownership and the flag/float store ordering without expanding the local array to manufacture a frame.
+ * Earlier measurements below are historical, including any diagnostic-only
+ * constructs they describe; those constructs are no longer active C.
+ */
 /* Retained complete C reconstruction; not linked or counted.
  * Tier: Claude Opus 5.5 xhigh (v1979), 1 November 2026. Replaces the GPT-6.1 Sol draft
  * (frame 0x80, -G16), which this one is closer than.
@@ -246,7 +254,7 @@ extern void func_L23_0041B9F0(L23Moby *);
 
 /* Initialize the encounter objects and refresh their shared presentation state. */
 void func_L23_004177F8(L23Moby *object) {
-    Quad v[10];
+    Quad v[2];
 #define origin v[0]
 #define point v[1]
     L23Boss *state = object->vars;
