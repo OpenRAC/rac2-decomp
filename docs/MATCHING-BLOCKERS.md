@@ -1125,6 +1125,16 @@ remain beside the retained C in `nonmatching/`.
 
 ## 11. MMI and undecodable words
 
+`func_00278CE0` is a separately reviewed 408-byte VU0 ray/vector primitive,
+now marked `ASM_FUNC`. All 28 placements in each release contain the complete
+body and return, with COP2 loads/stores, vector arithmetic, Q/ACC operations,
+`vdiv`, `qmfc2` and trapping `addi`. These are body-local original-assembly
+indicators, not an inference from a failed C trial. Its functional port remains
+separate; this classification adds no reconstructed C bytes. Other unresolved
+MMI routines retain their existing markers pending their own evidence/review.
+The [marker and linked checks](https://github.com/OpenRAC/rac2-decomp/commit/96a2e817a258351edbd25db3583ab416e8fdcbcf)
+preserve all 84 complete retail program images.
+
 **3 November 2026, current RAC1 identity qualification (locally validated; review pending):**
 37 remaining routines, each longer than 16 bytes, match routines that current
 [RAC1 at `1d8228cc`](https://github.com/OpenRAC/rac1-decomp/tree/1d8228cc0c81da7bc2bdc3e77479ee050e0ef434/src)
@@ -2358,6 +2368,24 @@ particular label spelling does not unblock the loop layout.
   `func_L00_002A3B88` forwards `func_0028E640`'s complete 64-bit texture descriptor
   to `func_0028F410`. The callee builds it with a shift and OR; truncating to
   32 bits would be a false interface even if a later allocation looked closer.
+- **Do not generalize a font-style width to every drawing helper.** The matched
+  `func_L05_00303000` wrapper returns `void` and forwards seven 32-bit integer
+  arguments, including a packed color and stored text address. The retained
+  `func_L10_004227A0` had declared a return and widened that color to influence
+  allocation. Restoring the true interface on all eight calls and removing
+  three unwitnessed volatile globals gives 3,260/3,420 bytes, 0/1 USA v1.01;
+  USA v2.00 and PAL have no canonical row. The older 3,312-byte cleanup still
+  contained those diagnostics and is historical, not an admissible baseline.
+- **A measured field model must cover the actual accesses.** The Maktar actor
+  routine `func_L02_003D0408` uses a single volatile byte view at actor `+0x60`
+  for all six retail reads, including the two snapshots before distance tests.
+  It retains the real flag writer, complete vector storage and all argument
+  banks, rather than selecting volatile casts solely to move instructions.
+  Its 3,304-byte local comparison passes once in each USA release; PAL has no
+  canonical identity for this body. Both intended C placements also pass the
+  [strict linked qualification](https://github.com/OpenRAC/rac2-decomp/commit/96a2e817a258351edbd25db3583ab416e8fdcbcf).
+  See the source-method explanation in
+  [COMPILER-NOTES.md](COMPILER-NOTES.md#source-methods-shared-with-rac1).
 - **The dialect is C89:** `long` and `long long` are 64-bit, `int` and pointers are 32-bit, and
   there is no declaration after a statement.
 - **The patched gas expands `move $rd,$zero` into `daddu $rd,$zero,$zero` and `li $v0,1` into
@@ -2549,6 +2577,16 @@ native `func_00117CA0` (`log`, 1,556 bytes) and `func_001182B8` (`log10`, 424 by
 with their actual 96/32-byte scalar pools. The initially matching `log10` text
 with a wrong overlapping pool was rejected. See
 [the mechanism and controls](COMPILER-NOTES.md#positive-32-bit-masks-in-64-bit-registers).
+
+The same existing profile closes the caption pair `func_L00_002E3340` (476
+bytes) and `func_L00_002E3520` (468 bytes). Their shared unit keeps the actual
+64-bit font-style interface, 40-byte caption records and fully initialized
+twelve-halfword layout. Each local comparison passes 27/27 in all three
+releases. This is a new user of the qualified macro rule, not another compiler
+patch or a license to alter other instruction values.
+Their [linked qualification](https://github.com/OpenRAC/rac2-decomp/commit/96a2e817a258351edbd25db3583ab416e8fdcbcf)
+passes all 84 strict programs, including the shared unit's existing C and every
+intended caption placement.
 
 The related native `floor` and `fmod` sources remain nonmatching: 472/500 and
 1,052/1,108 bytes, respectively, in all three releases. Both output words of
@@ -4083,6 +4121,25 @@ problems. The fourteen named entry repairs described in [LEVELS.md](LEVELS.md)
 were subsequently verified in every carrying release and added to the existing
 generator mechanism. The other split/residue proposals remain open.
 
+**4 November 2026, further boundary witnesses:** all 33 carrying extents in
+US/US2/PAL were read for `func_L19_0041C328`, `func_L14_004321C0`,
+`func_L13_0043E8C0`, `func_L06_0047C1D0` and `func_L10_00419188`.
+The first has a closed 168-byte body and a separately referenced 8-byte stub
+(15 structured vtable references per release); the second has two independently
+entered 8-byte stubs. The two camera families each have three distinct camvtbl
+entry pointers, including all seven copies of the L06 family. They belong to
+different camera classes even in the same level: identical bytes must not
+collapse their identities. A guarded generator repair and all-release linked
+qualification remain to do. Hrugis instead has an 88-byte closed body plus
+an unreachable 8-byte return pair with no independent scanned entry witness;
+do not invent a second function or discard those bytes on that evidence alone.
+
+The retained `func_L00_00309DB0` residue hypothesis also has a PAL exception:
+all 27 PAL copies begin in the preceding return's delay slot, and an aligned
+loaded word in PAL level 20 equals that address with unproven pointer meaning.
+Resolve its predecessor extent and that word's provenance before a shared
+deletion. Direct or nearby address-pair absence alone is not proof of no entry.
+
 - Remove diagnostic source controls before comparing meaningful C. The eight
   overwritten initializers in `func_L02_00412D50`, ten dead initializers in
   `func_L01_003A6638`, always-true regeneration guard in `func_L06_004587E8`,
@@ -4094,10 +4151,16 @@ generator mechanism. The other split/residue proposals remain open.
   reproduces the retail copy loop and prologue: 972/972 bytes, still 0/1 USA.
   Flag/zero setup and later lifetimes remain different; this is a new useful
   constraint, not a reason to repeat every unchanged near miss.
-- `func_00131D98` is already an 80-byte main loop in the USA catalogue. Its
-  faithful retained C passes that local check with independently evidenced
-  file-scope alignment, but PAL/USA v2.00 still describe a 656-byte main-plus-sound
-  extent. Those release catalogues need a verified split before promotion.
+- `func_00131D98`'s former secondary-release boundary blocker is resolved by
+  the guarded main/sound split in `tools/carry.py --entries` (see
+  [LEVELS.md](LEVELS.md)). Both complete bodies, their named callees and their
+  EE section bounds are checked before writing either table. Its faithful
+  80-byte loop uses the actual indirect entry returned by ParseBin, cache
+  synchronization modes 0/2, a release-scoped initial entry and independently
+  evidenced file-scope alignment. Local checks pass in all three releases;
+  all three boot C placements also pass the
+  [strict linked build](https://github.com/OpenRAC/rac2-decomp/commit/96a2e817a258351edbd25db3583ab416e8fdcbcf).
+  The 576-byte sound initializer is a separate existing function, not C credit.
 - The menu-initializer relatives include real entry witnesses at `+0x10` for
   `func_L08_00363320`, `func_L11_00369700`, `func_L17_003583F8`,
   `func_L22_00358778` and `func_L24_0034C450`. The skipped `+0x20` stack restore

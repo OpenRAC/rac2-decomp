@@ -49,6 +49,22 @@ a native ABI; an EE match alone does not establish a working native port.
 Qualify the actual RAC2 source/profile and every carrying release, rather than
 assuming that an example in RAC1 guarantees a match here.
 
+`func_L02_003D0408` uses one borrowed actor-field view for all six measured
+byte reads at offset `0x60`. Its volatile qualifier describes the complete
+reload sequence, including two snapshots before the distance test on its
+abandon path. The animation writer `func_002A7470` clears the same bit after
+updating the sequence/frame. This is an access model, not proof of the original
+source qualifier. Both local vectors own their full 16 bytes; the xyz-only
+random-vector helper does not justify inventing an initialized fourth lane.
+The interleaved particle call preserves four integer and four FP arguments,
+including its actual vector pointer and byte tag. The ignored-pointer hook
+`func_L00_0042AB40` retains its constant-minus-one return with a consistent
+incoming-owner parameter. These EE contracts still need native ABI review
+before reuse in a PC port.
+The [implementation and checks](https://github.com/OpenRAC/rac2-decomp/commit/96a2e817a258351edbd25db3583ab416e8fdcbcf)
+pass the strict linked build in every carrying release; PAL has no identity
+for this Maktar body.
+
 ### Diagnosing allocation before changing source
 
 Run `python3 tools/regalloc.py func_XXXXXXXX --version us` on a current C
@@ -1286,6 +1302,16 @@ release. In `log10`, `two54` and zero are immediate expressions: declaring
 storage for them produced text that matched but a wrong 48-byte pool overlapping
 `log`. No pool bytes, aliases or padding were invented to fix it. Whole-program
 validation must include these complete pools, not just the text comparisons.
+
+The caption routines `func_L00_002E3340` and `func_L00_002E3520` also use this
+existing profile, with `-O2 -G0 -ffunction-sections` on their shared source unit.
+Their positive 64-bit font-style masks need the same measured SN seed; no
+compiler change or narrowed font interface is required. The real 40-byte
+caption records and twelve initialized layout halfwords replace the older
+scratch-buffer guesses. Both routines have 27 placements in each release;
+the whole-file option must preserve every existing C definition in that unit.
+All 81 placements of each caption and the unit's existing C were verified
+through the three complete strict builds, with no fallback to assembly.
 
 The linked build also encountered an existing 48-byte formatter pool containing
 four string records with padding followed by numeric constants. Its source,
