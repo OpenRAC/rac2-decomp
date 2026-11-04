@@ -1,3 +1,10 @@
+/* 5 November 2026: retained body unchanged (4640/4684 bytes). New negative: the boxes as a
+ * `static __inline__` helper taking the rounded coordinates as arguments (so they are
+ * evaluated before the inlined call) do not make retail's boundary; sched2 then interleaves
+ * all three chains. In haifa-sched a LOOP_BEG/END note in mid-block is a full barrier that
+ * does not end the block, which is why the rejected do-while (0) diagnostic worked; a natural
+ * construct with that effect is still not identified.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 4640/4684 bytes, 0/1 placements; first difference size mismatch.
  * Profile: -O2 -G8 -ffunction-sections -fno-schedule-insns.

@@ -530,6 +530,20 @@ loops give them: `for (i = 0; i < 16; i++) a[i] = 0;` has an address computation
 into the same pointer countdown as `*dst++` over a reversed counter. Check loop spellings first when a near miss is
 all stack offsets; they change nothing after loop.c.
 
+**Joba state machines, 5 November 2026 (USA v1.01, `-O2 -G8`, retained in `nonmatching/levels/`):**
+`func_L11_00453358` is now 4524/4524 bytes with every instruction equal; a scratch cc1 whose bucket
+count is forced from an environment variable (not committed) makes it `1 of 1` at S 539-543 and
+561-565, so only the gcse insn count is left (its source gives 551). Whole-file `-fno-force-mem`
+also lands it in the window (it removes the HI copy that `emit_cmp_insn`/`compare_from_rtx` force
+before each `short` compare), but changes four other places, among them a `u8` compare whose
+`andi 0xFF` retail keeps, so that flag is not retail's profile. Skipping `force_not_mem` only
+in `extendhisi2`, or only for HImode compares, moves `max_cuid` by just 2 and 4. Every spelling of
+an `if (*(s16 *)p)` test (`!= 0`, an `(s32)` cast, a struct field, an `s32` local) expands to the
+same three insns. Dead initialisers count one insn each and change no instruction. The case-9
+cross-jump in that function is closed only by the matched twin `func_L02_0040BE08`'s
+`height = 0.0f;`, which needs a ruling. `func_L11_00451178`'s natural wording needs S 575-585 and
+then still differs in two orders, so it is not a count alone.
+
 **Update, 3 November 2026 (pending review):** now matched. `func_L12_00300410` is C in `src/levels/12_todano/L12_00300410-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 1 US place (PAL and US2 catalogues have no function of this name). The measurements above are kept as history.
 
 **Qualified field and call-lifetime remedies, 25 October 2026:**

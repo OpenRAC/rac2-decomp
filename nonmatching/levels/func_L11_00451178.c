@@ -1,3 +1,23 @@
+/* 5 November 2026: retained body unchanged (4824/4824 bytes, 6 case-12 words, 0/1 places).
+ * Measured on the natural wording (out/scale/tmpl/spin/rows/axis written directly):
+ * gcse input is 1173 real insns plus 2 that gcse's preparation adds, so max_cuid 1175 and
+ * S 587. bucket = (14029 + regno + offset) % S holds exactly in the dump. At S 587, &work[1]
+ * ($1+32, bucket 561) always follows &work[4] ($1+80, bucket 22) whatever the regnos, so
+ * retail's slots need S 575..585, i.e. max_cuid 1150..1171: 4 to 25 fewer insns.
+ * Ruled out by measurement: every spelling of the s16 tests (`if (x)`, `!= 0`, an (s32) cast,
+ * a struct field, an s32 local) expands to the same HI load plus two shifts; a do-while for
+ * case 7's j loop gives the same code and the same count; a TI copy in place of case 7's
+ * qcopy adds insns and moves registers; -frac2-keep-block-order and
+ * -frac2-no-null-pointer-checks leave the count unchanged; PRE deletes no redundant loads
+ * here, only constants and addresses, so no hoisted local can be the missing source form.
+ * Bucket sweep (scratch cc1 with an RAC_S override, not kept) on the natural wording with
+ * &particle for tmpl: S 575..585 put the case-12 slots in retail's order, but two orders still
+ * differ: case 7's 0x707F hoist (+0xBE0) and case 12 setting object+0xF0 before state+0x2B0
+ * (+0x1070). So this one is not a bucket count alone. tmpl as a named pointer takes the first
+ * slot (0xC4) where retail has it third (0xCC), so retail's tmpl is a reaching register.
+ * Scratch compiler variants (not kept) that skip force_not_mem in extendhisi2, or for HImode
+ * compares, are not retail's either (see func_L11_00453358's note).
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 4824/4824 bytes, 0/1 placements; first difference 0x1088.
  * Profile: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges.
