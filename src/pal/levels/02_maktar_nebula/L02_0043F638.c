@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_0043F638);
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));

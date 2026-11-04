@@ -10,4 +10,3 @@ void func_PAL_L02_00335630(char *arg0, char *arg1) {
     func_L02_00333480(arg0, arg1, tmp);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_00335678);
