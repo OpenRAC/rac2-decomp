@@ -1,23 +1,12 @@
-/* func_L07_003F4578: retained near miss, opus-1 (v2224), 3 November 2026.
-   Profile: -O2 -G8 -ffunction-sections (own -g8.c unit; -g changes nothing).
-   check.py: 1012/1012 bytes, 0/1 places (USA v1.01); 14 non-relocation rows
-   differ, all in the `(segment + 1) % 32` block of the particle loop: the
-   same instructions with different temporaries (retail seg+1 in a1, seg+32
-   in a0, quotient v0, q<<5 v1) and sched2 order. In this build local-alloc
-   ties the chain into three quantities ({t1,q,q<<5}, {seg+1,rem,rem*16},
-   {-1,slt}); retail's registers fit an untied chain. `next` variables,
-   operand order, a reused index and -g do not change it.
-   Fixed here: one index per loop (the first loop's i in s1, the
-   third's in s7), the second loop written count-up (loop.c reverses it, so
-   the 31 init follows the pointer inits), MACRO_ADDR on D_L07_001A8F20 (the
-   la stays in the loop, unsplit), and the parameter pairs: E70[] incomplete
-   sda array read [0]/[1] (E74 = CONST lui form, out of delay slots), E78 as
-   an sda scalar plus D_L07_001B0E78_4[] MACRO_ADDR alias for E7C (the
-   D_L10_001B1390_4 convention). Earlier drafts named E64/E6C; retail
-   reads 0x001B0E74/0x001B0E7C.
-*/
+#include "include_asm.h"
 
 #include "common.h"
+
+/* func_L07_003F4578 reads its parameters through $gp, so it has a -G8 unit of its own.
+   D_L07_001B0E78_4 is the absolute (macro) form of D_L07_001B0E78's address; retail
+   reads E78 through $gp and E7C through lui. `next` takes both the quotient and the
+   remainder of `% 32` (expand_divmod's target), which leaves that chain to global-alloc
+   as in retail. */
 
 typedef union { s32 q __attribute__((mode(TI))); f32 f[4]; } Vector;
 typedef struct {
@@ -73,7 +62,7 @@ void func_L07_003F4578(u8 *object)
     Frame frame;
     u8 *state = *(u8 **)(object + 0x68);
     u8 *position = object + 0x10;
-    s32 i, j, k, segment, size, count;
+    s32 i, j, k, segment, next, size, count;
     u32 color0, color1, color;
     f32 angle, life, step;
 
@@ -108,8 +97,9 @@ void func_L07_003F4578(u8 *object)
         step = D_L07_001B0E40 * (1.0f / 60.0f);
         func_002AA2E8(&step, 0.0f, func_002A7878(0.0f, 2.0f) * (1.0f / 60.0f));
         segment = func_002A77E0(32);
+        next = (segment + 1) % 32;
         func_00282D08(&frame.work.particle.point, &frame.points[segment],
-                     &frame.points[(segment + 1) % 32], func_002A7878(0.0f, 1.0f));
+                     &frame.points[next], func_002A7878(0.0f, 1.0f));
         func_00282CF0(&frame.work.particle.direction, &frame.work.particle.point, position);
         frame.work.particle.direction.f[2] = 0.0f;
         func_00282F20(&frame.work.particle.direction, &frame.work.particle.direction, step);

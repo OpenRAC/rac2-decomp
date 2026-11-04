@@ -1,41 +1,23 @@
-/* 4 November 2026 actual-contract review; retained near miss, not linked.
- * USA v1.01 check.py: 1240/1240 bytes, 0/28 placements; first difference 0x1b0.
- * Profile: -O2 -G8 -ffunction-sections -frac2-hazard-labels.
- * The ignored color helper keeps its actual int return; widget getters return signed32 stored
- * addresses with explicit use-site casts. The hazard-labels profile is required to reproduce the
- * retained +0x1B0 spill-slot tie.
- * Earlier measurements below are historical where superseded by this note.
- */
-/* 2 November 2026: three new bounded source trials used real named input
- * masks and row/layout constants across the existing branches, following the
- * shared PRE hash/spill-slot guidance. None improved the retained one-cause
- * spill-slot miss: the mask-only and mask/stride forms remain 0/28 US places
- * at +0x1B0 and alter later scheduling/address operands; naming the row base
- * and count offset adds a pointer lifetime and regresses from +0xEC. The
- * original source/profile below is retained. No linked match is claimed.
- */
 #include "include_asm.h"
 
-/* func_003489E8 (boot, 1240 B): menu list update. G8: belongs at the end of
-   src/game/00345358-g8.c, with that unit's flags extended to
-   `-O2 -G8 -ffunction-sections -frac2-hazard-labels` (its other two functions still
-   match with the flag; without it one branch lands after the hazard nop instead of on it).
-   31 October 2026, USA v1.01: same size, one instruction off at +0x1B0 in every place:
-   the two spilled values swap stack slots. Retail keeps the E4 widget address at 4($sp)
-   and `pad & 0x1000` at 8($sp); here they are the other way round.
-   In this draft both are allocated in order of pseudo number: `pressed` is a user variable
-   (low number, slot 4) and the final call's `m + 0xE4` is a gcse copy (high number, slot 8).
-   Retail needs the E4 pseudo below the mask's. Tried: the mask as a gcse temporary (the
-   `if` repeats `pad & 0x1000`: it becomes 289, below the E4 copy 290); a `wE4` user
-   variable (any declaration order, assigned before or after the fifth func_00335E10 call,
-   or chained `wE4 = d = ...`): regmove then folds the fifth call's register into the
-   spilled variable and a, b, c move to other callee-saved registers.
-   Matched along the way: calls first and a/b/c assigned after them in both branches (cse
-   reuses the prologue pointers only on the `if` side), the origin store in each branch,
-   a const offset table, the final call recomputing `m + 0xE4`, and the
-   `if (v < 0) v = lim;` wrap, which gives retail's `slt` against -1. */
+/* Menu list update: shows the widgets for the current mode, places the five fixed widgets and
+   the list rows relative to the menu origin, greys out disabled rows, then steps the selection
+   on up/down (wrapping at both ends, skipping disabled rows) and highlights it. Its own unit:
+   - -G8 for the $gp-relative D_001AE5EC;
+   - -frac2-hazard-labels: the branch out of the `if` arm lands on the hazard nop after the
+     shared `mtc1` of the origin height, as in retail;
+   - -frac2-gcse-unsplit-edges: with the low wrap through a pointer (WrapLow, as in
+     func_00347F80), its branch only becomes a conditional move after the loop pass, which
+     keeps retail's -1 inside the selection loop;
+   - -fmove-all-movables: loop.c's pass 1 would otherwise leave the 0x80808080 constant of the
+     row loop for the rerun pass, after the induction-variable inits.
+   The four initialised locals (i, v, start, lim) bring the RTL to 284 insns, so gcse's PRE table
+   has 143 buckets and numbers the E4 widget copy before the `pad & 0x1000` mask: the two spilled
+   values then take retail's stack slots (4 and 8). The enabled flags are read through a struct
+   pointer so that the index is added to its own base register (`addu base, index`). */
 
 typedef unsigned char u8;
+typedef struct { int enabled[7]; } EnabledSet; /* at menu + 0x418, one per list row */
 
 extern float D_001AE5EC __attribute__((sda));
 extern const float D_001AE760[10] __attribute__((section(".sdata")));
@@ -46,6 +28,13 @@ extern int func_00335E10(void *);
 extern int func_00335E20(void *);
 extern void func_00335F88(void *, float, float, float, float);
 extern int func_002A9588(int, int, int, int, int);
+extern int func_002E5E58(int, int, void *);
+
+static inline void WrapLow(int *index, int last)
+{
+    if (*index < 0)
+        *index = last;
+}
 
 #define MODE (*(int *)(m + 0x44C))
 #define ORG (*(float **)(m + 0x434))
@@ -57,11 +46,10 @@ int func_003489E8(u8 *m, int pad)
     u8 *w130 = m + 0x130;
     u8 *w17C = m + 0x17C;
     u8 *w1C8 = m + 0x1C8;
-    u8 *wE4;
     u8 *a, *b, *c;
     float *p;
-    int *flags;
-    int pressed, step, i, n, idx, v, start, lim;
+    EnabledSet *flags;
+    int step, i = 0, v = 0, start = 0, lim = 0;
 
     func_00335E68(m, MODE == 0);
     func_00335E68(w98, MODE == 0);
@@ -92,7 +80,6 @@ int func_003489E8(u8 *m, int pad)
         a = m + 0x130;
         ORG[1] = 190.0f;
     }
-    pressed = pad & 0x1000;
 
     p = ((float *)func_00335E10(m));
     p[0] = D_001AE760[0] + ORG[0];
@@ -124,7 +111,7 @@ int func_003489E8(u8 *m, int pad)
     }
 
     step = 0;
-    if (pressed) {
+    if (pad & 0x1000) {
         func_002E5E58(3, 0, 0);
         step = -1;
     } else if (pad & 0x4000) {
@@ -135,18 +122,18 @@ int func_003489E8(u8 *m, int pad)
         start = *(int *)(m + 0x43C);
         func_002A9588(0, 0, 1, 0, 1);
         lim = *(int *)(m + 0x444) - 1;
-        flags = (int *)(m + 0x418);
+        flags = (EnabledSet *)(m + 0x418);
         do {
+            int wrapped;
             v = *(int *)(m + 0x43C) + step;
             if (lim < v)
                 v = 0;
-            if (v < 0)
-                v = lim;
-            idx = v;
-            *(int *)(m + 0x43C) = idx;
-            if (flags[idx] != 0)
+            wrapped = v;
+            WrapLow(&wrapped, lim);
+            *(int *)(m + 0x43C) = wrapped;
+            if (flags->enabled[wrapped] != 0)
                 break;
-        } while (start != idx);
+        } while (start != *(int *)(m + 0x43C));
     }
     func_003363C0(m + 0xE4, (float)*(int *)(m + 0x43C));
     *((unsigned int *)func_00335E20(m + (*(int *)(m + 0x43C) * 0x48 + 0x218))) = 0x70FFFEED;

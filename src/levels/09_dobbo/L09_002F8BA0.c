@@ -442,8 +442,6 @@ void func_L09_003E31C0(unsigned char *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L09_003E3288);
-
 /* Arms the sub-object: the halfword 10 at 0x24, the angle 10.0f, the word
    at 0xA4 copied to 0x8C, the byte 3, the scale 1.0f and the live byte 0x2F,
    then the resident four-argument starter on the record. */
@@ -853,7 +851,6 @@ int func_L09_003FB908(unsigned char *object, void *src)
     return 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L09_003FB9F8);
 
 typedef struct {
     int x;

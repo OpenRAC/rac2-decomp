@@ -1,5 +1,5 @@
-/* Closer i, 1 November 2026: ported from func_L15_00432A60; 1492/1492 bytes with 0.0f and 1.0f held in locals, and i == count - 1 in the core loop, but about 100 rows of register rotation remain. Retail keeps points + 1 in a stack slot, and zero in f22. Ten variants of the locals did not close it. */
-/* Gorn variant of the colored polyline ribbon renderer. */
+/* Hrugis Cloud and Gorn variant of the colored polyline ribbon renderer (placed in levels 10 and 15).
+ * It has its own unit because L10_0037D200.c declares the function with another prototype for its caller. */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad quad; float f[4]; } Vector;
@@ -18,7 +18,6 @@ extern float func_00282DF0(void *);
 void func_L10_0039DA48(Vector *points, u32 alpha, u32 outerAlpha, float coreWidth, float width, float extend, int count, u32 innerColor, u32 outerColor) {
     RibbonPacket core, halo;
     Vector normal, widthVector, eye, tangent, first, last, firstRay, lastRay, toEye, extension;
-    float zero, one;
     float length, initialLength, haloLength, firstLength, lastLength;
     int i;
     u32 coreColor, haloColor;
@@ -34,30 +33,32 @@ void func_L10_0039DA48(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     halo.flags = core.flags; halo.mode = core.mode; halo.primitive = core.primitive;
     halo.color[3] = haloColor; halo.color[2] = haloColor;
     halo.color[1] = haloColor; halo.color[0] = haloColor;
-    zero = 0.0f;
-    one = 1.0f;
-    halo.uv[0] = zero; halo.uv[1] = zero; halo.uv[2] = zero; halo.uv[3] = one;
-    halo.uv[4] = one; halo.uv[5] = zero; halo.uv[6] = one; halo.uv[7] = one;
-    core.uv[0] = zero; core.uv[1] = zero; core.uv[2] = zero; core.uv[3] = one;
-    core.uv[4] = one; core.uv[5] = zero; core.uv[6] = one; core.uv[7] = one;
+    halo.uv[0] = 0; halo.uv[1] = 0; halo.uv[2] = 0; halo.uv[3] = 1;
+    halo.uv[4] = 1; halo.uv[5] = 0; halo.uv[6] = 1; halo.uv[7] = 1;
+    core.uv[0] = 0; core.uv[1] = 0; core.uv[2] = 0; core.uv[3] = 1;
+    core.uv[4] = 1; core.uv[5] = 0; core.uv[6] = 1; core.uv[7] = 1;
     func_00282CF0(&eye, points, D_L10_001B9680);
     func_00282CF0(&tangent, points + 1, points);
     func_00282DD8(&normal, &tangent, &eye);
     initialLength = func_00282DF0(&normal);
-    if (initialLength != zero) initialLength = one / initialLength;
+    if (initialLength != 0) initialLength = 1.0f / initialLength;
     func_00282D30(&normal, &normal, coreWidth * initialLength);
     func_00282CC0(&core.vertex[0], points, &normal);
     func_00282CF0(&core.vertex[1], points, &normal);
     for (i = 1; i < count - 1; i++) {
+        /* The core loop declares its own zero constant, as in func_L00_003D37E8. */
+        float coreZero = 0.0f;
+
         func_00282CF0(&eye, points + i, D_L10_001B9680);
         func_00282CF0(&tangent, points + i + 1, points + i);
         func_00282DD8(&normal, &tangent, &eye);
         length = func_00282DF0(&normal);
-        if (length != zero) length = one / length;
+        if (length != coreZero) length = 1.0f / length;
         func_00282D30(&normal, &normal, coreWidth * length);
         func_00282CC0(&core.vertex[2], points + i, &normal);
         func_00282CF0(&core.vertex[3], points + i, &normal);
         if (i == 1) { core.color[1] = innerColor; core.color[0] = innerColor; }
+        /* Retail compares with the loop bound itself, so this variant never sets the end colours. */
         else if (i == count - 1) { core.color[3] = innerColor; core.color[2] = innerColor; }
         else if (i == 2) { core.color[1] = coreColor; core.color[0] = coreColor; }
         func_00280B90(&core, 0, 0);

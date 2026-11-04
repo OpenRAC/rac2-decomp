@@ -196,6 +196,7 @@
 #define InitializeHero                   func_L00_002A4928
 #define floor                            func_00117650
 #define MorphorayUpdate                  func_L00_00405808
+#define RenderLocalizedUiEntryList       func_002D6230
 
 /* descriptive */
 #define QueueMobyImpact                  func_002A8E20
@@ -865,6 +866,7 @@
 #define UpdateObjectPreviewSequence      func_002FF450
 #define __ieee754_fmod                   func_00117848
 #define InitPathMotion                   func_L00_004291A0
+#define draw_large_text_edge_faded       func_002F97A0
 #define DrawTaperedTwoLayerRibbon        func_L00_003BCF88
 #define UpdateSteeringInput              func_L05_00442A58
 #define WalkPathPickNext                 func_L22_003A2E50
@@ -886,5 +888,12 @@
 #define UpdateShipWeapons                func_L05_00443D08
 #define UpdateRaceSelectionMenu          func_L04_0040BA68
 #define L18_DisableModeGroups            func_L18_003FA180
+#define UpdateBeamLinkStrips             func_L09_003FB9F8
+#define FollowWaypointPath               func_L23_004186D0
+#define DestroyCrate                     func_003120C8
+#define DrawHrugisRibbon                 func_L10_0039DA48
+#define UpdateMenuChoiceListWidgets      func_003489E8
+#define UpdateHeroHeldObject             func_L00_002D5940
+#define UpdateItemPurchaseConfirmation   func_L00_00373F48
 
 #endif /* NAMES_H */

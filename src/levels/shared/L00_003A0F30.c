@@ -245,8 +245,6 @@ void func_L00_003A41F0(char *moby)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003A48D0);
-
 
 /* Runs one helper over the object and a stack buffer, then builds a second call from the object's field 104 sub-object - its field 24 as a float, the constants 2.0f/5.0f/0.6f and a bound data address - and stores the object into field 184 of the returned pointer when it is non-null. */
 void func_L00_003A5370(int a0)

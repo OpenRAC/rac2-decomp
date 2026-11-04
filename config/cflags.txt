@@ -3169,3 +3169,13 @@ src/levels/01_oozla/L01_003BB9D0-debris-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/03_endako/L03_0041CA78-g8.c	-O2 -G8 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
 src/levels/07_siberius/L07_00389EB8-trail-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/levels/02_maktar_nebula/L02_003E91F0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/levels/07_siberius/L07_003F4578-beam-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/09_dobbo/L09_003FB9F8.c	-O2 -G0 -ffunction-sections -g
+src/levels/23_damosel_orbit/L23_0042A018-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/game/002D5E98-render-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/game/0030F7B0-death-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/levels/shared/L10_0037D200-ribbon.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
+src/game/00345358-list-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels -frac2-gcse-unsplit-edges -fmove-all-movables
+src/levels/shared/L00_00384678-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-qcopy -frac2-qcopy-barrier -g -frac2-gcse-unsplit-edges
+src/levels/shared/L00_00373F48-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
+src/levels/shared/L00_003A0F30-lock.c	-O2 -G0 -ffunction-sections -g

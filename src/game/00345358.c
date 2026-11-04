@@ -419,8 +419,7 @@ void func_00348640(char *a0, int a1, int *a2)
 
 /* func_003486A8 is built from 00345358-children.c. */
 
-
-INCLUDE_ASM("asm/game", func_003489E8);
+/* func_003489E8 is built from 00345358-list-g8.c. */
 
 INCLUDE_ASM("asm/game", func_00348EC0);
 

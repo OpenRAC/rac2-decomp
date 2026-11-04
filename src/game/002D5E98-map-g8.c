@@ -1,51 +1,6 @@
-/* GPT-6.1 Sol (high), USA v1.01, game compiler -O2 -G8 -ffunction-sections.
- * Best check.py: 1708/1708 bytes, 0 of 28 places match.
- * Based on current RAC1 src/game/pause.c DrawMapScreen (Lombyte/OpenRAC,
- * GPL-3.0) and RaC2 retail. This is not a semantically validated native port.
- * All required declarations follow; compile this as a separate -g8.c unit.
- *
- * Measured improvements over the earlier 1648-byte draft:
- * - Real map/menu/header/disc structures replace the raw offset macros.
- * - Rejected warp requests return 1, not the back-button result.
- * - The visited-bitset is D_00139768, not the earlier draft's D_00149768.
- * - Disc request branches retain a pointer to the selected size word and
- *   share the read call. A distinct texture-base local fixes its lifetime.
- *
- * Remaining: the close/invalid-warp branches merge into the final return
- * rather than retail's backward branch to the earlier return-1 block;
- * menu/map bases, warp-save stores and streaming arguments allocate or
- * schedule differently. The first rejection is the saved register at +4.
- * The warp_map symbol is an alias of the same map state, expressing the
- * measured second selection read at retail 0x002D7060; it still gets a
- * different base lifetime from retail. Replacing that view with the ordinary
- * field folds the second signed guard and reload away.
- *
- * Negative trials: -g and the existing -frac2-keep-block-order profile do
- * not repair this body; pointer-typing the buffers is instruction-neutral.
- * Next: reconstruct the original warp helper/control-flow source boundary
- * and the streaming call's live argument/size-pointer arrangement. Avoid
- * repeating store-order changes or raw-offset rewrites without new evidence.
- *
- * Claude Opus 5.5 (xhigh), task v2091, body above left unchanged (still the
- * closest by size). Two measured findings for the next attempt:
- * - Put a label (close_map) on the first `return 1` inside the 0xD00/locked
- *   test and make the invalid-warp tests and the warp's final return
- *   `goto close_map`. That gives retail's backward branches into that block:
- *   if the warp keeps its own `return 1`, jump2 cross-jumps the labelled
- *   block away. On its own this is 1716 bytes.
- * - Drop warp_map. Use `MapState *warp = &D_001C4FA0;` assigned after the
- *   prev computation, and write that as
- *   `if (D_001C4FA0.level) { prev = D_001C4FA0.level; if (prev == 24)
- *   prev = 0; } else prev = 21;`. This gives retail's CSE boundary at the
- *   join: a fresh fp+0x4FA0 warp base in s1, a reload of level, and
- *   D_001F2840 rebuilt into s0 after the bitset test. But reorg then fills
- *   the beqz slot with the move. Retail has `beqz a1,J [li s2,21]; move
- *   s2,a1; xori; movz`, so jump.c's "if {x=a; goto l} x=b" hoist of
- *   prev = 21 must happen only in jump2. With `if (!level) prev = 21; else`
- *   the post-cse1 jump hoists it already, and cse2 then skips around the
- *   join and shares the bases. A ternary or a separate local in the else arm
- *   gives movn. 1720 bytes.
- */
+#include "include_asm.h"
+#include "common.h"
+
 typedef struct {
     char reserved[0xE0];
     int back;
@@ -106,7 +61,6 @@ typedef struct {
 } MapDisc;
 extern MapMenu D_001F2840;
 extern MapState D_001C4FA0;
-extern MapState warp_map __asm__("D_001C4FA0");
 extern MapRead D_001A63A8;
 extern MapDisc D_0014B540;
 extern int D_00138180[];
@@ -135,13 +89,12 @@ extern int func_002956E8(void), func_002958B8(void);
 extern void func_002EEED0(int, void *, int, int, int);
 extern int func_002B7B18(int, int, int);
 
-int func_002D6F38(void)
+int func_002D6F38(int arg)
 {
     int prev, idx, id, slot, n, buf, pick, next, k;
     MapHeader *hdr;
     char *pix, *pal, *base, *a, *tex, *b, *c;
-    int *size;
-    int sector, origin, read_buffer, sectors, mask;
+    int mapped;
     char *tbase;
 
     func_00295D00();
@@ -166,32 +119,31 @@ back_done:
         if (D_00138180[0x1C4 / 4] & 0x40)
             D_001F2840.next = (int)D_0025A498;
         if ((D_00138180[0x1C4 / 4] & 0x20) && D_001C4FA0.level >= 0 && !D_001F2840.pending) {
-            MapState *warp = &warp_map;
-            if (!D_001C4FA0.level)
-                prev = 21;
-            else {
-                prev = D_001C4FA0.level;
-                if (prev == 24) prev = 0;
+            if (D_001C4FA0.level == 0)
+                mapped = 21;
+            else if (D_001C4FA0.level == 24)
+                mapped = 0;
+            else
+                mapped = D_001C4FA0.level;
+            if (D_001C4FA0.level < 0) goto close_map;
+            {
+                unsigned int word = (unsigned)D_001C4FA0.level >> 2;
+                int bit = 1 << (D_001C4FA0.level & 0x1F);
+                if (!(D_00139768[word] & bit)) goto close_map;
             }
-            if (warp->level < 0) goto close_map;
-            mask = D_00139768[(unsigned)warp->level >> 2] & (1 << (warp->level & 31));
-            if (mask == 0) goto close_map;
             D_001A72D4 = D_001F2840.mode;
             func_002C9E60(0);
             {
-                int warp_level = warp->level;
                 int saved_mode = D_001A7478;
-                MapPage *saved_page = D_001F2840.current;
-                int saved_state = D_001F2840.state;
+                D_001F2840.saved_page = D_001F2840.current;
+                D_001F2840.saved_state = D_001F2840.state;
+                D_001F2840.warp = D_001C4FA0.level;
                 D_001F2840.saved_mode = saved_mode;
-                D_001F2840.saved_page = saved_page;
-                D_001F2840.saved_state = saved_state;
-                D_001F2840.warp = warp_level;
             }
             D_001A7478_sda = 2;
-            func_00288AA0(D_001BAD40, prev);
+            func_00288AA0(D_001BAD40, mapped);
             func_00288BE8(D_001BAD40);
-            return 1;
+            goto close_map;
         }
         idx = func_00295A10(D_001C4FA0.level);
         if (idx >= 0) {
@@ -267,22 +219,28 @@ back_done:
                     D_001C4FA0.sizes[pick] = D_001C4FA0.source_size;
                 } else {
                     if (next & 256) {
+                        int *size;
+                        int sector, origin, read_buffer, sectors;
+                        origin = D_0014B540.base;
                         sector = D_0014B540.alt_maps[next ^ 256].offset;
                         size = &D_0014B540.alt_maps[next ^ 256].size;
-                        origin = D_0014B540.base;
                         read_buffer = D_001C4FA0.slots[pick];
                         sectors = *size;
+                        func_002B7B18(read_buffer, sector + origin, sectors);
+                        D_001C4FA0.sizes[pick] = (*size << 11) >> 4;
                     } else {
+                        int *size;
+                        int sector, origin, read_buffer, sectors;
+                        origin = D_0014B540.base;
                         sector = D_0014B540.maps[next].offset;
                         size = &D_0014B540.maps[next].size;
-                        origin = D_0014B540.base;
                         read_buffer = D_001C4FA0.slots[pick];
                         sectors = *size;
+                        func_002B7B18(read_buffer, sector + origin, sectors);
+                        D_001C4FA0.sizes[pick] = (*size << 11) >> 4;
                     }
-                    func_002B7B18(read_buffer, origin + sector, sectors);
-                    D_001C4FA0.sizes[pick] = (*size << 11) >> 4;
+                    D_001F2840.pending = 1;
                 }
-                D_001F2840.pending = 1;
                 D_001C4FA0.ids[pick] = next | 0x1000;
                 D_001C4FA0.selected = pick;
             }

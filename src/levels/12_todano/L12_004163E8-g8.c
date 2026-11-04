@@ -1,34 +1,3 @@
-/* 4 November 2026: two new typed EE call interleavings place self/mask
- * after the first or second FP argument while preserving all four GPR
- * and four FP values, widths and bank orders. Both complete USA checker
- * listings are identical to the retained baseline: 1044/1044 bytes,
- * 0/1 places, first +0x24C. This is a three-wording tie; the original
- * declaration and C are retained. No alternate-release compile is claimed.
- */
-/* Claude Opus 5.5 xhigh, task v2228, 3 November 2026: retained near miss, not linked.
- * Build as a dedicated -G8 unit (src/levels/12_todano/L12_004163E8-g8.c, which gets
- * -O2 -G8 -ffunction-sections by name) and replace the INCLUDE_ASM marker in
- * L12_004149B8.c with a pointer comment.
- * USA: 1044/1044 bytes, 0/1 places; 2 instructions differ, first +0x24C (0x416634):
- * the effect call sets a1 = 0x3F before a0 = self, but retail sets a0 first.
- * Cause (from -fsched-verbose-5): with `base` declared before the if, its actorTable load
- * into $a1 stays in the effect-call block. In sched2 that load is an extra output dependent
- * of `$a1 = 63`, which ranks that insn above `$a0 = $s2`.
- * Retail fills the beq delay slot with the base load ($a1), keeps base untied, and ties
- * the reloaded index to the sum: addu $a0,$a1,$a0.
- * Tried:
- *   - Moving base inside the if fixes the argument order, but base becomes block-local.
- *     Pointer arithmetic puts ptr first in the PLUS, so the sum ties to base ($a0) and the
- *     index goes to $v1: 6 diffs.
- *   - Operand order `(s1->f0 << 8) + base` vs `base + ...` gives identical bytes.
- *   - An unused label before the release call does not split the block: still 6 diffs.
- *   - The real func_002B0A68 prototype order (self, mask, vec, u8, f0..f3) gives 14 diffs.
- * Fixed versus the sol-high draft: case 0 reads the packed counter as a scalar
- * `bits = D_0019B4A8[((s16)f >> 1) + (D_001A79F0 << 10)]`, and each terminal arm uses a
- * block-local `u8 *cell`. Together these remove the 8 case-0 address-register diffs.
- * Reopen with a construct that keeps base live across blocks (global) while its load
- * sits in the if body.
- */
 #include "common.h"
 
 extern s32 func_L12_0041E8E8(u8 *);
@@ -45,7 +14,6 @@ extern void func_002B0A68(f32, f32, f32, f32, char *, s32, f32 *, u8);
 extern int D_001A79F0 __attribute__((sda));
 extern u8 *D_L12_001B2E9C MACRO_ADDR;
 extern u8 *D_L12_001B2E9C;
-#define actorTable D_L12_001B2E9C
 extern int D_L12_001B18F0 __attribute__((sda));
 
 /* level 12 data reached absolutely: out of the $gp window */
@@ -106,7 +74,7 @@ void func_L12_004163E8(Actor *self)
     }
     case 1:
         if (s1->f0 != -1) {
-            if (func_L12_0041E8E8(actorTable + (s1->f0 << 8)) == 0)
+            if (func_L12_0041E8E8(D_L12_001B2E9C + (s1->f0 << 8)) == 0)
                 return;
         }
         self->f20 = 2;
@@ -119,7 +87,7 @@ void func_L12_004163E8(Actor *self)
         self->f18 = self->f18 + s1->f4;
         index = s1->f0;
         if (index != -1) {
-            u8 *base = actorTable;
+            u8 *base = D_L12_001B2E9C;
             ((Actor *)base)[index].f18 += s1->f4;
         }
         if (s1->f8 + 8.0f < self->f18)
@@ -138,7 +106,6 @@ void func_L12_004163E8(Actor *self)
         u16 f;
 
         if (func_00282948(&s1->fC) != 0) {
-        {
             u8 *t = (u8 *)D_L12_001B2E9C + (s1->f0 << 8);
             f32 local[4];
 
@@ -149,19 +116,10 @@ void func_L12_004163E8(Actor *self)
             func_L12_0041E8F8(t);
             func_00282F20(local, self->fC0, -0.10000000894069672f);
             func_002B0A68(3.0f, 6.0f, 3.0f, 6.0f, (char *)self, 0x3F, local, 0xFF);
-            {
-                s32 index = s1->f0;
-                u8 *base = actorTable;
-                if (index != -1) {
-                    Actor *child;
-                    index <<= 8;
-                    index += (s32)base;
-                    child = (Actor *)index;
-                    child->f34 &= 0xEFFF;
-                    func_0029F338(base + (s1->f0 << 8));
-                }
+            if (s1->f0 != -1) {
+                ((Actor *)D_L12_001B2E9C)[s1->f0].f34 &= 0xEFFF;
+                func_0029F338(D_L12_001B2E9C + (s1->f0 << 8));
             }
-        }
         f = self->fB2;
         if (f & 1) {
             u8 *cell = D_0019B4A8 + (((s16)f >> 1) + (D_001A79F0 << 10));
@@ -176,7 +134,7 @@ Destroy:
         func_0029F338(self);
         } else if (s1->fC == D_L12_001B18F0 / 2) {
             if (s1->f0 != -1)
-                ((Actor *)actorTable)[s1->f0].f20 = 4;
+                ((Actor *)D_L12_001B2E9C)[s1->f0].f20 = 4;
         }
         return;
 

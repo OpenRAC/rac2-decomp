@@ -1,32 +1,3 @@
-/* 4 November 2026 actual-contract review; retained near miss, not linked.
- * USA v1.01 check.py: 2708/2708 bytes, 0/27 placements; first difference 0x1a4.
- * Profile: -O2 -G0 -ffunction-sections -g -frac2-hazard-labels.
- * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
- * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
- * repair leaves the retained allocation/scheduling residual unchanged.
- * Earlier measurements below are historical where superseded by this note.
- */
-/* 2 November 2026: retained nonmatching C; no linked matching credit.
- * Profile: -O2 -G0 -ffunction-sections -g -frac2-hazard-labels.
- * USA v1.01 check: 2708/2708 bytes, 0/27 placements.
- * Matched func_L00_002C42E0 returns signed int. Correcting its ignored result leaves 2708 bytes
- * and 0/27 placements, first mismatch +0x1A4. The pre-copy origin-address setup and shared-tail
- * scheduling remain; no fabricated dependency is added.
- */
-/* Near miss: unit of its own, -O2 -G0 -ffunction-sections -g -frac2-hazard-labels. us 0/27, 2708/2708 bytes,
- * 6 raw lines: one insn out of place. PAL has no such function. Measured 2026-11-01:
- * func_002829D8 returns int; declaring it void was the whole of the old +0x88 $v0/$v1 swap, so no pin is needed.
- * The label before the row loop is 8-aligned, so its nop came back with the size.
- * `o = &origin` set before the aim arm's qcopy gives retail's size and the cross-jump, with no always-true test.
- * Left: retail has `addiu s1, sp, 0x10` after the lq/sq and `lw a1`; here it stays above the qcopy. Set after
- * the qcopy, the size falls to 2700. qcopy_nc changes nothing, a TImode copy moves other rows.
- * 2026-11-01: set after the qcopy, sched2 gives retail's order (lw a1, addiu s1, const, a0), but jump2 merges the
- * arms from `daddu a0, s1` back to front and reorg then takes `addiu s1` over the two-word const into the `b` slot,
- * so the shared tail starts one insn early (2700). Retail keeps s1 in place and has a0 in the slot. Above the qcopy
- * the volatile asm stops reorg's scan, which is why that spelling gets the size. So either something stops the
- * scan in retail or a0 is not merged there; a shared `point` local in both arms keeps the order but stops the
- * cross-jump (2732). Not the arm order: sched2's a0 has priority 6 against the const's 7 here.
- */
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
@@ -88,7 +59,7 @@ extern MuzzleLight D_L00_001C6F40[];
 extern WeaponEntry D_00262570[];
 extern u8 D_00294880[];
 
-extern void func_L00_003A41F0(Moby *);
+extern void func_L00_003A41F0(void *);
 extern int func_002829D8(void *);
 extern int func_L00_002C42E0(int, int);
 extern void func_002A75E0(void *, int, int, int, int);
@@ -124,13 +95,11 @@ extern void func_00291450(int);
 /* Acquires a stable target, fires and drives the short muzzle light. */
 void func_L00_003A48D0(Moby *moby)
 {
-    Vector *o;
     TurretVars *vars = moby->vars;
     Vector direction, origin, aim, muzzle, offset, lift;
     float horizontal, vertical;
     Moby *candidate;
     int ready;
-    Vector *point;
 
     if (moby->state == 0) {
         moby->state = 1;
@@ -164,11 +133,9 @@ void func_L00_003A48D0(Moby *moby)
         else
             color = 0x600FFF0F;
         func_00273318(moby, 1.25f, color, 0, 0x27, 0.0f, -1, 90.0f, 4);
-        o = &origin;
         qcopy(&direction, &HERO->q[0x760 / 16]);
         func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(&origin, &HERO->q[0x80 / 16], o);
-        point = &origin;
+        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
     } else {
         vars->aiming = 0;
         horizontal = 0.3141593039f;
@@ -177,12 +144,10 @@ void func_L00_003A48D0(Moby *moby)
             func_00282D30(&direction, &moby->forward, -1.0f);
         else
             qcopy(&direction, &HERO->q[0x760 / 16]);
-        { Vector *o = &origin;
-        func_00282D30(o, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-        func_00282CC0(o, &HERO->q[0x80 / 16], o);
-        point = o; }
+        func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
+        func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
     }
-    candidate = func_L00_00324D18(point, &direction, horizontal, vertical, 75.0f, horizontal, horizontal, 1);
+    candidate = func_L00_00324D18(&origin, &direction, horizontal, vertical, 75.0f, horizontal, horizontal, 1);
 
     if (vars->target != 0) {
         float *hp = ((float *)func_002AB1F0(vars->target));

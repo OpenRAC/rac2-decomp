@@ -1,27 +1,20 @@
-/* Retained complete C reconstruction, 30 October 2026. NOT MATCHING.
- * Profile: -O2 -G8 -ffunction-sections.
- * us: 09_dobbo: instruction at +0x74 differs; us2: 09_dobbo: instruction at +0x74 differs; pal: ABSENT.
- * Measured state fields are represented by their true widths and offsets, and func_002B60B0 has
- * its real pointer result. Modern qcopy keeps all 16-byte transfers. The typed initializer is
- * retail-sized but differs first at +0x74; measured-order volatile fields grow it to 584 and
- * were reverted.
- * Reopen: Independent initializer source-order and FP argument lifetime witness.
- * Local placement checks only; no strict linked or native-runtime claim.
- */
+#include "include_asm.h"
 #include "common.h"
 
-typedef int Quadword __attribute__((mode(TI)));
+/* Its caller func_L09_003EAA18 is in L09_002B7238-g8.c; this unit of its own keeps that
+   call external, since PAL has func_L09_003EAA18 in C but not this function. */
+extern void func_002A7750(char *object, int a1, int a2);
 
+/* func_L09_003EA798: the four scaled inputs differ per level (ref_). */
 extern int func_00283CF0(float);
 extern void func_002B60B0(char *, float, float, float, float);
 extern float func_L09_0033E7A0(int);
 extern int func_L09_003EA2D0(char *, int, int);
-extern void func_002A7750(char *, int, int);
 extern unsigned int D_L09_001FE6C0[];
-extern float D_L09_001B0C00 __attribute__((sda));
-extern float D_L09_001B0C04 __attribute__((sda));
-extern float D_L09_001B0C08 __attribute__((sda));
-extern float D_L09_001B0C0C __attribute__((sda));
+extern float ref_L09_003EA798_00 __attribute__((sda));
+extern float ref_L09_003EA798_01 __attribute__((sda));
+extern float ref_L09_003EA798_02 __attribute__((sda));
+extern float ref_L09_003EA798_03 __attribute__((sda));
 
 typedef struct {
     char pad0[0x28];
@@ -83,28 +76,22 @@ typedef struct {
     int f380;
 } DobboMoverState;
 
-/* Initialises the state block of a new object: copies its position and heading into the
-   block, sets the tuning constants and starts the first animation. */
+/* Initialises a new object's state block: copies its position and the vector at 0xF0,
+   sets the tuning constants and, when it has a table entry, moves it there.
+   The store order is the one sched1 (stores ending a constant's life first) and sched2
+   (stores with more dependants first, 0x50 being the 34th memory reference) turn into
+   retail's sequence. */
 void func_L09_003EA798(char *object) {
     DobboMoverState *state = *(DobboMoverState **)(object + 0x68);
     char *pos = object + 0x10;
     int entry;
-    float ax;
-    float ay;
-    float az;
-    float aw;
 
     qcopy((char *)state + 0x330, pos);
     qcopy((char *)state + 0x340, object + 0xF0);
     state->f48 = func_00283CF0(25.0f);
     state->f4A = func_00283CF0(19.2f);
-    state->f1F2 = 4;
     state->f1EC = 4;
     state->f1EE = 4;
-    state->f1F3 = 8;
-    state->f1F6 = 1;
-    state->f28 = 3;
-    state->f2F = 2;
     state->f191 = 2;
     state->f192 = 2;
     state->f196 = 2;
@@ -112,16 +99,18 @@ void func_L09_003EA798(char *object) {
     state->f1ED = 8;
     state->f1EF = 8;
     state->f190 = 5;
-    ax = 0.00027777778f * D_L09_001B0C00;
-    ay = 0.016666668f * D_L09_001B0C04;
-    az = 4.8481374e-06f * D_L09_001B0C08;
-    aw = 0.00029088825f * D_L09_001B0C0C;
+    state->f1F2 = 4;
+    state->f1F3 = 8;
+    state->f1F6 = 1;
+    state->f28 = 3;
+    state->f2F = 2;
+    state->f1C8 = 5;
+    state->f1AC = 0.0013888889f;
+    state->f1A4 = 0.0025f;
     state->f1A8 = 0.0025f;
     state->f1B0 = 1.5f;
     state->f1BC = 0.4f;
     state->f30 = 1.0f;
-    state->f1C8 = 5;
-    state->f1AC = 0.0013888889f;
     state->f19C = 0;
     state->f1A0 = 0;
     state->f1B4 = 0;
@@ -131,10 +120,10 @@ void func_L09_003EA798(char *object) {
     state->f5C = 0;
     state->f7C = 0;
     state->f50 = 3.5f;
-    state->f60 = 3.1415927f;
-    state->f80 = 0.5235988f;
-    state->f1A4 = 0.0025f;
-    func_002B60B0(object, ax, ay, az, aw);
+    state->f60 = 3.141593f;
+    state->f80 = 0.52359885f;
+    func_002B60B0(object, ref_L09_003EA798_00 * 0.00027777778f, ref_L09_003EA798_01 * 0.016666668f,
+                  ref_L09_003EA798_02 * 4.8481374e-06f, ref_L09_003EA798_03 * 0.00029088825f);
     state->f354 = state->f374;
     func_L09_0033E7A0(state->f36C);
     func_L09_0033E7A0(state->f350);

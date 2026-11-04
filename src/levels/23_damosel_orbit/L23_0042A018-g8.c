@@ -1,22 +1,7 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
-/*
- * GPT-6.1 Sol high, 2026-10-29: USA v1.01, 1052/1052 bytes, 0/1 places.
- * Standalone L23_0042A018-g8.c, -O2 -G8 -ffunction-sections -g
- * -frac2-hazard-labels. Other releases were not checked this time.
- * 19 instruction rows remain: the alpha addition swaps its source registers at
- * +0x130; color allocation and outer-loop setup differ at +0x22C..+0x274.
- * qzero_nc fixes the matrix/state lifetime and argument-address regeneration;
- * the first three independent matrix rows use qcopy_nc, while the fourth uses
- * qcopy because its W component is overwritten. The grouped first ALPHA pair
- * fixes the load/shift schedule. -g plus hazard-labels fixes the division guard.
- * Explicit UV start pointers, 2D pointers and named U/V fields tie. Reversing
- * alpha addition changes its load/result registers; unsigned addition ties.
- * MACRO_ADDR on the UV table changes its hoisted base and worsens the loop.
- * Reopen with new color/loop lifetime evidence; retained packet/matrix extents
- * are unchanged. This is closer than the historical 25 October draft.
- * Required declarations follow below; no custom helper or volatile cast.
- */
 #include "common.h"
+
+/* func_L23_0042A018 is a unit of its own: it reads its globals through $gp (-G8) and needs
+ * -frac2-hazard-labels (see config/cflags.txt). */
 
 typedef int TI16 __attribute__((mode(TI)));
 
@@ -141,13 +126,16 @@ void func_L23_0042A018(u8 *moby) {
     u32 col;
     s64 reg;
     s64 tex;
+    float *uvy0;
+    float *uvx0;
 
     if (D_L23_001B1484_2 != 0) {
         vars = *(L23Spin **)(moby + 0x68);
         D_L23_001B39D0 = D_L23_001B1470 * 1.1f;
         vars->turn = func_00283B98(vars->turn, (float)D_L23_001B1480 * 0.00029088825f);
         f = func_00283198((float)(*(u16 *)(moby + 0x96) % D_L23_001B1474) * (1.0f / (float)D_L23_001B1474) * 3.1415927f);
-        vars->alpha = D_L23_001B147C + (s32)(f * D_L23_001B1478);
+        vars->alpha = (s32)(f * D_L23_001B1478);
+        vars->alpha += D_L23_001B147C;
         reg = D_L23_001B1BAC | ((s64)D_L23_001B1BB0 << 2);
         reg |= (s64)D_L23_001B1BB4 << 4;
         reg |= (s64)D_L23_001B1BB8 << 6;
@@ -158,8 +146,6 @@ void func_L23_0042A018(u8 *moby) {
         pkt.tail[1] = tex;
         pkt.tail[0] = 0;
         func_002FC560(0x47, 0x53001);
-        /* The first three rows are independent stack writes until the matrix calls.
-         * Row four keeps qcopy because C overwrites its w field immediately. */
         hero = D_L23_001B1484_2;
         qcopy_nc(&m[0], hero + 0xC0);
         qcopy_nc(&m[1], hero + 0xD0);
@@ -172,17 +158,22 @@ void func_L23_0042A018(u8 *moby) {
         func_00283738(m, m, rot);
         if (D_L23_001B3714 == 0) {
             col = (vars->alpha << 24) + (D_L23_001B1BC4 & 0xFFFFFF);
+            pkt.col[3] = col;
+            pkt.col[2] = col;
+            pkt.col[1] = col;
+            pkt.col[0] = col;
         } else {
             col = (vars->alpha << 24) + (D_L23_001B1BC8 & 0xFFFFFF);
+            pkt.col[3] = col;
+            pkt.col[2] = col;
+            pkt.col[1] = col;
+            pkt.col[0] = col;
         }
-        pkt.col[3] = col;
-        pkt.col[2] = col;
-        pkt.col[1] = col;
-        pkt.col[0] = col;
-        for (i = 0; i < 0x48; i++) {
-            L23Corner *e = D_L23_002A68D0[i];
-            float *uvy = &pkt.uv[0][1];
-            float *uvx = &pkt.uv[0][0];
+        for (i = 0, uvx0 = &pkt.uv[0][0], uvy0 = &pkt.uv[0][1]; i < 0x48; i++) {
+            L23Corner (*tab)[4] = D_L23_002A68D0;
+            L23Corner *e = tab[i];
+            float *uvy = uvy0;
+            float *uvx = uvx0;
             TI16 *pos = pkt.pos;
 
             for (k = 3; k >= 0; k--) {
