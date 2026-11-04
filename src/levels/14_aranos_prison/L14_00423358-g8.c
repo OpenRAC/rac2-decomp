@@ -4,7 +4,7 @@ extern int func_002B3868(void *);
 extern int func_002A77E0(int);
 extern void func_002A7470(void *, int, int, int);
 extern void func_002A7750(void *, int, int);
-extern void *func_002B60B0(void *, float, float, float, float);
+extern void func_002B60B0(void *, float, float, float, float);
 extern int func_L14_00423CD0(void *, void *, int, void *, int, float);
 extern void func_L14_00423DC0(void *, void *);
 extern int func_L14_00423E50(void *);

@@ -3,7 +3,7 @@
  * Profile: -O2 -G8 -ffunction-sections.
  * 1100/1120 bytes; 0x30 frame instead of 0x20, initialization constant scheduling and route-state branches differ.
  * Reopen with an actual enemy-variable layout and constant-local lifetime witness.
- * ABI/bounds: No local packet/vector undersizing. Current 002B60B0 returns void pointer, preserved. Runtime fields retain signed route indices, byte modes, halfword timers and float bit values.
+ * ABI/bounds: No local packet/vector undersizing. 002B60B0 is declared void, its real contract. Runtime fields retain signed route indices, byte modes, halfword timers and float bit values.
  * Local checks and release presence are recorded in the shared NMC index.
  * Semantic equivalence has not been validated by the functional gate.
  */
@@ -14,7 +14,7 @@ extern unsigned char D_L01_001B0900[] __attribute__((sda));
 extern int func_00283CF0(float);
 extern void func_L01_003377C8(void *);
 extern float func_002A78D8(float, float);
-extern void *func_002B60B0(void *, float, float, float, float);
+extern void func_002B60B0(void *, float, float, float, float);
 extern void func_002A7750(void *, int, int);
 extern int func_002A7820(int, int);
 extern void func_002A7470(void *, int, int, int);

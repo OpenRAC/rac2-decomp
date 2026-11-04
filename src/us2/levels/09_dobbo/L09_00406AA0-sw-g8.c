@@ -9,7 +9,7 @@ extern float D_L09_001B13F8_1[] __attribute__((sda));
 extern char D_L09_00189EA0[];
 extern void func_L09_00404E58(char *);
 extern int func_002B3890(char *);
-extern void *func_002B60B0(char *, float, float, float, float);
+extern void func_002B60B0(char *, float, float, float, float);
 extern int func_00282948(void *);
 extern int func_002A77E0(int);
 extern void func_002A7750(char *, int, int);

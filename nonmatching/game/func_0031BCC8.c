@@ -29,7 +29,7 @@ extern u8 *D_001B1B5C[] __attribute__((sda));
 extern s16 *D_001EE5A0[];
 extern s32 D_001B1B78 __attribute__((sda));
 extern float D_001AFAF8[] SDATA(D_001AFAF8);
-extern void *func_002B60B0(void *, float, float, float, float);
+extern void func_002B60B0(void *, float, float, float, float);
 extern void func_0029FCC0(void *, s32, void *);
 extern void func_0029FC20(void *, s32, void *);
 extern s32 func_002761F8(void *, void *, s32, void *, s32);

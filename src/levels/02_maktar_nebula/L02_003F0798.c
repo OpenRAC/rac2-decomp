@@ -28,7 +28,7 @@ extern void func_L02_003F16A8(char *);
 extern float func_00282E80(void *, void *);
 extern float func_00283C80(float, float);
 extern int func_002B3890(u8 *);
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern int func_002B5278(u8 *, float);
 extern int func_002B4FF0(char *, float *, float);
 extern int func_002B50E0(void *, void *, float);

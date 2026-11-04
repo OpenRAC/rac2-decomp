@@ -46,7 +46,7 @@ typedef struct { char unused[10]; s16 lifetime; char unused12[20]; ParticleAttri
 extern Particle *func_002BDCE8(void *,int,float,float,float,void *,unsigned,int,float);
 extern char *func_L11_004417E8(void *);
 extern void func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
-extern void *func_002B60B0(void *,float,float,float,float);
+extern void func_002B60B0(void *,float,float,float,float);
 extern void func_L11_00458C38(void *);
 typedef struct { char pad0[0x18]; char *hit; int count; float point[4]; float pad30[4]; float normal[4]; } Collision;
 extern Collision D_L11_001C0D00;

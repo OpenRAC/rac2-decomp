@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern void func_002A7750(char *, int, int);
 extern s32 func_PAL_002B3F18(char *, char *, char *);
 extern void func_002A0488(void *, u8, u8, u8);

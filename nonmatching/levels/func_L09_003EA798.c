@@ -13,7 +13,7 @@
 typedef int Quadword __attribute__((mode(TI)));
 
 extern int func_00283CF0(float);
-extern void *func_002B60B0(char *, float, float, float, float);
+extern void func_002B60B0(char *, float, float, float, float);
 extern float func_L09_0033E7A0(int);
 extern int func_L09_003EA2D0(char *, int, int);
 extern void func_002A7750(char *, int, int);

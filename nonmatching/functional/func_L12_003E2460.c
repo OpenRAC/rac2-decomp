@@ -82,7 +82,7 @@ extern int func_002AEB60(void *, float);
 extern int func_002B1C20(void *, void *);
 extern int func_002B3868(void *);
 extern int func_002B3890(void *);
-extern void * func_002B60B0(void *, float, float, float, float);
+extern void func_002B60B0(void *, float, float, float, float);
 extern void * func_002C2210(float *, int, int, int, int, float *, int, float, float, float);
 extern int func_002E5CF8(int, int, void *);
 extern void * func_0032C700(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);

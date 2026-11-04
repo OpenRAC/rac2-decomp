@@ -2,8 +2,8 @@
 /* Retained complete C reconstruction, 30 October 2026. NOT MATCHING.
  * Profile: -O2 -G8 -ffunction-sections.
  * us: 09_dobbo: instruction at +0x74 differs; us2: 09_dobbo: instruction at +0x74 differs; pal: ABSENT.
- * Measured state fields are represented by their true widths and offsets, and func_002B60B0 has
- * its real pointer result. Modern qcopy keeps all 16-byte transfers. The typed initializer is
+ * Measured state fields are represented by their true widths and offsets, and func_002B60B0 is
+ * declared void, its real contract. Modern qcopy keeps all 16-byte transfers. The typed initializer is
  * retail-sized but differs first at +0x74; measured-order volatile fields grow it to 584 and
  * were reverted.
  * Reopen: Independent initializer source-order and FP argument lifetime witness.
@@ -14,7 +14,7 @@
 typedef int Quadword __attribute__((mode(TI)));
 
 extern int func_00283CF0(float);
-extern void *func_002B60B0(char *, float, float, float, float);
+extern void func_002B60B0(char *, float, float, float, float);
 extern float func_L09_0033E7A0(int);
 extern int func_L09_003EA2D0(char *, int, int);
 extern void func_002A7750(char *, int, int);

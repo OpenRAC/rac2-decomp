@@ -34,6 +34,37 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### `func_002B60B0` returns nothing
+
+**4 November 2026, local match (pending PR).** `func_002B60B0` (the motion-parameter
+setter) is `void`. Its definition matches all 23 USA v1.01 places as `void` with the
+stores grouped by parameter (`x` at 0x20/0x24, `y` 0x28, `z` 0x14/0x18, `w` 0x1C); the
+compiled `.text` is byte-identical to the old `void *` form, whose only evidence was the
+pointer left in `$v0` at return. A scan of all 505 retail calls in the 26 USA programs
+that carry it finds no path that reads `$v0` before overwriting it. Every `void *`
+caller declaration in `src/` (35 files, all releases) now says `void`; each file's
+compiled object is unchanged. As with `func_002AE730`
+([prototypes](COMPILER-NOTES.md#prototypes-lifetimes-and-varargs)), definition and
+callers were corrected together.
+
+With the true contract `func_L11_00420C88` matches (1/1, 15,832 bytes) in
+`src/levels/11_joba/L11_00420C88-state-g8.c`. Its last 18 rows (cases 14, 15, 22) came
+from the false return: sched1 puts the index `lw` (priority 8, load latency 2) before
+the table `lui` (7) after the call, and with a value-returning call local-alloc's
+`fake_birth` for the index meets the call's `REG_UNUSED` `$v0`, so index and base swap
+`$v0`/`$v1`. Earlier, 24 matched callers in 11 levels (Joba's `func_L11_00424A60`
+among them) matched only when they declared the helper `void`.
+
+History, 3-4 November, kept as measured constraints: each of the three blocks has two
+local quantities (the three-quantity sort below is not involved); disabling fake
+lifetimes gives 15,824 bytes, `-Os` 15,872, `-fno-schedule-insns` 15,820 (with the three
+sites correct); a private cc1 ignoring every unused call `$v0` breaks 19 other rows and
+`func_00339F28`. Path/index/object/table locals, `*(index + table)`, inline helpers,
+comma expressions and FP/pointer parameter interleavings all tied at 18 or regressed.
+Retail has no branch into the three call sequences. The scheduler dumps (`-dS`/`-dR`)
+abort under `_FORTIFY_SOURCE`; a private `haifa-sched.o` built with `-U_FORTIFY_SOURCE`
+gives identical output and readable `-fsched-verbose-5` priorities.
+
 ### Three-quantity local allocation
 
 **1 November 2026, retained near miss.** `block_alloc` sorts two or three quantities by hand:
@@ -1323,7 +1354,7 @@ pass. These repairs add no decompiled-byte credit.
 
 Eight further existing interfaces pass 104 carrying placements without
 new byte credit. The two `func_002B60B0` callers retain the object plus four
-float inputs and the real pointer return; `func_L00_00323F28` explicitly
+float inputs (their pointer return was withdrawn on 4 November: the helper is `void`); `func_L00_00323F28` explicitly
 forwards three floats. `func_L03_00419BD8` and `func_L03_00419B10` propagate
 the query result, point pointers, optional output pointers and floating
 inputs. The Aranos emitter preserves its caller-provided unused F12 slot,
@@ -3150,8 +3181,8 @@ loop gives eight, a single-case member dispatch ties at six, and capturing the
 offset during its real zeroing gives 93. The retained four-slot candidate is still
 best. For `func_L11_00420C88`, grouping configuration/path setup in an inline
 helper, representing each table entry as a pointer field, and using unsigned
-path indices all reproduce the existing 15,832-byte, 18-slot result. Both real
-callee return contracts were preserved. No new C match or native qualification;
+path indices all reproduce the existing 15,832-byte, 18-slot result. (Superseded
+4 November: `func_002B60B0` returns nothing, and the function now matches.) No new C match or native qualification;
 reopen with a measured scheduler/allocator input beyond these tied forms.
 
 | Spill-slot order, `func_L00_003E5BD8` | **Open, 1 November** | 1108/1108, only 19 stack offsets differ. A private cc1 overriding `expr_hash_table_size` shows the slots follow gcse's bucket order: 133 buckets gives 7 rows, no odd size from 101 to 501 gives 0, and declaration order has no effect. Three pseudos remain rotated, so retail differs in more than the table size. |
@@ -3684,6 +3715,8 @@ discard, the truthful all-four-FP-first argument view, an explicit SDATA alias a
 `-fno-force-mem` tie; `-fno-schedule-insns` worsens the result. Its marker is
 restored. Reopen with evidence for the post-call halfword value lifetime; a false
 helper return type is not an acceptable match.
+(Superseded 4 November: `func_002B60B0` is `void`; see
+[its entry](#func_002b60b0-returns-nothing). The `void` declaration is its real contract.)
 
 **Update, 29 October 2026 (pending review):** matched by the tiered-wave series; `func_L11_00456938` is C in `src/levels/11_joba/L11_00453358-retreat-g8.c` (`-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g`), placed at 1 US, 1 PAL, 1 US2 places; `func_L18_00428138` is C in `src/levels/shared/L18_00428138-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 3 US, 3 US2 places (PAL catalogue has no function of this name). The measurements above are kept as history.
 
@@ -3924,7 +3957,7 @@ the implementations remain in `nonmatching/levels/` with their production marker
 | Function | Current / retail bytes | Coverage and remaining obstruction |
 | --- | ---: | --- |
 | `func_L22_0039D708` | 15,528 / 16,068 | USA v1.01, 0/2. Reconstructed conversions, canonical collision/animation calls and shared scratch storage; branch tails and allocation remain, with further semantic review needed. |
-| `func_L11_00420C88` | 15,772 / 15,832 | USA v1.01, 0/1. Projectile paths and selector ordering are closer; shared tails, early-return position and allocation remain. |
+| `func_L11_00420C88` | 15,832 / 15,832 | Matched 4 November (USA v1.01, 1/1) once `func_002B60B0` was declared `void`; see [its entry](#func_002b60b0-returns-nothing). |
 | `func_L00_00300618` | 11,280 / 11,348 | USA v1.01, 0/27. Section-8 copy loop resolved locally; absolute macro stores, spills and group loops remain. |
 | `func_L00_003AE900` | 8,432 / 8,440 | USA v1.01 and v2.00, 0/27 each. Template loops resolved locally; saved FPR count, held-pose matrix pointers and spray-colour constants remain. |
 | `func_L08_003CDF98` | 6,632 / 6,736 | USA v1.01, 0/3. Voice-field widths and diagnostic argument corrected; per-case bases, float expression order and allocation remain. |

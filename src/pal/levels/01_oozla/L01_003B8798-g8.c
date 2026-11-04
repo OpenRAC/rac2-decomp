@@ -15,7 +15,7 @@ extern float D_L01_001AFDD0 __attribute__((sda));
 extern float func_PAL_L01_003BEB40(void);
 extern int func_00283CF0(float);
 extern int func_002A7820(int,int);
-extern void *func_002B60B0(u8 *,float,float,float,float);
+extern void func_002B60B0(u8 *,float,float,float,float);
 extern float func_L01_003377C8(unsigned char *);
 extern void func_002A7750(void *,int,int);
 extern void func_PAL_002A7E68(void *,int,int,int);

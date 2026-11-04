@@ -8,7 +8,7 @@ extern float D_L20_001B2138 __attribute__((sda));
 extern float D_L20_001B2128 __attribute__((sda));
 
 
-extern void *func_002B60B0(unsigned char *, float, float, float, float);
+extern void func_002B60B0(unsigned char *, float, float, float, float);
 extern float func_002A89A8(void *, int, float);
 extern float func_00282C10(float);
 

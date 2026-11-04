@@ -14,7 +14,7 @@ extern float func_00282E48(void *, void *), func_00282E80(void *, void *), func_
 extern void func_002A93B0(char *), func_002A7750(u8 *, int, int), func_PAL_002A7E68(char *, int, int, int);
 extern int func_002B3868(u8 *), func_002B38B8(u8 *), func_002A77E0(int), func_L01_00322288(int, float);
 extern int func_L02_0032E508(void *, int, void *, int), func_L02_0032EDD8(void *, void *, int, int *), func_PAL_L02_003CECB0(char *, int), func_002ACBC8(void *, int), func_00277258(void *, int, float, void *);
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern void func_L02_003CAE68(char *, void *), func_PAL_L02_003CEF50(char *);
 extern void func_PAL_L01_0031C9C0(char *, void *, float, float, float, int);
 extern void func_00282CC0(void *, void *, void *), func_00282C88(Quad *), func_00282F70(void *, void *, float), func_00282F20(void *, void *, float), func_00283028(void *, void *, void *), func_00282D30(void *, void *, float);

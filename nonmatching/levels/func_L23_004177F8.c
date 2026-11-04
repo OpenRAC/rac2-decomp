@@ -39,6 +39,9 @@
  * extern const bounds (hoists the tail's D_27A0 load); func_002B60B0 returning int (moves
  * sw 0x88 into the call's delay slot); dead default stores to raise 1.5708's refs (not
  * compiled: by the priority figures it would land in $f0).
+ * 4 November 2026: with func_002B60B0 declared void (its real contract) this draft is
+ * 2 rows; as void * it was 4. All 24 orders of the f5C/f60/flags88/f80 stores: best 2
+ * (four orders), none exact.
  * Release checks for us2/pal were not run. Required declarations follow.
  */
 

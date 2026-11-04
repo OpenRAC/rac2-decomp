@@ -6,7 +6,7 @@ typedef unsigned int u32;
 typedef signed short s16;
 extern void func_002A7750();
 extern void func_002A0488(void *, void *, void *, void *);
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern u8 D_001A7BCB __attribute__((sda));

@@ -69,7 +69,7 @@ extern int func_002B50E0(char *, int, float), func_002B4FF0(char *, float *, flo
 extern void func_002B5258(char *), func_002B5278(u8 *, float), func_0029F978(u8 *, u32, u8 *), func_00282A60(char *, int, int), func_002A7A00(float *, float, float);
 extern unsigned long func_002B1C20(void *, void *);
 extern void func_002B0A68(char *, int, int, float, float, float, float, u8), func_L01_003E9CF8(char *, int, void (*)(char *));
-extern void *func_002B60B0(u8 *, float, float, float, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
 /* Runs the armed enemy's target selection and combat animation state machines. */
 void func_L02_003D0408(char *self) {
     Vector target, scratch;
