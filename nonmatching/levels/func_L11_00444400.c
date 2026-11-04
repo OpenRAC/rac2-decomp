@@ -1,3 +1,18 @@
+/* 5 November 2026, third pass (retained body unchanged, 4640/4684 bytes). Measured:
+ * - This compiler's pass order after reload is flow2 -> sched2 -> jump2 (cross-jumping, jumps to
+ *   the next insn) -> dbr. Retail's boundary before each call's argument setup is therefore a
+ *   basic-block boundary that exists at sched2 and is gone by jump2 or dbr, without leaving a test.
+ * - `if (D_L11_001B3E00 == 1)` around the box call with identical arms (D_L11_001B3E00 being the
+ *   word before the scale, as the mode word D_L02_001B3E00 is in level 2) does give the boundary:
+ *   all three chains finish before the argument loads. But the arms are not merged, so the
+ *   function grows to 5144 bytes.
+ * - An inline `hud_scaled(float v)` returning (int)(v * D_L11_001B3E04 + 0.5f) gives retail's
+ *   chain shape (lwc1/cvt.s.w, value $f0, scale $f1); with the twin's dead `if (mode == 1)` arm
+ *   it also gives retail's full save set ($s3, $s4, $s6, $s7 saved), as func_L02_003FF6E8's note
+ *   explains, but no boundary (the test goes at flow2).
+ * - Negative: sched1 on (4644 bytes), no sched2 (retail does schedule: data and 0.5 move),
+ *   volatile layout globals (lw/mtc1 loads).
+ */
 /* 5 November 2026: retained body unchanged (4640/4684 bytes). New negative: the boxes as a
  * `static __inline__` helper taking the rounded coordinates as arguments (so they are
  * evaluated before the inlined call) do not make retail's boundary; sched2 then interleaves
