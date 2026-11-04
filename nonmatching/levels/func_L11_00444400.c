@@ -1,6 +1,6 @@
 /* 5 November 2026, two-agent pass:
- * - Boundary: with the F2I conversion macro of func_L02_003FE768 (a non-empty do-while(0), not
- *   landable pending the maintainers' ruling) on the box x/y/h and the label y, every call's
+ * - Boundary: with func_L02_003FE768's one-pass conversion groups (allowed by COMPILER-NOTES'
+ *   source methods; that function now matches) on the box x/y/h and the label y, every call's
  *   argument setup follows its chains as in retail: 4692/4684 bytes, 458 instructions aligned.
  * - Left, all register allocation: 0.5 in $f22 (the label -1/0 constants are block-local and
  *   local-alloc takes $f20/$f21 first; retail's are global, so a block boundary existed there
