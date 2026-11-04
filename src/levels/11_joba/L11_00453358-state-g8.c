@@ -1,42 +1,11 @@
-/* func_L11_00453358 (4,524 B, 1 place), 5 November 2026: retained near miss, not linked.
- * USA v1.01 tools/check.py: 4524/4524 bytes, 1131/1131 instructions, 0/1 places. Every
- * instruction and register equals retail except the four spilled pointers' stack slots
- * (pos 0x8C, pv+0x1B0 0x84, self+0xC0 0x88, self+0xF0 0x90; retail 0x84, 0x90, 0x88, 0x8C).
- * Profile: own unit src/levels/11_joba/L11_00453358-state-g8.c, -O2 -G8 -ffunction-sections.
- * This file is that complete unit: the declarations follow the callees' existing contracts
- * in the Joba and Maktar units. Removing the draft's ten dead initializers (d, lim, t, rot,
- * path, p, s, n, dist) leaves every instruction unchanged.
- *
- * Case 9: `height = 0.0f;` (height = case 8's ground height) is the construct the matched twin
- * func_L02_0040BE08 uses in its case 9. Without it, jump2's find_cross_jump merges case 9's
- * func_002A7750(self, 11, -1) tail into case 13's identical (14, -1) tail (-8 bytes); retail
- * keeps both. find_cross_jump stops when the current jump's side reaches a CODE_LABEL, so
- * retail kept a label between that call and the break. It is a dead store: whether it is
- * acceptable needs a ruling (the same one as the twin's), and a natural construct leaving that
- * label would be better.
- *
- * The slots: all four are gcse PRE reaching registers, numbered in expression-hash bucket
- * order, bucket = (14029 + regno + offset) % S, S = (max_cuid / 2) | 1 (self is pseudo 84,
- * pv 85). Retail's order pos < +0xC0 < +0xF0 < pv+0x1B0 is the unwrapped order and needs
- * S in {539, 541, 543} (or 561..565); this source gives S 551. Measured: whole-file
- * -fno-force-mem gives S 541 and exactly retail's four slots, but breaks case 3 (retail's
- * `andi v1,a0,0xFF` needs the forced QI compare) and three FP compares, so it is not
- * retail's profile. Scratch compiler variants (not kept) that skip force_not_mem in
- * extendhisi2 only, or for HImode compares only, move max_cuid by 2 and 4: not the cause.
- * Bucket sweep (scratch cc1 overriding expr_hash_table_size from RAC_S, not kept): this exact
- * unit gives tools/check.py `1 of 1 places match` at S 539, 541, 543, 561, 563 and 565 and at
- * no other odd S in 531..571. Everything but gcse's bucket count is retail's.
- * Second pass, 5 November 2026 (count measured exactly as real insns in the -dF dump; this
- * source has 1095, S 551). Count-neutral, code unchanged: case 11's loop as do-while, case
- * 14's loop as do-while, rot set before the loop, the byte-offset matrix qcopy (all 1095).
- * All ten dead initializers together reach only S 555, so neither window is reachable that
- * way. A `pos = self + 0x10` local (set once, or in each head arm as in func_L11_0044AFC8)
- * lands in the window (1078, S 543) and gives retail's compute-then-copy head, but pos then
- * takes $fp/$s7 instead of retail's slot 0x84; mixing pos and direct `self + 0x10` is worse.
- * So retail's pos is a gcse reaching register. These change code, so they are out: qcopy for
- * the head's or case 14's TI copies, and the `flag` spellings in case 8 (if/else, per arm).
- * Next: find source wording with 13 to 27 fewer insns at gcse (or 17 to 31 more), with
- * unchanged code; candidates are wordings whose redundancy gcse/flow removes later.
+/* func_L11_00453358: the Joba drone's state machine (patrol path, chase, grab, release, fall).
+ * Own -G8 unit: the level gate D_L11_001A8FF4 and D_L11_001B1D40 are $gp-relative.
+ * The four spilled pointers (self+0x10, self+0xC0, self+0xF0, pv+0x1B0) are gcse reaching
+ * registers; their stack slots follow gcse's hash-bucket order, which depends on the insn
+ * count at gcse. The anim() and turn() helpers are inlined; their expansion gives retail's
+ * count (S 543) without changing any instruction.
+ * Case 9's `height = 0.0f;` is the same construct as case 9 of the matched twin
+ * func_L02_0040BE08: it keeps case 9's tail apart from case 13's in jump2's cross-jumping.
  */
 #include "common.h"
 
@@ -90,6 +59,19 @@ extern void func_L11_00454508(u8 *);
 extern void func_L11_00454AE0(u8 *);
 extern void func_L11_00454DD8(u8 *);
 
+/* Start animation a (blend b) unless it is already playing. */
+static __inline__ void anim(u8 *self, int a, int b)
+{
+    if (self[0x43] != a)
+        func_002A7470(self, a, 0, b);
+}
+
+/* Movement tuning with the shared turn limits. */
+static __inline__ void turn(u8 *self, float rate, float speed)
+{
+    func_002B60B0(self, rate, speed, 0.001163553f, 0.10471977f);
+}
+
 void func_L11_00453358(u8 *self)
 {
     f32 v00[4];
@@ -99,7 +81,7 @@ void func_L11_00453358(u8 *self)
     f32 m[4][4];
     u8 *pv;
     u8 *target;
-    f32 dist;
+    f32 dist = 0.0f;
     f32 height;
 
     pv = *(u8 **)(self + 0x68);
@@ -129,7 +111,7 @@ void func_L11_00453358(u8 *self)
     switch (self[0x20]) {
     case 3: {
         if (func_002B3868(self) != 0) {
-            func_002B60B0(self, 0.027777778f, 1.6666667f, 0.001163553f, 0.10471977f);
+            turn(self, 0.027777778f, 1.6666667f);
             self[0xBC] = 0;
             *(u16 *)(self + 0x96) = 0;
         }
@@ -149,17 +131,16 @@ void func_L11_00453358(u8 *self)
             *(u16 *)(self + 0x96) = 0;
         if (*(u16 *)(self + 0x96) < 0x1A)
             break;
-        if (self[0x43] != 0)
-            func_002A7470(self, 0, 0, 5);
+        anim(self, 0, 5);
         func_002A7750(self, 8, 3);
         break;
     case 7: {
-        u8 *path;
-        u8 *p;
+        u8 *path = 0;
+        u8 *p = 0;
         s32 i;
         s32 best;
-        f32 d;
-        f32 lim;
+        f32 d = 0.0f;
+        f32 lim = 0.0f;
 
         if (*(s16 *)(pv + 0x1FC) != 0)
             path = D_L11_001FF580[*(s32 *)(pv + 0x1E0)];
@@ -168,7 +149,7 @@ void func_L11_00453358(u8 *self)
         if (func_002B3868(self) != 0) {
             p = path + 0x10;
             best = 0;
-            func_002B60B0(self, 0.027777778f, 3.3333335f, 0.001163553f, 0.10471977f);
+            turn(self, 0.027777778f, 3.3333335f);
             *(f32 *)(pv + 0x1C8) = func_002A7878(1.0f, 3.0f);
             d = func_00282E48((self + 0x10), p);
             for (i = 0; i < *(s32 *)path - 1; i++, p += 0x10) {
@@ -226,7 +207,7 @@ void func_L11_00453358(u8 *self)
     case 8: {
         s32 flag;
         if (func_002B3868(self) != 0)
-            func_002B60B0(self, 0.011111111f, 1.3333334f, 0.001163553f, 0.10471977f);
+            turn(self, 0.011111111f, 1.3333334f);
         flag = 0;
         if (*(s16 *)(pv + 0x1FC) != 0) {
             if (4.0f < dist) {
@@ -254,20 +235,19 @@ void func_L11_00453358(u8 *self)
         break;
     }
     case 9:
-        if (func_002B3868(self) != 0 && self[0x43] != 2)
-            func_002A7470(self, 2, 0, 3);
+        if (func_002B3868(self) != 0)
+            anim(self, 2, 3);
         if (self[0x60] & 2) {
-            if (self[0x43] != 3)
-                func_002A7470(self, 3, 0, 5);
+            anim(self, 3, 5);
             func_002A7750(self, 11, -1);
         }
         height = 0.0f;
         break;
     case 11: {
         s32 k;
-        f32 lim;
+        f32 lim = 0.0f;
         if (func_002B3890(self) != 0) {
-            func_002B60B0(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+            turn(self, 0.0022222223f, 0.06666667f);
             *(u16 *)(self + 0x96) = 0;
         }
         *(f32 *)(self + 0x48) = 1.75f;
@@ -292,13 +272,11 @@ void func_L11_00453358(u8 *self)
         }
         if (((Hero *)D_00189E20)->ptr[0x249C / 4] == self) {
             func_002A7750(self, 12, -1);
-            if (self[0x43] != 4)
-                func_002A7470(self, 4, 0, 5);
+            anim(self, 4, 5);
             *(f32 *)(self + 0x48) = 1.0f;
         }
         if (func_00282E48((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) > 4.0f && *(u16 *)(self + 0x96) >= 0x79) {
-            if (self[0x43] != 5)
-                func_002A7470(self, 5, 0, 15);
+            anim(self, 5, 15);
             func_002A7750(self, 4, -1);
             *(f32 *)(self + 0x48) = 1.0f;
         }
@@ -307,15 +285,13 @@ void func_L11_00453358(u8 *self)
     case 12:
         if (!(self[0x60] & 2))
             break;
-        if (self[0x43] != 0)
-            func_002A7470(self, 0, 0, 15);
+        anim(self, 0, 15);
         func_002A7750(self, 8, -1);
         break;
     case 10:
         if (*(u16 *)(self + 0x96) >= 0xF) {
             func_002A7750(self, 9, -1);
-            if (self[0x43] != 2)
-                func_002A7470(self, 2, 0, 2);
+            anim(self, 2, 2);
             *(f32 *)(self + 0x48) = 1.0f;
         }
         qcopy(v10, (self + 0x10));
@@ -332,8 +308,7 @@ void func_L11_00453358(u8 *self)
         func_002A8C28(self, (self + 0x10), 0x10000, 0.5f, (f32)pv[0x34], 1.0f, 0, 1, 0);
         if (*(f32 *)(pv + 0x20) > 0.0f) {
             func_002A7750(self, 8, 3);
-            if (self[0x43] != 0)
-                func_002A7470(self, 0, 0, 5);
+            anim(self, 0, 5);
         } else if (*(s16 *)(pv + 0x1FC) != 0 && func_002A77E0(2) == 0) {
             func_002A7750(self, 14, -1);
         } else {
@@ -343,8 +318,8 @@ void func_L11_00453358(u8 *self)
         break;
     case 14: {
         s32 j;
-        u8 *t;
-        f32 *rot;
+        u8 *t = 0;
+        f32 *rot = 0;
         if (func_002B3868(self) != 0) {
             t = func_L11_004417E8(*(u8 **)(self + 0xB8));
             func_00282CF0(pv + 0x100, t, (self + 0x10));
@@ -398,8 +373,8 @@ void func_L11_00453358(u8 *self)
             *(f32 *)(pv + 0x108) = 0.016666668f;
             *(f32 *)(self + 0x18) = *(f32 *)(target + 8) + 0.3f;
         } else if (func_00277258((self + 0x10), 6, 0, 0.3f) != 0) {
-            f32 s;
-            s32 n;
+            f32 s = 0.0f;
+            s32 n = 0;
             *(f32 *)(pv + 0x108) = 0.016666668f;
             *(f32 *)(self + 0x18) = *(f32 *)(target + 8) + 0.3f;
             v10[0] = *(f32 *)(self + 0x10) + func_002A7878(-0.01f, 0.01f);

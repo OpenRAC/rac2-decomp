@@ -18,6 +18,11 @@
  * Second pass: natural case 12 plus the twin's block-scoped `ActorVector *tmpl` in case 7 gives
  * retail's case-7 hoist order, but tmpl takes slot 0xC4 (retail 0xCC) and case 12 still sets
  * object+0xF0 before state+0x2B0, at the natural S and at forced S 577 and 581.
+ * Third pass: the inline helpers that closed func_L11_00453358 (anim: `if (object[0x43] != a)
+ * func_002A7470(object, a, 0, b);`, turn: func_002B60B0 with 0.0005817765f, 0.052359886f) are
+ * code-neutral here too and move S: natural wording + turn gives 581 (in the window), + anim
+ * 579, both 573. The case-7 0x707F hoist (+0xBE0) then remains; with the twin's block-scoped
+ * tmpl the hoist is right but tmpl takes slot 0xC4. Retained body + helpers: still 6 words.
  * Scratch compiler variants (not kept) that skip force_not_mem in extendhisi2, or for HImode
  * compares, are not retail's either (see func_L11_00453358's note).
  */

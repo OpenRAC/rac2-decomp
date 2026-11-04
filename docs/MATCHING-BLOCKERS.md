@@ -546,6 +546,15 @@ then still differs in two orders, so it is not a count alone.
 Second pass: for 453358, loop spellings, `rot` placement and the byte-offset `qcopy` are
 count-neutral, and even all ten dead initialisers reach only S 555. A `pos` local lands in the
 window but takes a saved register, so the roughly 20-insn difference is still unidentified.
+**Resolved later on 5 November 2026:** `func_L11_00453358` matches (level 11 `OK`) in
+`src/levels/11_joba/L11_00453358-state-g8.c`. The count came from two inlined helpers, not from
+spellings: `anim(self, a, b)` (`if (self[0x43] != a) func_002A7470(self, a, 0, b);`, eight
+sites) and `turn(self, rate, speed)` (`func_002B60B0` with the shared last two constants, four
+sites). Both are code-neutral and bring S from 551 to 543. So a void helper that wraps a
+repeated idiom is a count lever: F4's "inline helpers returning a value do nothing" does not
+extend to these. On the forced-bucket check, an `emit()` helper around the `func_002A8C28`
+calls is code-neutral too (S 541). For `func_L11_00451178` the same helpers bring the natural
+wording into its window (`turn` alone gives S 581), but its case-7 hoist order still differs.
 
 **Update, 3 November 2026 (pending review):** now matched. `func_L12_00300410` is C in `src/levels/12_todano/L12_00300410-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 1 US place (PAL and US2 catalogues have no function of this name). The measurements above are kept as history.
 
