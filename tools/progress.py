@@ -251,6 +251,40 @@ def pending_boot_split(functions: list[dict], where: dict) -> bool:
         return False
 
 
+def pending_level_splits(functions: list[dict], where: dict) -> set[str] | None:
+    """Missing identities explained by the exact old, wholly unmatched level rows.
+
+    Catalogue generation checks the retail bodies and typed dispatch witnesses.
+    CI checks the old/new extent graph without game data or report mutations.
+    None denotes an invalid merged row, including one alongside reported children.
+    """
+    reported = {f["name"]:f for f in functions}
+    missing = set()
+    for name, spec in levels.LEVEL_FUNCTION_SPLITS.items():
+        parts = spec[-1]
+        old = reported.get(name)
+        if not old or name not in where or old.get("size") != str(sum(n for _, n in parts)):
+            continue
+        address, _, kind, level = where[name]
+        if old["fuzzy_match_percent"] != 0.0 or kind != spec[1]:
+            return None
+        try:
+            if old["metadata"]["virtual_address"] != str(address):
+                return None
+        except (KeyError, TypeError):
+            return None
+        offset = 0
+        for child, length in parts:
+            if where.get(child) != (address + offset, length, kind, level):
+                return None
+            if child != name:
+                if child in reported:
+                    return None
+                missing.add(child)
+            offset += length
+    return missing
+
+
 def release_check(version: str, report_path: Path) -> None:
     """CI's check for another release, without the disc: the report counts only functions of
     the release's catalogues that are C (or ASM_FUNC) in src/ and src/<version>/, and every
@@ -273,14 +307,18 @@ def release_check(version: str, report_path: Path) -> None:
     split = pending_boot_split(functions, where)
     if total != len(reported):
         sys.exit(f"{report_path.relative_to(ROOT)} has duplicate function rows")
+    level_splits = pending_level_splits(functions, where)
+    if level_splits is None:
+        sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged level row")
     if "func_00131DE8" in where and not split and any(
             f["name"] == "func_00131D98" and f.get("size") == "656" for f in functions):
         sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged main/sound row")
     if total != len(where) or retired or missing:
         # Boundary-only PRs leave the reports for a maintainer's later refresh.
-        # Only measured unmatched remnants or this exact unmatched merged boot
-        # row are tolerated. Missing entries and duplicate compensation still fail.
-        known_split = split and not retired
+        # Only measured unmatched remnants or the named unmatched merged rows
+        # are tolerated. Unknown missing entries and duplicate compensation fail.
+        explained = level_splits | ({"func_00131DE8"} if split else set())
+        known_split = bool(missing) and missing == explained and not retired
         known_boundary = ((retired or known_split) and retired <= set(levels.FUNCTION_RESIDUES)
                           and (not missing or known_split)
                           and total == len(where) + len(retired) - len(missing)
@@ -294,6 +332,9 @@ def release_check(version: str, report_path: Path) -> None:
                   "a maintainer regenerates it on master")
         if split:
             print(f"{report_path.relative_to(ROOT)} retains the unmatched merged main/sound row; "
+                  "a maintainer regenerates it on master")
+        if level_splits:
+            print(f"{report_path.relative_to(ROOT)} predates {len(level_splits)} witnessed level entries; "
                   "a maintainer regenerates it on master")
     ahead = sorted((in_c & set(where)) - matched)
     if ahead and "--strict" in sys.argv:

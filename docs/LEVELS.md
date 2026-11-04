@@ -183,6 +183,41 @@ other missing or retired entries, partial/matched credit for the old merged
 body and an already reported sound row are rejected. No report is rewritten
 or credited by this exception; `--strict` still requires the refreshed rows.
 
+Four level extents also contain independently entered callbacks rather than
+one larger function. `split_level_rows` applies only these named repairs:
+
+| Existing identity | Complete extent | Recovered entries |
+| --- | ---: | --- |
+| `func_L19_0041C328` | 176 bytes | 168-byte group traversal, then an 8-byte moby handler |
+| `func_L14_004321C0` | 16 bytes | Two separate 8-byte object methods |
+| `func_L13_0043E8C0` | 24 bytes | Three separate 8-byte camera callbacks |
+| `func_L06_0047C1D0` | 24 bytes, seven levels | Three separate 8-byte camera callbacks in each carrying level |
+
+The Grelbin handler has fifteen distinct class records; Aranos Prison's second
+entry has one. The camera activate/update/exit entries occupy separate callback
+slots in a complete five-word camera record. In Boldan the two equal-byte
+camera families belong to different classes and retain separate identities.
+The full normalized body, placement family, EE text bounds, typed dispatch
+witnesses and every child extent must agree before a table is written.
+Partial, overlapping or conflicting input is rejected. Stable identities cover
+both the old complete fingerprints and the new pieces, so unrelated equal-byte
+methods are not regrouped when these rows shrink. Default replay and historical
+bootstrap from the known placements retain the same output.
+
+All six newly recovered identities have independently witnessed entry addresses.
+The sum of their extents preserves every original end and the total code bytes.
+Hrugis's unentered return-looking tail is excluded from this rule. The report
+checker permits these exact old, wholly unmatched merged rows to await the
+maintainer's refresh; it verifies the complete current child graph and old
+virtual starts. Other missing entries, stale rows claiming matching credit,
+partially reported children and duplicate compensation fail; strict mode still
+requires the refreshed report. These checks never rewrite or credit a report.
+The [named repairs and C definitions](https://github.com/OpenRAC/rac2-decomp/commit/42e0babe572b3f2ef5da5cbc4989e6f7b63a2c51)
+pass all 84 strict linked program builds. All ten definitions are present at
+every carrying placement; the 168-byte traversal and nine no-op callbacks
+contribute 240 distinct C bytes. The six additional catalogue names identify
+real entries and do not increase the total code bytes.
+
 `FUNCTION_RESIDUES` excludes individually verified remnants by name and size. The
 one-word entries' immediate predecessors finish with a return and its delay slot
 across alignment nops, or a closed tail jump before debug-fill bytes. The static scan

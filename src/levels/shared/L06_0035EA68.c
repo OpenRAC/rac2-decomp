@@ -279,4 +279,15 @@ INCLUDE_ASM("asm/levels", func_L06_0047A408);
 
 /* func_L06_0047AC68 is defined in L06_0047AC68-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L06_0047C1D0);
+/* Separate camera activate, update and exit entries, shared by seven levels. */
+void func_L06_0047C1D0(void *camera)
+{
+}
+
+void func_L06_0047C1D8(void *camera)
+{
+}
+
+void func_L06_0047C1E0(void *camera)
+{
+}
