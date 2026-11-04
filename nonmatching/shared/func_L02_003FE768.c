@@ -1,3 +1,15 @@
+/* 5 November 2026: exact with a non-empty do-while(0) statement macro, not landed.
+ * The body below now rounds into t and converts through
+ *   #define F2I(i, f) do { (i) = (f); } while (0)
+ * and tools/check.py gives 2 of 2 places match (levels 02 and 11). With the macro's do/while
+ * replaced by a plain assignment, the same source gives 0 of 2 (the D_001A7B90 mode load is
+ * hoisted across the conversions). Mechanism, from a scratch cc1 that makes fix:SI a sched2
+ * barrier: retail has a scheduling barrier at each of these float-to-int conversions. Applied
+ * to every function, that barrier breaks 95 of 228 matched functions that convert, so it comes
+ * from how these HUD files wrote the conversion, not from the compiler. The loop notes of a
+ * one-iteration loop are such a barrier. Per AGENTS.md and the open "non-empty do { } while (0)"
+ * question in docs/MATCHING-BLOCKERS.md this waits for a maintainer ruling.
+ */
 /* 2 November 2026, bounded scheduling check on the pinned workspace compiler:
  * -fno-schedule-insns: 332/332 bytes, 0/2 USA places, same mode-load hoist
  * (checker first mismatch +0xE4). -fno-schedule-insns2: 332/332, 0/2, first
@@ -23,6 +35,8 @@ extern int D_L02_001B134C[] __attribute__((sda));
 extern int D_L02_001B1350[] __attribute__((sda));
 extern float D_L02_001B3E04[] __attribute__((sda));
 extern int D_001A7B90[] __attribute__((sda));
+#define F2I(i, f) do { (i) = (f); } while (0)
+
 void func_L02_003FE768(float fraction)
 {
     int width;
@@ -31,6 +45,7 @@ void func_L02_003FE768(float fraction)
     int bottom;
     int left;
     int right;
+    float t;
     func_002FC560(0x42, 0x8000000044ULL);
     if (fraction < 0.0f)
         fraction = 0.0f;
@@ -39,12 +54,14 @@ void func_L02_003FE768(float fraction)
         color = func_L00_0031C998(D_L02_001B134C[0], D_L02_001B1348, fraction + fraction - 1.0f);
     else
         color = func_L00_0031C998(D_L02_001B1350[0], D_L02_001B134C[0], fraction + fraction);
-    top = (int)((float)D_L02_001B1334[0] * D_L02_001B3E04[0] + 0.5f);
+    t = (float)D_L02_001B1334[0] * D_L02_001B3E04[0] + 0.5f;
+    F2I(top, t);
     if (D_001A7B90[0])
         top -= D_L02_001B1340;
     left = D_L02_001B1330;
     right = left + width;
-    bottom = (int)((float)D_L02_001B133C[0] * D_L02_001B3E04[0] + 0.5f);
+    t = (float)D_L02_001B133C[0] * D_L02_001B3E04[0] + 0.5f;
+    F2I(bottom, t);
     if (D_001A7B90[0])
         bottom -= D_L02_001B1340;
     func_0028FC48(left, top, right, bottom, color, 0);

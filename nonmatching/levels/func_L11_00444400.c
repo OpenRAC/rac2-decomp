@@ -1,3 +1,14 @@
+/* 5 November 2026, two-agent pass:
+ * - Boundary: with the F2I conversion macro of func_L02_003FE768 (a non-empty do-while(0), not
+ *   landable pending the maintainers' ruling) on the box x/y/h and the label y, every call's
+ *   argument setup follows its chains as in retail: 4692/4684 bytes, 458 instructions aligned.
+ * - Left, all register allocation: 0.5 in $f22 (the label -1/0 constants are block-local and
+ *   local-alloc takes $f20/$f21 first; retail's are global, so a block boundary existed there
+ *   during allocation); rect-address reaching registers keep $fp/$s6/$s7 where retail's reload
+ *   evicts them (reload here never needs more than $v0/$v1); the constant 3 follows cse's
+ *   10-block path length. The only construct found that fixes 0.5 and the save set is the
+ *   twin's dead `if (mode == 1) y = 1.0f;` arm (580 aligned), which blocker 26 rules out.
+ */
 /* 5 November 2026, third pass (retained body unchanged, 4640/4684 bytes). Measured:
  * - This compiler's pass order after reload is flow2 -> sched2 -> jump2 (cross-jumping, jumps to
  *   the next insn) -> dbr. Retail's boundary before each call's argument setup is therefore a

@@ -541,13 +541,13 @@ in `extendhisi2`, or only for HImode compares, moves `max_cuid` by just 2 and 4.
 an `if (*(s16 *)p)` test (`!= 0`, an `(s32)` cast, a struct field, an `s32` local) expands to the
 same three insns. Dead initialisers count one insn each and change no instruction. The case-9
 cross-jump in that function is closed only by the matched twin `func_L02_0040BE08`'s
-`height = 0.0f;`, which needs a ruling. `func_L11_00451178`'s natural wording needs S 575-585 and
+`height = 0.0f;`, which needs a ruling. (Under blocker 26 it is an artificial use, so `func_L11_00453358` is kept in `nonmatching/` exact but unlanded.) `func_L11_00451178`'s natural wording needs S 575-585 and
 then still differs in two orders, so it is not a count alone.
 Second pass: for 453358, loop spellings, `rot` placement and the byte-offset `qcopy` are
 count-neutral, and even all ten dead initialisers reach only S 555. A `pos` local lands in the
 window but takes a saved register, so the roughly 20-insn difference is still unidentified.
-**Resolved later on 5 November 2026:** `func_L11_00453358` matches (level 11 `OK`) in
-`src/levels/11_joba/L11_00453358-state-g8.c`. The count came from two inlined helpers, not from
+**Later on 5 November 2026:** `func_L11_00453358` became exact (level 11 `OK`) but is kept in
+`nonmatching/` because of the case-9 dead store (blocker 26). The count came from two inlined helpers, not from
 spellings: `anim(self, a, b)` (`if (self[0x43] != a) func_002A7470(self, a, 0, b);`, eight
 sites) and `turn(self, rate, speed)` (`func_002B60B0` with the shared last two constants, four
 sites). Both are code-neutral and bring S from 551 to 543. So a void helper that wraps a
