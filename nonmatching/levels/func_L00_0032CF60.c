@@ -1,3 +1,10 @@
+/* 4 November 2026 bounded source-method review; retained, not linked.
+ * Four new actual read/dispatch/address-word forms under O2/G8/g reach 260/260 bytes but 0/27 USA
+ * places, first +0xA8. A complete measured flags-reload view removes speculative flag-load
+ * motion, but callback v0/v1 allocation and the branch/jalr delay slots still differ. The older
+ * plain 256-byte draft below is retained; no nonvoid callback return, invented argument or
+ * instruction patch was used.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 256/260 bytes, 0/27 placements; first difference size mismatch.
  * Profile: -O2 -G8 -ffunction-sections -g.

@@ -1,3 +1,10 @@
+/* 4 November 2026 bounded source-method review; retained, not linked.
+ * Four new definition-lookup, typed-definition, scoped-record and real-qcopy trials under O2/G0/g
+ * give 572 or 576 bytes against568, 0/2 USA places. The shorter initial record scope and earlier
+ * current-level snapshot do not fix the sentinel/record scratch registers. Both observed 16-byte
+ * copies were also tested with the reviewed qcopy helper; no extra initialization or object
+ * extent was invented. The older 568-byte body below is retained.
+ */
 /* Retained meaningful C; not matching. 2026-10-28 game -O2 -G0
  * -ffunction-sections -g: 568/568 bytes in both US placements. Remaining
  * difference: initial record pointer and missing-value sentinel use a2/a1,

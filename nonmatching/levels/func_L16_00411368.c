@@ -1,3 +1,9 @@
+/* 4 November 2026 current-RAC1 source trials; retained, not linked.
+ * A real phase-calculation group remains 276/276 bytes, 0/1 USA, first +0x64. Defining the
+ * consumed cycle factor before the period call instead gives 284/276 bytes, 0/1. Neither fixes
+ * the remainder/constant allocation. The original 276-byte body below remains the best draft; no
+ * argument-bank width, return contract or global qualifier changed.
+ */
 /* 2026-11-03 w02 source-contract review (USA v1.01 only).
  * Profile: -O2 -G0 -ffunction-sections.
  * Current check.py: 276/276 bytes, 0/1 places, first mismatch +0x78.

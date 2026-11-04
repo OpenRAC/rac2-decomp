@@ -1,3 +1,20 @@
+/* 4 November 2026, real source-group review; retained, not linked.
+ * Default G0 profile in L01_002A7248.c: a group containing the actual height read restores the
+ * full retail register map. It is 276/272 bytes, 0/5 USA places: only the alignment nop at +0x74
+ * remains (then shifts the following instructions). Including normal preparation or the whole
+ * response with its real return keeps 276 bytes and loses that register map. The retained best
+ * group is below with complete declarations and the existing four-word pointer interface; no
+ * dummy owner reference was used. Reopen with a real height-lifetime/label-alignment witness, not
+ * padding removal or invented volatility. Older measurements follow as history.
+ */
+#include "common.h"
+typedef struct { char pad[0x18]; void *moby; int count; char gap[0x20]; float normal[4]; } ProbeResult;
+extern ProbeResult D_L01_001BF900;
+extern int func_002761F8(void *, void *, int, void *, int);
+extern void func_00282F20(void *, void *, float);
+extern void func_00282CF0(void *, void *, void *);
+extern float func_00282DB0(void *, void *);
+extern void func_00282CC0(void *, void *, void *);
 /*
  func_L01_0031B300 (272 bytes, 5 places) - default flags (-O2 -G0), in L01_002A7248.c; right size.
  opus-1 (v2139, 2026-11-03), recompiled on v2/c04: 272/272 bytes, 0/5 places, 12 instruction rows differ
@@ -22,7 +39,7 @@ typedef union { TI128 q; float f[4]; } Vector;
 
 extern float func_00282C48(float f12);
 
-int func_L01_0031B300(char *a0, int a1, char *a2, char *a3) {
+int func_L01_0031B300(void *a0, void *a1, void *a2, void *a3) {
     Vector v, w;
     float f20;
     float f2;
@@ -40,7 +57,9 @@ int func_L01_0031B300(char *a0, int a1, char *a2, char *a3) {
         if (v1 == 0x881 || v1 == 0)
             return 0;
     }
-    f20 = *(float *)(a0 + 0x18);
+    do {
+        f20 = *(float *)(a0 + 0x18);
+    } while (0);
     qcopy(&w, g + 0x40);
     h = g + 0x40;
     func_00282F20(w.f, w.f, 1.0f);

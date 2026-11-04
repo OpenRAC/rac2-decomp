@@ -1,3 +1,8 @@
+/* 4 November 2026 current-RAC1 source-method trial; retained, not linked.
+ * Grouping the actual data read or actual collision-result call gives 292/292 bytes, 0/27 USA
+ * placements, first +0x4, with the default G0 profile. The entry schedule and subsequent
+ * allocation remain different; no empty barrier or invented access was used.
+ */
 /* Claude Opus 5.5 (xhigh), 2026-10-31: code below unchanged, remeasured.
  * -fno-schedule-insns: 292/292 bytes, 0/27 places, 11 register/order lines in the arms.
  * Default -O2 -G0 -ffunction-sections: 296/292, 0/27; only the entry block differs, and it
@@ -47,7 +52,11 @@ void func_L00_003B39D0(CollisionObject *object)
     float normal[4],projection[4],remaining[4];
     char *data=object->data;
     void *position=&object->position;
-    if(func_00277258(position,0,0.25f,(void *)D_00189E20.mask)) {
+    int collided;
+    do {
+        collided = func_00277258(position,0,0.25f,(void *)D_00189E20.mask);
+    } while (0);
+    if (collided) {
         qcopy(position,D_L00_001BF230);
         if(D_L00_001A8FF0[0]) {
             float dot;

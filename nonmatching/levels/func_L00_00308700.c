@@ -1,3 +1,11 @@
+/* 4 November 2026 current-RAC1 source trials; retained, not linked.
+ * Three real RAC1 scan/swap/decode-phase trials give 272 or 276 bytes against 288, 0/27 USA
+ * placements. The retained 276-byte owner-view form uses the complete cache representation for
+ * age offsets and the measured entry array for data; it avoids stepping beyond a scalar field as
+ * an int array. It preserves the miss return and selected-first swap without the donor's dummy
+ * increment/decrement. Keeping separate table-base/index values across decode remains unresolved.
+ * Older 296-byte measurements below are history.
+ */
 /* v2133 (Opus 5.5): still the closest draft (296/288, 0/27). Retail keeps
  * la D (s0, set in the miss block) and best<<4 (s1) across the call and adds
  * them base-first afterwards, so cse never knew the base was a constant.
@@ -19,6 +27,8 @@
  * then resolve the swap's local allocator roles. No linked build was run.
  * Declarations below.
  */
+#include "common.h"
+
 typedef int Q128 __attribute__((mode(TI)));
 
 typedef union {
@@ -41,7 +51,6 @@ typedef struct {
 } Cache_308700;
 
 extern Cache_308700 D_L00_001C93A0;
-extern Ent_308700 D_L00_001C93D0[8];
 extern int D_001B18D8;
 extern void func_00297550(unsigned char *, int, unsigned char *, short *);
 
@@ -55,23 +64,26 @@ int func_L00_00308700(int key)
         return 0;
     found = 0;
     best = 0;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 8; ++i) {
         if (D_L00_001C93A0.e[i].s.key == key)
             break;
-        if (D_L00_001C93A0.e[i].s.age < (&D_L00_001C93A0.e[0].s.age)[best * 4])
+        if (D_L00_001C93A0.e[i].s.age < *(int *)((unsigned char *)&D_L00_001C93A0 + 0x34 + best * 16))
             best = i;
     }
     if (i == 8) {
-        func_00297550(((unsigned char **)&D_L00_001C93A0)[best * 4 + 14], key, D_L00_001C93A0.base, D_L00_001C93A0.info);
+        do {
+            func_00297550(D_L00_001C93A0.e[best].s.data, key, D_L00_001C93A0.base, D_L00_001C93A0.info);
+        } while (0);
         D_L00_001C93A0.e[best].s.key = key;
         i = best;
         found = 1;
     }
     if (i != 0) {
-        Q128 tmp = D_L00_001C93D0[0].q;
-        Q128 other = D_L00_001C93D0[i].q;
-        D_L00_001C93D0[i].q = tmp;
-        D_L00_001C93D0[0].q = other;
+        Ent_308700 *base = D_L00_001C93A0.e;
+        Ent_308700 *other = base + i;
+        Q128 tmp = other->q;
+        other->q = base->q;
+        base->q = tmp;
     }
     D_L00_001C93A0.e[0].s.age = D_001B18D8;
     return found;

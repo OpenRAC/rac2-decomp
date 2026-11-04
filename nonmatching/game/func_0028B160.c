@@ -1,3 +1,11 @@
+/* 4 November 2026 current-RAC1 source trials; retained, not linked.
+ * Six actual size/upload/bound-read groups, a page helper and loop-profile trials do not match.
+ * The size-only group plus no-strength-reduce gives 292/292 bytes, 0/28 USA, first +0xA8: the
+ * full prologue and shift-base/immediate registers agree, but call setup and the shift delay slot
+ * differ. Other new forms are 288/292, 300/292, or retain the original register swap. Current
+ * RAC1 ui/hud.c uses the same ordinary bank loop. The older best body is retained with complete
+ * declarations; the new size-group source remains a diagnostic, not a qualified profile.
+ */
 /* func_0028B160 - Opus 5.5 xhigh, v1749: 292/292 bytes, 0/28 USA v1.01 places, first mismatch
  * +0x14, under the unit's -O2 -G0 -ffunction-sections (src/game/00288D88.c). Only six words
  * differ, all one swap: retail keeps immediate in $s7 and the hoisted constant 1 in $s6.
@@ -27,6 +35,58 @@
  * Declarations: struct HudTexCounts, HudTexPage and HudState with D_001B1870 sda, and
  * func_0028AE88, as above func_0028ACB0 in src/game/00288D88.c. Marker restored in src/.
  */
+#include "common.h"
+
+struct HudTexCounts {
+    unsigned char pad0[0x14];
+    int mid_ends[8];
+    int ends[16];
+    int loaded[16];
+};
+struct HudBank {
+    int unk0;
+    int off4;
+    int off8;
+    int offC;
+    int off10;
+    unsigned char pad14[0x40];
+    int has54;
+    int size58;
+    int has5C;
+    int has60;
+    int has64;
+    unsigned char pad68[0x2C];
+    int unk94;
+    int unk98;
+    int unk9C;
+    int unkA0;
+    int unkA4;
+};
+struct HudTexPage {
+    unsigned int source_address;
+    unsigned short gs_block_offset;
+    unsigned char width_log2;
+    unsigned char height_log2;
+};
+struct HudState {
+    int serial;
+    int unk4;
+    int unk8;
+    int z;
+    int heap_cur;
+    int heap_end;
+    union {
+        struct HudTexCounts *counts;
+        struct HudBank *bank;
+    } header;
+    void *anim_defs;
+    void *frame_refs;
+    struct HudTexPage *image_pages;
+    struct HudTexPage *palette_pages;
+};
+extern struct HudState D_001B1870 __attribute__((sda));
+extern void func_0028AE88(int, int);
+
 extern int D_001A7308 __attribute__((section(".sdata")));
 extern void func_0028F948(unsigned int, int, int, int, int, int);
 

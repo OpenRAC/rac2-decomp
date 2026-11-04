@@ -34,6 +34,26 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Trigger and title/setup lifetimes
+
+**4 November 2026, strict linked matches; [PR #420](https://github.com/OpenRAC/rac2-decomp/pull/420) pending review.**
+`func_L01_00390A50` is 528 bytes and passes six placements in each release with
+the actual forced-trigger arm grouped as one statement. Its volume/path calls
+use their canonical names and real point/index interfaces. `func_002CD3C0` is
+284 bytes and passes 28 USA v1.01 placements after separating its screen y
+coordinate from the later owner pointer; its canonical identity is absent in
+the other releases. The two setup hooks accept the owner explicitly supplied
+by retail. Each hook passes 28 placements in every release, and their complete
+compiled object is unchanged. All 84 loaded images and the 46 new C placements
+are verified, with PAL rebuilt after the latest carry update. See [source interfaces](COMPILER-NOTES.md#source-methods-shared-with-rac1).
+
+One-pass groups are not a general remedy. In `func_L01_0031B300`, grouping the
+actual height read restores the register map but adds an alignment nop at
++0x74 (276/272 bytes, 0/5 USA places). Wider response groups lose that map.
+The HUD-bank loop, menu cache and frame-phase drafts still have allocation or
+call-scheduling differences; their source, exact trial limits and next useful
+conditions remain in `nonmatching/`. No failed variant is linked or counted.
+
 ### Player initialization and retained allocation constraints
 
 **4 November 2026, strict linked match; pending PR review.**
