@@ -1,3 +1,10 @@
+/* 4 November 2026: two new typed EE call interleavings place self/mask
+ * after the first or second FP argument while preserving all four GPR
+ * and four FP values, widths and bank orders. Both complete USA checker
+ * listings are identical to the retained baseline: 1044/1044 bytes,
+ * 0/1 places, first +0x24C. This is a three-wording tie; the original
+ * declaration and C are retained. No alternate-release compile is claimed.
+ */
 /* Claude Opus 5.5 xhigh, task v2228, 3 November 2026: retained near miss, not linked.
  * Build as a dedicated -G8 unit (src/levels/12_todano/L12_004163E8-g8.c, which gets
  * -O2 -G8 -ffunction-sections by name) and replace the INCLUDE_ASM marker in

@@ -1,3 +1,12 @@
+/* 4 November 2026: the hero view now starts at the owning resident object
+ * D_00189E20[], with its position formed at +0x80. Previously subtracting
+ * 0x80 from a standalone 16-byte D_00189EA0 declaration stepped outside
+ * that declared object. Access widths, offsets and operations are retained.
+ * US and US2: 972/972 bytes, 0/27 placements each, first +0x218.
+ * The source change affects only the unlinked symbol/addend spelling;
+ * all other instruction columns agree with the preceding draft. PAL has
+ * no carried identity of this name. No linked match is claimed.
+ */
 #include "common.h"
 /* Tier: near miss (v2142, 3 November 2026).
  * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
@@ -24,7 +33,7 @@
  * aliasing.
  */
 typedef unsigned int CameraQuad __attribute__((mode(TI)));
-extern CameraQuad D_00189EA0;
+extern unsigned char D_00189E20[];
 extern CameraQuad D_0018A0E0;
 extern int D_L00_001B1580 SDATA(D_L00_001B1580), D_L00_001B1584 SDATA(D_L00_001B1584);
 extern unsigned short D_L00_001B1514 SDATA(D_L00_001B1514), D_L00_001B1518 SDATA(D_L00_001B1518);
@@ -99,7 +108,7 @@ void func_L00_004233F8(CameraOwner *owner)
     PlaneState *plane;
     TrackerState *tracker;
     float distance;
-    unsigned char *initialPosition = (unsigned char *)&D_00189EA0;
+    unsigned char *initialPosition = D_00189E20 + 0x80;
     unsigned char *hero;
     D_L00_001B1580 = 0;
     D_L00_001B1584 = 0;

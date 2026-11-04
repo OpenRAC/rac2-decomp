@@ -1,3 +1,10 @@
+/* 4 November 2026: an alias-model control declares D_001AB984 as an
+ * incomplete SDA array and reads element zero, following the documented
+ * fixed-scalar/struct-store distinction. It keeps the intermediate store
+ * but grows 2072 to 2084 bytes against 2076, still 0/28 USA placements.
+ * The broader reload/scheduling regression is rejected; the better C
+ * below is retained. No extra volatile access or barrier was introduced.
+ */
 /* Claude Opus 5.5, xhigh effort, 2 November 2026 (task v2080).
  * USA v1.01, current pinned game compiler, -O2 -G8 -ffunction-sections:
  * check.py: 2072/2076 bytes, 0/28 places match (53 differing rows, all of the

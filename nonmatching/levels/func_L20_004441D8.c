@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1740/1744 bytes, 0/1 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections -frac2-zero-ti-por.
+ * The event helper returns int and the particle constructor returns a pointer, as in their
+ * matched definitions. The health lookup keeps its signed32 stored-address return with explicit
+ * pointer conversion. None resolves the increment/group-index scheduling residual.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* func_L20_004441D8, 1744 bytes. USA v1.01, -O2 -G8 -ffunction-sections -frac2-zero-ti-por:
  * 1740/1744 bytes, opcodes aligned to the end. The group loops are real do/while loops entered by a
  * goto into the middle: that keeps the loop note and alignment nop, and loop.c refuses to hoist
@@ -27,10 +35,10 @@ extern float D_L20_001B2BE8 __attribute__((sda));
 extern float D_L20_001B2220[2] __attribute__((sda));
 extern s32 D_0018C0B0[];
 extern char D_L20_001A8F20[];
-extern void func_002E5CF8(int, int, void *);
+extern int func_002E5CF8(int, int, void *);
 extern float func_00282C48(float);
 extern void func_0029F338(void *);
-extern char *func_002AB1F0(void *);
+extern int func_002AB1F0(void *);
 extern void func_002A8F70(void *, int, int, float, void *, void *);
 extern float func_002A89A8(void *, int, float);
 extern void func_00282C90(void *), func_00282C88(void *);
@@ -38,7 +46,7 @@ extern float func_002A7878(float, float), func_002A7940(void);
 extern void func_002830C0(void *, void *, void *);
 extern int func_00283D38(int, int, float);
 extern int func_002A77E0(int), func_002A7820(int, int);
-extern void func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern void * func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
 extern char *func_L20_00448A18(char *, char *, char *, char *);
 
 typedef struct { char pad[0x21C]; int g1; int pad220; int groups[3]; int f230; int pad234[2]; int g2; char pad240[0x1858-0x240]; int current; } State;
@@ -99,7 +107,7 @@ void func_L20_004441D8(char *obj)
                 goto end1;
             if ((U(m, 0x34) ^ 1) & 1) {
                 if (size == 0.0f) {
-                    char *c = func_002AB1F0(m);
+                    char *c = ((char *)func_002AB1F0(m));
 
                     if (c == 0)
                         goto next1;
@@ -132,7 +140,7 @@ void func_L20_004441D8(char *obj)
                 goto end2;
             if ((U(m, 0x34) ^ 1) & 1) {
                 if (size == 0.0f) {
-                    char *c = func_002AB1F0(m);
+                    char *c = ((char *)func_002AB1F0(m));
 
                     if (c == 0)
                         goto next2;

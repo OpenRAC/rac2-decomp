@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 3428/3432 bytes, 0/27 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * func_002C9C20 and func_002E9268 keep their defined int returns. The one-word delay-slot
+ * residual is unchanged. A selected volatile store chosen only to affect scheduling remains
+ * unsupported.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Claude Opus 5.5 xhigh retry, 2026-10-31 (task v1862). Unmatched: not a linked match.
  * Goes in src/levels/shared/L00_002A3B88-g8.c (-G8; take the marker out of L00_002A3B80.c).
  * This body, USA v1.01, -O2 -G8 -ffunction-sections: 3428/3432 bytes, 0/27 places.
@@ -123,7 +131,7 @@ extern void func_00292078(int), func_00292408(int), func_002926B8(int), func_002
 extern int func_002AD860(int);
 extern void func_L00_00303990(int, int);
 extern void func_00294F10(void), func_0028AB70(void), func_0029CD48(void);
-extern void func_002C9C20(void);
+extern int func_002C9C20(void);
 extern int func_002B49E0(int, int, int, int, unsigned char *);
 extern void func_0027D330(int), func_002B6E78(int, int, int), func_002B72E8(int);
 extern void func_00133220(void);
@@ -139,7 +147,8 @@ extern void func_L00_0037F7E8(void), func_L00_0037F790(void);
 extern void func_L00_0036FA68(void), func_L00_002E6400(void);
 extern void func_002F5FB8(void), func_L00_00370408(void), func_0027C480(void), func_0027D900(void);
 extern void func_002CA8A8(void), func_L00_002E6448(void), func_00286738(void), func_0027C4A8(void);
-extern void func_L00_00374C18(void), func_L00_0037A610(void), func_002E9268(void), func_002EA8E8(void);
+extern void func_L00_00374C18(void), func_L00_0037A610(void), func_002EA8E8(void);
+extern int func_002E9268(void);
 extern int func_L00_002FC5C8(void), func_L00_002FC5E8(void);
 extern void func_00282A28(void), func_L00_0032B288(void), func_L00_002D6FD8(void);
 extern void func_00298F00(void), func_00298178(void), func_0027C540(int);

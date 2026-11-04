@@ -1,3 +1,11 @@
+/* 4 November 2026: faithful retained C; no linked match.
+ * Remove the invented private-pointer test, identical rounding arms, empty do/while panel wrapper and unused historical helper.
+ * us: 3128/3140 bytes, 0/1 places; us2: absent; pal: absent.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Reopen: Recover natural text/panel rounding boundaries and floating argument lifetimes without scheduling-only wrappers.
+ * Earlier measurements below are historical, including any diagnostic-only
+ * constructs they describe; those constructs are no longer active C.
+ */
 /*
  * Opus 5.5 xhigh (opus-1), USA v1.01, -O2 -G8 -ffunction-sections, own unit L15_0042E1B0-g8.c.
  * Best check.py: 3124 bytes, expected 3140; 0 of 1 places match. 725 of 785 retail rows align
@@ -81,20 +89,12 @@ extern void func_L05_003263F8(int);
 extern int func_L05_00324DB8(void);
 extern void func_L00_0030CF60(void),func_L05_0037A5F8(void);
 
-static __inline__ int HudY(int y,int mode,int adjust,float r)
-{
-    if(mode!=0) return (int)(y*D_L15_001B2E84[0]+r)+adjust;
-    return (int)(y*D_L15_001B2E84[0]+r);
-}
-
 #define HudText(X,Y,TEXT,R) { int sx,sy; \
-    if((int)private!=0) { sx=(X); sy=(int)((Y)*D_L15_001B2E84[0]+R)+zero; } \
-    else { sx=(X); sy=(int)((Y)*D_L15_001B2E84[0]+R); } \
+    sx=(X); sy=(int)((Y)*D_L15_001B2E84[0]+R); \
     func_0027F5B8(sx,sy,0x80808080,TEXT,128); }
 
 #define HudPanel(P,C) { float px,py; \
     px=D_L15_001AC560[0]+four; py=(int)((D_L15_001AC560[1]+four)*D_L15_001B2E84[0]+round); \
-    do { } while (0); \
     func_00300968(P,px,py,C,0.8f,0); }
 
 int func_L15_0042E1B0(void)
@@ -106,7 +106,6 @@ int func_L15_0042E1B0(void)
     char *private=FIELD(char *,D_L15_001B1580,0x68);
     int kind=1;
     int selection;
-    const int zero=0;
     char *label;
     float half;
     float x,y,ratio,base,alpha,four,round;

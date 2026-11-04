@@ -1,3 +1,11 @@
+/* 4 November 2026: faithful retained C; no linked match.
+ * Remove the unused eight-float local that existed solely to reproduce the stack frame.
+ * us: 564/564 bytes, 0/1 places; us2: 564/564 bytes, 0/1 places; pal: 564/564 bytes, 0/1 places.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Reopen: Recover genuine scratch ownership and loop/allocation lifetimes; no unused storage or array overstatement.
+ * Earlier measurements below are historical, including any diagnostic-only
+ * constructs they describe; those constructs are no longer active C.
+ */
 /* func_L23_0041CA58 (564 bytes, 1 place: 23:0041CA58) -- NEAR MISS, not integrated.
    This C compiles to 564 bytes, the retail size (a -G0 unit: no $gp); check.py reports
    "instruction at +0x8 differs" (the prologue save order), 0 of 1 places; 7 mnemonics and the
@@ -51,7 +59,6 @@ void func_L23_0041CA58(char *arg0) {
     int sums[47];
     int picks[7];
     float F[4];
-    float pad[8];
     TI128 *dst;
     char *base;
     int total = 0;

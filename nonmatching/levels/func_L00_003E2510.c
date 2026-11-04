@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1724/1724 bytes, 0/27 placements; first difference 0x50.
+ * Profile: -O2 -G0 -ffunction-sections -g.
+ * func_002E5CF8 returns int in its matched definition; restoring that ignored result changes
+ * 1700 to 1724 bytes. The frame-address reaching copy and subsequent allocation/layout remain
+ * different. The health lookup keeps its signed32 stored-address return, cast only at use.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* sol-high, task v1240; USA v1.01, -O2 -G0 -ffunction-sections -g.
  * Best retained draft: 1700 bytes versus 1724 retail; 0 of 27 places match.
  * All required declarations are below. Tested in a dedicated source unit.
@@ -29,7 +37,7 @@
 extern int func_002B4038(int,int);
 extern void func_002AFFD8(void *,void *,int);
 extern int func_L00_003E39B8(void *);
-extern char *func_002AB1F0(void *);
+extern int func_002AB1F0(void *);
 extern void func_00282CF0_7(void *,void *,void *);
 extern void func_00282CC0_7(void *,void *,void *);
 extern void func_00282D30_7(void *,void *,float);
@@ -42,7 +50,7 @@ extern void func_L00_003E3890(void *);
 extern int func_002761F8(void *,void *,int,int,void *);
 extern void func_L00_003E3258(void *,int,int);
 extern void func_00334160(void *,int,int);
-extern void func_002E5CF8(int,int,void *);
+extern int func_002E5CF8(int,int,void *);
 extern int func_00282948(void *);
 extern void func_L00_003E3668(void *);
 extern int func_002A77E0(int);
@@ -95,7 +103,7 @@ void func_L00_003E2510(char *obj)
         if(func_L00_003E39B8(state->target)) goto clear_target;
         {
             func_00282CF0_7(delta,state->target+0x10,obj+0x10);
-            r=func_002AB1F0(state->target);
+            r=((char *)func_002AB1F0(state->target));
             if(r) {func_00282D30_7(tmp,dir,EF(r,0x10));func_00282CC0_7(delta,delta,tmp);}
             len=func_00282DF0_7(delta);
             if(len!=0) {

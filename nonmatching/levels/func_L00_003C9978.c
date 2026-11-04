@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 2792/2800 bytes, 0/27 placements; first difference size mismatch.
+ * Profile: -O2 -G0 -ffunction-sections -ffast-math -frac2-zero-ti-por -frac2-hazard-labels.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Current retained result, 1 November 2026: 2792/2800 bytes. Restore the emitter's pointer return and
  * provide the complete 40-byte collision request footprint. Its tail reuses the direction slot in a 48-byte
  * union, as the retail stack accesses show, instead of overrunning a separate 32-byte object. The final
@@ -183,7 +191,7 @@ extern void func_0029F338(void *);
 extern float func_002A7878(float, float);
 extern void func_002A8C00(void *, void *, int, float, void *);
 extern void func_002A8E20(void *, void *);
-extern float *func_002AB1F0(void *);
+extern int func_002AB1F0(void *);
 extern void func_002AC728(void *, void *, float, float, int);
 extern void func_002FEE50(int);
 extern void func_002FEE70(int, void *, int);
@@ -329,7 +337,7 @@ void func_L00_003C9978(Moby_003C9978 *self)
         vars->speed = vars->speed + vars->accel;
 
         if (vars->target != 0) {
-            float *health = func_002AB1F0(vars->target);
+            float *health = ((float *)func_002AB1F0(vars->target));
             float lim;
             int n;
 

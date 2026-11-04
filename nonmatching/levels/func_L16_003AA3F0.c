@@ -1,3 +1,11 @@
+/* 4 November 2026: faithful retained C; no linked match.
+ * Remove four initializers whose values are overwritten before every read; the real later assignments remain.
+ * us: 1676/1676 bytes, 0/1 places; us2: 1676/1676 bytes, 0/1 places; pal: absent.
+ * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
+ * Reopen: Recover actual local/GCSE and particle-loop lifetime evidence without dummy initializers or artificial bucket-count perturbations.
+ * Earlier measurements below are historical, including any diagnostic-only
+ * constructs they describe; those constructs are no longer active C.
+ */
 /*
  * Tier: task v2035, Claude Opus 5.5, 1 November 2026.
  * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
@@ -78,12 +86,12 @@ void func_L16_003AA3F0(BeamMoby *object)
     Vector positions[32], velocities[32], scratch, jitter;
     Vector transform[4];
     const float frameTime = 0.01666666753590107f;
-    float half = 0.0f;
-    float timeStep = 0.0f;
+    float half;
+    float timeStep;
     float unit;
-    float spread = 0.0f;
+    float spread;
     int i, smoothIndex, branchIndex, particleIndex, j, k;
-    int selected = 0;
+    int selected;
     object->position.w = 1.0f;
     beam->lifetime = func_002A7820(D_L16_001AF884, D_L16_001AF888);
     beam->duration = beam->lifetime;

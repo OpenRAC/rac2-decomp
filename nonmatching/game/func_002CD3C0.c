@@ -9,7 +9,10 @@
  * and commuted-add spellings tied. Reopen with an independent constant-
  * lifetime witness; no other-release or linked validation is claimed.
  * The formatter's return was subsequently corrected to int from its current
- * definition in 0027F980.c; this final retained declaration is uncompiled.
+ * definition in 0027F980.c. The final retained declaration was checked on
+ * 4 November 2026: 284/284 bytes, 0/28 USA placements, first +0x24.
+ * US2 and PAL have no catalogue identity of this name; those are absences,
+ * not successful placement checks.
  */
 extern void func_0027C540(int);
 extern void func_0027C660(void);

@@ -1,3 +1,13 @@
+/* 4 November 2026, bounded source-lifetime follow-up; not linked.
+ * Current replay of the retained profile/body: 1252/1252 bytes, 0/27 USA
+ * v1.01 places; only the two one/150 initialization instructions differ.
+ * A common named increment for the counter/mode updates produces 1264 bytes.
+ * A natural if/else replacing the two-arm switch produces 1248 bytes and
+ * changes the dispatch/delay layout. Neither improves the retained switch.
+ * No synthetic dependency or discarded source effect is retained. US2/PAL
+ * compilation was not repeated after the US mismatch. Reopen only with
+ * independent evidence for the original constant birth order.
+ */
 /* GPT-6.1 Sol, high effort; bounded manual reconstruction, 2026-10-29; not linked.
  * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
  *          -fno-gcse -fno-strength-reduce.

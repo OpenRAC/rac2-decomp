@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 752/752 bytes, 0/1 placements; first difference 0xc.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* 2026-11-03 w02 source-contract review (USA v1.01 only).
  * Profile: -O2 -G8 -ffunction-sections.
  * Current check.py: 752/752 bytes, 0/1 places, first mismatch +0x0C.
@@ -44,7 +52,7 @@ typedef unsigned char u8;
 typedef short s16;
 
 extern void func_L11_00443940(char *, int);
-extern char *func_00288FB8(int);
+extern int func_00288FB8(int);
 extern long long func_0027C878(int);
 extern void func_0027F640(long long, char *, float, float, float, int, long long, char *);
 extern void func_002802E0(char *, int, int, int, int, int, int, int, int);
@@ -89,7 +97,7 @@ void func_L11_004456A0(char *a0) {
 
     func_L11_00443940(a0, 0);
     state = *(char **)(a0 + 0x68);
-    text = func_00288FB8(0x2F45);
+    text = ((char *)func_00288FB8(0x2F45));
     func_0027F640(D_L11_001B180C, text, (float)D_L11_001B1810,
                   (float)(int)((float)D_L11_001B1814 * D_L11_001B3E04 + 0.5f), D_L11_001B1808, -1,
                   func_0027C878(1), D_L11_002A3AD0);
@@ -109,18 +117,18 @@ void func_L11_004456A0(char *a0) {
     func_002802E0(ctx, r1, r2, D_L11_001B1838, D_L11_001B183C, D_L11_001B181C, r3,
                   D_L11_001B1840, 3);
     if (*(s16 *)(state + 0x1E8) == 0 && D_001395B8[func_L11_0043E108(0)] < 2) {
-        text = func_00288FB8(0x2F96);
+        text = ((char *)func_00288FB8(0x2F96));
         func_00280270(ctx, D_L11_001B1818, text, func_001157AC(text));
     } else if (*(s16 *)(state + 0x1E8) == 1 && D_001395B8[func_L11_0043E108(1)] < 2) {
-        text = func_00288FB8(0x2F97);
+        text = ((char *)func_00288FB8(0x2F97));
         func_00280270(ctx, D_L11_001B1818, text, func_001157AC(text));
     } else {
-        text = func_00288FB8(0x2F62);
-        msg = func_00288FB8(0x2F5E);
+        text = ((char *)func_00288FB8(0x2F62));
+        msg = ((char *)func_00288FB8(0x2F5E));
         func_00115DA8(buf2, D_L11_001B15A0, text, *(int *)(state + 0x1E0), msg);
         func_00280270(ctx, D_L11_001B1818, buf2, func_001157AC(buf2));
     }
-    text = func_00288FB8(0x2F47);
+    text = ((char *)func_00288FB8(0x2F47));
     u = (float)D_L11_001B1830;
     u = u * D_L11_001B3E04;
     u = u + 0.5f;

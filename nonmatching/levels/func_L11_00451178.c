@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 4824/4824 bytes, 0/1 placements; first difference 0x1088.
+ * Profile: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges.
+ * Five helpers keep their defined return contracts: the four level movement helpers return int
+ * and func_003280C8 returns a pointer. These ignored-result repairs leave the six case-12
+ * PRE/spill words unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* func_L11_00451178 (4,824 B, 1 place): finisher F3, 2026-10-26. The Joba twin of
  * func_L02_0040A4A8 (same particle loop: alpha = 127 after the 0x48 store, the template through
  * tmpl; see that unit's header). Profile -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges.
@@ -91,14 +99,14 @@ extern u8 *func_L11_004417E8(u8 *);
 extern void func_L11_00452F30(u8 *, u8 *);
 extern void func_L11_004530C0(u8 *);
 extern void func_L02_00333438(u8 *, void *);
-extern void func_L01_00321178(u8 *, void *);
+extern int func_L01_00321178(u8 *, void *);
 extern s32 func_L11_00441808(u8 *, u8 *);
 extern void func_002B5278(u8 *, float);
 extern s32 func_00282978(void *);
 extern s32 func_002761F8(void *, void *, s32, void *, void *);
 extern s32 func_L11_004530E0(u8 *);
 extern s32 func_002B4FF0(u8 *, float *, float);
-extern void func_L02_00333480(u8 *, void *, void *);
+extern int func_L02_00333480(u8 *, void *, void *);
 extern s32 func_002B50E0(u8 *, void *, float);
 extern s32 func_00283DB8(void *, float);
 extern void func_0029FC20(u8 *, s32, void *);
@@ -112,16 +120,16 @@ extern void *func_002C65A0(void *, void *, s32, u32, s32, s32, s32, float, float
 extern s32 func_002A8C28(void *, void *, float, u32, float, float, s32, s32, s32);
 extern void *func_002C16C0(void *, void *, s32, s32, u32, s32, float, float, float, float, float);
 extern s32 func_002A7820(s32, s32);
-extern void func_L11_00340500(u8 *, void *);
+extern int func_L11_00340500(u8 *, void *);
 extern float func_0029F530(u8 *);
 extern s32 func_002AEB60(u8 *, float);
 extern void func_00283098(void *, void *, void *);
-extern void func_003280C8(float, u8 *, void *, void *, s32, s32);
+extern void *func_003280C8(float, u8 *, void *, void *, s32, s32);
 extern s32 func_002B1C20(u8 *, void *);
 extern void func_L02_003FC248(u8 *, s32, s32);
 extern void func_L11_00452DF8(u8 *);
 extern void func_002AB6D8(void *, void *);
-extern void func_L07_00321D68(u8 *, void *);
+extern int func_L07_00321D68(u8 *, void *);
 extern void func_00282D30(void *, void *, float);
 extern void func_002A3F10(u8 *, s32, s32 *, void *);
 extern void func_002B4090(float, float, float, u8 *, void *);

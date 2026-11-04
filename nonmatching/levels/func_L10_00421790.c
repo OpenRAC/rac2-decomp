@@ -1,3 +1,10 @@
+/* Faithful-source review, 4 November 2026; retained, not linked.
+ * 3616/3620 bytes, 0/1 USA placement.
+ * Remove the placeholder text_row condition and helper; every call passed adjustment zero, so each actual coordinate is the direct signed conversion of scaled. Real screen-coordinate adjustments remain. HUD constant lifetimes and print/sprite argument scheduling remain open.
+ * Measured in the assigned production unit with the profile recorded below.
+ * Other-release checks were not rerun for this nonmatching source.
+ * Earlier diagnostic measurements below are historical where superseded.
+ */
 /* opus-1 worker (Claude Opus 5.5, xhigh), task v1872, USA v1.01.
  * Closest draft: 3620 bytes / 3620 retail, 0 of 1 places; 80 of 905 rows differ, first at +0x208.
  * Compile as a dedicated -g8.c unit with default game flags (-O2 -G8 -ffunction-sections).
@@ -115,12 +122,6 @@ extern void func_L05_003263F8(s32);
 extern s32 func_L05_00324DB8(void);
 extern void func_L00_0030CF60(void),func_L05_0037A5F8(void);
 
-static __inline__ s32 text_row(s32 mode, f32 scaled, s32 adjust)
-{
- if(mode!=0) return (s32)scaled+adjust;
- return (s32)scaled;
-}
-
 static __inline__ s32 screen_coord(s32 mode, f32 value, f32 offset)
 {
  f32 scaled=value*D_L10_001B2D84+0.5f;
@@ -145,7 +146,7 @@ s32 func_L10_00421790(void) {
  textX=(s32)func_L05_00379ED0(0xf85); if(textX) score=func_L10_0037D200((void *)textX); else score=0;
  label=func_00288FB8(0x31d8);
  func_00115DA8(text,D_L10_001B14C8,label,score);
- scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+0.5f; textX=D_L10_001B14C0-65; func_0027F5B8(textX,text_row((s32)data,scaled,0),0x80808080,text,128);
+ scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+0.5f; textX=D_L10_001B14C0-65; func_0027F5B8(textX,(s32)scaled,0x80808080,text,128);
  if(func_L10_004176A0() && D_L10_001B13F4) { D_L10_001B13F4=0; D_L10_001B13F8=180; }
  if(func_L10_004176B0()) { D_L10_001B13F4=1; D_L10_001B13FC=180; }
  if(D_L10_001B13F8) func_L00_0030DD70(func_00288FB8(0x31d9),-1);
@@ -158,10 +159,10 @@ s32 func_L10_00421790(void) {
  func_L10_00424CD0(0,1,1,1);
  label=func_00288FB8(0x31db); fmt=D_L10_001B14C8;
  func_00115DA8(text,fmt,label,func_L05_0037B3A0(func_L05_00379ED0(0xf93)));
- scaled=(D_L10_001B14BC-8)*D_L10_001B2D84+half; textX=D_L10_001B14B8-65; func_0027F5B8(textX,text_row((s32)data,scaled,0),0x80808080,text,128);
+ scaled=(D_L10_001B14BC-8)*D_L10_001B2D84+half; textX=D_L10_001B14B8-65; func_0027F5B8(textX,(s32)scaled,0x80808080,text,128);
  label=func_00288FB8(0x31dc);
  func_00115DA8(text,fmt,label,func_L05_0037B3A0(func_L05_00379ED0(0xcbe)));
- scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+half; textX=D_L10_001B14C0-65; func_0027F5B8(textX,text_row((s32)data,scaled,0),0x80808080,text,128);
+ scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+half; textX=D_L10_001B14C0-65; func_0027F5B8(textX,(s32)scaled,0x80808080,text,128);
  break;
  }
  case 2: {
@@ -169,7 +170,7 @@ s32 func_L10_00421790(void) {
  func_L10_00424CD0(0,1,0,1);
  label=func_00288FB8(0x31dd); fmt=D_L10_001B14C8;
  func_00115DA8(text,fmt,label,func_L05_0037B3A0(func_L05_00379ED0(0xf8e)));
- scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+0.5f; func_0027F5B8(D_L10_001B14C0-70,text_row((s32)data,scaled,0),0x80808080,text,128);
+ scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+0.5f; func_0027F5B8(D_L10_001B14C0-70,(s32)scaled,0x80808080,text,128);
  break;
  }
  case 3: {
@@ -177,11 +178,11 @@ s32 func_L10_00421790(void) {
  func_L10_00424CD0(1,1,0,1);
  label=func_00288FB8(0x31d7);
  func_00115DA8(text,D_L10_001B14C8,label,D_L10_001B141C);
- scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+half; textX=D_L10_001B14C0-65; func_0027F5B8(textX,text_row((s32)data,scaled,0),0x80808080,text,128);
+ scaled=(D_L10_001B14C4-8)*D_L10_001B2D84+half; textX=D_L10_001B14C0-65; func_0027F5B8(textX,(s32)scaled,0x80808080,text,128);
  func_002ED578(D_L10_001B3550,&a,&b,&c);
  label=func_00288FB8(0x2f83);
  func_00115DA8(text,D_L10_001B14D0,label,a,b,c);
- scaled=(D_L10_001B14AC-8)*D_L10_001B2D84+half; textX=D_L10_001B14A8-80; func_0027F5B8(textX,text_row((s32)data,scaled,0),0x80808080,text,128);
+ scaled=(D_L10_001B14AC-8)*D_L10_001B2D84+half; textX=D_L10_001B14A8-80; func_0027F5B8(textX,(s32)scaled,0x80808080,text,128);
  break;
  }
  }

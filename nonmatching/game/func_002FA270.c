@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1552/1552 bytes, 0/28 placements; first difference 0x2b4.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * The text lookup keeps its signed32 stored-address return with a use-site pointer cast.
+ * func_0028EA58 returns void in its matched definition; that correction fixes the two color-store
+ * ordering rows at +0x4A8/+0x4B4. The earlier table/alpha/coordinate residual remains.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* opus xhigh, task v2072: retained C attempt, USA v1.01.
  * Profile: -O2 -G8 -ffunction-sections (unit src/game/002F9BC0-ammo-g8.c).
  * Best: 1552 bytes, the same as retail; 0 of 28 places; about 21 real
@@ -44,8 +52,8 @@ extern int func_00282C30(int);
 extern void func_00285548(int,int,int,int,int,int,unsigned int);
 extern int func_0028E588(int,int);
 extern unsigned int func_00336EF8(int);
-extern int func_0028EA58(int,int,int,int,int,unsigned int *);
-extern char *func_00288FB8(int);
+extern void func_0028EA58(int,int,int,int,int,unsigned int *);
+extern int func_00288FB8(int);
 extern int func_0027F288(char *,int,float);
 extern void func_002F97A0(float,float,unsigned long,float,char *,int);
 static __inline__ int screen_y(int y) { int result = (int)((float)y * D_001B2280[0] + 0.5f); if (D_001A7B90) result += 4; return result; }

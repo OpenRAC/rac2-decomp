@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 436/436 bytes, 0/27 placements; first difference 0xc.
+ * Profile: -O2 -G64 -Wa,-G64 -ffunction-sections -fno-strength-reduce -fno-rerun-loop-opt.
+ * Current source reproduces 436 bytes in USA v1.01 and v2.00; PAL has no canonical row. The old
+ * 412-byte index entry is superseded. Index/fade saved-register roles and the D-1 base remain
+ * different.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /*
  * Retained manual C reconstruction; not linked or counted.
  * Tier opus-1 (Claude Opus 5.5, xhigh), task v2202, 3 November 2026.

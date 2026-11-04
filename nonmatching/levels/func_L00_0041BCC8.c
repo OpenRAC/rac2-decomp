@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1176/1176 bytes, 0/27 placements; first difference 0x4c.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Current source reproduces 1176 bytes in all three releases. The old 832-byte index measurement
+ * is superseded. Only the two PRE spill slots remain swapped; the exact probe with 27 unused
+ * locals remains rejected.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Tier: Claude Opus 5.5 (xhigh), task v1715, 31 October 2026.
  * Unit: new sibling src/levels/shared/L00_0041ABB8-beam-g8.c, default -G8 profile
  * (-O2 -G8 -ffunction-sections); the name alone gives the flags, no cflags line.

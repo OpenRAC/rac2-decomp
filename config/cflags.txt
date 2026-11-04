@@ -3133,3 +3133,5 @@ src/levels/shared/L05_00443D08-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-p
 src/levels/shared/L05_0041A228-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/levels/shared/L00_003A53E8-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
 src/levels/11_joba/L11_00420C88-state-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L00_002D7940.c	-O2 -G0 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
+src/levels/02_maktar_nebula/L02_003D0408-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels

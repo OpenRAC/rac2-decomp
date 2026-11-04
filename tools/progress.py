@@ -228,6 +228,29 @@ def build_report(groups: dict, title, data: dict) -> dict:
     return {"version": 2, "measures": total, "categories": cats, "units": units}
 
 
+def pending_boot_split(functions: list[dict], where: dict) -> bool:
+    """Recognize only the unmatched report row predating the measured main/sound split.
+
+    The catalogue repair validates the retail bodies. Without game data, CI can
+    check the exact old/new names, boot extents and virtual address; it never
+    rewrites the report or turns the old merged row into matching credit.
+    """
+    main, sound = "func_00131D98", "func_00131DE8"
+    reported = {f["name"] for f in functions}
+    if set(where) - reported != {sound} or main not in where:
+        return False
+    address, size, kind, level = where[main]
+    if (size, kind, level) != (80, "boot", None) or where[sound] != (address + 80, 576, "boot", None):
+        return False
+    old = [f for f in functions if f["name"] == main]
+    if len(old) != 1 or old[0]["fuzzy_match_percent"] != 0.0:
+        return False
+    try:
+        return old[0]["size"] == "656" and old[0]["metadata"]["virtual_address"] == str(address)
+    except (KeyError, TypeError):
+        return False
+
+
 def release_check(version: str, report_path: Path) -> None:
     """CI's check for another release, without the disc: the report counts only functions of
     the release's catalogues that are C (or ASM_FUNC) in src/ and src/<version>/, and every
@@ -246,20 +269,32 @@ def release_check(version: str, report_path: Path) -> None:
     functions = [f for u in report["units"] for f in u["functions"]]
     reported = {f["name"] for f in functions}
     retired = reported - set(where)
-    if total != len(where) or retired:
+    missing = set(where) - reported
+    split = pending_boot_split(functions, where)
+    if total != len(reported):
+        sys.exit(f"{report_path.relative_to(ROOT)} has duplicate function rows")
+    if "func_00131DE8" in where and not split and any(
+            f["name"] == "func_00131D98" and f.get("size") == "656" for f in functions):
+        sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged main/sound row")
+    if total != len(where) or retired or missing:
         # Boundary-only PRs leave the reports for a maintainer's later refresh.
-        # Tolerate only measured, wholly unmatched remnants, never a new missing
-        # entry, arbitrary deletion, duplicate row or an overstated match.
-        known_retirement = (retired and retired <= set(levels.FUNCTION_RESIDUES)
-                            and not (set(where) - reported)
-                            and total == len(where) + len(retired)
-                            and all(f["fuzzy_match_percent"] == 0.0 for f in functions
-                                    if f["name"] in retired))
-        if not known_retirement or "--strict" in sys.argv:
+        # Only measured unmatched remnants or this exact unmatched merged boot
+        # row are tolerated. Missing entries and duplicate compensation still fail.
+        known_split = split and not retired
+        known_boundary = ((retired or known_split) and retired <= set(levels.FUNCTION_RESIDUES)
+                          and (not missing or known_split)
+                          and total == len(where) + len(retired) - len(missing)
+                          and all(f["fuzzy_match_percent"] == 0.0 for f in functions
+                                  if f["name"] in retired))
+        if not known_boundary or "--strict" in sys.argv:
             sys.exit(f"{report_path.relative_to(ROOT)} has {total} functions, the catalogues {len(where)}: "
                      f"regenerate it with tools/progress.py --version {version}")
-        print(f"{report_path.relative_to(ROOT)} retains {len(retired)} unmatched catalogue remnants; "
-              "a maintainer regenerates it on master")
+        if retired:
+            print(f"{report_path.relative_to(ROOT)} retains {len(retired)} unmatched catalogue remnants; "
+                  "a maintainer regenerates it on master")
+        if split:
+            print(f"{report_path.relative_to(ROOT)} retains the unmatched merged main/sound row; "
+                  "a maintainer regenerates it on master")
     ahead = sorted((in_c & set(where)) - matched)
     if ahead and "--strict" in sys.argv:
         sys.exit(f"{report_path.relative_to(ROOT)} is behind src/ by {len(ahead)} function(s), e.g. {', '.join(ahead[:5])}")

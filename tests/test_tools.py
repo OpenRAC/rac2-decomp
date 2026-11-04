@@ -697,7 +697,7 @@ class ProgressChecks(unittest.TestCase):
         units={u["name"]:u["measures"]["complete_code"] for u in report["units"]}
         self.assertEqual(units,{"game/done":"12","game/open":"0","Shared level code":"0"})
 
-    def release(self, functions, flags=(), where=None):
+    def release(self, functions, flags=(), where=None, source=None):
         import progress
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
@@ -706,7 +706,7 @@ class ProgressChecks(unittest.TestCase):
             before = path.read_bytes()
             with patch.object(progress,"ROOT",root), \
                  patch.object(progress,"release_functions",return_value=where or {"kept":(0x1000,8,"boot",None)}), \
-                 patch.object(progress,"source_functions",return_value={}), \
+                 patch.object(progress,"source_functions",return_value=source or {}), \
                  patch.object(progress,"handwritten",return_value=set()), \
                  patch.object(levels,"FUNCTION_RESIDUES",{"retired":4}), \
                  patch.object(sys,"argv",["progress.py","--check",*flags]):
@@ -716,6 +716,89 @@ class ProgressChecks(unittest.TestCase):
     def test_unmatched_named_retirement_can_wait_for_a_report_refresh(self):
         self.release([{"name":"kept","fuzzy_match_percent":0.0},
                       {"name":"retired","fuzzy_match_percent":0.0}])
+
+    def split_fixture(self, address=0x00131DF8):
+        main, sound = "func_00131D98", "func_00131DE8"
+        functions = [{"name":main, "size":"656", "fuzzy_match_percent":0.0,
+                      "metadata":{"virtual_address":str(address)}}]
+        where = {main:(address,80,"boot",None), sound:(address+80,576,"boot",None)}
+        return functions, where
+
+    def test_exact_unmatched_boot_split_can_wait_without_rewriting_reports(self):
+        for address in (0x00131D98, 0x00131DF8):
+            with self.subTest(address=address):
+                functions, where = self.split_fixture(address)
+                self.release(functions, where=where,
+                             source={"src/core/main.c":[("func_00131D98", True)]})
+
+    def test_strict_check_still_rejects_the_old_merged_row(self):
+        functions, where = self.split_fixture()
+        with self.assertRaises(SystemExit):
+            self.release(functions, flags=("--strict",), where=where)
+
+    def test_wrong_old_split_extent_address_or_credit_is_rejected(self):
+        for change in ("size", "address", "missing metadata", "matched", "partial", "numeric address"):
+            with self.subTest(change=change), self.assertRaises(SystemExit):
+                functions, where = self.split_fixture()
+                row = functions[0]
+                if change == "size": row["size"] = "652"
+                elif change == "address": row["metadata"]["virtual_address"] = str(0x00131DFC)
+                elif change == "missing metadata": del row["metadata"]
+                elif change == "matched": row["fuzzy_match_percent"] = 100.0
+                elif change == "partial": row["fuzzy_match_percent"] = 25.0
+                else: row["metadata"]["virtual_address"] = float(0x00131DF8) + 0.5
+                self.release(functions, where=where,
+                             source={"src/core/main.c":[("func_00131D98", True)]})
+
+    def test_wrong_current_split_layout_or_kind_is_rejected(self):
+        main, sound = "func_00131D98", "func_00131DE8"
+        for change in ("main size", "tail size", "tail start", "main kind", "tail kind", "main level"):
+            with self.subTest(change=change), self.assertRaises(SystemExit):
+                functions, where = self.split_fixture()
+                name = main if change.startswith("main") else sound
+                row = list(where[name])
+                if change.endswith("size"): row[1] -= 4
+                elif change.endswith("start"): row[0] += 4
+                elif change.endswith("kind"): row[2] = "shared"
+                else: row[3] = 0
+                where[name] = tuple(row)
+                self.release(functions, where=where)
+
+    def test_split_does_not_hide_other_missing_entries_or_duplicate_rows(self):
+        for change in ("missing", "duplicate", "compensating duplicate", "unknown deletion"):
+            with self.subTest(change=change), self.assertRaises(SystemExit):
+                functions, where = self.split_fixture()
+                if change == "missing": where["other"] = (0x2000,8,"boot",None)
+                elif change == "unknown deletion": functions.append({"name":"unknown","fuzzy_match_percent":0.0})
+                else:
+                    functions.append(dict(functions[0]))
+                    if change == "compensating duplicate":
+                        where["other"] = (0x2000,8,"boot",None)
+                self.release(functions, where=where)
+
+    def test_split_tolerance_does_not_hide_a_retired_row(self):
+        functions, where = self.split_fixture()
+        functions.append({"name":"retired", "fuzzy_match_percent":0.0})
+        with self.assertRaises(SystemExit):
+            self.release(functions, where=where)
+
+    def test_old_merged_main_with_a_reported_tail_is_rejected(self):
+        functions, where = self.split_fixture()
+        functions.append({"name":"func_00131DE8", "size":"576", "fuzzy_match_percent":0.0})
+        with self.assertRaises(SystemExit):
+            self.release(functions, where=where)
+
+    def test_duplicate_missing_compensation_without_a_split_is_rejected(self):
+        functions = [{"name":"kept", "fuzzy_match_percent":0.0}] * 2
+        where = {"kept":(0x1000,8,"boot",None), "missing":(0x2000,8,"boot",None)}
+        with self.assertRaises(SystemExit):
+            self.release(functions, where=where)
+
+    def test_refreshed_separate_rows_need_no_boundary_tolerance(self):
+        functions, where = self.split_fixture()
+        functions[0]["size"] = "80"
+        functions.append({"name":"func_00131DE8", "size":"576", "fuzzy_match_percent":0.0})
+        self.release(functions, flags=("--strict",), where=where)
 
     def test_strict_report_check_still_requires_the_retired_row_removed(self):
         with self.assertRaises(SystemExit):

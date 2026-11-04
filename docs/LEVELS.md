@@ -158,6 +158,31 @@ catalogue is written. The normal carry command still performs full cross-release
 alignment and may revisit correspondences; entry maintenance does not do that or
 change source files. These are catalogue repairs, not compiler changes or new C matches.
 
+`tools/carry.py --entries` also recovers the measured main/sound split in the
+two secondary boot catalogues. USA v1.01 already has the closed 80-byte loop
+`func_00131D98` followed by the separately called 576-byte initializer
+`func_00131DE8`. USA v2.00 combined them at `0x00131D98`; PAL combined them at
+`0x00131DF8`. Direct entry witnesses, the loop's back edge and both complete
+bodies establish the same boundary in all three releases. The correction
+requires one EE code section containing the entire span, matching normalized
+bodies and named direct callees, and nonoverlapping original extents. Partial,
+conflicting or changed rows fail; a valid split replays unchanged. It adds one
+row to each secondary boot catalogue and preserves the total end and all bytes.
+The main loop's initial indirect entry uses a scoped `ref_` because its
+canonical identity differs between releases. Its following eight-byte alignment
+is independently evidenced; the separate sound body remains unchanged.
+The [generator, source and regression tests](https://github.com/OpenRAC/rac2-decomp/commit/96a2e817a258351edbd25db3583ab416e8fdcbcf)
+pass two unchanged catalogue replays and all 84 strict program builds. The
+main loop is present as C in each boot's placement report.
+
+PRs still leave the generated reports for a maintainer's refresh on `master`.
+For this split, `tools/progress.py --check` recognizes only the old unmatched
+656-byte main row at the same virtual address, with exactly the sound name
+missing and the current adjacent 80/576-byte boot entries. Duplicate rows,
+other missing or retired entries, partial/matched credit for the old merged
+body and an already reported sound row are rejected. No report is rewritten
+or credited by this exception; `--strict` still requires the refreshed rows.
+
 `FUNCTION_RESIDUES` excludes individually verified remnants by name and size. The
 one-word entries' immediate predecessors finish with a return and its delay slot
 across alignment nops, or a closed tail jump before debug-fill bytes. The static scan

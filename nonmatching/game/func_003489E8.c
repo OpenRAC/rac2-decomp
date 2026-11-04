@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 1240/1240 bytes, 0/28 placements; first difference 0x1b0.
+ * Profile: -O2 -G8 -ffunction-sections -frac2-hazard-labels.
+ * The ignored color helper keeps its actual int return; widget getters return signed32 stored
+ * addresses with explicit use-site casts. The hazard-labels profile is required to reproduce the
+ * retained +0x1B0 spill-slot tie.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* 2 November 2026: three new bounded source trials used real named input
  * masks and row/layout constants across the existing branches, following the
  * shared PRE hash/spill-slot guidance. None improved the retained one-cause
@@ -34,10 +42,10 @@ extern const float D_001AE760[10] __attribute__((section(".sdata")));
 
 extern void func_00335E68(void *, int);
 extern void func_003363C0(void *, float);
-extern float *func_00335E10(void *);
-extern unsigned int *func_00335E20(void *);
+extern int func_00335E10(void *);
+extern int func_00335E20(void *);
 extern void func_00335F88(void *, float, float, float, float);
-extern void func_002A9588(int, int, int, int, int);
+extern int func_002A9588(int, int, int, int, int);
 
 #define MODE (*(int *)(m + 0x44C))
 #define ORG (*(float **)(m + 0x434))
@@ -86,33 +94,33 @@ int func_003489E8(u8 *m, int pad)
     }
     pressed = pad & 0x1000;
 
-    p = func_00335E10(m);
+    p = ((float *)func_00335E10(m));
     p[0] = D_001AE760[0] + ORG[0];
     p[1] = D_001AE760[1] + ORG[1];
-    p = func_00335E10(a);
+    p = ((float *)func_00335E10(a));
     p[0] = D_001AE760[2] + ORG[0];
     p[1] = D_001AE760[3] + ORG[1];
-    p = func_00335E10(b);
+    p = ((float *)func_00335E10(b));
     p[0] = D_001AE760[4] + ORG[0];
     p[1] = D_001AE760[5] + ORG[1];
-    p = func_00335E10(c);
+    p = ((float *)func_00335E10(c));
     p[0] = D_001AE760[6] + ORG[0];
     p[1] = D_001AE760[7] + ORG[1];
-    p = func_00335E10(m + 0xE4);
+    p = ((float *)func_00335E10(m + 0xE4));
     p[0] = D_001AE760[8] + ORG[0];
     p[1] = D_001AE760[9] + ORG[1];
 
     for (i = 0; i < *(int *)(m + 0x444); i++) {
         u8 *row = m + 0x218 + i * 0x48;
 
-        p = func_00335E10(row);
+        p = ((float *)func_00335E10(row));
         p[0] = ((float *)(*(int *)(m + 0x414) + i * 12))[0] + ORG[0];
         p[1] = ((float *)(*(int *)(m + 0x414) + i * 12))[1] + ORG[1];
         func_00335F88(row, ((float *)(*(int *)(m + 0x414) + i * 12))[2], 0.0f, 0.0f, 0.0f);
         if (*(int *)(m + 0x418 + i * 4) != 0)
-            *func_00335E20(row) = 0x80F0F0F0;
+            *((unsigned int *)func_00335E20(row)) = 0x80F0F0F0;
         else
-            *func_00335E20(row) = 0x80808080;
+            *((unsigned int *)func_00335E20(row)) = 0x80808080;
     }
 
     step = 0;
@@ -141,6 +149,6 @@ int func_003489E8(u8 *m, int pad)
         } while (start != idx);
     }
     func_003363C0(m + 0xE4, (float)*(int *)(m + 0x43C));
-    *func_00335E20(m + (*(int *)(m + 0x43C) * 0x48 + 0x218)) = 0x70FFFEED;
+    *((unsigned int *)func_00335E20(m + (*(int *)(m + 0x43C) * 0x48 + 0x218))) = 0x70FFFEED;
     return *(int *)(m + 0x43C);
 }

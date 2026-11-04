@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 5988/6048 bytes, 0/28 placements; first difference size mismatch.
+ * Profile: -O2 -G0 -ffunction-sections.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* 3 November 2026: retained near miss, not linked.
  * Profile: -O2 -G0 -ffunction-sections.
  * Current size: 5988/6048 bytes; US 0/28, US2 absent, PAL absent.
@@ -90,9 +98,9 @@ extern void func_003361E0(char *o, char *text, s32 arg);
 extern void func_00336390(char *o, char *font, s32 n);
 extern void func_00335E38(char *o, f32 x, f32 y, f32 z, f32 w);
 extern void func_00335F88(char *o, f32 x, f32 y, f32 z, f32 w);
-extern s32 *func_00335E20(char *o);
-extern s32 *func_00335E18(char *o);
-extern s32 *func_00335E10(char *o);
+extern int func_00335E20(char *o);
+extern int func_00335E18(char *o);
+extern int func_00335E10(char *o);
 extern void *func_00115484(void *dst, s32 c, unsigned int n);
 extern void func_003369A8(char *o, char *text, s32 arg);
 extern void func_00336A38(char *o, char *buf);
@@ -164,7 +172,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_00336710(self + 0x148, D_001AE6A0, arg);
     func_00335F88(self + 0x148, 32.0f, 32.0f, 0.0f, 0.0f);
     func_00335E38(self + 0x148, 20.0f, 15.0f, 0.0f, 0.0f);
-    *func_00335E20(self + 0x148) = 0x60F0F0B0;
+    *((s32 *)func_00335E20(self + 0x148)) = 0x60F0F0B0;
     func_003361E0(self + 0x184, D_001AE6B0, arg);
     func_00335E38(self + 0x184, 498.0f, 10.0f, 0.0f, 0.0f);
     func_00336390(self + 0x184, font + 0x8710, 3);
@@ -196,20 +204,20 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_00335F88(self + 0x2C0, 1.0f, 1.0f, 0.0f, 0.0f);
     func_00335E38(self + 0x2C0, 125.0f, 208.0f, 0.0f, 0.0f);
     color = 0x442D00;
-    *func_00335E20(self + 0x2C0) = color;
+    *((s32 *)func_00335E20(self + 0x2C0)) = color;
     func_00335F20(self + 0x2C0, *(f32 **)(self + 0x7E4));
     func_003361E0(self + 0x30C, D_001ADFF0, arg);
     func_00336390(self + 0x30C, font + 0x8710, 6);
     func_00335F88(self + 0x30C, 1.0f, 1.0f, 0.0f, 0.0f);
     func_00335E38(self + 0x30C, 125.0f, 208.0f, 0.0f, 0.0f);
     color = 0xF0C070;
-    *func_00335E20(self + 0x30C) = color;
+    *((s32 *)func_00335E20(self + 0x30C)) = color;
     func_00335F20(self + 0x30C, *(f32 **)(self + 0x7E4));
     func_003361E0(self + 0x5B8, D_001AE000, arg);
     func_00336390(self + 0x5B8, font + 0x8710, 0x10);
     func_00335E38(self + 0x5B8, 125.0f, 208.0f, 0.0f, 0.0f);
     color = 0xFFFEED;
-    *func_00335E20(self + 0x5B8) = color;
+    *((s32 *)func_00335E20(self + 0x5B8)) = color;
     func_00335E68(self + 0x5B8, 0);
 
     for (i = 0; i < 8; i++) {
@@ -225,7 +233,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
         func_00335E38(w, 125.0f, 208.0f, 0.0f, 0.0f);
         func_00335F20(w, *(f32 **)(self + 0x7E4));
         color = 0x442D00;
-        *func_00335E20(w) = color;
+        *((s32 *)func_00335E20(w)) = color;
         func_00115DA8(buf, D_001AE020, i);
         w = (char *)&((HudSelectionPrefix *)self)->icons[i];
         func_00336710(w, buf, arg);
@@ -235,13 +243,13 @@ void func_0034B2C8(char *self, char *font, s32 arg)
         func_00335E38(w, x, (s32)(func_00283198(angle) * 76.442f) + 189, 0.0f, 0.0f);
         func_00335F88(w, 32.0f, 32.0f, 0.0f, 0.0f);
         color = 0xF0F0B0;
-        *func_00335E20(w) = color;
+        *((s32 *)func_00335E20(w)) = color;
     }
     for (i = 1; i < 8; i++) {
-        func_00335EB0(self + 0x358 + i * 0x4C, func_00335E18(self + 0x358));
-        func_00335EB0(self + 0x604 + i * 0x3C, func_00335E18(self + 0x604));
+        func_00335EB0(self + 0x358 + i * 0x4C, ((s32 *)func_00335E18(self + 0x358)));
+        func_00335EB0(self + 0x604 + i * 0x3C, ((s32 *)func_00335E18(self + 0x604)));
     }
-    func_00335EB0(self + 0x2C0, func_00335E18(self + 0x358));
+    func_00335EB0(self + 0x2C0, ((s32 *)func_00335E18(self + 0x358)));
 
     func_00349D58(self + 0x7E8, font, arg);
     func_0034AFE8(self + 0x7E8, 147.0f, 10.0f);
@@ -253,7 +261,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_003495D8(0.3f, hud_bits_34B2C8(0x60442D00), 0.0f, 0.0f, 0.0f, self + 0xBEC, 1);
     func_003495D8(1.0f, hud_bits_34B2C8(0x60442D00), 0.0f, 0.0f, 0.0f, self + 0xBEC, 2);
     func_00349610(self + 0xBEC, 1, 0.0f, 2.0f);
-    func_00349590(self + 0xBEC, func_00335E20(self + 0x358));
+    func_00349590(self + 0xBEC, ((s32 *)func_00335E20(self + 0x358)));
     func_00349670(self + 0xBEC, 0);
     func_003495C0(self + 0xBEC, self + 0x1448);
     func_00349630(self + 0xBEC, -1);
@@ -265,7 +273,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_003495D8(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, self + 0xC74, 0);
     func_003495D8(0.3f, 1.0f, 1.0f, 0.0f, 0.0f, self + 0xC74, 1);
     func_003495D8(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, self + 0xC74, 2);
-    func_00349590(self + 0xC74, func_00335E18(self + 0x358));
+    func_00349590(self + 0xC74, ((s32 *)func_00335E18(self + 0x358)));
     func_00349670(self + 0xC74, 0);
     func_003495C0(self + 0xC74, self + 0x1444);
     func_00349630(self + 0xC74, -1);
@@ -279,7 +287,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_00349610(self + 0xE0C, 0, 0.0f, 0.0f);
     func_003495D8(1.0f, hud_bits_34B2C8(0x60F0F0B0), 0.0f, 0.0f, 0.0f, self + 0xE0C, 2);
     func_00349610(self + 0xE0C, 1, 0.0f, 0.0f);
-    func_00349590(self + 0xE0C, func_00335E20(self + 0x604));
+    func_00349590(self + 0xE0C, ((s32 *)func_00335E20(self + 0x604)));
     func_00349670(self + 0xE0C, 0);
     func_003495C0(self + 0xE0C, self + 0x1448);
     func_00349630(self + 0xE0C, -1);
@@ -292,7 +300,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_003495D8(0.3f, hud_bits_34B2C8(0x55F0C070), 0.0f, 0.0f, 0.0f, self + 0xCFC, 1);
     func_003495D8(1.0f, hud_bits_34B2C8(0x55F0C070), 0.0f, 0.0f, 0.0f, self + 0xCFC, 2);
     func_00349610(self + 0xCFC, 1, 0.0f, 3.0f);
-    func_00349590(self + 0xCFC, func_00335E20(self + 0x30C));
+    func_00349590(self + 0xCFC, ((s32 *)func_00335E20(self + 0x30C)));
     func_00349670(self + 0xCFC, 0);
     func_003495C0(self + 0xCFC, self + 0x1448);
     func_00349630(self + 0xCFC, -1);
@@ -304,7 +312,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_003495D8(0.0f, 1.2f, 1.2f, 0.0f, 0.0f, self + 0xD84, 0);
     func_003495D8(0.3f, 1.0f, 1.0f, 0.0f, 0.0f, self + 0xD84, 1);
     func_003495D8(1.0f, 1.0f, 1.0f, 0.0f, 0.0f, self + 0xD84, 2);
-    func_00349590(self + 0xD84, func_00335E18(self + 0x30C));
+    func_00349590(self + 0xD84, ((s32 *)func_00335E18(self + 0x30C)));
     func_00349670(self + 0xD84, 0);
     func_003495C0(self + 0xD84, self + 0x1444);
     func_00349630(self + 0xD84, -1);
@@ -324,33 +332,33 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_003495C8(self + 0xE94, 0);
 
     func_00349970(self + 0xF1C, arg);
-    func_00349A60(self + 0xF1C, 0, func_00335E20(self));
+    func_00349A60(self + 0xF1C, 0, ((s32 *)func_00335E20(self)));
     func_00349AA8(self + 0xF1C, 0, 0x442D00);
     func_00349AA8(self + 0xF1C, 1, 0x60442D00);
     *(f32 *)(self + 0xF1C + 0xC) = 2.0f;
     *(f32 *)(self + 0xF1C + 0x8) = 0.0f;
-    func_00349A60(self + 0xF1C, 1, func_00335E18(self));
+    func_00349A60(self + 0xF1C, 1, ((s32 *)func_00335E18(self)));
     func_00349A70(0.0f, 0.0f, 0.0f, 0.0f, self + 0xF1C, 1, 0);
     func_00349A70(1.0f, 1.0f, 0.0f, 0.0f, self + 0xF1C, 1, 1);
-    func_00349A60(self + 0xF1C, 2, func_00335E10(self));
+    func_00349A60(self + 0xF1C, 2, ((s32 *)func_00335E10(self)));
     func_00349A70(50.0f, 25.0f, 0.0f, 0.0f, self + 0xF1C, 2, 0);
     func_00349A70(10.0f, 10.0f, 0.0f, 0.0f, self + 0xF1C, 2, 1);
 
     func_00349970(self + 0xFB0, arg);
-    func_00349A60(self + 0xFB0, 0, func_00335E20(self + 0x4C));
+    func_00349A60(self + 0xFB0, 0, ((s32 *)func_00335E20(self + 0x4C)));
     func_00349AA8(self + 0xFB0, 0, 0xF0C070);
     func_00349AA8(self + 0xFB0, 1, 0x55F0C070);
     *(f32 *)(self + 0xF1C + 0xC) = 3.0f;
     *(f32 *)(self + 0xF1C + 0x8) = 0.0f;
-    func_00349A60(self + 0xFB0, 1, func_00335E18(self + 0x4C));
+    func_00349A60(self + 0xFB0, 1, ((s32 *)func_00335E18(self + 0x4C)));
     func_00349A70(1.2f, 1.2f, 0.0f, 0.0f, self + 0xFB0, 1, 0);
     func_00349A70(1.0f, 1.0f, 0.0f, 0.0f, self + 0xFB0, 1, 1);
-    func_00349A60(self + 0xFB0, 2, func_00335E10(self + 0x4C));
+    func_00349A60(self + 0xFB0, 2, ((s32 *)func_00335E10(self + 0x4C)));
     func_00349A70(0.0f, 0.0f, 0.0f, 0.0f, self + 0xFB0, 2, 0);
     func_00349A70(10.0f, 10.0f, 0.0f, 0.0f, self + 0xFB0, 2, 1);
 
     func_00349970(self + 0x1044, arg);
-    func_00349A60(self + 0x1044, 0, func_00335E20(self + 0x100));
+    func_00349A60(self + 0x1044, 0, ((s32 *)func_00335E20(self + 0x100)));
     func_00349AA8(self + 0x1044, 0, 0xF0F0F0);
     func_00349AA8(self + 0x1044, 1, 0x80F0F0F0);
     *(f32 *)(self + 0x1044 + 0xC) = 3.0f;
@@ -361,14 +369,14 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_003495D8(0.0f, hud_bits_34B2C8(0x1EFF), 0.0f, 0.0f, 0.0f, self + 0x10D8, 0);
     func_003495D8(0.5f, hud_bits_34B2C8(0x1EFF), 0.0f, 0.0f, 0.0f, self + 0x10D8, 1);
     func_003495D8(1.0f, hud_bits_34B2C8(0x80001EFF), 0.0f, 0.0f, 0.0f, self + 0x10D8, 2);
-    func_00349590(self + 0x10D8, func_00335E20(self + 0x98));
+    func_00349590(self + 0x10D8, ((s32 *)func_00335E20(self + 0x98)));
     func_00349670(self + 0x10D8, 0);
     func_003495C0(self + 0x10D8, self + 0x1448);
     func_00349630(self + 0x10D8, 1);
     func_00349678(self + 0x10D8, 0.06666f);
 
     func_00349970(self + 0x1160, arg);
-    func_00349A60(self + 0x1160, 0, func_00335E20(self + 0x148));
+    func_00349A60(self + 0x1160, 0, ((s32 *)func_00335E20(self + 0x148)));
     func_00349AA8(self + 0x1160, 0, 0xF0F0B0);
     func_00349AA8(self + 0x1160, 1, 0x60F0F0B0);
     *(f32 *)(self + 0x1160 + 0xC) = 3.0f;
@@ -376,42 +384,42 @@ void func_0034B2C8(char *self, char *font, s32 arg)
     func_00349B18(self + 0x1160, 0.06666f);
 
     func_00349970(self + 0x11F4, arg);
-    func_00349A60(self + 0x11F4, 0, func_00335E20(self + 0x184));
+    func_00349A60(self + 0x11F4, 0, ((s32 *)func_00335E20(self + 0x184)));
     func_00349AA8(self + 0x11F4, 0, 0x442D00);
     func_00349AA8(self + 0x11F4, 1, 0x60442D00);
     *(f32 *)(self + 0x11F4 + 0xC) = 2.0f;
     *(f32 *)(self + 0x11F4 + 0x8) = 0.0f;
-    func_00349A60(self + 0x11F4, 1, func_00335E18(self + 0x184));
+    func_00349A60(self + 0x11F4, 1, ((s32 *)func_00335E18(self + 0x184)));
     func_00349A70(0.0f, 0.0f, 0.0f, 0.0f, self + 0x11F4, 1, 0);
     func_00349A70(1.0f, 1.0f, 0.0f, 0.0f, self + 0x11F4, 1, 1);
-    func_00349A60(self + 0x11F4, 2, func_00335E10(self + 0x184));
+    func_00349A60(self + 0x11F4, 2, ((s32 *)func_00335E10(self + 0x184)));
     func_00349A70(458.0f, 25.0f, 0.0f, 0.0f, self + 0x11F4, 2, 0);
     func_00349A70(498.0f, 10.0f, 0.0f, 0.0f, self + 0x11F4, 2, 1);
 
     func_00349970(self + 0x1288, arg);
-    func_00349A60(self + 0x1288, 0, func_00335E20(self + 0x1D0));
+    func_00349A60(self + 0x1288, 0, ((s32 *)func_00335E20(self + 0x1D0)));
     func_00349AA8(self + 0x1288, 0, 0xF0C070);
     func_00349AA8(self + 0x1288, 1, 0x55F0C070);
     *(f32 *)(self + 0x1288 + 0xC) = 3.0f;
     *(f32 *)(self + 0x1288 + 0x8) = 0.0f;
-    func_00349A60(self + 0x1288, 1, func_00335E18(self + 0x1D0));
+    func_00349A60(self + 0x1288, 1, ((s32 *)func_00335E18(self + 0x1D0)));
     func_00349A70(1.2f, 1.2f, 0.0f, 0.0f, self + 0x1288, 1, 0);
     func_00349A70(1.0f, 1.0f, 0.0f, 0.0f, self + 0x1288, 1, 1);
     *(f32 *)(self + 0x1288 + 0x4) = 3.0f;
     *(f32 *)(self + 0x1288) = 0.0f;
-    func_00349A60(self + 0x1288, 2, func_00335E10(self + 0x1D0));
+    func_00349A60(self + 0x1288, 2, ((s32 *)func_00335E10(self + 0x1D0)));
     func_00349A70(514.0f, 4.0f, 0.0f, 0.0f, self + 0x1288, 2, 0);
     func_00349A70(498.0f, 10.0f, 0.0f, 0.0f, self + 0x1288, 2, 1);
 
     func_00349970(self + 0x131C, arg);
-    func_00349A60(self + 0x131C, 0, func_00335E20(self + 0x238));
+    func_00349A60(self + 0x131C, 0, ((s32 *)func_00335E20(self + 0x238)));
     func_00349AA8(self + 0x131C, 0, 0xF0F0F0);
     func_00349AA8(self + 0x131C, 1, 0x80F0F0F0);
     *(f32 *)(self + 0x131C + 0xC) = 3.0f;
     *(f32 *)(self + 0x131C + 0x8) = 0.0f;
 
     func_00349970(self + 0x13B0, arg);
-    func_00349A60(self + 0x13B0, 0, func_00335E20(self + 0x280));
+    func_00349A60(self + 0x13B0, 0, ((s32 *)func_00335E20(self + 0x280)));
     func_00349AA8(self + 0x13B0, 0, 0xF0F0B0);
     func_00349AA8(self + 0x13B0, 1, 0x60F0F0B0);
     *(f32 *)(self + 0x13B0 + 0xC) = 3.0f;
@@ -419,7 +427,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
 
     func_003494D0(self + 0x144C, arg);
     func_00349628(self + 0x144C, 2);
-    func_00349590(self + 0x144C, func_00335E20(self));
+    func_00349590(self + 0x144C, ((s32 *)func_00335E20(self)));
     func_003495C0(self + 0x144C, self + 0x1448);
     func_00349678(self + 0x144C, 0.02f);
     func_003495D8(0.0f, hud_bits_34B2C8(0x70202080), 0.0f, 0.0f, 0.0f, self + 0x144C, 0);
@@ -430,7 +438,7 @@ void func_0034B2C8(char *self, char *font, s32 arg)
 
     func_003494D0(self + 0x14D4, arg);
     func_00349628(self + 0x14D4, 2);
-    func_00349590(self + 0x14D4, func_00335E20(self + 0x4C));
+    func_00349590(self + 0x14D4, ((s32 *)func_00335E20(self + 0x4C)));
     func_003495C0(self + 0x14D4, self + 0x1448);
     func_00349678(self + 0x14D4, 0.02f);
     func_003495D8(0.0f, hud_bits_34B2C8(0x606060C0), 0.0f, 0.0f, 0.0f, self + 0x14D4, 0);

@@ -798,7 +798,8 @@ void func_L00_0042A500(int i)
 
 /* func_L00_0042A908 is defined in L00_0042A908-g8.c. */
 
-int func_L00_0042AB40(void) {
+/* The actor hook receives its owner even when this implementation returns no index. */
+int func_L00_0042AB40(char *owner) {
     return -1;
 }
 

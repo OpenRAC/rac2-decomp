@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 644/644 bytes, 0/28 placements; first difference 0x98.
+ * Profile: -O2 -G8 -ffunction-sections.
+ * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
+ * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
+ * repair leaves the retained allocation/scheduling residual unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* 3 November 2026: retained near miss, not linked.
  * Profile: -O2 -G8 -ffunction-sections.
  * Current size: 644/644 bytes; US 0/28, US2 absent, PAL absent.
@@ -31,8 +39,8 @@
 
 extern int func_002A9588(int, int, int, int, int);
 extern void func_00336320(char *);
-extern float *func_00335E10(char *);
-extern int *func_00335E20(char *);
+extern int func_00335E10(char *);
+extern int func_00335E20(char *);
 extern float D_001AE5F0 __attribute__((sda));
 extern float D_001B23A4[] MACRO_ADDR;
 extern int D_001A7344[] MACRO_ADDR;
@@ -93,18 +101,18 @@ void func_00348EC0(char *o)
 
             if (i == 7 && !menu->showSpecial)
                 continue;
-            p = (ListRect *)func_00335E10(o + 0x17C);
+            p = (ListRect *)((float *)func_00335E10(o + 0x17C));
             p->x = D_001AE5D0 + menu->origin->x;
             p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
             c = i == menu->selected ? color : 0x55F0C070;
-            *func_00335E20(o + 0x1C8) = c;
+            *((int *)func_00335E20(o + 0x1C8)) = c;
             func_00336320(o + 0x17C);
-            p = (ListRect *)func_00335E10(o + 0x1C8);
+            p = (ListRect *)((float *)func_00335E10(o + 0x1C8));
             p->x = D_001AE5D0 + menu->origin->x;
             p->y = (D_001AE5D4[0] + (float)i * D_001AE5D8) + (float)start;
             func_00336320(o + 0x1C8);
             slot = (char *)&((ListSlot *)(o + 0x218))[i];
-            p = (ListRect *)func_00335E10(slot);
+            p = (ListRect *)((float *)func_00335E10(slot));
             p->x = D_001AE5E0 + menu->origin->x;
             p->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)start;
             v = *(ListVtable **)(o + i * 72 + 0x248);

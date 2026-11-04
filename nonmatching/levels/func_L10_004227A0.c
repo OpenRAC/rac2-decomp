@@ -1,3 +1,24 @@
+/* Contract follow-up, 4 November 2026; retained, not linked.
+ * The matched func_L05_00303000 definition in L05_003008C0.c is void
+ * with seven signed32 EE arguments: x, y, width, height, packed color,
+ * text-address word and length. All eight calls now keep that physical
+ * interface; color is not widened and the text pointer is explicitly cast
+ * to its real address word. The earlier s32/u64 declaration was false.
+ * D_L10_001B1394/98/9C are ordinary words: there is no measured reload
+ * witness supporting the inherited volatile diagnostic declarations.
+ * Current -O2 -G8 -ffunction-sections check: 3260/3420 bytes, 0/1 USA.
+ * This canonical name is absent from the current US2/PAL catalogues.
+ * Real source/helper lifetimes and rounding/scheduling remain unresolved.
+ * Earlier sizes and the inherited diagnostic choices below are historical
+ * where superseded; no dummy controls, accesses or fields were introduced.
+ */
+/* Faithful-source review, 4 November 2026; retained, not linked.
+ * 3312/3420 bytes, 0/1 USA placement.
+ * Remove MENU_ROW's conditional scaled+1 assignment, which was overwritten without a read and existed only to leave a compiler block boundary. Keep the direct rounded row and the separate consumed display-mode coordinate helper. Actual HUD helper/control-flow evidence is needed before another scheduling experiment.
+ * Measured in the assigned production unit with the profile recorded below.
+ * Other-release checks were not rerun for this nonmatching source.
+ * Earlier diagnostic measurements below are historical where superseded.
+ */
 /*
  * Claude Opus 5.5 (xhigh), task v1820, USA v1.01. Replaces the 3300-byte draft from v1754.
  * Game -O2 -G8 -ffunction-sections, in its own -g8.c unit (for example
@@ -67,7 +88,8 @@ extern s32 func_0027FBD8(s32, s32, u64, char *, s32);
 extern s32 func_0027FB40(s32, s32, u64, char *, s32);
 extern s32 func_0027FAA8(s32, s32, u64, char *, s32);
 extern void func_0027F5B8(s32, s32, u64, char *, s32);
-extern s32 func_L05_00303000(s32, s32, s32, s32, u64, char *, s32);
+/* The matched wrapper consumes seven signed EE words; argument six is a text address. */
+extern void func_L05_00303000(s32, s32, s32, s32, s32, s32, s32);
 extern s32 D_001A7340;
 typedef struct { u8 pad[0x1A0]; s32 buttons; } MenuInput;
 extern MenuInput D_00138180;
@@ -77,7 +99,7 @@ extern u8 *D_L10_001A904C;
 extern f32 D_L10_001B2D84;
 extern s32 D_L10_001B2D80;
 extern s32 D_L10_001B2048;
-extern volatile s32 D_L10_001B1394, D_L10_001B1398, D_L10_001B139C;
+extern s32 D_L10_001B1394, D_L10_001B1398, D_L10_001B139C;
 extern s32 D_L10_001B1454[] __attribute__((sda)), D_L10_001B1460[] __attribute__((sda)), D_L10_001B146C[] __attribute__((sda));
 extern s32 D_L10_001B1F64 __attribute__((sda));
 extern s32 D_L10_001B143C __attribute__((sda));
@@ -96,8 +118,6 @@ static __inline__ s32 MenuY(f32 y, f32 adjustment) {
         f32 y = (y0);                                  \
         f32 scaled = y * D_L10_001B2D84 + 0.5f;        \
         dst = (s32)scaled;                             \
-        if (D_L10_001B2D80 == 1)                       \
-            scaled = scaled + 1.0f;                    \
     }
 
 s32 func_L10_004227A0(void) {
@@ -148,7 +168,7 @@ s32 func_L10_004227A0(void) {
             s32 row;
             MENU_ROW(row, 131.0f);
             len = func_001157AC(text);
-            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, text, len);
+            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
         }
         {
             s32 index = D_L10_001B1390;
@@ -163,7 +183,7 @@ s32 func_L10_004227A0(void) {
             s32 row;
             MENU_ROW(row, 242.0f);
             len = func_001157AC(buf);
-            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, buf, len);
+            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
         }
         }
         func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
@@ -183,7 +203,7 @@ s32 func_L10_004227A0(void) {
                 s32 row;
                 MENU_ROW(row, 131.0f);
                 len = func_001157AC(text);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, text, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
             }
             {
                 s32 index = D_L10_001B1394;
@@ -197,7 +217,7 @@ s32 func_L10_004227A0(void) {
                 s32 row;
                 MENU_ROW(row, 242.0f);
                 len = func_001157AC(buf);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, buf, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
             }
             func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
         } else {
@@ -226,7 +246,7 @@ s32 func_L10_004227A0(void) {
                 s32 row;
                 MENU_ROW(row, 131.0f);
                 len = func_001157AC(text);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, text, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
             }
             {
                 s32 index = D_L10_001B1398;
@@ -240,7 +260,7 @@ s32 func_L10_004227A0(void) {
                 s32 row;
                 MENU_ROW(row, 242.0f);
                 len = func_001157AC(buf);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, buf, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
             }
             func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
         } else {
@@ -269,7 +289,7 @@ s32 func_L10_004227A0(void) {
                 s32 row;
                 MENU_ROW(row, 131.0f);
                 len = func_001157AC(text);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, text, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
             }
             {
                 s32 index = D_L10_001B139C;
@@ -283,7 +303,7 @@ s32 func_L10_004227A0(void) {
                 s32 row;
                 MENU_ROW(row, 242.0f);
                 len = func_001157AC(buf);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, buf, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
             }
             func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
         } else {

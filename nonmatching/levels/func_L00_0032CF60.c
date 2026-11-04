@@ -1,3 +1,12 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 256/260 bytes, 0/27 placements; first difference size mismatch.
+ * Profile: -O2 -G8 -ffunction-sections -g.
+ * The raw-pointer draft, a complete measured 0x100-byte state/next/flags/callback record and a
+ * direct callback-member call produce identical checker output. This establishes a three-form
+ * tie; neither layout nor callback-local removal resolves the allocation/delay-slot difference.
+ * The original body is preserved.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Retained plain-C attempt: 256/260 bytes; first difference +0x88.
  * us: 0/27, pal: 0/27, us2: 0/27.
  * Profile: -O2 -G8 -ffunction-sections -g.

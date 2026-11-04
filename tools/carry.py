@@ -487,6 +487,80 @@ def correct_level_entries(rows: list[tuple]) -> list[tuple]:
     return out
 
 
+def correct_boot_splits(boot: list[tuple]) -> list[tuple]:
+    """Recover the measured main/sound boundary in the two secondary releases.
+
+    The old 656-byte row combines the closed 80-byte main loop and the separately
+    called 576-byte sound initializer. Validate both against the primary catalogue,
+    including their named callees, before adding the missing initializer identity.
+    """
+    main, sound = "func_00131D98", "func_00131DE8"
+    target = {name: (a, n) for name, a, n in boot}
+    if main not in target:
+        return boot
+    if len(target) != len(boot):
+        raise ValueError("duplicate boot identity around main/sound split")
+    a, size = target[main]
+    if size not in (80, 656):
+        raise ValueError(f"{main}: unexpected merged extent {size}")
+    if size == 80 and target.get(sound) != (a + 80, 576):
+        raise ValueError(f"{main}: incomplete main/sound split")
+    if size == 656 and sound in target:
+        raise ValueError(f"{main}: overlapping initializer identity")
+    if any(p < a + 656 and p + n > a for name, p, n in boot if name not in (main, sound)):
+        raise ValueError(f"{main}: another boot extent overlaps the split")
+    primary = []
+    for line in (ROOT / "config/boot/functions.tsv").read_text().splitlines():
+        if line and not line.startswith("#"):
+            name, address, length = line.split("\t")[:3]
+            primary.append((name, int(address, 16), int(length)))
+    source = {name: (p, n) for name, p, n in primary}
+    if len(source) != len(primary):
+        raise ValueError("duplicate primary boot identity")
+    if source.get(main, (0, 0))[1] != 80 or source.get(sound) != (source[main][0] + 80, 576):
+        raise ValueError("primary main/sound boundary changed")
+    sections = boot_sections(ROOT / "baserom/SCUS_972.68")
+    target_sections = boot_sections(levels.BOOT)
+
+    def span(code_sections, start, length):
+        matches = [data[start - base:start - base + length] for section, base, data in code_sections
+                   if section in ("core.text", ".text") and base <= start and start + length <= base + len(data)]
+        if len(matches) != 1:
+            raise ValueError("main/sound is not contained in one EE code section")
+        return matches[0]
+
+    span(sections, source[main][0], 656)
+    span(target_sections, a, 656)
+    source_names = {p: name for name, p, _ in primary}
+    target_names = {p: name for name, p, _ in boot}
+    target_names[a + 80] = sound
+
+    def calls(body, base, names):
+        out = []
+        for i, word in enumerate(levels.words(body)):
+            if word >> 26 == 3:
+                dest = ((base + i * 4 + 4) & 0xF0000000) | ((word & 0x3FFFFFF) << 2)
+                if dest not in names:
+                    raise ValueError("main/sound has an unidentified direct callee")
+                out.append(names[dest])
+        return out
+
+    for name, offset, length in ((main, 0, 80), (sound, 80, 576)):
+        p, _ = source[name]
+        expected = span(sections, p, length)
+        actual = span(target_sections, a + offset, length)
+        if len(actual) != length or ident(expected) != ident(actual):
+            raise ValueError(f"{name}: secondary split body differs")
+        if calls(expected, p, source_names) != calls(actual, a + offset, target_names):
+            raise ValueError(f"{name}: secondary split callees differ")
+    if size == 80:
+        return boot
+    out = []
+    for name, p, n in boot:
+        out.extend([(main, a, 80), (sound, a + 80, 576)] if name == main else [(name, p, n)])
+    return out
+
+
 def refresh_entries() -> None:
     """Repair measured extents in an existing release catalogue, retaining identities.
 
@@ -494,7 +568,7 @@ def refresh_entries() -> None:
     The normal carry remains the full cross-release alignment operation.
     """
     boot = []
-    for name, a, n in levels.read_boot_functions():
+    for name, a, n in correct_boot_splits(levels.read_boot_functions()):
         if not levels.function_residue(name, n):
             a, n = levels.function_extent(name, a, n)
             boot.append((name, a, n))

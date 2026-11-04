@@ -1,3 +1,11 @@
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 444/444 bytes, 0/27 placements; first difference 0x0.
+ * Profile: -O2 -G8 -ffunction-sections -mno-split-addresses.
+ * The timer decomposition helper and sprintf keep their defined int returns. sprintf has its
+ * actual two-named-argument variadic interface. These repairs retain the frame and saved-FP-
+ * constant allocation residual.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* Batch 3 (2026-10-28) handoff notes:
 # func_L00_003DDEC8 (444 B, 27 places) -- w5 handoff, size exact, allocation differs
 
@@ -68,8 +76,8 @@ extern char D_001B0450[];
 
 extern void func_00300A00(s32, s32, f32, f32, f32, f32, f32);
 extern s32 func_00336D50(s32, s32);
-extern void func_002ED578(s32, s32 *, s32 *, s32 *);
-extern void func_00115DA8(void *, char *, s32, s32, s32);
+extern int func_002ED578(s32, s32 *, s32 *, s32 *);
+extern int func_00115DA8(char *, char *, ...);
 extern s32 func_00283CF0(f32);
 extern void func_0027F5B8(s32, s32, u64, void *, s32);
 

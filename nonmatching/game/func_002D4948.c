@@ -1,3 +1,9 @@
+/* 4 November 2026 source audit: removed the always-false preset-search guard.
+ * The previous controlled result below is historical and cannot qualify this
+ * revised draft. Production remains assembly; no linked or native credit.
+ * Fresh check: 1216/1220 bytes, US and PAL 0/28 each; US2 name absent.
+ * Profile: -O2 -G8 -ffunction-sections. Reopen on a real preset-search control-flow witness.
+ */
 /* func_002D4948: near miss. Opus 5.5 xhigh (opus-2), 31 October 2026. Unit: a -G8 sibling such as
    src/game/002D3390-002D4948-g8.c, default flags (it needs $gp for D_001ABA74). Remove the marker
    from src/game/002D3390.c when trying it.
@@ -206,8 +212,6 @@ int func_002D4948(void)
     D_001F2840.count = n;
     D_001F2840.timer = 300;
     for (D_001ABA74 = 0; D_001ABA74 < 21; D_001ABA74++) {
-        if (D_001ABA74 >= 21)
-            D_001ABA74 = 0;
         if ((D_001A7AF0 & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
             break;
         }
