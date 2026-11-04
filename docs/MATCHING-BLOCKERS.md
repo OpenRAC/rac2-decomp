@@ -4129,8 +4129,19 @@ The first has a closed 168-byte body and a separately referenced 8-byte stub
 entered 8-byte stubs. The two camera families each have three distinct camvtbl
 entry pointers, including all seven copies of the L06 family. They belong to
 different camera classes even in the same level: identical bytes must not
-collapse their identities. A guarded generator repair and all-release linked
-qualification remain to do. Hrugis instead has an 88-byte closed body plus
+collapse their identities. The named correction in `split_level_rows` now
+checks the complete body, placement family, text bounds and typed dispatch
+witnesses in every carrying release before recovering the separate entries.
+Both original and shortened fingerprints retain stable identities, including
+the unrelated methods that still have identical complete bytes. Catalogue
+replay and historical-bootstrap regression tests cover the camera collision.
+The 168-byte traversal and nine separate no-op callbacks are ordinary C;
+their linked qualification is distinct from the entry-boundary evidence.
+The [implementation](https://github.com/OpenRAC/rac2-decomp/commit/42e0babe572b3f2ef5da5cbc4989e6f7b63a2c51)
+passes all 84 strict programs, with all ten C entries checked in each carrying
+placement report and 382 unit tests passing. No-op callbacks are counted as
+their real individual entries; no original-assembly classification is involved.
+Hrugis instead has an 88-byte closed body plus
 an unreachable 8-byte return pair with no independent scanned entry witness;
 do not invent a second function or discard those bytes on that evidence alone.
 
@@ -4188,7 +4199,9 @@ deletion. Direct or nearby address-pair absence alone is not proof of no entry.
 - `func_L00_0042A4E8` contains three independent return stubs: initialized
   pointers reach `+0`, `+8` and `+0x10` in all 27 USA placements. The same
   three-entry pattern has separate witnesses for `func_L13_0043E8C0` in all
-  three releases. Do not fabricate a single C function spanning these entries.
+  three releases; its named repair is described above. The L00 family still
+  needs its own release-qualified generator correction. Do not fabricate a
+  single C function spanning these entries.
 
 Reference scans must separate EE text from `.vutext`: decoding VU microcode as
 R5900 instructions creates false branch witnesses. An aligned word equal to an
