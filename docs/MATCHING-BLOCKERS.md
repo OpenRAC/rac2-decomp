@@ -36,7 +36,7 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ### Trigger and title/setup lifetimes
 
-**4 November 2026, strict linked matches; PR review pending.**
+**4 November 2026, strict linked matches; [PR #420](https://github.com/OpenRAC/rac2-decomp/pull/420) pending review.**
 `func_L01_00390A50` is 528 bytes and passes six placements in each release with
 the actual forced-trigger arm grouped as one statement. Its volume/path calls
 use their canonical names and real point/index interfaces. `func_002CD3C0` is

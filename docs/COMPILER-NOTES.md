@@ -85,6 +85,8 @@ renderer interface already used in `00336A78.c`. The three complete objects
 remain identical. A native 32-bit C regression tests the context, flags, four
 bounds and null-context path; its prior-source control fails on the lost FP
 arguments. Ambient register contents are not a C argument-forwarding contract.
+[PR #420](https://github.com/OpenRAC/rac2-decomp/pull/420) contains the source
+repairs, the regression and the linked-placement checks.
 
 `func_L02_003D0408` uses one borrowed actor-field view for all six measured
 byte reads at offset `0x60`. Its volatile qualifier describes the complete
