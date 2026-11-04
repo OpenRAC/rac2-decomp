@@ -44,6 +44,24 @@ source method or adding a compiler mechanism. At revision
   This does not justify permuting arguments inside a bank or omitting an argument.
 
 RAC2 already uses this call-shape method in `func_0030E700` and Barlow helpers.
+Meaningful one-pass statement groups are also present in active RAC1 game C at
+[`1d8228cc`](https://github.com/OpenRAC/rac1-decomp/tree/1d8228cc0c81da7bc2bdc3e77479ee050e0ef434):
+[`taxi_and_mine_layer.c`](https://github.com/OpenRAC/rac1-decomp/blob/1d8228cc0c81da7bc2bdc3e77479ee050e0ef434/src/overlays/l03_kerwan/taxi_and_mine_layer.c#L1391)
+groups an actual mission-field read, and
+[`map_menu_filters.c`](https://github.com/OpenRAC/rac1-decomp/blob/1d8228cc0c81da7bc2bdc3e77479ee050e0ef434/src/overlays/shared/map_menu_filters.c#L212)
+groups an actual inner loop. `tools/overlay_asm.py` discovers these overlay
+sources; the public release maps include matched entries from them. Following
+the current RAC1 source-practice rule, a nonempty `do { real_operation; } while (0)`
+can group necessary operations here too. It may preserve compiler loop notes,
+scheduling or label alignment without adding runtime instructions. Empty loops,
+dummy values, false tests, extra accesses and changed call contracts remain
+excluded; a group must preserve the original control flow and side effects.
+The three centered-text draws (`func_002CDA20`, `func_002CF2B8`, `func_002D53F0`)
+group their real formatter call, preserving its 64-bit style argument and the
+text getter's signed 32-bit EE address result. `func_L02_003FB000` groups its
+final 16-bit report-state store. All 84 strict release programs pass, with the
+functions present in each carrying program. These are source forms, not compiler patches.
+
 Different C declarations across units need a consistent interface or adapter for
 a native ABI; an EE match alone does not establish a working native port.
 Qualify the actual RAC2 source/profile and every carrying release, rather than

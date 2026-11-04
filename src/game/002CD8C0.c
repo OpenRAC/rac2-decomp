@@ -121,7 +121,7 @@ long long func_002CD8C0(void)
 
 int func_002CD8F0(void *object) { char *root=D_001A8CFC[0]; if (root != 0) { func_00341550(root+0x3BE08,1); *(void **)((char *)object+0x34)=func_00341558(D_001A8CFC[0]+0x3BE08); } return 0; }
 
-INCLUDE_ASM("asm/game", func_002CDA20);
+/* func_002CDA20 is defined in 002CDA20.c. */
 
 int func_002CDAB0(void)
 {
@@ -169,7 +169,7 @@ int func_002CF188(char *object) {
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_002CF2B8);
+/* func_002CF2B8 is defined in 002CF2B8.c. */
 
 /* func_002CF340 is built from 002CF340-g8.c. */
 

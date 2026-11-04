@@ -260,7 +260,7 @@ int func_002D5290(char *object) {
 
 /* func_002D52D8 is in the -G8 sibling. */
 
-INCLUDE_ASM("asm/game", func_002D53F0);
+/* func_002D53F0 is defined in 002D53F0.c. */
 
 extern void func_00287E80(void);
 extern void func_00341540(char *, char *, char *, char *);

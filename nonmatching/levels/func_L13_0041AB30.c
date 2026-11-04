@@ -1,3 +1,14 @@
+/* 4 November 2026 source-layout review, retained near miss.
+ * Four new grid/address/group forms with -O2 -G8 -ffunction-sections -g
+ * remain 460/460 bytes, 0/2 USA places (first +0x78 or +0x84).
+ * Both borrowed grids have three rows of four 16-byte cells: the second
+ * ends at counter +0x620. A four-row owning view would overlap that counter.
+ * Typed cell pointers and signed/unsigned EE-word row sums do not preserve
+ * the second preheader copy. A real inner-loop or row-assignment one-pass
+ * group does not resolve it either. The older best C below is retained.
+ * Reopen with evidence of the row pseudo's lifetime across loop reduction;
+ * no dummy pointer, false return or register pin was introduced.
+ */
 /* Nonmatching C reconstruction (opus-1, v2196, USA v1.01, 2026-11-03).
  * Tier: near miss. Profile: -O2 -G8 -ffunction-sections -g in its own unit
  * (-g supplies the two nops before each div.s).
