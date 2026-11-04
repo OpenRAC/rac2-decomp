@@ -106,7 +106,58 @@ char *func_0033F0A0(char *object)
 
 
 
-INCLUDE_ASM("asm/game", func_00340498);
+/* Fills func_00337210's 23-word descriptor in the order of func_00344F98, with the child at
+   o + 0x17C set up by func_00336390 just before f[10] takes it. */
+typedef struct { unsigned int lo; unsigned int hi; } Word2_340498;
+extern const Word2_340498 D_001AE078;
+extern const Word2_340498 D_001AE080;
+extern const Word2_340498 D_001AE088;
+extern const Word2_340498 D_001AE090;
+extern char D_00259F58[];
+extern char *D_001A8CFC __attribute__((sda));
+extern void func_00336390(void *, void *, int);
+extern void func_00337210(int *);
+
+static __inline__ void initDescriptor_340498(int *f) { f[20] = 0; f[21] = 1; }
+
+void func_00340498(char *o)
+{
+    Word2_340498 q0 = D_001AE078;
+    Word2_340498 q1 = D_001AE080;
+    Word2_340498 q2 = D_001AE078;
+    Word2_340498 q3 = D_001AE088;
+    Word2_340498 q4 = D_001AE090;
+    int f[23];
+    char *child;
+
+    initDescriptor_340498(f);
+    f[19] = *(int *)(o + 0x820);
+    f[21] = *(int *)(o + 0x81C) == 0;
+    f[3] = *(int *)(o + 0x814);
+    f[4] = *(int *)(o + 0x818);
+    f[16] = (int)(o + 0xA18);
+    f[9] = (int)&q4;
+    f[1] = 4;
+    f[2] = 6;
+    f[0] = (int)D_00259F58;
+    f[17] = (int)(o + 0x870);
+    f[13] = (int)(o + 0x260);
+    f[14] = 0;
+    child = o + 0x17C;
+    func_00336390(child, D_001A8CFC + 0x8710, 0x23);
+    f[10] = (int)child;
+    f[12] = (int)(o + 0x214);
+    f[11] = (int)(o + 0x98);
+    f[15] = (int)(o + 0x7D0);
+    f[18] = *(int *)(o + 0x80C);
+    f[8] = (int)&q3;
+    f[7] = (int)&q2;
+    f[6] = (int)&q1;
+    f[5] = (int)&q0;
+    f[22] = 0;
+    func_00337210(f);
+}
+
 
 INCLUDE_ASM("asm/game", func_00340638);
 

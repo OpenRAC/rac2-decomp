@@ -245,8 +245,6 @@ void func_L00_003A41F0(char *moby)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003A4480);
-
 INCLUDE_ASM("asm/levels", func_L00_003A48D0);
 
 
@@ -265,7 +263,7 @@ void func_L00_003A5370(int a0)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003A53E8);
+/* func_L00_003A53E8 is defined in L00_003A53E8-g16.c. */
 
 /* func_L00_003A5FC0 is defined in L00_003A5FC0-contact.c. */
 

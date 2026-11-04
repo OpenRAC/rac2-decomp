@@ -211,7 +211,7 @@ extern void func_0035F450(int a, int b, void *c, int d);
 /* func_L00_00404ED8 is defined in L00_00404ED8-g.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L00_00405808);
+/* func_L00_00405808 is defined in L00_00405808-g8.c. */
 
 /* func_L00_00406040 is defined in L00_00406040-g8.c. */
 

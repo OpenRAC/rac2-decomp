@@ -527,7 +527,7 @@ void func_002FF3F8(void)
     *(float *)(object + 0x10) = 5.0f;
 }
 
-INCLUDE_ASM("asm/game", func_002FF450);
+/* func_002FF450 is matched in its own unit, src/game/002FC8D0-preview.c (-g). */
 
 /* The camera's eye position and view direction. */
 typedef struct {

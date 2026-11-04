@@ -367,7 +367,7 @@ void func_00329328(void *obj) {
     }
 }
 
-INCLUDE_ASM("asm/game", func_00329488);
+/* func_00329488 is in 00327038-pool.c. */
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B5200 vector from the
  * object's own position through three float helpers, writes the last matrix row from that
@@ -678,7 +678,7 @@ void func_0032BDC8(Vec16_Fc936841d *object, int index)
 
 /* func_0032BE30 is defined in 0032BE30-beam.c. */
 
-INCLUDE_ASM("asm/game", func_0032C2E8);
+/* func_0032C2E8 is in 00327038-quads-g8.c. */
 
 
 /* func_0032C700 is in 0032C700-explosion.c. */
@@ -699,8 +699,7 @@ s32 func_0032D700(void *object) {
     return result;
 }
 
-INCLUDE_ASM("asm/game", func_0032D758);
-
+/* func_0032D758 is in 00327038-slot.c. */
 
 /* func_0032DA58 is in 0032DA58-g8.c. */
 

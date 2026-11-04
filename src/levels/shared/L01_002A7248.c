@@ -33,6 +33,54 @@ extern unsigned char *D_L01_001FF040;
 typedef int MotionQuad __attribute__((mode(TI)));
 typedef union { float v[4]; MotionQuad q; } MotionVec;
 
+typedef struct {
+    MotionVec motion;
+    char pad10[0x70];
+    MotionVec position;
+    char pad90[0x50];
+    MotionVec probeEnd;
+    char padF0[0x4D0];
+    char *held;
+} MotionHero;
+typedef struct {
+    MotionVec velocity;
+    char pad10[0x10];
+    int flags;
+    char pad24[0xC];
+    int frame;
+    float gain;
+    float distance;
+    int pad3C;
+    int sound;
+} MotionState;
+typedef struct { MotionVec forward[4]; MotionVec inverse[4]; } MotionPath;
+
+extern MotionHero motionHero __asm__("D_00189E20");
+typedef struct {
+    char pad00[0x30];
+    float hitX;
+    float hitY;
+} MotionCollision;
+extern MotionCollision motionCollision __asm__("D_L01_001BF900");
+
+extern char D_00188660[];
+extern int D_L01_001B2088[] __attribute__((sda));
+extern MotionPath *D_L01_001B264C[] __attribute__((sda));
+extern float D_L01_001BF928;
+extern void func_00282D08(void *, void *, void *, float);
+extern float func_00282E48(void *, void *);
+extern float func_00282E80(void *, void *);
+extern void func_00282F70(void *, void *, float);
+extern void func_002833F0(void *, void *);
+extern int func_002A8C28(void *, void *, int, int, int, int, float, float, float);
+extern void func_002AC9F8(void *, float);
+extern int func_002ACBC8(void *, int);
+extern int func_002C9218(int, void *, void *, float);
+extern void func_002E59F8(int);
+extern int func_002E5CF8(int, int, void *);
+extern int func_L00_002E0200(void *, float, float, int, void *);
+extern int func_L01_0031B300(void *, void *, void *, void *);
+
 extern void func_002E3470(void *, void *, void *);
 
 typedef int ClosestPointQuad __attribute__((mode(TI)));
@@ -251,7 +299,172 @@ void func_L01_002A9298(void) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L01_002AE128);
+
+typedef int LedgeQuad __attribute__((mode(TI)));
+typedef struct {
+unsigned char pad0[464];
+short cooldown;
+unsigned char pad1d2[146];
+float radius;
+unsigned char pad268[180];
+float groundHeight;
+unsigned char pad320[382];
+unsigned char pastApex;
+unsigned char pad49f[1945];
+float frame;
+unsigned char padc3c[5716];
+void * moby;
+int state;
+unsigned char pad2298[4];
+int control;
+unsigned char pad22a0[20];
+unsigned char vehicle;
+} LedgeProbeResident;
+extern LedgeProbeResident ledgeHero __asm__("D_00189E20");
+extern float func_002C9280(void *);
+extern void func_002C92D8(void *, void *, float);
+extern float func_002C9628(void *);
+extern float func_002E3560(void *, void *);
+extern float func_002E3A48(float);
+extern int func_002D3C80(void *, void *, int, void *, int);
+extern int func_002D77E8(void);
+extern char *func_003148A0(void *);
+extern char *func_00316D00(void *);
+extern int func_002D4CE0(void *, int, void *, float);
+typedef struct {
+    unsigned char pad0[0x18];
+    void *moby;
+    unsigned char pad1c[4];
+    float position[4];
+    unsigned char pad30[16];
+    float normal[4];
+} LedgeProbeHit;
+extern LedgeProbeHit ledgeHit __asm__("D_L01_001BF900");
+#define FL(p,o) (*(float *)((char *)(p)+(o)))
+#define IN(p,o) (*(int *)((char *)(p)+(o)))
+/* The ledge probe of func_L00_002ACF88 without its vehicle == 1 branch. */
+int func_L01_002AE128(void *position, void *unused, char *out)
+{
+    float v0[4], v1[4], v2[4], v3[4], v4[4], v5[4], v6[4], v7[4], v8[4], v9[4], v10[4], v11[4], v12[4], v13[4], v14[4], v15[4], v16[4], v17[4], v18[4], v19[4];
+    char *a, *b;
+    void *object;
+    int go, found, i, kind, ok;
+    int edge, j;
+    float height;
+    float step, max;
+    float down, top, drop, d, length;
+    LedgeProbeResident *hero;
+    if (out) IN(out,0x28)=0;
+    if (ledgeHero.cooldown) return 0;
+    go=0;
+    if (ledgeHero.vehicle==0) {
+        if ((ledgeHero.control==4 && (ledgeHero.pastApex || func_002C9280((char *)&ledgeHero+0xf0)<0.05833333730697632f)) || ledgeHero.control==2 || ledgeHero.state==8 || ledgeHero.state==25 || ledgeHero.state==26) go=1;
+        if (ledgeHero.state==14 && ledgeHero.frame<37.0f) go=0;
+    }
+    if (out != (char *)&ledgeHero+0x550) go=1;
+    if (!go) return 0;
+    hero=&ledgeHero;
+    down=-0.7f; top=1.15f; drop=-1.43f;
+    found=0;
+    qcopy(v0,position);
+    func_002E3738(v4,hero,hero->radius);
+    func_002E3470(v0,v0,v4);
+    func_002E3738(v4,(char *)&ledgeHero+0x20,1.65f);
+    func_002E3470(v1,v0,v4);
+    func_002E3738(v4,(char *)&ledgeHero+0x20,-top);
+    func_002E3470(v2,v0,v4);
+    func_002E3738(v3,hero,0.075f);
+    for(i=0; i<4; i++) {
+        func_002E3470(v1,v1,v3);
+        func_002E3470(v2,v2,v3);
+        if(func_002D3C80(v1,v2,4,ledgeHero.moby,0)) {
+            kind=func_002D77E8();
+            if(kind!=9 && kind!=12 && kind!=0 && func_002C9628(ledgeHit.normal)<0.349065899848938f) found=1;
+        }
+        if(found) break;
+    }
+    object=0;
+    if(!found) goto fail;
+    if(ledgeHit.moby) {
+        ok=0;
+        a=func_003148A0(ledgeHit.moby);
+        b=func_00316D00(ledgeHit.moby);
+        if(a && (*(unsigned short *)(a+0x1e)&1)) ok=1;
+        else if(b) ok=IN(b,0x3c)&1;
+        if(!ok) return 0;
+        object=ledgeHit.moby;
+    }
+    if(out) *(void **)(out+0x38)=ledgeHit.moby;
+    qcopy(v6,ledgeHit.position);
+    func_002E34A0(v5,v6,position);
+    if(1.5f<func_002C9280(v5)) return 0;
+    func_002E3738(v7,(char *)&ledgeHero+0x20,0.005f);
+    func_002E3470(v7,v7,v6);
+    func_002E3738(v8,(char *)&ledgeHero,-1.0f);
+    func_002E3470(v8,v8,v7);
+    if(func_002D3C80(v8,v7,2,ledgeHero.moby,0)) {
+        if(!ledgeHit.moby || ledgeHit.moby!=object) return 0;
+    }
+    if(out) {
+        func_002E3738(v9,(char *)&ledgeHero+0x20,0.6f);
+        func_002E3470(v9,v9,v6);
+        if(func_002D4CE0(v9,4,ledgeHero.moby,0.45f)) IN(out,0x34)|=1;
+        else IN(out,0x34)&=~1;
+    }
+    height=func_002C9280(v5);
+    if(height+ledgeHero.groundHeight<1.8f || height<0.5f) return 0;
+    *(LedgeQuad *)v11=0; FL(v11,0)=1.0f; FL(v11,8)=down;
+    func_002E3918(v11,v11,(char *)&ledgeHero);
+    edge=0;
+    func_002E3470(v11,v11,v6);
+    func_002E34A0(v9,position,v11);
+    func_002C92D8(v9,v9,0.0f);
+    func_002E3470(v9,v9,v11);
+    func_002E3738(v10,(char *)&ledgeHero+0x20,-down*0.2f);
+    for(j=0;j<5;j++) {
+        if(func_002D3C80(v9,v11,2,0,0)) {
+            func_002E3738(v12,ledgeHit.normal,1.0f);
+            edge=1;
+            func_002C92D8(v12,v12,0.0f);
+            break;
+        }
+        func_002E3470(v9,v9,v10);
+        func_002E3470(v11,v11,v10);
+    }
+    if(!edge) return 0;
+    length=func_002E3560((char *)&ledgeHero,v12);
+    if(!(length<func_002E3A48(1.134464144706726f))) return 0;
+    step=0.03f;
+    max=2.4f;
+    qcopy(v18,v6);
+    func_002E3738(v17,(char *)&ledgeHero+0x2c0,-0.05f);
+    func_002E3738(v16,v12,step);
+    func_002E3470(v15,v16,v17);
+    func_002E34A0(v16,v16,v17);
+    func_002E3470(v13,v18,v16);
+    func_002E3470(v14,v18,v15);
+    for(d=0.0f;d<max;d+=step) {
+        if(!func_002D3C80(v14,v13,4,ledgeHero.moby,0)) {
+            if(out) {
+                qcopy(out+0x10,v18);
+                func_002E3738(v19,v12,0.5f);
+                func_002E3738(out,(char *)&ledgeHero+0x2c0,-drop);
+                func_002E3470(out,v19,out);
+                func_002E3470(out,out+0x10,out);
+                FL(out,0x24)=func_002E3B10(FL(v12,0),FL(v12,4));
+                IN(out,0x28)=1;
+            }
+            return 1;
+        }
+        qcopy(v18,ledgeHit.position);
+        func_002E3470(v14,v18,v15);
+        func_002E3470(v13,v18,v16);
+    }
+fail:
+    return 0;
+}
+#undef FL
+#undef IN
 
 typedef int HeroQuad __attribute__((mode(TI)));
 extern char D_00189E20[];
@@ -535,7 +748,7 @@ void func_L01_002B4DA0(int force)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_002B5EA0);
+/* func_L01_002B5EA0 is in L01_002A7248-collide-g8.c. */
 
 /* func_L01_002B6948 is in L01_002B6948-velocity.c. */
 
@@ -732,7 +945,175 @@ void func_L01_0031A278(char *a0, float *a1, float f12, float f13, float f14) {
     func_002E3470(a1, a1, a0 + 0x10);
 }
 
-INCLUDE_ASM("asm/levels", func_L01_0031AB20);
+/* Retail compares the vertical speed on landing, then stores the same value on both sides of the
+ * test, so this call's arms merge at jump2 and only the comparison stays behind. */
+static inline void MotionLandingSpeed(float *speed, float rising, float falling)
+{
+    if (0 < *speed) {
+        *speed = rising;
+    } else {
+        *speed = falling;
+    }
+}
+
+void func_L01_0031AB20(char *m, MotionState *state, int path, float height, float radius, float extent)
+{
+    MotionVec old, start, delta, turn, target, change, samples[8], matrix[3], actual;
+    float speed, gain, limit, accel, ground;
+    int i, handle;
+    int phase = D_L01_001B2088[0];
+
+    if ((phase & 15) == (((int)m >> 8) & 15)) {
+        float dist = func_00282E48(&motionHero.position, m + 0x10);
+
+        if (*(unsigned short *)(m + 0x34) & 0x1000) {
+            if (state->distance < dist) {
+                *(unsigned short *)(m + 0x34) &= 0xEFFF;
+            }
+        } else if (dist < state->distance) {
+            *(unsigned short *)(m + 0x34) |= 0x1000;
+        }
+    }
+    qcopy(&old, m + 0x10);
+    if (motionHero.held == m) {
+        qcopy(&start, m + 0x10);
+        start.v[2] += 0.5f;
+        if (func_002761F8(&start, &motionHero.probeEnd, 2, m, 0)) {
+            motionHero.held = 0;
+        }
+        func_00282CF0(&delta, m + 0x10, &motionHero.position);
+        if (state->frame != -1 && func_002ACBC8(m + 0x10, state->frame)) {
+            func_00283098(&delta, &delta, D_L01_001B264C[0][state->frame].inverse);
+            delta.v[1] = 0;
+            func_00283098(&delta, &delta, D_L01_001B264C[0][state->frame].forward);
+        }
+        gain = 4.0f;
+        if (state->gain != 0) {
+            gain = state->gain;
+        }
+        func_00282F70(&delta, &delta, gain);
+        func_00282CC0(&delta, &delta, &motionHero.position);
+        func_00282F20(&turn, &motionHero.motion, gain);
+        func_00282CC0(&turn, &turn, &motionHero.position);
+        turn.v[2] = delta.v[2];
+        func_00282D08(&delta, &delta, &turn, 0.5f);
+        func_00282CF0(&delta, &delta, &motionHero.position);
+        func_00282F20(&delta, &delta, gain);
+        func_00282CC0(&delta, &delta, &motionHero.position);
+        if (state->flags & 4) {
+            gain = func_00282E80(m + 0x10, &delta) * 0.5333333611f;
+            accel = 0.01388888899f;
+            limit = 0.2666666806f;
+        } else {
+            gain = func_00282E80(m + 0x10, &delta) * 0.06666667014f;
+            accel = 0.00555555569f;
+            limit = 0.1333333403f;
+        }
+        if (limit < gain) {
+            gain = limit;
+        }
+        func_00282CF0(&target, &delta, m + 0x10);
+        target.v[2] = 0;
+        func_00282F20(&target, &target, gain);
+        func_00282CF0(&change, &target, state);
+        func_002AC9F8(&change, accel);
+        state->velocity.v[0] += change.v[0];
+        state->velocity.v[1] += change.v[1];
+    } else {
+        speed = func_00282DF0(state);
+        func_002AA2E8(&speed, 0, 0.002777777845f);
+        func_00282F20(state, state, speed);
+    }
+    if (0.001f < func_00282DF0(state)) {
+        if (!(state->flags & 2)) {
+            qcopy(&start, m + 0x10);
+            qcopy(&delta, m + 0x10);
+            start.v[2] += 0.25f;
+            delta.v[2] -= 1;
+            ground = 0;
+            if (func_002761F8(&start, &delta, 16, m, 0)) {
+                ground = D_L01_001BF928;
+            }
+            if (*(float *)(m + 0x18) < ground) {
+                *(float *)(m + 0x18) = ground;
+                MotionLandingSpeed(&state->velocity.v[2], 0, 0);
+            } else {
+                state->velocity.v[2] -= 0.00555555569f;
+            }
+        }
+        if (!(state->flags & 4) && func_00282E80(m + 0x10, &motionHero.position) < radius + 2.5f) {
+            float toward;
+
+            func_00282CF0(&start, &motionHero.position, m + 0x10);
+            start.v[2] = 0;
+            func_00282F20(&start, &start, 1);
+            toward = func_00282DB0(&start, state);
+            if (0 < toward) {
+                func_00282F20(&delta, &start, -toward);
+                func_00282CC0(state, state, &delta);
+            }
+        }
+        turn.q = 0;
+        turn.v[2] = 0.7853982449f;
+        func_00282CC0(m + 0x10, m + 0x10, state);
+        qcopy(&delta, m + 0x10);
+        delta.v[2] += 0.25f;
+        func_002833F0(matrix, &turn);
+        func_00282F70(&start, state, radius);
+        for (i = 0; i < 8; i++) {
+            func_00283098(&start, &start, matrix);
+            func_00282CC0(&samples[i], m + 0x10, &start);
+            samples[i].v[2] += 0.25f;
+            func_L01_0031B300(m, state, &delta, &samples[i]);
+        }
+        func_00282D30(&target, state, 5);
+        func_00282CC0(&target, &target, m + 0x10);
+        target.v[2] += radius;
+        func_002A8C28(m, &target, 0x4000000, 0, 1, 0, radius + 0.2f, 1, 1);
+        qcopy(&change, m + 0x10);
+        change.v[2] += height;
+        if (func_L00_002E0200(&change, radius, extent, 0, m)) {
+            *(float *)(m + 0x10) = motionCollision.hitX;
+            *(float *)(m + 0x14) = motionCollision.hitY;
+        }
+        if (path != -1) {
+            func_002C9218(path, m + 0x10, m + 0x10, radius);
+        }
+        func_00282CF0(&actual, m + 0x10, &old);
+        gain = func_00282E20(&actual);
+        if (gain < func_00282E20(state)) {
+            state->velocity.v[0] = actual.v[0];
+            state->velocity.v[1] = actual.v[1];
+        }
+        if (func_00282E20(state) != 0) {
+            char *sound = D_00188660 + state->sound * 0x70;
+
+            if (*(char **)(sound + 0x88) != m || !((unsigned char *)sound)[0x74]) {
+                state->sound = func_002E5CF8(0, 4, m);
+            }
+        } else {
+            handle = state->sound;
+            if (handle != -1) {
+                unsigned char *sound = (unsigned char *)D_00188660 + handle * 0x70;
+
+                if (*(char **)(sound + 0x88) == m && sound[0x74]) {
+                    func_002E59F8(handle);
+                }
+            }
+            state->sound = -1;
+        }
+    } else {
+        handle = state->sound;
+        if (handle != -1) {
+            char *sound = D_00188660 + handle * 0x70;
+
+            if (*(char **)(sound + 0x88) == m && ((unsigned char *)sound)[0x74]) {
+                func_002E59F8(handle);
+            }
+        }
+        state->sound = -1;
+    }
+}
 
 INCLUDE_ASM("asm/levels", func_L01_0031B300);
 

@@ -188,6 +188,13 @@
 #define SetPalMode                       func_0027B440
 #define PredictMineImpact                func_L00_003AE550
 #define FontPrintWindow                  func_0027FC70
+#define draw_nanotech_ball               func_003146C0
+#define follow_camera_build_view         func_L00_00425560
+#define Camera_ResolveBlockedView        func_L01_002B5EA0
+#define UpdateOceanWaterSheet            func_L06_00403130
+#define InitializeHero                   func_L00_002A4928
+#define floor                            func_00117650
+#define MorphorayUpdate                  func_L00_00405808
 
 /* descriptive */
 #define QueueMobyImpact                  func_002A8E20
@@ -854,5 +861,27 @@
 #define UpdateTriggeredAnchorMover       func_L17_003C3C50
 #define DrawSegmentedBeam                func_L07_003F4CC0
 #define UpdateCollisionRing              func_L07_003F4578
+#define UpdateObjectPreviewSequence      func_002FF450
+#define __ieee754_fmod                   func_00117848
+#define InitPathMotion                   func_L00_004291A0
+#define DrawTaperedTwoLayerRibbon        func_L00_003BCF88
+#define UpdateSteeringInput              func_L05_00442A58
+#define WalkPathPickNext                 func_L22_003A2E50
+#define UpdateFeltzinProjectile          func_L05_00419888
+#define SpawnHomingShot                  func_L04_003F9320
+#define WalkPathUpdate                   func_L22_003A2160
+#define SpawnAimedProjectile             func_L00_00409E48
+#define LaunchSpawnerMobyUpdate          func_L04_003EE090
+#define RefreshMissionMenuItems          func_0029B910
+#define UpdateBankedOrientation          func_002EE000
+#define ProbeLedgeGrab                   func_L01_002AE128
+#define UpdateOwnedParticleTrails        func_003054E8
+#define DrawNativeQuads                  func_00300AA8
+#define DrawAndReleaseObjectParticles    func_00329488
+#define DrawQuadFaces                    func_0032C2E8
+#define StartAttachedEffect              func_0032D758
+#define UpdateWeatherParticles           func_L01_00399510
+#define UpdateBouncingExplosive          func_L00_003F4210
+#define UpdateShipWeapons                func_L05_00443D08
 
 #endif /* NAMES_H */

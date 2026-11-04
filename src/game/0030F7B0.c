@@ -515,7 +515,7 @@ void func_00313548(unsigned char *object, float *out, int index)
 
 INCLUDE_ASM("asm/game", func_003136D0);
 
-INCLUDE_ASM("asm/game", func_003146C0);
+/* func_003146C0 is in 0030F7B0-ball-g8.c. */
 
 INCLUDE_ASM("asm/game", func_00314CF8);
 

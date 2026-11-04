@@ -464,7 +464,6 @@ void func_L00_003F0B10(char *pos, int a1, int a2, char *a3, int t0,
     func_00280B90(pkt, m, 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003F0CC8);
 
 /* func_L00_003F1300 is defined in L00_003F1300-g8.c. */
 
@@ -865,7 +864,7 @@ void func_L00_003F3AD0(char *object)
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_003F4210);
+/* func_L00_003F4210 uses its dedicated debug-profile unit. */
 
 /* func_L00_003F4B68 uses its dedicated quadword-copy profile. */
 

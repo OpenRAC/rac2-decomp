@@ -122,7 +122,7 @@ typedef struct {
 
 INCLUDE_ASM("asm/levels", func_L00_004096B0);
 
-INCLUDE_ASM("asm/levels", func_L00_00409E48);
+/* func_L00_00409E48 is defined in L00_004096B0-g8.c. */
 
 /* func_L00_0040A4A8 is defined in L00_0040A4A8.c. */
 

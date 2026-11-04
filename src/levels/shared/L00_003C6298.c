@@ -110,7 +110,6 @@ extern void ref_L00_003CC030_00(char *);
 
 /* Measured partial layout; original type and game role are unknown. */
 
-INCLUDE_ASM("asm/levels", func_L00_003C6298);
 
 /* Defined in L00_003C6A88-g8.c. */
 

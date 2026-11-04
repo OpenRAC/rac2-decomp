@@ -17,9 +17,9 @@ int func_001163B0(void) {
 
 /* func_00117278 is in 00117278.c with its O0 quadword-save profile. */
 
-INCLUDE_ASM("asm/core", func_00117650);
+/* func_00117650 is in 00117650.c. */
 
-INCLUDE_ASM("asm/core", func_00117848);
+/* func_00117848 is in 00117848.c. */
 
 /* func_00117CA0 is in 00117CA0.c. */
 

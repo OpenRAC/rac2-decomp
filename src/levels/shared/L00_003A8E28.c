@@ -411,7 +411,7 @@ INCLUDE_ASM("asm/levels", func_L00_003B0DA0);
 
 /* func_L00_003B1270 is defined in L00_003A8E28-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003B14D0);
+/* func_L00_003B14D0 is defined in L00_003A8E28-por.c. */
 
 /* A variadic forwarder whose whole retail body is the register save area the EE compiler
    emits for a variadic function: four named integer arguments consume $a0-$a3, so the

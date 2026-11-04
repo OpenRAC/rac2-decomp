@@ -243,6 +243,8 @@ NativeCompactHeader *func_00300618(NativeCompactHeader *header) {
     return header;
 }
 
+/* func_00300AA8 is in 00300618-draw-g8.c. */
+
 typedef struct {
     char pad00[4];
     short field04;
@@ -325,7 +327,7 @@ void func_00300A00(char *object, int flags, float a, float b, float c, float d, 
     }
 }
 
-INCLUDE_ASM("asm/game", func_00300AA8);
+/* func_00300AA8 is defined in 00300618-draw-g8.c. */
 
 /* func_00300F58 is defined in 00300F58-g8.c. */
 
@@ -374,7 +376,7 @@ int func_00302440(char *obj, char *obj2)
 
 
 
-INCLUDE_ASM("asm/game", func_00302470);
+
 
 INCLUDE_ASM("asm/game", func_00302848);
 
@@ -651,8 +653,6 @@ void func_00305228(Owner_F9e2cd219 *self)
 void func_00305418(void) {
     func_00300330(D_00227DA0);
 }
-
-INCLUDE_ASM("asm/game", func_003054E8);
 
 /* The table of hundred objects and the three helpers it uses sit at another
    address in every program, so they have no address of their own. */
