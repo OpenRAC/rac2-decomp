@@ -316,7 +316,6 @@ char *func_00332440(void *a0, void *a1, void *a2)
 
 
 
-INCLUDE_ASM("asm/game", func_00333048);
 
 INCLUDE_ASM("asm/game", func_003334B0);
 
