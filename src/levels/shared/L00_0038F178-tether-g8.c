@@ -1,19 +1,3 @@
-/* 2 November 2026: retained 792/792 bytes, 0/27 US placements. func_L00_002C42E0 returns int (its matched state-machine definition explicitly returns a status), not void. Correcting that declaration fixes the attachment-publication store in the call delay slot. The initial hero-base register and byte/halfword-store schedule still differ. A typed appearance view and a scoped hero pointer tie the corrected bytes; retain the simpler existing view. No complete match. */
-/* 1 November 2026: 12 words: every order of the six entry stores ties (hi part $v0 here, $v1 in retail), and the attachment store sits before the func_L00_002C42E0 arguments where retail has it in the slot. */
-/* GPT-6.1 Sol (high), 29 October 2026: retained near miss, not linked.
- * USA v1.01, -O2 -G8 -ffunction-sections: 792/792 bytes, 0/27 places;
- * first difference +0x58. Required declarations and measured layouts follow.
- * Reading frame time into a local before storing attachment20 recovers the
- * retail frame-time-load / return-value-store schedule without strict aliasing.
- * Three qcopy transfers, the ordinary TI owner-to-local transfer and trailing
- * float zeros match. Initial actor-byte stores/registers and the attachment14
- * result store around func_L00_002C42E0 still differ.
- * A measured state layout ties the raw-offset form. Strict aliasing repairs
- * the frame-time read too, but changes support loads and the local quad copy.
- * Reopen with independent field/scheduling evidence for the initial stores and
- * the attachment14 publication. No volatile accesses or barriers were added.
- */
-#include "include_asm.h"
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef struct {
@@ -35,7 +19,10 @@ typedef struct {
     char *current; char pad2284[0xC]; char *object;
 } TetherHero;
 extern TetherHero D_00189E20;
-extern int D_L00_001B1BE8[] __attribute__((sda)), D_L00_001B1A4C[] __attribute__((sda)), D_L00_001A8FF0[] __attribute__((sda));
+/* The moby fields set at spawn (RAC1 struct Moby: state, update_dist, visible, draw_dist). */
+typedef struct { char pad00[0x20]; u8 state; char pad21[0xF]; u8 updateDist; u8 visible; s16 drawDist; } TetherActor;
+extern int D_L00_001B1BE8[] __attribute__((sda)), D_L00_001B1A4C[] __attribute__((sda));
+extern int D_L00_001A8FF0;
 extern float D_L00_001AF0E4 __attribute__((sda));
 extern float D_L00_001BF220[4];
 extern char *func_0029EFD0(int);
@@ -60,11 +47,11 @@ char *func_L00_00390FF8(char *owner, char *position, float yaw, float pitch) {
         state = *(TetherState **)(actor + 0x68);
         D_L00_001B1BE8[0] = 1;
         D_00189E20.current = actor;
-        *(u8 *)(actor + 0x30) = 0xFF;
-        *(u8 *)(actor + 0x31) = 1;
-        *(u8 *)(actor + 0x20) = 1;
-        *(u16 *)(actor + 0x32) = 0xFF;
-        if (D_L00_001A8FF0[0]) {
+        ((TetherActor *)actor)->updateDist = 0xFF;
+        ((TetherActor *)actor)->visible = 1;
+        ((TetherActor *)actor)->state = 1;
+        ((TetherActor *)actor)->drawDist = 0xFF;
+        if (D_L00_001A8FF0) {
             *(float *)(actor + 0xF8) = 0;
             *(float *)(actor + 0xF4) = 0;
         } else {
@@ -114,7 +101,7 @@ char *func_L00_00390FF8(char *owner, char *position, float yaw, float pitch) {
         }
         D_L00_001B1A4C[0] = 1;
         func_002B0CE0(6, 0, 1);
-        if (D_L00_001A8FF0[0]) {
+        if (D_L00_001A8FF0) {
             *(u16 *)(actor + 0x34) |= 0x100;
             qcopy(actor + 0xC0, D_00189E20.axis);
             func_002AFFD8(actor + 0x10, actor + 0xE0, 1);

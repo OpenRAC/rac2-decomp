@@ -313,12 +313,12 @@ void func_L00_003827C0(void)
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_00382F28);
+/* func_L00_00382F28 is defined in L00_0037E898-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L00_00383B90);
 
 
-INCLUDE_ASM("asm/levels", func_L00_00384248);
+/* func_L00_00384248 is defined in L00_0037E898-trail-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L00_00384678);
 

@@ -3121,12 +3121,14 @@ src/levels/shared/L00_003B9CB8-g16-qcopy.c	-O2 -G16 -Wa,-G16 -ffunction-sections
 src/levels/shared/L04_0040F8F0-anim-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_00412928-ribbon-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L03_002AB5C8-rope.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L03_002AB5C8-ribbon.c	-O2 -G0 -ffunction-sections -g -fno-rerun-loop-opt
 src/game/00300618-g8-qcopy.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/game/00300618-draw-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_003C6298-gun-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/game/00327038-pool.c	-O2 -G0 -ffunction-sections -g -fno-gcse
 src/game/00327038-quads-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_00405808-g8.c	-O2 -G8 -ffunction-sections -g -frac2-zero-ti-por -frac2-hazard-labels
+src/levels/shared/L22_003A15D0-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32 -g -frac2-zero-ti-por
 src/levels/shared/L01_00397110-weather-g8.c	-O2 -G8 -ffunction-sections -ffast-math -g -frac2-hazard-labels
 src/levels/shared/L00_003F4210-g8-dbg.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g -frac2-hazard-labels
 src/levels/shared/L05_00443D08-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
@@ -3161,3 +3163,9 @@ src/pal/levels/10_hrugis_cloud/L10_0041A730-f7-g8.c	-O2 -G8 -ffunction-sections 
 src/pal/levels/11_joba/L11_00473908-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/12_todano/L12_0041C930-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/13_boldan/L13_00421C68-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/shared/L00_004233F8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L18_00427BE0-shot-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/levels/01_oozla/L01_003BB9D0-debris-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/03_endako/L03_0041CA78-g8.c	-O2 -G8 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
+src/levels/07_siberius/L07_00389EB8-trail-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/levels/02_maktar_nebula/L02_003E91F0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels

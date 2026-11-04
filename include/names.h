@@ -191,6 +191,7 @@
 #define draw_nanotech_ball               func_003146C0
 #define follow_camera_build_view         func_L00_00425560
 #define Camera_ResolveBlockedView        func_L01_002B5EA0
+#define RegisterObjectRenderClass        func_L00_002FF6A8
 #define UpdateOceanWaterSheet            func_L06_00403130
 #define InitializeHero                   func_L00_002A4928
 #define floor                            func_00117650
@@ -883,5 +884,7 @@
 #define UpdateWeatherParticles           func_L01_00399510
 #define UpdateBouncingExplosive          func_L00_003F4210
 #define UpdateShipWeapons                func_L05_00443D08
+#define UpdateRaceSelectionMenu          func_L04_0040BA68
+#define L18_DisableModeGroups            func_L18_003FA180
 
 #endif /* NAMES_H */

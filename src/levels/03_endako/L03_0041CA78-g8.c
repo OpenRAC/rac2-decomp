@@ -1,37 +1,7 @@
-/* 4 November 2026, current-profile follow-up; not linked.
- * With -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
- * -Wa,--r5900-unsigned32-mask=sn: 1076/1076 bytes, 0/1 USA v1.01 places.
- * The qualified assembler option resolves the two sentinel instructions below.
- * Twenty initialization store/FPR rows still differ, first at +0x94. A sparse
- * measured state struct produces byte-identical checker output, so merely
- * replacing cast accesses with fields does not resolve that scheduling.
- * The better original C is retained. US2/PAL compilation was not repeated
- * after the US mismatch; no cross-release or strict-build match is claimed.
- * Earlier v2216 measurements follow as history, before the mask option.
- */
-/* Tier: Claude Opus 5.5 xhigh, v2216. USA v1.01, game compiler.
- * Best check.py: 1076/1076 bytes, 0 of 1 places match (first difference +0x94);
- * 22 differing rows of 269, two of them relocation addends only (D_001A7A60+0x1C).
- * Profile: separate unit L03_0041CA78-g8.c with
- * -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * Fixed since v0826: death path written out (no goto, so the beq lands on the
- * jal func_0029F338 and the cleanup calls are skipped); D_001A7A60[0x1C] with
- * MACRO_ADDR for the absolute byte flag; D_L03_001A8F20 MACRO_ADDR (unsplit la keeps
- * lui/addiu adjacent after a0/a1); func_002B0A68 prototype (...,float x4,u8) as in
- * the matched func_L03_0041EAE0 (fills a3=0xFF into the jal slot); product stores
- * written 70,74,78,64,6C,68 (last use issues first) -> retail 74,70,78,68,6C,64.
- * Still differs:
- * 1. Sentinel: cc1 emits dli $2,0xffffffff; our assembler expands it to
- *    lui 0xFFFF; dsrl32 0. Retail always uses addiu -1; dsrl32 0 (45 sites in
- *    31 functions, no lui form anywhere). At that time no as option selected it;
- *    the qualified unsigned32-mask option above now resolves this item.
- * 2. Init stores 0x150..0x58: retail issues them in exact source order; our sched1
- *    puts stores whose source dies first (INSN_REG_WEIGHT), then the rest. Both
- *    constant-load orders are identical; f3/f4 (0.5 vs 0.5236) follow from the
- *    store order through local-alloc spans. -fno-schedule-insns is far worse.
- *    Needs a construct giving every store equal weight (or a store chain).
- * Declarations are all below; func_002E5CF8/func_002E5E58/func_002B3BA8 return int.
- */
+/* func_L03_0041CA78 is a unit of its own: it reads level data through $gp (-G8) and its
+   0x00000000FFFFFFFF sentinel needs the SN constant seed (addiu -1; dsrl32 0) selected by
+   -Wa,--r5900-unsigned32-mask=sn (config/cflags.txt). The initialization stores are written
+   in the order sched1 needs: stores whose value is reused later in the block come first. */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
@@ -84,6 +54,9 @@ void func_L03_0041CA78(u8 *e) {
             return;
         }
         { s32 initialMode = 3;
+        *(int *)(s+0x2ac)=0; *(int *)(s+0x188)=initialMode;
+        *(float *)(s+0x174)=*(float *)(s+0x170)=0.5f;
+        *(float *)(s+0x17c)=0.4f; *(float *)(s+0x64)=0.20943955f; *(float *)(s+0x58)=0.4f;
         s[0x150]=7; s[0x28]=initialMode;
         *(float *)(s+0x68)=0.20943955f;
         *(float *)(s+0x84)=scale*0.05f;
@@ -93,10 +66,7 @@ void func_L03_0041CA78(u8 *e) {
         *(float *)(s+0x60)=0.78539824f;
         *(float *)(s+0x80)=0.52359885f;
         *(int *)(s+0x8c)=*(int *)(s+0x290);
-        *(int *)(s+0x2ac)=0; *(int *)(s+0x188)=initialMode;
-        *(float *)(s+0x174)=*(float *)(s+0x170)=0.5f;
-        *(float *)(s+0x17c)=0.4f; *(float *)(s+0x64)=0.20943955f; *(float *)(s+0x58)=0.4f;
-        *(Quad *)(s+0x2b0)=*(Quad *)(e+0x10); }
+        qcopy(s+0x2b0,e+0x10); }
         if(*(u64 *)(s+0x2a0)!=0xffffffffULL) {
             func_002A7750(e,8,4);
             *(int *)(e+0x98)=0;

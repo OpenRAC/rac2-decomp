@@ -1,32 +1,3 @@
-/* Faithful-source review, 4 November 2026; retained, not linked.
- * 1720/1720 bytes, 0/1 USA placement, first mismatch +0xD8.
- * Remove the three overwritten declaration values of i, spin and value. The earlier two-word result depended on their GCSE bucket effects and is superseded. Genuine saved-pointer spill lifetimes and final spark argument scheduling remain open.
- * Measured in the assigned production unit with the profile recorded below.
- * Other-release checks were not rerun for this nonmatching source.
- * Earlier diagnostic measurements below are historical where superseded.
- */
-/*
- * func_L02_003E91F0, tier opus-1 (task v2033).
- * Best check.py: 1720/1720 bytes, 0/1 places, 2 instructions differ.
- * Build as src/levels/02_maktar_nebula/L02_003E91F0-g8.c with
- * -O2 -G8 -ffunction-sections -g -frac2-hazard-labels, in place of the INCLUDE_ASM line.
- *
- * What differs: only the last spark call. Retail has mov.s $f13,$f20 at 003E9834 and
- * daddu $t0,$s0,$zero at 003E9844; this draft has the two swapped. The first two spark
- * calls match. spin and radius both die at the last call (REG_DEAD on both moves), and
- * sched2 breaks the tie by sched1 order, which puts t0 first here.
- * No effect on the swap: an int return type on func_002C2210, returning its result,
- * a separate local for radius * 0.1f. A separate local for the last spin adds a swap.
- *
- * Declarations and review points:
- * - i = 0, spin = 0 and value = 1.0f are declaration initial values, used only because
- *   spill slots differ. They bring the PRE table to retail's 205 buckets (203 without
- *   them), which gives the slot order state+0x20, state+0x30, i<<2, i*16. Disclose them
- *   in a NOTE REVIEW if this lands.
- * - zero holds 0.0f across the two tests in the loop, so loop.c moves it in pass 1,
- *   before the sideways address copy (mtc1 $zero,$f24 order).
- * - Externs, TetherState and Hero are below.
- */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 extern float D_L02_001B0BA8 __attribute__((sda));
@@ -57,7 +28,7 @@ extern float func_00282DF0(void *);
 extern void func_00282CC0(void *, void *, void *);
 extern float func_00283248(float, float), func_002A7878(float, float);
 extern int func_002A7820(int, int), func_002A77E0(int);
-extern void func_002C2210(void *, int, int, int, int, void *, int, float, float, float);
+extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
 typedef struct {
     char pad[0x20];
     float start[4];
@@ -72,7 +43,7 @@ void func_L02_003E91F0(char *actor) {
     float endpoint[4], direction[4], delta[4], blended[4], tangent[4], sideways[4], toward[4];
     float length = D_L02_001B0BA8 * 0.05f;
     float phase, span, distance, oscillation, lateral, radius;
-    int i, spin;
+    int spin;
     D_L02_001B0C28 = func_00283B98(D_L02_001B0C28, D_L02_001B0C2C);
     D_L02_001B0C30 = func_00283BE0(D_L02_001B0C30, D_L02_001B0C34);
     D_L02_001B0C44 = func_00283B98(D_L02_001B0C44, D_L02_001B0C48);
@@ -92,6 +63,9 @@ void func_L02_003E91F0(char *actor) {
     func_00282D30(tangent, direction, length);
     qcopy(D_L02_00249090[0][0], state->start);
     qcopy(D_L02_00249090[1][0], state->start);
+    {
+    /* i is declared here, after the setup code: its later pseudo number sets the gcse order of the spilled state->start/state->end/i*4 copies. */
+    int i;
     for (i = 1; i < 20; i++) {
         float value, height, zero;
         float *point;
@@ -144,6 +118,7 @@ void func_L02_003E91F0(char *actor) {
         qcopy(D_L02_00249360[i], sideways);
         func_00282CC0(D_L02_00249090[1][i], D_L02_00249090[1][i], sideways);
     }
+    }
     qcopy(state->end, D_L02_00249090[0][19]);
     oscillation = func_002A78D8(0.52359885f, 1.0471977f);
     phase = func_002A7878(-0.52359885f, 1.0471977f);
@@ -153,10 +128,10 @@ void func_L02_003E91F0(char *actor) {
     spin = func_002A7820(1, 8);
     if (func_002A77E0(2)) spin = -spin;
     radius = func_002A7878(0.2f, 0.6f);
-    func_002C2210(state->start, 15, D_L02_001B0C7C | 0x7F000000, 0, spin, toward, 0, radius * 0.3f, radius, 0.0f);
-    func_002C2210(state->start, 15, 0x307F7F7F, 0, -spin, toward, 0, radius * 0.15f, radius * 0.5f, 0.0f);
+    func_002C2210(state->start, 15, radius * 0.3f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, toward, 0, 0.0f);
+    func_002C2210(state->start, 15, radius * 0.15f, radius * 0.5f, 0x307F7F7F, 0, -spin, toward, 0, 0.0f);
     spin = func_002A7820(1, 8);
     if (func_002A77E0(2)) spin = -spin;
     radius = func_002A7878(0.15f, 3.0f);
-    func_002C2210(state->end, 12, D_L02_001B0C7C | 0x7F000000, 0, spin, D_L02_001A8F20, 0, radius * 0.1f, radius, 0.0f);
+    func_002C2210(state->end, 12, radius * 0.1f, radius, D_L02_001B0C7C | 0x7F000000, 0, spin, D_L02_001A8F20, 0, 0.0f);
 }

@@ -417,8 +417,7 @@ void func_00348640(char *a0, int a1, int *a2)
         func_L00_0042C360_1(a0 + 536 + i * 72, func_00288FB8_2(a2[i]));
 }
 
-/* func_003486A8 is a near miss: nonmatching/game/func_003486A8.c */
-INCLUDE_ASM("asm/game", func_003486A8);
+/* func_003486A8 is built from 00345358-children.c. */
 
 
 INCLUDE_ASM("asm/game", func_003489E8);
@@ -647,7 +646,78 @@ void func_0034A4B0(Rac2Native_79744baad5ad7f65_ScalarChange48Owner *owner, int v
     owner->value_04 = value;
 }
 
-INCLUDE_ASM("asm/game", func_0034A4E0);
+typedef struct { char bytes[0x4C]; } StageSprite;
+typedef struct { char prefix[0x5C]; StageSprite left, right; } StageOwner;
+typedef struct { float values[3]; } StageFloatTable;
+typedef struct { int values[3]; } StageIntTable;
+extern const StageFloatTable D_001AE628, D_001AE638;
+extern const StageIntTable D_001AE648, D_001AE658;
+extern void func_003363C0(char *widget, float position);
+
+float func_0034A4E0(char *object, int type, int *columns, int *rows,
+                    float *spacing, int *xOffset, int *yOffset, int *flag,
+                    float *extra)
+{
+    StageOwner *owner = (StageOwner *)object;
+    StageFloatTable spacings, results;
+    StageIntTable xOffsets, yOffsets;
+    int index, tier;
+    float position, result = 0.0f;
+
+    spacings = D_001AE628;
+    results = D_001AE638;
+    *flag = 0;
+    index = type - 1;
+    xOffsets = D_001AE648;
+    tier = 1;
+    if (type > 20) tier = 2;
+    *rows = tier;
+    if (index < 0) index = 0;
+    yOffsets = D_001AE658;
+    if (type >= 1 && type <= 20) {
+        position = (float)(index / 4);
+        *columns = 6;
+        *spacing = spacings.values[0];
+        *xOffset = xOffsets.values[0];
+        *yOffset = yOffsets.values[0];
+        result = results.values[0];
+        *extra = 0.0f;
+        func_003363C0((char *)&owner->left, position);
+        func_003363C0((char *)&owner->right, position);
+        func_00336390((char *)&owner->left, D_001A8CFC + 0x8710, 17);
+        func_00336390((char *)&owner->right, D_001A8CFC + 0x8710, 18);
+    } else if (type >= 21 && type <= 40) {
+        int row = index / 4 - 5;
+        if (row < 0) row = 0;
+        position = (float)row;
+        *columns = 10;
+        *spacing = spacings.values[1];
+        *xOffset = xOffsets.values[1];
+        *yOffset = yOffsets.values[1];
+        *extra = -0.5f;
+        result = results.values[1];
+        func_003363C0((char *)&owner->left, position);
+        func_003363C0((char *)&owner->right, position);
+        func_00336390((char *)&owner->left, D_001A8CFC + 0x8710, 19);
+        func_00336390((char *)&owner->right, D_001A8CFC + 0x8710, 20);
+    } else if (type >= 41 && type <= 80) {
+        int row = index / 4 - 10;
+        if (row < 0) row = 0;
+        position = (float)row;
+        *columns = 10;
+        *spacing = spacings.values[2];
+        *xOffset = xOffsets.values[2];
+        *yOffset = yOffsets.values[2];
+        *extra = -0.5f;
+        *flag = 1;
+        result = results.values[2];
+        func_003363C0((char *)&owner->left, position);
+        func_003363C0((char *)&owner->right, position);
+        func_00336390((char *)&owner->left, D_001A8CFC + 0x8710, 21);
+        func_00336390((char *)&owner->right, D_001A8CFC + 0x8710, 22);
+    }
+    return result;
+}
 
 /* func_0034A808 is in 0034A808.c. */
 
@@ -886,3 +956,5 @@ INCLUDE_ASM("asm/game", func_0034CE88);
 
 /* Measured target: byte-identical across all 27 levels. */
 void func_0034CE98(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2bc) = a1; }
+
+INCLUDE_ASM("asm/game", func_003486A8);

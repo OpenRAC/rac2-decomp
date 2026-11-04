@@ -1,26 +1,14 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
-#include "common.h"
-/* sol-high, 29 October 2026. Retained matching attempt.
- * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * Current USA check: 972/972 bytes, 0/27 placements; first mismatch +0x11C.
- * The typed state views and independent hero-position/parent pointers recover
- * the retail frame, saved registers, camera initialization and final vector work.
- * Remaining differences: movement/orientation/rotation store scheduling and
- * plane/tracker global-load ordering and FPR allocation. No linked-build credit.
- * The rebuild call belongs only to the non-handoff branch, as retail shows.
- * RAC1 reference: src/overlays/shared/follow_camera.c, follow_camera_setup
- * (func_L00_002E8210); its state layout differs from RAC2's measured offsets.
- * Required declarations and partial state views are included below. The hero
- * parent is reached from its independently established resident position at +0x80.
- * Tested remedies that did not close the mismatch: raw pointers, manual qcopy,
- * MACRO_ADDR/SDATA scalar views, and disabling either scheduling pass or aliasing.
+/* func_L00_004233F8 (follow_camera_setup): own unit for -G8 with the
+ * quadword-copy profile. Counterpart: RAC1 src/overlays/shared/follow_camera.c,
+ * follow_camera_setup; the state layout here follows RAC2's measured offsets.
  */
+#include "common.h"
 typedef unsigned int CameraQuad __attribute__((mode(TI)));
-extern CameraQuad D_00189EA0;
+extern unsigned char D_00189E20[];
 extern CameraQuad D_0018A0E0;
 extern int D_L00_001B1580 SDATA(D_L00_001B1580), D_L00_001B1584 SDATA(D_L00_001B1584);
 extern unsigned short D_L00_001B1514 SDATA(D_L00_001B1514), D_L00_001B1518 SDATA(D_L00_001B1518);
-extern float D_L00_001B14A0 __attribute__((sda)), D_L00_001B14A4 __attribute__((sda));
+extern float D_L00_001B14A0 SDATA(D_L00_001B14A0), D_L00_001B14A4 SDATA(D_L00_001B14A4);
 extern float D_L00_001B1510 SDATA(D_L00_001B1510), D_L00_001B14D4 SDATA(D_L00_001B14D4), D_L00_001B14D8 SDATA(D_L00_001B14D8), D_L00_001B14DC SDATA(D_L00_001B14DC);
 extern float D_L00_001A8900, D_L00_001A8904;
 extern int D_L00_001B1854;
@@ -91,11 +79,11 @@ void func_L00_004233F8(CameraOwner *owner)
     PlaneState *plane;
     TrackerState *tracker;
     float distance;
-    unsigned char *initialPosition = (unsigned char *)&D_00189EA0;
+    unsigned char *initialPosition = D_00189E20 + 0x80;
     unsigned char *hero;
     D_L00_001B1580 = 0;
     D_L00_001B1584 = 0;
-    *(CameraQuad *)camera = *(CameraQuad *)initialPosition;
+    qcopy(camera, initialPosition);
     hero = initialPosition - 0x80;
     camera->fB0 = 1.5f;
     camera->iC0 = CI(hero, 0x2290);
@@ -127,9 +115,9 @@ void func_L00_004233F8(CameraOwner *owner)
     movement->i24 = 0;
     movement->h3C = 0;
     movement->h3E = 0;
+    movement->f48 = 0.003f;
     movement->f54 = 0.003f;
     movement->f58 = 4.64f;
-    movement->f48 = 0.003f;
     movement->i44 = 0;
     movement->i50 = 0;
     root = owner->state;
@@ -141,8 +129,8 @@ void func_L00_004233F8(CameraOwner *owner)
     orientation = &owner->state->orientation;
     orientation->h0 = 0;
     orientation->f20 = 0.2f;
-    orientation->f38 = 0.0002908882452175021f;
     orientation->f34 = 0.0002908882452175021f;
+    orientation->f38 = 0.0002908882452175021f;
     orientation->f1C = 0.005f;
     orientation->i10 = 0;
     orientation->iC = 0;
@@ -160,9 +148,9 @@ void func_L00_004233F8(CameraOwner *owner)
     rotation->iC = 0;
     rotation->i10 = 0;
     rotation->f18 = 0.523598849773407f;
-    rotation->i24 = 0;
     rotation->i1C = 0;
     rotation->i20 = 0;
+    rotation->i24 = 0;
     plane = (PlaneState *)((char *)owner->state + 0x240);
     plane->i0 = 0;
     plane->i10 = 0;
@@ -177,11 +165,11 @@ void func_L00_004233F8(CameraOwner *owner)
     tracker->h38 = 0;
     tracker->h4C = 0;
     tracker->h4E = 0;
-    tracker->i48 = D_L00_001B1854;
     tracker->h34 = 2000;
     tracker->f44 = D_L00_001B14D4;
     tracker->f3C = D_L00_001B14DC;
     tracker->f40 = D_L00_001B14D8;
+    tracker->i48 = D_L00_001B1854;
     func_00282C88(tracker->direction);
     if (owner->handoff == 2) {
         func_L00_00423290((unsigned char *)owner);

@@ -269,7 +269,6 @@ void func_L00_00390E10(char *object)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_00390FF8);
 
 /* Releases the second argument's object: clears a word of the sub-object at +0x68, clears
  * two globals, hands its +0x14 word over before clearing it, then runs five helpers and the

@@ -1,26 +1,8 @@
-/* 4 November 2026 actual-contract review; retained near miss, not linked.
- * USA v1.01 check.py: 1368/1372 bytes, 0/1 placements; first difference size mismatch.
- * Profile: -O2 -G8 -ffunction-sections.
- * The measured state fields fix the final growth/threshold load ordering and keep 1/60 in f3.
- * The earlier false-path tuning reload is still deleted and the multiply operands differ. The
- * event helper keeps its actual int return.
- * Earlier measurements below are historical where superseded by this note.
- */
-/* func_L07_003F3E80 (1372 B). Opus xhigh v2090, 3 November 2026: 1368/1372 bytes, 0/1 places.
- * Tier: build in the -G8 unit L07_00389EB8-g8.c (-O2 -G8 -ffunction-sections); that unit already
- * declares func_0029F338(int), so drop that extern there. Needs the sda/MACRO_ADDR/SDATA externs below.
- * Case 0 (the whole particle loop) now matches: `speed` as a Vector (BLK stack MEM) passed as speed.f
- * is not copied to a pseudo by precompute_register_parameters (an ADDRESSOF f32 was: MEM cost 6 > 2),
- * so loop pass 2 counts 61 insns and hoists 210000.0f into $f25 like retail. Case-1 stores order
- * 0x98, 0x34, then 0x18 as retail.
- * Remaining 4 bytes, all case 1: (a) retail's func_002A77E0 then-arm is mult(C=1/60 in f1, -D in f0)
- * and its else-arm reloads D (lwc1 f1) before mult(D, C); here both arms fold to X*C and the else-arm
- * D load is deleted as redundant with the delay-slot load (fold/cse swap REAL_CST to the second
- * operand, so no plain source keeps C first). (b) retail loads D_L07_001B0E44 above the 0x24 store and
- * keeps 1/60 in f3; F() casts are not MEM_IN_STRUCT_P, so try struct-member accesses on `state`. */
 #include "common.h"
 
-#define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
+/* func_L07_003F3E80 needs -frac2-hazard-labels with -G8: retail keeps the case-1 join label on the
+   mtc1 -> mul.s hazard nop. The two phase-step arms write one local; jump2 then cross-jumps their
+   commutative-equal multiplies. */
 typedef union { s32 q __attribute__((mode(TI))); f32 f[4]; } Vector;
 extern void func_00282C98(void *), func_00282DD8(void *, void *, void *);
 extern void func_00283098(void *, void *, void *), func_00282CC0(void *, void *, void *);
@@ -48,6 +30,7 @@ extern s32 D_L07_001B0E70_gp SDATA(D_L07_001B0E70);
 extern f32 D_L07_001B0E78[] MACRO_ADDR;
 extern f32 D_L07_001B0E78_gp SDATA(D_L07_001B0E78);
 
+/* The state block at object + 0x68; only the fields this function touches are named. */
 typedef struct {
     f32 position[4];
     f32 direction[4];
@@ -60,30 +43,30 @@ void func_L07_003F3E80(u8 *object)
     Vector axis, up, direction;
     f32 rotation[12];
     Vector previous, displacement, origin, point, velocity, speed;
-    f32 magnitude, life;
-    u8 *state = *(u8 **)(object + 0x68);
+    f32 magnitude, life, step;
+    SiberiusTrailState *trail = *(SiberiusTrailState **)(object + 0x68);
     s32 i, size, count;
     u32 color;
     switch (object[0x20]) {
     case 0:
         func_00282C98(&up);
-        if (*(u8 **)(state + 0x20)) func_00283098(&direction, state + 0x10, *(u8 **)(state + 0x20) + 0xC0);
-        else qcopy(&direction, state + 0x10);
+        if (trail->attachment) func_00283098(&direction, trail->direction, trail->attachment + 0xC0);
+        else qcopy(&direction, trail->direction);
         func_00282DD8(&axis, &up, &direction);
         func_002ACE78(&axis, &axis, D_L07_001B0E3C * 0.00029088825f);
         func_00283958(&axis, rotation);
         func_00283738(object + 0xC0, rotation, object + 0xC0);
         qcopy(&previous, object + 0x10);
-        ((SiberiusTrailState *)state)->direction[2] -= ((SiberiusTrailState *)state)->direction[3];
-        if (*(u8 **)(state + 0x20)) {
-            func_00282CC0(state, state, state + 0x10);
-            func_00283098(object + 0x10, state, *(u8 **)(state + 0x20) + 0xC0);
-            func_00282CC0(object + 0x10, object + 0x10, *(u8 **)(state + 0x20) + 0x10);
-            func_00283098(&displacement, state + 0x10, *(u8 **)(state + 0x20) + 0xC0);
+        trail->direction[2] -= trail->direction[3];
+        if (trail->attachment) {
+            func_00282CC0(trail->position, trail->position, trail->direction);
+            func_00283098(object + 0x10, trail->position, trail->attachment + 0xC0);
+            func_00282CC0(object + 0x10, object + 0x10, trail->attachment + 0x10);
+            func_00283098(&displacement, trail->direction, trail->attachment + 0xC0);
             func_00282CF0(&origin, object + 0x10, &displacement);
         } else {
-            func_00282CC0(object + 0x10, object + 0x10, state + 0x10);
-            qcopy(&displacement, state + 0x10);
+            func_00282CC0(object + 0x10, object + 0x10, trail->direction);
+            qcopy(&displacement, trail->direction);
             qcopy(&origin, &previous);
         }
         magnitude = func_00282DF0(&displacement);
@@ -114,23 +97,24 @@ void func_L07_003F3E80(u8 *object)
             func_002E5DA0(4, 0, object, 0xE5F);
             *(u32 *)(object + 0x98) = 0;
             *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xEFFF;
-            F(object, 0x18) += 0.333f;
-            ((SiberiusTrailState *)state)->growth = 0.1f;
-            ((SiberiusTrailState *)state)->strength = 1.0f;
-            if (func_002A77E0(2)) ((SiberiusTrailState *)state)->phase_step = (1.0f / 60.0f) * -D_L07_001B0E4C;
-            else ((SiberiusTrailState *)state)->phase_step = D_L07_001B0E4C * (1.0f / 60.0f);
-            ((SiberiusTrailState *)state)->phase = func_002A7878(0.0f, 1.0f);
-            if (*(u8 **)(state + 0x20))
-                func_002AD0E0(object, *(u8 **)(state + 0x20), object + 0x10, object + 0xF0, object + 0x10, object + 0xF0);
+            *(f32 *)(object + 0x18) += 0.333f;
+            trail->growth = 0.1f;
+            trail->strength = 1.0f;
+            if (func_002A77E0(2)) step = -D_L07_001B0E4C * (1.0f / 60.0f);
+            else step = D_L07_001B0E4C * (1.0f / 60.0f);
+            trail->phase_step = step;
+            trail->phase = func_002A7878(0.0f, 1.0f);
         }
-        ((SiberiusTrailState *)state)->growth += D_L07_001B0E40 * (1.0f / 60.0f);
-        if (((SiberiusTrailState *)state)->growth >= D_L07_001B0E44) {
-            func_002AA2E8((f32 *)(state + 0x28), 0.0f, D_L07_001B0E48 * (1.0f / 60.0f));
-            if (((SiberiusTrailState *)state)->strength <= 0.0f) { func_0029F338((int)object); return; }
+        if (trail->attachment)
+            func_002AD0E0(object, trail->attachment, object + 0x10, object + 0xF0, object + 0x10, object + 0xF0);
+        trail->growth += D_L07_001B0E40 * (1.0f / 60.0f);
+        if (trail->growth >= D_L07_001B0E44) {
+            func_002AA2E8(&trail->strength, 0.0f, D_L07_001B0E48 * (1.0f / 60.0f));
+            if (trail->strength <= 0.0f) { func_0029F338((int)object); return; }
         }
-        ((SiberiusTrailState *)state)->phase += ((SiberiusTrailState *)state)->phase_step;
-        if (((SiberiusTrailState *)state)->phase > 1.0f) ((SiberiusTrailState *)state)->phase -= 1.0f;
-        else if (((SiberiusTrailState *)state)->phase < 0.0f) ((SiberiusTrailState *)state)->phase += 1.0f;
+        trail->phase += trail->phase_step;
+        if (trail->phase > 1.0f) trail->phase -= 1.0f;
+        else if (trail->phase < 0.0f) trail->phase += 1.0f;
         func_L00_002E6CF0(func_L07_003F4578, object);
         break;
     }

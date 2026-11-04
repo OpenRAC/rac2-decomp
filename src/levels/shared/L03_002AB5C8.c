@@ -189,8 +189,6 @@ void func_L03_002ADCA0(void) {
         *(float *)(*(unsigned char **)(g + 0x2290) + 0xF4) = *(float *)(g + 0x6B0);
 }
 
-INCLUDE_ASM("asm/levels", func_L03_0038AB30);
-
 
 extern float func_002AA2E8(float *, float, float);
 extern void func_002AA3A8(float *, float *, float, float, float, float);

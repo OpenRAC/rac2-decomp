@@ -424,7 +424,7 @@ extern void func_003109C8(char *, int, int);
 /* Store the mode value and the inverse of the launch factor. */
 /* func_L07_003EF1E0 is matched in L07_003EF1E0.c (built with -g). */
 
-INCLUDE_ASM("asm/levels", func_L07_003F3E80);
+/* func_L07_003F3E80 is in L07_00389EB8-trail-g8.c (-G8 with -frac2-hazard-labels). */
 
 /* func_L07_003F43E0 is in the sibling file L07_00389EB8-g8.c: its body
    reads small-data globals through $gp. */

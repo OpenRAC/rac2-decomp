@@ -103,3 +103,25 @@ void func_L00_00300378(u8 *a0)
         D_L00_001B1AC4 = 0;
     }
 }
+
+typedef struct {
+    unsigned long long data;
+    unsigned long long tag1;
+    unsigned long long tag2;
+} Packet_FE268;
+
+extern unsigned long long D_001A72C8;
+extern unsigned int D_001A72C0;
+extern void *D_L00_001BF1B4[];
+extern Packet_FE268 D_L00_001C91C0[];
+extern unsigned long long D_L00_001A9510 __attribute__((sda));
+extern void func_002933D0(void *, int, void *);
+
+void func_L00_002FE268(unsigned int value)
+{
+    D_001A72C0 = value;
+    D_L00_001C91C0[0].data = D_001A72C8;
+    D_L00_001C91C0[0].tag1 = 0x0000FFA0000000E0ULL;
+    D_L00_001C91C0[0].tag2 = 0x0040000400004000ULL;
+    func_002933D0(D_L00_001BF1B4[0], 0, &D_L00_001A9510);
+}

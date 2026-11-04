@@ -172,7 +172,7 @@ int func_L00_002C3A78(void)
 
 /* func_L00_002C3E18 is built in its dedicated G8/copy-profile unit. */
 
-INCLUDE_ASM("asm/levels", func_L00_002C40C0);
+/* func_L00_002C40C0 is built in its dedicated G8 unit, L00_002C2DE8-select-g8.c. */
 
 
 extern unsigned char D_0018C0D4[];

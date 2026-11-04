@@ -41,7 +41,7 @@ s32 func_L18_004283F0(u8 *a0) {
     return r;
 }
 
-INCLUDE_ASM("asm/levels", func_L18_00428428);
+/* func_L18_00428428 lives in L18_00427BE0-shot-g8.c. */
 
 /* Stores the measured halfword control for the one class that carries it, leaving
    the two silent classes alone and renewing the shared slot for anything else. */

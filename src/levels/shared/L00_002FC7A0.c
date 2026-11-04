@@ -343,10 +343,146 @@ void func_L00_002FD400(void)
 /* func_L00_002FD480 is matched in its own unit, src/levels/shared/L00_002FD480-g8-qcopy.c (-O2 -G8 -ffunction-sections -frac2-qcopy). */
 
 
-INCLUDE_ASM("asm/levels", func_L00_002FE268);
+/* func_L00_002FE268 is defined in L00_002FC7A0-g8.c (-G8 small data). */
 
 
-INCLUDE_ASM("asm/levels", func_L00_002FF6A8);
+/* Object render class: three LOD tables of 16-byte records, then 80-byte GS texture packets. */
+typedef struct ObjectRenderLod_FF6A8 {
+    u8 *data; /* relative to the table until registered */
+    u8 pad04[12];
+} ObjectRenderLod_FF6A8;
+typedef union ObjectRenderPacketWord_FF6A8 {
+    u64 d;
+    s32 w[2];
+} ObjectRenderPacketWord_FF6A8;
+typedef struct ObjectRenderPacket_FF6A8 {
+    u64 tex0;
+    u64 tag0;
+    ObjectRenderPacketWord_FF6A8 tex1; /* K in w[0], MMIN in w[1] until registered */
+    u64 tag1;
+    u64 miptbp1;
+    u64 tag2;
+    ObjectRenderPacketWord_FF6A8 clamp; /* two fields until registered, then packed with the material index */
+    u64 tag3;
+    u64 tail[2];
+} ObjectRenderPacket_FF6A8;
+typedef struct ObjectRenderClass_FF6A8 {
+    ObjectRenderLod_FF6A8 *lod_tables[3];
+    u8 lod_counts[3];
+    u8 packet_count;
+    u8 pad10[4];
+    f32 lod_distance_1;
+    f32 lod_distance_2;
+    ObjectRenderPacket_FF6A8 *packets;
+    void *first_instance;
+    u8 pad24[12];
+    s32 unk30;
+    u8 *unk34;
+    u8 pad38[6];
+    s16 instance_count;
+    u8 pad40[6];
+    u16 class_slot;
+    f32 scale;
+} ObjectRenderClass_FF6A8;
+extern s32 D_L00_001B2510 __attribute__((sda));
+extern ObjectRenderClass_FF6A8 *D_L00_00226700[];
+extern s16 D_L00_00226900[];
+extern u8 D_L00_00226A00[];
+extern s32 D_L00_0022DA00[];
+extern MaterialMap_04340 D_L00_0022DE00[];
+
+/* Registers an object (TIE) render class: slot and id tables, its fixed distance threshold,
+ * relocates its LOD tables and packets, copies its material map and rewrites each packet's
+ * TEX0/TEX1/MIPTBP1/CLAMP words from its texture (or from the resident material templates).
+ * Adapted from RAC1 src/game/loaders.c, register_object_render_class; RAC2 adds the LOD
+ * distance defaults and relocates one more pointer (unk34).
+ */
+void func_L00_002FF6A8(ObjectRenderClass_FF6A8 *render_class, ResidentRenderTextureDefinition_04340 *textures,
+                       u128_04340 *material_map, s32 class_id)
+{
+    s32 lod, j;
+    s32 packet_index;
+    s32 fixed_threshold;
+    s32 slot;
+    u8 *slot_materials;
+    ObjectRenderPacket_FF6A8 *packet, *packets;
+
+    D_L00_00226900[D_L00_001B2510] = class_id;
+    D_L00_00226A00[class_id] = D_L00_001B2510;
+    D_L00_00226700[D_L00_001B2510] = render_class;
+    render_class->class_slot = D_L00_001B2510;
+    fixed_threshold = func_00283CF0(render_class->scale * 1024.0f);
+    slot = D_L00_001B2510;
+    D_L00_001B2510 = slot + 1;
+    D_L00_0022DA00[slot] = fixed_threshold;
+    render_class->first_instance = 0;
+    render_class->instance_count = 0;
+    for (lod = 0; lod < 3; lod++) {
+        if (render_class->lod_tables[lod]) {
+            render_class->lod_tables[lod] =
+                (ObjectRenderLod_FF6A8 *)((s32)render_class->lod_tables[lod] + (s32)render_class);
+            for (j = 0; j < render_class->lod_counts[lod]; j++) {
+                ObjectRenderLod_FF6A8 *table = render_class->lod_tables[lod];
+                table[j].data = (u8 *)((s32)table[j].data + (s32)table);
+            }
+        }
+    }
+    if (render_class->lod_counts[1] == 0) render_class->lod_distance_1 = 8190.0f;
+    if (render_class->lod_counts[2] == 0) render_class->lod_distance_2 = 8192.0f;
+    render_class->unk34 = (u8 *)((s32)render_class->unk34 + (s32)render_class);
+    packets = render_class->packets = (ObjectRenderPacket_FF6A8 *)((s32)render_class->packets + (s32)render_class);
+    render_class->unk30 = 0;
+    slot_materials = (u8 *)&D_L00_0022DE00[D_L00_00226A00[class_id]];
+    qcopy(slot_materials, material_map);
+    packet = packets;
+    for (packet_index = 0; packet_index < render_class->packet_count; packet_index++, packet++) {
+        s32 material_index, draw_high, draw_shift, clamp_low, clamp_shift;
+
+        material_index = slot_materials[packet_index];
+        draw_high = packet->tex1.w[0];
+        draw_shift = packet->tex1.w[1];
+        clamp_low = packet->clamp.w[0];
+        clamp_shift = packet->clamp.w[1];
+        if (textures) {
+            ResidentRenderTextureDefinition_04340 *texture = &textures[material_index];
+            s32 width_bits, width_units_64, width_units_128, width_log2, height_log2, gs_block_base;
+            s32 mip_block_0, mip_block_1, draw_control_count;
+            u64 tex0_word, tex1_word, mip_word, clamp_word;
+
+            width_bits = (u16)texture->width << 16;
+            width_units_64 = width_bits >> 22;
+            width_units_128 = width_bits >> 23;
+            if (width_units_64 <= 0) width_units_64 = 1;
+            if (width_units_128 <= 0) width_units_128 = 1;
+            width_log2 = func_00282A18(width_bits >> 16);
+            height_log2 = func_00282A18(texture->height);
+            gs_block_base = D_001A72F4 >> 8;
+            mip_block_1 = texture->mip_block_offset_1 + gs_block_base;
+            mip_block_0 = texture->mip_block_offset_0 + gs_block_base;
+            width_bits = texture->clut_block_offset + gs_block_base;
+            draw_control_count = texture->draw_control_count;
+            tex0_word = (s64)((u64)(((s64)width_units_64 << 14) | ((s64)0x13 << 20) | ((s64)width_log2 << 26)) | ((u64)height_log2 << 30) | ((u64)1 << 34) | ((u64)width_bits << 37)) | ((s64)4 << 61);
+            tex1_word = (s64)(((u64)(draw_control_count - 1) << 2) | ((u64)1 << 5) | ((u64)draw_shift << 6)) | ((s64)draw_high << 32);
+            mip_word = (s64)(((u64)width_units_128 << 14) | ((u64)mip_block_0 << 20) | ((u64)1 << 34) | ((u64)mip_block_1 << 40)) | ((s64)1 << 54);
+            clamp_word = (u64)clamp_low | ((u64)clamp_shift << 2) | ((u64)material_index << 24);
+            packet->tex0 = tex0_word;
+            packet->tex1.d = tex1_word;
+            packet->miptbp1 = mip_word;
+            packet->clamp.d = clamp_word;
+        } else {
+            u64 template_tex0 = D_L00_001C91C0[material_index * 3];
+            u64 template_tex1 = D_L00_001C91C0[material_index * 3 + 1];
+            u64 template_mip = D_L00_001C91C0[material_index * 3 + 2];
+            u64 draw_bits = ((u64)draw_shift << 6) | 0x20;
+            u64 template_draw_word = (template_tex1 & 0x1C) | draw_bits | ((u64)draw_high << 32);
+            u64 template_clamp_word = (u64)clamp_low | ((u64)clamp_shift << 2) | ((u64)material_index << 24);
+            packet->tex0 = template_tex0;
+            packet->tex1.d = template_draw_word;
+            packet->miptbp1 = template_mip;
+            packet->clamp.d = template_clamp_word;
+        }
+    }
+}
 
 /* Registers the class, relocates its streams, and builds its GS texture packets.
  * Adapted from RAC1 src/game/loaders.c, register_shrub_render_class, which
