@@ -3274,13 +3274,17 @@ remain in the retained C even though neither body matches. The latter's normaliz
 call precedes initialization of its packet input in retail; the source preserves
 that ordering and does not invent a zero vector.
 
-The same review issue prevents integrating PR #361's `func_00333048` draft.
-In USA v1.01, the call at +0x36C normalizes the hit packet at stack +0x40;
-its first identified initialization follows at +0x3CC. This reads meaningful
-XYZ components before their producer. The draft remains in `nonmatching`
-with corrected allocator return declarations; the source marker stays assembly.
-Resolve the packet's producer/lifetime before claiming defined C or adding
-initialization that the retail body does not perform.
+PR #361's `func_00333048` draft was held back by the same review issue.
+**Resolved 4 November 2026; now matched** (28/28 USA v1.01 places, in
+`src/game/00333048-g8.c`). Its hit-packet question has an answer:
+- At +0x36C, retail normalizes the packet's vector at stack +0x40. Nothing
+  writes stack +0x40..0x4F before that: no store to it, and its address is not
+  taken. The slot is not shared with another local.
+- `func_002A8C00` (matched in `src/game/002A7750.c`) then overwrites the whole
+  vector from its `q` argument without reading it. So the normalize result is
+  dead in every iteration.
+- The C keeps the call in place and adds no initialization.
+- The USA v2.00 identity hash is the same.
 
 The 320-record state machine `func_L00_003F0680` reaches 796 bytes with O2/G0
 and its SDA declaration, reproducing the initial absolute and later GP table load;

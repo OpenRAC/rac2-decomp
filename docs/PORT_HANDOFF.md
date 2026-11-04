@@ -42,7 +42,8 @@ what the retail code does when the port runs it.
 ## State at this handoff
 
 - **master** merges #396–#399 on top of #393 (functional C round 2). OpenRAC's default branch is
-  `develop`; it pins `99f35ac2`, branch `master`. The next repin carries the 27 rows returned below.
+  `develop`; it pins `d5d78af0`, branch `master` (OpenRAC #245), which carries the 27 rows returned
+  below.
 - **Reports after #399:**
 
   | Release | Functions in C |
@@ -77,11 +78,17 @@ what the retail code does when the port runs it.
   alone matches the build without them on level 26, and all 38 left-out rows together match the
   #236 build on all 26 tours. Tours compare rounded values, so an ulp-sized difference can hide.
   The cause was not traced.
-- **27 helper rows are back, 408 rows in all.** Each has a current SAME verdict in OpenRAC's
-  `fcheck.tsv`.
-- **11 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.** Ten are
-  `unchecked` (loaders, main loops, FMV, code no capture calls) and `func_L03_003E4680` has no
-  verdict. A clean tour does not count as SAME; a row returns only when it is proven.
+- **30 rows are back, 410 rows in all.** 27 helper rows, then `func_L00_002EDCF0`, `func_L03_0038AB30`
+  and `func_L04_0032F3C0`, once capturing in every level that has them gave SAME on 6, 6 and 24
+  calls. `func_L03_0038AB30` ran 324 of its 449 instructions; the others ran all of theirs.
+  `func_L04_0032F3C0` needs the batch gate's `sqrtf` stand-in; `fcheck.py check` alone cannot link it.
+  With the three rows, all 26 tours match the build without them.
+- **7 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.**
+  `func_L00_003FA858` is not called in any of the 27 level runs, so it needs a route. The other six
+  (`func_0026EDE8`, `func_002CA070`, `func_002EAB18`, `func_002F5FB8`, `func_L00_002A3B88`,
+  `func_L00_00303990`) were recorded as waiting on a frame, the disc or a loop that does not return.
+  The gate delivers no interrupts, frames or disc, so a larger `--limit` should not help. They need
+  a different check. A clean tour does not count as SAME.
 - **Rows waiting on retail captures:** `func_L08_003CD708` and `func_L08_003CDB78`. Retail never
   called them in the `fcheck` play of levels 8, 9 and 19, so they need a route that reaches the
   object using them. They have near misses in `nonmatching/levels/` but no functional files yet.
@@ -165,6 +172,20 @@ rows give the same run, diff the generated code (`games/rac2-ntsc/gen`) for what
 - **Aligning a port run with retail.** Tick numbers part after a load, because the port doesn't
   model load time. Hold the level write through the boot, find the hero's first big move in each
   run, and shift the play inputs by the difference. Level 14 then stays within 0.05 for 685 ticks.
+- **Shift every press after the load.** An arrival scene ends on a press, so a press that keeps its
+  absolute frame lands at the wrong moment. Shift all of them by the load offset.
+- **A hold is not a split.** The random state stands still in a pause and in load holds. Count a
+  stretch across those gaps before calling it a divergence.
+- **Random draws per tick.** `--watch-stores 133BE0:4` lists each draw with its callers. Place the
+  port's state in that sequence, and compare draws per tick to find what ran or did not run.
+- **Drop the row.** To clear a functional row, remove it so the port translates retail's own code.
+  Most rows suspected this way were innocent. A temporary print can move stack data, so an
+  uninitialized read may change value in the instrumented build.
+- **Same bytes, each engine alone.** Playing one bank's sound in both sound engines showed they
+  agree, which pointed at the commands the game sends.
+- **Memory at one field.** At a field where the random state matches, count the floats within a few
+  ulps of retail, with and without a change. OpenRAC #241's `ps2_float` additions lowered the count
+  in all five levels tested, slightly in levels 19 and 22.
 - **Tours.** OpenRAC's regress tour drives each level to control and compares the runs.
   - "Diverges from the previous build" is not "wrong". Check the diverging level against retail
     before reverting anything: levels 22 and 23 were a fix, and the 14-level change after the
@@ -228,17 +249,42 @@ there come from this repository's code and help when naming progress code:
 
 ## Open items
 
-- Prove and return the 11 rows still left out.
-- Find a route to the two level 8 rows, write their functional C, then capture and gate them.
-- Feltzin still splits from retail at about tick 1,937: the port fires one extra projectile.
-  Projectile positions are 1–3 ulps off from the first spawn, likely the joint target
-  (`func_0029FCC0` → `func_002A3F10`, the bone matrix) on host floats.
-- Gorn's arrival differs from retail: the rain moby's region test (`func_002ACD38` against
-  `0x1C4F40`) reads 0 in the port.
-- Hrugis's arrival differs because the port doesn't model the EE time a load takes. Retail
-  catches up 2–3 game ticks per field after it. That is a port model gap, not a slip.
-- Name Maktar's other 13 arena challenges and Joba's challenges from the game text, for the save
-  editor.
+- Find a way to check the 7 rows still left out (see above).
+- Find a route to the two level 8 rows, write their functional C, then capture and gate them. They
+  already run in the port as translated assembly, so this is not urgent.
+- Feltzin: on `fcheck`'s level 5 route the random state now matches retail for 2,864 fields, to
+  about 2,900 ticks after control, apart from a 1-field pause gap (OpenRAC #241). It parts at
+  retail field 5061, after a level restart; not traced. The extra projectile at tick 1,937 came
+  from a different input route and was not re-run.
+- Levels 4, 11, 12, 14, 16, 19, 22 and 26 first stop matching retail at fields 1899, 2834, 2852,
+  3274, 2873, 2675, 1909 and 2463 on the same routes. At level 14 that is a hold, and it parts
+  just after, at the catch-up below. The others are not traced, but levels 11, 12 and 16 match again
+  later at a new offset, which looks like the same gap. Level 23 never lined up. OpenRAC #236 does
+  not move these first stretches on levels 4, 11, 12 and 16, so it was not re-proven there.
+- Hrugis (level 10): on this route it stays in step for 1,056 fields after arrival, to field 2732,
+  so its arrival is not where it parts here. The earlier report came from another route.
+
+## Limits of the retail reference
+
+"Retail" in these comparisons is the test-only interpreter, not a console. Its CPU matches well,
+but its sound side is a model, and it can be wrong:
+
+- **Sound parameter mask.** It read the mask of the set-params command wrongly, so the sound's
+  pitch bend was cleared and sound slots ended at the wrong tick. That alone caused Feltzin's split
+  at field 3328 (OpenRAC #241). The game's own masks settled it: 0xF comes with a pitch modifier,
+  0x1F with a bend.
+- **Catch-up after a hold.** After level 14's 9-field hold at field 3274, the interpreter runs about
+  three game ticks in one field. The port stays at one per field. This is the load-time gap.
+- **Frame load.** Gorn's weather (`func_L01_00399510`) scales its rain by `0x1B2150` and `0x1B214C`,
+  which look like frame-load values: 0.87 and 1.25 on the arrival tick, then about 0.25. In the port
+  they stay 0. That moves the random chain by a tick's draws, so level 15 never lines up. Not
+  confirmed as timers.
+- **Uninitialized `v[2]`.** `func_L01_003993C8` reads a third component it never writes, so its
+  base count depends on leftover stack data: 6 in the interpreter, 4 in the port. Do not zero it
+  alone: with no load scaling the port would draw more rain than retail.
+
+When a run differs, check which side is right before changing the port. The Gorn lead this
+document used to give (the region test reads 0) was not the cause: retail reads 0 there too.
 
 ## Rules that still apply
 
