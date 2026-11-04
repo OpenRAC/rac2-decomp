@@ -7,6 +7,7 @@ from real calls of the game (OpenRAC's docs/port/BACKFILL.md, "The gate").
   python3 tools/fcheck.py check NAME [CANDIDATE.c] [--ulps N] [--work DIR] [--retail]
   python3 tools/fcheck.py build NAME [CANDIDATE.c] --out DIR [--level N]
   python3 tools/fcheck.py capture LIST [--script menu|newgame|level00|all] [--frames N] [--force]
+  python3 tools/fcheck.py swap NAME SCRIPT [CANDIDATE.c] [--frames N] [--out DIR] [--self-test]
   python3 tools/fcheck.py source NAME
   python3 tools/fcheck.py scripts
 
@@ -70,6 +71,15 @@ Placement. Each relocation is resolved against retail's addresses in the program
   $gp's 64 KB window (retail's $gp, 0x1AEFF0). A read-only constant is used where retail has
   the same bytes there (the unit's own placement, else core.lit / .lit, in a level its lit at
   0x1A7C80); anything else out of range stops the build ("LINK ...").
+
+`swap` is for C that `check` cannot run, because it waits on a frame, the disc or an interrupt. It
+plays SCRIPT twice in `openrac-boot`: plainly, and with NAME's calls sent to the C (`--swap`). It then
+compares a memory hash at every field and, at every return, the result by the return type, the kept
+registers and the memory hash, and gives how much of NAME the route ran. Memory leaves out the C's
+code and the stack. Exit status: 0 nothing differs, 1 a difference (which may be timing: code with
+another instruction count moves counters and load progress, so read it), 2 the candidate did not
+build, 3 NAME was not called. `--self-test` swaps in retail's own bytes, which must give 0. This is
+OpenRAC's weaker `same-run` verdict (docs/port/BACKFILL.md), never `same`.
 
 `capture` plays the US v1.01 disc (baserom/SCUS_972.68.iso) headless in the interpreter
 (`openrac-boot --capture`, no window) and writes call states of the listed functions (names,
@@ -1383,6 +1393,107 @@ def cover(name: str, out: Path) -> int:
     return 0
 
 
+RETURN_FIELDS = ["field", "ra", "v0 name", "v0", "v1 name", "v1", "f0 name", "f0"] + [
+    f"kept {r}" for r in ("s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "gp", "sp", "fp", "ra")
+] + [f"f{n}" for n in range(20, 32)] + ["mem name", "mem"]
+
+
+def digest_differences(plain: list[str], swapped: list[str]) -> list[int]:
+    """The fields whose memory hash differs, of the lines two `--digest` runs have in common."""
+    return [i for i, (a, b) in enumerate(zip(plain, swapped)) if a != b]
+
+
+def return_differences(plain: list[str], swapped: list[str], returns: str) -> list[list[str]]:
+    """Per return of two `--returns` logs, what differs. The field is timing, and a result register
+    counts only as the return type has it: a void function's v0 is what it left there."""
+    ignored = {"field", "v0 name", "v1 name", "f0 name", "mem name", "v1"}
+    if returns == "float":
+        ignored |= {"v0"}
+    elif returns == "void":
+        ignored |= {"v0", "f0"}
+    else:
+        ignored |= {"f0"}
+    out = []
+    for a, b in zip(plain, swapped):
+        u, v = a.split(), b.split()
+        out.append([RETURN_FIELDS[k] for k in range(min(len(u), len(v), len(RETURN_FIELDS)))
+                    if u[k] != v[k] and RETURN_FIELDS[k] not in ignored])
+    return out
+
+
+def swap(name: str, script: str, candidate: Path | None, frames: int | None, out: Path, self_test: bool) -> int:
+    """`swap`, in the module's docstring: exit status as described there."""
+    s = SCRIPTS[script]
+    frames = frames or s["frames"]
+    prog = script_program(script)
+    out = out.resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    places: list[tuple[str, Program]] = []
+    if prog is not BOOT_PROGRAM and prog.own(name):
+        places.append(("level", prog))
+    if name in boot_functions():
+        places.append(("boot", BOOT_PROGRAM))
+    if not places:
+        print(f"{name}: no place in {script}'s program")
+        return 2
+    swaps, entries, returns = [], [], "void"
+    for tag, p in places:
+        a, size = p.functions()[name]
+        first = struct.unpack("<I", p.retail(a, 4))[0]
+        where = out / tag
+        where.mkdir(exist_ok=True)
+        if self_test:
+            (where / "code0.bin").write_bytes(p.retail(a, size))
+            info = {"entry": BASE, "segments": [["code0.bin", BASE]]}
+        else:
+            try:
+                info = build_candidate(name, candidate, where, prog=p)
+            except Link as e:
+                print(e)
+                return 2
+            returns = info.get("returns", returns)
+        files = ":".join(f"{where / f}" if i == 0 else f"{at:x}:{where / f}"
+                         for i, (f, at) in enumerate(info["segments"]))
+        swaps += ["--swap", f"{a:x}:{first:x}:{info['entry']:x}:{files}"]
+        entries.append((tag, a, size, first))
+
+    def play(tag: str, extra: list[str]) -> list[str]:
+        cmd = [str(BOOT), str(DISC), "--hooks", str(HOOKS), "--no-card", "--ntsc", "--gs-threads", "2",
+               "--frames", str(frames), "--report", "0", *extra]
+        for key, flag in (("presses", "--press"), ("sticks", "--stick"), ("writes", "--write")):
+            for p in s.get(key, []):
+                cmd += [flag, p]
+        env = dict(os.environ, OPENRAC_BOOT_CPI="1", OPENRAC_CLOCK="2026-01-01 12:00:00")
+        r = subprocess.run(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+        return [line for line in r.stderr.splitlines() if line.startswith("swap ")]
+
+    def lines(path: Path) -> list[str]:
+        return path.read_text().splitlines()
+
+    status = 3
+    for tag, a, size, first in entries:
+        watch = ["--returns", f"{a:x}:{first:x}"]
+        calls = play("swap", ["--digest", str(out / "swap.txt"), *watch, str(out / "ret-swap.txt"), *swaps])
+        ran = next((int(c.split()[2]) for c in calls if c.startswith(f"swap {a:x}:")), 0)
+        if not ran:
+            continue
+        play("plain", ["--digest", str(out / "plain.txt"), *watch, str(out / "ret-plain.txt"),
+                       "--cover", f"{a:x}:{size:x}", str(out / "cover.txt")])
+        fields = digest_differences(lines(out / "plain.txt"), lines(out / "swap.txt"))
+        rets = return_differences(lines(out / "ret-plain.txt"), lines(out / "ret-swap.txt"), returns)
+        cover = (out / "cover.txt").read_text()
+        print(f"{name} {script} ({tag}, {a:x}): {ran} calls; ran {cover.count('1')} of {len(cover)} instructions")
+        print(f"  fields differing: {len(fields)} of {len(lines(out / 'plain.txt'))}" +
+              (f", first {fields[0]}, last {fields[-1]}" if fields else ""))
+        print(f"  returns: {len(rets)}, differing: {[r for r in rets if r]}")
+        status = 1 if fields or any(rets) else 0
+        if status == 1:
+            break
+    if status == 3:
+        print(f"{name}: NOT CALLED in {script}")
+    return status
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1408,6 +1519,13 @@ def main() -> int:
     p = sub.add_parser("cover", help="which of NAME's retail instructions its captured calls run")
     p.add_argument("name")
     p.add_argument("out", type=Path)
+    p = sub.add_parser("swap", help="a whole run with NAME's calls sent to the C, against a plain run")
+    p.add_argument("name")
+    p.add_argument("script", choices=list(SCRIPTS))
+    p.add_argument("candidate", nargs="?", type=Path)
+    p.add_argument("--frames", type=int)
+    p.add_argument("--out", type=Path)
+    p.add_argument("--self-test", action="store_true", help="retail's own bytes as the candidate: must give 0")
     p = sub.add_parser("source", help="NAME's unit, whether it is C or assembly there, and its definition's span")
     p.add_argument("name")
     sub.add_parser("scripts")
@@ -1434,6 +1552,9 @@ def main() -> int:
         return 0
     if a.cmd == "cover":
         return cover(a.name, a.out)
+    if a.cmd == "swap":
+        given = a.candidate.resolve() if a.candidate else ROOT / "nonmatching/functional" / f"{a.name}.c"
+        return swap(a.name, a.script, given, a.frames, a.out or WORK / "swap" / f"{a.name}-{a.script}", a.self_test)
     if a.cmd == "source":
         if a.name not in sources():
             print(json.dumps({"name": a.name}))
