@@ -3161,3 +3161,4 @@ src/pal/levels/10_hrugis_cloud/L10_0041A730-f7-g8.c	-O2 -G8 -ffunction-sections 
 src/pal/levels/11_joba/L11_00473908-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/12_todano/L12_0041C930-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/13_boldan/L13_00421C68-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/11_joba/L11_00451178-gu-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges

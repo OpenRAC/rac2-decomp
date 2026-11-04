@@ -555,6 +555,23 @@ repeated idiom is a count lever: F4's "inline helpers returning a value do nothi
 extend to these. On the forced-bucket check, an `emit()` helper around the `func_002A8C28`
 calls is code-neutral too (S 541). For `func_L11_00451178` the same helpers bring the natural
 wording into its window (`turn` alone gives S 581), but its case-7 hoist order still differs.
+**Resolved later the same day:** `func_L11_00451178` matches too (`L11_00451178-gu-g8.c`). Three
+steps, each read from a dump:
+- **Slot order.** Retail's 0xCC slot for `tmpl` sits between gcse registers (0xC4/0xC8 for
+  `&work[1]`/`&work[4]`, 0xD0+ for case 12's addresses), which a user variable can only get if
+  it is *evicted*. Global-alloc gives `tmpl` and case 12's three reaching registers one saved
+  register (their lives do not overlap), reload takes it back, and the evicted pseudos get
+  slots in pseudo order after the ones spilled from the start. The variable has to win the
+  register first, so `tmpl = &particle;` goes just before the template is filled (a short
+  life), not earlier in the case. As a register argument it also drops gcse's copy from the
+  particle loop: 46 insns, so loop.c's first-pass threshold (61 - 3 per hoist) still covers
+  0x70707F.
+- **PRE copy order.** PRE inserts its copies in expression-index order, which is the order of
+  first appearance. `spin = (float *)(state + 0x2B0);` before the loop (`func_L11_0044AFC8`'s
+  `rotation`) makes `state+0x2B0` appear before `object+0xF0`.
+- **Bucket count.** The `turn()` helper gives S 583.
+Reading `-dL` for "not desirable" and the loop's real insn count is the quickest check on a
+preheader order.
 
 **Update, 3 November 2026 (pending review):** now matched. `func_L12_00300410` is C in `src/levels/12_todano/L12_00300410-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 1 US place (PAL and US2 catalogues have no function of this name). The measurements above are kept as history.
 
