@@ -46,6 +46,26 @@ JAL = 0x0C000000
 JR_RA = 0x03E00008
 
 
+class SwapTests(unittest.TestCase):
+    LINE = "10 2000 v0 1 v1 2 f0 3 " + " ".join(["4"] * 12) + " " + " ".join(["5"] * 12) + " mem aa"
+
+    def test_digests_part_at_the_differing_fields(self):
+        self.assertEqual(fcheck.digest_differences(["0 a", "1 b", "2 c"], ["0 a", "1 x", "2 c"]), [1])
+
+    def test_a_void_functions_result_registers_do_not_count(self):
+        other = self.LINE.replace("v0 1", "v0 9").replace("v1 2", "v1 9").replace("f0 3", "f0 9")
+        self.assertEqual(fcheck.return_differences([self.LINE], [other], "void"), [[]])
+        self.assertEqual(fcheck.return_differences([self.LINE], [other], "int"), [["v0"]])
+        self.assertEqual(fcheck.return_differences([self.LINE], [other], "float"), [["f0"]])
+
+    def test_memory_and_kept_registers_count_and_the_field_does_not(self):
+        other = self.LINE.replace("10 2000", "11 2000").replace("mem aa", "mem bb")
+        self.assertEqual(fcheck.return_differences([self.LINE], [other], "void"), [["mem"]])
+        parts = self.LINE.split()
+        parts[8] = "7"
+        self.assertEqual(fcheck.return_differences([self.LINE], [" ".join(parts)], "void"), [["kept s0"]])
+
+
 class PlacerTests(unittest.TestCase):
     def test_jump_table_entries_go_to_the_placed_code(self):
         # .text.f: lui/lw of the table (.rodata), the table holds two case offsets into .text.f.
