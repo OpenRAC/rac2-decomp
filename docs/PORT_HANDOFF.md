@@ -83,12 +83,13 @@ what the retail code does when the port runs it.
   calls. `func_L03_0038AB30` ran 324 of its 449 instructions; the others ran all of theirs.
   `func_L04_0032F3C0` needs the batch gate's `sqrtf` stand-in; `fcheck.py check` alone cannot link it.
   With the three rows, all 26 tours match the build without them.
-- **7 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.**
-  `func_L00_003FA858` is not called in any of the 27 level runs, so it needs a route. The other six
-  (`func_0026EDE8`, `func_002CA070`, `func_002EAB18`, `func_002F5FB8`, `func_L00_002A3B88`,
-  `func_L00_00303990`) were recorded as waiting on a frame, the disc or a loop that does not return.
-  The gate delivers no interrupts, frames or disc, so a larger `--limit` should not help. They need
-  a different check. A clean tour does not count as SAME.
+- **5 rows came back on a whole-run check, not on fcheck.** `func_002CA070`, `func_002EAB18`,
+  `func_002F5FB8`, `func_L00_002A3B88` and `func_L00_00303990` wait on a frame, the disc or a loop
+  that does not return, so they stay `same-run`, not `same` (OpenRAC `port/game/rac2-ntsc/fcheck_run.tsv`,
+  `docs/port/BACKFILL.md`). With them, all 26 tours match the build without them on `d5d78af0`.
+- **2 rows stay out, files kept in `nonmatching/functional/`.** `func_L00_003FA858` is not called on
+  any route, so it needs one (class 3406, spawned by `func_0032DA58`). `func_0026EDE8` matches on real
+  routes, but holding state 3 by `--write` crashes the C at field 2720 and not retail; not explained.
 - **Rows waiting on retail captures:** `func_L08_003CD708` and `func_L08_003CDB78`. Retail never
   called them in the `fcheck` play of levels 8, 9 and 19, so they need a route that reaches the
   object using them. They have near misses in `nonmatching/levels/` but no functional files yet.
@@ -249,7 +250,7 @@ there come from this repository's code and help when naming progress code:
 
 ## Open items
 
-- Find a way to check the 7 rows still left out (see above).
+- Check the 2 rows still left out (see above).
 - Find a route to the two level 8 rows, write their functional C, then capture and gate them. They
   already run in the port as translated assembly, so this is not urgent.
 - Feltzin: on `fcheck`'s level 5 route the random state now matches retail for 2,864 fields, to
