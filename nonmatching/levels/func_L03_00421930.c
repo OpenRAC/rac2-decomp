@@ -1,3 +1,8 @@
+/* 4 November 2026 current-RAC1 source-method trial; retained, not linked.
+ * Two new real-operation group trials (the first append call and the state-pointer read) each
+ * produce 420/412 bytes, 0/1 USA placements. Neither promotes table/stride allocation as
+ * required; the older best C below is retained.
+ */
 /* opus-1 xhigh, USA v1.01: 416 bytes / 412 retail, 0 of 1 places match.
  * (The earlier form of the alpha test, >= 2 first, gives 412/412 with the wrong
  * final layout; the arm order below reproduces retail's layout.)

@@ -1636,7 +1636,78 @@ void func_L01_003909E0(int a0, int a1, int a2, int a3) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_00390A50);
+extern int func_002A8AF0(float *, float *, int);
+extern int func_002ACBC8(void *, int);
+
+void func_L01_00390A50(char *object)
+{
+    SpatialTriggerSettings *settings;
+    ClosestPointQuad point;
+    int flag = 0;
+    int i;
+    int j;
+    int k;
+    int *mobys;
+    int forced;
+    char *path;
+
+    settings = *(SpatialTriggerSettings **)(object + 0x68);
+    *(unsigned char *)(object + 0x30) = 0xFF;
+    if (settings->switches[2])
+        qcopy(&point, D_L01_001B94C0);
+    else
+        qcopy(&point, D_00189EA0);
+    forced = *(unsigned char *)(object + 0x95);
+    if (forced == 0) {
+        if (settings->radius > 0.0f && func_002E3618(object + 0x10, &point) < settings->radius)
+            flag = 1;
+        if (!flag) {
+            if (settings->path != -1) {
+                path = D_L01_001FE180[settings->path];
+                flag = func_002A8AF0((float *)&point, (float *)(path + 0x10), *(int *)path) != 0;
+            }
+        }
+        if (!flag) {
+            for (i = 0; ; i++) {
+                if (i >= 6)
+                    goto done;
+                if (settings->volumes[i] == -1)
+                    continue;
+                if (func_002ACBC8(&point, settings->volumes[i]))
+                    break;
+            }
+            goto set;
+        }
+    } else {
+        do {
+            if (forced == 1) {
+set:
+                flag = 1;
+            } else {
+                flag = 0;
+            }
+        } while (0);
+    }
+done:
+    if ((flag && !*(unsigned char *)(object + 0xBC)) ||
+        (!flag && *(unsigned char *)(object + 0xBC)) ||
+        !*(unsigned char *)(object + 0x20)) {
+        if (flag)
+            *(unsigned char *)(object + 0xBC) = 1;
+        else
+            *(unsigned char *)(object + 0xBC) = 0;
+        *(unsigned char *)(object + 0x20) = *(unsigned char *)(object + 0xBC) + 1;
+        mobys = settings->mobys;
+        for (j = 0; j < 12; j++) {
+            if (settings->lists[j] != -1)
+                func_L01_003909E0((int)object, (int)settings, settings->lists[j], flag);
+        }
+        for (k = 0; k < 11; k++) {
+            if (mobys[k] != -1)
+                func_L01_003907B8(mobys[k], (TriggerSettings *)settings, flag);
+        }
+    }
+}
 
 void func_L01_00390C60(char *a0)
 {

@@ -1061,7 +1061,7 @@ int func_002CD220(void)
   return 0;
 }
 
-INCLUDE_ASM("asm/game", func_002CD3C0);
+/* func_002CD3C0 is defined in 002CD3C0.c. */
 
 int func_002CD4E0(void)
 {
