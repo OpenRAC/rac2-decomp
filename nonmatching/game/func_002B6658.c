@@ -1,3 +1,13 @@
+/* 4 November 2026 follow-up: nonmatching, not linked. The actual head-cache
+ * store occurs once in the entry branch slot, using the getter's v0; the
+ * loop backedge enters at the current-node state test. Do not add a cache
+ * store per iteration. The void callback view agrees with current RAC1's
+ * Moby update API. A real one-pass callback group, the same group with -g,
+ * and a stored signed32 callback-address view all remain 144/148 bytes,
+ * 0/28 USA: callback allocation and null-branch scheduling still differ.
+ * Those probes are preserved privately; the pointer-based baseline below
+ * retains its historical measurement. Corrected only its scope name here.
+ */
 /* 2 November 2026, remaining-function review: nonmatching; no linked credit.
  * Profile: -O2 -G8 -ffunction-sections.
  * US check: 144/148 bytes, 0/28 placements.
@@ -21,14 +31,14 @@ struct Node {
 extern Node *func_002A08A0(void);
 extern void func_002A05A8(Node *);
 extern void func_002A0F48(Node *);
-extern Node *ref_L00_002B6658_00 __attribute__((sda));
+extern Node *ref_002B6658_00 __attribute__((sda));
 
 void func_002B6658(void)
 {
     Node *t;
     void (*update)(Node *);
-    ref_L00_002B6658_00 = func_002A08A0();
-    t = ref_L00_002B6658_00;
+    ref_002B6658_00 = func_002A08A0();
+    t = ref_002B6658_00;
     for (; t != 0; t = t->next) {
         if (t->flag20 >= 0) {
             if ((t->flags & 0x40) == 0)

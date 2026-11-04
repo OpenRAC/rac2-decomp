@@ -1,3 +1,10 @@
+/* 4 November 2026: a real one-pass flag-update/state-change group, as seen
+ * in current RAC1 game C, gives 64/60 bytes and 0/1 USA. The object still
+ * uses v1 rather than a3 and an extra alignment nop remains. No improvement;
+ * the probe is retained privately. Keep the meaningful pointer-based baseline
+ * and canonical three-argument state setter below. Its declaration cleanup
+ * is not a new matching measurement; older results remain historical.
+ */
 /* Near miss from src/levels/22_dobbo_orbit/L22_00358778.c — 1 word (4 bytes) differ.
  *
  * Kept as a starting point; not linked, not counted.
@@ -36,14 +43,13 @@ typedef unsigned short u16;
 
 typedef int s32;
 
-extern void func_31FBB8();
+extern void func_002A7750(u8 *, int, int);
 
-void func_L22_003D0840(s32 a0) {
-    s32 a3 = a0;
-    if (*(u8 *)(a3 + 0x20) == 0) {
-        u16 v = *(u16 *)(a3 + 0x34) | 0x41;
-        *(u16 *)(a3 + 0x34) = v;
-        func_31FBB8(a3, 1, -1);
+void func_L22_003D0840(u8 *object) {
+    if (object[0x20] == 0) {
+        u16 flags = *(u16 *)(object + 0x34) | 0x41;
+        *(u16 *)(object + 0x34) = flags;
+        func_002A7750(object, 1, -1);
     }
 }
 /* Second attempt (wave 24, worker 15): the same one word off, same check line

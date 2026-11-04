@@ -21,7 +21,7 @@ extern void func_L00_003B09F8(void);
 extern int func_L00_002ADEA0(int index);
 
 /* Loads the level's tuning constants and starts the two subsystems. */
-INCLUDE_ASM("asm/levels", func_L22_002A8B98);
+/* func_L22_002A8B98 is defined in L22_002A8B98-init.c. */
 
 
 extern void func_L00_002D36E0(void *, int, float, float, float);
