@@ -592,7 +592,88 @@ Moby_L08_003B2DB0 *func_L08_003B2DB0(int owner, float *pos, float *dir, int life
     return moby;
 }
 
-INCLUDE_ASM("asm/levels", func_L08_003B2F70);
+typedef struct {
+    Vec vector;
+    void *object;
+    int flags;
+    u8 enabled, kind;
+    u16 group;
+    float radius;
+    int active;
+} CollisionInput;
+extern Vec ref_L08_003B2F70_00, ref_L08_003B2F70_01, ref_L08_003B2F70_02;
+extern int func_002E5CF8(int, int, void *);
+extern float func_00282E80(void *, void *);
+extern void func_00282CF0(void *, void *, void *);
+extern int func_00282978(short *);
+extern void func_0029F338(void *);
+extern float func_00282DF0(void *);
+extern u8 *func_L04_00358AE8(void *, void *, int, int, float);
+extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
+extern void func_00277F48(void *, float, int, void *, void *);
+void func_L08_003B2F70(char *obj) {
+    struct { Vec old; CollisionInput collision; Vec velocity, random; } frame;
+    CollisionInput *input;
+    Bolt_L08_003B2DB0 *state = *(Bolt_L08_003B2DB0 **)(obj + 0x68);
+    float distance = func_00282E48(obj + 0x10, D_00189EA0);
+    qcopy(&frame.old, obj + 0x10);
+    func_00282CC0(obj + 0x10, obj + 0x10, (char *)state);
+    if (!state->f28 && state->f24 && state->f20 < distance && distance < 3.0f) {
+        func_002E5CF8(0, 0, obj);
+        state->f28 = 1;
+    }
+    if (distance < state->f20) state->f24 = 1;
+    state->f20 = distance;
+    if (*(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
+        *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
+        *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f ||
+        func_00282E80(obj + 0x10, &ref_L08_003B2F70_00) > 255.0f) goto destroy;
+    input = 0;
+    if (!*(u8 *)(obj + 0xBC)) {
+        frame.collision.flags = 0x70001;
+        frame.collision.radius = 3.0f;
+        frame.collision.object = obj;
+        frame.collision.active = 1;
+        qcopy(&frame.collision.vector, state);
+        func_00282CF0(&frame.collision.vector, obj + 0x10, D_00189EA0);
+        func_00282F70(&frame.collision.vector, &frame.collision.vector, 1.0f);
+        input = &frame.collision;
+        frame.collision.vector.f[2] = 1.0f;
+        frame.collision.vector.f[3] = 5627.9248046875f;
+        frame.collision.enabled = 1;
+        frame.collision.kind = 3;
+        frame.collision.group = *(u16 *)(obj + 0xAA);
+    }
+    if (func_00282978(&state->h1C) && !*(u8 *)(obj + 0xBC)) {
+        *(u8 *)(obj + 0xBC) = 1;
+        state->h1C = state->h1E / 4;
+    } else if (state->h1C <= 0 && *(u8 *)(obj + 0xBC)) {
+destroy:
+        func_0029F338(obj);
+        return;
+    }
+    if (!func_002761F8(&frame.old, obj + 0x10, 0, (void *)state->owner, input)) return;
+    qcopy(obj + 0x10, &ref_L08_003B2F70_01);
+    if (!*(u8 *)(obj + 0xBC)) {
+        int n;
+        for (n = 0; n < 5; n++) {
+            frame.random.q = 0;
+            frame.random.f[0] = func_002A7878(-1.0f, 1.0f);
+            frame.random.f[1] = func_002A7878(-1.0f, 1.0f);
+            frame.random.f[2] = func_002A7878(-1.0f, 1.0f);
+            frame.velocity.q = frame.random.q;
+            func_00283028(&frame.random, state, &ref_L08_003B2F70_02);
+            func_00282F20(&frame.velocity, &frame.velocity, func_00282DF0(&frame.random) * 0.5f);
+            func_00282CC0((char *)&frame.velocity, (char *)&frame.random, (char *)&frame.velocity);
+            func_00282F20(&frame.velocity, &frame.velocity, func_002A7878(0.05000000447034836f, 0.10000000894069672f));
+            func_L04_00358AE8(obj + 0x10, &frame.velocity, 0x7F2F4F6F, func_002A7820(10, 15), 60000.0f);
+        }
+    }
+    func_002ABBB8(obj, state, 0, 0.0f, 0.0f, 4, 3, 6, 1.1f, 0.6f, 1.0f, 0.9f, -1, 0.0f,
+        0, 1, -1, 0, 0x810001);
+    func_00277F48(obj + 0x10, 1.1f, 16, obj, input);
+    func_0029F338(obj);
+}
 
 INCLUDE_ASM("asm/levels", func_L08_003C5940);
 

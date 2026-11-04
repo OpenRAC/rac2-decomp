@@ -271,7 +271,7 @@ void func_L02_003D5660(char *arg0, int arg1) {
     *(short *)(state + 0x31E) = 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L02_003D5748);
+/* func_L02_003D5748 is defined in L02_003D5748-g8-dbg.c. */
 
 void func_L02_003D5B90(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);
@@ -489,7 +489,7 @@ void func_L02_003D7900(char *arg0) {
     *(int *)(state + 0x18) = 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L02_003D91A0);
+/* func_L02_003D91A0 is defined in L02_003D91A0.c. */
 
 void func_L02_003D9608(char *arg0) {
     char *state = *(char **)(arg0 + 0x68);

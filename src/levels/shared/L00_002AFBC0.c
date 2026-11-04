@@ -528,8 +528,6 @@ ret:
     return;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_002B1350);
-
 extern void func_L00_002B1350(int);
 /* Read through its macro symbol: the copy reorg puts in a branch delay slot assembles
  * $gp-relative, the one in ordinary flow as lui/lw. */

@@ -241,7 +241,80 @@ void func_L00_003BB668(char *a0)
     func_002FC560(0x47, 0x0005360B);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003BB8B8);
+extern int D_L00_0023DDA0[];
+extern float func_002A7878(float, float);
+extern float func_002A78D8(float, float);
+extern void func_00282C88(void *);
+extern char *func_002AB1F0(char *);
+extern void func_L00_003252A8(char *, void *, int);
+extern void func_00282D30(void *, void *, float);
+
+/* Claims the first free one of the thirty 0xA0-byte records at D_L00_0023DDA0 for self:
+   counts it in self's data, copies self's position, draws three triples from the ranges
+   below, stores count, target and the timer, and starts it at target (offset through
+   func_L00_003252A8 when func_002AB1F0 finds target's info). */
+void func_L00_003BB8B8(char *self, char *target, int count)
+{
+    char *pool = (char *)D_L00_0023DDA0;
+    char *position = self + 0x10;
+    char *target_position = target + 0x10;
+    char *data = *(char **)(self + 0x68);
+    char *p;
+    char *info;
+    float v[4];
+    int i;
+    for (i = 0; i < 30; i++) {
+        p = pool + i * 0xA0;
+        if (*(int *)(p + 0x8C) == 0) {
+            float max_angle, min_angle;
+            float max_scale, min_scale;
+            float max_dist, min_dist;
+            *(char **)(p + 0x8C) = self;
+            (*(int *)(data + 0x54))++;
+            qcopy(p + 0x20, position);
+            min_angle = -3.14159274101257324219f;
+            max_angle = 3.14159274101257324219f;
+            min_scale = 0.001f;
+            max_scale = 0.005f;
+            min_dist = 3.25f;
+            max_dist = 4.75f;
+            *(float *)(p + 64) = func_002A7878(min_angle, max_angle);
+            *(float *)(p + 68) = func_002A7878(min_angle, max_angle);
+            *(float *)(p + 72) = func_002A7878(min_angle, max_angle);
+            *(float *)(p + 100) = func_002A7878(min_angle, max_angle);
+            *(float *)(p + 104) = func_002A7878(min_angle, max_angle);
+            *(float *)(p + 108) = func_002A7878(min_angle, max_angle);
+            *(float *)(p + 76) = func_002A78D8(min_scale, max_scale);
+            *(float *)(p + 80) = func_002A78D8(min_scale, max_scale);
+            *(float *)(p + 84) = func_002A78D8(min_scale, max_scale);
+            *(float *)(p + 112) = func_002A78D8(min_scale, max_scale);
+            *(float *)(p + 116) = func_002A78D8(min_scale, max_scale);
+            *(float *)(p + 120) = func_002A78D8(min_scale, max_scale);
+            *(float *)(p + 88) = func_002A7878(min_dist, max_dist);
+            *(float *)(p + 92) = func_002A7878(min_dist, max_dist);
+            *(float *)(p + 96) = func_002A7878(min_dist, max_dist);
+            *(float *)(p + 124) = func_002A7878(min_dist, max_dist);
+            *(float *)(p + 128) = func_002A7878(min_dist, max_dist);
+            *(float *)(p + 132) = func_002A7878(min_dist, max_dist);
+            func_00282C88(p);
+            func_00282C88(p + 0x10);
+            *(int *)(p + 0x94) = count;
+            *(int *)(p + 0x98) = count;
+            *(char **)(p + 0x90) = target;
+            *(int *)(p + 0x9C) = 0;
+            *(int *)(p + 0x88) = 20;
+            info = func_002AB1F0(target);
+            if (info) {
+                func_L00_003252A8(target, v, 1);
+                func_00282D30(v, v, *(float *)(info + 0x10));
+                func_00282CC0(p + 0x30, v, target + 0x10);
+            } else {
+                qcopy(p + 0x30, target_position);
+            }
+            break;
+        }
+    }
+}
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
 void func_L00_003BC080(char *p)
@@ -381,10 +454,6 @@ extern char D_0023F060[];
    loop test is `sltu` here against retail's `slt`, and the base is derived from the end
    pointer instead of being materialised on its own. */
 
-INCLUDE_ASM("asm/levels", func_L00_003BCF88);
-
-extern float func_002A7878(float, float);
-extern float func_002A78D8(float, float);
 extern int func_002A77E0(int);
 extern int func_001163B0(void);
 extern void func_00283098(void *, void *, void *);
@@ -603,9 +672,6 @@ void func_L00_003C1FC8(int unused, char *pos, int color, int first, int second, 
     func_002EE178_1(pkt + 48, pkt + 48, 0.5f);
     func_802EAC30_1(pkt, m, 0);
 }
-
-
-INCLUDE_ASM("asm/levels", func_L00_003C27A0);
 
 extern void func_L00_003263D0(char *a, char *b, float h, int c, int d, char *e, float i,
                                int f, int g, float j, float k);

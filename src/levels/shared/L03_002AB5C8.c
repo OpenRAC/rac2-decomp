@@ -189,6 +189,8 @@ void func_L03_002ADCA0(void) {
         *(float *)(*(unsigned char **)(g + 0x2290) + 0xF4) = *(float *)(g + 0x6B0);
 }
 
+INCLUDE_ASM("asm/levels", func_L03_0038AB30);
+
 
 extern float func_002AA2E8(float *, float, float);
 extern void func_002AA3A8(float *, float *, float, float, float, float);
@@ -530,7 +532,7 @@ void func_L03_00339268(unsigned char *a0) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L03_0038AB30);
+/* func_L03_0038AB30 is defined in L03_002AB5C8-ribbon.c (its own loop-pass flags). */
 
 /* func_L03_0038B238 is defined in L03_002AB5C8-g8.c (this unit has no $gp access for it). */
 
@@ -592,7 +594,6 @@ void func_L03_0038B408(Moby *object)
 
 
 
-INCLUDE_ASM("asm/levels", func_L03_0038B5D8);
 
 void func_L03_00393228(unsigned char *a0) {
     unsigned char *g = D_L03_00189E20;

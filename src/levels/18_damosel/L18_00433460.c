@@ -61,6 +61,13 @@ extern void func_002ACEC0(void *, void *, void *, float);
 extern u8 *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
 
 typedef int TI128 __attribute__((mode(TI)));
+typedef union { TI128 q; float f[4]; } RibbonVector;
+struct RibbonQuad { RibbonVector position[4]; u32 color[4]; float uv[4][2]; u64 clear, texture, giftag, flags; };
+extern unsigned long func_0027C878(int);
+extern void func_L00_00412088(void *);
+extern void func_00282DD8(void *, void *, void *);
+extern void func_002830C0(void *, void *, void *);
+extern void func_00280B90(void *, void *, int);
 
 void func_L18_00435CC8(void) {
     func_L04_003A21F8(D_L18_002A9C40, 0x12);
@@ -208,7 +215,90 @@ void func_L18_00433460(u8 *obj) {
 
 /* func_L18_00433B70 lives in L18_00433B70.c. */
 
-INCLUDE_ASM("asm/levels", func_L18_00434510);
+void func_L18_00434510(RibbonVector *points, int count, int flags, u32 color0, u32 color1, float width, float scale) {
+    RibbonVector basis[4];
+    struct RibbonQuad mainQuad, innerQuad;
+    RibbonVector template0, template1;
+    float u, nextU, step;
+    int i;
+    mainQuad.texture = func_0027C878(0x2B);
+    mainQuad.flags = ((u64)(u32)flags << 32) | 0x68;
+    mainQuad.giftag = 0xFF9000000260ULL;
+    mainQuad.color[0] = mainQuad.color[1] = mainQuad.color[2] = mainQuad.color[3] = color0;
+    mainQuad.clear = 0;
+    func_L00_00412088(&mainQuad);
+    mainQuad.uv[0][0] = 0.0f; mainQuad.uv[0][1] = 0.0f;
+    mainQuad.uv[1][0] = 0.0f; mainQuad.uv[1][1] = 1.0f;
+    mainQuad.uv[2][0] = 1.0f; mainQuad.uv[2][1] = 0.0f;
+    mainQuad.uv[3][0] = 1.0f; mainQuad.uv[3][1] = 1.0f;
+    innerQuad.texture = func_0027C878(0x2B);
+    innerQuad.giftag = 0xFF9000000260ULL;
+    innerQuad.clear = 0;
+    innerQuad.flags = ((u64)(long)(flags / 3) << 32) | 0x68;
+    innerQuad.color[0] = innerQuad.color[1] = innerQuad.color[2] = innerQuad.color[3] = color1;
+    func_L00_00412088(&innerQuad);
+    innerQuad.uv[0][0] = 0.0f; innerQuad.uv[0][1] = 0.0f;
+    innerQuad.uv[1][0] = 0.0f; innerQuad.uv[1][1] = 1.0f;
+    innerQuad.uv[2][0] = 0.33f; innerQuad.uv[2][1] = 0.0f;
+    innerQuad.uv[3][0] = 0.33f; innerQuad.uv[3][1] = 1.0f;
+    template0.q = 0;
+    template1.q = 0;
+    template0.f[3] = 1.0f;
+    template1.f[3] = 1.0f;
+    template0.f[2] = width;
+    template1.f[2] = width * scale;
+    func_00282CF0((float *)&basis[0], (float *)&points[1], (float *)&points[0]);
+    func_00282F20((char *)&basis[0], (char *)&basis[0], 1.0f);
+    func_00282CF0((float *)&basis[1], D_L18_001B97C0, (float *)&points[0]);
+    func_00282DD8(&basis[2], &basis[1], &basis[0]);
+    func_00282F20((char *)&basis[2], (char *)&basis[2], 1.0f);
+    func_00282DD8(&basis[1], &basis[0], &basis[2]);
+    qcopy(&basis[3], &points[0]);
+    qcopy(&mainQuad.position[0], &template0);
+    func_00282D30(&mainQuad.position[1], &mainQuad.position[0], -1.0f);
+    func_002830C0(&mainQuad.position[0], &mainQuad.position[0], basis);
+    func_002830C0(&mainQuad.position[1], &mainQuad.position[1], basis);
+    qcopy(&innerQuad.position[0], &template1);
+    func_00282D30(&innerQuad.position[1], &innerQuad.position[0], -1.0f);
+    func_002830C0(&innerQuad.position[0], &innerQuad.position[0], basis);
+    func_002830C0(&innerQuad.position[1], &innerQuad.position[1], basis);
+    for (i = 1; i < count - 1; i++) {
+        qcopy(&mainQuad.position[2], &template0);
+        func_00282D30(&mainQuad.position[3], &mainQuad.position[2], -1.0f);
+        qcopy(&innerQuad.position[2], &template1);
+        func_00282D30(&innerQuad.position[3], &innerQuad.position[2], -1.0f);
+        func_00282CF0((float *)&basis[0], (float *)&points[i + 1], (float *)&points[i]);
+        func_00282F20((char *)&basis[0], (char *)&basis[0], 1.0f);
+        func_00282CF0((float *)&basis[1], D_L18_001B97C0, (float *)&points[i]);
+        func_00282DD8(&basis[2], &basis[1], &basis[0]);
+        func_00282F20((char *)&basis[2], (char *)&basis[2], 1.0f);
+        func_00282DD8(&basis[1], &basis[0], &basis[2]);
+        qcopy(&basis[3], &points[i]);
+        func_002830C0(&mainQuad.position[2], &mainQuad.position[2], basis);
+        func_002830C0(&mainQuad.position[3], &mainQuad.position[3], basis);
+        func_002830C0(&innerQuad.position[2], &innerQuad.position[2], basis);
+        func_002830C0(&innerQuad.position[3], &innerQuad.position[3], basis);
+        if (i == count - 2) {
+            mainQuad.color[2] = 0; mainQuad.color[3] = 0;
+            innerQuad.color[2] = 0; innerQuad.color[3] = 0;
+        }
+        func_00280B90(&mainQuad, 0, 0);
+        func_00280B90(&innerQuad, 0, 0);
+        step = 0.33f;
+        u = step * func_00283CE0(i);
+        nextU = u + step;
+        if (u >= 1.0f) {
+            u -= 1.0f;
+            nextU -= 1.0f;
+        }
+        innerQuad.uv[0][0] = u; innerQuad.uv[1][0] = u;
+        innerQuad.uv[2][0] = nextU; innerQuad.uv[3][0] = nextU;
+        qcopy(&mainQuad.position[0], &mainQuad.position[2]);
+        qcopy(&mainQuad.position[1], &mainQuad.position[3]);
+        qcopy(&innerQuad.position[0], &innerQuad.position[2]);
+        qcopy(&innerQuad.position[1], &innerQuad.position[3]);
+    }
+}
 
 void func_L18_00434A98(char *pos, int count) {
     float velocity[4] __attribute__((aligned(16)));

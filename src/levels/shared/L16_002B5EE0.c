@@ -50,7 +50,7 @@ extern char *D_L16_001C3FC0[];
 /* func_L16_003A8D58 is in L16_002B5EE0-shot.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L16_003C2C08);
+/* func_L16_003C2C08 is in L16_002B5EE0-state-g8.c. */
 
 /* func_L16_003C32F8 is in L16_003C32F8-render-g64.c. */
 

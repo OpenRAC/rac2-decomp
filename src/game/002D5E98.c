@@ -179,8 +179,6 @@ int func_002D75E8(int *arg0)
     return 0;
 }
 
-INCLUDE_ASM("asm/game", func_002D7698);
-
 
 int func_002D7AC8(void)
 {
@@ -1224,9 +1222,3 @@ int func_002DCB28(Handles_2DCB28 *object) {
     object->first = func_002DE618(object->first);
     return 0;
 }
-
-
-
-
-INCLUDE_ASM("asm/game", func_002DDA10);
-

@@ -370,7 +370,6 @@ s32 func_00334100(s32 a0)
     return r;
 }
 
-INCLUDE_ASM("asm/game", func_00334160);
 
 INCLUDE_ASM("asm/game", func_00334550);
 

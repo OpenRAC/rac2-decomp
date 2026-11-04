@@ -411,8 +411,6 @@ void func_003173B0(char *self)
 #undef FB
 #undef FP
 
-INCLUDE_ASM("asm/game", func_00317D78);
-
 extern void func_003182C0(void *);
 
 void func_003181E0(void *object) {

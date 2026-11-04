@@ -434,7 +434,7 @@ u8 *func_L12_003E1B28(s32 index, u8 *obj)
 
 /* func_L12_00413108 is defined in L12_00413108-por.c. */
 
-INCLUDE_ASM("asm/levels", func_L12_004135A8);
+/* func_L12_004135A8 is defined in L12_00398E50-init-g8.c. */
 
 
 void func_L12_004141A8(u8 *o) {

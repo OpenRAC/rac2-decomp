@@ -262,7 +262,7 @@ void func_L05_00418508(char *a0)
 
 /* func_L05_00419370 is defined in L05_00419370-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L05_00419888);
+/* func_L05_00419888 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B104C through $gp). */
 
 INCLUDE_ASM("asm/levels", func_L05_00419CC8);
 
@@ -273,7 +273,7 @@ void func_L05_0041A218(void)
     char buf[0x20];
 }
 
-INCLUDE_ASM("asm/levels", func_L05_0041A228);
+/* func_L05_0041A228 is defined in L05_0041A228-g8.c. */
 
 
 /* func_L05_0041C1F0 is defined in L05_0041C1F0-g8.c. */

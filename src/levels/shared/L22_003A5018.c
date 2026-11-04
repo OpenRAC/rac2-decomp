@@ -359,7 +359,7 @@ INCLUDE_ASM("asm/levels", func_L22_003F54B8);
 
 /* func_L22_003FC048 is in L22_003FC048-particles-g32.c. */
 
-INCLUDE_ASM("asm/levels", func_L22_003FC338);
+/* func_L22_003FC338 is defined in L22_003A5018-g8.c. */
 
 /* func_L22_003FC780 is defined in L22_003FC780-helper-g8.c. */
 
