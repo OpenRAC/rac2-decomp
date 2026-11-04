@@ -175,6 +175,14 @@ The [generator, source and regression tests](https://github.com/OpenRAC/rac2-dec
 pass two unchanged catalogue replays and all 84 strict program builds. The
 main loop is present as C in each boot's placement report.
 
+PRs still leave the generated reports for a maintainer's refresh on `master`.
+For this split, `tools/progress.py --check` recognizes only the old unmatched
+656-byte main row at the same virtual address, with exactly the sound name
+missing and the current adjacent 80/576-byte boot entries. Duplicate rows,
+other missing or retired entries, partial/matched credit for the old merged
+body and an already reported sound row are rejected. No report is rewritten
+or credited by this exception; `--strict` still requires the refreshed rows.
+
 `FUNCTION_RESIDUES` excludes individually verified remnants by name and size. The
 one-word entries' immediate predecessors finish with a return and its delay slot
 across alignment nops, or a closed tail jump before debug-fill bytes. The static scan
