@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L05_00419C60);
 
 extern void func_00282C88(char *block);
 extern int func_002A77E0(int kind);

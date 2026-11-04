@@ -25,5 +25,4 @@ extern void func_L00_003294F0(void *, int);
 extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
 extern void func_002E59F8(int);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003F16D8);
 

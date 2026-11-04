@@ -12,5 +12,4 @@ extern char D_00189E20[];
 extern int func_L00_002ADEA0(int index);
 extern void func_L00_002B3EF8(int index, float a, float b, float c);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002B3E90);
 

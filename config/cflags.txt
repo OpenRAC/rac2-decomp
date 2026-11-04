@@ -3135,3 +3135,29 @@ src/levels/shared/L00_003A53E8-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac
 src/levels/11_joba/L11_00420C88-state-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L00_002D7940.c	-O2 -G0 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
 src/levels/02_maktar_nebula/L02_003D0408-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/20_yeedil/L20_00449870.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L00_003BFBD8-nointerblock-g8.c	-O2 -G8 -ffunction-sections -fno-sched-interblock
+src/pal/levels/shared/L02_00335678.c	-O2 -G0 -ffunction-sections -mno-split-addresses
+src/pal/levels/06_notak/L06_00405FA8-hz.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L04_0040B8B8-trail.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/11_joba/L11_00445BB8-g.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L02_0038CE70-hz.c	-O2 -G0 -ffunction-sections -mno-split-addresses
+src/pal/levels/shared/L00_002D5380-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L04_0033EB40-movement.c	-O2 -G0 -g -ffunction-sections
+src/pal/levels/shared/L18_003FDE80-switch-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/20_yeedil/L20_003A1940-g8-hz.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/pal/levels/shared/L01_002A8B30.c	-O2 -G0 -ffunction-sections
+src/pal/levels/11_joba/L11_0043C288-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-keep-block-order
+src/pal/levels/01_oozla/L01_00414828-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/pal/levels/01_oozla/L01_003D5C30-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/02_maktar_nebula/L02_00402030-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/01_oozla/L01_00432438-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/pal/levels/00_aranos_tutorial/L00_004138A0-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/01_oozla/L01_00415E78-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/02_maktar_nebula/L02_0043F638-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/05_feltzin_system/L05_00419C60-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/06_notak/L06_0045ACC8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/10_hrugis_cloud/L10_0041A730-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/11_joba/L11_00473908-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/12_todano/L12_0041C930-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/13_boldan/L13_00421C68-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
