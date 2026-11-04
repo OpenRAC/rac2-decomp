@@ -1,19 +1,16 @@
-/* func_L15_004307E0: near miss, 848/848 bytes, 0 of 1 place (USA v1.01, 2 November 2026).
+/* func_L15_004307E0: Gorn's cutscene controller. On the first frame it starts the scene and
+   wakes every 0x1211 object, then, once the timer runs out, it builds the camera from the
+   object D_L15_001B261C points at (a ray towards it, the distance halved or pulled to -32, a
+   basis from the facing and the up vector) and later hands control back.
 
-   Profile: its own unit, `-O2 -G8 -ffunction-sections -frac2-qcopy`.
+   The camera position is taken $gp-relative (an SDATA view) but its z is read and written
+   absolutely (MACRO_ADDR), D_L15_00221E3C is NOT_SDA, and the basis w components are one
+   chained `= 0.0f` in the order 0, 1, 2 (retail stores a float zero with swc1).
 
-   Gorn's cutscene controller: on the first frame it starts the scene and wakes every 0x1211
-   object, then, once the timer runs out, it builds the camera from the object D_L15_001B261C
-   points at (a ray towards it, the distance halved or pulled to -32, a basis from the facing
-   and the up vector) and later hands control back. 11 rows differ, 5 of them relocations.
-   What mattered: the camera position is taken $gp-relative (an SDATA view) but its z is read
-   and written absolutely (MACRO_ADDR), D_L15_00221E3C is NOT_SDA, and the basis w components
-   are one chained `= 0.0f` in the order 0, 1, 2 (retail stores a float zero with swc1).
-   What differs: the D_L15_001B1520 decrement before the hand-back call has the counter in $v0
-   and the table pointer in $v1; retail has them the other way round. The instruction order is
-   retail's, only local-alloc's choice differs. Tried, unchanged: --, -= 1, = x + -1, an array
-   view of D_L15_001B1520, the table as 0x100-byte structs, swapped operands, the pointer in a
-   local first (worse); volatile is 4 bytes over. */
+   func_0029B3E0 returns int, as its definition in src/game/0029AE78-save-g8.c does and as
+   L00_002FC7A8-launch.c tests. With the value-returning call, local-alloc gives the counter
+   decrement after it retail's registers (the table pointer in $v0, the counter in $v1); a
+   void declaration swaps them. */
 
 #include "common.h"
 
@@ -54,7 +51,7 @@ extern void func_00282DD8(void *, void *, void *);
 extern void func_002AB6D8(void *, void *);
 extern void func_L05_00442828(void *, void *, int);
 extern void func_L15_00432008(void);
-extern void func_0029B3E0(int, int);
+extern int func_0029B3E0(int, int);
 extern void func_L00_003294F0(void *, int);
 extern void func_L05_00379F48(int);
 extern void func_002AD7B8(int);

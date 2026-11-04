@@ -3161,3 +3161,15 @@ src/pal/levels/10_hrugis_cloud/L10_0041A730-f7-g8.c	-O2 -G8 -ffunction-sections 
 src/pal/levels/11_joba/L11_00473908-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/12_todano/L12_0041C930-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/13_boldan/L13_00421C68-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/levels/15_gorn/L15_004307E0-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/levels/23_damosel_orbit/L23_0041A3B8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/pal/levels/14_aranos_prison/L14_00427108-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/15_gorn/L15_004241F8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/17_smolg/L17_0041D4E8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/18_damosel/L18_0043BDE8-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/20_yeedil/L20_0043E868-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/22_dobbo_orbit/L22_00414080-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/23_damosel_orbit/L23_0041A950-f7-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/shared/L01_003BD328-lift-pre.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-gcse-unsplit-edges
+src/pal/levels/shared/L22_002C8740-timers-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/20_yeedil/L20_002D6678-timers-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
