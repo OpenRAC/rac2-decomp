@@ -1049,7 +1049,14 @@ void func_L14_004308D0(void *position, int texture, int color, int mode,
 
 INCLUDE_ASM("asm/levels", func_L14_00430E08);
 
-INCLUDE_ASM("asm/levels", func_L14_004321C0);
+/* Distinct no-op entries: the first is called directly, the second by the moby table. */
+void func_L14_004321C0(void *object)
+{
+}
+
+void func_L14_004321C8(void *object)
+{
+}
 
 extern void func_002A7750(void *, int, int);
 extern int func_002A7820(int, int);

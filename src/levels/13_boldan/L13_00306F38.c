@@ -490,4 +490,15 @@ void func_L13_0042BFD8(u8 *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L13_0043E8C0);
+/* Separate camera activate, update and exit entries in camvtbl. */
+void func_L13_0043E8C0(void *camera)
+{
+}
+
+void func_L13_0043E8C8(void *camera)
+{
+}
+
+void func_L13_0043E8D0(void *camera)
+{
+}

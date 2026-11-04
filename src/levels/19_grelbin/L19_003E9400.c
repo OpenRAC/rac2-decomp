@@ -45,7 +45,33 @@ INCLUDE_ASM("asm/levels", func_L19_00417F88);
 
 /* func_L19_0041BFD0 is defined in L19_0041BFD0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L19_0041C328);
+extern u16 *D_L19_001FB5A0[];
+extern u8 *D_L19_001B2A1C[] __attribute__((sda));
+extern s32 D_L19_001B2A38[] __attribute__((sda));
+
+/* Mark every entity in this object's group state. */
+void func_L19_0041C328(u8 *object)
+{
+    u16 *p;
+    u8 *entity;
+
+    if (object[0x21] == 0xFF)
+        return;
+    p = D_L19_001FB5A0[object[0x21]];
+    while (object[0x21] != 0xFF && object[0x21] <= D_L19_001B2A38[0] && p != 0 &&
+           ((p != 0 && (s16)p[-1] >= 0) || p == D_L19_001FB5A0[object[0x21]])) {
+        entity = D_L19_001B2A1C[0] + ((*p & 0x7FFF) << 8);
+        if (entity == 0)
+            break;
+        *(s32 *)(*(u8 **)(entity + 0x68) + 0x240) = 1;
+        p++;
+    }
+}
+
+/* A separate no-op moby handler, entered by fifteen class records. */
+void func_L19_0041C3D0(void *object)
+{
+}
 
 
 /* func_L19_0041E5B0 is defined in L19_003E9400-lift-g8.c. */

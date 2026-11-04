@@ -994,6 +994,95 @@ def level_text(directory: Path) -> tuple[int, bytes]:
     return text["address"], (directory / "text.bin").read_bytes()
 
 
+# Complete reviewed extents, including separately entered empty callbacks.
+# Names and placement families stay distinct even when the shortened bytes agree.
+LEVEL_FUNCTION_SPLITS = {
+    "func_L19_0041C328": ("2c7af8399d44fbd2", "level", 1, "vtbl", 15,
+                            (("func_L19_0041C328", 168), ("func_L19_0041C3D0", 8))),
+    "func_L14_004321C0": ("19a756548c944b84", "level", 1, "vtbl", 1,
+                            (("func_L14_004321C0", 8), ("func_L14_004321C8", 8))),
+    "func_L13_0043E8C0": ("d456d82bfa98afa7", "level", 1, "camvtbl", 1,
+                            (("func_L13_0043E8C0", 8), ("func_L13_0043E8C8", 8), ("func_L13_0043E8D0", 8))),
+    "func_L06_0047C1D0": ("d456d82bfa98afa7", "shared", 7, "camvtbl", 1,
+                            (("func_L06_0047C1D0", 8), ("func_L06_0047C1D8", 8), ("func_L06_0047C1E0", 8))),
+}
+
+
+def split_level_rows(rows: list[tuple]) -> list[tuple]:
+    """Apply only the named splits, verifying every complete body and dispatch witness.
+
+    Both merged and fully split inputs are accepted. Partial, overlapping or
+    divergent metadata fails before any catalogue is written. Hrugis's unentered
+    tail is deliberately excluded: return-looking bytes alone are not an entry.
+    """
+    by_name = {r[0]: r for r in rows}
+    if len(by_name) != len(rows):
+        raise ValueError("duplicate level identity before entry splitting")
+    out = list(rows)
+    for name, (expected_fp, expected_kind, count, table, witnesses, parts) in LEVEL_FUNCTION_SPLITS.items():
+        names = {n for n, _ in parts}
+        if name not in by_name:
+            if names & by_name.keys():
+                raise ValueError(f"{name}: partial split without its first entry")
+            continue
+        row = by_name[name]
+        _, kind, size, _, places = row
+        total = sum(n for _, n in parts)
+        merged = size == total
+        if kind != expected_kind or len(places) != count or len({lv for lv, _ in places}) != count:
+            raise ValueError(f"{name}: changed split placement family")
+        if size not in (total, parts[0][1]):
+            raise ValueError(f"{name}: unexpected split extent {size}")
+        if merged and (names - {name}) & by_name.keys():
+            raise ValueError(f"{name}: merged row already has a child identity")
+        if not merged and not names <= by_name.keys():
+            raise ValueError(f"{name}: incomplete split entries")
+        keys = [set() for _ in parts]
+        for lv, address in places:
+            base, text = level_text(DUMP / level_dir(lv))
+            if not base <= address or address + total > base + len(text):
+                raise ValueError(f"{name}: complete split span outside EE text")
+            body = text[address - base:address - base + total]
+            if fingerprint(body, address) != expected_fp:
+                raise ValueError(f"{name}: level {lv} complete split body differs")
+            if any(p < address + total and p + n > address
+                   for other, _, n, _, locations in rows if other not in names
+                   for level, p in locations if level == lv):
+                raise ValueError(f"{name}: another level extent overlaps the split")
+            raw = (DUMP / level_dir(lv) / f"{table}.bin").read_bytes()
+            if len(raw) % 4:
+                raise ValueError(f"{name}: incomplete dispatch word")
+            data, width, seen = words(raw), 5 if table == "camvtbl" else 3, set()
+            for start in range(0, len(data) - width + 1, width):
+                record = data[start:start + width]
+                if record[0] == 0xFFFFFFFF:
+                    break
+                if ((table == "camvtbl" and record[2:5] == (address, address + 8, address + 16))
+                        or (table == "vtbl" and record[1] == address + parts[0][1])):
+                    seen.add(record[0])
+            if len(seen) != witnesses:
+                raise ValueError(f"{name}: level {lv} structured entry witnesses differ")
+            offset = 0
+            for i, (_, length) in enumerate(parts):
+                keys[i].add(fingerprint(body[offset:offset + length], address + offset))
+                offset += length
+        if any(len(k) != 1 for k in keys):
+            raise ValueError(f"{name}: split copies differ")
+        offset, split = 0, []
+        for (child, length), key in zip(parts, keys):
+            split.append((child, kind, length, next(iter(key)), [(lv, a + offset) for lv, a in places]))
+            offset += length
+        if not merged:
+            if any(by_name[r[0]] != r for r in split):
+                raise ValueError(f"{name}: conflicting split metadata")
+            continue
+        if row[3] != expected_fp:
+            raise ValueError(f"{name}: merged catalogue fingerprint differs")
+        at = out.index(row)
+        out[at:at + 1] = split
+    return out
+
+
 def old_extents(program: str) -> list[tuple[int, int]]:
     """Function extents from the catalogues this project kept before (config/function-catalog/,
     one gzipped file per program): only for the first catalogue."""
@@ -1054,7 +1143,7 @@ def catalogue() -> None:
     for name, a, n in boot:
         if name in FUNCTION_ENTRY_OFFSETS:
             remember_entry(name, a, n, boot_bytes, "boot")
-    source_rows = [] if from_old and not CATALOGUE.is_file() else read_catalogue()
+    source_rows = [] if from_old and not CATALOGUE.is_file() else split_level_rows(read_catalogue())
     for name, kind, n, _, places in source_rows:
         if name in FUNCTION_ENTRY_OFFSETS and name not in entry_bodies:
             number, a = places[0]
@@ -1062,6 +1151,9 @@ def catalogue() -> None:
             remember_entry(name, a, n, lambda p, size: data[p - base:p - base + size], kind)
     source_kinds = {name: kind for name, kind, _, _, _ in source_rows}
     stable_keys = set(entry_bodies.values())
+    split_names = {n for spec in LEVEL_FUNCTION_SPLITS.values() for n, _ in spec[-1]}
+    stable_keys.update((fp, n) for name, _, n, fp, _ in source_rows if name in split_names)
+    stable_keys.update((spec[0], sum(n for _, n in spec[-1])) for spec in LEVEL_FUNCTION_SPLITS.values())
     # Read named residues from the immutable input, including after their rows
     # have disappeared. Otherwise a second run can rename a surviving copy.
     for name, n in FUNCTION_RESIDUES.items():
@@ -1099,6 +1191,36 @@ def catalogue() -> None:
             base, data = level_text(DUMP / level_dir(number))
             extents[number] = [(a, n, None) for a, n in old_extents(f"{number}_{NAMES[number]}")
                                if base <= a < base + len(data)]
+        # Historical inputs may still hold the complete merged spans. Once the
+        # witnessed identities exist, bootstrapping must not merge them again.
+        known_rows = {name: (size, places) for name, _, size, _, places in source_rows if name in split_names}
+        whole, pieces = {}, {}
+        for name, spec in LEVEL_FUNCTION_SPLITS.items():
+            if name not in known_rows:
+                continue
+            parts = spec[-1]
+            for lv, address in known_rows[name][1]:
+                whole[lv, address] = parts
+            for child, length in parts:
+                for lv, address in known_rows[child][1]:
+                    pieces[lv, address] = child, length
+        for lv, entries in extents.items():
+            expanded = []
+            for address, size, original in entries:
+                parts = whole.get((lv, address))
+                if parts and size == sum(n for _, n in parts):
+                    offset = 0
+                    for child, length in parts:
+                        expanded.append((address + offset, length, child))
+                        offset += length
+                elif (lv, address) in pieces:
+                    child, length = pieces[lv, address]
+                    if size != length:
+                        raise ValueError(f"{child}: conflicting historical split extent")
+                    expanded.append((address, size, child))
+                else:
+                    expanded.append((address, size, original))
+            extents[lv] = expanded
     else:
         for name, kind, size, fp, places in source_rows:
             for number, a in places:
