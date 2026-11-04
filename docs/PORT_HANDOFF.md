@@ -78,11 +78,17 @@ what the retail code does when the port runs it.
   alone matches the build without them on level 26, and all 38 left-out rows together match the
   #236 build on all 26 tours. Tours compare rounded values, so an ulp-sized difference can hide.
   The cause was not traced.
-- **27 helper rows are back, 408 rows in all.** Each has a current SAME verdict in OpenRAC's
-  `fcheck.tsv`.
-- **11 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.** Ten are
-  `unchecked` (loaders, main loops, FMV, code no capture calls) and `func_L03_003E4680` has no
-  verdict. A clean tour does not count as SAME; a row returns only when it is proven.
+- **30 rows are back, 410 rows in all.** 27 helper rows, then `func_L00_002EDCF0`, `func_L03_0038AB30`
+  and `func_L04_0032F3C0`, once capturing in every level that has them gave SAME on 6, 6 and 24
+  calls. `func_L03_0038AB30` ran 324 of its 449 instructions; the others ran all of theirs.
+  `func_L04_0032F3C0` needs the batch gate's `sqrtf` stand-in; `fcheck.py check` alone cannot link it.
+  With the three rows, all 26 tours match the build without them.
+- **7 rows stay out of `functional.tsv`, files kept in `nonmatching/functional/`.**
+  `func_L00_003FA858` is not called in any of the 27 level runs, so it needs a route. The other six
+  (`func_0026EDE8`, `func_002CA070`, `func_002EAB18`, `func_002F5FB8`, `func_L00_002A3B88`,
+  `func_L00_00303990`) were recorded as waiting on a frame, the disc or a loop that does not return.
+  The gate delivers no interrupts, frames or disc, so a larger `--limit` should not help. They need
+  a different check. A clean tour does not count as SAME.
 - **Rows waiting on retail captures:** `func_L08_003CD708` and `func_L08_003CDB78`. Retail never
   called them in the `fcheck` play of levels 8, 9 and 19, so they need a route that reaches the
   object using them. They have near misses in `nonmatching/levels/` but no functional files yet.
@@ -243,15 +249,18 @@ there come from this repository's code and help when naming progress code:
 
 ## Open items
 
-- Prove and return the 11 rows still left out.
-- Find a route to the two level 8 rows, write their functional C, then capture and gate them.
+- Find a way to check the 7 rows still left out (see above).
+- Find a route to the two level 8 rows, write their functional C, then capture and gate them. They
+  already run in the port as translated assembly, so this is not urgent.
 - Feltzin: on `fcheck`'s level 5 route the random state now matches retail for 2,864 fields, to
   about 2,900 ticks after control, apart from a 1-field pause gap (OpenRAC #241). It parts at
   retail field 5061, after a level restart; not traced. The extra projectile at tick 1,937 came
   from a different input route and was not re-run.
-- Levels 12, 14, 19, 22 and 26 part from retail at fields 2852, 3274, 2675, 1909 and 2463 on the
-  same routes. Level 14's cause is the catch-up below; the others are not traced. Level 23 never
-  lined up.
+- Levels 4, 11, 12, 14, 16, 19, 22 and 26 first stop matching retail at fields 1899, 2834, 2852,
+  3274, 2873, 2675, 1909 and 2463 on the same routes. At level 14 that is a hold, and it parts
+  just after, at the catch-up below. The others are not traced, but levels 11, 12 and 16 match again
+  later at a new offset, which looks like the same gap. Level 23 never lined up. OpenRAC #236 does
+  not move these first stretches on levels 4, 11, 12 and 16, so it was not re-proven there.
 - Hrugis (level 10): on this route it stays in step for 1,056 fields after arrival, to field 2732,
   so its arrival is not where it parts here. The earlier report came from another route.
 
