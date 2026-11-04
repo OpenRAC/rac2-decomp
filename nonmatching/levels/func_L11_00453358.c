@@ -26,6 +26,15 @@
  * Bucket sweep (scratch cc1 overriding expr_hash_table_size from RAC_S, not kept): this exact
  * unit gives tools/check.py `1 of 1 places match` at S 539, 541, 543, 561, 563 and 565 and at
  * no other odd S in 531..571. Everything but gcse's bucket count is retail's.
+ * Second pass, 5 November 2026 (count measured exactly as real insns in the -dF dump; this
+ * source has 1095, S 551). Count-neutral, code unchanged: case 11's loop as do-while, case
+ * 14's loop as do-while, rot set before the loop, the byte-offset matrix qcopy (all 1095).
+ * All ten dead initializers together reach only S 555, so neither window is reachable that
+ * way. A `pos = self + 0x10` local (set once, or in each head arm as in func_L11_0044AFC8)
+ * lands in the window (1078, S 543) and gives retail's compute-then-copy head, but pos then
+ * takes $fp/$s7 instead of retail's slot 0x84; mixing pos and direct `self + 0x10` is worse.
+ * So retail's pos is a gcse reaching register. These change code, so they are out: qcopy for
+ * the head's or case 14's TI copies, and the `flag` spellings in case 8 (if/else, per arm).
  * Next: find source wording with 13 to 27 fewer insns at gcse (or 17 to 31 more), with
  * unchanged code; candidates are wordings whose redundancy gcse/flow removes later.
  */

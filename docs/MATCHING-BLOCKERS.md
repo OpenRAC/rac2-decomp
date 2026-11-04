@@ -543,6 +543,9 @@ same three insns. Dead initialisers count one insn each and change no instructio
 cross-jump in that function is closed only by the matched twin `func_L02_0040BE08`'s
 `height = 0.0f;`, which needs a ruling. `func_L11_00451178`'s natural wording needs S 575-585 and
 then still differs in two orders, so it is not a count alone.
+Second pass: for 453358, loop spellings, `rot` placement and the byte-offset `qcopy` are
+count-neutral, and even all ten dead initialisers reach only S 555. A `pos` local lands in the
+window but takes a saved register, so the roughly 20-insn difference is still unidentified.
 
 **Update, 3 November 2026 (pending review):** now matched. `func_L12_00300410` is C in `src/levels/12_todano/L12_00300410-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 1 US place (PAL and US2 catalogues have no function of this name). The measurements above are kept as history.
 
