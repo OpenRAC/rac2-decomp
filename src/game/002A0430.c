@@ -52,7 +52,8 @@ INCLUDE_ASM("asm/game", func_002A05A8);
 
 INCLUDE_ASM("asm/game", func_002A08A0);
 
-INCLUDE_ASM("asm/game", func_002A0A28);
+/* Original assembly: $at as a working register and trapping add/addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002A0A28);
 
 ASM_FUNC("asm/game", func_002A0B88);
 
@@ -62,7 +63,8 @@ ASM_FUNC("asm/game", func_002A0C68);
 
 INCLUDE_ASM("asm/game", func_002A0F48);
 
-INCLUDE_ASM("asm/game", func_002A10E8);
+/* Original assembly: lqc2/vmove VU0 ops and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002A10E8);
 
 INCLUDE_ASM("asm/game", func_002A1130);
 

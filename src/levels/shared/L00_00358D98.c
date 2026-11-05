@@ -383,19 +383,26 @@ int func_L00_00367720(void) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_0036BE28);
+/* Original assembly: $at as a working register (lw $at,off($a0)) and lui $ra in the return delay slot. */
+ASM_FUNC("asm/levels", func_L00_0036BE28);
 
-INCLUDE_ASM("asm/levels", func_L00_0036C9AC);
+/* Original assembly: $at as a working register (lw $at,off($a0)) and lui $ra in the return delay slot. */
+ASM_FUNC("asm/levels", func_L00_0036C9AC);
 
-INCLUDE_ASM("asm/levels", func_L00_0036C9D4);
+/* Original assembly: $at as a working register (lw $at,off($a0)) and lui $ra in the return delay slot. */
+ASM_FUNC("asm/levels", func_L00_0036C9D4);
 
-INCLUDE_ASM("asm/levels", func_L00_0036D274);
+/* Original assembly: $at as a working register (lw $at,off($a0)) and lui $ra in the return delay slot. */
+ASM_FUNC("asm/levels", func_L00_0036D274);
 
-INCLUDE_ASM("asm/levels", func_L00_0036D29C);
+/* Original assembly: $at as a working register (lw $at,off($a0)) and lui $ra in the return delay slot. */
+ASM_FUNC("asm/levels", func_L00_0036D29C);
 
-INCLUDE_ASM("asm/levels", func_L00_0036EF40);
+/* Original assembly: $at as a working register (lw $at,off($a0)) and lui $ra in the return delay slot. */
+ASM_FUNC("asm/levels", func_L00_0036EF40);
 
-INCLUDE_ASM("asm/levels", func_L00_0036EF68);
+/* Original assembly: $at as a working register and trapping add/addi; the compiler cannot emit them. */
+ASM_FUNC("asm/levels", func_L00_0036EF68);
 
 unsigned int func_L00_0036F480(void)
 {

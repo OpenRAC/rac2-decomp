@@ -493,15 +493,19 @@ ASM_FUNC("asm/game", func_0029CF58);
 /* Original assembly: RAC1 game/render/miscproc.c, func_0020C230. */
 ASM_FUNC("asm/game", func_0029CF78);
 
-INCLUDE_ASM("asm/game", func_0029CFB0);
+/* Original assembly: $at as a working register and trapping addi/add/sub; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_0029CFB0);
 
 ASM_FUNC("asm/game", func_0029D050);
 
-INCLUDE_ASM("asm/game", func_0029D0E0);
+/* Original assembly: $at as a working register and trapping addi/add; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_0029D0E0);
 
-INCLUDE_ASM("asm/game", func_0029D258);
+/* Original assembly: lqc2/qmtc2/qmfc2 VU0 ops, $at as a working register and trapping addi/add. */
+ASM_FUNC("asm/game", func_0029D258);
 
-INCLUDE_ASM("asm/game", func_0029D398);
+/* Original assembly: lqc2/qmtc2/qmfc2 VU0 ops, $at as a working register and trapping addi/add. */
+ASM_FUNC("asm/game", func_0029D398);
 
 ASM_FUNC("asm/game", func_0029D4D0);
 

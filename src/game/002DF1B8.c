@@ -37,7 +37,8 @@ ASM_FUNC("asm/game", func_002E0408);
 
 ASM_FUNC("asm/game", func_002E0558);
 
-INCLUDE_ASM("asm/game", func_002E0BA8);
+/* Original assembly: lqc2/sqc2/vdiv VU0 ops and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002E0BA8);
 
 ASM_FUNC("asm/game", func_002E0C40);
 

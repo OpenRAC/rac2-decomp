@@ -220,7 +220,8 @@ ASM_FUNC("asm/game", func_002808F8);
 /* Original assembly: RAC1 game/render/drawquad.c, func_001F7DD8. */
 ASM_FUNC("asm/game", func_00280A70);
 
-INCLUDE_ASM("asm/game", func_00280B30);
+/* Original assembly: lqc2/sqc2/vdiv and VU0 vector ops; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00280B30);
 
 ASM_FUNC("asm/game", func_00280B90);
 
@@ -307,7 +308,8 @@ ASM_FUNC("asm/game", func_00282978);
 /* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_001FEF78. */
 ASM_FUNC("asm/game", func_002829A8);
 
-INCLUDE_ASM("asm/game", func_002829D8);
+/* Original assembly: $at as a working register and trapping addi/sub; the compiler cannot emit these. */
+ASM_FUNC("asm/game", func_002829D8);
 
 ASM_FUNC("asm/game", func_00282A18);
 
@@ -319,13 +321,15 @@ ASM_FUNC("asm/game", func_00282A60);
 
 ASM_FUNC("asm/game", func_00282A88);
 
-INCLUDE_ASM("asm/game", func_00282AB0);
+/* Original assembly: trapping add/addi in the copy loops; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00282AB0);
 
 ASM_FUNC("asm/game", func_00282B50);
 
 ASM_FUNC("asm/game", func_00282B78);
 
-INCLUDE_ASM("asm/game", func_00282BA8);
+/* Original assembly: $at as a working base register (lui/ori $at then sw), sync, and ori after jr; the compiler cannot emit these. */
+ASM_FUNC("asm/game", func_00282BA8);
 
 ASM_FUNC("asm/game", func_00282BE0);
 
@@ -350,7 +354,8 @@ ASM_FUNC("asm/game", func_00282C78);
 /* Clear one aligned 128-bit object through architectural zero. */
 void func_00282C88(TI128 *a0) { *a0 = 0; }
 
-INCLUDE_ASM("asm/game", func_00282C90);
+/* Original assembly: sqc2 (COP2 store) in the return delay slot, which the compiler cannot emit. */
+ASM_FUNC("asm/game", func_00282C90);
 
 ASM_FUNC("asm/game", func_00282C98);
 
@@ -399,9 +404,11 @@ ASM_FUNC("asm/game", func_00282F20);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9E10. */
 ASM_FUNC("asm/game", func_00282F70);
 
-INCLUDE_ASM("asm/game", func_00282FB8);
+/* Original assembly: lqc2/sqc2/vdiv/vwaitq VU0 ops, $at as a working register and trapping addi. */
+ASM_FUNC("asm/game", func_00282FB8);
 
-INCLUDE_ASM("asm/game", func_00283028);
+/* Original assembly: lqc2/sqc2/vrsqrt VU0 ops and $at as a working register; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00283028);
 
 ASM_FUNC("asm/game", func_00283098);
 
@@ -410,7 +417,8 @@ ASM_FUNC("asm/game", func_002830C0);
 
 ASM_FUNC("asm/game", func_002830F0);
 
-INCLUDE_ASM("asm/game", func_00283108);
+/* Original assembly: RAC1 game/math/fastfunc.c, func_001F9F30. */
+ASM_FUNC("asm/game", func_00283108);
 
 ASM_FUNC("asm/game", func_00283130);
 
@@ -423,7 +431,8 @@ ASM_FUNC("asm/game", func_00283198);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9FC0. */
 ASM_FUNC("asm/game", func_002831B0);
 
-INCLUDE_ASM("asm/game", func_00283248);
+/* Original assembly: lqc2/qmtc2/qmfc2 VU0 ops and trapping add; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00283248);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA168. */
 ASM_FUNC("asm/game", func_00283360);
@@ -448,7 +457,8 @@ ASM_FUNC("asm/game", func_00283678);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA4A0. */
 ASM_FUNC("asm/game", func_00283698);
 
-INCLUDE_ASM("asm/game", func_002836E8);
+/* Original assembly: lqc2/sqc2 and VU0 vector ops; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002836E8);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA4F0. */
 ASM_FUNC("asm/game", func_00283738);
@@ -458,7 +468,8 @@ ASM_FUNC("asm/game", func_00283788);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA588. */
 ASM_FUNC("asm/game", func_002837D0);
 
-INCLUDE_ASM("asm/game", func_00283810);
+/* Original assembly: lqc2/sqc2/vrsqrt VU0 ops and $at as a working register; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00283810);
 
 /* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_001FFED8. */
 ASM_FUNC("asm/game", func_00283898);
@@ -469,11 +480,14 @@ ASM_FUNC("asm/game", func_00283958);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA6C0. */
 ASM_FUNC("asm/game", func_002839D0);
 
-INCLUDE_ASM("asm/game", func_00283A58);
+/* Original assembly: lqc2/sqc2 and VU0 vector ops; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00283A58);
 
-INCLUDE_ASM("asm/game", func_00283AF0);
+/* Original assembly: qmtc2/vitof/sqc2 VU0 ops with $at as a working register; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00283AF0);
 
-INCLUDE_ASM("asm/game", func_00283B48);
+/* Original assembly: lqc2/sqc2/qmtc2 and VU0 vector ops; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_00283B48);
 
 /* Byte-identical 72-byte copy of RAC1 func_001FA748, which RAC1 marks ASM_FUNC. */
 ASM_FUNC("asm/game", func_00283B98);
@@ -481,7 +495,8 @@ ASM_FUNC("asm/game", func_00283B98);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA790. */
 ASM_FUNC("asm/game", func_00283BE0);
 
-INCLUDE_ASM("asm/game", func_00283C28);
+/* Original assembly: $at as a working register and trapping add; the compiler cannot emit these. */
+ASM_FUNC("asm/game", func_00283C28);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA850. */
 ASM_FUNC("asm/game", func_00283C80);
@@ -503,7 +518,8 @@ ASM_FUNC("asm/game", func_00283D00);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA8A8. */
 ASM_FUNC("asm/game", func_00283D38);
 
-INCLUDE_ASM("asm/game", func_00283D80);
+/* Original assembly: lqc2/VU0 vector ops, $at as a working register and trapping addi/sub. */
+ASM_FUNC("asm/game", func_00283D80);
 
 ASM_FUNC("asm/game", func_00283DB8);
 

@@ -183,7 +183,8 @@ ASM_FUNC("asm/levels", func_L00_002E0200);
 
 /* func_L00_002E2048 (packed status field) is a near miss:
    nonmatching/levels/func_L00_002E2048.c */
-INCLUDE_ASM("asm/levels", func_L00_002E2048);
+/* Original assembly: trapping addi; the compiler cannot emit it. */
+ASM_FUNC("asm/levels", func_L00_002E2048);
 
 
 INCLUDE_ASM("asm/levels", func_L00_002E2958);

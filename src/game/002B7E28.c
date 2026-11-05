@@ -328,7 +328,8 @@ ASM_FUNC("asm/game", func_002B9038);
 /* Original assembly: RAC1 overlays/shared/particle_create_kill.c, func_L00_002688A8. */
 ASM_FUNC("asm/game", func_002B9180);
 
-INCLUDE_ASM("asm/game", func_002B9288);
+/* Original assembly: lqc2/qmtc2/vitof VU0 ops and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002B9288);
 
 INCLUDE_ASM("asm/game", func_002B9380);
 
@@ -336,7 +337,8 @@ INCLUDE_ASM("asm/game", func_002B9390);
 
 ASM_FUNC("asm/game", func_002B9420);
 
-INCLUDE_ASM("asm/game", func_002BA048);
+/* Original assembly: qmfc2 VU0 op and trapping add/addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002BA048);
 
 INCLUDE_ASM("asm/game", func_002BA0E0);
 
