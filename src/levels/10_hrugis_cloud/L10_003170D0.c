@@ -517,7 +517,24 @@ void func_L10_00418AD8(u8 *arg0) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L10_00419188);
+extern u32 D_L10_001FB1E0[];
+extern u8 *D_001B251C_base[] __asm__("D_001B251C") __attribute__((sda));
+
+void func_L10_00419188(u8 *arg0)
+{
+    u32 s0 = D_L10_001FB1E0[arg0[0x21]];
+    s16 *p;
+    u8 *q;
+
+    if (s0 == 0) {
+        return;
+    }
+    p = (s16 *)s0;
+    do {
+        q = D_001B251C_base[0] + (((*(u16 *)p & 0x7FFF) << 8));
+        *(q + 0x20) = 2;
+    } while (*p++ >= 0);
+}
 
 void func_L10_004191E0(void)
 {
