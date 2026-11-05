@@ -225,7 +225,7 @@ int func_002EB158(int index)
 /* func_002EBAA8 is in 002EBAA8-g8.c (-G8 small data). */
 
 
-INCLUDE_ASM("asm/game", func_002EBC70);
+/* func_002EBC70 is in 002EBC70-g8.c (-G8 small data). */
 
 /* func_002EBDF0 is matched in 002EBDF0-g8.c. */
 
