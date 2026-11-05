@@ -2,7 +2,6 @@
 # Each does what the retail function does without matching its bytes; the matching build never reads it.
 # Files under nonmatching/functional/ are C written for the port only (no matching attempt behind them).
 # name	file
-func_001325E0	nonmatching/functional/func_001325E0.c
 func_00280710	nonmatching/functional/func_00280710.c
 func_00283CB8	nonmatching/functional/func_00283CB8.c
 func_00283CF0	nonmatching/functional/func_00283CF0.c

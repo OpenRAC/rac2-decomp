@@ -201,7 +201,7 @@ INCLUDE_ASM("asm/core", func_00131DE8);
 
 /* func_00132318 and func_001326D8 are in 00132318-g8.c. */
 
-INCLUDE_ASM("asm/core", func_001325E0);
+/* func_001325E0 is defined in 00131780-g8.c. */
 
 
 void func_00132858(int value) {
