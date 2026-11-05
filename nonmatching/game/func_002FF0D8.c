@@ -1,3 +1,8 @@
+/* 4 November 2026 current-RAC1 source-method trial; retained, not linked.
+ * Grouping the two actual voice-request stores fixes their order but produces 432/428 bytes, 0/28
+ * USA placements: the join gains an alignment nop. Both O2/g and Os/g retain it; this compiler
+ * rejects -fno-align-loops. The older 428-byte source below remains the best draft.
+ */
 /* 3 November 2026: owning resident-view repair, original G0/g profile.
  * The resident byte object remains incomplete; only its actual preview-vector
  * prefix is typed. Model lookup preserves the observed 0x1220 + index*0x50

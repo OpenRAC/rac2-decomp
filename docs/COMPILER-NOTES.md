@@ -67,6 +67,27 @@ a native ABI; an EE match alone does not establish a working native port.
 Qualify the actual RAC2 source/profile and every carrying release, rather than
 assuming that an example in RAC1 guarantees a match here.
 
+An unused incoming argument also needs caller evidence. The retail
+`func_002CD3C0` explicitly passes its owner pointer to `func_0034EBE0` and
+`func_0034EC70`, although both helpers initialize resident state without reading
+that parameter. Their definitions now accept the same ignored pointer as the
+caller; the complete compiled helper object is unchanged. An unused register
+left at return is a separate question and does not establish a return value.
+Separating the screen-coordinate lifetime from the borrowed owner pointer
+resolves the title/setup caller's allocation difference without sharing a
+misleading integer local between those roles.
+
+The rectangle setup forwarders (`func_0029B658`, `func_US2_0029C448`,
+`func_PAL_0029BFF0`) also preserve four FP inputs. Retail leaves `f12` through
+`f15` unchanged in the wrapper, and `func_003384C0` consumes all four before
+its first call. Declare and forward those bounds explicitly, using the typed
+renderer interface already used in `00336A78.c`. The three complete objects
+remain identical. A native 32-bit C regression tests the context, flags, four
+bounds and null-context path; its prior-source control fails on the lost FP
+arguments. Ambient register contents are not a C argument-forwarding contract.
+[PR #420](https://github.com/OpenRAC/rac2-decomp/pull/420) contains the source
+repairs, the regression and the linked-placement checks.
+
 `func_L02_003D0408` uses one borrowed actor-field view for all six measured
 byte reads at offset `0x60`. Its volatile qualifier describes the complete
 reload sequence, including two snapshots before the distance test on its

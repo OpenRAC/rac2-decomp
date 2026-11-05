@@ -1,3 +1,10 @@
+/* 4 November 2026 current-RAC1 source trials; retained, not linked.
+ * Two new split-end-pointer trials with no-gcse, then no-strength-reduce, produce 108/108 bytes
+ * but 0/28 USA placements, first +0x30. The high half still hoists, changes registers and leaves
+ * a loop nop. This does not validate the macro-length diagnosis or its bindings. The older
+ * 112-byte draft below remains the best instruction-order witness; its ref namespace now follows
+ * the boot canonical identity.
+ */
 /* func_002F0FA0 - near miss: 112 bytes of the retail 108, 0/28 places
  * (opus-1, Claude Opus 5.5, 3 November 2026, task v2127).
  *
@@ -54,24 +61,24 @@ typedef struct {
     unsigned char unk1F;
 } Record002F0FA0;
 
-extern Record002F0FA0 *ref_L00_002F0FA0_00;
-extern Record002F0FA0 *ref_L00_002F0FA0_01;
-extern int ref_L00_002F0FA0_02 __attribute__((nosda));
-extern int ref_L00_002F0FA0_03;
-extern int ref_L00_002F0FA0_04;
-extern int ref_L00_002F0FA0_05;
-extern int ref_L00_002F0FA0_06 __attribute__((sda));
+extern Record002F0FA0 *ref_002F0FA0_00;
+extern Record002F0FA0 *ref_002F0FA0_01;
+extern int ref_002F0FA0_02 __attribute__((nosda));
+extern int ref_002F0FA0_03;
+extern int ref_002F0FA0_04;
+extern int ref_002F0FA0_05;
+extern int ref_002F0FA0_06 __attribute__((sda));
 
 void func_002F0FA0(void)
 {
-    Record002F0FA0 *p = ref_L00_002F0FA0_00;
-    int v = ref_L00_002F0FA0_02;
-    Record002F0FA0 *end = ref_L00_002F0FA0_01;
+    Record002F0FA0 *p = ref_002F0FA0_00;
+    int v = ref_002F0FA0_02;
+    Record002F0FA0 *end = ref_002F0FA0_01;
 
-    ref_L00_002F0FA0_03 = v;
-    ref_L00_002F0FA0_04 = 0;
-    ref_L00_002F0FA0_05 = 0;
-    ref_L00_002F0FA0_06 = 0;
+    ref_002F0FA0_03 = v;
+    ref_002F0FA0_04 = 0;
+    ref_002F0FA0_05 = 0;
+    ref_002F0FA0_06 = 0;
 
     if (p == end)
         return;
@@ -81,5 +88,5 @@ void func_002F0FA0(void)
         p->unk14 = 0xFFFF;
         p->unk1F = 0xFF;
         p++;
-    } while (p != ref_L00_002F0FA0_01);
+    } while (p != ref_002F0FA0_01);
 }

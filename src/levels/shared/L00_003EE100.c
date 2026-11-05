@@ -329,7 +329,6 @@ void func_L00_003F0130(char *obj)
     } while (i >= 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003F0198);
 
 
 extern char *D_L00_001B2BB8 __attribute__((sda));

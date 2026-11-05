@@ -12,6 +12,8 @@
  *   then enters gcse's expression table before object+0xF0, which orders the PRE copies.
  * - turn() is inlined; with it gcse sees retail's insn count (S 583), and the bucket order of
  *   the reaching registers gives retail's spill slots.
+ * - Case 11 preserves func_002B1C20's unsigned 64-bit return. Its early exit keeps the
+ *   low-bit test in control flow; the compound OR spelling adds a 32-bit normalization.
  */
 #include "common.h"
 
@@ -79,7 +81,7 @@ extern float func_0029F530(u8 *);
 extern s32 func_002AEB60(u8 *, float);
 extern void func_00283098(void *, void *, void *);
 extern void *func_003280C8(float, u8 *, void *, void *, s32, s32);
-extern s32 func_002B1C20(u8 *, void *);
+extern unsigned long func_002B1C20(u8 *, void *);
 extern void func_L02_003FC248(u8 *, s32, s32);
 extern void func_L11_00452DF8(u8 *);
 extern void func_002AB6D8(void *, void *);
@@ -359,17 +361,17 @@ void func_L11_00451178(u8 *object)
             func_002A7750(object, 7, -1);
         break;
     case 11: {
-        s32 flags = func_002B1C20(object, state + 0x50);
+        unsigned long flags = func_002B1C20(object, state + 0x50);
         if (object[0x42] == 15) {
-            if (!func_002A77E0(30) || (flags & 1)) {
-                if (func_0029F530(object) < 15.0f && *(s16 *)(state + 0x2D8) && !func_002A77E0(2))
-                    func_002A7750(object, 12, -1);
-                else {
-                    func_L02_003FC248(object, 0, -1);
-                    func_L11_00452DF8(object);
-                }
+            if (func_002A77E0(30) && (flags & 1UL) == 0)
+                break;
+            if (func_0029F530(object) < 15.0f && *(s16 *)(state + 0x2D8) && !func_002A77E0(2))
+                func_002A7750(object, 12, -1);
+            else {
+                func_L02_003FC248(object, 0, -1);
+                func_L11_00452DF8(object);
             }
-        } else if (flags & 2)
+        } else if ((flags & 2UL) != 0)
             func_002A7750(object, 7, 3);
         break;
     }

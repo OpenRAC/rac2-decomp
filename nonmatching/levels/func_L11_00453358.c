@@ -1,3 +1,9 @@
+/* 4 November 2026 contract review: restore the integer returns of func_002A8C28,
+ * func_002A8D70 and func_L07_00321D68, and the float return of func_002AA548, from their
+ * matched definitions. The ignored results do not change the generated body: the retained
+ * -O2 -G8 -ffunction-sections candidate passes 1/1 in both USA releases. PAL has no canonical
+ * identity. It remains a held diagnostic because of the case-9 dead store below.
+ */
 /* func_L11_00453358 (4,524 B, 1 place), 5 November 2026: exact in tools/check.py (1 of 1) and in
  * tools/build.py all --strict, but NOT landable under AGENTS.md / MATCHING-BLOCKERS blocker 26:
  * case 9's `height = 0.0f;` is a dead store whose only job is to keep a label between case 9's
@@ -50,10 +56,10 @@ extern void func_002A7750(void *, int, int);
 extern int func_002A77E0(int);
 extern float func_002A7878(float, float);
 extern void func_002A7A00(void *, float, float);
-extern void func_002A8C28(void *, void *, int, float, float, float, int, int, int);
-extern void func_002A8D70(void *, int, int, float, float, float, int, int, int);
+extern int func_002A8C28(void *, void *, int, float, float, float, int, int, int);
+extern int func_002A8D70(void *, int, int, float, float, float, int, int, int);
 extern float func_002AA150(float, float, float);
-extern void func_002AA548(void *, void *, float, float, float, float);
+extern float func_002AA548(void *, void *, float, float, float, float);
 extern void func_002AB6D8(void *, void *);
 extern int func_002B3868(u8 *);
 extern int func_002B3890(u8 *);
@@ -63,7 +69,7 @@ extern void func_002B60B0(u8 *, float, float, float, float);
 extern char *func_002C2210(void *, float, float, int, unsigned int, int, int, void *, float, int);
 extern int func_L01_00321178(void *, void *);
 extern void func_L02_00333438(void *, void *);
-extern void func_L07_00321D68(void *, void *);
+extern int func_L07_00321D68(void *, void *);
 extern u8 *func_L11_004417E8(u8 *);
 extern int func_L11_00441808(u8 *, void *);
 extern void func_L11_00441A38(u8 *, int, int);

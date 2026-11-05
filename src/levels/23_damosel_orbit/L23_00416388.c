@@ -34,7 +34,7 @@ void func_L23_004180F0(char *arg0) {
 
 /* func_L23_00418650 is matched in L23_00418650.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-INCLUDE_ASM("asm/levels", func_L23_004186D0);
+/* func_L23_004186D0 is matched in L23_004186D0-g8.c. */
 
 /* func_L23_00418BC8 is matched in L23_00418BC8-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
@@ -135,7 +135,7 @@ s32 func_L23_00419CE0(u64 arg0) {
 
 /* func_L23_0041A038 is matched in L23_0041A038-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L23_0041A3B8);
+/* func_L23_0041A3B8 is defined in L23_0041A3B8-g8.c. */
 
 /* func_L23_0041A7A0 is matched in L23_0041A7A0-g8.c. */
 
@@ -320,7 +320,7 @@ void func_L23_0041CCC0(char *arg0) {
 
 /* func_L23_0041D1F0 is matched in L23_0041D1F0-g8.c (built with -fno-gcse). */
 
-INCLUDE_ASM("asm/levels", func_L23_0041D398);
+/* func_L23_0041D398 is matched in L23_0041D398-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L23_0041DA48);
 

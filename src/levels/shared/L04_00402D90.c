@@ -415,7 +415,8 @@ void func_L04_0040AC30(char *a0, char *a1)
 
 INCLUDE_ASM("asm/levels", func_L04_0040AD28);
 
-INCLUDE_ASM("asm/levels", func_L04_0040BA68);
+/* func_L04_0040BA68 reaches its small globals off $gp, so its body lives in
+   L04_00402D90-select-g8.c. */
 
 typedef unsigned int L04Quad __attribute__((mode(TI)));
 extern int func_0030FF98(float);

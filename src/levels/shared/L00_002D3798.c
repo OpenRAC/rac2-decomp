@@ -789,7 +789,7 @@ void func_L00_002D4D98(char *arg0) {
 
 /* func_L00_002D5158 is in L00_002D3798-aim-g8.c (-G8 and division line labels). */
 
-INCLUDE_ASM("asm/levels", func_L00_002D5940);
+/* func_L00_002D5940 is in L00_002D3798-g8.c (-G8). */
 
 extern short D_L00_00262260[];
 

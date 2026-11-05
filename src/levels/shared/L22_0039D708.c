@@ -19,7 +19,7 @@ extern Rec_003A2D58 *D_L22_001FE940[];
 
 INCLUDE_ASM("asm/levels", func_L22_0039D708);
 
-INCLUDE_ASM("asm/levels", func_L22_003A15D0);
+/* func_L22_003A15D0 is defined in L22_003A15D0-g8.c. */
 
 
 /* func_L22_003A1ED8 is defined in L22_003A1ED8.c. */

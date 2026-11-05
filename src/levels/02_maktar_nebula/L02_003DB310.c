@@ -319,7 +319,7 @@ INCLUDE_ASM("asm/levels", func_L02_003E80F8);
 
 /* func_L02_003E9040 is matched in L02_003E9040-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-INCLUDE_ASM("asm/levels", func_L02_003E91F0);
+/* func_L02_003E91F0 is in L02_003E91F0-g8.c. */
 
 /* func_L02_003E98A8 is in L02_003E98A8-g8.c. */
 

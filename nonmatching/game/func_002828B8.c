@@ -1,3 +1,7 @@
+/* 4 November 2026: meaningful product and return one-pass groups remain
+ * 12/16 bytes, 0/1 USA placements at G8; they do not restore the missing nop. The equivalent
+ * eight-function boot/level family remains unresolved.
+ */
 /* func_002828B8 - 16 bytes, 1 place (the boot), retail at 0x002828b8:
    lwc1 $f0,-0x76E0($gp) ; nop ; jr $ra ; mul.s $f0,$f0,$f12.  The gp
    relative float constant (D_001A7910) and the multiplication are right,

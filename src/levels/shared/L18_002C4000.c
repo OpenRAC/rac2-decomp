@@ -687,7 +687,75 @@ void func_L18_003F9FB0(unsigned char *a0) {
     *(int *)(p + 0x88) = -1;
 }
 
-INCLUDE_ASM("asm/levels", func_L18_003FA180);
+/* Slot i of the state block's eight group ids (the words at +0x60). */
+#define L18_GROUP_ID(i) (*(int *)(state + 0x60 + (i) * 4))
+
+/* The engine's walk over a group's terminated stream of 15-bit actor indices, written as in
+   the other matched walks (FOR_EACH_ID in L06_0033BDC0-g8.c). Its repeated `entry != 0` adds a
+   label to the exit test that jump.c cannot thread before cse, so the rolled test is not copied
+   in front of the loop; the PRE copies then land behind NOTE_INSN_LOOP_BEG, last in the init. */
+#define L18_FOR_EACH_ID(entry, i) \
+    for (entry = D_L18_001FB320[L18_GROUP_ID(i)]; \
+         (L18_GROUP_ID(i) & 0xFF) != 0xFF && L18_GROUP_ID(i) <= D_L18_001B2838[0] && entry != 0 && \
+         ((entry != 0 && (short)entry[-1] >= 0) || entry == D_L18_001FB320[L18_GROUP_ID(i)]); \
+         entry++)
+
+/* Disables every actor of group i: clears flag bits 0, 1 and 6 and sets bit 12 at +0x34,
+   copies the word at +0x10 of the actor's +0x24 block to +0x98 and, unless the owner is of
+   kind 0xB69, also clears the byte at +0x31 and sets bit 0 again. */
+#define L18_DISABLE_GROUP(i) \
+    L18_FOR_EACH_ID(entry, i) { \
+        member = D_L18_001B281C[0] + (*entry & 0x7fff) * 0x100; \
+        if (member == 0) \
+            break; \
+        flags = *(unsigned short *)(member + 0x34) & 0xffbc; \
+        *(unsigned short *)(member + 0x34) = flags | 0x1000; \
+        *(int *)(member + 0x98) = *(int *)(*(char **)(member + 0x24) + 0x10); \
+        if (*(short *)(owner + 0xaa) != 0xb69) { \
+            member[0x31] = 0; \
+            *(unsigned short *)(member + 0x34) = flags | 0x1001; \
+        } \
+    }
+
+/* Disables the actor groups that belong to mode 0-4 of the owner's state block. */
+void func_L18_003FA180(char *owner, unsigned int mode)
+{
+    unsigned char *state = *(unsigned char **)(owner + 0x68);
+    unsigned short *entry;
+    char *member;
+    unsigned short flags;
+
+    if (mode >= 8)
+        return;
+    switch (mode) {
+    case 0:
+        L18_DISABLE_GROUP(0);
+        L18_DISABLE_GROUP(1);
+        break;
+    case 1:
+        L18_DISABLE_GROUP(2);
+        break;
+    case 2:
+        L18_DISABLE_GROUP(3);
+        L18_DISABLE_GROUP(5);
+        L18_DISABLE_GROUP(6);
+        break;
+    case 3:
+        L18_DISABLE_GROUP(4);
+        break;
+    case 4:
+        L18_DISABLE_GROUP(7);
+        break;
+    case 5:
+    case 6:
+    case 7:
+        return;
+    }
+}
+
+#undef L18_DISABLE_GROUP
+#undef L18_FOR_EACH_ID
+#undef L18_GROUP_ID
 
 /* The bank base and group count again, read-only here: this walk calls nothing, and retail loads
    both once before the walk of each group (the count also once for the whole function) instead of

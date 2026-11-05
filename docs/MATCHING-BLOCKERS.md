@@ -34,6 +34,26 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Trigger and title/setup lifetimes
+
+**4 November 2026, strict linked matches; [PR #420](https://github.com/OpenRAC/rac2-decomp/pull/420) pending review.**
+`func_L01_00390A50` is 528 bytes and passes six placements in each release with
+the actual forced-trigger arm grouped as one statement. Its volume/path calls
+use their canonical names and real point/index interfaces. `func_002CD3C0` is
+284 bytes and passes 28 USA v1.01 placements after separating its screen y
+coordinate from the later owner pointer; its canonical identity is absent in
+the other releases. The two setup hooks accept the owner explicitly supplied
+by retail. Each hook passes 28 placements in every release, and their complete
+compiled object is unchanged. All 84 loaded images and the 46 new C placements
+are verified, with PAL rebuilt after the latest carry update. See [source interfaces](COMPILER-NOTES.md#source-methods-shared-with-rac1).
+
+One-pass groups are not a general remedy. In `func_L01_0031B300`, grouping the
+actual height read restores the register map but adds an alignment nop at
++0x74 (276/272 bytes, 0/5 USA places). Wider response groups lose that map.
+The HUD-bank loop, menu cache and frame-phase drafts still have allocation or
+call-scheduling differences; their source, exact trial limits and next useful
+conditions remain in `nonmatching/`. No failed variant is linked or counted.
+
 ### Player initialization and retained allocation constraints
 
 **4 November 2026, strict linked match; pending PR review.**
@@ -572,6 +592,18 @@ steps, each read from a dump:
 - **Bucket count.** The `turn()` helper gives S 583.
 Reading `-dL` for "not desirable" and the loop's real insn count is the quickest check on a
 preheader order.
+
+**PR #419 contract review, 4 November 2026:** the sentry's `func_002B1C20` call must
+preserve its matched callee's unsigned 64-bit return. With that declaration and a
+64-bit local, the compound `!func_002A77E0(30) || (flags & 1)` condition adds a
+`dsll32`/`dsra32` normalization pair (4832/4824 bytes). The equivalent early exit
+`if (func_002A77E0(30) && (flags & 1UL) == 0) break;` preserves the original call
+order and low-bit tests and restores 4824 bytes, 1/1 USA v1.01 placements. Its
+canonical identity is absent from PAL and USA v2.00. The held drone also restores
+four ignored return contracts from their matched definitions: integer results for
+`func_002A8C28`, `func_002A8D70` and `func_L07_00321D68`, and a float result for
+`func_002AA548`. It remains 1/1 in both USA releases, but its case-9 dead store
+still prevents promotion.
 
 **Update, 3 November 2026 (pending review):** now matched. `func_L12_00300410` is C in `src/levels/12_todano/L12_00300410-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 1 US place (PAL and US2 catalogues have no function of this name). The measurements above are kept as history.
 

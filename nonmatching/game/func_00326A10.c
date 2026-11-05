@@ -1,3 +1,10 @@
+/* 4 November 2026 source-contract/lifetime trials; retained, not linked.
+ * Three actual call/source trials remain unmatched: FP-first bank ordering gives 460/444 bytes;
+ * interleaved bank ordering and real rounded-coordinate groups give 444/444, 0/1 USA placements,
+ * first +0x0. Integer/FP bank counts, widths and order are preserved. Neither restores the unused
+ * s0 save or the two x rematerializations. The older best C below is retained; no fresh result is
+ * claimed for the three timer siblings.
+ */
 /* 2026-11-03 w02 source-contract review (USA v1.01 only).
  * Profile: -O2 -G8 -ffunction-sections.
  * Current check.py: 444/444 bytes, 0/1 places, first mismatch +0x0.

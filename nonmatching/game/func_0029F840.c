@@ -1,3 +1,9 @@
+/* 4 November 2026 current-RAC1 source-method trial; retained, not linked.
+ * Removed the synthetic always-zero e & 0x100 arm. Three actual scale/setup/first-transform
+ * groups each give 288/288 bytes, 0/28 USA placements, first +0x10. The object/count registers
+ * and first-call setup remain different. The retained C is the measured real first-transform
+ * group; historical exact claims below concern the removed synthetic arm.
+ */
 /* func_0029F840 - 288 bytes, 28 places (the boot and every level). Tier: Opus 5.5 xhigh, 1 Nov 2026.
    Best check.py result: the C below gives 28 of 28 places in USA v1.01, PAL and v2.00. tools/build.py was not
    run. No match is claimed and the marker stays in src/: the exact bytes need the `if (out != 0)` arm, whose
@@ -28,6 +34,8 @@
    retail's order but the test and arm stay); both arms p = m; s = field on `index != 0` (boundary right, a0
    late, s3 and s4 exchanged).
    Needs only the externs below. */
+#include "common.h"
+
 extern void func_00282D60(void *, void *, float);
 extern void func_00283098(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
@@ -55,14 +63,13 @@ int func_0029F840(char *obj, char *m, char *out, int index) {
     if (e == 0xFF) {
         return 0;
     }
-    p = m;
-    s = *(float *)(obj + 0x2C);
-    if (out != 0) {
-        p = m + (e & 0x100);
-    }
     k = 0.0009765625f;
-    rec = (char *)tab + e * 16;
-    func_00282D60(p, rec, s * k);
+    do {
+        p = m;
+        s = *(float *)(obj + 0x2C);
+        rec = (char *)tab + e * 16;
+        func_00282D60(p, rec, s * k);
+    } while (0);
     rec += 0x10;
     func_00283098(m, m, obj + 0xC0);
     func_00282CC0(m, m, obj + 0x10);

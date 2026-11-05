@@ -273,7 +273,6 @@ void func_L01_003DC9E0(void *arg, void *fallback) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L01_003DCF40);
 
 /* func_L01_003DD3A0 is in L01_003DD3A0.c. */
 

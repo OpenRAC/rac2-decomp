@@ -336,7 +336,7 @@ void func_L22_003D4428(u8 *a0) {
 
 /* func_L22_003F52D8 is in L22_003F52D8-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L22_003F54B8);
+/* func_L22_003F54B8 is in L22_003A5018-g8.c. */
 
 /* func_L22_003F5580 is in L22_003A5018-g8.c: it reaches the level's scale factor
  * through $gp, which this -G0 unit cannot produce. */

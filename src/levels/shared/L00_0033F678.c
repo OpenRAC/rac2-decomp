@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "common.h"
 
 extern int func_00282978_1(char *p);
 
@@ -29,8 +30,6 @@ extern void func_00300248(char *a, char *b);
 extern int func_00282978_3(char *p);
 
 extern void func_002B9180_6(char *p);
-
-typedef int s32;
 
 #ifndef RAC2_T_V4_F61E33AD9
 #define RAC2_T_V4_F61E33AD9
@@ -315,7 +314,94 @@ float func_L00_00341A88(void *a0, void *a1, float scale)
 
 /* func_L00_00341D08 is defined in L00_0033F678-projection.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_00341FA8);
+typedef int Quadword __attribute__((mode(TI)));
+typedef union { Quadword q; float f[4]; } Vector;
+typedef struct { int count; int reserved[3]; Vector points[0]; } Path;
+extern int func_L00_00341820(const Path *, Vector *, int *, float *, float, int);
+extern float func_L00_00341D08(Vector *, const Vector *, const Vector *, const Vector *, float);
+extern void func_00282C88(Quadword *);
+
+/* Find the nearby path segment and the projected position on that segment.
+ * Counterpart of rac1-decomp's find_nearest_path_point (moby_ground_collision.c). */
+int func_L00_00341FA8(const Path *path, const Vector *point, Vector *out,
+                     int *index, float *offset, int wrap,
+                     float range, float step, float height) {
+    Vector current, a, b, candidate;
+    int scanIndex = 0;
+    float scanOffset = 0.0f;
+    int left, right;
+    int nearestIndex;
+    float nearestOffset;
+    float nearestDistance, distance, searchRange;
+    int finished, previous, next;
+    qcopy(&current, &((const Vector *)path)[1]);
+    a.q = point->q;
+    nearestIndex = 0;
+    nearestOffset = 0.0f;
+    nearestDistance = func_L00_00341A88(&current, &a, height);
+    if (path->count == 0) {
+        func_00282C88(&out->q);
+        return 0;
+    }
+    searchRange = step + range;
+    do {
+        finished = func_L00_00341820(path, &current, &scanIndex, &scanOffset, step, wrap);
+        a.q = point->q;
+        distance = func_L00_00341A88(&current, &a, height);
+        if (distance < nearestDistance) {
+            nearestIndex = scanIndex;
+            nearestDistance = distance;
+            nearestOffset = scanOffset;
+        }
+    } while (!finished);
+    if (searchRange < nearestDistance) return 0;
+    left = nearestIndex;
+    scanOffset = nearestOffset;
+    func_L00_00341820(path, &current, &left, &scanOffset, -step, wrap);
+    right = nearestIndex;
+    scanOffset = nearestOffset;
+    func_L00_00341820(path, &current, &right, &scanOffset, step, wrap);
+    right = func_L00_003417B8(&path->count, right, 1, wrap);
+    scanIndex = left;
+    nearestDistance = 1000000000.0f;
+    for (;;) {
+        a.q = ((const Vector *)path)[scanIndex + 1].q;
+        b.q = point->q;
+        distance = func_L00_00341A88(&a, &b, height);
+        if (distance < nearestDistance) {
+            nearestIndex = scanIndex;
+            nearestDistance = distance;
+        }
+        if (scanIndex == right) break;
+        scanIndex = (scanIndex + 1) % path->count;
+    }
+    nearestDistance = 1000000000.0f;
+    /* As in RAC1's find_nearest_path_point, the projection distance is kept in an
+     * arm-local and becomes the best distance only after the offset call. */
+    if (nearestIndex > 0 || wrap) {
+        float projected;
+        previous = path->count - 1;
+        previous = (nearestIndex + previous) % path->count;
+        projected = func_L00_00341D08(out, point, &((const Vector *)path)[previous + 1], &((const Vector *)path)[nearestIndex + 1], height);
+        *index = previous;
+        a.q = ((const Vector *)path)[previous + 1].q;
+        b.q = out->q;
+        *offset = func_L00_00341A88(&a, &b, 0.0f);
+        nearestDistance = projected;
+    }
+    if (nearestIndex < path->count - 1 || wrap) {
+        next = (nearestIndex + 1) % path->count;
+        distance = func_L00_00341D08(&a, point, &((const Vector *)path)[nearestIndex + 1], &((const Vector *)path)[next + 1], height);
+        if (distance < nearestDistance) {
+            qcopy(out, &a);
+            *index = nearestIndex;
+            b.q = ((const Vector *)path)[nearestIndex + 1].q;
+            candidate.q = out->q;
+            *offset = func_L00_00341A88(&b, &candidate, 0.0f);
+        }
+    }
+    return 1;
+}
 
 /* func_L00_003425F8 is defined in L00_0033F678-pushout.c. */
 

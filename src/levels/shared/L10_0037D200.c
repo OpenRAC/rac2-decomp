@@ -141,7 +141,7 @@ void func_L10_0039D9C0(void *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L10_0039DA48);
+/* func_L10_0039DA48 lives in L10_0037D200-ribbon.c. */
 
 
 /* func_L10_004190F0 lives in L10_004190F0.c. */

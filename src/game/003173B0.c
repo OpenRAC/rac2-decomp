@@ -673,7 +673,7 @@ unsigned int func_0031AB08(unsigned int param_1)
 /* func_0031AB18 is defined in 0031AB18-zero-ti.c. */
 
 
-INCLUDE_ASM("asm/game", func_0031BCC8);
+/* func_0031BCC8 is in 0031BCC8-g8.c. */
 
 /* func_0031C498 is in 0031C498.c. */
 

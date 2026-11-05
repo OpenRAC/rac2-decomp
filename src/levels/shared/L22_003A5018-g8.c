@@ -109,6 +109,44 @@ void func_L22_003B9358(u32 a0)
     *slot = 0;
 }
 
+/* func_L22_003F54B8 sets up the motion that func_L22_003F5580 runs: the heading of the
+ * object's variables is a coin toss of +/- pi/2 added to the angle of the vector from the
+ * object to a level point (after func_002AFDD8), the phase step is a rate in degrees per
+ * second turned into radians per frame (pi / 180 / 60), and the amplitude is a level
+ * value. The point and both values take per-program names.
+ */
+extern void func_00282CF0(void *, void *, void *);
+extern void func_002AFDD8(void *, void *, void *, int);
+extern int func_002A77E0(int);
+extern f32 func_00283248(f32, f32);
+extern f32 func_00283B98(f32, f32);
+
+typedef struct {
+    u8 pad[0xB0];
+    f32 heading;     /* 0xB0 */
+    u8 pad_b4[8];
+    f32 amplitude;   /* 0xBC */
+    f32 phase_step;  /* 0xC0 */
+    f32 phase;       /* 0xC4 */
+} SwayVars;
+
+extern char ref_L22_003F54B8_00[];
+extern f32 ref_L22_003F54B8_01 __attribute__((sda));
+extern f32 ref_L22_003F54B8_02 __attribute__((sda));
+
+void func_L22_003F54B8(u8 *obj) {
+    SwayVars *vars = *(SwayVars **)(obj + 0x68);
+    f32 delta[4];
+
+    func_00282CF0(delta, ref_L22_003F54B8_00, obj + 0x10);
+    func_002AFDD8(obj, delta, delta, 0);
+    vars->heading = func_002A77E0(2) ? 1.5707964f : -1.5707964f;
+    vars->heading = func_00283B98(vars->heading, func_00283248(delta[0], delta[1]));
+    vars->phase_step = ref_L22_003F54B8_01 * 0.000290888245f;
+    vars->amplitude = ref_L22_003F54B8_02;
+    vars->phase = 0.0f;
+}
+
 /* func_L22_003F5580 is another function of this unit that reaches a level word through
  * $gp; the scale factor it multiplies is at a different address in the other program that
  * carries the function, so it takes a per-program name.
