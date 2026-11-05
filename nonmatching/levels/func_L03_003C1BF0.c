@@ -1,3 +1,8 @@
+/* Claude Opus 5.5 (5 November 2026, round 4): no match (27 compiles). The CF0 group cannot work: cc1 loads arg regs a0,a1,a2 in order (no PUSH_ARGS_REVERSED on MIPS), &delta's precompute is folded by PRE, so the loop-note barrier always lands on the a0 copy; dp=&delta in the group, or a group from the first 3098 call or from the if (226/274 diffs) all fail. Without a group the only gap is &other live 107 (747) vs 0xF2D 750: `do { offset = &other; } while (0);` before the switch fixes s6/s7, but its barrier breaks the dispatch order (6-7 diffs). In e1 (single-set index, sched1 lh,fp,&other,li.s,0x940) li.s and 0x940 tie on priority, weight, class and depend count, li.s wins on luid at t=9 (memory unit free); 0x940 can only go first if it is birthing (its reg live past the block) or shares lh's cycle. A `pos` user variable for object+0x10 is much worse (129). */
+/* Claude Opus 5.5 (5 November 2026, retained draft): body below = twice-set `type` index in state 22 plus `do { func_00282CF0(&delta, &point, offset); } while (0);`. Profile: own unit src/levels/shared/L03_002AB5C8-state-g8.c (remove the INCLUDE_ASM marker from L03_002AB5C8.c), cflags line "src/levels/shared/L03_002AB5C8-state-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels -malign-loops=2". 5680/5680 bytes, 0/2 places, 2 positions (a0/a2 at +0x155C..+0x1560). */
+/* Claude Opus 5.5 (5 November 2026, round 3): the group form's a0/a2 swap comes from the loop note itself. haifa attaches LOOP_BEG to the next insn, which is the a0 copy (args load a0, a1, a2), and makes it a full barrier, so a0 always comes first. Retail loads a2 first for func_00283098 and for func_00282CF0. Tried without effect: `offset = &other` inside the group, `&other` as the third argument, `do { offset = &other; } while (0)` after the switch. Worse: the group around both calls (178 diffs), and the join calls copied into both branches (not cross-jumped, +60 B). A group around the switch (with -malign-loops=2) also fixes &other in s6, because its PRE set gains weight. But fp's PRE set in the same block rises to 892, above 0xF2D (750), so fp takes s7 and 0xF2D takes $fp, and li.s goes before li 0x940 again (10 diffs). Still needed: a boost that reaches &other but not fp, or a group whose first insn is not an argument copy. */
+/* Claude Opus 5.5 (5 November 2026, round 2): do-group tests on the twice-set `type` variant. `do { func_00282CF0(&delta, &point, offset); } while (0);` lifts &other to 5 refs (934 > 750) and fixes s6/s7 and the li.s/li 0x940 order, but its LOOP_BEG aligns the switch-end label at +0x157C (one nop; -malign-loops=2 removes it), and the note barrier pins the a0 copy first, so a0/a2 at +0x155C..+0x1560 swap (2 positions left, with -malign-loops=2). A group around func_00283098 or the whole join block lifts object+0xC0 and spills fp; one around the switch is worse. Stores through offset in the arms also fix s6/s7, but they become s6-based. dp=&delta in nested groups gives dp s4 but leaves PRE copies of object+0xF0, which then take a register and fp spills. Next: find a group whose first RTL insn is not the a0 copy, or another genuine &other reference. */
+/* Claude Opus 5.5 (5 November 2026): still 4 positions at +0x1358 (the task's count of eight was stale). New: sched1 gives birthing insns (single-set, live at block end) max_priority; li.s and li 0x940 both stay at priority 2 and li.s wins on luid, so li 0x940 goes first only when lh issues in the same cycle and holds the memory unit (li.s is xfer). That forces fp and &other into t=8, which makes &other live 107 (4 refs = 747) under the 0xF2D constant (3 refs, REG_EQUIV-doubled 40 = 750), so s6/s7 swap. A user dp=&delta set in both branches removes PRE's two r715 self-copies (&other 105, s6/s7 right) but dp then has 4 refs and loses s4 to -1 (5/36), and bb203 order breaks. No-op: chained -1 stores, type reused in the loop, mtx variable for object+0xC0 (worse). Remains: one more RTL insn in the 0xF2D loop or one fewer in &other's range, without changing the asm. */
 /* Claude Opus 5.5 xhigh, task v2114 (2026-11-03): closer near miss; supersedes v1626 below.
  * -O2 -G8 -ffunction-sections -frac2-hazard-labels: 5680/5680 bytes, 0 of 2 places (L03/L14).
  * Four instruction positions differ apart from relocations: +0x1358..+0x1364, where cc1
@@ -497,8 +502,9 @@ void func_L03_003C1BF0(u8 *object)
             MotionVector *offset;
             func_00282CC0(object + 0x10, object + 0x10, state + 0x1B0);
             qzero_nc(&point); qzero_nc(&other);
+            type = *(s16 *)(object + 0xAA);
             height = 0.8f;
-            switch (*(s16 *)(object + 0xAA)) {
+            switch (type) {
             case 0x964:
                 height = 0.3f;
             case 0x940:
@@ -534,7 +540,9 @@ void func_L03_003C1BF0(u8 *object)
             }
             func_002833F0(object + 0xC0, object + 0xF0);
             func_00283098(offset, offset, object + 0xC0);
-            func_00282CF0(&delta, &point, offset);
+            do {
+                func_00282CF0(&delta, &point, offset);
+            } while (0);
             func_00282CC0(object + 0x10, object + 0x10, &delta);
             break;
         }

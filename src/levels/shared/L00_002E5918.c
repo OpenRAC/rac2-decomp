@@ -264,19 +264,23 @@ void func_L00_002ED808(void) {
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
 ASM_FUNC("asm/levels", func_L00_002EDC90);
 
-INCLUDE_ASM("asm/levels", func_L00_002EDCB8);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fast_vector_math original assembly. */
+ASM_FUNC("asm/levels", func_L00_002EDCB8);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
 ASM_FUNC("asm/levels", func_L00_002EDCC8);
 
-INCLUDE_ASM("asm/levels", func_L00_002EDCF0);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fast_vector_math original assembly. */
+ASM_FUNC("asm/levels", func_L00_002EDCF0);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
 ASM_FUNC("asm/levels", func_L00_002EDD00);
 
-INCLUDE_ASM("asm/levels", func_L00_002EDD28);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fast_vector_math original assembly. */
+ASM_FUNC("asm/levels", func_L00_002EDD28);
 
-INCLUDE_ASM("asm/levels", func_L00_002EDD38);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fast_vector_math original assembly. */
+ASM_FUNC("asm/levels", func_L00_002EDD38);
 
 /* func_L00_002EE050 (the two-argument float maximum) is matched in its own
    unit, src/levels/shared/L00_002EE050.c: it needs the -O1 -ffast-math
@@ -286,7 +290,8 @@ ASM_FUNC("asm/levels", func_L00_002EE058);
 
 ASM_FUNC("asm/levels", func_L00_002EE078);
 
-INCLUDE_ASM("asm/levels", func_L00_002EE0C0);
+/* Original assembly: `sd; nop; jr $ra; sw` keeps a nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fast_vector_math original assembly. */
+ASM_FUNC("asm/levels", func_L00_002EE0C0);
 
 ASM_FUNC("asm/levels", func_L00_002EE290);
 

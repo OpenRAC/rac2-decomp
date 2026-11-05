@@ -1,4 +1,7 @@
-/* Per-frame update of the hero-steered bot (class 0x81E): flight, collision,
+/* 5 November 2026: own -g8 unit, `-O2 -G8 -ffunction-sections -g`; 8,440/8,440, 0/27. Retail's $fp=0x7F is
+ * hoisted `high` (`high = 0x7F` set in loop 2's body plus alpha `high` in loop 3 reproduces it), but loop 3's
+ * uses then stay sll, not REG_EQUIV constants. Also left: r2 = 0x30 spill, $fp/$s7 picks, defs-load regs.
+ * Per-frame update of the hero-steered bot (class 0x81E): flight, collision,
  * attachment, idle effects and self-destruct burst. Not functional-gated.
  * USA v1.01/v2.00: 8,432/8,440 bytes, 0/27 placements in each, 2026-11-01.
  * Compile separately as L00_003AE900-g8.c: -O2 -G8 -ffunction-sections.
@@ -119,7 +122,7 @@ typedef struct {
 } HitAE900;
 
 /* 0xE0-byte weapon record: +4 upgraded flag, +0x70 a rate. */
-typedef struct { char pad00[4]; unsigned char upgraded; char pad05[0x6B]; float rate; char pad74[0x6C]; } WeaponAE900;
+typedef struct { char pad00[4]; unsigned char upgraded; char pad05[0x6B]; float rate; char pad74[0x6C]; } WeaponAE900 __attribute__((aligned(16)));
 
 /* Sound state has a 0x70-byte header followed by 52 0x70-byte voices. */
 typedef struct {
@@ -128,9 +131,9 @@ typedef struct {
     char unknown05[0x13];
     MobyAE900 *owner;
     char unknown1C[0x54];
-} SlotAE900;
+} SlotAE900 __attribute__((aligned(16)));
 typedef struct { char header[0x70]; SlotAE900 slots[52]; } SoundAE900;
-#define SLOT_AE900(i) (&D_00188660.slots[(i)])
+#define SLOT_AE900(i) (D_00188660.slots[(i)])
 
 /* 0x50-byte effect template copied to the stack for func_00312B70. */
 typedef struct { VecAE900 v; char rest[0x40]; } TemplateAE900;
@@ -233,18 +236,18 @@ extern void func_002A9288(void *, float);
 
 /* Leaves the current state: stops the owned sound and resets the fall. */
 #define DETACH_AE900() \
-    do { \
+    { \
         int sound; \
         moby->state = 0; \
         sound = vars->sound; \
         if (sound != -1) { \
-            if (SLOT_AE900(sound)->owner == moby && SLOT_AE900(sound)->active) \
+            if (SLOT_AE900(sound).owner == moby && SLOT_AE900(sound).active) \
                 func_002E59F8(sound); \
         } \
         vars->sound = -1; \
         vars->timer34 = 0x78; \
         vars->vel.f[2] = 0.0f; \
-    } while (0)
+    }
 
 /* Packs a particle colour (0xAABBGGRR); the components are not folded before the loops hoist them. */
 static __inline__ int RgbaAE900(int r, int g, int b, int a)
@@ -254,19 +257,35 @@ static __inline__ int RgbaAE900(int r, int g, int b, int a)
     return c | r;
 }
 
+/* Rotation matrix for half a turn about X. */
+static __inline__ void HalfTurnAE900(VecAE900 *m)
+{
+    VecAE900 turn;
+
+    turn.q = 0;
+    turn.f[0] = PI_AE900;
+    func_00283410(m, &turn);
+}
+
+/* Copies the owner's matrix into dst. */
+static __inline__ void OwnerMatrixAE900(VecAE900 *dst, MobyAE900 *owner)
+{
+    func_00283658(dst, owner->matrix);
+}
+
 /* While held (state 1): the bot's matrix is its owner's, turned half a turn about X. */
 static __inline__ void AlignToOwnerAE900(MobyAE900 *moby, VarsAE900 *vars)
 {
     VecAE900 m1[4];
     VecAE900 m2[4];
-    VecAE900 turn;
+    VecAE900 *rot = m1;
+    VecAE900 *own;
 
-    turn.q = 0;
-    turn.f[0] = PI_AE900;
-    func_00283410(m1, &turn);
-    func_00283658(m2, vars->owner->matrix);
-    func_00283788(m1, m2, m1);
-    func_00283678(moby->matrix, m1);
+    HalfTurnAE900(rot);
+    own = m2;
+    OwnerMatrixAE900(own, vars->owner);
+    func_00283788(rot, own, rot);
+    func_00283678(moby->matrix, rot);
 }
 
 void func_L00_003AE900(MobyAE900 *moby)
@@ -684,6 +703,7 @@ void func_L00_003AE900(MobyAE900 *moby)
                 {
                 int low = 0x60;
                 int high = 0x7F;
+                float half = 0.5f;
 
                 for (i = 0; i < 150; i++) {
                     float r;
@@ -700,7 +720,7 @@ void func_L00_003AE900(MobyAE900 *moby)
                     t140.f[1] = func_00283198(a) * r;
                     t140.f[2] = 0.0f;
                     func_00282CC0(&t140, &t140, &moby->pos);
-                    t140.f[2] = surface + 0.5f;
+                    t140.f[2] = surface + half;
                     t130.f[2] -= r * (8.0f * FRAME_AE900);
                     func_L00_0033AA40(&t140, &t130, 0, func_002A7878(0.35f, 1.25f), surface,
                                       RgbaAE900(low, low, high, 0x16), 1.0f / 180.0f, RgbaAE900(low, low, high, 0), 1);
@@ -708,9 +728,10 @@ void func_L00_003AE900(MobyAE900 *moby)
                 for (i = 0; i < 20; i++) {
                     int c1;
                     int c2;
+                    char **defs;
 
-                    c1 = func_L00_0031C998(0x7F000000, RgbaAE900(low, low, high, high), func_002A7878(0.25f, 1.0f));
-                    c2 = func_L00_0031C998(0, RgbaAE900(low >> 1, low >> 1, high >> 1, 0), func_002A7878(0.5f, 1.0f));
+                    c1 = func_L00_0031C998(0x7F000000, RgbaAE900(0x60, 0x60, high, 0x7F), func_002A7878(0.25f, 1.0f));
+                    c2 = func_L00_0031C998(0, RgbaAE900(low >> 1, 0x30, 0x3F, 0), func_002A7878(0.5f, 1.0f));
                     t140.f[0] = func_002A7878(-3.0f, 3.0f);
                     t140.f[1] = func_002A7878(-3.0f, 3.0f);
                     t140.f[2] = func_002A7878(4.0f * FRAME_AE900, 14.0f * FRAME_AE900);
@@ -718,10 +739,11 @@ void func_L00_003AE900(MobyAE900 *moby)
                     t140.f[2] = func_002A7878(3.0f, 6.0f) * FRAME_AE900;
                     t130.q = moby->pos.q;
                     t130.f[2] = surface;
+                    defs = (char **)D_L00_001FE940;
                     c1 = func_002AAFA0(c1, WEAPON_AE900.upgraded != 0);
                     c2 = func_002AAFA0(c2, WEAPON_AE900.upgraded != 0);
                     func_002BCB00(func_002A7878(0.15f * 210000.0f, 0.25f * 210000.0f), &t130, &t140, c1, c2,
-                                  func_002A7820(90, 150), 1, *(unsigned char *)*(char **)(D_L00_001FE940 + 0x2C), -1, 0);
+                                  func_002A7820(90, 150), 1, *(unsigned char *)defs[11], -1, 0);
                 }
                 }
             } else if (water + 2.0f < moby->pos.f[2]) {
@@ -770,13 +792,15 @@ void func_L00_003AE900(MobyAE900 *moby)
                         break;
                     }
                     case 2: {
-                        int color = 0x5FF8F8F8;
+                        int color;
                         int c1;
                         int c2;
                         float f;
+                        int roll = func_002A77E0(100);
 
-                        if (func_002A77E0(100) > 39)
-                            color = 0x2F486078;
+                        color = 0x2F486078;
+                        if (roll <= 39)
+                            color = 0x5FF8F8F8;
                         c1 = func_002AAFA0(color, WEAPON_AE900.upgraded != 0);
                         c2 = func_002AAFA0(0x0F000020, WEAPON_AE900.upgraded != 0);
                         f = scale * 150000.0f;

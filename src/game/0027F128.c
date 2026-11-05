@@ -285,19 +285,23 @@ INCLUDE_ASM("asm/game", func_00282848);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
 ASM_FUNC("asm/game", func_00282890);
 
-INCLUDE_ASM("asm/game", func_002828B8);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fastfunc original assembly. */
+ASM_FUNC("asm/game", func_002828B8);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
 ASM_FUNC("asm/game", func_002828C8);
 
-INCLUDE_ASM("asm/game", func_002828F0);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fastfunc original assembly. */
+ASM_FUNC("asm/game", func_002828F0);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
 ASM_FUNC("asm/game", func_00282900);
 
-INCLUDE_ASM("asm/game", func_00282928);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fastfunc original assembly. */
+ASM_FUNC("asm/game", func_00282928);
 
-INCLUDE_ASM("asm/game", func_00282938);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); its neighbours are RAC1 fastfunc original assembly. */
+ASM_FUNC("asm/game", func_00282938);
 
 ASM_FUNC("asm/game", func_00282948);
 
@@ -345,7 +349,8 @@ f32 func_00282C48(f32 a0) { return __builtin_fabsf(a0); }
 
 ASM_FUNC("asm/game", func_00282C58);
 
-INCLUDE_ASM("asm/game", func_00282C68);
+/* Original assembly: identical to RAC1 game/math/fastfunc.c func_001F9BB0, which rac1-decomp keeps as handwritten; 16 bytes, so below the identity rule's length. */
+ASM_FUNC("asm/game", func_00282C68);
 
 ASM_FUNC("asm/game", func_00282C78);
 
@@ -499,7 +504,8 @@ ASM_FUNC("asm/game", func_00283C28);
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001FA850. */
 ASM_FUNC("asm/game", func_00283C80);
 
-INCLUDE_ASM("asm/game", func_00283CB8);
+/* Original assembly: `cvt.s.w` directly after `cvt.w.s` in the FPU; this cc1's only cvt.s.w templates start from mtc1 or l.s, so it cannot emit it. */
+ASM_FUNC("asm/game", func_00283CB8);
 
 /* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_002001D8. */
 ASM_FUNC("asm/game", func_00283CC8);
@@ -508,7 +514,8 @@ ASM_FUNC("asm/game", func_00283CC8);
 /* integer-to-float conversion; byte-identical across all 27 levels. */
 f32 func_00283CE0(s32 a0) { return (f32)a0; }
 
-INCLUDE_ASM("asm/game", func_00283CF0);
+/* Original assembly: identical to RAC1 game/math/fastfunc.c func_001FA898, which rac1-decomp keeps as handwritten; 16 bytes, so below the identity rule's length. */
+ASM_FUNC("asm/game", func_00283CF0);
 
 /* Original assembly: RAC1 overlays/shared/fast_vector_math.c, func_L00_00200210. */
 ASM_FUNC("asm/game", func_00283D00);

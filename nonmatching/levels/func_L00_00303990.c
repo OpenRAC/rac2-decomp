@@ -1,3 +1,22 @@
+/* 5 November 2026, round 4: miss. DI `lo = sum; lo >>= 8; lo |= C` gives retail's ties but dsra; DI `lo |= C` after sra ties to C (47 rows); an int temp reset before (lo | hi) ties lo but moves loads/adds daddu (59+ rows); shared hi (24), union, (int)lo >> 8 fail. */
+/* 5 November 2026 (w-c7): USA v1.01 3388/3388 bytes, 0/27 places (USA only), first diff +0x164.
+ * Unit: src/levels/shared/L00_002FC7A0-00303990-g16.c, flags -O2 -G16 -Wa,-G16 -ffunction-sections.
+ * Replace INCLUDE_ASM in L00_002FC7A0.c with a "defined in" comment.
+ * Starts from the matching draft (fe9a7138^); func_L00_00300610 gets retail's (table, count) args.
+ * Fixed: the lw/daddu swap at 0x00304350. A group around the texture-base store and the count
+ * load puts a barrier after the sw (count * 16 stays outside the group).
+ * Only remaining diff: 0x00303AF4/0x00303B10/0x00303B14. Retail puts the result of the first GS
+ * word's (lo | hi) in lo's register v1; cc1 ties it to hi (v0). mips.md iordi3 operand 1 is the
+ * (sign_extend lo) rtx, not a REG, so local-alloc (block_alloc -> combine_regs) can only tie to
+ * hi. For retail, hi must be non-local, or lo must be a DI REG that combine does not fold.
+ * Tried without effect: 64-bit OR of the lo constant (folded back to SI), a separate `lo |= C`
+ * statement (57 rows), `lo |= hi`, a group around the store (barrier breaks interleave, 71 rows),
+ * lo/hi shared by both words (24 rows). Loop notes do not split flow blocks.
+ * Round 2: `unsigned long` (SDK idiom), one-expression SDK form (32 rows), `hi |= lo`, a
+ * separate `long lo = (int)l`, a group ending after lo's extension (69 rows) all keep the tie
+ * (combine folds the sign_extend back into the ior; loop notes do not stop combine).
+ * Unit flags -fno-regmove/-fno-caller-saves: no change; -fno-expensive-optimizations 75 rows.
+ */
 /* Current retained result, 1 November 2026: 3392/3388 bytes. Preserve the level loader's heap-pointer
  * return contract. An explicit goto form of the final loop measured 3380 bytes and lost required control-
  * flow/alignment; keep the structured loop. GS-word allocation and macro-load loop padding remain
@@ -160,7 +179,7 @@ extern void func_00291DE0(void *, int);
 extern void func_L00_002FD480(char *);
 extern void func_00291CA8(void *, char *, void *, int);
 extern void func_0026FEB8(const char *, ...);
-extern char *func_L00_00300618(int);
+extern int func_L00_00300618(int);
 extern void func_L00_003032F0(void);
 extern void func_L00_00303418(int);
 extern void func_L00_00358B30(void);
@@ -376,9 +395,12 @@ int func_L00_00303990(int load, int resume)
         if (D_L00_001B24D4 != TEXBASE->i[0x18 / 4]) {
             char *dst;
             int size;
-            TEXBASE->p[0x10 / 4] = base;
-            size = h->i[0x30 / 4] * 16;
+            do {
+                TEXBASE->p[0x10 / 4] = base;
+                size = h->i[0x30 / 4];
+            } while (0);
             dst = base;
+            size *= 16;
             base += size;
             func_00282B50(dst, (char *)h + h->i[0x34 / 4], size);
             TEXBASE->p[0x14 / 4] = base;
@@ -426,7 +448,7 @@ int func_L00_00303990(int load, int resume)
         base = (char *)((unsigned int)end & ~0x3F);
         LD->p[0x48 / 4] = base;
     }
-    LD->p[0x68 / 4] = func_L00_00300618(load);
+    LD->i[0x68 / 4] = func_L00_00300618(load);
     if (load)
         D_00152CE4[0] = -1;
     if (TEXBASE->i[0xC / 4] != 0) {
