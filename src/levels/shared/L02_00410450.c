@@ -29,7 +29,7 @@ extern float func_0031E8D0(void);
 
 /* func_L02_00410E58 is defined in L02_00410E58.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_00410F68);
+/* func_L02_00410F68 is defined in L02_00410F68-g8.c. */
 
 /* Plays one of nine resident messages, chosen by the sub-object's state word. */
 /* func_L02_004114A0 is defined in L02_004114A0.c. */

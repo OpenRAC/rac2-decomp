@@ -247,8 +247,6 @@ void func_L00_00413298(char *object)
     *(int *)(state + 0x8) = 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00413358);
-
 void func_L00_00414018(void)
 {
 }

@@ -113,7 +113,7 @@ void func_002D5E98(int param_1)
 }
 /* func_002D5EC0 is in 002D5E98-list-g8.c. */
 
-INCLUDE_ASM("asm/game", func_002D6230);
+/* func_002D6230 is in 002D5E98-render-g8.c. */
 
 /* func_002D68D8 is in 002D5E98-g8.c. */
 
@@ -151,8 +151,6 @@ int func_002D6E78(void)
     }
     return 0;
 }
-
-INCLUDE_ASM("asm/game", func_002D6F38);
 
 extern void func_0029D830(int *);
 extern int func_0029DB28(unsigned int, unsigned int, unsigned int, int);

@@ -172,7 +172,7 @@ void func_L12_004149B8(Ent49B8 *a0)
 
 /* func_L12_00414EB8 is in L12_004149B8-effects-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L12_004163E8);
+/* func_L12_004163E8 is in L12_004163E8-g8.c. */
 
 /* func_L12_00417690 is in L12_004149B8-f7-g8.c. */
 

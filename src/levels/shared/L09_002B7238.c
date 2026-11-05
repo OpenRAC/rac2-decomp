@@ -437,7 +437,7 @@ int func_L09_003EA2D0(char *object, int index, int value)
 
 /* func_L09_003EA360 is defined in L09_003EA360-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L09_003EA798);
+/* func_L09_003EA798 is defined in L09_003EA798-g8.c. */
 
 void func_L09_003EA9D0(char *object)
 {

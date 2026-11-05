@@ -226,9 +226,7 @@ extern void func_0035F450(int a, int b, void *c, int d);
 
 /* func_L00_00407E38 is defined in L00_00407E38-g8.c. */
 
-
-INCLUDE_ASM("asm/levels", func_L00_00408E58);
-
+/* func_L00_00408E58 is defined in L00_003FFA70-reaction-g8.c. */
 
 /* shared native body of family af5b3bc3a678ed5c */
 void func_L00_00409420(char *object)

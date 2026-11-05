@@ -104,3 +104,100 @@ void func_L00_003852A0(void *object)
     func_L00_002E95C0(D_L00_001AEE98[4], D_L00_001AEE98[5], D_L00_001AEEB0_gp, buffer, -1);
 }
 
+
+/* 128-bit stack vectors reach lq/sq only through TImode. */
+typedef int FlareQuad __attribute__((mode(TI)));
+typedef union { FlareQuad bits; float f[4]; } FlareVec;
+typedef struct { char pad[0x20]; unsigned char flags; } FlareTarget;
+
+extern float func_00282E48(void *, void *);
+extern float func_00283CE0(int);
+extern void func_00279BD8(void *, void *);
+extern unsigned long func_0027C878(int);
+extern float func_00282C48(float);
+extern int func_00283CF0(float);
+extern void func_002FC560(unsigned int, unsigned long long);
+extern void func_0027E018(int, int, int, int, int, int, int, int,
+                         unsigned long, unsigned long);
+
+typedef struct {
+    FlareTarget *target;
+    int active;
+    float intensity;
+    int pad;
+    short alpha[16];
+    short texture[16];
+    unsigned int color[16];
+    float offset[16];
+    float scale[16];
+} FlareState;
+extern FlareState D_L00_001B90C0;
+extern int D_001A7348[] __attribute__((sda));
+/* Effect texture base (.bss, set by func_L00_00382AE8); read as retail's tied lui/lw. */
+extern int D_L00_001B273C[] __attribute__((sda));
+/* Base sprite size, 64. */
+extern int D_L00_001AED00[];
+
+/* Projects the flare target to the screen and draws its 14 sprites along the line
+   through the screen centre, faded by distance and by how far off-centre it is
+   (RAC1 draw_lens_flare; func_L08_003F7A48 draws 12). Both table bases are read
+   through pointers set before the loop: reload rematerializes them inside it. */
+void func_L00_00382F28(char *object)
+{
+    char *work = *(char **)(object + 0x68);
+    FlareVec screen;
+    float center[4], delta[4], offset[4], location[4];
+    float distance, fade, horizontal, vertical;
+    unsigned long texture;
+    int color;
+    int i, size, left, top;
+    int *baseSize;
+    int *texBase;
+
+    if (D_L00_001B90C0.active != 1 || (D_L00_001B90C0.target->flags & 0x80)) {
+        D_L00_001B90C0.active = 0;
+        return;
+    }
+    if (D_L00_001B90C0.intensity <= 0.0f)
+        return;
+    distance = func_00282E48(D_L00_001B8DC0, work);
+    baseSize = D_L00_001AED00;
+    center[0] = func_00283CE0(D_001A7348[0]);
+    center[1] = func_00283CE0(D_001A7348[1]);
+    func_00279BD8(&screen, work);
+    screen.f[0] = (screen.f[0] - func_00283CE0(D_001A7348[2])) * 0.0625f;
+    screen.f[1] = (screen.f[1] - func_00283CE0(D_001A7348[3])) * 0.0625f;
+    delta[0] = center[0] - screen.f[0];
+    delta[1] = center[1] - screen.f[1];
+    for (i = 0, texBase = D_L00_001B273C; i < 14; ++i) {
+        texture = func_0027C878(*texBase + D_L00_001B90C0.texture[i]);
+        offset[0] = delta[0] * D_L00_001B90C0.offset[i];
+        offset[1] = delta[1] * D_L00_001B90C0.offset[i];
+        location[0] = center[0] + offset[0];
+        location[1] = center[1] + offset[1];
+        fade = distance - 5.0f;
+        if (fade > 1.0f)
+            fade = 1.0f;
+        else if (fade < 0.0f)
+            fade = 0.0f;
+        horizontal = func_00282C48(delta[0]) / center[0] * -5.0f + 5.5f;
+        if (horizontal > 1.0f)
+            horizontal = 1.0f;
+        else if (horizontal < 0.0f)
+            horizontal = 0.0f;
+        vertical = func_00282C48(delta[1]) / center[1] * -5.0f + 5.5f;
+        if (vertical > 1.0f)
+            vertical = 1.0f;
+        else if (vertical < 0.0f)
+            vertical = 0.0f;
+        fade *= horizontal * vertical * D_L00_001B90C0.intensity;
+        color = (int)(((unsigned int)func_00283CF0(fade * D_L00_001B90C0.alpha[i]) << 24)
+                      | (D_L00_001B90C0.color[i] & 0xFFFFFF));
+        size = func_00283CF0(*baseSize * D_L00_001B90C0.scale[i]);
+        func_002FC560(66, 0x8000000048ULL);
+        left = func_00283CF0(location[0] - (float)(size >> 1));
+        top = func_00283CF0(location[1] - (float)(size >> 1));
+        func_0027E018(left, top, size, size, 0, 0, 64, 64, color, texture);
+    }
+    D_L00_001B90C0.intensity = 0.0f;
+}

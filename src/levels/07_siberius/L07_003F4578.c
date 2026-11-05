@@ -4,7 +4,7 @@
 /* Quadword copies and clears, the spelling that reaches lq/sq. */
 typedef int TI128 __attribute__((mode(TI)));
 
-INCLUDE_ASM("asm/levels", func_L07_003F4578);
+/* func_L07_003F4578 is defined in L07_003F4578-ring-g8.c. */
 
 extern u8 D_L07_001B31AF __attribute__((sda));
 
@@ -25,7 +25,7 @@ void func_L07_0040FC50(void)
 
 /* func_L07_003F4C18 is defined in L07_003F4C18-copy.c. */
 
-INCLUDE_ASM("asm/levels", func_L07_003F4CC0);
+/* func_L07_003F4CC0 is defined in L07_003F4578-beam-g8.c. */
 
 /* func_L07_003F59C0 is defined in L07_003F59C0-g8.c. */
 
