@@ -1,3 +1,5 @@
+/* 5 November 2026: new, still $v1 (60/60, 0/1): K&R definition; the call through a 4-argument view passing the object again as a3 (64 bytes, still $v1, and a false prototype anyway). Remaining: the object pointer in $v1, retail $a3. */
+/* 5 November 2026: lesson-3 copy (`self = object; object += 0x34; *(u16 *)object |= 0x41; call(self)`) keeps a second pointer but cse/combine do not fold the +0x34 back: 64/60 bytes, still $v1. global.c find_reg skips regs_someone_prefers first, so $a3 needs a conflicting pseudo that prefers $v1 or a block-local copy that local-alloc puts in $v1; no legal source found for either. */
 /* 4 November 2026: a real one-pass flag-update/state-change group, as seen
  * in current RAC1 game C, gives 64/60 bytes and 0/1 USA. The object still
  * uses v1 rather than a3 and an extra alignment nop remains. No improvement;

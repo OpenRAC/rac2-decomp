@@ -1,3 +1,5 @@
+/* 5 November 2026 (w-c4): no change from block-scoped prev/i, a static inline relink(prev) or relink(frame, prev) helper (drops the base copy), while(i<count) with entries[i++], short/long/long long i, `register`, or -fno-rerun-cse-after-loop/-fno-gcse/-fno-schedule-insns/-frac2-{gcse-unsplit-edges,keep-block-order,no-null-pointer-checks}; refs stay i 7/15, prev 7/17, cursor 7/22, so retail's prev > cursor > i order needs prev >= 8 refs and an undoubled cursor at once. */
+/* 5 November 2026 (w-c4): regalloc confirms refs = 1 + 2 x in-loop uses (prev 7/17, i 7/15). i cannot drop below 7 refs (init, addiu, slt); prev needs an 8th out-of-loop ref that retail does not show. No compile beyond the baseline; no new shape found. */
 /* Near miss (opus-2, Claude Opus 5.5 xhigh, task v2098, 3 November 2026;
  * earlier opus-1 v2078): 380/380 bytes, 0 of 28 places.  Only the
  * entry-relinking loop's registers differ (about 13 words); the call

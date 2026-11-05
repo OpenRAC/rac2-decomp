@@ -1,3 +1,5 @@
+/* 5 November 2026 (w-c4): no new C lever; the body already matches and only the save layout differs (retail sd ra 0x0, sq s0 0x10, 0xA0 frame). Same compiler gap as func_L01_00324550/func_L02_00411D18: per-register save width (mips_reg_mode) with 16-byte slots for sq-saved GPRs. Not retried. */
+/* 5 November 2026 (w-c2): same frame as func_L01_00324550: register_precision is stock but only sets widths; mips.c 6497-6611 always puts $ra in the top GP slot, retail has s0 above ra. Not retried. */
 /* Opus-1 v0735, 29 October 2026: recompiled with this cc1 (scratch, both
  * profiles): unchanged, 264 bytes; with -mastra-quad-saves only the four
  * save/restore words differ (last check.py record: 264/264, 0/4 places).

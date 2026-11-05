@@ -1,3 +1,5 @@
+/* 5 November 2026: new, no gain: the three transform calls as a static inline helper (288/288, 0/28, rec in s2, setup order unchanged); the joint lookup as an inline returning NULL with a caller test (304 bytes, the NULL test stays). Remaining: a0 = m first in the bne slot needs the block boundary after l.s. */
+/* 5 November 2026 (w-c4): `n = 0; if (e != 0xFF) { body }` inverts the cnt test (bnez/b), regresses the prologue; no new form found. Retail fills bne's slot from before the branch (a0 = m set before the e test), so the next lever is a real a0-before-test source shape. */
 /* 4 November 2026 current-RAC1 source-method trial; retained, not linked.
  * Removed the synthetic always-zero e & 0x100 arm. Three actual scale/setup/first-transform
  * groups each give 288/288 bytes, 0/28 USA placements, first +0x10. The object/count registers
