@@ -1,3 +1,4 @@
+/* 5 November 2026: preserve this native-oriented variant rather than replacing it with the matching draft. Only the independently checked interfaces/widths are repaired; no new native runtime validation is claimed. */
 /* functional: high. Unchecked: every captured call waits past the gate's 40M-instruction budget (NOTHING COMPARED). Read 0x2CA070-0x2CA5C8 in full, with all 12 jump-table words at 0x26CC50 (0, 7, 9 go to the default): same reads, writes and calls in retail's order. Differs only in form: the 16-byte lq/sq copies and clears are four word copies (same bytes), case 8 calls func_002CB510 directly where retail jalr's the constant it just stored, function addresses are stored as 32-bit game addresses, and func_002FC8D0 is declared as the port's host function (gaddr = unsigned int). */
 
 /* Enters a menu/scene state (D_001F2840): picks the menu page for its state (cases 1-6, 8, 10, 11; case 8 also
@@ -101,17 +102,17 @@ extern int D_001B5340[];
 extern void func_002C9C60(float);
 extern void func_002D5E98(void *);
 extern void func_002CB648(void);
-extern void func_002CB510(int);
+extern int func_002CB510(int);
 extern void func_002C9AD8(void *);
 extern void func_00295C50(int);
-extern void func_0029D830(void);
+extern int func_0029D830(void);
 extern void func_00282D30(void *, void *, float);
 extern void func_0027AB40(void);
 extern void func_002C9C90(void);
 extern void func_00279D18(void);
 extern void func_002FC3C0(int);
 extern int func_001261F0(int);
-extern int func_002DE3A0(int);
+extern void func_002DE3A0(int);
 extern void func_002FC1D8(void);
 extern void func_002954C0(void);
 extern void func_0028AFE8(int);

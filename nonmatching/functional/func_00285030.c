@@ -1,4 +1,10 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
+/* functional: medium. Retained interface/owner corrections; matching and native behavior remain unqualified. */
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain the actual int return and pointer/signed-short inputs of func_00125F20.
+ * The measured 680-byte USA near miss still differs in packet constant/address scheduling; no false call contract is used to close it.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
+#include "common.h"
 /* Closer C3, 1 November 2026: 680/680, 5 rows, plain -O2 -G8. 0xE and 0x8000 share a2 only when 0x8000 is born at least one
  * insn after t[1]'s store dies (a gap of none conflicts in local-alloc), and sched1 issues 0x8000 in the first free ALU slot,
  * so retail has one more ALU insn in the block's first six cycles than we do. t[6] = 0x106 written in the block gives that
@@ -15,7 +21,7 @@ extern DrawState D_001A6480[];
 extern s32 D_001B22A8[] MACRO_ADDR;
 extern long D_001A7470;
 extern void func_00282A88();
-extern void func_00125F20(s32, s32, s32, s32, s32, s32);
+extern int func_00125F20(void *, short, short, short, short, short);
 
 void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
     DrawState *s = D_001A6480;
@@ -50,7 +56,7 @@ void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
     p = (u8 *)D_001B22A8[0];
     q = (long *)(p + 0x10);
     D_001B22A8[0] = (s32)q;
-    func_00125F20((s32)q, s->h164, s->h160, s->h162, 3, 0);
+    func_00125F20(q, s->h164, s->h160, s->h162, 3, 0);
     ((TexBits *)(p + 0x10))->lo = s->h166;
     if (mode == 0) {
         q[2] = s->h16E | ((long)(s->h16C & 0xF) << 24);

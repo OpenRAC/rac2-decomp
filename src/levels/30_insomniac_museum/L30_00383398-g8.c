@@ -71,11 +71,10 @@ void func_L30_00383398(GridVec *origin)
             dot=func_00282DB0(&v,&n);
             square=dot*dot;
             t=func_00282DB0(&v,&v);
-            /* One source line keeps a debug label from adding padding before this division. */
-            lower=D_L30_001AEBE8; upper=D_L30_001AEBEC; brightness=D_L30_001AEBE4*square/t;
-            brightness=upper<brightness?upper:brightness;
-            brightness=lower>brightness?lower:brightness;
-            D_L30_00238B60[i][j]=~(int)brightness;
+            /* Keep the complete brightness update on one debug source line:
+               address arithmetic for the final store is interleaved with the
+               bounds loads, and retail has no division label between them. */
+            lower=D_L30_001AEBE8; upper=D_L30_001AEBEC; brightness=D_L30_001AEBE4*square/t; brightness=upper<brightness?upper:brightness; brightness=lower>brightness?lower:brightness; D_L30_00238B60[i][j]=~(int)brightness;
         }
     }
 }

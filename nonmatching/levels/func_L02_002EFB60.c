@@ -1,3 +1,8 @@
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain the constructor pointer return instead of a false void declaration.
+ * The 540-byte source remains a near miss; complete-position and W-component grouping do not recover the decrement slot.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
 /* Claude Opus 5.5 (xhigh), 2026-10-30. Best rule-compliant result: 540/540 bytes, 0/8 places,
  * us level 02: one instruction differs in two slots. Profile: -O2 -G8 -ffunction-sections
  * -mno-split-addresses, in a unit of its own (L02_002EFB60-g8.c).
@@ -40,7 +45,7 @@ extern void func_00282D08(void *, void *, void *, float);
 extern void func_00282C88(void *);
 extern void func_00282CC0(void *, void *, void *);
 extern int func_00283D38(int, int, float);
-extern void func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern void *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
 
 void func_L02_002EFB60(void *owner, void *from, void *to, int count, int *colour, float speed) {
     Vec4 direction;

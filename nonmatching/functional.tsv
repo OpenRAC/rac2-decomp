@@ -18,7 +18,6 @@ func_002CBC58	nonmatching/functional/func_002CBC58.c
 func_002E3998	nonmatching/functional/func_002E3998.c
 func_002E3BD8	nonmatching/functional/func_002E3BD8.c
 func_002ECB70	nonmatching/functional/func_002ECB70.c
-func_002F0FA0	nonmatching/functional/func_002F0FA0.c
 func_003384C0	nonmatching/functional/func_003384C0.c
 func_0034B2C8	nonmatching/functional/func_0034B2C8.c
 func_002833F0	nonmatching/functional/func_002833F0.c
@@ -68,7 +67,6 @@ func_00283BE0	nonmatching/functional/func_00283BE0.c
 func_00283C80	nonmatching/functional/func_00283C80.c
 func_00285030	nonmatching/functional/func_00285030.c
 func_0028A670	nonmatching/functional/func_0028A670.c
-func_00294420	nonmatching/functional/func_00294420.c
 func_0029CF58	nonmatching/functional/func_0029CF58.c
 func_0029CF78	nonmatching/functional/func_0029CF78.c
 func_0029F840	nonmatching/functional/func_0029F840.c
@@ -79,17 +77,14 @@ func_002B6F70	nonmatching/functional/func_002B6F70.c
 func_002B9030	nonmatching/functional/func_002B9030.c
 func_002B9380	nonmatching/functional/func_002B9380.c
 func_002CC6B0	nonmatching/functional/func_002CC6B0.c
-func_002EEBC8	nonmatching/functional/func_002EEBC8.c
 func_002F3CF8	nonmatching/functional/func_002F3CF8.c
 func_00301F18	nonmatching/functional/func_00301F18.c
 func_003136D0	nonmatching/functional/func_003136D0.c
-func_00337210	nonmatching/functional/func_00337210.c
 func_0033A520	nonmatching/functional/func_0033A520.c
 func_00340638	nonmatching/functional/func_00340638.c
 func_00348EC0	nonmatching/functional/func_00348EC0.c
 func_00349D58	nonmatching/functional/func_00349D58.c
 func_0034CEA0	nonmatching/functional/func_0034CEA0.c
-func_0034DB98	nonmatching/functional/func_0034DB98.c
 func_L00_002A9460	nonmatching/functional/func_L00_002A9460.c
 func_L00_002AED68	nonmatching/functional/func_L00_002AED68.c
 func_L00_002B0968	nonmatching/functional/func_L00_002B0968.c
@@ -118,7 +113,6 @@ func_L03_0041DAD0	nonmatching/functional/func_L03_0041DAD0.c
 func_L04_003429F8	nonmatching/functional/func_L04_003429F8.c
 func_L04_0040DCA8	nonmatching/functional/func_L04_0040DCA8.c
 func_L05_003CF350	nonmatching/functional/func_L05_003CF350.c
-func_L05_00419CC8	nonmatching/functional/func_L05_00419CC8.c
 func_L05_0041DF58	nonmatching/functional/func_L05_0041DF58.c
 func_L05_00421B98	nonmatching/functional/func_L05_00421B98.c
 func_L06_004012B0	nonmatching/functional/func_L06_004012B0.c
@@ -128,7 +122,6 @@ func_L08_00308888	nonmatching/functional/func_L08_00308888.c
 func_L10_00421790	nonmatching/functional/func_L10_00421790.c
 func_L10_004227A0	nonmatching/functional/func_L10_004227A0.c
 func_L10_00424CD0	nonmatching/functional/func_L10_00424CD0.c
-func_L11_004465F8	nonmatching/functional/func_L11_004465F8.c
 func_L11_004580E8	nonmatching/functional/func_L11_004580E8.c
 func_L13_0041AB30	nonmatching/functional/func_L13_0041AB30.c
 func_L14_003DFA60	nonmatching/functional/func_L14_003DFA60.c
@@ -196,7 +189,6 @@ func_L05_0037A5F8	nonmatching/functional/func_L05_0037A5F8.c
 func_L06_0041EF08	nonmatching/functional/func_L06_0041EF08.c
 func_L09_0037FCE8	nonmatching/functional/func_L09_0037FCE8.c
 func_L01_00394240	nonmatching/functional/func_L01_00394240.c
-func_L00_00424F98	nonmatching/functional/func_L00_00424F98.c
 func_L04_003A21F8	nonmatching/functional/func_L04_003A21F8.c
 func_L06_00443A38	nonmatching/functional/func_L06_00443A38.c
 func_L06_003E5D30	nonmatching/functional/func_L06_003E5D30.c
@@ -214,7 +206,6 @@ func_003486A8	nonmatching/functional/func_003486A8.c
 func_0028D1E8	nonmatching/functional/func_0028D1E8.c
 func_L00_00300618	nonmatching/functional/func_L00_00300618.c
 func_L00_0036EF68	nonmatching/functional/func_L00_0036EF68.c
-func_L00_0042A4E8	nonmatching/functional/func_L00_0042A4E8.c
 func_L02_002EFB60	nonmatching/functional/func_L02_002EFB60.c
 func_L04_0032F62C	nonmatching/functional/func_L04_0032F62C.c
 func_L04_0032F994	nonmatching/functional/func_L04_0032F994.c
@@ -316,3 +307,4 @@ func_002F5FB8	nonmatching/functional/func_002F5FB8.c
 func_002CA070	nonmatching/functional/func_002CA070.c
 func_L00_002A3B88	nonmatching/functional/func_L00_002A3B88.c
 func_L00_00303990	nonmatching/functional/func_L00_00303990.c
+func_L11_004465F8	nonmatching/functional/func_L11_004465F8.c

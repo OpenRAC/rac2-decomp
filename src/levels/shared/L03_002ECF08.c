@@ -1,22 +1,5 @@
-/* Opus-1 (v1496), 29 October 2026: GNU game -O2 -G0 -ffunction-sections.
- * US, US2 and PAL: 1016/1008 bytes, 0/2 places each.
- * The `for (i = 0; i < count; i++)` form (i otherwise unused) gives retail's loop:
- * the guard tests the incoming $t1, loop.c's reversed counter lives in $s6 and is
- * decremented in the final call's delay slot, and a/b/c land in $s5/$s4/$s3. The older
- * do/while draft put count in $s3 and shifted every saved register.
- * One cause remains (two instructions): `flags` (spilled to 0x4C($sp)) is stored
- * twice. sched1's split_block_insns splits `flags = 0x1003C` into lui/ori on the
- * pseudo, so reload stores after the lui (+0x8) and after the ori; the in-out reload
- * of the ori names flags twice, so delete_output_reload keeps the first store. Retail
- * has lui, ori and one `sw $v0,0x4C($sp)` (the blez delay slot). The extra word then
- * misaligns the loop head and its .p2align 3 adds the nop before the first jal.
- * Passing 0x1003C directly is rematerialized in the loop (980 bytes); `flags = 0x3C;
- * flags |= 0x10000`, a short helper local and an inline helper returning the constant
- * all fold back to the same split. Reopen with a source form that keeps flags' set
- * from being a large-constant move at sched1 (retail evidently copied it from a
- * register); func_L05_00398A38 shows retail's split-with-two-stores form for comparison.
- */
 #include "common.h"
+
 
 extern float func_002A7878(float, float);
 extern void func_00283098(void *, void *, void *);
@@ -60,13 +43,13 @@ void func_L03_002ECF08(unsigned char *object, float *minimumPosition, float *max
             startColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x80102040, 0x801010A0);
             endColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x102040, 0x1010A0);
             break;
-        case 2:
-            startColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x80104010, 0x8020A020);
-            endColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x104010, 0x20A020);
-            break;
         case 3:
             startColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x80201608, 0x80402510);
             endColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x201608, 0x402510);
+            break;
+        case 2:
+            startColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x80104010, 0x8020A020);
+            endColor = func_00283D38(func_002A7878(0.0f, 1.0f), 0x104010, 0x20A020);
             break;
         case 0:
         default:

@@ -1,3 +1,9 @@
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain the measured int returns of func_002CB510 and func_0029D830 and the void contract of func_002DE3A0.
+ * The 1372-byte source remains a near miss; interface corrections do not qualify its allocation/scheduling.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
+#include "common.h"
 /* func_002CA070 - 1,372 bytes, 27 places (the boot and 26 levels). Finisher F1, 2026-10-26,
    on f5fab978 (qzero_nc default). Unit profile: -O2 -G16 -Wa,-G16 -ffunction-sections, as its
    own unit (src/game/002CA070-g16.c). 343 of 343 instructions, everything equal except five
@@ -138,17 +144,17 @@ extern u8 D_001B5340[];
 extern void func_002C9C60(float);
 extern void func_002D5E98(void *);
 extern void func_002CB648(void);
-extern void func_002CB510(int);
+extern int func_002CB510(int);
 extern void func_002C9AD8(void *);
 extern void func_00295C50(int);
-extern void func_0029D830(void);
+extern int func_0029D830(void);
 extern void func_00282D30(void *, void *, float);
 extern void func_0027AB40(void);
 extern void func_002C9C90(void);
 extern void func_00279D18(void);
 extern void func_002FC3C0(int);
 extern int func_001261F0(int);
-extern int func_002DE3A0(int);
+extern void func_002DE3A0(int);
 extern void func_002FC1D8(void);
 extern void func_002954C0(void);
 extern void func_0028AFE8(int);

@@ -3205,3 +3205,13 @@ src/levels/shared/L00_003C6298-seeker.c	-O2 -G0 -ffunction-sections -ffast-math 
 src/levels/shared/L02_00410F68-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
 src/levels/shared/L03_002AB5C8-region.c	-O2 -G0 -ffunction-sections -g
 src/levels/11_joba/L11_00451178-gu-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/game/002E7338-g8.c	-O2 -G8 -ffunction-sections
+src/game/00337210.c	-O2 -G0 -ffunction-sections
+src/game/00316E08.c	-O2 -G0 -ffunction-sections
+src/levels/shared/L00_00418230.c	-O2 -G0 -ffunction-sections
+src/levels/shared/L03_002ECF08.c	-O2 -G0 -ffunction-sections
+src/levels/shared/L05_00419CC8-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
+src/levels/shared/L00_00424F98-g8.c	-O2 -G8 -ffunction-sections -g
+src/game/002EEBC8.c	-O2 -G0 -ffunction-sections
+src/game/002F0FA0-g8.c	-O2 -G8 -ffunction-sections
+src/core/001185E8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves

@@ -143,12 +143,15 @@ shortened entry in all 28 programs (the boot's at `0x00260988`, each level's in 
 fingerprint, so the prefix words are identical there; their rows were moved by the same
 8 bytes by hand, because those dumps are not in this checkout for `tools/carry.py --entries`.
 
-One open row is two functions and still needs a split: `func_00115E28` (64 bytes) is
-`abort` at +0 followed by a separate noreturn assert-style printer at `00115E38`, which
-four `jal`s reach. Splitting it adds a boot row and changes the function count, so it
-is left as one row for now. Both functions have C, newlib's `abort` and `__assert`, in
-`nonmatching/core/func_00115E28.c`: the boot links byte-identical with it, and it can move
-into `src/core/00115200.c` once the row is split into 16 and 48 bytes.
+The old 64-byte `func_00115E28` row contains two separately entered noreturn
+functions: `abort` (16 bytes) and the assertion reporter `func_00115E38` (48).
+`split_boot_rows` verifies the complete normalized body, its three named callees
+and four direct calls to the second entry in each release. Duplicate, incomplete,
+overlapping or changed entries are rejected before writing the catalogues.
+Primary `catalogue` and secondary `carry.py --entries` preserve every unrelated
+row and the original end; replay leaves the split unchanged. Both C bodies are
+in `src/core/00115200.c`. This adds one catalogue identity, without adding bytes
+or treating the lack of a return in `abort` as evidence of a bad boundary.
 
 Release-specific rows have their own named corrections. `tools/carry.py --entries`
 repairs established extents while retaining their existing identities and kinds,

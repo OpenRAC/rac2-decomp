@@ -228,25 +228,30 @@ def build_report(groups: dict, title, data: dict) -> dict:
     return {"version": 2, "measures": total, "categories": cats, "units": units}
 
 
-def pending_boot_split(functions: list[dict], where: dict) -> bool:
-    """Recognize only the unmatched report row predating the measured main/sound split.
+def pending_boot_split(functions: list[dict], where: dict,
+                       main: str = "func_00131D98", sound: str = "func_00131DE8",
+                       head_size: int = 80, tail_size: int = 576) -> bool:
+    """Recognize an unmatched report row predating a named, measured boot split.
 
     The catalogue repair validates the retail bodies. Without game data, CI can
     check the exact old/new names, boot extents and virtual address; it never
     rewrites the report or turns the old merged row into matching credit.
     """
-    main, sound = "func_00131D98", "func_00131DE8"
     reported = {f["name"] for f in functions}
-    if set(where) - reported != {sound} or main not in where:
+    # Validate this split independently; release_check requires the union of
+    # all verified splits to explain every missing identity, without extras.
+    if sound not in where or sound in reported or main not in where:
         return False
     address, size, kind, level = where[main]
-    if (size, kind, level) != (80, "boot", None) or where[sound] != (address + 80, 576, "boot", None):
+    if ((size, kind, level) != (head_size, "boot", None)
+            or where[sound] != (address + head_size, tail_size, "boot", None)):
         return False
     old = [f for f in functions if f["name"] == main]
     if len(old) != 1 or old[0]["fuzzy_match_percent"] != 0.0:
         return False
     try:
-        return old[0]["size"] == "656" and old[0]["metadata"]["virtual_address"] == str(address)
+        return (old[0]["size"] == str(head_size + tail_size)
+                and old[0]["metadata"]["virtual_address"] == str(address))
     except (KeyError, TypeError):
         return False
 
@@ -305,6 +310,7 @@ def release_check(version: str, report_path: Path) -> None:
     retired = reported - set(where)
     missing = set(where) - reported
     split = pending_boot_split(functions, where)
+    assertion_split = pending_boot_split(functions, where, "func_00115E28", "func_00115E38", 16, 48)
     if total != len(reported):
         sys.exit(f"{report_path.relative_to(ROOT)} has duplicate function rows")
     level_splits = pending_level_splits(functions, where)
@@ -313,11 +319,15 @@ def release_check(version: str, report_path: Path) -> None:
     if "func_00131DE8" in where and not split and any(
             f["name"] == "func_00131D98" and f.get("size") == "656" for f in functions):
         sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged main/sound row")
+    if "func_00115E38" in where and not assertion_split and any(
+            f["name"] == "func_00115E28" and f.get("size") == "64" for f in functions):
+        sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged abort/assertion row")
     if total != len(where) or retired or missing:
         # Boundary-only PRs leave the reports for a maintainer's later refresh.
         # Only measured unmatched remnants or the named unmatched merged rows
         # are tolerated. Unknown missing entries and duplicate compensation fail.
-        explained = level_splits | ({"func_00131DE8"} if split else set())
+        explained = (level_splits | ({"func_00131DE8"} if split else set())
+                     | ({"func_00115E38"} if assertion_split else set()))
         known_split = bool(missing) and missing == explained and not retired
         known_boundary = ((retired or known_split) and retired <= set(levels.FUNCTION_RESIDUES)
                           and (not missing or known_split)
@@ -332,6 +342,9 @@ def release_check(version: str, report_path: Path) -> None:
                   "a maintainer regenerates it on master")
         if split:
             print(f"{report_path.relative_to(ROOT)} retains the unmatched merged main/sound row; "
+                  "a maintainer regenerates it on master")
+        if assertion_split:
+            print(f"{report_path.relative_to(ROOT)} retains the unmatched merged abort/assertion row; "
                   "a maintainer regenerates it on master")
         if level_splits:
             print(f"{report_path.relative_to(ROOT)} predates {len(level_splits)} witnessed level entries; "

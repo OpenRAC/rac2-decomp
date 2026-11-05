@@ -1,4 +1,18 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
+/* functional: medium. Retained interface/owner corrections; matching and native behavior remain unqualified. */
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain the four 64-bit fields of func_002A0468 and a complete camera owner at D_001B5200: position +0x140, matrix +0x370.
+ * Do not subtract before a separately declared D_001B5570 array.
+ * USA remains 0/28 at +0x78.
+ * Retail also explicitly supplies the unused f12=1.0 to func_0027B9C0; preserve that observed input.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
+/* 4 November 2026 actual-contract review; retained near miss, not linked.
+ * USA v1.01 check.py: 772/772 bytes, 0/28 placements; first difference 0x78.
+ * Profile: -O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
+ * func_002A0380 keeps its defined int return even though this caller ignores it. The view-
+ * pointer register roles and flag/argument scheduling residual remain unchanged.
+ * Earlier measurements below are historical where superseded by this note.
+ */
 /* func_0027BA68 - 772 bytes, 28 places. Claude Opus 5.5 (xhigh), task v1962, USA v1.01.
  * Best check: 772/772 bytes, 0/28 places, check.py first mismatch +0x78, 12 rows really differ
  * (cdiff prints 53 of 193, the rest being masked relocations), in a unit of its own built with
@@ -55,7 +69,13 @@ typedef struct { char pad[0x34]; unsigned short flags; } CaptureMoby;
 typedef struct { QuadPoint position; float angles[4]; QuadPoint vertices[4]; float width, height; CaptureMoby *moby; } CaptureObject;
 typedef struct { char pad[0x50]; CaptureObject *capture; } CaptureState;
 extern CaptureState D_001B8840;
-extern char D_001B5570[];
+typedef struct {
+    char reserved0[0x140];
+    QuadPoint position;
+    char reserved150[0x370 - 0x150];
+    QuadPoint matrix[4];
+} CaptureCamera;
+extern CaptureCamera D_001B5200;
 typedef struct { char pad[0xB0]; float scale; } CaptureView;
 extern CaptureView D_001B9040;
 extern char D_001C2AC0[];
@@ -75,8 +95,10 @@ extern void func_001292C0(void *, void *, float);
 extern void func_00129368(void *, void *, float);
 extern void func_00129218(void *, void *, float);
 extern void func_00279D18(void);
-extern void func_002A0468(void *, int, int, int, int);
-extern void func_0027AB40(void), func_002FC748(void), func_002A0220(void), func_002A0380(void), func_002A03C0(void);
+extern void func_002A0468(unsigned long long *, unsigned long long,
+                        unsigned long long, unsigned long long, unsigned long long);
+extern void func_0027AB40(void), func_002FC748(void), func_002A0220(void), func_002A03C0(void);
+extern int func_002A0380(void);
 extern void func_00280B90(void *, int, int);
 
 void func_0027BA68(void)
@@ -94,7 +116,7 @@ void func_0027BA68(void)
         int i;
         func_002A0250();
         func_002A01C8();
-        view_matrix = D_001B5570;
+        view_matrix = (char *)&D_001B5200 + 0x370;
         func_002A01F0();
         scene = (void *)D_001B1B58[1];
         moby->flags |= 1;
@@ -102,7 +124,7 @@ void func_0027BA68(void)
         moby->flags &= ~1;
         func_00282B50(saved_matrix, view_matrix, 0x40);
         {
-            char *first = view_matrix - 0x230;
+            char *first = (char *)&D_001B5200 + 0x140;
             qcopy(&saved_position, first);
             view_position = first;
         }
@@ -115,7 +137,7 @@ void func_0027BA68(void)
         func_00282B50(view_matrix, matrix, 0x40);
         qcopy(view_position, position);
         func_00279D18();
-        func_002A0468(moby, 0x404040, 0xE, 0, 0);
+        func_002A0468((unsigned long long *)moby, 0x404040, 0xE, 0, 0);
         qcopy(D_001C2AC0, &D_001A8820);
         qcopy(D_001C2AC0 + 0x20, &D_001A8830);
         qcopy(D_001C2AC0 + 0x10, &D_001A8840);

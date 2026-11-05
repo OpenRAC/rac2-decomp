@@ -1,3 +1,7 @@
+/* 5 November 2026: retained, not linked. Getter declarations now match the existing int32 address-returning definitions, with explicit pointer conversions.
+ * Array/text phase, wide snapshot and signed/full-width style trials remain failures. Retail reads eight bytes at +0x38 before narrowing the font index and preserves signed high bits in the final styles; those representation questions remain open. Do not call this a native-qualified renderer.
+ */
+#include "common.h"
 /* 2026-11-03 w02 source-contract/lifetime review (USA v1.01 only).
  * Profile: -O2 -G8 -ffunction-sections.
  * Current check.py: 1088/1088 bytes, 0/28 places, first mismatch +0x4.
@@ -26,9 +30,9 @@
 extern void func_00336320(void *);
 extern void func_00336828(void *);
 extern void func_00336A78(void *);
-extern float *func_00335E18(void *);
-extern float *func_00335E10(void *);
-extern unsigned int *func_00335E20(void *);
+extern int func_00335E18(void *);
+extern int func_00335E10(void *);
+extern int func_00335E20(void *);
 extern void func_0034AD10(void *);
 extern unsigned long long func_0027C878(int);
 extern void func_0027F640(unsigned long long, char *, int, unsigned long long, void *, float, float, float);
@@ -63,12 +67,12 @@ void func_0034DB98(char *object)
         right = object + 0x30C;
         func_00336320(left);
         func_00336320(right);
-        { float *value = func_00335E18(left); *value = -*value; }
-        { float *value = func_00335E18(right); *value = -*value; }
+        { float *value = (float *)func_00335E18(left); *value = -*value; }
+        { float *value = (float *)func_00335E18(right); *value = -*value; }
         func_00336320(left);
         func_00336320(right);
-        { float *value = func_00335E18(left); *value = -*value; }
-        { float *value = func_00335E18(right); *value = -*value; }
+        { float *value = (float *)func_00335E18(left); *value = -*value; }
+        { float *value = (float *)func_00335E18(right); *value = -*value; }
         {
         p = object + 0x358;
         cursor = p + 0x30;
@@ -86,7 +90,7 @@ void func_0034DB98(char *object)
         }
         }
         func_00336320(object + 0x5B8);
-        *func_00335E20(object + 0x5B8) = 0x70FFFEED;
+        *(unsigned int *)func_00335E20(object + 0x5B8) = 0x70FFFEED;
     }
     func_00336320(object + 0x184);
     func_00336320(object + 0x1D0);
@@ -94,11 +98,11 @@ void func_0034DB98(char *object)
     final = object + 0x7E8;
     func_00336A78(p);
     func_00336828(object + 0x280);
-    x = func_00335E10(p)[0];
-    y = func_00335E10(p)[1];
+    x = ((float *)func_00335E10(p))[0];
+    y = ((float *)func_00335E10(p))[1];
     x += 32.0f;
     y += -10.0f;
-    color = *func_00335E20(p);
+    color = *(unsigned int *)func_00335E20(p);
     count = 1;
     n = D_001A79F8[0];
     while (n >= 10) { n /= 10; count++; }
@@ -114,7 +118,7 @@ void func_0034DB98(char *object)
         do {
             float drawX = start - (float)(int)(step * 11.6f);
             step += 3.0f;
-            scale = func_00335E18(p);
+            scale = (float *)func_00335E18(p);
             func_0027F640((unsigned long long)color, text, -1, func_0027C878((long long)(int)*(long long *)(p + 0x38)),
                          *(void **)(p + 0x34), drawX, y + (float)yoffset, *scale);
         } while (step < digits);

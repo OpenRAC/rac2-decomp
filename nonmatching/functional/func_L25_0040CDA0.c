@@ -1,3 +1,4 @@
+/* 5 November 2026: preserve this native-oriented variant rather than replacing it with the matching draft. Only the independently checked interfaces/widths are repaired; no new native runtime validation is claimed. */
 /* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
 /* sol-high retained draft, USA v1.01, game compiler -O2 -G8.
  * check.py: 1128/1128 bytes, 0 of 1 places match.
@@ -55,7 +56,7 @@ extern float D_L25_001B2904 MACRO_ADDR;
 extern unsigned char D_001A7C01 MACRO_ADDR;
 extern int D_001A79F0 MACRO_ADDR;
 extern int func_L25_0040DCD0(char *,int);
-extern void func_00288E18(int,int);
+extern int func_00288E18(int,int);
 extern int func_00282948(void *);
 extern void func_L05_00379B60(void);
 extern void func_L05_0030C930(int,int);
@@ -118,6 +119,7 @@ void func_L25_0040CDA0(char *obj)
             func_0029B758(0,func_L25_0040D208);
             D_L25_001B0CDC=active;
         }
+        /* This counted wait and its backward branch are present in retail. */
         for (i=6;i>=0;i--) {}
         if (D_L25_00221850.paused || D_L25_001B1BC8<6) break;
         if (D_L25_00221850.completed<=0) {
@@ -143,7 +145,7 @@ void func_L25_0040CDA0(char *obj)
                 if (!D_L25_001B0CF8) {
                     func_L05_0037B108(); D_L25_001B0CF8=1;
                 }
-                { u32 seen = D_0018C958.completed & (1 << D_001A79F0);
+                { u32 seen = D_0018C958.completed & (1u << D_001A79F0);
                 if (!seen) func_00288E18(0xa36,0x8d); }
             }
         }

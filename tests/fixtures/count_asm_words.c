@@ -35,3 +35,29 @@ void scalar_rows(int *dst, int n)
         dst[i] = 0;
     }
 }
+
+/* Two back edges to the same head must share the first edge's padding. */
+unsigned skip_pair(unsigned value, unsigned first, unsigned second)
+{
+    while (value == first || value == second)
+        value++;
+    return value;
+}
+
+/* A later independent head still gets its own minimum span. */
+unsigned skip_two_pairs(unsigned value, unsigned a, unsigned b, unsigned c, unsigned d)
+{
+    while (value == a || value == b)
+        value++;
+    while (value == c || value == d)
+        value++;
+    return value;
+}
+
+/* Volatile reads cannot be speculated into the other condition's delay slot. */
+void poll_pair(volatile unsigned *a, volatile unsigned *b)
+{
+    while (*a || *b) {
+        /* Both condition reads are the observable polling work. */
+    }
+}

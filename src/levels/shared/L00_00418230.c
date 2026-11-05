@@ -1,17 +1,5 @@
-/* Closer i, 1 November 2026: exact at 27 of 27 USA places with compiler/reload-other-inherit (checked with a scratch compile, not check.py), 2 rows off without it. Land once that branch is accepted. */
-/* GPT-6.1 Sol (high), task v0818, 29 October 2026.
- * USA v1.01, default -O2 -G0 -ffunction-sections: 1276/1276 bytes,
- * 0/27 places. First mismatch +0x4C. Indexed points preserve count in fp;
- * a separate initial next-point local restores stack slots 0x188/0x18C.
- * UV union bit stores recover retail's integer zero stores. Separate width,
- * W-component and color assignments plus earlier b.prim recover setup order.
- * Remaining: intermediate high-half color spill, loop-entry nop and copy
- * address allocation/scheduling. Scalar/struct/union packed colors tied.
- * -fno-schedule-insns removes the partial spill but gives 1268 bytes and loses
- * count's fp allocation. C TI copies with qcopy/barrier worsen allocation.
- * No linked match; all required declarations follow.
- */
 #include "common.h"
+
 typedef unsigned int Q __attribute__((mode(TI)));
 typedef union { Q q; float f[4]; } V;
 typedef struct { V vertex[4]; unsigned color[4]; union { float uv[4][2]; unsigned uvBits[4][2]; } tex; unsigned long long flags,texture,mode,prim; } Packet;
@@ -25,6 +13,9 @@ extern void func_00280B90(void *,int,int);
 extern float func_00283CE0(int);
 void func_L00_00418230(char *object,int alpha,V *points,int count)
 {
+    /* As in the resident trail renderer, retail never initializes b.color[1].
+       The assembly consumer transfers that packet word unchanged. The caller
+       does not read it as a C value or claim a fully initialized packet. */
     Packet a,b;
     V frame[4], inner,outer;
     unsigned color;
@@ -32,7 +23,7 @@ void func_L00_00418230(char *object,int alpha,V *points,int count)
     int i;
     float u,v;
     if(*(int *)(*(char **)(object+0x68)+4)==0) color=0x800000ff;
-    else { int c=D_L00_0025A9B8*10; color=(alpha<<24)|(c<<16)|(255-c); }
+    else { int c=D_L00_0025A9B8*10; color=((unsigned)alpha<<24)|((unsigned)c<<16)|(unsigned)(255-c); }
     a.texture=func_0027C878(43);
     a.mode=0xff9000000260ULL;
     a.prim=((unsigned long long)alpha<<32)|0x68;

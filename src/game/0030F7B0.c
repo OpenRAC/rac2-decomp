@@ -633,6 +633,5 @@ void func_00316DA0(Vec16_Fc936841d *object, int index)
     Fc936841d_FUN_00282CC0((char *)&object[index - 1], (char *)&object[index - 2], local);
 }
 
-INCLUDE_ASM("asm/game", func_00316E08);
 
 INCLUDE_ASM("asm/game", func_003172D0);

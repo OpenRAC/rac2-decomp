@@ -1,3 +1,12 @@
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain the int return of func_00288E18 and unsigned level-bit shift.
+ * The countdown from six is present in retail, including its backward branch and padding; it is not an invented alignment loop.
+ * The three distributors and func_L05_00445B58 really return void.
+ * The valid baseline stays 1128/1128 bytes, 0/1 USA, with the second zero in v0 rather than v1.
+ * Genuine camera/path groups grow to 1132; FP-bank ordering ties.
+ * No false return type is retained.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
 /* opus-1 (Claude Opus 5.5) retained draft, USA v1.01, game compiler -O2 -G8.
  * Belongs in src/levels/25_wupash_nebula/L25_00373ED0-g8.c (same-file callees
  * func_L25_003752D8/00376FE0/00377608 are defined there as void (u8 *[, f32])).
@@ -53,7 +62,7 @@ extern float D_L25_001B2904 MACRO_ADDR;
 extern unsigned char D_001A7C01 MACRO_ADDR;
 extern int D_001A79F0 MACRO_ADDR;
 extern int func_L25_0040DCD0(char *,int);
-extern void func_00288E18(int,int);
+extern int func_00288E18(int,int);
 extern int func_00282948(void *);
 extern void func_L05_00379B60(void);
 extern void func_L05_0030C930(int,int);
@@ -83,7 +92,7 @@ void func_L25_0040CDA0(char *obj)
     float b[4] __attribute__((aligned(16)));
     float c[4] __attribute__((aligned(16)));
     float d[4] __attribute__((aligned(16)));
-    int i;
+    int delay;
     int active = 1;
     MissionContext *ctx;
     switch (B(obj,0x20)) {
@@ -118,7 +127,9 @@ void func_L25_0040CDA0(char *obj)
             func_0029B758(0,func_L25_0040D208);
             D_L25_001B0CDC=active;
         }
-        for (i=6;i>=0;i--) {}
+        /* Retail executes this counted wait before reading the mission state:
+           6, decrement, padded backward bgez, decrement in its delay slot. */
+        for (delay=6; delay>=0; delay--) {}
         if (D_L25_00221850.paused || D_L25_001B1BC8<6) break;
         if (D_L25_00221850.completed<=0) {
             D_L25_00221850.timerVisible=1;
@@ -143,7 +154,7 @@ void func_L25_0040CDA0(char *obj)
                 if (!D_L25_001B0CF8) {
                     func_L05_0037B108(); D_L25_001B0CF8=1;
                 }
-                { u32 seen = D_0018C958.completed & (1 << D_001A79F0);
+                { u32 seen = D_0018C958.completed & (1u << D_001A79F0);
                 if (!seen) func_00288E18(0xa36,0x8d); }
             }
         }

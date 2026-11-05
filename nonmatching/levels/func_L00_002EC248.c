@@ -1,3 +1,5 @@
+/* 5 November 2026: Indexed emission, byte palette and colour/position FP-bank forms remain 964/956 bytes. Separate signed/unsigned remaining counters and reuse of the captured count for a real lifetime count give 972 bytes. Keep the 964-byte body; no candidate is promoted.
+ */
 /* Nonmatching reconstruction, 2 November 2026. Replaces the old opcode screen.
  * Default -O2 -G0 -ffunction-sections: three USA checks give 928, 964, 972
  * bytes against 956, all 0/7. Retained guarded do-loop form is 964 bytes with
