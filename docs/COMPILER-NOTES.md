@@ -270,6 +270,8 @@ keeps generic frame scheduling by default; `-mastra-keep-frame-order` is an expl
 experiment. `func_002B7170` needs the generic order plus measured source lifetimes
 and stores. No frame-order option fixes arbitrary entry-block allocation.
 
+### Short-loop padding
+
 Short-loop padding must run after delay-slot scheduling: this C pipeline uses GNU
 `as`, rather than the assembler assumed by patch 0054.
 [enable_loop_padding.py](../tools/compiler/transformers/enable_loop_padding.py)
@@ -316,6 +318,36 @@ exactly one. Witness: the three-row matrix copy in `func_L00_0041CB80` (27 place
 It runs after count_block_move_length.py and extends the same counter condition.
 No matched function changes: `build.py all --strict` is OK with both patches.
 Test: [test_count_asm_words.py](../tests/test_count_asm_words.py).
+
+Inserted padding also advances the running word count. The pass places nops
+before the branch it is already visiting, so they will not be visited later.
+Without accounting for them, a second back edge to the same label adds redundant
+padding. Both filled and assembler-filled delay-slot paths now count those nops.
+Authored single-pair, independent-pair and volatile polling controls inspect the
+actual assembled backward spans; the previous compiler fails all three. This
+recovers `func_00294420`'s two tests of a shared search-loop head without changing
+its C operations. Symbolic macro-length estimation is a separate limitation.
+
+The counter also handles one measured symbolic class: an ordinary, external
+32-bit register load/address whose assembler metadata has not been emitted yet.
+GAS expands it to two words in reorder mode, even when the scheduler length is
+one. `SYMBOL_REF_USED` establishes external provenance during expansion, and
+the existing `TREE_ASM_WRITTEN` markers distinguish prior announcements and
+definitions. Definitions are marked at `-G0` too, without changing emitted
+assembly. Both raw `*name` and ordinary name spellings are respected.
+
+This applies only to simple SI register SETs on R5900/GAS: not delay-slot
+sequences, stores, FP/wide operations, PIC or buffered extern output. Explicit
+`SDATA` aliases are excluded because their `__gp` metadata is supplied by the
+existing assembly-input pass. Scheduler lengths and compiler-authored operations
+are untouched. [test_symbolic_loop_words.py](../tests/test_symbolic_loop_words.py)
+checks unknown addresses/loads, early SDA, incomplete SDATA, both alias spellings
+and an external defined between functions. The previous compiler produces
+eight-word loops in the three positive cases; all seven controls pass with the
+corrected counter. The linked C witnesses are `func_002EEBC8` (one place per USA
+release and 28 in PAL) and `func_002F0FA0` (28 in each release). The complete
+84-program strict qualification preserves every existing match and accepts
+all 114 placements of these two bodies.
 
 ### Quadword saves and return slots
 
@@ -727,7 +759,15 @@ unconditional. The archive's `reload_reg_free_for_value_p` returns 0 for a regis
 spill set (`IOR_COMPL_HARD_REG_SET (reload_reg_used, chain->used_spill_regs)`). Patch 0047,
 the GCC 2.95.2 reload1.c in Lombyte's stack, drops that test, so reload could inherit a
 spilled pseudo's value into a hard register that a pseudo of the same insn holds. The
-transformer restores the archive's test and leaves the rest of 0047 alone.
+transformer restores that exclusion without changing the rest of 0047.
+
+The excluded set is a snapshot taken immediately after the spill-set complement.
+The mutable `reload_reg_used` also accumulates `RELOAD_OTHER` marks later in the
+instruction: testing those marks at entry rejects a reload's own register before
+the existing lifetime loop can skip `i == reloadnum`. The immutable snapshot
+rejects genuinely unavailable registers while that loop continues to reject
+overlapping reloads. This removes the intermediate color spills in the trail,
+quad and grid renderers without deleting the count-reload safeguard below.
 
 The visible case is a count in a stack slot, incremented and then compared: the increment's
 output reload leaves the value in `$v0`, and local-alloc gives the `slt` result `$v0` too.
@@ -735,15 +775,18 @@ Without the test the compare inherits it (`addiu $v0,$v0,1; sw $v0,n; slti $v0,$
 with it the compare reloads the slot (`sw $v0,n; lw $v1,n; slti $v0,$v1,128`), and the
 round-robin reload registers after it move on by one, as retail's do.
 
-Witnesses: `func_L00_003C5B88` (1,804 bytes) and its 22 copies in other levels are exact
+Historical qualification: `func_L00_003C5B88` (1,804 bytes) and its 22 copies in other levels were exact
 under it: the count reload after `n++` and the index reloads in `$a0` were their only
 differences. Every matched function of the 28 programs compiles to the same bytes with and
 without it (`tools/build.py all --strict`, 28 of 28). Of 625 profiled near misses in
 `nonmatching/`, 57 compile differently; 9 of their functions come closer to retail,
 3 move further and the rest are unchanged. [tests/test_reload_reg_used_guard.py](../tests/test_reload_reg_used_guard.py)
-checks the anchor and two authored controls: a count compared after its increment is
-reloaded into `$v1`, and an increment whose reload register is a spill register of the
-compare is still inherited.
+checks the anchors and the two original object controls. A native harness additionally
+compiles the actual prepared GCC predicate and covers self-inheritance, non-spill
+exclusions, other reload lifetimes, equal read-only inputs, multi-register overlaps
+and reset at the next instruction. The old mutable-set guard fails the self case;
+removing the guard fails the unavailable-register case. These are negative controls,
+not substitutes for linked game builds.
 
 ### Clear scheduling and materialized stack zeros
 
@@ -1223,6 +1266,28 @@ now sits in the call's statement (no line label between), which matches with and
 without the change. A division emitted inside a noreorder region still gets no new
 floor. [test_div_label_after_call.py](../tests/test_div_label_after_call.py) covers
 the label, no-label and noreorder cases.
+
+Across a non-PIC GP relaxation fragment, the label-distance calculation follows
+the selected expansion when its symbol already has a size or section. The
+alternative `lui`/load words stored for relaxation are not additional emitted
+instructions. Thus a labelled GP load followed by `div.s` receives one nop,
+just like an explicit GP operand; an absolute two-word expansion receives none.
+Unknown forward symbols, alignment and unsupported fragment kinds retain the
+previous fallback. This is a bounded distance correction, not general relaxation
+or SDK equivalence. [test_div_gp_fragments.py](../tests/test_div_gp_fragments.py)
+checks authored GP, absolute, two-load, `.word` and unknown-symbol controls. The
+previous assembler fails only the one-load GP macro control. The corresponding
+C witnesses are `func_L05_00419CC8` and `func_L00_00424F98`, at four and 27
+placements respectively in each USA release; neither identity is carried in PAL.
+
+The strict USA regression exposed one existing source dependency on the old
+overcount: `func_L30_00383398` gained a nop before its brightness division.
+Its final pixel-address arithmetic is scheduled between the bounds loads;
+separate debug source lines introduced a label before the last GP load.
+Keeping the whole brightness calculation, clamp and store on one source line
+preserves retail's lack of that label and restores all 1,424 bytes. No C
+operation or evaluation order changes. This existing function earns no new
+matching credit.
 
 The genuine SDK 3.01 oracle Ps2EeAs has SHA-256
 `cb5adda955e64626564212ef7e0c1434708c4e1ef423344a92ec8033306ed3aa`.

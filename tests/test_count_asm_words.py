@@ -1,5 +1,8 @@
 """Loop padding counts an asm statement and the grouped qcopy by their words."""
 import os
+import importlib.util
+import struct
+import sys
 from pathlib import Path
 import re
 import subprocess
@@ -7,7 +10,36 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+import elf
 FUNCTIONS = ("asm_copy_rows", "pattern_copy_rows", "scalar_rows")
+
+spec = importlib.util.spec_from_file_location(
+    "count_asm_words", ROOT / "tools/compiler/transformers/count_asm_words.py")
+transformer = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(transformer)
+
+
+class TransformerTests(unittest.TestCase):
+    def object_definition(self):
+        return ("\nmips_declare_object (stream, name, init_string, final_string, size)\n{\n"
+                + transformer.declaration_old + "\n}\n")
+
+    def test_padding_updates_the_counter_and_reapplication_is_rejected(self):
+        source = ("void\nmips_r5900_pad_loops (first)\n{\n" + transformer.old
+                  + "\n" + transformer.padding_old * 2 + "\n}\n/* ASTRA P25:"
+                  + self.object_definition())
+        patched = transformer.patch(source)
+        self.assertIn(transformer.padding_new, patched)
+        with self.assertRaises(AssertionError):
+            transformer.patch(patched)
+
+    def test_insertion_drift_fails_before_a_result_is_returned(self):
+        for insertion in ("", transformer.padding_old, transformer.padding_old * 3):
+            source = ("void\nmips_r5900_pad_loops (first)\n{\n" + transformer.old
+                      + "\n" + insertion + "\n}\n/* ASTRA P25:" + self.object_definition())
+            with self.subTest(insertion=insertion), self.assertRaises(AssertionError):
+                transformer.patch(source)
 
 
 def loop_words(asm: str, name: str) -> tuple[int, int]:
@@ -25,6 +57,24 @@ def loop_words(asm: str, name: str) -> tuple[int, int]:
         if re.match(r"b\w*\s", line):
             return words + 1, nops   # the delay slot follows
     raise AssertionError("no loop branch in " + name)
+
+
+def backward_spans(obj: dict, name: str) -> list[list[int]]:
+    """Actual object-word spans include assembler-generated empty delay slots."""
+    symbol = next(s for s in obj["symbols"] if s["name"] == name and s["type"] == 2)
+    raw = obj["sections"][symbol["section"]]["data"]
+    body = raw[symbol["value"]:symbol["value"] + symbol["size"]]
+    edges = {}
+    for position, (word,) in enumerate(struct.iter_unpack("<I", body)):
+        if word >> 26 not in (1, 4, 5, 6, 7, 20, 21, 22, 23):
+            continue
+        displacement = word & 0xFFFF
+        if displacement >= 0x8000:
+            displacement -= 0x10000
+        target = position + 1 + displacement
+        if 0 <= target <= position:
+            edges.setdefault(target, []).append(position - target + 2)
+    return [edges[target] for target in sorted(edges)]
 
 
 class CompilerOutputTests(unittest.TestCase):
@@ -53,6 +103,9 @@ class CompilerOutputTests(unittest.TestCase):
             subprocess.run([str(compiler / "as"), "-o", str(root / "input.o"), str(asm)], check=True)
             text = asm.read_text()
             cls.loops = {name: loop_words(text, name) for name in FUNCTIONS}
+            obj = elf.read_object(root / "input.o")
+            cls.multiple = {name: backward_spans(obj, name)
+                            for name in ("skip_pair", "skip_two_pairs", "poll_pair")}
 
     def test_the_asm_copy_counts_two_words(self):
         # Counted as one insn, the seven-word retail loop got an eighth word.
@@ -67,6 +120,15 @@ class CompilerOutputTests(unittest.TestCase):
     def test_a_short_scalar_loop_is_still_padded(self):
         words, nops = self.loops["scalar_rows"]
         self.assertGreaterEqual(words, 7)
+
+    def test_second_back_edge_counts_the_padding_already_inserted(self):
+        self.assertEqual(self.multiple["skip_pair"], [[7, 9]])
+
+    def test_independent_loops_each_keep_their_own_minimum(self):
+        self.assertEqual(self.multiple["skip_two_pairs"], [[7, 9], [7, 9]])
+
+    def test_unfilled_delay_slots_also_count_prior_padding(self):
+        self.assertEqual(self.multiple["poll_pair"], [[7, 10]])
 
 
 if __name__ == "__main__":

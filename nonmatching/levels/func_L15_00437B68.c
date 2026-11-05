@@ -1,3 +1,5 @@
+/* 5 November 2026: The repaired reload/loop counters reduce the retained USA body to 1748/1740 bytes, still 0/1. Index triples and face-owner views tie; a packed 12-index face grows to 1796. Giv/register allocation remains unresolved.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 1756/1740 bytes, 0/1 placements; first difference size mismatch.
  * Profile: -O2 -G8 -ffunction-sections.

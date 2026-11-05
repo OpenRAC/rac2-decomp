@@ -3,6 +3,7 @@ import importlib.util
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -18,14 +19,18 @@ NAMES = ("refused", "inherited")
 
 
 class TransformerTests(unittest.TestCase):
-    SOURCE = "static int\nreload_reg_free_for_value_p ()\n{\n" + transformer.OLD + "    }\n}\n"
+    SOURCE = (transformer.DECLARATION_OLD
+              + "static int\nreload_reg_free_for_value_p ()\n{\n"
+              + transformer.OLD + "    }\n}\n"
+              + "void choose_reload_regs(void) {\n" + transformer.INITIAL_OLD + "}\n")
 
     def test_patch_tests_reload_reg_used_first_and_applies_once(self):
         patched = transformer.patch(self.SOURCE)
         body = patched.split("int copy = 0;\n", 1)[1]
-        self.assertRegex(body, r"(?s)^\n  /\* RAC2: .*?\*/\n  if \(TEST_HARD_REG_BIT \(reload_reg_used, regno\)\)\n"
+        self.assertRegex(body, r"(?s)^\n  /\* RAC2: .*?\*/\n  if \(TEST_HARD_REG_BIT \(rac2_reload_unavailable, regno\)\)\n"
                                r"    return 0;\n\n  if \(out == const0_rtx\)")
-        self.assertTrue(patched.endswith("    }\n}\n"))
+        self.assertIn(transformer.DECLARATION_NEW, patched)
+        self.assertTrue(patched.endswith(transformer.INITIAL_NEW + "}\n"))
         with self.assertRaisesRegex(ValueError, "already patched"):
             transformer.patch(patched)
 
@@ -34,6 +39,46 @@ class TransformerTests(unittest.TestCase):
             transformer.patch(self.SOURCE.replace("int copy = 0;", "int copy;"))
         with self.assertRaisesRegex(ValueError, "found 2"):
             transformer.patch(self.SOURCE + transformer.OLD)
+
+    def test_missing_or_duplicate_snapshot_anchor_is_rejected(self):
+        for anchor in (transformer.DECLARATION_OLD, transformer.INITIAL_OLD):
+            for source in (self.SOURCE.replace(anchor, ""), self.SOURCE + anchor):
+                with self.subTest(anchor=anchor), self.assertRaises(ValueError):
+                    transformer.patch(source)
+
+
+class ReloadLifetimeTests(unittest.TestCase):
+    def test_real_predicate_keeps_conflicts_but_ignores_its_own_reload(self):
+        source_path = os.environ.get("RAC2_GCC_SOURCE")
+        if not source_path:
+            self.skipTest("compiler recipe supplies its freshly patched reload1.c")
+        compiler = shutil.which("cc") or shutil.which("gcc")
+        if not compiler:
+            self.fail("native C compiler required by the compiler recipe")
+        text = Path(source_path).read_text()
+        start = text.index("static int\nreload_reg_free_for_value_p (regno")
+        end = text.index("\n}\n", start) + 3
+        predicate = text[start:end]
+        self.assertIn("i != reloadnum", predicate)
+        self.assertIn("TEST_HARD_REG_BIT (rac2_reload_unavailable, regno)", predicate)
+        harness = (ROOT / "tests/fixtures/reload_lifetime_control.c").read_text()
+        declaration, cases = harness.split("/* INSERT_ACTUAL_PREDICATE */")
+        variants = {
+            "current": (predicate, 0),
+            "mutable_set": (predicate.replace("(rac2_reload_unavailable, regno)",
+                                               "(reload_reg_used, regno)"), 40),
+            "no_exclusion": (predicate.replace("TEST_HARD_REG_BIT (rac2_reload_unavailable, regno)",
+                                                "0"), 41),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name, (body, expected) in variants.items():
+                with self.subTest(name=name):
+                    source, exe = root / (name + ".c"), root / name
+                    source.write_text(declaration + body + cases)
+                    subprocess.run([compiler, "-std=gnu89", str(source), "-o", str(exe)],
+                                   capture_output=True, text=True, check=True)
+                    self.assertEqual(subprocess.run([str(exe)]).returncode, expected)
 
 
 def instructions(body: str) -> list[str]:

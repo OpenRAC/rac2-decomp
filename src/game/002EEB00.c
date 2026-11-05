@@ -95,7 +95,6 @@ int func_002EEB00(int *a0)
 
 INCLUDE_ASM("asm/game", func_002EEBB0);
 
-INCLUDE_ASM("asm/game", func_002EEBC8);
 
 void func_002EED08(void)
 {
@@ -248,7 +247,6 @@ void func_002F0E38(void)
 /* func_002F0EF8 is in 002EEB00-flags.c (-mno-split-addresses). */
 
 
-INCLUDE_ASM("asm/game", func_002F0FA0);
 
 ASM_FUNC("asm/game", func_002F1010);
 

@@ -1,3 +1,4 @@
+/* 5 November 2026: preserve this native-oriented variant rather than replacing it with the matching draft. Only the independently checked interfaces/widths are repaired; no new native runtime validation is claimed. */
 /* functional: medium. Written from the assembly: same reads, writes and calls with the same arguments in the same order; the divide-by-zero checks retail emits for the divisions by 2*h and 2*w are dropped. */
 extern char D_001F2840[];       /* C: the menu block */
 extern char D_00138180[];       /* P: the pad block */
@@ -31,14 +32,14 @@ extern void func_002A0250(void);
 extern void func_002A01C8(void);
 extern void func_002A01F0(void);
 extern void func_002A0220(void);
-extern void func_002A0380(void);
+extern int func_002A0380(void);
 extern void func_0026FEB8(void *, ...);
 extern void func_00280510(float, int, int, int);
 extern void func_00280600(void);
 extern void func_0028FDD8(int, int, int, int, int, int, int);
 extern void func_0027E018(int, int, int, int, int, int, int, int, unsigned long long, unsigned long long);
 extern int func_00283CF0(float);
-extern void func_002FC3C0(int);
+extern void func_002FC3C0(unsigned long long);
 extern void func_0029FEE0(void);
 
 #define CW(o) (*(int *)(D_001F2840 + (o)))

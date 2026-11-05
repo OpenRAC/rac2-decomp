@@ -1,3 +1,5 @@
+/* 5 November 2026: Paired array/record owners and ABI-preserving FP-first parameters produced identical 1652-byte near-miss output. The twelve spill-offset differences remain; this is a three-way tie, not a new remedy.
+ */
 /* Claude Opus 5.5 xhigh, v1776: 1652/1652 bytes, 0/27 USA v1.01 places; 12 instructions differ,
  * all of them spill-slot offsets. Everything else, including the prologue, is the retail's.
  * Profile: -O2 -G0 -ffunction-sections -frac2-zero-ti-por, in a unit of its own.
