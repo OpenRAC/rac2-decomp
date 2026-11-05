@@ -100,7 +100,6 @@ void func_002E7090(int level)
 
 /* func_002E7248 is matched in its own unit, 002E7248-qcopy.c. */
 
-INCLUDE_ASM("asm/game", func_002E7338);
 
 /* func_002E7570 is in 002E7018-qcopy.c (grouped lq/sq copies). */
 

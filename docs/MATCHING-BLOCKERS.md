@@ -34,6 +34,54 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### Reload self-conflicts and padding counters
+
+**5 November 2026, strict linked matches; pending PR review.**
+The non-spill exclusion in `reload_reg_free_for_value_p` now uses the initial
+instruction mask, before `RELOAD_OTHER` marks accumulate. The lifetime loop
+still rejects other interfering reloads and permits its own reload. Authored
+controls reject both the old self-conflicting guard and a removed exclusion.
+This removes the partial color/flag spills in `func_002E7338`,
+`func_00337210`, `func_00316E08`, `func_L00_00418230` and
+`func_L03_002ECF08`; ordinary mode-store ordering and independent switch-case
+placement supply the remaining source differences. No register or opcode is
+patched. See [the mechanism and controls](COMPILER-NOTES.md#inheritance-into-a-register-the-insns-pseudos-hold).
+
+Two existing counters had separate accounting errors. The post-delay-slot loop
+pass must include nops inserted before an already-visited branch: otherwise
+another back edge adds them again (`func_00294420`, 28 places per release).
+The assembler's division-label distance must count the selected GP expansion
+once, excluding its stored absolute alternative (`func_L05_00419CC8`, four
+places, and `func_L00_00424F98`, 27 places, in both USA releases). Known symbol
+metadata permits the latter correction; unknown symbols and general alignment
+remain bounded by the prior fallback. Neither USA identity is carried in PAL.
+All three corrections have authored positive and negative controls; the linked
+build remains the acceptance gate. The complete qualification passes all 84
+programs across USA v1.01, USA v2.00 and PAL with zero C fallbacks. Ten new
+USA functions contribute 8,052 distinct bytes and 489 verified C placements,
+including the separately witnessed abort/assertion entries described below.
+The existing museum brightness routine retains its 1,424-byte match after
+keeping its calculation, clamp and store on one debug source line; it earns
+no additional credit. Progress reports were not regenerated.
+
+The renderers use complete quad, matrix and UV owners. `GridEquipped.item[4]`
+includes the observed menu selector 3; a two-element declaration was too small
+even though its object matched. Both trail renderers preserve a retail defect:
+the second packet's color word at offset `0x44` is never initialized before
+the assembly renderer transfers it. The C caller never evaluates that word as
+a scalar. This is not evidence of a fully initialized packet or native gameplay
+validation; adding a new store would change retail.
+
+`func_L11_004465F8` is explicitly held. Although its `qcopy_nc` spelling becomes
+locally exact, subsequent C reads and modifies those copied vertices, violating
+the helper's dependency contract. The retained normal-`qcopy` source is
+1668/1660 bytes, 0/1 USA placement. Typed TI copies with the existing copy
+pattern, with and without its barrier, both give 1636/1660. None earns C credit.
+The vehicle-input callback uses an unsigned level-bit shift on its current
+gameplay-level contract (observed overlay IDs 0..26 excluding 21, plus 30).
+Adding an explicit mask costs a word; no out-of-range vehicle caller has been
+observed. A discovered caller outside that domain must reopen the assumption.
+
 ### Trigger and title/setup lifetimes
 
 **4 November 2026, strict linked matches; [PR #420](https://github.com/OpenRAC/rac2-decomp/pull/420) pending review.**
@@ -1545,6 +1593,15 @@ included in the 84 strict program builds; old drafts remain in Git history.
 A start inside a prior epilogue, measured linker filler, or an implausible entry warrants an extent/reference audit before matching.
 
 No jr, two returns, a short size, or a register read before its local definition is not proof by itself. Trap/tail-call bodies may lack jr; ABI-defined live-ins must be considered. A four-byte residue needs its surrounding completed return and reference evidence, not just its size.
+
+**Abort/assertion boundary, 4 November 2026:** the old 64-byte
+`func_00115E28` extent contains a 16-byte abort thunk and the independently
+entered 48-byte `func_00115E38` assertion reporter. All three releases have
+the same complete normalized body, named callees and four incoming assertion
+calls. Guarded generation and two replays change only these boot rows;
+seven synthetic tests reject changed bodies, targets and malformed metadata.
+Both C bodies pass their local checks in every release. The strict linked
+qualification accompanies the implementation PR; the split alone is not C credit.
 
 **Resolved entry, 30 October 2026, `func_L05_0042AFE0`:** callback address
 construction in `func_L05_0042AC30` (US/US2) and the distinct PAL caller

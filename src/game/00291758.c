@@ -718,7 +718,6 @@ after:
     func_002942A0(i, index, (int)((char *)&Fee2b87d1_D_00152CD0 + 0x40 + index * 0xC800), 0);
 }
 
-INCLUDE_ASM("asm/game", func_00294420);
 
 extern void func_00294398(int a0, int a1);
 

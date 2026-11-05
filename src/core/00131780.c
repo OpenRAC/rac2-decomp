@@ -186,7 +186,7 @@ ASM_FUNC("asm/core", func_00131AE8);
    compiler puts the argument in the jump's delay slot. */
 extern void func_0011FA20(int);
 
-void func_00131CA8(void) {
+void func_00131CA8(int ignored_status) {
     func_0011FA20(0);
 }
 

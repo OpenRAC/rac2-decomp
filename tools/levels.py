@@ -1103,6 +1103,58 @@ def read_boot_functions() -> list[tuple[str, int, int]]:
     return rows
 
 
+ABORT_ASSERT_IDENTITY = "3e4dda7e1a6bd73e4c5ab02d78d0fb5eb52353fb3264f8f567509a989128ead1"
+
+
+def split_boot_rows(rows: list[tuple[str, int, int]]) -> list[tuple[str, int, int]]:
+    """Separate abort from the independently called assertion printer after it.
+
+    The complete 64-byte span, its three named calls and four incoming calls
+    establish this boundary. Accept both the old row and an identical replay;
+    never infer an entry merely from a missing return in a noreturn routine.
+    """
+    first, second = "func_00115E28", "func_00115E38"
+    by_name = {name: (address, size) for name, address, size in rows}
+    if len(by_name) != len(rows):
+        raise ValueError("duplicate boot identity before entry splitting")
+    if first not in by_name:
+        if second in by_name:
+            raise ValueError("assertion entry without abort")
+        return rows
+    address, size = by_name[first]
+    if size not in (16, 64):
+        raise ValueError("unexpected abort/assertion extent")
+    if ((size == 64 and second in by_name)
+            or (size == 16 and by_name.get(second) != (address + 16, 48))):
+        raise ValueError("incomplete or overlapping abort/assertion split")
+    if any(p < address + 64 and p + n > address for name, p, n in rows
+           if name not in (first, second)):
+        raise ValueError("another boot extent overlaps abort/assertion")
+    body = boot_bytes(address, 64)
+    if len(body) != 64 or hashlib.sha256(cross_identity(body)).hexdigest() != ABORT_ASSERT_IDENTITY:
+        raise ValueError("complete abort/assertion body differs")
+    for offset, name in ((8, "func_00131CA8"), (48, "func_00115CF0"), (56, first)):
+        word = struct.unpack_from("<I", body, offset)[0]
+        destination = ((address + offset + 4) & 0xF0000000) | ((word & 0x3FFFFFF) << 2)
+        if word >> 26 != 3 or name not in by_name or destination != by_name[name][0]:
+            raise ValueError("abort/assertion callee differs")
+    for name, offset in (("func_003358A0", 0x2C), ("func_00336DB8", 0x40),
+                         ("func_00336E40", 0x74), ("func_0034EE78", 0x68)):
+        if name not in by_name or offset + 4 > by_name[name][1]:
+            raise ValueError("assertion caller extent differs")
+        pc = by_name[name][0] + offset
+        word = struct.unpack("<I", boot_bytes(pc, 4))[0]
+        destination = ((pc + 4) & 0xF0000000) | ((word & 0x3FFFFFF) << 2)
+        if word >> 26 != 3 or destination != address + 16:
+            raise ValueError("assertion entry witness differs")
+    if size == 16:
+        return rows
+    out = []
+    for name, p, n in rows:
+        out.extend([(first, p, 16), (second, p + 16, 48)] if name == first else [(name, p, n)])
+    return out
+
+
 def read_catalogue() -> list[tuple[str, str, int, str, list[tuple[int, int]]]]:
     rows = []
     for line in CATALOGUE.read_text().splitlines():
@@ -1125,6 +1177,7 @@ def catalogue() -> None:
                 if text_va <= a < text_va + text_size]
     else:
         boot = read_boot_functions()
+    boot = split_boot_rows(boot)
     # Recover the original complete extent even after a previous regeneration.
     # Its exact normalized code/size identifies level copies without a table of
     # per-level addresses, including when starting from the historical inputs.

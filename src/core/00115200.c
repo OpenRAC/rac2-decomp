@@ -37,7 +37,24 @@ ASM_FUNC("asm/core", func_001158F4);
 ASM_FUNC("asm/core", func_00115AC0);
 
 
-INCLUDE_ASM("asm/core", func_00115E28);
+extern void func_00131CA8(int status) __attribute__((noreturn));
+extern void func_00115CF0(void *stream, const char *format, ...);
+extern char D_0013A370[];
+
+/* Newlib abort and its separately entered assertion reporter. */
+void func_00115E28(void) __attribute__((noreturn));
+
+void func_00115E28(void)
+{
+    func_00131CA8(1);
+}
+
+void func_00115E38(const char *file, int line, const char *expression)
+{
+    func_00115CF0(*(void **)((char *)D_00133E74 + 0xC),
+                  D_0013A370, expression, file, line);
+    func_00115E28();
+}
 
 
 extern int D_001341E0;

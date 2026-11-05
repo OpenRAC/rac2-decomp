@@ -936,6 +936,39 @@ class ProgressChecks(unittest.TestCase):
         functions.append({"name":"func_00131DE8", "size":"576", "fuzzy_match_percent":0.0})
         self.release(functions, flags=("--strict",), where=where)
 
+    def assertion_fixture(self):
+        first, second, address = "func_00115E28", "func_00115E38", 0x00115E28
+        functions = [{"name": first, "size": "64", "fuzzy_match_percent": 0.0,
+                      "metadata": {"virtual_address": str(address)}}]
+        where = {first: (address, 16, "boot", None), second: (address + 16, 48, "boot", None)}
+        return functions, where
+
+    def test_unmatched_assertion_split_waits_without_mutating_the_report(self):
+        functions, where = self.assertion_fixture()
+        self.release(functions, where=where,
+                     source={"src/core/abort.c": [(n, True) for n in where]})
+        with self.assertRaises(SystemExit):
+            self.release(functions, flags=("--strict",), where=where)
+
+    def test_assertion_split_rejects_credit_drift_duplicates_and_unknown_gaps(self):
+        for change in ("matched", "partial", "address", "size", "tail", "duplicate",
+                       "unknown", "current size", "kind", "missing metadata"):
+            with self.subTest(change=change), self.assertRaises(SystemExit):
+                functions, where = self.assertion_fixture()
+                if change == "matched": functions[0]["fuzzy_match_percent"] = 100.0
+                elif change == "partial": functions[0]["fuzzy_match_percent"] = 25.0
+                elif change == "address": functions[0]["metadata"]["virtual_address"] = "0"
+                elif change == "size": functions[0]["size"] = "60"
+                elif change == "tail":
+                    functions.append({"name": "func_00115E38", "size": "48", "fuzzy_match_percent": 0.0})
+                elif change == "duplicate": functions.append(dict(functions[0]))
+                elif change == "unknown": where["other"] = (0x2000, 8, "boot", None)
+                elif change == "current size": where["func_00115E38"] = (0x00115E38, 44, "boot", None)
+                elif change == "kind": where["func_00115E38"] = (0x00115E38, 48, "shared", 0)
+                else: del functions[0]["metadata"]
+                self.release(functions, where=where,
+                             source={"src/core/abort.c": [(n, True) for n in where]})
+
     def level_split_fixture(self, families=None):
         families = families or ["func_L13_0043E8C0"]
         functions, where = [], {}

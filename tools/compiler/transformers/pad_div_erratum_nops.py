@@ -98,23 +98,54 @@ rac2_div_erratum_p (ip)
       return 0;
     }
 }
-/* Count actual four-byte slots when the code label remains in this fragment.
-   This includes emitted .word data and fixed padding. Other fragments retain
-   the saturated instruction/nop fallback until relaxation is known. */
+/* Count emitted bytes, not the unselected instructions stored in a relaxation
+   fragment. Only cross fixed fragments and non-PIC alternatives whose symbol
+   already has a size or section; forward symbols and alignment retain the
+   existing conservative fallback. */
 static int
 rac2_div_code_distance ()
 {
   if (rac2_div_last_code_label != 0
-      && rac2_div_code_label_segment == now_seg
-      && rac2_div_last_code_label->sy_frag == frag_now)
+      && rac2_div_code_label_segment == now_seg)
     {
-      valueT here = (valueT) frag_now_fix ();
+      fragS *frag = rac2_div_last_code_label->sy_frag;
       valueT start = S_GET_VALUE (rac2_div_last_code_label);
-      if (here >= start)
+      valueT bytes = 0;
+      for (; frag != 0; frag = frag->fr_next)
         {
-          valueT bytes = here - start;
-          if ((bytes & 3) == 0)
-            return bytes >= 8 ? 2 : (int) (bytes / 4);
+          valueT size = frag == frag_now ? (valueT) frag_now_fix ()
+                                        : (valueT) frag->fr_fix;
+          if (size < start)
+            break;
+          bytes += size - start;
+          start = 0;
+          if (frag == frag_now)
+            {
+              if ((bytes & 3) == 0)
+                return bytes >= 8 ? 2 : (int) (bytes / 4);
+              break;
+            }
+          if (frag->fr_type == rs_machine_dependent
+              && mips_pic == NO_PIC
+              && ! RELAX_MIPS16_P (frag->fr_subtype))
+            {
+              symbolS *sym = frag->fr_symbol;
+              if (sym == 0
+                  || ((! S_IS_DEFINED (sym) || S_IS_COMMON (sym))
+                      && S_GET_VALUE (sym) == 0
+#ifndef NO_ECOFF_DEBUGGING
+                      && sym->ecoff_extern_size == 0
+#endif
+                      ))
+                break;
+              if (nopic_need_relax (sym, 0))
+                bytes += RELAX_NEW (frag->fr_subtype)
+                         - RELAX_OLD (frag->fr_subtype);
+            }
+          else if (frag->fr_type != rs_fill || frag->fr_offset != 0)
+            break;
+          if (bytes >= 8)
+            return 2;
         }
     }
   return rac2_div_insns_since_label;

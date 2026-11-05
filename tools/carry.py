@@ -568,7 +568,7 @@ def refresh_entries() -> None:
     The normal carry remains the full cross-release alignment operation.
     """
     boot = []
-    for name, a, n in correct_boot_splits(levels.read_boot_functions()):
+    for name, a, n in levels.split_boot_rows(correct_boot_splits(levels.read_boot_functions())):
         if not levels.function_residue(name, n):
             a, n = levels.function_extent(name, a, n)
             boot.append((name, a, n))

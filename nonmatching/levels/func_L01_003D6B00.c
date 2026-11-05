@@ -1,3 +1,10 @@
+/* 4 November 2026: independent loop-count capture after the positive guard
+ * restores its incoming-register test, but hoists the object-position pointer:
+ * 408/396 bytes. A meaningful vector-add group reduces this to 404, still
+ * 0/2 USA placements with a different register map. The bank-preserving typed
+ * emitter interface retains seven integer and four floating arguments.
+ * Keep the existing 396-byte source below; neither trial is a linked match.
+ */
 /* Nonmatching C reconstruction.
  * Profile: -O2 -G0 -ffunction-sections -frac2-zero-ti-por.
  * Compiled 396 bytes; retail 396 bytes.
