@@ -3215,3 +3215,4 @@ src/levels/shared/L00_00424F98-g8.c	-O2 -G8 -ffunction-sections -g
 src/game/002EEBC8.c	-O2 -G0 -ffunction-sections
 src/game/002F0FA0-g8.c	-O2 -G8 -ffunction-sections
 src/core/001185E8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
+src/levels/shared/L00_00423290-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier

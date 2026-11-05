@@ -293,6 +293,30 @@ def pending_level_splits(functions: list[dict], where: dict) -> set[str] | None:
     return missing
 
 
+def demoted_renames(version: str, functions: list, retired: set, missing: set, where: dict) -> dict:
+    """Retired report rows that tools/carry.py --demote renamed for the release: each is
+    listed in config/<version>/not_carried.tsv, is unmatched in the report, and has exactly
+    one missing catalogue row of the release's own name at its reported address."""
+    path = ROOT / levels.VERSIONS[version]["config"] / "not_carried.tsv"
+    listed = set()
+    if path.is_file():
+        listed = {line.split("\t", 1)[0] for line in path.read_text().splitlines()
+                  if line and not line.startswith("#")}
+    prefix = f"func_{levels.VERSIONS[version]['tag']}_"
+    out = {}
+    for f in functions:
+        name = f["name"]
+        if name not in retired or name not in listed or f["fuzzy_match_percent"] != 0.0:
+            continue
+        address = f.get("metadata", {}).get("virtual_address")
+        if address is None:
+            continue
+        found = [m for m in missing if m.startswith(prefix) and where[m][0] == int(address)]
+        if len(found) == 1:
+            out[name] = found[0]
+    return out
+
+
 def release_check(version: str, report_path: Path) -> None:
     """CI's check for another release, without the disc: the report counts only functions of
     the release's catalogues that are C (or ASM_FUNC) in src/ and src/<version>/, and every
@@ -335,10 +359,14 @@ def release_check(version: str, report_path: Path) -> None:
         # A name retired by an audited identity split explains its unreported parts.
         explained |= {n for spec in levels.IDENTITY_SPLITS.values() if set(spec[2]) & retired
                       for n, _ in spec[1] if n not in reported}
+        # A demoted v1.01 name (config/<version>/not_carried.tsv), unmatched in the report,
+        # explains exactly one missing release-named row at the same address.
+        demoted = demoted_renames(version, functions, retired, missing, where)
+        explained |= set(demoted.values())
         # Measured residues may retire in the same tree as exactly explained splits.
         known_split = bool(missing) and missing == explained
         known_boundary = ((retired or known_split)
-                          and retired <= set(levels.FUNCTION_RESIDUES) | renamed
+                          and retired <= set(levels.FUNCTION_RESIDUES) | renamed | set(demoted)
                           and (not missing or known_split)
                           and total == len(where) + len(retired) - len(missing)
                           and all(f["fuzzy_match_percent"] == 0.0 for f in functions

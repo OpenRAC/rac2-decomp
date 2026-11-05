@@ -112,7 +112,28 @@ void func_L01_003BD178(char *m, void *position, int count,
 
 INCLUDE_ASM("asm/levels", func_L01_003D4270);
 
-INCLUDE_ASM("asm/levels", func_L01_003D6B00);
+typedef union { int whole __attribute__((mode(TI))); float f[4]; } EffectVector;
+extern void func_L00_003263D0(void *, void *, float, int, int, void *, float, float, unsigned int, void *, float);
+
+void func_L01_003D6B00(char *object, int count, float low, float high, float radius, float speed)
+{
+    EffectVector position, velocity;
+    float angle;
+    int i;
+    position.whole = 0;
+    velocity.whole = 0;
+    for (i = 0; i < count; i++) {
+        angle = func_002A7878(-3.1415927410125732f, 3.1415927410125732f);
+        position.f[0] = radius * func_00283180(angle);
+        position.f[1] = radius * func_00283198(angle);
+        position.f[2] = func_002A7878(0.0f, 1.0f);
+        func_00282F20(&velocity, &position, func_002A7878(speed * 0.75f, speed * 1.25f));
+        position.f[2] = func_002A7878(low, high);
+        func_00282CC0(&position, object + 0x10, &position);
+        func_L00_003263D0(object, &position, 0.0f, 1, 1, &velocity, 0.0f, 1.0f,
+                          0x50808040, 0, 5.5f);
+    }
+}
 
 
 extern int func_002A9640(char *, int, int);

@@ -197,7 +197,52 @@ void *func_0033A4A0(char *p)
 }
 
 
-INCLUDE_ASM("asm/game", func_0033A520);
+typedef struct { float x, y, width, height; } TitlePosition;
+extern void func_00336710(void *, void *, void *);
+extern int func_00335E20(void *);
+extern void func_003369A8(void *, void *, void *);
+extern int *func_00336DA8(int, int);
+extern int func_00336E40(void *);
+extern float D_001B23A4 __attribute__((sda));
+/* Allocate the title position (scaled y, rounded) and set up its two labels.
+ * The scale is read after the x store: retail issues 300.0 before it. */
+void func_0033A520(unsigned char *obj, void *arg)
+{
+    float v;
+    TitlePosition *p;
+    char *text;
+
+    *(int *)(obj + 0x1F8) = 0;
+    *(void **)(obj + 0x200) = arg;
+    if (arg != 0) {
+        int *alloc = func_00336DA8(16, func_00336E40(arg));
+        *(int **)(obj + 0x1FC) = alloc;
+        alloc[1] = 0;
+        alloc[2] = 0;
+        alloc[3] = 0;
+        alloc[0] = 0;
+    }
+    do {
+        float position;
+        int y;
+        p = *(TitlePosition **)(obj + 0x1FC);
+        p->x = 70.0f;
+        position = 300.0f;
+        y = (int)(D_001B23A4 * position + 0.5f);
+        v = y;
+    } while (0);
+    text = D_001ADC88;
+    p = *(TitlePosition **)(obj + 0x1FC);
+    p->y = v;
+    func_00336710(obj + 0x134, text, *(void **)(obj + 0x200));
+    func_00335F88(obj + 0x134, 24.0f, 24.0f, 0.0f, 0.0f);
+    *(int *)func_00335E20(obj + 0x134) = 0x60F0F0B0;
+    v = 65.0f;
+    *(float *)(obj + 0x204) = v;
+    func_003369A8(obj + 0x170, text, *(void **)(obj + 0x200));
+    *(int *)func_00335E20(obj + 0x170) = 0x80F0F0F0;
+    func_00335F88(obj + 0x170, 0.7f, 0.7f, 0.0f, 0.0f);
+}
 
 /* func_0033A688 is matched in 003399B0-g8.c (-G8 small data). */
 

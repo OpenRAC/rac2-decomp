@@ -120,7 +120,6 @@ void func_L00_00423038(int reposition)
 
 /* func_L00_00423038 is in a separate compilation unit. */
 
-INCLUDE_ASM("asm/levels", func_L00_00423290);
 
 /* func_L00_004233F8 is in L00_004233F8-g8.c. */
 

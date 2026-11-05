@@ -967,11 +967,15 @@ class ProgressChecks(unittest.TestCase):
         units={u["name"]:u["measures"]["complete_code"] for u in report["units"]}
         self.assertEqual(units,{"game/done":"12","game/open":"0","Shared level code":"0"})
 
-    def release(self, functions, flags=(), where=None, source=None):
+    def release(self, functions, flags=(), where=None, source=None, not_carried=()):
         import progress
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             path = root / "report.json"
+            if not_carried:
+                listed = root / levels.VERSIONS["pal"]["config"] / "not_carried.tsv"
+                listed.parent.mkdir(parents=True)
+                listed.write_text("# header\n" + "".join(f"{n}\tmeasured\n" for n in not_carried))
             path.write_text(json.dumps({"units":[{"functions":functions}]}))
             before = path.read_bytes()
             with patch.object(progress,"ROOT",root), \
@@ -1067,6 +1071,22 @@ class ProgressChecks(unittest.TestCase):
                 self.release(functions + [extra], where=where)
         with self.assertRaises(SystemExit):
             self.release(functions + [{"name":"retired", "fuzzy_match_percent":0.0}], where=where, flags=("--strict",))
+
+    def test_demoted_rename_is_accepted_only_as_listed_unmatched_and_same_address(self):
+        old = {"name":"func_0033A520", "fuzzy_match_percent":0.0,
+               "metadata":{"virtual_address":str(0x0033C448)}}
+        where = {"kept":(0x1000,8,"boot",None), "func_PAL_0033C448":(0x0033C448,360,"boot",None)}
+        kept = {"name":"kept", "fuzzy_match_percent":0.0}
+        self.release([kept, old], where=where, not_carried=["func_0033A520"])
+        for change in ("unlisted", "matched", "address", "strict"):
+            with self.subTest(change=change), self.assertRaises(SystemExit):
+                f = copy.deepcopy(old)
+                listed, flags = ["func_0033A520"], ()
+                if change == "unlisted": listed = []
+                elif change == "matched": f["fuzzy_match_percent"] = 100.0
+                elif change == "address": f["metadata"]["virtual_address"] = "0"
+                elif change == "strict": flags = ("--strict",)
+                self.release([kept, f], where=where, not_carried=listed, flags=flags)
 
     def test_old_merged_main_with_a_reported_tail_is_rejected(self):
         functions, where = self.split_fixture()
