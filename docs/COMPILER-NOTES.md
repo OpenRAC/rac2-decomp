@@ -192,6 +192,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Public SDK/libgcc source differs under game compiler | sdk profile, accurate types and inline declarations | func_00122800, func_00122B00 |
 | libgcc `_eh.o` (L_eh): preserve the frame at final calls and place the exception-return stub correctly | sdk profile with -fexceptions, as GCC's libgcc Makefile builds _eh.o (rac3-decomp builds its copy the same way) | func_00120A30, func_001208E8; paired throw/rethrow func_00120F00 and func_001210E0 |
 | Whole GPR save area uses sq/lq | -mastra-quad-saves | func_00119BC8, func_00115F28, func_00115C90 |
+| Quad slots: `sd $ra` below `sq $s0` | -mastra-quad-saves -frac2-narrow-saves-below, `register_precision(ra, 64)` | func_L01_00324550, func_L08_00389B68 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
 | Arguments spilled and branch to common epilogue | Measured -O0 unit, not an invented varargs helper | func_001175F0 |
@@ -356,6 +357,22 @@ the GPR order retains the released descending walk; default output is unchanged.
 Witnesses include `func_00119BC8` (48 bytes), `func_00115F28` (80) and
 `func_00115C90` (92). The last also needs its failure value compared as unsigned
 `0xFFFFFFFF` to preserve the immediate sequence.
+
+Two variadic level functions mix widths in quad slots: func_L01_00324550 (132 bytes,
+11 places; `sd $ra,0x200` below `sq $s0,0x210`) and func_L08_00389B68 (264 bytes, 4 places;
+`sd $ra,0x0` below `sq $s0,0x10`), each restoring `lq $s0` before `ld $ra`. A scan of every
+catalogue prologue finds one other frame mixing `sq` and `sd` GPR saves, func_L02_00411D18
+(`sq $s2` in a 16-byte slot below 8-byte ones), which this rule does not cover. The stock EE
+attribute `register_precision(ra, 64)` on the prototype narrows the `$ra` save to `sd`, but
+the save loop still gives `$ra` the top slot.
+[narrow_saves_below.py](../tools/compiler/transformers/narrow_saves_below.py) adds
+`-frac2-narrow-saves-below`: with `-mastra-quad-saves` the loop walks the registers saved at
+the slot's full width first, then the narrower ones, so the narrower save sits below. A frame
+whose saves all have one width keeps `$ra` on top, as func_00115C90 and func_00115FC0 do;
+without `-mastra-quad-saves` the option has no effect. Forced on in every game unit, it changes
+none of 7,572 (144 SDK units use another compiler). `register_precision` sets the mode for the
+rest of the unit, so each function has a file of its own. The attribute is an inference from
+the save widths, not a recovered source line.
 
 Patch 0057 enables `-mastra-split-trunc-slot`: split `truncdisi2` after reload and
 before scheduling so its second shift can fill the return slot. `func_0012E8C8`
@@ -1493,6 +1510,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | TImode reload count | [test_ti_one_gpr.py](../tests/test_ti_one_gpr.py) |
 | Inheritance into non-spill registers | [test_reload_reg_used_guard.py](../tests/test_reload_reg_used_guard.py) |
 | Null-pointer-check pass | [test_no_null_pointer_checks.py](../tests/test_no_null_pointer_checks.py) |
+| Width-ordered quad saves | [test_narrow_saves_below.py](../tests/test_narrow_saves_below.py) |
 | Masks/sign seed | [test_dli_masks.py](../tests/test_dli_masks.py) |
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
