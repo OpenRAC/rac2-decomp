@@ -107,6 +107,7 @@ src/game/0029DC58-rc2.c	-O2 -G8 -ffunction-sections -fno-builtin
 src/game/002A7398-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
 src/game/002A90C8-rc2.c	-O2 -G0 -mno-split-addresses -ffunction-sections -fno-builtin
 src/game/002A9640-rc2.c	-O2 -fno-gcse -G0 -ffunction-sections -fno-builtin
+src/game/0029F840-nogcse.c	-O2 -G0 -ffunction-sections -fno-gcse
 src/game/002B3670-rc2.c	-O2 -G8 -ffunction-sections -fno-builtin
 src/game/002B7CE0-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
 src/game/002C1EF0-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
