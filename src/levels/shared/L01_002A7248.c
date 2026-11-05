@@ -874,7 +874,8 @@ INCLUDE_ASM("asm/levels", func_L01_002F1588);
 
 
 
-INCLUDE_ASM("asm/levels", func_L01_00304270);
+/* Original assembly: level copy of func_0029D7C0 (RAC1 miscproc func_0020C758): live-in $v1 and unconditional `teq` traps. */
+ASM_FUNC("asm/levels", func_L01_00304270);
 
 /* Defined in L01_00310BC0.c. */
 

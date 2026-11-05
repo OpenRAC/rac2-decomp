@@ -509,7 +509,8 @@ ASM_FUNC("asm/game", func_0029D4D0);
 
 ASM_FUNC("asm/game", func_0029D7A0);
 
-INCLUDE_ASM("asm/game", func_0029D7C0);
+/* Original assembly: RAC1 game/render/miscproc.c, func_0020C758 (live-in $v1, unconditional `teq` traps; one more nop before the final return). */
+ASM_FUNC("asm/game", func_0029D7C0);
 
 
 extern void *D_0026CA90[];

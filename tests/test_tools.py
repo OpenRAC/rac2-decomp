@@ -323,10 +323,9 @@ class CodeWitnessedSplit(unittest.TestCase):
         self.assertEqual(levels.code_address_pairs(text, 0, 0x4291E0), 0)
 
     def test_audited_rows_keep_real_entries_and_the_pal_exception(self):
-        # Referenced or returning rows of the audit stay functions; the PAL copies of
-        # func_L00_00309DB0 begin in a delay slot, so that row waits for its predecessor.
+        # Referenced or returning rows of the audit stay functions.
         for name in ("func_002B9030", "func_002B9380", "func_002A1378", "func_002A677C", "func_002A08A0",
-                     "func_00282848", "func_001325E0", "func_00131CB0", "func_L00_00309DB0"):
+                     "func_00282848", "func_001325E0", "func_00131CB0"):
             with self.subTest(name=name):
                 self.assertNotIn(name, levels.FUNCTION_RESIDUES)
         for name in ("func_0032A130", "func_L03_0041B848", "func_PAL_0032B920", "func_PAL_L00_003E63F0"):
@@ -334,6 +333,46 @@ class CodeWitnessedSplit(unittest.TestCase):
                 self.assertEqual(levels.FUNCTION_ENTRY_OFFSETS[name], (16, 8))
                 self.assertEqual(levels.function_extent(name, 0x32A130, 16), (0x32A138, 8))
                 self.assertEqual(levels.function_extent(name, 0x32A138, 8), (0x32A138, 8))
+
+
+class DelaySlotBoundary(unittest.TestCase):
+    """6 November 2026: a fill-prefixed syscall stub and a PAL row that left its delay slot behind."""
+
+    def test_named_corrections(self):
+        self.assertEqual(levels.function_extent("func_0011A7F8", 0x11A7F8, 24), (0x11A800, 16))
+        self.assertEqual(levels.function_extent("func_0011A7F8", 0x11A800, 16), (0x11A800, 16))
+        self.assertTrue(levels.function_residue("func_L00_00309DB0", 28))
+        with self.assertRaises(ValueError):
+            levels.function_residue("func_L00_00309DB0", 24)
+        name = "func_PAL_L00_0030BA80"
+        self.assertEqual(levels.function_extent(name, 0x30BA80, 336), (0x30BA80, 340))
+        self.assertEqual(levels.function_extent(name, 0x30BA80, 340), (0x30BA80, 340))
+        with self.assertRaises(ValueError):
+            levels.function_extent(name, 0x30BA80, 344)
+
+    def fixture(self, root, ret):
+        import carry
+        address = 0x2000
+        text = code(0x27BDFFE0, ret, 0x27BD0020, 0, 0x0000102D, 0)
+        directory = root / levels.level_dir(0)
+        directory.mkdir(parents=True)
+        (directory / "manifest.json").write_text(json.dumps({"sections": [
+            {"name": "text", "address": address, "size": len(text), "type": 1}]}))
+        (directory / "text.bin").write_bytes(text)
+        rows = [("pred", "shared", 8, levels.fingerprint(text[:8], address), [(0, address)]),
+                ("res", "shared", 16, "x", [(0, address + 8)])]
+        with patch.object(levels, "DUMP", root), patch.object(levels, "FUNCTION_DELAY_SLOTS", {"pred": 8}), \
+                patch.object(levels, "FUNCTION_RESIDUES", {"res": 16}):
+            return carry.correct_level_entries(rows), text
+
+    def test_slot_returns_to_its_function_and_the_rest_is_residue(self):
+        with tempfile.TemporaryDirectory() as d:
+            out, text = self.fixture(Path(d), 0x03E00008)
+        self.assertEqual(out, [("pred", "shared", 12, levels.fingerprint(text[:12], 0x2000), [(0, 0x2000)])])
+
+    def test_slot_needs_a_return_before_it(self):
+        with tempfile.TemporaryDirectory() as d, self.assertRaises(ValueError):
+            self.fixture(Path(d), 0)
 
 
 class AuditedIdentitySplit(unittest.TestCase):

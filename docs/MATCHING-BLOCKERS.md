@@ -2800,7 +2800,7 @@ Words **and operands** matter: qualifying sp-by-sp adjustments, zero moves and n
 
 The four-byte residue rule also needs its measured position after a completed return and delay slot. PR #253 now handles five additional specifically audited mixed-instruction residues (section 50), not an opcode-only generalization.
 
-An extent beginning inside a prior epilogue but containing a later real function needs an entry correction, not deletion. Positive stack adjustment is only a clue. Verify call/data/vtable entries, preserve ends and raw bytes, and preserve boot/level identity when regenerating fingerprints. Other mixed boundaries remain open. **5 November 2026:** 59 more named residues and four 16-to-8 entry corrections are applied; see section 50.
+An extent beginning inside a prior epilogue but containing a later real function needs an entry correction, not deletion. Positive stack adjustment is only a clue. Verify call/data/vtable entries, preserve ends and raw bytes, and preserve boot/level identity when regenerating fingerprints. Other mixed boundaries remain open. **5 November 2026:** 59 more named residues and four 16-to-8 entry corrections are applied; see section 50. **6 November 2026:** one more residue, one fill-skipping entry correction and one PAL delay slot returned to its function (section 50).
 
 One boot example remains open: USA v1.01 callers `func_0027B440` and
 `func_00291850` enter `0x00126288`, four bytes after the catalogued
@@ -2905,6 +2905,11 @@ PR #253 is merged. Generator, catalogue, markers and tests account for these spe
 - **Entry corrections** (`FUNCTION_ENTRY_OFFSETS`, 16 to 8 bytes): `func_0032A130`, `func_L03_0041B848`, `func_PAL_0032B920`, `func_PAL_L00_003E63F0`. Each starts with an 8-byte stack-restore residue; the code builds the address of the `jr $ra; nop` at +8 with `lui`/`addiu` at every placement (28/5/1/27). The callers now pass the symbol without `+ 8`; the four empty callbacks are C.
 - **Real functions, kept:** `func_002B9030` (jal thunk), `func_002B9380` (address pair), `func_002A1378` (jump target), `func_002A677C`, `func_002A08A0`, `func_001325E0` (jal), `func_00282848` (returns), `func_00131CB0` (crt0 passes it in `$t0` to the thread syscall).
 - **Kept pending:** `func_L00_00309DB0` (PAL copies start in the previous delay slot; the PAL level-20 word is packed halfword data, not a pointer) and `func_L00_00424BB8` (section 34).
+
+**6 November 2026, applied (all three releases):**
+
+- `func_L00_00309DB0` is a residue (`FUNCTION_RESIDUES`, 28 bytes). US and US2: all 27 copies follow `jr $ra`, its delay slot and a `nop`. PAL: `func_PAL_L00_0030BA80` (frame `-0x20`) ends on `jr $ra` at all 27 places and the row's first word, `addiu $sp,$sp,0x20`, is that return's delay slot. The new named `FUNCTION_DELAY_SLOTS` table gives the slot back (336 to 340 bytes; `carry.py --entries` checks the `jr $ra`); the other 24 PAL bytes are the same residue. No direct target, aligned loaded word or address pair from the level's own sections enters any placement (boot `.text` hits at those addresses are boot code; the PAL level-20 word is the halfword data above).
+- `func_0011A7F8` gets an entry correction (`FUNCTION_ENTRY_OFFSETS`, 24 to 16 bytes). In all three boots 0x11A7F8/0x11A7FC are `0xCDCDCDCD` fill after `jr $ra; addiu $sp,$sp,0x140`; 0x11A800 is `addiu $v1,$zero,0; syscall; jr $ra; nop`. Nothing in the boots or levels enters 0x11A7F8..0x11A800. Like its syscall-stub neighbours (commit eb2811fe) it is `ASM_FUNC`: no C emits `syscall`.
 
 
 <a id="blocker-51"></a>
@@ -3377,6 +3382,7 @@ fill-like words before a syscall/return body. It follows the preceding completed
 stack-adjustment delay slot. The scan of catalogued boot functions and aligned loaded words
 found no direct/pointer reference to the extent, but computed indirect entries are untraced
 and the syscall body itself is coherent. Retain the marker pending entry/ABI and compiler review.
+**6 November 2026:** the fill is skipped (entry 0x11A800, 16 bytes) and the stub is `ASM_FUNC`; see section 50.
 
 A known entry pointer is strong positive evidence; one pointer lookup is not proof that all other entry points or indirect targets are absent. Verify every affected placement and preserve raw bytes.
 
@@ -4352,7 +4358,7 @@ build `0x004191E0` and pass it as `$a1` to a registration call. The split now
 accepts this `text` witness: 88-byte `func_L10_00419188` plus the empty C
 callback `func_L10_004191E0`. Its C now matches (1/1 per release) by reading `D_001B251C` through an sda alias inside the loop (section 2).
 
-The retained `func_L00_00309DB0` residue hypothesis also has a PAL exception:
+**6 November 2026:** resolved; see section 50. The retained `func_L00_00309DB0` residue hypothesis also had a PAL exception:
 all 27 PAL copies begin in the preceding return's delay slot, and an aligned
 loaded word in PAL level 20 equals that address with unproven pointer meaning.
 Resolve its predecessor extent and that word's provenance before a shared

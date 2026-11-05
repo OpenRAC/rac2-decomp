@@ -42,4 +42,4 @@ int func_001163B0(void) {
 
 /* func_00118CC8 is defined in 00118CC8.c with quadword saves. */
 
-INCLUDE_ASM("asm/core", func_0011A7F8);
+ASM_FUNC("asm/core", func_0011A7F8);

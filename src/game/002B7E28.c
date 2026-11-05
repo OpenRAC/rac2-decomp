@@ -328,9 +328,11 @@ ASM_FUNC("asm/game", func_002B9180);
 /* Original assembly: lqc2/qmtc2/vitof VU0 ops and trapping addi; the compiler cannot emit them. */
 ASM_FUNC("asm/game", func_002B9288);
 
-INCLUDE_ASM("asm/game", func_002B9380);
+/* Original assembly: `lw; nop; jr $v0` keeps a load-delay nop before an indirect tail jump; cc1 never emits the nop and has no indirect sibling call (MATCHING-BLOCKERS 4). */
+ASM_FUNC("asm/game", func_002B9380);
 
-INCLUDE_ASM("asm/game", func_002B9390);
+/* Original assembly: RAC1 game/render/partproc.c, func_00218A80; $ra saved at $gp+0x2DB8, $at as a working register and trapping add/addi. */
+ASM_FUNC("asm/game", func_002B9390);
 
 ASM_FUNC("asm/game", func_002B9420);
 

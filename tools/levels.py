@@ -847,11 +847,28 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_L03_0041B848": (16, 8),
     "func_PAL_0032B920": (16, 8),
     "func_PAL_L00_003E63F0": (16, 8),
+    # Two 0xCDCDCDCD fill words after the previous return, then a syscall-0
+    # stub; nothing enters the fill in US/PAL/US2; 6 November 2026.
+    "func_0011A7F8": (24, 8),
+}
+
+
+# Rows measured one word short: the catalogued extent ends on the body's last
+# `jr $ra` and leaves its delay slot to the next row. Give the slot back.
+FUNCTION_DELAY_SLOTS = {
+    # PAL only: `jr $ra; addiu $sp,$sp,0x20` restores its own -0x20 frame at
+    # all 27 placements; the rest of the old next row is a residue.
+    "func_PAL_L00_0030BA80": 336,
 }
 
 
 def function_extent(name: str, address: int, size: int) -> tuple[int, int]:
     """Apply a named, measured entry correction once; reject unexpected extents."""
+    if name in FUNCTION_DELAY_SLOTS:
+        short = FUNCTION_DELAY_SLOTS[name]
+        if size not in (short, short + 4):
+            raise ValueError(f"{name}: {size} bytes, expected {short} or {short + 4}")
+        return address, short + 4
     if name not in FUNCTION_ENTRY_OFFSETS:
         return address, size
     original, skip = FUNCTION_ENTRY_OFFSETS[name]
@@ -957,6 +974,10 @@ FUNCTION_RESIDUES = {
     "func_003172D0": 188,
     "func_00335270": 252,
     "func_00314CF8": 300,
+    # 6 November 2026: two stack restores and orphan $v0 moves after a completed
+    # return at all 27 placements of each release (in PAL the first word is the
+    # predecessor's delay slot, see FUNCTION_DELAY_SLOTS); no reference enters it.
+    "func_L00_00309DB0": 28,
 }
 
 

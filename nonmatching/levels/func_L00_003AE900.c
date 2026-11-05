@@ -1,3 +1,12 @@
+/* 6 November 2026, round 6: 8,440/8,440, 0/27, first diff now +0x9C0. Dropping the `hitMoby` local (read
+ * D_L00_001BF200.hit directly) lets jump threading send the null-hit test straight to the count test, as retail.
+ * Left: +0x9C0 bc1f lands on retail's hazard nop (reorg's new label follows the line note; if/else and
+ * default-then-override phase forms do not move it); retail `high` is non-equivalent in $fp while loop 3's
+ * high<<16 is a rematerialized REG_EQUIV and r2 is a folded, spilled 0x30: needs cse2 to know low/high in
+ * loop 3's preheader; reassigning them before loop 3 folds everything, `low = 0x60` at loop 2's end breaks
+ * loop 2, literal 0x7F in loop 2 makes high rematerialized. defs: inline array read shrinks; moving the
+ * assignment does not swap v1/a0.
+ */
 /* 5 November 2026: own -g8 unit, `-O2 -G8 -ffunction-sections -g`; 8,440/8,440, 0/27. Retail's $fp=0x7F is
  * hoisted `high` (`high = 0x7F` set in loop 2's body plus alpha `high` in loop 3 reproduces it), but loop 3's
  * uses then stay sll, not REG_EQUIV constants. Also left: r2 = 0x30 spill, $fp/$s7 picks, defs-load regs.
@@ -424,8 +433,6 @@ void func_L00_003AE900(MobyAE900 *moby)
                     func_002BFB38(&t120, &t130, func_002A77E0(2), life);
                 }
             } else if (vars->inWater != 0 || func_00278E78() != 0) {
-                MobyAE900 *hitMoby;
-
                 if (D_L00_001BF200.hit) {
                     if (func_002ABB78(D_L00_001BF200.hit) || (D_L00_001BF200.hit->flags & 0x1000)) {
                         if (D_L00_001BF200.hit->oClass != moby->oClass && D_L00_001BF200.hit != D_00189E20.moby
@@ -439,9 +446,8 @@ void func_L00_003AE900(MobyAE900 *moby)
                         }
                     }
                 }
-                hitMoby = D_L00_001BF200.hit;
-                if (hitMoby && hitMoby->oClass == moby->oClass) {
-                    func_00282CF0(&D_L00_001BF200.normal, &moby->pos, &hitMoby->pos);
+                if (D_L00_001BF200.hit && D_L00_001BF200.hit->oClass == moby->oClass) {
+                    func_00282CF0(&D_L00_001BF200.normal, &moby->pos, &D_L00_001BF200.hit->pos);
                     if (vars->vel.f[2] < -9.8f * FRAME_AE900) {
                         moby->bBC = 1;
                         qcopy(&moby->pos, &D_L00_001BF200.point);
@@ -459,7 +465,7 @@ void func_L00_003AE900(MobyAE900 *moby)
                         qcopy(&t130, &D_L00_001BF200.normal);
                         goto align;
                     }
-                } else if ((hitMoby && hitMoby != D_00189E20.moby && hitMoby != vars->owner) || D_L00_001BF200.count > 0) {
+                } else if ((D_L00_001BF200.hit && D_L00_001BF200.hit != D_00189E20.moby && D_L00_001BF200.hit != vars->owner) || D_L00_001BF200.count > 0) {
                     if (vars->inWater != 0 || func_00278E78() == 0 || vars->vel.f[2] < -9.8f * FRAME_AE900) {
                         moby->bBC = 1;
                         qcopy(&moby->pos, &D_L00_001BF200.point);

@@ -479,6 +479,9 @@ def correct_level_entries(rows: list[tuple]) -> list[tuple]:
             if lv not in texts:
                 texts[lv] = levels.level_text(levels.DUMP / levels.level_dir(lv))
             base, data = texts[lv]
+            if name in levels.FUNCTION_DELAY_SLOTS and \
+                    levels.words(data[a - base + n - 8:a - base + n - 4]) != (JR_RA,):
+                raise ValueError(f"{name}: level {lv} has no return before its delay slot")
             keys.add((levels.fingerprint(data[a - base:a - base + n], a), n))
         if len(keys) != 1:
             raise ValueError(f"{name}: corrected level copies differ")

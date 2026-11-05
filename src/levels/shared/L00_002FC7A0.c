@@ -900,8 +900,6 @@ void func_L00_00309368(void)
 {
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00309DB0);
-
 /* Call the registered handler with a table pointer built from one module base word plus the constant 36808, forwarding the incoming argument; do nothing when the base word is zero. */
 void func_L00_0030C710(int argument)
 {

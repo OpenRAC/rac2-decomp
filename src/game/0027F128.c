@@ -280,7 +280,8 @@ void func_002820C8(void)
 {
 }
 
-INCLUDE_ASM("asm/game", func_00282848);
+/* Original assembly: `lwc1; nop; jr $ra; mul.s` keeps a load-delay nop before the return that this cc1 never emits (MATCHING-BLOCKERS 4); same body as RAC1 fastfunc func_001F9840, and its neighbours are RAC1 fastfunc original assembly. */
+ASM_FUNC("asm/game", func_00282848);
 
 /* Original assembly: RAC1 game/math/fastfunc.c, func_001F9850. */
 ASM_FUNC("asm/game", func_00282890);
@@ -315,7 +316,8 @@ ASM_FUNC("asm/game", func_002829D8);
 
 ASM_FUNC("asm/game", func_00282A18);
 
-INCLUDE_ASM("asm/game", func_00282A28);
+/* Original assembly: an unconditional `teq $zero,$zero,0`; this cc1 has no trap pattern that emits `teq` (only div_trap's bne/break) and rejects __builtin_trap. Same bytes as RAC1 fastfunc func_001F9978 (asm/handwritten). */
+ASM_FUNC("asm/game", func_00282A28);
 
 ASM_FUNC("asm/game", func_00282A38);
 

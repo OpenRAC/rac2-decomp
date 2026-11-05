@@ -1,3 +1,4 @@
+/* 6 November 2026, round 6: marked ASM_FUNC in src/ (original assembly, pending maintainer review); see the src comment for the evidence. */
 #include "include_asm.h"
 
 /* Claude Opus 5.5 xhigh worker, 2026-10-31; retained near miss, not linked.
