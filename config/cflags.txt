@@ -3211,3 +3211,6 @@ src/levels/shared/L00_00418230.c	-O2 -G0 -ffunction-sections
 src/levels/shared/L03_002ECF08.c	-O2 -G0 -ffunction-sections
 src/levels/shared/L05_00419CC8-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
 src/levels/shared/L00_00424F98-g8.c	-O2 -G8 -ffunction-sections -g
+src/game/002EEBC8.c	-O2 -G0 -ffunction-sections
+src/game/002F0FA0-g8.c	-O2 -G8 -ffunction-sections
+src/core/001185E8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves

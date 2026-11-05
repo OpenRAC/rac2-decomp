@@ -31,7 +31,6 @@ int func_001163B0(void) {
 
 /* func_001184D0 is in 001184D0.c with the game compiler profile. */
 
-INCLUDE_ASM("asm/core", func_001185E8);
 
 /* func_00118BC0 is in 00118BC0.c with quadword saves. */
 

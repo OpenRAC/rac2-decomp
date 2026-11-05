@@ -997,6 +997,11 @@ def level_text(directory: Path) -> tuple[int, bytes]:
 # Complete reviewed extents, including separately entered empty callbacks.
 # Names and placement families stay distinct even when the shortened bytes agree.
 LEVEL_FUNCTION_SPLITS = {
+    # Boldan binds these three empty entries through object dispatch records;
+    # the other 26 copies use one camera dispatch record.
+    "func_L00_0042A4E8": ("d456d82bfa98afa7", "shared", 27,
+                            {"default": "camvtbl", 13: "vtbl"}, 1,
+                            (("func_L00_0042A4E8", 8), ("func_L00_0042A4F0", 8), ("func_L00_0042A4F8", 8))),
     "func_L19_0041C328": ("2c7af8399d44fbd2", "level", 1, "vtbl", 15,
                             (("func_L19_0041C328", 168), ("func_L19_0041C3D0", 8))),
     "func_L14_004321C0": ("19a756548c944b84", "level", 1, "vtbl", 1,
@@ -1049,18 +1054,30 @@ def split_level_rows(rows: list[tuple]) -> list[tuple]:
                    for other, _, n, _, locations in rows if other not in names
                    for level, p in locations if level == lv):
                 raise ValueError(f"{name}: another level extent overlaps the split")
-            raw = (DUMP / level_dir(lv) / f"{table}.bin").read_bytes()
+            selected_table = table.get(lv, table.get("default")) if isinstance(table, dict) else table
+            if selected_table not in ("camvtbl", "vtbl"):
+                raise ValueError(f"{name}: unknown dispatch table")
+            raw = (DUMP / level_dir(lv) / f"{selected_table}.bin").read_bytes()
             if len(raw) % 4:
                 raise ValueError(f"{name}: incomplete dispatch word")
-            data, width, seen = words(raw), 5 if table == "camvtbl" else 3, set()
+            data, width, seen = words(raw), 5 if selected_table == "camvtbl" else 3, set()
+            entry_witnesses = [set() for _ in parts]
             for start in range(0, len(data) - width + 1, width):
                 record = data[start:start + width]
                 if record[0] == 0xFFFFFFFF:
                     break
-                if ((table == "camvtbl" and record[2:5] == (address, address + 8, address + 16))
-                        or (table == "vtbl" and record[1] == address + parts[0][1])):
+                if ((selected_table == "camvtbl" and record[2:5] == (address, address + 8, address + 16))
+                        or (selected_table == "vtbl" and record[1] == address + parts[0][1])):
                     seen.add(record[0])
-            if len(seen) != witnesses:
+                if selected_table == "vtbl" and len(parts) == 3:
+                    offset = 0
+                    for index, (_, length) in enumerate(parts):
+                        if record[1] == address + offset:
+                            entry_witnesses[index].add(record[0])
+                        offset += length
+            witnessed = (all(len(entry) == witnesses for entry in entry_witnesses)
+                         if selected_table == "vtbl" and len(parts) == 3 else len(seen) == witnesses)
+            if not witnessed:
                 raise ValueError(f"{name}: level {lv} structured entry witnesses differ")
             offset = 0
             for i, (_, length) in enumerate(parts):

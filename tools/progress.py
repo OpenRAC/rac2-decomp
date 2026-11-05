@@ -238,7 +238,9 @@ def pending_boot_split(functions: list[dict], where: dict,
     rewrites the report or turns the old merged row into matching credit.
     """
     reported = {f["name"] for f in functions}
-    if set(where) - reported != {sound} or main not in where:
+    # Validate this split independently; release_check requires the union of
+    # all verified splits to explain every missing identity, without extras.
+    if sound not in where or sound in reported or main not in where:
         return False
     address, size, kind, level = where[main]
     if ((size, kind, level) != (head_size, "boot", None)

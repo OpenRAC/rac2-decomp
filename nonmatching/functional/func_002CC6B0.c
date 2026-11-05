@@ -1,3 +1,4 @@
+/* 5 November 2026: preserve this native-oriented variant rather than replacing it with the matching draft. Only the independently checked interfaces/widths are repaired; no new native runtime validation is claimed. */
 /* functional: medium. Near-miss draft, not byte-compared in the latest sweep: paths the captured calls never take are unproven. */
 /* GPT-6.1 Sol, high effort, 29 October 2026 (task v1320).
  * USA v1.01, current pinned game compiler, -O2 -G8 -ffunction-sections:
@@ -45,8 +46,8 @@ extern int D_00138320[];
 extern char *D_001F2854 NOT_SDA;
 extern char D_0025A498[];
 extern void func_002FC560(int, long);
-extern void func_0029DB28(int, int, void *, int);
-extern void func_00289FC8(int, int, void *);
+extern int func_0029DB28(int *, unsigned int *, int *, int);
+extern int func_00289FC8(short, int, unsigned short *);
 typedef struct { unsigned char pad[4]; unsigned char available; unsigned char tail[0xDB]; } ItemConfig;
 extern ItemConfig D_00239BA0[];
 extern int func_00115DA8(char *, const char *, ...);
@@ -131,7 +132,7 @@ int func_002CC6B0(unsigned char *w) {
         content = *(int *)(st + 0x40);
         id = *(short *)(*(char **)(st + 0x34) + content * 12);
         *(int *)(w + 0x34) = 0xFFFF;
-        func_00289FC8(id, 0, w + 0x34);
+        func_00289FC8(id, 0, (unsigned short *)(w + 0x34));
     } else {
         char *cell;
         int k;
@@ -207,7 +208,7 @@ int func_002CC6B0(unsigned char *w) {
     a23 = *(int *)(w + 0x18) + *(int *)(w + 0x20) / 2;
     a21 = *(int *)(w + 0x1C) + *(int *)(w + 0x24) / 2;
     if ((f & 0x4004) == 0x4004 && *(int *)(w + 0x34) == 0x112D) {
-        func_0029DB28(0x70000000, (int)&helpResult, 0, 0);
+        func_0029DB28((int *)0x70000000, (unsigned int *)&helpResult, 0, 0);
         if (helpResult < 0) text = TEXT(0x112C);
         a21 += 8;
     }

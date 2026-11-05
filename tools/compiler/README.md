@@ -24,7 +24,9 @@ The retail code was built with GNU EE-GCC 2.9-ee-991111b. `build.sh` rebuilds it
   unconditional. It snapshots the non-spill exclusions before reloads add their own marks,
   so self-inheritance reaches the existing lifetime checks (docs/COMPILER-NOTES.md).
   `count_asm_words.py` counts copy words and inserted loop nops, including nops before an
-  already-visited branch. `pad_div_erratum_nops.py` counts a known non-PIC relaxation
+  already-visited branch. It also counts an unannounced external SI load/address as its
+  two emitted words, preserving the scheduler's lengths and the explicit GP/PIC/buffering
+  exclusions. `pad_div_erratum_nops.py` counts a known non-PIC relaxation
   alternative once when measuring the code-label distance. Both have authored output
   controls; neither changes compiler-authored operations or selects individual functions.
   `gcse_store_kills_loads.py` gives gcse GCC 2.95.3's memory model, where every store kills

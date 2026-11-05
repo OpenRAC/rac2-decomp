@@ -81,7 +81,7 @@ python3 $T/trap_redundant_barrier.py gcc/reorg.c
 python3 $T/count_asm_words.py gcc/config/mips/mips.c
 python3 $T/no_recombine_givs.py gcc/loop.c
 sha256sum --check --quiet <<'SUMS'
-3f40d033dab2da68bdecf47f7b9a8566b7f852c72d9e7381aedac548f4b39a57  gcc/config/mips/mips.c
+067fa4c4588fc22d0887d1f33019f04f6553df67109d395b01f6d58ccc0870d8  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
 d75635500f55f4c7c626e925f6e8146c4e33d3865314eca4ae9bb3860fe7eeab  gcc/toplev.c
@@ -133,6 +133,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_swap_branch_slots.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_div_label_after_call.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_div_gp_fragments.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_count_asm_words.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_symbolic_loop_words.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_recombine_givs.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_qcopy.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_qcopy_barrier.py"

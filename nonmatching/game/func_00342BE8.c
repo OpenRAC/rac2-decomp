@@ -1,3 +1,11 @@
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain func_0028EA58 as void with its real colour pointer and unsigned alpha packing.
+ * The last bounded checks remain 900/900 bytes, 0/28 USA places: only clip.x1 and clip.y1 stores swap.
+ * Complete screen-size views, captured width, builtin/byte-view copies, complete-owner stores and equivalent zero-to-initialized flag transitions all tie.
+ * Do not repeat store permutations or add volatile stack fields.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
+#include "common.h"
 /* 3 November 2026 (opus, v2198): still 2 words. Ranking sched1 by hand (priority, then INSN_REG_WEIGHT, class,
  * depcount, luid) shows retail needs sched1 order 264<261<269 and 256<266<249. With the width load (252, p7, latency 2)
  * in the block, y1's store (266, p4, weight 0) always takes t3, before li 1 (269, p3, weight +1). Only a width pseudo
@@ -46,7 +54,7 @@ extern int D_001A7340 MACRO_ADDR, D_001A7344 MACRO_ADDR;
 extern int screenWidthGP SDATA(D_001A7340);
 extern void func_002FC620(int, int, int, int);
 extern int func_0028E588(int, int);
-extern int func_0028EA58(int, int, int, int, int, unsigned int *);
+extern void func_0028EA58(int, int, int, int, int, int *);
 
 
 typedef struct {
@@ -83,10 +91,10 @@ void func_00342BE8(MenuList *object)
         second = func_003427C0((char *)object, low,
                 object->position->y + object->rowHeight * current + object->iconSize + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
-        *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | (first << 24);
-        *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | (first << 24);
-        *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | (second << 24);
-        *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | (second << 24);
+        *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | ((unsigned int)first << 24);
+        *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | ((unsigned int)first << 24);
+        *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | ((unsigned int)second << 24);
+        *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | ((unsigned int)second << 24);
         if (D_001B23C0 == 0) {
             clip.x0 = 0;
             clip.x1 = screenWidthGP - 1;
@@ -100,7 +108,7 @@ void func_00342BE8(MenuList *object)
         texture = func_0028E588(*(unsigned short *)(entry + 0x3C), 0);
         func_0028EA58(texture, (int)object->position->x,
                 (int)(object->position->y + object->rowHeight * current + (float)object->scrollOffset),
-                (int)object->iconSize, (int)object->iconSize, (unsigned int *)colours);
+                (int)object->iconSize, (int)object->iconSize, (int *)colours);
         func_002FC620(0, D_001A7340 - 1, 0, D_001A7344 - 1);
     }
 }

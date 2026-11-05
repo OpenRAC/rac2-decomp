@@ -1,3 +1,9 @@
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain func_002A0380 as int and func_002FC3C0 with its 64-bit mask.
+ * The repaired source still fails all 28 USA places at +0x14.
+ * Panel lifetime and clamp scheduling remain open; the indirect callback contract is not newly qualified.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
 /*
  * Opus 5.5 xhigh worker (v2069), USA v1.01, -O2 -G8 -ffunction-sections.
  * Best check.py result: 2100/2100 bytes, 0/28 places match; 58 of 525
@@ -84,7 +90,9 @@ extern void func_00280510(int,int,int,float);
 extern void func_0028FDD8(int,int,int,int,long,int,int);
 extern void func_00280600(void);
 extern void func_0027E018(int,int,int,int,int,int,int,int,long,long);
-extern void func_002A0220(void),func_002A0380(void),func_002FC3C0(int),func_0029FEE0(void);
+extern void func_002A0220(void),func_0029FEE0(void);
+extern int func_002A0380(void);
+extern void func_002FC3C0(unsigned long);
 extern int func_00283CF0(float);
 
 void func_002CBC58(int mode)

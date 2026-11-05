@@ -270,6 +270,8 @@ keeps generic frame scheduling by default; `-mastra-keep-frame-order` is an expl
 experiment. `func_002B7170` needs the generic order plus measured source lifetimes
 and stores. No frame-order option fixes arbitrary entry-block allocation.
 
+### Short-loop padding
+
 Short-loop padding must run after delay-slot scheduling: this C pipeline uses GNU
 `as`, rather than the assembler assumed by patch 0054.
 [enable_loop_padding.py](../tools/compiler/transformers/enable_loop_padding.py)
@@ -325,6 +327,27 @@ Authored single-pair, independent-pair and volatile polling controls inspect the
 actual assembled backward spans; the previous compiler fails all three. This
 recovers `func_00294420`'s two tests of a shared search-loop head without changing
 its C operations. Symbolic macro-length estimation is a separate limitation.
+
+The counter also handles one measured symbolic class: an ordinary, external
+32-bit register load/address whose assembler metadata has not been emitted yet.
+GAS expands it to two words in reorder mode, even when the scheduler length is
+one. `SYMBOL_REF_USED` establishes external provenance during expansion, and
+the existing `TREE_ASM_WRITTEN` markers distinguish prior announcements and
+definitions. Definitions are marked at `-G0` too, without changing emitted
+assembly. Both raw `*name` and ordinary name spellings are respected.
+
+This applies only to simple SI register SETs on R5900/GAS: not delay-slot
+sequences, stores, FP/wide operations, PIC or buffered extern output. Explicit
+`SDATA` aliases are excluded because their `__gp` metadata is supplied by the
+existing assembly-input pass. Scheduler lengths and compiler-authored operations
+are untouched. [test_symbolic_loop_words.py](../tests/test_symbolic_loop_words.py)
+checks unknown addresses/loads, early SDA, incomplete SDATA, both alias spellings
+and an external defined between functions. The previous compiler produces
+eight-word loops in the three positive cases; all seven controls pass with the
+corrected counter. The linked C witnesses are `func_002EEBC8` (one place per USA
+release and 28 in PAL) and `func_002F0FA0` (28 in each release). The complete
+84-program strict qualification preserves every existing match and accepts
+all 114 placements of these two bodies.
 
 ### Quadword saves and return slots
 

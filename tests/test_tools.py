@@ -1,4 +1,5 @@
 """Tests for tools/levels.py and tools/elf.py: no game data, no toolchains."""
+import copy
 import json
 import struct
 import sys
@@ -195,6 +196,29 @@ class SplitLevelEntries(unittest.TestCase):
             (root/levels.level_dir(13)/"text.bin").write_bytes(code(0x24020001,0)*3)
             with patch.object(levels,"DUMP",root), patch.object(levels,"LEVEL_FUNCTION_SPLITS",spec), self.assertRaises(ValueError):
                 levels.split_level_rows(rows)
+
+    def test_shared_callbacks_accept_each_measured_dispatch_kind(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);rows,spec=self.fixture(root,count=2)
+            name=rows[0][0];rule=list(spec[name]);rule[3]={"default":"camvtbl",13:"vtbl"};spec[name]=tuple(rule)
+            a=rows[0][4][1][1]
+            (root/levels.level_dir(13)/"vtbl.bin").write_bytes(code(101,a,0,102,a+8,0,103,a+16,0))
+            with patch.object(levels,"DUMP",root), patch.object(levels,"LEVEL_FUNCTION_SPLITS",spec):
+                split=levels.split_level_rows(rows)
+                self.assertEqual(levels.split_level_rows(split),split)
+                self.assertEqual([r[4] for r in split],
+                    [[(lv,p+8*i) for lv,p in rows[0][4]] for i in range(3)])
+
+    def test_object_dispatch_must_witness_all_three_callback_entries(self):
+        for missing in (0,1,2):
+            with self.subTest(missing=missing), tempfile.TemporaryDirectory() as d:
+                root=Path(d);rows,spec=self.fixture(root,count=2)
+                name=rows[0][0];rule=list(spec[name]);rule[3]={"default":"camvtbl",13:"vtbl"};spec[name]=tuple(rule)
+                a=rows[0][4][1][1];data=[]
+                for i in range(3):data.extend((101+i,0 if i==missing else a+8*i,0))
+                (root/levels.level_dir(13)/"vtbl.bin").write_bytes(code(*data))
+                with patch.object(levels,"DUMP",root), patch.object(levels,"LEVEL_FUNCTION_SPLITS",spec), self.assertRaises(ValueError):
+                    levels.split_level_rows(rows)
 
     def test_unrelated_rows_are_not_split_from_return_bytes(self):
         rows=[("unrelated","level",24,"",[(6,0x2000)])]
@@ -949,6 +973,20 @@ class ProgressChecks(unittest.TestCase):
                      source={"src/core/abort.c": [(n, True) for n in where]})
         with self.assertRaises(SystemExit):
             self.release(functions, flags=("--strict",), where=where)
+
+    def test_boot_and_level_splits_jointly_explain_only_their_own_gaps(self):
+        functions, where = self.assertion_fixture()
+        level_functions, level_where = self.level_split_fixture(["func_L00_0042A4E8"])
+        functions += level_functions
+        where.update(level_where)
+        before = copy.deepcopy(functions)
+        self.release(functions, where=where)
+        self.assertEqual(functions, before)
+        with self.assertRaises(SystemExit):
+            self.release(functions, where=where, flags=("--strict",))
+        where["unknown_gap"] = (0x300000, 8, "boot", None)
+        with self.assertRaises(SystemExit):
+            self.release(functions, where=where)
 
     def test_assertion_split_rejects_credit_drift_duplicates_and_unknown_gaps(self):
         for change in ("matched", "partial", "address", "size", "tail", "duplicate",

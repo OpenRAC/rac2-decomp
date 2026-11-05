@@ -1,3 +1,5 @@
+/* 5 November 2026: Scoped byte/word flag locals merge constants and give 484/488 bytes. Grouping the real header writes keeps 488 bytes but the same five flag constant/store words still differ. No variant is promoted.
+ */
 /* Retained nonmatching reconstruction, 27 October 2026.
  * Profile: -O2 -G0 -ffunction-sections -g. Candidate and retail: 488 bytes. USA v1.01, USA v2.00 and PAL each reject all three carrying places. Only five initial flag constant/store words differ: the byte and halfword 255 constants take different registers/order. The later spawn, vector operations, division hazards, stores and return agree. Reordering the stores either changes their order or merges the constants. A separately tested partial object-header view tied. Reopen with a measured allocation explanation; no volatile or artificial dependencies.
  */

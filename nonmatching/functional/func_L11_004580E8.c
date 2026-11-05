@@ -1,4 +1,10 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
+/* functional: medium. Retained interface/owner corrections; matching and native behavior remain unqualified. */
+/* 5 November 2026: retained reconstruction, not linked or counted.
+ * Retain the pointer return of func_0032C700 and the typed scheduler callback.
+ * The shared scratch covers 48 bytes, including all three vectors.
+ * USA remains 0/1 at +0xC8; constant order and loop allocation are unresolved.
+ * Earlier measurements below describe earlier sources or toolchains.
+ */
 /* Tier: opus-1 (Claude Opus 5.5, xhigh). USA v1.01 (v2.00 identical; not in PAL).
  * Best check: 2476/2476 bytes, 0 of 1 places match. cdiff: 107 of 619 rows differ,
  * all but 22 of them relocation-only (unlinked symbol and $gp offsets).
@@ -39,13 +45,14 @@ extern void *func_002A9640(void *,unsigned int,int);
 extern int func_002B4FF0(void *,void *,float);
 extern float func_002AA548(void *,void *,float,float,float,float);
 extern int func_00282978(void *);
-extern void func_002A7750(void *,int,int),func_00282CC0(void *,void *,void *),func_00282F20(void *,void *,float),func_00282D30(void *,void *,float),func_00283028(void *,void *,void *),func_L00_0031D670(void *,void *,void *,float),func_002E59F8(int),func_002A8BD0(void *,void *,int,float),func_L00_002E6EF8(void *,void *);
+extern void func_002A7750(void *,int,int),func_00282CC0(void *,void *,void *),func_00282F20(void *,void *,float),func_00282D30(void *,void *,float),func_00283028(void *,void *,void *),func_L00_0031D670(void *,void *,void *,float),func_002E59F8(int),func_002A8BD0(void *,void *,int,float);
+extern void func_L00_002E6EF8(void (*)(void *),void *);
 extern int func_00277F48(float,void *,int,void *,void *);
 typedef struct { int unused; int mode; short unused8; u8 alpha, duration; } ParticleAttributes;
 typedef struct { char unused[10]; s16 lifetime; char unused12[20]; ParticleAttributes attributes; } Particle;
 extern Particle *func_002BDCE8(void *,int,float,float,float,void *,unsigned,int,float);
 extern char *func_L11_004417E8(void *);
-extern void func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
+extern char *func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 extern void func_002B60B0(void *,float,float,float,float);
 extern void func_L11_00458C38(void *);
 typedef struct { char pad0[0x18]; char *hit; int count; float point[4]; float pad30[4]; float normal[4]; } Collision;

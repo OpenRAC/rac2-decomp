@@ -21,9 +21,14 @@ spec.loader.exec_module(transformer)
 
 
 class TransformerTests(unittest.TestCase):
+    def object_definition(self):
+        return ("\nmips_declare_object (stream, name, init_string, final_string, size)\n{\n"
+                + transformer.declaration_old + "\n}\n")
+
     def test_padding_updates_the_counter_and_reapplication_is_rejected(self):
         source = ("void\nmips_r5900_pad_loops (first)\n{\n" + transformer.old
-                  + "\n" + transformer.padding_old * 2 + "\n}\n/* ASTRA P25:")
+                  + "\n" + transformer.padding_old * 2 + "\n}\n/* ASTRA P25:"
+                  + self.object_definition())
         patched = transformer.patch(source)
         self.assertIn(transformer.padding_new, patched)
         with self.assertRaises(AssertionError):
@@ -32,7 +37,7 @@ class TransformerTests(unittest.TestCase):
     def test_insertion_drift_fails_before_a_result_is_returned(self):
         for insertion in ("", transformer.padding_old, transformer.padding_old * 3):
             source = ("void\nmips_r5900_pad_loops (first)\n{\n" + transformer.old
-                      + "\n" + insertion + "\n}\n/* ASTRA P25:")
+                      + "\n" + insertion + "\n}\n/* ASTRA P25:" + self.object_definition())
             with self.subTest(insertion=insertion), self.assertRaises(AssertionError):
                 transformer.patch(source)
 

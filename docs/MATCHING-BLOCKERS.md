@@ -57,9 +57,8 @@ metadata permits the latter correction; unknown symbols and general alignment
 remain bounded by the prior fallback. Neither USA identity is carried in PAL.
 All three corrections have authored positive and negative controls; the linked
 build remains the acceptance gate. The complete qualification passes all 84
-programs across USA v1.01, USA v2.00 and PAL with zero C fallbacks. Ten new
-USA functions contribute 8,052 distinct bytes and 489 verified C placements,
-including the separately witnessed abort/assertion entries described below.
+programs across USA v1.01, USA v2.00 and PAL with zero C fallbacks, including
+the separately witnessed abort/assertion entries described below.
 The existing museum brightness routine retains its 1,424-byte match after
 keeping its calculation, clamp and store on one debug source line; it earns
 no additional credit. Progress reports were not regenerated.
@@ -81,6 +80,50 @@ The vehicle-input callback uses an unsigned level-bit shift on its current
 gameplay-level contract (observed overlay IDs 0..26 excluding 21, plus 30).
 Adding an explicit mask costs a word; no out-of-range vehicle caller has been
 observed. A discovered caller outside that domain must reopen the assumption.
+
+The remaining unannounced-symbolic-macro counter case is also resolved:
+`func_002EEBC8` (320 USA bytes) and `func_002F0FA0` (108) pass every carrying
+placement and the complete 84-program strict build. Only ordinary unannounced
+external SI loads/addresses count as two words; prior metadata, SDATA aliases,
+PIC, buffering and delay-slot sequences remain excluded. Seven authored
+controls cover the boundary; the old compiler fails the three positive cases.
+See [the counter model](COMPILER-NOTES.md#short-loop-padding).
+
+The retained counter-display draft `func_0034DB98` is no longer registered as
+functional native C. Its wide font read and sign-preserving style inputs are
+not faithfully represented by the retained body; declaration repairs alone
+do not settle those differences. The C and measured failed alternatives stay
+in `nonmatching/` and private working evidence, with no matching credit.
+
+`func_00342BE8` remains a 900-byte near miss: only the `clip.x1` and `clip.y1`
+store order differs. Complete screen-size views, explicit width capture,
+builtin/byte-view copies, complete-owner stores and equivalent initialization
+state transitions all tie. Reopen with independent scheduling or source-boundary
+evidence, not another store permutation or invented volatile stack access.
+
+### Floating formatter lifetimes and inherited limits
+
+`func_001185E8` is 1,496 bytes in each release and passes all three strict boot
+builds. A separate integer-digit budget and decimal exponent shorten the real
+value lifetimes. Grouping the actual bit-pattern dispatch, and the character
+encoding/store, preserves the remaining schedule without fake inputs or asm.
+Its unit uses `-O2 -G2 -ffunction-sections -mastra-quad-saves`.
+
+Keep the measured behavior distinct from a safe formatting API: retail examines
+the low word for its special-value dispatch, and the caller supplies an
+unbounded precision. The formatter applies no new cap. For example, formatting
+zero with precision 128 reaches `p[130]`, beyond the next known tty-buffer base
+at `D_0013C100`. No larger scratch extent or missing guard was invented.
+
+A separate pre-existing source issue remains in the `INSERT_WORDS` macros of
+`func_00117650` and `func_00117848`: the scalar `iw` is evaluated before it is
+initialized. Overwriting both halves later does not make that C evaluation
+defined. Initializing it to zero gives 460/500 and 1048/1108 bytes; initializing
+from the destination gives 504/500 and 1112/1108. Proper bit-field owners, with
+and without real half-write groups, give 472/500 and 1052/1108. None replaces
+the existing source in this change. Reopen with a defined word-construction
+model or independently supported compiler behavior; the current retail-byte
+proof is not an ISO-C or native-safety certification of those callees.
 
 ### Trigger and title/setup lifetimes
 
@@ -4289,12 +4332,14 @@ deletion. Direct or nearby address-pair absence alone is not proof of no entry.
   diagnostic return; narrowing the IMR or declaring the ignored result void is
   not a legitimate scheduling remedy. Its equal error-path variants are recorded
   in the retained source.
-- `func_L00_0042A4E8` contains three independent return stubs: initialized
-  pointers reach `+0`, `+8` and `+0x10` in all 27 USA placements. The same
-  three-entry pattern has separate witnesses for `func_L13_0043E8C0` in all
-  three releases; its named repair is described above. The L00 family still
-  needs its own release-qualified generator correction. Do not fabricate a
-  single C function spanning these entries.
+- `func_L00_0042A4E8`, `func_L00_0042A4F0` and `func_L00_0042A4F8` now have
+  separate eight-byte rows and C bodies. In each release, 26 copies have a
+  camera-table record naming all three entries; Boldan names each through
+  its object dispatch table instead. The generator verifies the complete
+  original extent, every typed witness and all 27 placements before splitting.
+  Both regeneration replays and all 243 C placements pass; all 84 complete
+  programs pass the strict build. No return-looking padding was promoted
+  without an entry witness.
 
 Reference scans must separate EE text from `.vutext`: decoding VU microcode as
 R5900 instructions creates false branch witnesses. An aligned word equal to an
