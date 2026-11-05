@@ -192,6 +192,23 @@ Retail has no branch into the three call sequences. The scheduler dumps (`-dS`/`
 abort under `_FORTIFY_SOURCE`; a private `haifa-sched.o` built with `-U_FORTIFY_SOURCE`
 gives identical output and readable `-fsched-verbose-5` priorities.
 
+### `func_002E3E54` takes three arguments
+
+**6 November 2026, local match (PR pending; USA v1.01 strict build).** The sky piece
+renderers `func_002E3998` and `func_002E3BD8` (boot and all 27 levels) had stopped one
+`daddu $a3,$t0` short (576/572 and 632/628): retail loads the +0x2C halfword straight
+into `$a3` and uses it for `base + h` with no copy. Their drafts declared the
+handwritten vertex transform `func_002E3E54` with four arguments and passed `h` as
+the fourth. The retail body never reads `$a3`, and its functional C already said
+"arg3 is unused". Declared and called with its three real arguments, both functions
+match 28/28 in `src/game/002E10B8-sky-g8.c`. The `$a3` was only local-alloc giving `h`
+a free call-clobbered register, because `h` dies before the call.
+
+When a near miss is one argument-register copy away, check the callee's actual
+register use before tuning schedules, especially for an `ASM_FUNC` callee, whose
+interface no C definition constrains. The same applies to return values; see the
+entry above.
+
 ### Three-quantity local allocation
 
 **1 November 2026, retained near miss.** `block_alloc` sorts two or three quantities by hand:
