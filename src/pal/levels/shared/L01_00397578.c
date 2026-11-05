@@ -49,7 +49,6 @@ void func_PAL_L01_0039A174(void *actor) {
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L01_0039A7B0);
 
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L01_0039AD60);

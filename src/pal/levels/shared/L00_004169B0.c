@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_004169B0);
 
 typedef struct {
     char pad0[0x7C];
