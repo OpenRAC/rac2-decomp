@@ -301,7 +301,22 @@ void func_L00_00424B70(float a, float b)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00424BB8);
+void func_L00_00424BB8(float a, float b)
+{
+    char *p = D_L00_001B8E10;
+
+    if (*(short *)(p + 134) == 0) {
+        char *q = *(char **)(p + 112);
+        char *r = q + 0x60;
+
+        if (a != 0.0f) {
+            *(float *)(r + 228) = a;
+        }
+        if (b != 0.0f) {
+            *(float *)(r + 232) = b;
+        }
+    }
+}
 
 void func_L00_00424C00(void)
 {

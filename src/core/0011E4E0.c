@@ -209,5 +209,3 @@ int func_0011E8A8(int value) {
         return -1;
     return D_00140180[0];
 }
-
-INCLUDE_ASM("asm/core", func_0011E920);

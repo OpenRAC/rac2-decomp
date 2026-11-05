@@ -291,16 +291,12 @@ void func_002B8048(int value, long address)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002B80B8);
-
 /* func_002B8108 is in 002B7E28-g8.c. */
 
 void func_002B8518(void) {
     D_00138180.active = 0;
     D_00138180.value = 0;
 }
-
-INCLUDE_ASM("asm/game", func_002B8530);
 
 /* func_002B85F8 is in 002B7E28-g8.c. */
 

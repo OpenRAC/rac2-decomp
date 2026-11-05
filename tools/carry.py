@@ -572,7 +572,7 @@ def refresh_entries() -> None:
         if not levels.function_residue(name, n):
             a, n = levels.function_extent(name, a, n)
             boot.append((name, a, n))
-    rows = correct_level_entries(levels.split_level_rows(levels.read_catalogue()))
+    rows = levels.split_identities(correct_level_entries(levels.split_level_rows(levels.read_catalogue())))
     # Validate both catalogues completely before writing either output.
     write_catalogues(boot, rows)
     print(f"entry repairs: {len(boot)} boot functions, {len(rows)} level rows; identities retained")

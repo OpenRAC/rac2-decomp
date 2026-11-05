@@ -220,8 +220,6 @@ void func_00298BB8(unsigned char *source)
     func_00115AC0(D_001A79D0, (int)D_001A7930, 13);
 }
 
-INCLUDE_ASM("asm/game", func_00298D10);
-
 extern char D_001A9970[];
 extern void func_0029B168(char *, int, int *);
 extern void func_0029B628(void);

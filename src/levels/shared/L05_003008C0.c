@@ -40,14 +40,10 @@ void func_L05_0030C930(int a0, int a1) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L05_0033CD40);
-
 /* func_L05_0033D3A0 is in L05_003008C0-reaction-g8.c. */
 
 
 
-
-INCLUDE_ASM("asm/levels", func_L05_0033F4A8);
 
 /* func_L05_00352B28 lives in L05_00352B28.c:
    its grouped vector copy and debug division labels need a per-file profile. */

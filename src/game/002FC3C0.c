@@ -48,11 +48,7 @@ void func_002FC410(Rac2Native_4e44694cc39e7084_u32 data_address, Rac2Native_4e44
     ref_L00_0037B3B8_00 += 16;
 }
 
-INCLUDE_ASM("asm/game", func_002FC460);
-
 /* func_002FC468 is matched in 002FC468.c (-G0: D_001B22A8 is loaded absolutely). */
-
-INCLUDE_ASM("asm/game", func_002FC510);
 
 void func_002FC518(Rac2Native_ae24050903bcaa08_u32 final_word)
 {
@@ -79,15 +75,11 @@ void func_002FC560(Rac2Native_9da4b6b15b3cf4a0_RecordWord180 final_word, Rac2Nat
     ref_L00_0037B508_00 += 48;
 }
 
-INCLUDE_ASM("asm/game", func_002FC618);
-
 /* func_002FC620 is matched in 002FC620.c (-G0: its globals are read absolutely). */
 
 
 
 
-
-INCLUDE_ASM("asm/game", func_002FC868);
 
 void func_002FC870(void)
 {

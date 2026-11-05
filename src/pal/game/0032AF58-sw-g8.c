@@ -139,6 +139,5 @@ void func_PAL_0032AF58(char *self)
         }
         break;
     }
-    /* The catalogue extent includes eight bytes before this return callback. */
-    func_0027CFD0((char *)func_PAL_0032B920 + 8, self);
+    func_0027CFD0(func_PAL_0032B920, self);
 }

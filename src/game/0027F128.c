@@ -198,8 +198,6 @@ void func_00280600(void) {
 
 /* func_00280630 -- see src/game/0027F128-g8.c (built with -G8). */
 
-INCLUDE_ASM("asm/game", func_00280660);
-
 /* The share of a region's pixels whose low 24 bits do not exceed the region's threshold. */
 void func_00280670(u32 *pixels, int index) {
     CopyRegion *region = &D_001B8A10[index];

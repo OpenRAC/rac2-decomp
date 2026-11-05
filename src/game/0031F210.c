@@ -593,8 +593,6 @@ INCLUDE_ASM("asm/game", func_00326A10);
 
 
 
-INCLUDE_ASM("asm/game", func_00326CA8);
-
 /* negates two floats read from a fixed global table, clamps each to [-1,1] into an object reached through the parameter's +104 pointer, packs the pair into a two-float stack buffer, passes it to two callees and stores the second callee's float return value at object+48 */
 void func_00326CB8(char *obj)
 {

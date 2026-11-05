@@ -750,8 +750,6 @@ void func_0031D268(char *arg0) {
 
 /* func_0031D308 is in the -G8 sibling. */
 
-INCLUDE_ASM("asm/game", func_0031D350);
-
 /* func_0031D3E0 is in 0031D3E0.c. */
 
 /* func_0031D588 is in 0031D588-g8.c. */
@@ -904,8 +902,6 @@ void func_0031DEE8(char *owner)
 
 
 /* func_0031E560 is defined in 0031E560-dbg.c (-g). */
-
-INCLUDE_ASM("asm/game", func_0031E6D8);
 
 
 

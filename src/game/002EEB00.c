@@ -93,8 +93,6 @@ int func_002EEB00(int *a0)
     return s2;
 }
 
-INCLUDE_ASM("asm/game", func_002EEBB0);
-
 
 void func_002EED08(void)
 {

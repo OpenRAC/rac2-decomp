@@ -18,8 +18,6 @@ int func_002DF1D0(void) {
 
 /* func_002DF3F8 is in 002DF1B8-capture.c. */
 
-INCLUDE_ASM("asm/game", func_002DF630);
-
 
 /* func_002DF7A8 is matched in 002DF1B8-g8.c (-G8 small data). */
 

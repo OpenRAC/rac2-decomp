@@ -494,8 +494,6 @@ float func_003495A0(Value_3495A0 *object) {
     return previous;
 }
 
-INCLUDE_ASM("asm/game", func_003495B8);
-
 /* Measured target: byte-identical across all 27 levels. */
 void func_003495C0(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x80) = a1; }
 
@@ -950,8 +948,6 @@ void func_0034CE28(int *self, int value)
         F076896f4_FUN_00349AB8((char *)self + 5040, 0);
     }
 }
-
-INCLUDE_ASM("asm/game", func_0034CE88);
 
 /* Measured target: byte-identical across all 27 levels. */
 void func_0034CE98(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2bc) = a1; }
