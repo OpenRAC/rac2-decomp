@@ -1113,7 +1113,7 @@ void func_L02_003FC248(void *a0, int unused_a1, int unused_a2) {
 
 /* The two entry scalers live in the -g8 sibling: retail reads the table through $gp. */
 
-INCLUDE_ASM("asm/levels", func_L02_003FE768);
+/* func_L02_003FE768 is in L02_003FE768-g8.c. */
 
 /* Allocates sixteen of sixty with no owner; on success attaches A0 as kind two. */
 void func_L02_003FF698(void *a0) {

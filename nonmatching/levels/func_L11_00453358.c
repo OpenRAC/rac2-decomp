@@ -1,12 +1,95 @@
-/* 4 November 2026 source audit: removed the ten dead float stores used only to raise the instruction count.
- * The previous controlled result below is historical and cannot qualify this
- * revised draft. Production remains assembly; no linked or native credit.
- * Current cleaned body is uncompiled: inherited standalone declarations/types
- * are incomplete. Recover them and review the state machine before new trials.
+/* 4 November 2026 contract review: restore the integer returns of func_002A8C28,
+ * func_002A8D70 and func_L07_00321D68, and the float return of func_002AA548, from their
+ * matched definitions. The ignored results do not change the generated body: the retained
+ * -O2 -G8 -ffunction-sections candidate passes 1/1 in both USA releases. PAL has no canonical
+ * identity. It remains a held diagnostic because of the case-9 dead store below.
  */
-/*
- * func_L11_00453358: strict build rejected it: ten consecutive dead stores to dist with counting values (dist = 2.0f ... 11.0f), padding that only raises gcse's insn count; overseer ruling: not landable. Near miss without them: only four spill slots permuted
+/* func_L11_00453358 (4,524 B, 1 place), 5 November 2026: exact in tools/check.py (1 of 1) and in
+ * tools/build.py all --strict, but NOT landable under AGENTS.md / MATCHING-BLOCKERS blocker 26:
+ * case 9's `height = 0.0f;` is a dead store whose only job is to keep a label between case 9's
+ * func_002A7750(self, 11, -1) and its break until jump2, so jump2 does not cross-jump that tail
+ * into case 13's (14, -1) one (without it: 4516 bytes). The merged twin func_L02_0040BE08 uses
+ * the same store; a ruling on both, or a natural construct that leaves that label, is needed.
+ * Tried without success: case 9 with an early break, and three inline-helper shapes for the
+ * transition (an inlined body's return label is deleted too early).
+ * Everything else is ordinary C: own -G8 unit with the default -g8 profile; the anim() and
+ * turn() inline helpers give gcse retail's count (S 543), which orders the four spilled
+ * reaching registers (pos, self+0xC0, self+0xF0, pv+0x1B0) as retail does.
  */
+/* func_L11_00453358: the Joba drone's state machine (patrol path, chase, grab, release, fall).
+ * Own -G8 unit: the level gate D_L11_001A8FF4 and D_L11_001B1D40 are $gp-relative.
+ * The four spilled pointers (self+0x10, self+0xC0, self+0xF0, pv+0x1B0) are gcse reaching
+ * registers; their stack slots follow gcse's hash-bucket order, which depends on the insn
+ * count at gcse. The anim() and turn() helpers are inlined; their expansion gives retail's
+ * count (S 543) without changing any instruction.
+ * Case 9's `height = 0.0f;` is the same construct as case 9 of the matched twin
+ * func_L02_0040BE08: it keeps case 9's tail apart from case 13's in jump2's cross-jumping.
+ */
+#include "common.h"
+
+typedef int TI128 __attribute__((mode(TI)));
+typedef struct { TI128 q; } Vec;
+typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; u8 *ptr[0x980]; TI128 q[0x260]; } Hero;
+
+extern char D_00189E20[];
+extern s32 D_L11_001A8FF4 __attribute__((sda));
+extern f32 D_L11_001B1D40 __attribute__((sda));
+extern f32 D_L11_001B1D44;
+extern f32 D_L11_001B1D48;
+extern u8 *D_L11_001FF580[];
+
+extern int func_002761F8(void *, void *, int, void *, void *);
+extern s32 func_00277258(void *, s32, void *, float);
+extern float func_00282C48(float);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_00282CF0(void *, void *, void *);
+extern void func_00282D30(void *, void *, float);
+extern float func_00282E48(void *, void *);
+extern float func_00282E80(void *, void *);
+extern void func_00282F20(void *, void *, float);
+extern float func_00283248(float, float);
+extern void func_002833F0(void *, void *);
+extern float func_00283B98(float, float);
+extern void func_002A677C(void *);
+extern void func_002A7470(void *, int, int, int);
+extern void func_002A7750(void *, int, int);
+extern int func_002A77E0(int);
+extern float func_002A7878(float, float);
+extern void func_002A7A00(void *, float, float);
+extern int func_002A8C28(void *, void *, int, float, float, float, int, int, int);
+extern int func_002A8D70(void *, int, int, float, float, float, int, int, int);
+extern float func_002AA150(float, float, float);
+extern float func_002AA548(void *, void *, float, float, float, float);
+extern void func_002AB6D8(void *, void *);
+extern int func_002B3868(u8 *);
+extern int func_002B3890(u8 *);
+extern void func_002B4090(void *, void *, float, float, float);
+extern int func_002B4FF0(void *, void *, float);
+extern void func_002B60B0(u8 *, float, float, float, float);
+extern char *func_002C2210(void *, float, float, int, unsigned int, int, int, void *, float, int);
+extern int func_L01_00321178(void *, void *);
+extern void func_L02_00333438(void *, void *);
+extern int func_L07_00321D68(void *, void *);
+extern u8 *func_L11_004417E8(u8 *);
+extern int func_L11_00441808(u8 *, void *);
+extern void func_L11_00441A38(u8 *, int, int);
+extern void func_L11_00454508(u8 *);
+extern void func_L11_00454AE0(u8 *);
+extern void func_L11_00454DD8(u8 *);
+
+/* Start animation a (blend b) unless it is already playing. */
+static __inline__ void anim(u8 *self, int a, int b)
+{
+    if (self[0x43] != a)
+        func_002A7470(self, a, 0, b);
+}
+
+/* Movement tuning with the shared turn limits. */
+static __inline__ void turn(u8 *self, float rate, float speed)
+{
+    func_002B60B0(self, rate, speed, 0.001163553f, 0.10471977f);
+}
+
 void func_L11_00453358(u8 *self)
 {
     f32 v00[4];
@@ -17,6 +100,7 @@ void func_L11_00453358(u8 *self)
     u8 *pv;
     u8 *target;
     f32 dist = 0.0f;
+    f32 height;
 
     pv = *(u8 **)(self + 0x68);
     if (self[0x20] == 1)
@@ -45,7 +129,7 @@ void func_L11_00453358(u8 *self)
     switch (self[0x20]) {
     case 3: {
         if (func_002B3868(self) != 0) {
-            func_002B60B0(self, 0.027777778f, 1.6666667f, 0.001163553f, 0.10471977f);
+            turn(self, 0.027777778f, 1.6666667f);
             self[0xBC] = 0;
             *(u16 *)(self + 0x96) = 0;
         }
@@ -65,8 +149,7 @@ void func_L11_00453358(u8 *self)
             *(u16 *)(self + 0x96) = 0;
         if (*(u16 *)(self + 0x96) < 0x1A)
             break;
-        if (self[0x43] != 0)
-            func_002A7470(self, 0, 0, 5);
+        anim(self, 0, 5);
         func_002A7750(self, 8, 3);
         break;
     case 7: {
@@ -84,7 +167,7 @@ void func_L11_00453358(u8 *self)
         if (func_002B3868(self) != 0) {
             p = path + 0x10;
             best = 0;
-            func_002B60B0(self, 0.027777778f, 3.3333335f, 0.001163553f, 0.10471977f);
+            turn(self, 0.027777778f, 3.3333335f);
             *(f32 *)(pv + 0x1C8) = func_002A7878(1.0f, 3.0f);
             d = func_00282E48((self + 0x10), p);
             for (i = 0; i < *(s32 *)path - 1; i++, p += 0x10) {
@@ -142,7 +225,7 @@ void func_L11_00453358(u8 *self)
     case 8: {
         s32 flag;
         if (func_002B3868(self) != 0)
-            func_002B60B0(self, 0.011111111f, 1.3333334f, 0.001163553f, 0.10471977f);
+            turn(self, 0.011111111f, 1.3333334f);
         flag = 0;
         if (*(s16 *)(pv + 0x1FC) != 0) {
             if (4.0f < dist) {
@@ -155,10 +238,10 @@ void func_L11_00453358(u8 *self)
             }
             flag = dist < 4.0f;
         } else {
-            f32 z = *(f32 *)(target + 8) + 0.5f;
-            func_002AA548(self + 0x18, pv + 0x108, z, 0.0055555557f, 0.027777778f, 0.16666667f);
+            height = *(f32 *)(target + 8) + 0.5f;
+            func_002AA548(self + 0x18, pv + 0x108, height, 0.0055555557f, 0.027777778f, 0.16666667f);
             func_002B4FF0(self, v00, *(f32 *)(pv + 0x1D0));
-            if (func_00282C48(*(f32 *)(self + 0x18) - z) < 0.1f &&
+            if (func_00282C48(*(f32 *)(self + 0x18) - height) < 0.1f &&
                 func_00282E80((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) < 2.0f)
                 flag = 1;
         }
@@ -170,19 +253,19 @@ void func_L11_00453358(u8 *self)
         break;
     }
     case 9:
-        if (func_002B3868(self) != 0 && self[0x43] != 2)
-            func_002A7470(self, 2, 0, 3);
+        if (func_002B3868(self) != 0)
+            anim(self, 2, 3);
         if (self[0x60] & 2) {
-            if (self[0x43] != 3)
-                func_002A7470(self, 3, 0, 5);
+            anim(self, 3, 5);
             func_002A7750(self, 11, -1);
         }
+        height = 0.0f;
         break;
     case 11: {
         s32 k;
         f32 lim = 0.0f;
         if (func_002B3890(self) != 0) {
-            func_002B60B0(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+            turn(self, 0.0022222223f, 0.06666667f);
             *(u16 *)(self + 0x96) = 0;
         }
         *(f32 *)(self + 0x48) = 1.75f;
@@ -207,13 +290,11 @@ void func_L11_00453358(u8 *self)
         }
         if (((Hero *)D_00189E20)->ptr[0x249C / 4] == self) {
             func_002A7750(self, 12, -1);
-            if (self[0x43] != 4)
-                func_002A7470(self, 4, 0, 5);
+            anim(self, 4, 5);
             *(f32 *)(self + 0x48) = 1.0f;
         }
         if (func_00282E48((self + 0x10), &((Hero *)D_00189E20)->q[0x80 / 16]) > 4.0f && *(u16 *)(self + 0x96) >= 0x79) {
-            if (self[0x43] != 5)
-                func_002A7470(self, 5, 0, 15);
+            anim(self, 5, 15);
             func_002A7750(self, 4, -1);
             *(f32 *)(self + 0x48) = 1.0f;
         }
@@ -222,15 +303,13 @@ void func_L11_00453358(u8 *self)
     case 12:
         if (!(self[0x60] & 2))
             break;
-        if (self[0x43] != 0)
-            func_002A7470(self, 0, 0, 15);
+        anim(self, 0, 15);
         func_002A7750(self, 8, -1);
         break;
     case 10:
         if (*(u16 *)(self + 0x96) >= 0xF) {
             func_002A7750(self, 9, -1);
-            if (self[0x43] != 2)
-                func_002A7470(self, 2, 0, 2);
+            anim(self, 2, 2);
             *(f32 *)(self + 0x48) = 1.0f;
         }
         qcopy(v10, (self + 0x10));
@@ -247,8 +326,7 @@ void func_L11_00453358(u8 *self)
         func_002A8C28(self, (self + 0x10), 0x10000, 0.5f, (f32)pv[0x34], 1.0f, 0, 1, 0);
         if (*(f32 *)(pv + 0x20) > 0.0f) {
             func_002A7750(self, 8, 3);
-            if (self[0x43] != 0)
-                func_002A7470(self, 0, 0, 5);
+            anim(self, 0, 5);
         } else if (*(s16 *)(pv + 0x1FC) != 0 && func_002A77E0(2) == 0) {
             func_002A7750(self, 14, -1);
         } else {

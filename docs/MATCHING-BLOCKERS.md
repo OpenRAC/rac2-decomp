@@ -641,6 +641,61 @@ loops give them: `for (i = 0; i < 16; i++) a[i] = 0;` has an address computation
 into the same pointer countdown as `*dst++` over a reversed counter. Check loop spellings first when a near miss is
 all stack offsets; they change nothing after loop.c.
 
+**Joba state machines, 5 November 2026 (USA v1.01, `-O2 -G8`, retained in `nonmatching/levels/`):**
+`func_L11_00453358` is now 4524/4524 bytes with every instruction equal; a scratch cc1 whose bucket
+count is forced from an environment variable (not committed) makes it `1 of 1` at S 539-543 and
+561-565, so only the gcse insn count is left (its source gives 551). Whole-file `-fno-force-mem`
+also lands it in the window (it removes the HI copy that `emit_cmp_insn`/`compare_from_rtx` force
+before each `short` compare), but changes four other places, among them a `u8` compare whose
+`andi 0xFF` retail keeps, so that flag is not retail's profile. Skipping `force_not_mem` only
+in `extendhisi2`, or only for HImode compares, moves `max_cuid` by just 2 and 4. Every spelling of
+an `if (*(s16 *)p)` test (`!= 0`, an `(s32)` cast, a struct field, an `s32` local) expands to the
+same three insns. Dead initialisers count one insn each and change no instruction. The case-9
+cross-jump in that function is closed only by the matched twin `func_L02_0040BE08`'s
+`height = 0.0f;`, which needs a ruling. (Under blocker 26 it is an artificial use, so `func_L11_00453358` is kept in `nonmatching/` exact but unlanded.) `func_L11_00451178`'s natural wording needs S 575-585 and
+then still differs in two orders, so it is not a count alone.
+Second pass: for 453358, loop spellings, `rot` placement and the byte-offset `qcopy` are
+count-neutral, and even all ten dead initialisers reach only S 555. A `pos` local lands in the
+window but takes a saved register, so the roughly 20-insn difference is still unidentified.
+**Later on 5 November 2026:** `func_L11_00453358` became exact (level 11 `OK`) but is kept in
+`nonmatching/` because of the case-9 dead store (blocker 26). The count came from two inlined helpers, not from
+spellings: `anim(self, a, b)` (`if (self[0x43] != a) func_002A7470(self, a, 0, b);`, eight
+sites) and `turn(self, rate, speed)` (`func_002B60B0` with the shared last two constants, four
+sites). Both are code-neutral and bring S from 551 to 543. So a void helper that wraps a
+repeated idiom is a count lever: F4's "inline helpers returning a value do nothing" does not
+extend to these. On the forced-bucket check, an `emit()` helper around the `func_002A8C28`
+calls is code-neutral too (S 541). For `func_L11_00451178` the same helpers bring the natural
+wording into its window (`turn` alone gives S 581), but its case-7 hoist order still differs.
+**Resolved later the same day:** `func_L11_00451178` matches too (`L11_00451178-gu-g8.c`). Three
+steps, each read from a dump:
+- **Slot order.** Retail's 0xCC slot for `tmpl` sits between gcse registers (0xC4/0xC8 for
+  `&work[1]`/`&work[4]`, 0xD0+ for case 12's addresses), which a user variable can only get if
+  it is *evicted*. Global-alloc gives `tmpl` and case 12's three reaching registers one saved
+  register (their lives do not overlap), reload takes it back, and the evicted pseudos get
+  slots in pseudo order after the ones spilled from the start. The variable has to win the
+  register first, so `tmpl = &particle;` goes just before the template is filled (a short
+  life), not earlier in the case. As a register argument it also drops gcse's copy from the
+  particle loop: 46 insns, so loop.c's first-pass threshold (61 - 3 per hoist) still covers
+  0x70707F.
+- **PRE copy order.** PRE inserts its copies in expression-index order, which is the order of
+  first appearance. `spin = (float *)(state + 0x2B0);` before the loop (`func_L11_0044AFC8`'s
+  `rotation`) makes `state+0x2B0` appear before `object+0xF0`.
+- **Bucket count.** The `turn()` helper gives S 583.
+Reading `-dL` for "not desirable" and the loop's real insn count is the quickest check on a
+preheader order.
+
+**PR #419 contract review, 4 November 2026:** the sentry's `func_002B1C20` call must
+preserve its matched callee's unsigned 64-bit return. With that declaration and a
+64-bit local, the compound `!func_002A77E0(30) || (flags & 1)` condition adds a
+`dsll32`/`dsra32` normalization pair (4832/4824 bytes). The equivalent early exit
+`if (func_002A77E0(30) && (flags & 1UL) == 0) break;` preserves the original call
+order and low-bit tests and restores 4824 bytes, 1/1 USA v1.01 placements. Its
+canonical identity is absent from PAL and USA v2.00. The held drone also restores
+four ignored return contracts from their matched definitions: integer results for
+`func_002A8C28`, `func_002A8D70` and `func_L07_00321D68`, and a float result for
+`func_002AA548`. It remains 1/1 in both USA releases, but its case-9 dead store
+still prevents promotion.
+
 **Update, 3 November 2026 (pending review):** now matched. `func_L12_00300410` is C in `src/levels/12_todano/L12_00300410-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 1 US place (PAL and US2 catalogues have no function of this name). The measurements above are kept as history.
 
 **Qualified field and call-lifetime remedies, 25 October 2026:**
@@ -3546,7 +3601,7 @@ attributed for provenance, not exclusive ownership.
 | **Clear through a register address at a nonzero offset:** `func_002B5678` | Open | Retail has `addiu $v0,$s1,0x60 ; sq $zero,0($v0)`, the clear macro's register operand. After #258, C gives `por` + `sq $v0,0x60($s1)`. **Next:** a profile that materializes the address of a displaced const-0 TImode store. |
 | **A `por` clear at a zero displacement:** `func_L02_003DB200`, `func_L02_00423520`, `func_L23_00422798`, and with the copy barrier `func_L02_003DBA70`, `func_L23_00429DC8` | Proposed: PR #281 | These functions clear a stack vector with `por $v0,$zero,$zero` + `sq $v0,0($sp)`. Since #258, the fold still makes that `sq $zero,0($sp)`, because the address is register-only.<br><br>A finer retail count (one place per catalogue row, boot game code from 0x26EA00, a store counted when every path into it starts from the `por`) finds 183 `por`-fed stores at a zero displacement, in 153 functions. Every one of them is to `0($sp)`; none goes through another register. Against that, 396 `sq $zero,0(reg)` stores in 263 functions, of which 82 (58 functions) are also to `0($sp)`.<br><br>PR #281 adds the opt-in `-frac2-zero-ti-por`: with it, the fold leaves a store to `0($sp)` alone, and stores through any other register still fold. It is neutral by default (806 of 806 units). Forced on everywhere, it changes exactly the 4 units whose matched functions clear `0($sp)` with `sq $zero`. The five functions above are exact with it. `func_L23_003C16D8` stays out: three of its clears go through a computed stack address. |
 | **A cse block boundary that leaves no instruction:** `func_L02_003D26B0`; the five 632-byte twins `func_L11_00436D08`, `func_L11_00449C70`, `func_L11_0044C850`, `func_L11_004530E0`, `func_L11_004566C0`; `func_L02_003F1BA8`, `func_L02_0040BBD8`; `func_L07_00378898` | Open | Retail keeps a gcse (PRE) copy, for example `daddu $s5,$s4,$zero` of `e + 0x10`, that this cc1 makes only when cse1 and cse2 both see a label at that spot. Adding `\|\| x == 7 \|\| y == 9` to the test reproduces it, with extra code. An empty `do { } while (0)` reproduces it exactly but is rejected (#257, fc4a6c6). For `func_L07_00378898`, `-fno-cse-follow-jumps -fno-cse-skip-blocks` reproduces the block, as a probe only. **Next:** the original's construct at that spot, or a measured cse rule. |
-| **Meaningful nonempty one-pass groups:** `func_L02_003FB000`, `func_002CDA20`, `func_002CF2B8`, `func_002D53F0` | Strict linked matches; pending PR review | **4 November 2026:** current active RAC1 game C supplies the missing source-method precedent; see [source methods](COMPILER-NOTES.md#source-methods-shared-with-rac1). The actual last store gives Maktar 288 bytes, 1/1 places in each USA release (PAL identity absent). Actual formatter-call groups give the three text draws 140/136/140 bytes and 28/28 USA v1.01 places each; their canonical identities are absent in the other releases. The formatter style remains 64 bits; its return and the signed32 address getter follow their real definitions. Old narrower-style trials remain invalid. All 84 strict programs pass with zero C fallbacks, and all 92 placements of the five added functions are present in their carrying programs. This supersedes the earlier blanket hold on nonempty groups, not the ban on empty loops or fake dependencies. `func_0033A520` is still unresolved: its historical exact probe also assumes an unevidenced const global and fails both alternate releases. |
+| **Meaningful nonempty one-pass groups:** `func_L02_003FB000`, `func_002CDA20`, `func_002CF2B8`, `func_002D53F0` | Strict linked matches; pending PR review | **4 November 2026:** current active RAC1 game C supplies the missing source-method precedent; see [source methods](COMPILER-NOTES.md#source-methods-shared-with-rac1). The actual last store gives Maktar 288 bytes, 1/1 places in each USA release (PAL identity absent). Actual formatter-call groups give the three text draws 140/136/140 bytes and 28/28 USA v1.01 places each; their canonical identities are absent in the other releases. The formatter style remains 64 bits; its return and the signed32 address getter follow their real definitions. Old narrower-style trials remain invalid. All 84 strict programs pass with zero C fallbacks, and all 92 placements of the five added functions are present in their carrying programs. This supersedes the earlier blanket hold on nonempty groups, not the ban on empty loops or fake dependencies. `func_0033A520` is still unresolved: its historical exact probe also assumes an unevidenced const global and fails both alternate releases.<br><br>**5 November 2026:** `func_L02_003FE768` (shared boss bar) matches the same way, with each real conversion of its rounded edge in a group (`t = v * scale + 0.5f; do { top = t; } while (0);`): 2 of 2 USA places, 0 of 2 without the groups. A scratch cc1 that made every float-to-int conversion a sched2 barrier broke 95 of 228 matched functions, so the barrier belongs to these sources. In `func_L11_00444400` the same groups give retail's boundary before each box call (4692/4684 bytes); its register allocation is still open. |
 | **Jump tables the build cannot place:** `func_L06_003FDA08`, `func_L13_00422CB8`, `func_L03_003C4578`, `func_L02_003F9AF0`, `func_L02_003F9B70`, `func_L02_003FE1B0` | Solved, PR pending | A computed goto through retail's own table, in the form of `func_00310A40`, matches all six. The three level 2 records' in-order switches were wrong: retail's tables map the values to the bodies in another order. Decode the table before trusting a record's `switch`. |
 | **Labels behind hazard nops:** `func_L18_004308F0`, `func_L02_00411530` | Merged, #264 | Opt-in `-frac2-hazard-labels`. 198 retail branch targets after a compare or `mtc1` sit on the nop, and SN's `Ps2EeAs` agrees. Forced on everywhere it is neutral (778 of 779, one `.mdebug`). |
 | **gcse critical-edge split, Cygnus block merge:** `func_002CD720`, `func_L02_003E79F8`, `func_L02_003FCCA0`, `func_L18_004283F0` | Merged, #261 | Opt-in `-frac2-gcse-unsplit-edges` and `-frac2-keep-block-order`. `func_L23_0041B9F0` reaches retail's size with the gcse switch and still stops at the copy order. |

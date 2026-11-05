@@ -1,3 +1,36 @@
+/* 5 November 2026, two-agent pass:
+ * - Boundary: with func_L02_003FE768's one-pass conversion groups (allowed by COMPILER-NOTES'
+ *   source methods; that function now matches) on the box x/y/h and the label y, every call's
+ *   argument setup follows its chains as in retail: 4692/4684 bytes, 458 instructions aligned.
+ * - Left, all register allocation: 0.5 in $f22 (the label -1/0 constants are block-local and
+ *   local-alloc takes $f20/$f21 first; retail's are global, so a block boundary existed there
+ *   during allocation); rect-address reaching registers keep $fp/$s6/$s7 where retail's reload
+ *   evicts them (reload here never needs more than $v0/$v1); the constant 3 follows cse's
+ *   10-block path length. The only construct found that fixes 0.5 and the save set is the
+ *   twin's dead `if (mode == 1) y = 1.0f;` arm (580 aligned), which blocker 26 rules out.
+ */
+/* 5 November 2026, third pass (retained body unchanged, 4640/4684 bytes). Measured:
+ * - This compiler's pass order after reload is flow2 -> sched2 -> jump2 (cross-jumping, jumps to
+ *   the next insn) -> dbr. Retail's boundary before each call's argument setup is therefore a
+ *   basic-block boundary that exists at sched2 and is gone by jump2 or dbr, without leaving a test.
+ * - `if (D_L11_001B3E00 == 1)` around the box call with identical arms (D_L11_001B3E00 being the
+ *   word before the scale, as the mode word D_L02_001B3E00 is in level 2) does give the boundary:
+ *   all three chains finish before the argument loads. But the arms are not merged, so the
+ *   function grows to 5144 bytes.
+ * - An inline `hud_scaled(float v)` returning (int)(v * D_L11_001B3E04 + 0.5f) gives retail's
+ *   chain shape (lwc1/cvt.s.w, value $f0, scale $f1); with the twin's dead `if (mode == 1)` arm
+ *   it also gives retail's full save set ($s3, $s4, $s6, $s7 saved), as func_L02_003FF6E8's note
+ *   explains, but no boundary (the test goes at flow2).
+ * - Negative: sched1 on (4644 bytes), no sched2 (retail does schedule: data and 0.5 move),
+ *   volatile layout globals (lw/mtc1 loads).
+ */
+/* 5 November 2026: retained body unchanged (4640/4684 bytes). New negative: the boxes as a
+ * `static __inline__` helper taking the rounded coordinates as arguments (so they are
+ * evaluated before the inlined call) do not make retail's boundary; sched2 then interleaves
+ * all three chains. In haifa-sched a LOOP_BEG/END note in mid-block is a full barrier that
+ * does not end the block, which is why the rejected do-while (0) diagnostic worked; a natural
+ * construct with that effect is still not identified.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 4640/4684 bytes, 0/1 placements; first difference size mismatch.
  * Profile: -O2 -G8 -ffunction-sections -fno-schedule-insns.

@@ -1,63 +1,19 @@
-/* 4 November 2026 actual-contract review; retained near miss, not linked.
- * USA v1.01 check.py: 4824/4824 bytes, 0/1 placements; first difference 0x1088.
- * Profile: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges.
- * Five helpers keep their defined return contracts: the four level movement helpers return int
- * and func_003280C8 returns a pointer. These ignored-result repairs leave the six case-12
- * PRE/spill words unchanged.
- * Earlier measurements below are historical where superseded by this note.
- */
-/* func_L11_00451178 (4,824 B, 1 place): finisher F3, 2026-10-26. The Joba twin of
- * func_L02_0040A4A8 (same particle loop: alpha = 127 after the 0x48 store, the template through
- * tmpl; see that unit's header). Profile -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges.
- * 1206 of 1206 instructions, 4824 bytes; every instruction equal except 7 words in case 12.
- * What closed it:
- *  - one function-scope scratch array work[6] at sp+0x10: retail reuses sp+0x10..0x5F for the
- *    head's aim vector, case 7's bounds[2] + matrix[4], case 9's hand/shot/dir and case 12's
- *    5-quad buffer. Block-scoped vectors cannot share it here: an address-taken block local is
- *    preserved to the enclosing level by every following expression statement (function.c
- *    preserve_temp_slots), so the head's vector would stay live and push the frame to 0x180;
- *  - pos = object + 0x10 set in each head arm, after the call in the state->0x2D8 arm (retail's
- *    compute-then-copy);
- *  - case 5 before case 6, each with its own movement-flag test (no fall-through);
- *  - -G8 sda floats for the gp block D_L11_001B1D04..001B1D24, D_L11_001A8F20 as MACRO_ADDR
- *    (one la insn at the call), D_L11_001C0D18 as an incomplete array, the boot pointers nosda;
- *  - case 12's row copy as qcopy() in a counted loop: a TI copy lets loop.c reverse the loop;
- *  - the spill slots: retail's sp+0xC4 &work[1], 0xC8 &work[4], 0xCC tmpl, 0xD0 state+0x2B0,
- *    0xD4 object+0xC0, 0xD8 object+0xF0 is pseudo-number order (none gets a hard register from
- *    global; reload1.c gives slots in pseudo order). As gcse PRE copies the case-12 addresses
- *    come in hash-bucket order (max_cuid 1175, 587 buckets) and always after tmpl, so they are
- *    function-scope pointers declared out, scale, tmpl, spin, rows, axis.
- * Left (7 words, case 12 head): retail sets the spilled pointers in the order spin, out, axis,
- * scale, rows (stores to 0xD0, 0xC4, 0xD8, 0xC8, 0xD4); here out and scale are always adjacent
- * (0xD0, 0xC4, 0xC8, 0xD8, 0xD4 at best; all 120 orders of the five assignments give 12
- * sequences, none retail's; assigning them before the func_002B3868 call moves the frame ones
- * out of the block), and the state+0x1A8 clear is scheduled after the lw $s0 reload where
- * retail has it before.
- * v1932 (opus-1, 2026-10-31), recompiled on v2/c05: this body still gives 4824/4824 bytes, 0/1
- * places, 6 words differ (+0x1088..0x1094, +0x10D4/+0x10EC). Why single-set locals cannot fix
- * it: haifa-sched adjust_priority raises an insn that becomes ready when the func_002B3868 call
- * issues to the call's priority if birthing_insn_p (dest live, REG_N_SETS == 1). out and scale
- * are $1-based, so they depend on the call ($1 = $at is call-clobbered) and get boosted ahead of
- * axis. Retail's pointers are gcse PRE reaching registers (REG_N_SETS > 1, never boosted), as in
- * matched func_L11_0044AFC8. The natural wording (drop out/scale/tmpl/spin/rows/axis, write the
- * addresses directly, &particle for tmpl; the v1925 wip) gives retail's exact instruction order,
- * the 0x1A8 clear included. Only 15 spill-slot offsets then differ, because PRE numbers reaching
- * regs in bucket order, bucket = (14029 + regno + const) % S, S = (max_cuid/2)|1. That wording
- * has max_cuid 1176 (S 589): $1+176 wraps below $1+32. Retail's slots need S in 575..585, i.e.
- * max_cuid 1148..1171, 5 to 28 fewer insns after cse1 (or S 599 with state's pseudo >= 88, which
- * means 20+ more). Checked: deleting three object[0xBC] = 1 stores (max_cuid 1170) gives retail's
- * slots with no other change. Count-neutral: pointer locals inside one EBB, split head tests,
- * int vs float 0x1A8 clear, a byte-offset qcopy in the row loop. These change code: hoisted
- * &work[0]/&work[2] locals in case 9, a ?: argument for case 9's func_002A7750.
- * PERMUTE-FLAGS: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
- *
- * closer D, 1 November 2026: the natural wording scores 19 words here. Merging the `object[0x60] & 2`
- * tails of cases 5, 6 and 10 with a shared label would lower max_cuid, but retail keeps those tails
- * apart (4,784 to 4,808 bytes), so the 5 to 28 fewer insns have to come from elsewhere.
- * Dropping the started, launch and goal locals scores 18 words; the first difference stays at +0xA24.
- *
- * closer D, later: MACRO_ADDR on D_00189E20 or D_L11_001C0D18 (one fewer insn each, same-register lui/addiu) moves
- * code, 29 to 57 words. They are not the missing 5 to 28 insns.
+/* func_L11_00451178: the Joba sentry's patrol, alert, attack and launch states; the twin of
+ * func_L02_0040A4A8 (L02_0040A4A8-gu.c). Own unit for -frac2-gcse-unsplit-edges.
+ * - work[6] is one function-scope scratch array: retail reuses sp+0x10..0x5F across the head
+ *   and cases 7, 9 and 12.
+ * - Case 7 passes the particle template through tmpl, set just before the template is filled.
+ *   Its short life wins it a saved register in global-alloc, which reload then takes back, so
+ *   its slot (0xCC) is assigned with case 12's reaching registers (state+0x2B0, object+0xC0,
+ *   object+0xF0), in pseudo order after &work[1] and &work[4] (0xC4, 0xC8). Through a register,
+ *   the template also keeps the particle loop at 46 insns, so loop.c hoists all seven
+ *   constants in its first pass (see the twin's header).
+ * - Case 12 sets spin = state + 0x2B0 before its loop, as func_L11_0044AFC8 does: the address
+ *   then enters gcse's expression table before object+0xF0, which orders the PRE copies.
+ * - turn() is inlined; with it gcse sees retail's insn count (S 583), and the bucket order of
+ *   the reaching registers gives retail's spill slots.
+ * - Case 11 preserves func_002B1C20's unsigned 64-bit return. Its early exit keeps the
+ *   low-bit test in control flow; the compound OR spelling adds a 32-bit normalization.
  */
 #include "common.h"
 
@@ -125,7 +81,7 @@ extern float func_0029F530(u8 *);
 extern s32 func_002AEB60(u8 *, float);
 extern void func_00283098(void *, void *, void *);
 extern void *func_003280C8(float, u8 *, void *, void *, s32, s32);
-extern s32 func_002B1C20(u8 *, void *);
+extern unsigned long func_002B1C20(u8 *, void *);
 extern void func_L02_003FC248(u8 *, s32, s32);
 extern void func_L11_00452DF8(u8 *);
 extern void func_002AB6D8(void *, void *);
@@ -138,6 +94,12 @@ extern void func_L11_00452810(u8 *);
 extern void func_L11_004528A0(u8 *);
 extern void func_L00_002E6EF8(void (*)(u8 *), void *);
 
+/* Movement tuning with the sentry's usual turn limits. */
+static __inline__ void turn(u8 *object, float rate, float speed)
+{
+    func_002B60B0(object, rate, speed, 0.0005817765f, 0.052359886f);
+}
+
 /* Update the Joba sentry's patrol, alert, attack and launch states. */
 void func_L11_00451178(u8 *object)
 {
@@ -149,12 +111,7 @@ void func_L11_00451178(u8 *object)
     ActorVector velocity;
     ActorVector particle;
     s32 count;
-    ActorVector *out;
-    ActorVector *scale;
     ActorVector *tmpl;
-    float *spin;
-    ActorVector *rows;
-    u8 *axis;
     u8 *state;
     u8 *pos;
     float heading;
@@ -196,7 +153,7 @@ void func_L11_00451178(u8 *object)
             if (object[0x43] != 9)
                 func_002A7470(object, 9, 0, 10);
             object[0xBC] = 0;
-            func_002B60B0(object, 0.0044444446f, 0.13333334f, 0.0005817765f, 0.052359886f);
+            turn(object, 0.0044444446f, 0.13333334f);
             func_L11_00452F30(object, func_L11_004417E8(*(u8 **)(object + 0xB8)));
             *(u16 *)(object + 0x96) = 10000;
         }
@@ -260,9 +217,9 @@ void func_L11_00451178(u8 *object)
             *(u16 *)(state + 0x2D6) = 0;
         }
         if (D_L11_001B1D24 < range)
-            func_002B60B0(object, 0.0044444446f, 0.13333334f, 0.0005817765f, 0.052359886f);
+            turn(object, 0.0044444446f, 0.13333334f);
         else if (range < D_L11_001B1D20)
-            func_002B60B0(object, 0.0011111111f, 0.033333335f, 0.0005817765f, 0.052359886f);
+            turn(object, 0.0011111111f, 0.033333335f);
         if (object[0x42] != 12 && range < D_L11_001B1D18 && angle < 1.5707965f) {
             if (object[0x43] != 12) func_002A7470(object, 12, 0, 10);
         } else if (object[0x42] == 12 && D_L11_001B1D1C < range) {
@@ -310,7 +267,6 @@ void func_L11_00451178(u8 *object)
                 func_00282CC0(&near_point, &near_point, &effect);
                 func_00282CC0(&far_point, &far_point, &effect);
                 near_point.f[2] -= 0.1f;
-                tmpl = &particle;
                 far_point.f[2] -= 0.1f;
                 i = 2;
                 do {
@@ -328,6 +284,7 @@ void func_L11_00451178(u8 *object)
                         func_002A8C28(object, &far_point, 0.3f, 0x4000001, (float)state[0x34], 1.0f, 0, 1, 0);
                     }
                 } while (--i >= 0);
+                tmpl = &particle;
                 particle.f[0] = 0.0f;
                 particle.f[1] = 0.0f;
                 particle.f[2] = 0.1f;
@@ -404,53 +361,50 @@ void func_L11_00451178(u8 *object)
             func_002A7750(object, 7, -1);
         break;
     case 11: {
-        s32 flags = func_002B1C20(object, state + 0x50);
+        unsigned long flags = func_002B1C20(object, state + 0x50);
         if (object[0x42] == 15) {
-            if (!func_002A77E0(30) || (flags & 1)) {
-                if (func_0029F530(object) < 15.0f && *(s16 *)(state + 0x2D8) && !func_002A77E0(2))
-                    func_002A7750(object, 12, -1);
-                else {
-                    func_L02_003FC248(object, 0, -1);
-                    func_L11_00452DF8(object);
-                }
+            if (func_002A77E0(30) && (flags & 1UL) == 0)
+                break;
+            if (func_0029F530(object) < 15.0f && *(s16 *)(state + 0x2D8) && !func_002A77E0(2))
+                func_002A7750(object, 12, -1);
+            else {
+                func_L02_003FC248(object, 0, -1);
+                func_L11_00452DF8(object);
             }
-        } else if (flags & 2)
+        } else if ((flags & 2UL) != 0)
             func_002A7750(object, 7, 3);
         break;
     }
     case 12: {
         u8 *launch = state + 0x1A0;
         s32 started = func_002B3868(object);
-        spin = (float *)(state + 0x2B0);
-        out = &work[1];
-        axis = object + 0xF0;
-        scale = &work[4];
-        rows = (ActorVector *)(object + 0xC0);
         if (started) {
             s32 k;
+            float *spin;
             func_00282CF0(launch, func_L11_004417E8(*(u8 **)(object + 0xB8)), pos);
             *(float *)(state + 0x1A8) = 0.0f;
             func_00282F20(launch, launch, func_002A7878(3.0f, 5.0f) * 0.016666668f);
             *(s16 *)(state + 0x2D8) = 0;
+            spin = (float *)(state + 0x2B0);
             for (k = 0; k < 3; k++) {
                 spin[k] = func_002A7878(240.0f, 720.0f) * 0.00029088825f;
-                qcopy(&work[k], &rows[k]);
+                qcopy(&work[k], &((ActorVector *)(object + 0xC0))[k]);
             }
-            func_002AB6D8(work, axis);
+            func_002AB6D8(work, object + 0xF0);
             if (object[0x43] != 18) func_002A7470(object, 18, 0, 30);
             *(u16 *)(object + 0x34) &= 0xEFFF;
         }
         *(float *)(state + 0x1A8) -= *(float *)(state + 0x12C);
         func_L07_00321D68(object, launch);
-        func_00282D30(spin, spin, 0.98f);
+        func_00282D30(state + 0x2B0, state + 0x2B0, 0.98f);
         {
             float f = *(float *)(object + 0x2C) * 0.0009765625f;
             count = 3;
-            func_002A3F10(object, 1, &count, out);
-            func_00282D30(&work[0], scale, f);
+            func_002A3F10(object, 1, &count, &work[1]);
+            func_00282D30(&work[0], &work[4], f);
         }
         func_002B4090(*(float *)(state + 0x2B0), *(float *)(state + 0x2B4), *(float *)(state + 0x2B8), object, work);
-        func_002833F0(rows, axis);
+        func_002833F0(object + 0xC0, object + 0xF0);
         if (*(float *)(object + 0x18) < ((float *)func_L11_004417E8(*(u8 **)(object + 0xB8)))[2] + 5.0f ||
             !func_002A77E0(450) || *(u16 *)(object + 0x96) >= 301) {
             func_L02_003FC248(object, 0, -1);
