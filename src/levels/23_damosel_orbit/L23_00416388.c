@@ -135,7 +135,7 @@ s32 func_L23_00419CE0(u64 arg0) {
 
 /* func_L23_0041A038 is matched in L23_0041A038-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L23_0041A3B8);
+/* func_L23_0041A3B8 is defined in L23_0041A3B8-g8.c. */
 
 /* func_L23_0041A7A0 is matched in L23_0041A7A0-g8.c. */
 

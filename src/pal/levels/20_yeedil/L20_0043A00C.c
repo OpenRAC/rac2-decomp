@@ -30,5 +30,4 @@ s32 func_PAL_L20_0043A610(char *arg0, s32 arg1) {
     return s2;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0043E868);
 
