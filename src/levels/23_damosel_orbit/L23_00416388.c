@@ -320,8 +320,6 @@ void func_L23_0041CCC0(char *arg0) {
 
 /* func_L23_0041D1F0 is matched in L23_0041D1F0-g8.c (built with -fno-gcse). */
 
-INCLUDE_ASM("asm/levels", func_L23_0041D398);
-
 /* func_L23_0041D398 is matched in L23_0041D398-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L23_0041DA48);

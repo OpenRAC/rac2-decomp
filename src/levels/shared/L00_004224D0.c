@@ -44,7 +44,7 @@ extern void func_L00_00424EB0(char *a0, char *a1, float t);
 
 extern float func_L00_00424C90(char *a0, char *a1, float t);
 
-INCLUDE_ASM("asm/levels", func_L00_004224D0);
+/* func_L00_004224D0 is in L00_004224D0-main-g8.c (-G8, -frac2-qcopy). */
 
 typedef struct { float x, y, z, w; } Vector;
 typedef struct { Vector row[3]; } Matrix;

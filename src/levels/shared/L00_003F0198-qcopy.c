@@ -1,33 +1,13 @@
-/* 4 November 2026, bounded source-lifetime follow-up; not linked.
- * Current replay of the retained profile/body: 1252/1252 bytes, 0/27 USA
- * v1.01 places; only the two one/150 initialization instructions differ.
- * A common named increment for the counter/mode updates produces 1264 bytes.
- * A natural if/else replacing the two-arm switch produces 1248 bytes and
- * changes the dispatch/delay layout. Neither improves the retained switch.
- * No synthetic dependency or discarded source effect is retained. US2/PAL
- * compilation was not repeated after the US mismatch. Reopen only with
- * independent evidence for the original constant birth order.
- */
-/* GPT-6.1 Sol, high effort; bounded manual reconstruction, 2026-10-29; not linked.
- * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
- *          -fno-gcse -fno-strength-reduce.
- * USA v1.01: 1252/1252 bytes, 0/27 places. This draft was not checked in other releases.
- * Only two instructions differ: retail initializes s0 = 1 at +0x2C and a1 = 150 at
- * +0x5C; this C initializes those same constants in the opposite order. All remaining
- * non-relocation instructions agree at level 00, including the 0x80 frame, F20 zero lifetime,
- * bounds/rollback stores, all three initialization variants and the pool scan.
- * Disabling GCSE preserves the floating zero but requires an explicit scan base,
- * displacement and shared capacity. Separate shade-result locals and paired assignments
- * recover return-register and store order. Reading the slot owner before capturing its
- * displacement, with strength reduction disabled, recovers the retail offset copy.
- * A const capacity duplicates the two limit loads; moving its initialization into the
- * loop is a tie. An explicit first-kind variable with goto dispatch hoists an extra
- * floating constant and is worse. No volatile accesses or fabricated dependencies used.
- * Reopen with evidence for the original two constant lifetimes or loop-hoisting order.
- * All declarations needed by this draft follow below.
+/* Takes a free record from the 128-byte pool, counts it against its owner, and fills it in one of
+ * three ways by kind.
+ *
+ * A unit of its own for its flags: -fno-gcse keeps the floating zero in one register,
+ * -fno-strength-reduce keeps the record offset a copy of the shifted index, and the position copy
+ * needs -frac2-qcopy with its barrier.
  */
 #include "common.h"
 
+/* func_L00_003F0198: the 320-record pool of 128-byte records, owned through their last word. */
 typedef int PoolWord128 __attribute__((mode(TI)));
 typedef union { PoolWord128 word; float values[4]; } PoolVector;
 typedef struct {
@@ -54,13 +34,15 @@ PoolRecord *func_L00_003F0198(char *owner, int kind, PoolVector *position, float
     char *slotOwner;
     PoolRecord *pool = D_L00_001B2BB8;
     int displacement;
-    int limit;
     int i, oldCount, random;
     float scale;
     float zero = 0.0f;
     i = 0;
-    limit = 150;
     for (; i < 320; i++) {
+        /* Set before any test of the iteration, so loop.c hoists it ahead of 90, the
+           direction address and 2; the 150 of the rollback tests then goes last. */
+        int secondKind = 1;
+
         slotOwner = pool[i].owner;
         displacement = i * 128;
         if (slotOwner)
@@ -69,7 +51,7 @@ PoolRecord *func_L00_003F0198(char *owner, int kind, PoolVector *position, float
         case 0:
             oldCount = *(int *)(owner + 0x40);
             *(int *)(owner + 0x40) = oldCount + 1;
-            if (oldCount + 1 == limit) {
+            if (oldCount + 1 == 150) {
                 *(int *)(owner + 0x40) = oldCount;
                 return 0;
             }
@@ -77,7 +59,7 @@ PoolRecord *func_L00_003F0198(char *owner, int kind, PoolVector *position, float
         case 1:
             oldCount = *(int *)(owner + 0x44);
             *(int *)(owner + 0x44) = oldCount + 1;
-            if (oldCount + 1 == limit) {
+            if (oldCount + 1 == 150) {
                 *(int *)(owner + 0x44) = oldCount;
                 return 0;
             }
@@ -110,7 +92,7 @@ PoolRecord *func_L00_003F0198(char *owner, int kind, PoolVector *position, float
             slot->angularSpeed = func_002A78D8(0.05235988646745682f, 0.10471977293491364f);
             slot->mode = 2;
             slot->kind = 2;
-        } else if (kind == 1) {
+        } else if (kind == secondKind) {
             int shade;
             func_002ACEC0(&slot->velocity, owner + 0x10, owner, func_002A7940());
             slot->x = zero;

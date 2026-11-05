@@ -1,67 +1,5 @@
-/* 4 November 2026 actual-contract review; retained near miss, not linked.
- * USA v1.01 check.py: 2792/2800 bytes, 0/27 placements; first difference size mismatch.
- * Profile: -O2 -G0 -ffunction-sections -ffast-math -frac2-zero-ti-por -frac2-hazard-labels.
- * Stored-address getters follow their matched signed32 return contracts, with explicit pointer
- * casts at the actual uses. Physical EE widths and argument-bank order are preserved; this
- * repair leaves the retained allocation/scheduling residual unchanged.
- * Earlier measurements below are historical where superseded by this note.
- */
-/* Current retained result, 1 November 2026: 2792/2800 bytes. Restore the emitter's pointer return and
- * provide the complete 40-byte collision request footprint. Its tail reuses the direction slot in a 48-byte
- * union, as the retail stack accesses show, instead of overrunning a separate 32-byte object. The final
- * countdown loop exists in retail and is retained. PRE allocation still prevents a match.
- * Not a functional-port qualification or a complete matching-build result.
- * Profile: -O2 -G0 -ffunction-sections -ffast-math -frac2-zero-ti-por -frac2-hazard-labels.
- * Earlier measurements below remain historical where superseded by this note.
- */
-/* Retained nonmatching C (opus-1, Claude Opus 5.5 xhigh), measured 31 October 2026 on v2/c05.
- * Profile (own unit, e.g. src/levels/shared/L00_003C9978.c, one cflags line):
- *   -O2 -G0 -ffunction-sections -ffast-math -frac2-zero-ti-por -frac2-hazard-labels
- * -frac2-hazard-labels is required: retail's beqz at 003CA070 lands on the mtc1 hazard nop.
- * Best check.py with allowed C (this file): us 0/27, us2 0/27, pal not in catalogue;
- * 2792/2800 bytes, 394 of 700 rows, most of them a two-instruction shift.
- *
- * EXACT-SIZE FORM, NOT ALLOWED (do { } while (0), worker guide): 2800/2800 bytes, 0/27, 143 of
- * 700 rows. In the code below, open `do {` right after `dist = func_00282E48(&self->pos, &saved);`
- * and close `} while (0);` right after `vars->spark = spark;`. It is not retail's form: it adds a
- * .p2align nop before the then-block label (retail's label is at 003CA224, not 8-aligned).
- * Wrapping the goto search instead, `do { i = 0; goto test; ... } while (0);`, is 2792/2800,
- * 221 rows: state-1 head, the spill and the hit loop all match, but the argument order at
- * the func_00277F48 call changes (a1 leaves the delay slot).
- *
- * WHY RETAIL DIFFERS (measured with tools/regalloc.py and cc1 dumps):
- * - Allocation order is floor_log2(refs) * refs / live_length. &spark is 7 refs over 354 (14/354),
- *   below the hoisted constants 3 (3/52), 5 (3/54) and 0x500000000000 (3/58), so 5 takes $fp and
- *   &spark is spilled. Retail has $fp = &spark, &self->m[2] spilled at sp+0x7C, 3 in $s7, and 5
- *   and the mask rematerialised inside the hit loop. Refs weigh by loop-note depth, so one extra
- *   weighted ref (8 refs, 24/354) yields exactly that; both wrappers above show it.
- * - PRE inserts all ten addresses at five sites: state 0's loop head (dead), the target test,
- *   the locked test, the second target test, and before the search's entry jump. The last site
- *   of the stack addresses survives as a self-copy (2 refs) and of &self->m[2] is deleted (0 refs),
- *   so a loop note covering it lifts &spark and not &self->m[2]. Probable retail shape.
- * - A plain for gives retail's odd layout (i++, then test, then body, with backward fail branches):
- *     for (i = 0; i < n; i++) { Moby *m = D_L00_001C3280[i];
- *         if ((mode & 0x1000) && oclass != 0xA7E && m != D_0018C0B0 && m->cls->kind == 5) {
- *             vars->target = m; break; } }
- *   expand_end_loop rotates everything up to the last exit within 30 insns; this has exactly 30.
- *   One more insn, or `if (...) continue;`, rotates only the first test (blez, hoisting, givs).
- *   BLOCKER: cc1 then duplicates the exit code ahead of the loop (blez plus a first-iteration
- *   copy, 2808 bytes), where retail enters with `b test`. The duplication happened at 29 and at
- *   30 insns, so no count in the rotation window avoids it. A nested empty do/while stops the
- *   last-exit scan. Same family as func_00305438 in docs/MATCHING-BLOCKERS.md.
- *   With duplication blocked, PRE's last site would sit after LOOP_BEG, which should also make
- *   the loop phony for loop.c (retail hoists nothing there). Not reproduced: that is the reopen.
- *
- * STILL DIFFERENT in every form: lbu 0x7B before mov.s at 003CA064; flip++ uses $v1 in retail;
- * callback is `lui $v0; a1 = self; jal; addiu $a0` in retail (a1 set first); and without a barrier
- * after dist, -1.0f gets $f1 because the store to info and the load of vars->spark are ordered,
- * which puts the constant on the longest chain (retail: mov.s, a0, lui, mtc1 $f0, nop, swc1).
- *
- * Kept here because each measurably fixed a row: the flag read into one variable for FF0 and FF4
- * (`lui $v0; lw $v0`), and D_L00_001ADB2C read before the timer store (sw in the beqz delay slot;
- * only that lui still differs, $a0 against retail's $v0). Tried, no gain: ternary for lim (2832
- * bytes), int timers[3] (frame 0xF0), (s16) cast and a local class pointer (no extra insn).
- */
+/* Homing projectile update, in all 27 levels. A unit of its own for -ffast-math (min.s) and
+ * -frac2-hazard-labels (the fast/slow arms' cross-jump lands on the mtc1 hazard nop). */
 
 #include "common.h"
 
@@ -167,7 +105,7 @@ extern void *D_0018C0B0;
 extern s16 D_0018A168;
 extern s32 D_L00_001A8FF0 __attribute__((sda));
 extern s32 D_L00_001A8FF4;
-extern s32 D_L00_001ADB2C;
+extern s32 D_L00_001ADB2C MACRO_ADDR;
 extern Collide_003C9978 *D_L00_001BF218;
 extern u8 D_L00_001BF230[];
 extern struct Pair_003C9978 D_L00_001B0128;
@@ -246,6 +184,7 @@ void func_L00_003C9978(Moby_003C9978 *self)
         vars->trail_timer = 2;
     case 1: {
         float dist;
+        float travelled;
         int hit;
 
         vars->spin = vars->spin - 0.1f;
@@ -259,19 +198,31 @@ void func_L00_003C9978(Moby_003C9978 *self)
                 int n = func_00277F48(15.0f, &self->pos, 0, self, 0);
                 int i;
 
-                i = 0;
-                goto test;
-            next:
-                i++;
-            test:
-                if (i < n) {
-                    Moby_003C9978 *m = D_L00_001C3280[i];
+                /* The end test leaves by goto, so the break is the first exit expand_end_loop sees
+                 * and the whole body rotates. It is then too long for jump.c to duplicate, which
+                 * keeps retail's entry branch to the test. */
+                for (i = 0;; i++) {
+                    Moby_003C9978 *m;
+                    Class_003C9978 *cls;
+                    u16 *mode;
+                    s16 *kind;
+                    Moby_003C9978 **found;
 
-                    if (!(m->flags.h.mode & 0x1000) || m->oclass == 0xA7E || m == D_0018C0B0
-                        || m->cls->kind != 5)
-                        goto next;
-                    vars->target = m;
+                    if (i >= n)
+                        goto searched;
+                    m = D_L00_001C3280[i];
+                    mode = &m->flags.h.mode;
+                    if ((*mode & 0x1000) && m->oclass != 0xA7E && m != D_0018C0B0) {
+                        cls = m->cls;
+                        kind = &cls->kind;
+                        if (*kind == 5) {
+                            found = &vars->target;
+                            *found = m;
+                            break;
+                        }
+                    }
                 }
+            searched:;
             }
         }
 
@@ -338,7 +289,6 @@ void func_L00_003C9978(Moby_003C9978 *self)
 
         if (vars->target != 0) {
             float *health = ((float *)func_002AB1F0(vars->target));
-            float lim;
             int n;
 
 
@@ -354,11 +304,13 @@ void func_L00_003C9978(Moby_003C9978 *self)
                 qcopy(&info.v.b, &vars->target->pos);
             }
             dist = func_00282E48(&self->pos, &info.v.b);
-            lim = 0.25f;
-            if (vars->fast != 0)
-                lim = 1.5f;
-            if (dist < lim)
-                dist = 0.0f;
+            if (vars->fast != 0) {
+                if (dist < 1.5f)
+                    dist = 0.0f;
+            } else {
+                if (dist < 0.25f)
+                    dist = 0.0f;
+            }
             n = D_L00_001A8FF0;
             if (n == 0)
                 n = D_L00_001A8FF4;
@@ -373,12 +325,12 @@ void func_L00_003C9978(Moby_003C9978 *self)
                 func_L00_00320B70(&self->pos, vars, &info.v.b, &vars->f54, &info, 0, 0.03f, 0.2f, 0.0f, 0.25f);
         }
 
-        dist = func_00282E48(&self->pos, &saved);
+        travelled = func_00282E48(&self->pos, &saved);
         info.v.a.w = -1.0f;
         spark = vars->spark;
         if (func_00282948(&spark) != 0 || vars->spark == 0) {
             info.t.pair = D_L00_001B0128;
-            func_L00_00341410(self, &info, info.t.pair.p[vars->flip % 2], vars->b78, vars->b79, dist * 0.5f);
+            func_L00_00341410(self, &info, info.t.pair.p[vars->flip % 2], vars->b78, vars->b79, travelled * 0.5f);
             vars->flip++;
         }
         vars->spark = spark;

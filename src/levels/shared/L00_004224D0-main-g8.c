@@ -1,58 +1,6 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
-/* func_L00_004224D0 (2,916 bytes, 27 level places; USA v1.01 only, in neither the PAL nor the
- * us2 catalogue). Tier: opus-1, Claude Opus 5.5 (xhigh), task v1867, not matched.
- *
- * Best check: 2916/2916 bytes; 0 of 27 places match; first mismatch +0x484. Twelve instruction rows
- * differ once relocated fields are set aside, all in +0x484..+0x4BC. check.py stops at the first
- * mismatch, so relocation binding after +0x484 is unqualified; the five nonzero local immediates
- * that differ later are symbol+addend low parts and agree by hand.
- *
- * To check it: save as src/levels/shared/L00_004224D0-g8.c, take the INCLUDE_ASM out of
- * L00_004224D0.c and append to config/cflags.txt:
- * src/levels/shared/L00_004224D0-g8.c<TAB>-O2 -G8 -ffunction-sections -frac2-qcopy
- * -frac2-qcopy-barrier -frac2-hazard-labels
- *
- * What still differs (the setup of the first func_00282D30 after func_L00_00423038):
- *   retail: lw v1,0x10(sp); a0=sp; lwc1 f12; a1=..; lw s3,0x70(v1); neg.s; daddu s1,s3;
- *           addiu s3,0x1F0; jal; addiu s0,s1,0x20
- *   here:   lwc1 f12; a0=sp; lw v1,0x10(sp); a1=..; neg.s; jal; lw s3,0x70(v1); daddu s1,s3; ...
- * All of it follows from one sched2 choice at the first clock after the call. The priorities
- * (sched2 dump, -fsched-verbose-5) are 35 for the height load and 33 for the reload of obj, and
- * retail needs the reload first. Worked by hand, issuing it first gives retail's order: neg.s then
- * waits three clocks for the call, and the pointer chain fits in front of the jal.
- *
- * Fixed here against the earlier drafts, all without volatile:
- *  - func_L00_00424C00 follows both ifs (this was both branch displacements);
- *  - the timer-reset stores are written 0x16, 0x12, 0x14: the last store in the source holds the
- *    base register's death, so sched1 issues it first (order a,b,c comes out c,a,b);
- *  - the parameter stores are written distance, then height, flags, f18, f10, f0c. This lengthens
- *    the follow pointer's life, which also flips local-alloc to retail's s3/s4;
- *  - aim (q->vector50) is initialized at the top of the block.
- *
- * Tried without closing the gap:
- *  - float h = -height or float h = height before the reload, a local for the direction or for
- *    the output argument: the same 12 rows (tie). params before the advance is worse (23 rows);
- *  - leaving out -frac2-qcopy-barrier (before aim moved up): the same rows in this region;
- *  - an empty do { } while (0) after the call (forbidden form, probe only): 30 rows. It adds a
- *    barrier, but the height load still goes first and the order at +0x458..+0x468 breaks;
- *  - a test right after the call (identical call arms, probe only): 430 rows. A block end there
- *    should give the needed priority (worked by hand from memory of GCC 2.95's
- *    add_branch_dependences, whose source is not in this checkout: unreferenced insns must precede
- *    a trailing call). But the pointers then cross blocks and leave local-alloc, q loses $fp and
- *    obj gains a register, so retail seems to have no real test there. Arms folded early
- *    (params ? local : &local[0], an inline Pick helper) left no boundary.
- * Next idea: something that makes the chain lw/daddu/addiu precede the call without a block end;
- * the reload needs priority above 35, so the chain must reach the call or one of its arguments.
- *
- * All declarations are below.
- */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-#define I(p,n) (*(int *)((char *)(p)+(n)))
-#define F(p,n) (*(float *)((char *)(p)+(n)))
-#define H(p,n) (*(short *)((char *)(p)+(n)))
 #define B(p,n) (*(unsigned char *)((char *)(p)+(n)))
-#define P(p,n) (*(char **)((char *)(p)+(n)))
 typedef struct CameraParams {
     short h0;
     short flags;
@@ -177,7 +125,9 @@ extern void func_00282CC0(void *,void *,void *), func_00282CF0(void *,void *,voi
 extern int func_00277F48(void *,int,int,int,float);
 extern char *func_002AB1F0(char *);
 extern void func_L00_00423038(int);
-extern void func_L00_00424BB8(float,float),func_L00_00424B20(float);
+/* func_L00_00424BB8 in most levels; its twin func_L16_0042FB58 in levels 16, 22, 23 and 26. */
+extern void ref_L00_004224D0_00(float,float);
+extern void func_L00_00424B20(float);
 extern void func_L00_00424C60(void),func_L00_00424C28(void),func_L00_00424C00(void);
 extern void func_L00_00424F00(char *,float,float),func_L00_00424F58(char *,float,float);
 extern void func_L00_00424A50(float,float),func_L00_00424A08(int,float,float);
@@ -203,7 +153,7 @@ void func_L00_004224D0(CameraMoby *obj)
     }
     if (D_00189E20.moveState==30) {
         obj->vars->offsets.distance=0.75f;
-        func_L00_00424BB8(0.04f,0.2f);
+        ref_L00_004224D0_00(0.04f,0.2f);
     }
     if (D_001A79F0==1 && D_00189E20.state==48 && D_00189E20.position[2]>75.0f && D_00189E20.position[2]<105.0f) {
         func_L00_00424B20(0.8726646900177002f);
@@ -233,7 +183,7 @@ void func_L00_004224D0(CameraMoby *obj)
     }
     if (D_00189E20.moveState==16) obj->vars->offsets.distance=0.25f;
     if (D_00189E20.b22b4==1) {
-        if (!I(state,0) && mode==-1) {
+        if (!state[0] && mode==-1) {
             CameraOffsets *followVars=&obj->vars->offsets;
             func_L00_00424A08(1,3.0f,0.003f);
             if (!special) { followVars->distance=1.0f;func_L00_00424A50(1.0f,0.003f); }
@@ -241,7 +191,7 @@ void func_L00_004224D0(CameraMoby *obj)
         obj->vars->rates.f3c=0.6f;
     }
     if (D_00189E20.b22b4==2) {
-        if (I(state,0x10)<2) {
+        if (state[4]<2) {
             func_L00_00424A88(0,D_L00_001B1594,0.005f);
             func_L00_00424A08(1,D_L00_001B1598,0.003f);
             func_L00_00424A50(D_L00_001B159C,0.003f);
@@ -254,11 +204,9 @@ void func_L00_004224D0(CameraMoby *obj)
                 q->distance=D_L00_001B1594;
                 func_L00_00423038(1);
                 {
-                CameraRates *end=(CameraRates *)obj->vars;
-                CameraVars *reloaded=(CameraVars *)end;
-                CameraParams *params;
-                end=(CameraRates *)((char *)end+0x1f0);
-                params=&reloaded->params;
+                CameraRates *rates=&obj->vars->rates;
+                CameraVars *vars=obj->vars;
+                CameraParams *params=&vars->params;
                 func_00282D30(local,D_00189E20.direction,-follow->height);
                 func_00282CC0(aim,dir,local);
                 func_00282CF0(follow,pos,aim);
@@ -268,9 +216,9 @@ void func_L00_004224D0(CameraMoby *obj)
                 qcopy(q->vector90,q->vector40);
                 qcopy(q->position,dir);
                 qcopy(q->vector60,q->position);
-                qcopy(reloaded,pos);
-                qcopy((char *)reloaded+0x210,pos);
-                end->i30=0;params->f14=0.0f;
+                qcopy(vars,pos);
+                qcopy((char *)vars+0x210,pos);
+                rates->i30=0;params->f14=0.0f;
                 params->distance=q->distance;
                 {
                     float zero=params->f14;
@@ -297,7 +245,7 @@ void func_L00_004224D0(CameraMoby *obj)
     if (hooks->update) hooks->update();
     camera=(FollowCameraGlobal *)((char *)hooks-0x3a0);
     target=camera->target;
-    if (target && I(state,0x10)<2) {
+    if (target && state[4]<2) {
         int targetState=B(target,0x20);
         if (targetState==254) camera->target=0;
         else if (targetState==253) camera->target=0;
@@ -326,51 +274,51 @@ void func_L00_004224D0(CameraMoby *obj)
     if (!D_L00_001B8C80.target && !D_00189E20.p1450) D_L00_001B8C80.targetTicks=0;
     if (D_00189E20.state==129) {
         func_L00_00424C28();func_L00_00424B70(1,1);
-        func_L00_00424BB8(0.06f,0.2f);func_L00_00424C00();
+        ref_L00_004224D0_00(0.06f,0.2f);func_L00_00424C00();
     }
     if (D_00189E20.state==123) {
         func_L00_00424B70(0.04f,0.2f);
         func_L00_00424F00(D_00189E20.p2290+0xc0,0.7853982448577881f,0);
         func_L00_00424A08(0,3,0.003f);func_L00_00424C00();
     }
-    if (I(state,0x10)<2 && D_00189E20.state!=129 &&
+    if (state[4]<2 && D_00189E20.state!=129 &&
         (D_00189E20.state==126 || D_00189E20.state==130 || D_00189E20.h1454) && (D_00138180.buttons&3)) {
-        char *resetVars;
+        CameraVars *resetVars;
         func_L00_00424B48(0);func_L00_00424C28();func_L00_00424B70(0.04f,0.2f);
-        resetVars=((char *)obj->vars);H(resetVars,0x16)=0;H(resetVars,0x12)=0;H(resetVars,0x14)=0;
+        resetVars=obj->vars;resetVars->timer16=0;resetVars->timer12=0;resetVars->timer14=0;
     } else if (D_L00_001B1590) {
-        char *timerVars=((char *)obj->vars);a=0;
+        CameraVars *timerVars=obj->vars;a=0;
         for(i=0;i<4;i++) { local[i]=func_00283C80(D_L00_001B8E20.samples[i],D_L00_001B8E20.samples[i+1]);a+=local[i]; }
         b=5.0f;a*=0.25f;b=a*b;if(b>1)b=1;b=1-b;
-        if (b<D_L00_001B1578) H(timerVars,0x12)=32;
-        if (H(timerVars,0x12)) {
-            if (func_00282978((short *)(timerVars+0x12))) H(timerVars,0x14)=45;
-            func_L00_00424C28();H(timerVars,0x16)++;
-            if (H(timerVars,0x16)>30) H(timerVars,0x16)=30;
-            a=func_00283CE0(H(timerVars,0x16));a/=func_00283CE0(30);
+        if (b<D_L00_001B1578) timerVars->timer12=32;
+        if (timerVars->timer12) {
+            if (func_00282978(&timerVars->timer12)) timerVars->timer14=45;
+            func_L00_00424C28();timerVars->timer16++;
+            if (timerVars->timer16>30) timerVars->timer16=30;
+            a=func_00283CE0(timerVars->timer16);a/=func_00283CE0(30);
             func_L00_00424B70((D_L00_001B157C-0.015f)*a+0.015f,0.2f);
             D_L00_001A8900=0;
         } else {
-            if (H(timerVars,0x14)) {
-                func_00282978((short *)(timerVars+0x14));
-                a=func_00283CE0(H(timerVars,0x14));a/=func_00283CE0(45);
+            if (timerVars->timer14) {
+                func_00282978(&timerVars->timer14);
+                a=func_00283CE0(timerVars->timer14);a/=func_00283CE0(45);
                 a*=-0.85f;
                 a+=0.85f;
                 D_L00_001A8900=a;
-                H(timerVars,0x16)=0;
+                timerVars->timer16=0;
             } else {
-                H(timerVars,0x16)=0;
+                timerVars->timer16=0;
                 D_L00_001A8900=0.85f;
             }
         }
     }
-    I(state,0x10)=0;
+    state[4]=0;
     count=func_00277F48(D_00189E20.position,1,(int)D_00189E20.p2290,0,15.0f);
     if (count>0) {
     int targetIndex;
     for(targetIndex=0;targetIndex<count;targetIndex++) {
         char *candidate=func_002AB1F0(D_L00_001C3280[targetIndex]);
-        if (candidate && (float)B(candidate,0xd)!=0.0f) { I(state,0x10)=1;break; }
+        if (candidate && (float)B(candidate,0xd)!=0.0f) { state[4]=1;break; }
     }
     }
 }

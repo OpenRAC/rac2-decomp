@@ -241,11 +241,11 @@ void func_L00_0041AFD8(void *unused, float *a, int k, float f)
     func_00280B90(&local, &local.m00, 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_0041B1B8);
+/* func_L00_0041B1B8 is in L00_0041ABB8-trail-g8.c. */
 
 /* func_L00_0041B840 is in L00_0041ABB8-ring-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_0041BCC8);
+/* func_L00_0041BCC8 is in L00_0041ABB8-beam-g8.c. */
 
 /* Builds a 224-byte local record, writes a looked-up handle and fixed fields, calls bound float helpers, invokes one bound helper on each of four blocks, and passes the record to a final bound helper. */
 void func_L00_0041C160(void *unused, float *b, float *a, int k, float f)

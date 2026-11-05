@@ -886,6 +886,7 @@
 #define UpdateWeatherParticles           func_L01_00399510
 #define UpdateBouncingExplosive          func_L00_003F4210
 #define UpdateShipWeapons                func_L05_00443D08
+#define UpdateLockOnWeapon               func_L00_003C8A90
 #define UpdateRaceSelectionMenu          func_L04_0040BA68
 #define L18_DisableModeGroups            func_L18_003FA180
 #define UpdateBeamLinkStrips             func_L09_003FB9F8
@@ -895,5 +896,12 @@
 #define UpdateMenuChoiceListWidgets      func_003489E8
 #define UpdateHeroHeldObject             func_L00_002D5940
 #define UpdateItemPurchaseConfirmation   func_L00_00373F48
+#define DrawEffectRecordQuads            func_L00_003A8940
+#define UpdateHomingMissile              func_L00_003E2510
+#define DrawPositionRingTrail            func_L00_0041B1B8
+#define UpdateBouncingBlastProjectile    func_L00_004096B0
+#define UpdateWaveLineEffect             func_L00_00413358
+#define DrawShrinkingMobyRings           func_L01_00398B50
+#define DrawAnimatedEffectQuads          func_L02_00410F68
 
 #endif /* NAMES_H */

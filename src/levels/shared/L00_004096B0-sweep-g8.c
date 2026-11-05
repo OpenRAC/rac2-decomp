@@ -1,47 +1,3 @@
-/* 2 November 2026:
- * Correct func_0032C700 to return its allocated object pointer. Retained 1944/1944 bytes, 0/27
- * US placements. Moving the range field ahead of radius does not repair the float-constant/store
- * schedule and is not retained. The small shape-copy HIGH register, range initialization and PRE
- * spill reloads remain the next constraints. No complete match.
- */
-/* 1 November 2026 (closer a3): 1944/1944, 28 words, profile -O2 -G8 -ffunction-sections -frac2-hazard-labels -g
- * -frac2-zero-ti-por. From 94 with: no pointer locals for state + 0x10 / + 0x20 (PRE's reaching copies are the two
- * spilled slots 0x11C and 0x120, and s0 is reload's register for the first, inherited over the three calls), plain
- * locals for contacts/kind/triggered (the old stack struct was a stand-in for spilled pseudos), hoisted 5 now gets
- * $s6 once &rotation stops outranking it, D_0018C0B0 NOT_SDA, (idx + table)->field for retail's mult-then-index addu.
- * Left: (1) the 12-byte copy: retail's %hi is v1, so ptr gets a1 and reload's scratches v0/a0; local-alloc's fake_death
- * sends %hi off v0 only if a local in v0 follows the copy, and here the load of state + 0x24 waits on the copy while
- * the range load doesn't (a fixed scalar symbol against a frame store), so the range load sits in between. (2) the
- * range: retail stores it before 1.5's li.s, so 1.5 gets f0; here 1.5 goes first. (3) spill reloads a2/a3 for a1/a2. */
-/* GPT-6.1 Sol high, task v1293, 29 October 2026.
- * Best check: 1944/1944 bytes, 0/27 USA v1.01 placements; first mismatch
- * +0xB0. Compile alone with game -O2 -G8 -ffunction-sections; declarations
- * follow below. The retail 0x190 frame is reproduced. No linked build or
- * runtime validation was performed; the original INCLUDE_ASM is restored.
- *
- * The incoming draft rechecked at 1944 bytes, 0/27, first mismatch +0xB8.
- * Independent diagnostic comparison found 334 non-relocation instruction
- * differences there versus 80 here (390 versus 95 when relocation opcode/
- * register bits are included). These counts ignore relocated values, are only
- * diagnostics, and do not imply a match or validated bindings.
- *
- * Separate search-loop variables, retail branch orientation, separate impact
- * notification calls, and a response-local struct recover the measured
- * contacts/kind/trigger/rotation/timer stack slots at +0x110 through +0x120.
- * A short-lived rotation pointer retains the initial three-call register.
- * The copied constant is three integer ignore-list entries, not float XYZ:
- * retail level 00 words are 0, 3604, 3684. The strength table has stride 0xE0
- * and a float at +0x74. All vector transfers use memory-clobbering qcopy.
- *
- * Eighteen checker invocations (one syntax correction) and two allocator
- * diagnostics: ordinary late scalar locals gave 1936 bytes/0x180 frame;
- * grouping response locals restored 1944/0x190. Scalar/array/builtin copies
- * did not recover the ignore-copy registers. An inline query initializer
- * produced 1952 bytes; early scale calculation hoisted FP work too far.
- * Remaining: ignore-list copy registers, query range/scale FP allocation,
- * point/best-index allocation, call setup and later stores/branches. Reopen
- * with an evidenced query initializer or allocator-lifetime improvement.
- */
 #include "common.h"
 
 #include "include_asm.h"
@@ -49,16 +5,14 @@
 typedef int CollisionQuad __attribute__((mode(TI)));
 typedef union { CollisionQuad q; float f[4]; } CollisionVector;
 typedef struct { int ignored[3]; } CollisionShape;
+/* The swept sphere func_002FE9D0 takes; src/game/002FC8D0.c names its fields. */
 typedef struct {
     CollisionVector previous, position, velocity;
-    char *owner;
-    CollisionShape *shape;
-    int kind;
-    float range, scale, radius;
-    int flags, reserved;
-    int result;
-    int result_kind;
-    int extra;
+    char *moby;
+    CollisionShape *ignored;
+    int ignoredCount;
+    float radius, bounce, minFacing;
+    int pad48, collisionFlags, slideOnCreatures, surface, useOffset;
 } CollisionQuery;
 typedef struct {
     CollisionVector force;
@@ -109,15 +63,15 @@ extern int func_00300540(int);
 extern void func_002ACDE8(void *, void *, void *);
 extern int func_00277F48(void *, float, int, void *, int);
 extern int func_002ABB78(char *);
-extern int func_002AB1F0(unsigned char *);
+extern char *func_002AB1F0(void *);
 extern float func_002A78D8(float, float);
 extern float func_002A7878(float, float);
 extern float func_00282C48(float);
-extern void func_002AB668(void *, int, float);
+extern void func_002AB668(void *, void *, float);
 extern int func_002E5CF8(int, int, char *);
 extern int func_00282978(void *);
 extern void func_002A8E20(void *, CollisionImpact *);
-extern void func_0032D758(void *, int, void *);
+extern int func_0032D758(void *, int, void *);
 extern char *func_0032C700(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
 extern void func_002FEE50(int);
@@ -140,30 +94,33 @@ void func_L00_004096B0(char *object)
     func_002AFFD8(position, (char *)&direction, 1);
     func_00300190(position, position);
     if (*(unsigned char *)(object + 0x20) == 0) {
-        float query_range;
+        float sweep_radius, min_facing;
 
         qcopy(&previous, position);
         func_00282CC0(position, position, state);
         func_002FEE70(*(int *)(state + 0x28), state, 0);
         func_002FE880(position, (float *)state, 0.0040555559f);
+        /* Set here rather than at its use: sched1 issues this constant right after the call, which
+           leaves the %hi of the copy below in $v1 and the list pointer in $a1. */
+        min_facing = 1.5f;
         shape[0] = D_L00_001B0FC8;
-        query_range = D_L00_001B0FAC;
+        sweep_radius = D_L00_001B0FAC;
         if (*(int *)(state + 0x24) != 0)
-            query_range = D_L00_001B0FBC;
+            sweep_radius = D_L00_001B0FBC;
         qcopy(&query.previous, &previous);
         qcopy(&query.position, position);
         qcopy(&query.velocity, state);
-    query.shape = shape;
-    query.radius = 1.5f;
-    query.scale = (D_L00_001B0FA0 - 1.0f) + 1.0f;
-    query.owner = object;
-    query.kind = 3;
-    query.range = query_range;
-    query.flags = 0;
-    query.reserved = 0;
-    query.extra = 0;
-    contacts = func_002FE9D0(&query);
-        contact_kind = func_00300540(query.result_kind);
+        query.radius = sweep_radius;
+        query.ignored = shape;
+        query.ignoredCount = 3;
+        query.minFacing = min_facing;
+        query.bounce = (D_L00_001B0FA0 - 1.0f) + 1.0f;
+        query.moby = object;
+        query.pad48 = 0;
+        query.collisionFlags = 0;
+        query.useOffset = 0;
+        contacts = func_002FE9D0(&query);
+        contact_kind = func_00300540(query.surface);
         qcopy(position, &query.position);
         qcopy(state, &query.velocity);
         func_002ACDE8(object + 0xC0, object + 0xC0, state + 0x10);
@@ -180,7 +137,7 @@ void func_L00_004096B0(char *object)
                     char *description;
                     if (*(unsigned char *)(target + 0x31) == 0 || func_002ABB78(target) != 0)
                         continue;
-                    description = (char *)func_002AB1F0((unsigned char *)target);
+                    description = func_002AB1F0(target);
                     if (description != 0 && !(*(float *)description <= 0.0f) && target != 0 &&
                         *(char **)(target + 0x24) != 0 &&
                         *(short *)(*(char **)(target + 0x24) + 0x46) == 5) {
@@ -193,7 +150,7 @@ void func_L00_004096B0(char *object)
                 }
                 if (best >= 0) {
                     char *target = D_L00_001C3280[best];
-                    char *description = (char *)func_002AB1F0((unsigned char *)target);
+                    char *description = func_002AB1F0(target);
                     float length, projection;
                     qcopy(&workspace.math.point, target + 0x10);
                     if (D_L00_001A8FF0 != 0) {
@@ -224,11 +181,11 @@ void func_L00_004096B0(char *object)
             func_00282F20(&workspace.math.point, &workspace.math.point, 1.0f);
             range = func_002A78D8(0.0f, 0.52359885f);
             if (func_00282C48(range) < 0.00001f) {
-                func_002AB668(&workspace.math.work, (int)&direction, range);
+                func_002AB668(&workspace.math.work, &direction, range);
                 func_002ACDE8(&workspace.math.point, &workspace.math.point, &workspace.math.work);
             }
             range = func_002A7878(0.05235988646745682f, 0.10471977293491364f);
-            func_002AB668(state + 0x10, (int)&workspace.math.point, range);
+            func_002AB668(state + 0x10, &workspace.math.point, range);
             func_002E5CF8(0, 0, object);
         }
         workspace.impact.owner = object;
@@ -252,7 +209,7 @@ void func_L00_004096B0(char *object)
                 count = func_00277F48(object + 0x10, range, 1, D_0018C0B0, 0);
                 for (i = 0; i < count; i++) {
                     char *target = D_L00_001C3280[i];
-                    char *description = (char *)func_002AB1F0((unsigned char *)target);
+                    char *description = func_002AB1F0(target);
                     int special = func_002ABB78(target);
                     if (special != 0 || (description != 0 && *(float *)description > 0.0f &&
                                          *(short *)(description + 6) == 0)) {

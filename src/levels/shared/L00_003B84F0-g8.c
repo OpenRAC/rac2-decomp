@@ -1,12 +1,11 @@
-/* functional: high. The near-miss draft (2404/2404 bytes; register allocation and scheduling differ) read against all 601 retail instructions of level 00's copy: every call and argument, the gp/lui data (0x1AFCE0..0x1AFD78 tunables, 0x1B19C8 the frame counter, 0x138180+0x1A0 the cheat/option word, hero 0x189E20), every float constant (1/60 0x3C888889, 0.5, pi 0x40490FDB, 0x3C8EFA36, 0x3F7FFF58, 0x3C23D70A) and every compare's sense and operand order agree. Changed from the draft: the 64-bit GS words and func_0027C878's result typed long / unsigned long (retail builds them with dsll/dsll32 and stores them with sd), and func_00280B90 declared as the port's host routine defines it (host/render.c: gaddr, int, int; the packet passed as a 32-bit game address). */
-/* func_L00_003B84F0 (shared, 27 places): draws a tractor/grind beam from the controller at *0x1AFD78
- * (+0 target moby, +0x20 origin, +0x30 direction, +0x40 phase, +0x44 current length). The length grows
- * toward the distance to the target (or 0x1AFCF4) while the beam is on (option word & hero+0x1230, hero
- * +0x340 set, no +0x34E/+0x1E0 and 0x1AFCE0 clear) and shrinks otherwise; reaching the target starts the
- * hero's grab (hero+0x1E0 = 30, func_L00_003294F0, func_002DF3F8). The phase scrolls by 0x1AFD18/60. Then
- * from the phase to the length in 0x1AFCF8 steps it draws a cross of two quads per step, its width eased by
- * a sine envelope, its colour cycling through three sines and its alpha alternating between two sets.
- * From the near-miss draft nonmatching/levels/func_L00_003B84F0.c. */
+/* Draws a beam from the position in D_L00_001AFD78's state object, four quads per segment, and
+ * tracks its length: it grows towards the target moby while the hero holds one of its buttonMask
+ * buttons and shrinks otherwise.
+ *
+ * A unit of its own for its flags: the `a.bits = 0` clear needs -frac2-zero-ti-por, the branch
+ * onto a divide needs -frac2-hazard-labels, and the small data needs -G8.
+ */
+#include "include_asm.h"
 #include "common.h"
 
 typedef int Quad_L00_003B84F0 __attribute__((mode(TI)));
@@ -35,10 +34,10 @@ typedef struct {
     Vec4_L00_003B84F0 m[4];
     int col[4];
     float uv[8];
-    unsigned long q70;
-    unsigned long q78;
-    unsigned long q80;
-    unsigned long q88;
+    long long q70;
+    long long q78;
+    long long q80;
+    long long q88;
 } Packet_L00_003B84F0;
 
 typedef struct {
@@ -97,9 +96,9 @@ extern float D_L00_001AFD6C __attribute__((sda));
 extern float D_L00_001AFD70 __attribute__((sda));
 extern float D_L00_001AFD74 __attribute__((sda));
 extern Ctl_L00_003B84F0 *D_L00_001AFD78 __attribute__((sda));
-extern int D_L00_001B19C8;
+extern int D_L00_001B19C8 MACRO_ADDR;
 
-extern unsigned long func_0027C878(int);
+extern long long func_0027C878(int);
 extern float func_00282E80(void *, void *);
 extern void func_L00_003294F0(void *, int);
 extern void func_002DF3F8(void *, void *);
@@ -114,7 +113,7 @@ extern int func_00283CF0(float);
 extern float func_00283B98(float, float);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
-extern void func_00280B90(unsigned int, int, int); /* as the port's host routine (host/render.c) defines it */
+extern void func_00280B90(void *, void *, int);
 
 void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
 {
@@ -127,8 +126,8 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     Vec4_L00_003B84F0 vz;
     Vec4_L00_003B84F0 p;
     Ctl_L00_003B84F0 *ctl;
-    unsigned long alpha0;
-    unsigned long alpha1;
+    long long alpha0;
+    long long alpha1;
     int on;
     int flag;
     int col;
@@ -143,16 +142,34 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     float u;
     float s;
     float phase;
-    float inset;
     float range;
+    float inv;
 
     ctl = D_L00_001AFD78;
     if (ctl == 0) {
         return;
     }
     pkt.q78 = func_0027C878(D_L00_001AFD14);
-    { long v; v = (long)D_L00_001AFD00 | ((long)D_L00_001AFCFC << 2); v |= (long)D_L00_001AFD04 << 4; v |= (long)D_L00_001AFD08 << 6; v |= (long)D_L00_001AFD0C << 32; alpha1 = v; }
-    { long v; v = (long)D_L00_001AFCFC | ((long)D_L00_001AFD00 << 2); v |= (long)D_L00_001AFD04 << 4; v |= (long)D_L00_001AFD08 << 6; v |= (long)D_L00_001AFD0C << 32; alpha0 = v; }
+    {
+        /* Two ALPHA register values: alpha1 swaps the A and B fields of alpha0. The order of
+           these steps, and building each value in a local of its own, decides sched1's order
+           and so local-alloc's priorities for the whole block. */
+        long long aShifted = (long long)D_L00_001AFCFC << 2;
+        long long bShifted = (long long)D_L00_001AFD00 << 2;
+        long long plain, swapped, swappedFull, plainFull;
+
+        inv = 1.0f - D_L00_001AFD34;
+        swapped = (long long)D_L00_001AFD00 | aShifted;
+        plain = (long long)D_L00_001AFCFC | bShifted;
+        plainFull = plain | (long long)D_L00_001AFD04 << 4;
+        swappedFull = swapped | (long long)D_L00_001AFD04 << 4;
+        plainFull |= (long long)D_L00_001AFD08 << 6;
+        swappedFull |= (long long)D_L00_001AFD08 << 6;
+        plainFull |= (long long)D_L00_001AFD0C << 32;
+        alpha0 = plainFull;
+        swappedFull |= (long long)D_L00_001AFD0C << 32;
+        alpha1 = swappedFull;
+    }
     pkt.col[3] = D_L00_001AFD10;
     pkt.col[2] = D_L00_001AFD10;
     pkt.col[1] = D_L00_001AFD10;
@@ -161,14 +178,14 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     pkt.q88 = alpha0;
     pkt.uv[0] = D_L00_001AFD34;
     pkt.uv[4] = D_L00_001AFD34;
-    pkt.q80 = 0xFF9000000260UL;
-    pkt.uv[2] = 1.0f - D_L00_001AFD34;
-    pkt.uv[6] = 1.0f - D_L00_001AFD34;
+    pkt.q80 = 0xFF9000000260LL;
+    pkt.uv[2] = inv;
+    pkt.uv[6] = inv;
     pkt.uv[1] = D_L00_001AFD34;
     pkt.q70 = 4;
     pkt.uv[3] = D_L00_001AFD34;
-    pkt.uv[5] = 1.0f - D_L00_001AFD34;
-    pkt.uv[7] = 1.0f - D_L00_001AFD34;
+    pkt.uv[5] = inv;
+    pkt.uv[7] = inv;
 
     dist = D_L00_001AFCF4;
     if (D_00189E20.f340 == 0 || D_00189E20.f34E != 0 || D_L00_001AFCE0 != 0 || D_00189E20.f1E0 != 0) {
@@ -259,14 +276,22 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
                 if (x < ctl->f44 * 0.5f) {
                     alpha = func_00283CF0(flag ? D_L00_001AFD30 : D_L00_001AFD2C);
                 }
+                col = r | (g << 8);
+                col = col | (bl << 16);
+                col = col | (alpha << 24);
+                pkt.col[3] = col;
+                pkt.col[2] = col;
+                pkt.col[1] = col;
+                pkt.col[0] = col;
+            } else {
+                col = r | (g << 8);
+                col = col | (bl << 16);
+                col = col | (alpha << 24);
+                pkt.col[3] = col;
+                pkt.col[2] = col;
+                pkt.col[1] = col;
+                pkt.col[0] = col;
             }
-            col = r | (g << 8);
-            col = col | (bl << 16);
-            col = col | (alpha << 24);
-            pkt.col[0] = col;
-            pkt.col[3] = col;
-            pkt.col[2] = col;
-            pkt.col[1] = col;
             flag ^= 1;
 
             func_00282F20(&vx, &b, x);
@@ -280,22 +305,22 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
             pkt.m[0].bits = p.bits;
             func_00282CF0(&p, &pkt.m[3], &vy);
             pkt.m[2].bits = p.bits;
-            func_00280B90((unsigned int)&pkt, 0, 1);
+            func_00280B90(&pkt, 0, 1);
             func_00282CC0(&p, &pkt.m[1], &vy);
             pkt.m[0].bits = p.bits;
             func_00282CC0(&p, &pkt.m[3], &vy);
             pkt.m[2].bits = p.bits;
-            func_00280B90((unsigned int)&pkt, 0, 1);
+            func_00280B90(&pkt, 0, 1);
             func_00282CF0(&p, &pkt.m[3], &vz);
             pkt.m[1].bits = p.bits;
             func_00282CF0(&p, &pkt.m[2], &vz);
             pkt.m[0].bits = p.bits;
-            func_00280B90((unsigned int)&pkt, 0, 1);
+            func_00280B90(&pkt, 0, 1);
             func_00282CF0(&p, &pkt.m[1], &vy);
             pkt.m[0].bits = p.bits;
             func_00282CF0(&p, &pkt.m[3], &vy);
             pkt.m[2].bits = p.bits;
-            func_00280B90((unsigned int)&pkt, 0, 1);
+            func_00280B90(&pkt, 0, 1);
             if (flag) {
                 pkt.q88 = alpha1;
             } else {

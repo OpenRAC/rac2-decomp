@@ -1,30 +1,13 @@
-/* Claude Opus 5.5 (xhigh), 2 November 2026: retained, unlinked near miss.
- * USA v1.01, -O2 -G8 -ffunction-sections (compile as an L23_0041D398-g8.c
- * unit): 1432/1432 bytes, 0/1 places; first real difference +0x380, 99 of
- * 358 cdiff rows (the sol-high draft differed from +0x50). No linked build.
- *
- * Solved here: the opening flag branches. Each arm of the flag test has its
- * own func_002A6C58/func_L23_0041D9B0 kill sequence and return (no goto):
- * jump2 cross-jumps the identical call tails and reload_cse deletes the
- * redundant a0 copy on the true arm, giving retail's beqz/daddu a1 and b/nop
- * shapes. The second, re-read flag test is real (volatile byte, two lbu).
- *
- * Remaining, all after +0x37C: post-transfer constant order (retail sets 10
- * before 1); both exits `timer & 15` / `timer & 31` use bnez where retail has
- * bnel with the annulled ld s0; both effect phases differ in schedule (retail:
- * jal 77E0 [a0=5]; daddu s2,v0; addiu s1,s1,0x358; sll v0,s2,2; ...; addu
- * s1,s1,v0; lw s0,0(s1); jal rand [addiu s0,0xD0]; ... jal rand [andi
- * s2,s2,1]) and in stack-argument store order. Index and cursor are
- * call-crossing, so haifa sched1 gives their in-place updates no anti-dep on
- * the last call and hoists them.
- * Tried: per-phase block-scoped `int index, parity; char *old, **base;` with
- * `base = cursor.state->parts; cursor.parts = base + index; parity = index
- * & 1` gives exactly retail's effect-phase order (a0=5 slot, andi in the
- * second rand slot, tied to index), but local-alloc then takes s0/s1 for
- * old/index, so the cursor moves to s2 and s1/s2 swap function-wide (101
- * rows). Retail's s1 cursor / s2 index implies index is a global pseudo;
- * reopen by finding a global-index shape that keeps that schedule.
- * All required declarations follow; the original INCLUDE_ASM stays in src/.
+/* Level 23 encounter damage phases. The function reads $gp data (hence -G8)
+ * and lives in a unit of its own, like its neighbours.
+ * The effect phases keep their index, table base, slot and direction in
+ * block locals: sched1 then keeps the slot address after the random call,
+ * and local-alloc gives direction, slot and index $s0, $s1 and $s2.
+ * The local holding 10 puts its load ahead of the 1 while the stores keep
+ * their order, as in retail.
+ * The byte at PlayerStats +0xFD is read at a nonzero offset: that is a tied
+ * two-word macro load, so reorg leaves the reread at its join instead of
+ * copying it into the two branch slots as a $gp load.
  */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
@@ -36,8 +19,8 @@ extern int D_L23_001B1434 __attribute__((sda));
 extern char *D_L23_001B13D0 __attribute__((sda));
 extern float D_L23_001B16D0 __attribute__((sda));
 extern int D_L23_001B3720;
-/* Retail reads this byte again at 0041D43C on the entry-cleanup path. */
-extern volatile unsigned char D_001A7AFD;
+/* PlayerStats. */
+extern u8 D_001A7A00[] __attribute__((sda));
 extern int func_002F5D10(void);
 extern void func_002A6C58(char *, int, int);
 extern void func_L23_0041D9B0(void);
@@ -58,12 +41,11 @@ void func_L23_0041D398(char *object) {
     struct { Quad velocity, matrix[4], random; } local;
     /* The encounter state becomes a cursor into its part table in each phase. */
     union { PartState *state; char **parts; } cursor;
-    char *old, *particle;
-    int index;
+    char *particle;
     unsigned short timer;
     float scale;
     cursor.state = *(PartState **)(D_L23_001B1484 + 0x68);
-    if (D_001A7AFD) {
+    if (D_001A7A00[0xFD]) {
         if (*(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
             func_002A6C58(object, 0, 3);
             func_L23_0041D9B0();
@@ -75,7 +57,7 @@ void func_L23_0041D398(char *object) {
             func_L23_0041D9B0();
             return;
         }
-        if (!D_001A7AFD && *(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
+        if (!D_001A7A00[0xFD] && *(unsigned short *)(object + 0x96) > D_L23_001B1468 + 60) {
             char *entryState;
             if (!D_L23_001B13D0) return;
             entryState = *(char **)(D_L23_001B13D0 + 0x68);
@@ -135,37 +117,44 @@ void func_L23_0041D398(char *object) {
                 *cursor.parts = 0;
             }
         }
-        D_L23_001B1434 = 1;
-        D_L23_001B3720 = 10;
+        {
+            int countdown = 10;
+            D_L23_001B1434 = 1;
+            D_L23_001B3720 = countdown;
+        }
         return;
     }
     if (D_L23_001B1468 / 3 < timer) {
         if (timer & 15) return;
-        index = func_002A77E0(5);
-        cursor.parts = cursor.state->parts;
-        cursor.parts += index;
-        old = *cursor.parts;
-        scale = func_002A7878(4.0f, 12.0f);
-        old += 0xD0;
-        func_00282D30((char *)&local.velocity, old, scale);
-        func_00282CC0((char *)&local.velocity, (char *)&local.velocity, *cursor.parts + 16);
-        scale = func_002A7878(2.3f, 3.7f);
-        index &= 1;
-        func_0032C700(&local.velocity, index, 20, 10, 14, 15, 25, 0, scale, 20.0f, index, 0, 0, 0);
+        {
+            int index = func_002A77E0(5);
+            char **base = cursor.state->parts;
+            char **slot = base + index;
+            char *direction = *slot + 0xD0;
+            int parity;
+            scale = func_002A7878(4.0f, 12.0f);
+            func_00282D30((char *)&local.velocity, direction, scale);
+            func_00282CC0((char *)&local.velocity, (char *)&local.velocity, *slot + 16);
+            scale = func_002A7878(2.3f, 3.7f);
+            parity = index & 1;
+            func_0032C700(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
+        }
         func_002E5CF8(func_002A77E0(3) + 13, 0, object);
         return;
     }
     if (timer & 31) return;
-    index = func_002A77E0(5);
-    cursor.parts = cursor.state->parts;
-    cursor.parts += index;
-    old = *cursor.parts;
-    scale = func_002A7878(4.0f, 12.0f);
-    old += 0xD0;
-    func_00282D30((char *)&local.velocity, old, scale);
-    func_00282CC0((char *)&local.velocity, (char *)&local.velocity, *cursor.parts + 16);
-    scale = func_002A7878(2.3f, 3.7f);
-    index &= 1;
-    func_0032C700(&local.velocity, index, 20, 10, 14, 15, 25, 0, scale, 20.0f, index, 0, 0, 0);
+    {
+        int index = func_002A77E0(5);
+        char **base = cursor.state->parts;
+        char **slot = base + index;
+        char *direction = *slot + 0xD0;
+        int parity;
+        scale = func_002A7878(4.0f, 12.0f);
+        func_00282D30((char *)&local.velocity, direction, scale);
+        func_00282CC0((char *)&local.velocity, (char *)&local.velocity, *slot + 16);
+        scale = func_002A7878(2.3f, 3.7f);
+        parity = index & 1;
+        func_0032C700(&local.velocity, parity, 20, 10, 14, 15, 25, 0, scale, 20.0f, parity, 0, 0, 0);
+    }
     func_002E5CF8(func_002A77E0(3) + 13, 0, object);
 }

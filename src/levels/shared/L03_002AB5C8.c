@@ -516,7 +516,7 @@ void func_L03_00326458(Moby *object)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L03_00329EF0);
+/* func_L03_00329EF0 is defined in L03_002AB5C8-region.c. */
 
 
 /* func_L03_00339128 is defined in L03_00339128-qcopy.c. */

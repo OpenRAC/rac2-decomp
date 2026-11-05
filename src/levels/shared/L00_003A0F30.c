@@ -398,4 +398,3 @@ void func_L00_003A8618(char *a0)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_003A8940);
