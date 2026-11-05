@@ -317,7 +317,8 @@ void func_002B9000(void) {
     func_002B85F8(&D_00138500);
 }
 
-INCLUDE_ASM("asm/game", func_002B9030);
+/* Original assembly: a `j` with a trapping `addi $a1,$zero,0` in its delay slot; the compiler emits only addiu. */
+ASM_FUNC("asm/game", func_002B9030);
 
 ASM_FUNC("asm/game", func_002B9038);
 

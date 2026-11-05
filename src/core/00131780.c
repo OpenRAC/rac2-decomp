@@ -190,7 +190,8 @@ void func_00131CA8(int ignored_status) {
     func_0011FA20(0);
 }
 
-INCLUDE_ASM("asm/core", func_00131CB0);
+/* Original assembly: `addiu $v1,$zero,0x23; syscall`, a thread-exit stub whose address crt0 passes to the thread syscall; the compiler cannot emit syscall. */
+ASM_FUNC("asm/core", func_00131CB0);
 
 /* func_00131D98 is defined in 00131D98.c. */
 
