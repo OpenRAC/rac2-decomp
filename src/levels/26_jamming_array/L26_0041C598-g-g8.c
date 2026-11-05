@@ -163,9 +163,9 @@ extern f32 func_L00_002D2A10(f32, f32, f32);
 
 extern s32 func_00283CF0(f32);
 
-extern void func_L16_0042FB58(f32, f32);
-
 extern void func_L00_00424BB8(f32, f32);
+
+extern void func_L16_0042FB10(f32, f32);
 
 extern void func_L00_00424A88(s32, f32, f32);
 
@@ -215,7 +215,7 @@ void func_L26_0041C598(Moby_004402D8 *moby)
             break;
         }
         if (func_002ACBC8(D_00189E20.f80, vars->f28[i]) != 0) {
-            func_L16_0042FB58(0.04f, 0.2f);
+            func_L00_00424BB8(0.04f, 0.2f);
             func_L00_00424A08(0, vars->f40, 0.003f);
             func_L00_00424A50(vars->f44, 0.003f);
             return;
@@ -250,8 +250,8 @@ void func_L26_0041C598(Moby_004402D8 *moby)
         }
         if (D_00189E20.f2294 == 0x5B && (D_00189E20.f49E == 0 || n >= 20)) {
             func_L00_00424B70(0.5f, 1.0f);
-            func_L16_0042FB58(0.05f, 0.2f);
-            func_L00_00424BB8(0.04f, 0.0f);
+            func_L00_00424BB8(0.05f, 0.2f);
+            func_L16_0042FB10(0.04f, 0.0f);
             func_L00_00424A88(0, D_L23_001B1F14, 0.005f);
             func_L00_00424A08(1, D_L23_001B1F08, 0.01f);
             func_L00_00424A50(D_L23_001B1F0C, 0.01f);
@@ -265,9 +265,9 @@ void func_L26_0041C598(Moby_004402D8 *moby)
 
             func_L00_00424A88(0, D_L23_001B1F10, 0.03f);
             if (D_00189E20.f229C == 2) {
-                func_L16_0042FB58(0.04f, 0.2f);
+                func_L00_00424BB8(0.04f, 0.2f);
             } else {
-                func_L16_0042FB58(0.015f, 0.2f);
+                func_L00_00424BB8(0.015f, 0.2f);
             }
             d = func_00282E48(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
             if (D_L23_001B1EEC < d) {
@@ -287,8 +287,8 @@ void func_L26_0041C598(Moby_004402D8 *moby)
             D_L23_001B234C = 0;
         }
     } else if (D_00189E20.f2294 == 0x81) {
-        func_L16_0042FB58(0.05f, 0.2f);
-        func_L00_00424BB8(0.04f, 0.0f);
+        func_L00_00424BB8(0.05f, 0.2f);
+        func_L16_0042FB10(0.04f, 0.0f);
         if (D_001A79F0 == 16) {
             func_L00_00424A88(0, 0.5f, 0.04f);
             func_L00_00424A08(0, 4.0f, 0.002f);
@@ -300,9 +300,9 @@ void func_L26_0041C598(Moby_004402D8 *moby)
         }
     } else {
         if (D_00189E20.f229C == 2) {
-            func_L16_0042FB58(0.04f, 0.2f);
+            func_L00_00424BB8(0.04f, 0.2f);
         } else {
-            func_L16_0042FB58(0.015f, 0.2f);
+            func_L00_00424BB8(0.015f, 0.2f);
         }
         if (D_00189E20.f229C == 5) {
             func_L00_00424A08(0, 4.0f, 0.003f);

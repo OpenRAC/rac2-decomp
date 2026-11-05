@@ -125,7 +125,7 @@ extern void func_00282CC0(void *,void *,void *), func_00282CF0(void *,void *,voi
 extern int func_00277F48(void *,int,int,int,float);
 extern char *func_002AB1F0(char *);
 extern void func_L00_00423038(int);
-/* func_L00_00424BB8 in most levels; its twin func_L16_0042FB58 in levels 16, 22, 23 and 26. */
+/* func_L00_00424BB8 in every level; levels 16, 22, 23 and 26 also have the q+0x20 setter func_L16_0042FB10. */
 extern void ref_L00_004224D0_00(float,float);
 extern void func_L00_00424B20(float);
 extern void func_L00_00424C60(void),func_L00_00424C28(void),func_L00_00424C00(void);

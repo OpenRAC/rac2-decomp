@@ -123,7 +123,10 @@ def check() -> None:
     c_names = {n for fns in source_functions().values() for n, c in fns if c}
     by_hand = handwritten()
     in_c = c_names | by_hand
-    gone = sorted(matched - in_c)
+    # Names an audited identity split retired (levels.IDENTITY_SPLITS): the report
+    # keeps them until a maintainer regenerates it on master.
+    renamed = {n for spec in levels.IDENTITY_SPLITS.values() for n in spec[2]}
+    gone = sorted(matched - in_c - renamed)
     if gone:
         sys.exit(f"progress/report.json counts {len(gone)} function(s) that are not C in src/, e.g. "
                  f"{', '.join(gone[:5])}: run tools/build.py all, then tools/progress.py")
@@ -300,7 +303,8 @@ def release_check(version: str, report_path: Path) -> None:
     c_names = {n for fns in source_functions(version).values() for n, c in fns if c}
     by_hand = handwritten(version)
     in_c = c_names | by_hand
-    gone = sorted(matched - (in_c & set(where)))
+    renamed = {n for spec in levels.IDENTITY_SPLITS.values() for n in spec[2]}
+    gone = sorted(matched - (in_c & set(where)) - renamed)
     if gone:
         sys.exit(f"{report_path.relative_to(ROOT)} counts {len(gone)} function(s) that are not C in src/, e.g. "
                  f"{', '.join(gone[:5])}: run tools/build.py all --version {version}, then tools/progress.py --version {version}")
@@ -328,13 +332,17 @@ def release_check(version: str, report_path: Path) -> None:
         # are tolerated. Unknown missing entries and duplicate compensation fail.
         explained = (level_splits | ({"func_00131DE8"} if split else set())
                      | ({"func_00115E38"} if assertion_split else set()))
+        # A name retired by an audited identity split explains its unreported parts.
+        explained |= {n for spec in levels.IDENTITY_SPLITS.values() if set(spec[2]) & retired
+                      for n, _ in spec[1] if n not in reported}
         # Measured residues may retire in the same tree as exactly explained splits.
         known_split = bool(missing) and missing == explained
-        known_boundary = ((retired or known_split) and retired <= set(levels.FUNCTION_RESIDUES)
+        known_boundary = ((retired or known_split)
+                          and retired <= set(levels.FUNCTION_RESIDUES) | renamed
                           and (not missing or known_split)
                           and total == len(where) + len(retired) - len(missing)
                           and all(f["fuzzy_match_percent"] == 0.0 for f in functions
-                                  if f["name"] in retired))
+                                  if f["name"] in retired - renamed))
         if not known_boundary or "--strict" in sys.argv:
             sys.exit(f"{report_path.relative_to(ROOT)} has {total} functions, the catalogues {len(where)}: "
                      f"regenerate it with tools/progress.py --version {version}")

@@ -1498,9 +1498,9 @@ the canonical `D_00189EA0`. Earlier zero/constant labels described a mistaken
 interpretation of `func_00334710`, which returns this stored vector. Preserve the
 shared identities without inventing constness or zero initialization at each read.
 
-**5 November 2026:** re-extracted in all three releases: levels 16, 22, 23 and 26 hold the `q + 0x20` body under this name and the `q + 0x60` body under `func_L16_0042FB58`. Swapping them renames symbols used by matched C (`src/levels/23_damosel_orbit/L23_004402D8-g8.c`); not done here.
+**5 November 2026, resolved:** in all three releases, levels 16, 22, 23 and 26 held the `q + 0x20` body under this name and the `q + 0x60` body under `func_L16_0042FB58`. The audited `IDENTITY_SPLITS` entry in `tools/levels.py` (also run by `carry.py --entries`) regroups the key by the release-independent words after the address pair: `func_L00_00424BB8` is now the `q + 0x60` setter at all 27 levels, `func_L16_0042FB10` the `q + 0x20` one at 4, and `func_L00_00424B70` is unchanged. Retail `jal` targets confirm which callers use which body; the level callers were renamed. Both setters are now C (27/27 and 4/4 in each release).
 
-**Current scope:** func_L00_00424BB8 remains a marker. The 23/27 report is historical; section 34 describes different field offsets. Re-extract the current extents before changing their grouping.
+**Earlier scope (superseded above):** func_L00_00424BB8 was a marker with a historical 23/27 report.
 
 **Signature:** `tools/check.py` reports a partial count (`23 of 27 places match`) and
 `instruction at +0xNN differs` on an `addiu` **immediate** or a **store displacement** - a word
@@ -2425,7 +2425,9 @@ fields at `+0x1C`/`+0x20`); the matching body in level 16 sits at `0x0042FB58` i
 candidates for the same collision (`func_L01_003BAFB0` against `func_L00_0037E668`,
 `func_L02_003E9BB0` against `func_L00_003973E8`, `func_L02_00401298` against
 `func_L00_002E94B8`). It is a `tools/levels.py` fix - the masking of the small immediates on a
-non-tainted base - not a C problem.
+non-tainted base - not a C problem. **5 November 2026:** this row is resolved by a named, audited
+`IDENTITY_SPLITS` entry (section 12). The same screen on today's catalogue finds 92 single-place
+rows sharing a multi-place fingerprint; each still needs its own byte-level audit.
 
 <a id="blocker-35"></a>
 
@@ -4348,7 +4350,7 @@ do not invent a second function or discard those bytes on that evidence alone. *
 `0x00418E1C`/`0x00418E24` (USA v1.01; same code in PAL and US2) `lui`/`addiu`
 build `0x004191E0` and pass it as `$a1` to a registration call. The split now
 accepts this `text` witness: 88-byte `func_L10_00419188` plus the empty C
-callback `func_L10_004191E0`. Its C draft is still 84/88 bytes (`nonmatching/levels/func_L10_00419188.c`).
+callback `func_L10_004191E0`. Its C now matches (1/1 per release) by reading `D_001B251C` through an sda alias inside the loop (section 2).
 
 The retained `func_L00_00309DB0` residue hypothesis also has a PAL exception:
 all 27 PAL copies begin in the preceding return's delay slot, and an aligned

@@ -1085,6 +1085,62 @@ LEVEL_FUNCTION_SPLITS = {
 }
 
 
+# Audited fingerprint collisions (docs/MATCHING-BLOCKERS.md section 34): the
+# fingerprint masks these field offsets with the address halves, so two bodies
+# share one key. The words after the leading SKIP bytes (the release-specific
+# address pair) are the same in every release and tell the bodies apart. Retired
+# names are the former rows that held a mixture of both bodies.
+IDENTITY_SPLITS = {
+    # Levels 16, 22, 23 and 26 also hold a `q + 0x20` setter (fields +0x1C/+0x20)
+    # beside the `q + 0x60` one (fields +0xE4/+0xE8) of all 27 levels; the third
+    # body under this key, 0x48 bytes earlier, was already grouped correctly.
+    ("6b8116fb9abb08d4", 72): (8, (("func_L00_00424B70", "7f473cd36e239055"),
+                                   ("func_L00_00424BB8", "cd3f4bff2deda94a"),
+                                   ("func_L16_0042FB10", "8ad3e57cf77c5195")),
+                               ("func_L16_0042FB58",)),
+}
+
+
+def split_identities(rows: list[tuple]) -> list[tuple]:
+    """Regroup the places of an audited colliding fingerprint by their unmasked words.
+
+    Every place must carry one of the measured bodies, and no level may hold one
+    body twice; anything else fails before a catalogue is written."""
+    out, groups, at = [], {}, {}
+    for row in rows:
+        key = (row[3], row[2])
+        if key not in IDENTITY_SPLITS:
+            out.append(row)
+            continue
+        groups.setdefault(key, []).append(row)
+        at.setdefault(key, len(out))
+    for key in sorted(at, key=at.get, reverse=True):
+        skip, parts, retired = IDENTITY_SPLITS[key]
+        known = {name for name, _ in parts} | set(retired)
+        places = {digest: [] for _, digest in parts}
+        for name, _, size, _, locations in groups[key]:
+            if name not in known:
+                raise ValueError(f"{name}: unaudited row with split fingerprint {key[0]}")
+            for lv, a in locations:
+                base, text = level_text(DUMP / level_dir(lv))
+                if not base <= a or a + size > base + len(text):
+                    raise ValueError(f"{name}: level {lv} split body outside EE text")
+                digest = hashlib.sha256(text[a - base + skip:a - base + size]).hexdigest()[:16]
+                if digest not in places:
+                    raise ValueError(f"{name}: level {lv} body is not one of the audited bodies")
+                places[digest].append((lv, a))
+        split = []
+        for name, digest in parts:
+            found = sorted(places[digest])
+            if not found:
+                raise ValueError(f"{name}: audited body has no place")
+            if len({lv for lv, _ in found}) != len(found):
+                raise ValueError(f"{name}: two copies of one body in a level")
+            split.append((name, "level" if len(found) == 1 else "shared", key[1], key[0], found))
+        out[at[key]:at[key]] = split
+    return out
+
+
 def code_address_pairs(text: bytes, base: int, target: int) -> int:
     """How many `lui r,hi` + `addiu r2,r,lo` pairs (within eight words) in TEXT build TARGET."""
     w, count = words(text), 0
@@ -1476,6 +1532,7 @@ def catalogue() -> None:
                 name = f"func_L{number:02d}_{a:08X}"
                 kind = "level" if len({p[0] for p in places}) == 1 else "shared"
             rows.append((name, kind, e["size"], fp, places))
+    rows = split_identities(rows)
     rows.sort(key=lambda r: r[4][0])
     BOOT_FUNCTIONS.parent.mkdir(parents=True, exist_ok=True)
     BOOT_FUNCTIONS.write_text("# name\taddress\tsize\n" +

@@ -80,18 +80,18 @@ extern char *D_L16_001B2B1C __attribute__((sda));
 extern char *D_L16_001B9B50;
 
 /* pushes the two axis values onto the linked node, unless the node is inert or a value is zero */
-void func_L16_0042FB58(float x, float y)
+void func_L16_0042FB10(float x, float y)
 {
     char *st = D_L16_001B9B50;
     char *p;
 
     if (*(s16 *)(st + 0x86) != 0)
         return;
-    p = *(char **)(st + 0x70) + 0x60;
+    p = *(char **)(st + 0x70) + 0x20;
     if (x != 0.0f)
-        *(float *)(p + 0xE4) = x;
+        *(float *)(p + 0x1C) = x;
     if (y != 0.0f)
-        *(float *)(p + 0xE8) = y;
+        *(float *)(p + 0x20) = y;
 }
 
 extern void func_L16_00435CE8(void);
