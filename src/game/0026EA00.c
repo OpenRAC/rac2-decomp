@@ -459,8 +459,6 @@ void func_0026FE48(void)
 void func_0026FEB8(const char *format,...) {
 }
 
-INCLUDE_ASM("asm/game", func_0026FEF0);
-
 
 typedef struct {
     u8 pad[0x3D0];
@@ -805,8 +803,6 @@ void func_00272280(void)
 
 /* func_00272CB0 is in 0026EA00-target.c (-g for its nop pair before div.s). */
 
-INCLUDE_ASM("asm/game", func_00272540);
-
 /* Fills a three-float local through two setup calls, stores a two-argument float helper result into a field, then stores a second helper result into two more fields and returns zero. */
 int func_00272550(float *a0)
 {
@@ -824,8 +820,6 @@ int func_00272550(float *a0)
 
     return 0;
 }
-
-INCLUDE_ASM("asm/game", func_002725C8);
 
 /* Draw sixteen lens-flare elements with distance and screen-edge fades.
  * Corresponds to RAC1 draw_lens_flare, src/game/effects.c (GPL-3.0). */

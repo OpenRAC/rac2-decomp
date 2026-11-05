@@ -101,8 +101,6 @@ extern D00138180_View D_00138180;
 
 extern float func_321018(float);
 
-INCLUDE_ASM("asm/levels", func_L30_0032AAF0);
-
 
 
 

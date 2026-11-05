@@ -519,6 +519,10 @@ void func_L10_00418AD8(u8 *arg0) {
 
 INCLUDE_ASM("asm/levels", func_L10_00419188);
 
+void func_L10_004191E0(void)
+{
+}
+
 extern void func_L10_0041ED50(u8 *arg0);
 extern void func_L10_0041EE00(u8 *arg0);
 extern void func_L00_00414018(void);

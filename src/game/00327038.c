@@ -510,7 +510,9 @@ void func_00329F40(char *self)
     }
 }
 
-INCLUDE_ASM("asm/game", func_0032A130);
+void func_0032A130(void)
+{
+}
 
 INCLUDE_ASM("asm/game", func_0032A140);
 

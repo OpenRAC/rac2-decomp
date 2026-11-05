@@ -328,7 +328,8 @@ def release_check(version: str, report_path: Path) -> None:
         # are tolerated. Unknown missing entries and duplicate compensation fail.
         explained = (level_splits | ({"func_00131DE8"} if split else set())
                      | ({"func_00115E38"} if assertion_split else set()))
-        known_split = bool(missing) and missing == explained and not retired
+        # Measured residues may retire in the same tree as exactly explained splits.
+        known_split = bool(missing) and missing == explained
         known_boundary = ((retired or known_split) and retired <= set(levels.FUNCTION_RESIDUES)
                           and (not missing or known_split)
                           and total == len(where) + len(retired) - len(missing)

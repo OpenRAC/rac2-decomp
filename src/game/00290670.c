@@ -37,8 +37,6 @@ void func_00290680(void)
         func_0027DDC0(0, 0, 0, r);
 }
 
-INCLUDE_ASM("asm/game", func_00290718);
-
 extern int D_001A901C __attribute__((sda));
 
 void func_00290720(void) {

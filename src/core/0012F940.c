@@ -26,8 +26,6 @@ int func_0012F948(char *p, unsigned int addr, int size) {
     return r1_func_0012BDD0(p);
 }
 
-INCLUDE_ASM("asm/core", func_0012F998);
-
 unsigned int func_0012F9A8(struct IndirectWord *resource)
 {
     return *resource->value;

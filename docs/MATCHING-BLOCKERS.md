@@ -1498,6 +1498,8 @@ the canonical `D_00189EA0`. Earlier zero/constant labels described a mistaken
 interpretation of `func_00334710`, which returns this stored vector. Preserve the
 shared identities without inventing constness or zero initialization at each read.
 
+**5 November 2026:** re-extracted in all three releases: levels 16, 22, 23 and 26 hold the `q + 0x20` body under this name and the `q + 0x60` body under `func_L16_0042FB58`. Swapping them renames symbols used by matched C (`src/levels/23_damosel_orbit/L23_004402D8-g8.c`); not done here.
+
 **Current scope:** func_L00_00424BB8 remains a marker. The 23/27 report is historical; section 34 describes different field offsets. Re-extract the current extents before changing their grouping.
 
 **Signature:** `tools/check.py` reports a partial count (`23 of 27 places match`) and
@@ -2796,7 +2798,7 @@ Words **and operands** matter: qualifying sp-by-sp adjustments, zero moves and n
 
 The four-byte residue rule also needs its measured position after a completed return and delay slot. PR #253 now handles five additional specifically audited mixed-instruction residues (section 50), not an opcode-only generalization.
 
-An extent beginning inside a prior epilogue but containing a later real function needs an entry correction, not deletion. Positive stack adjustment is only a clue. Verify call/data/vtable entries, preserve ends and raw bytes, and preserve boot/level identity when regenerating fingerprints. Other mixed boundaries remain open.
+An extent beginning inside a prior epilogue but containing a later real function needs an entry correction, not deletion. Positive stack adjustment is only a clue. Verify call/data/vtable entries, preserve ends and raw bytes, and preserve boot/level identity when regenerating fingerprints. Other mixed boundaries remain open. **5 November 2026:** 59 more named residues and four 16-to-8 entry corrections are applied; see section 50.
 
 One boot example remains open: USA v1.01 callers `func_0027B440` and
 `func_00291850` enter `0x00126288`, four bytes after the catalogued
@@ -2894,6 +2896,14 @@ PR #253 is merged. Generator, catalogue, markers and tests account for these spe
 **29 October 2026 USA v1.01 follow-up, pending maintainer review:** boot-only `func_002B8530` is catalogued as 20 bytes and disassembles to `lwc1 $f0,0x2D0($a2); nop; lwc1 $f0,0x258($a2); nop; addiu $sp,$sp,0x30`. The previous extent ends with a completed return/delay slot, the disassembler labels this address `alabel`, and a new frame begins at `func_002B8548`. This local boundary evidence is insufficient to edit the release-shared catalogue; retain the marker and row pending maintainer review.
 
 **28 October 2026 USA v1.01 follow-up, pending maintainer review:** boot-only `func_002B4068` is 36 bytes, labelled `alabel`, after `func_002B4040`'s completed return at 0x002B4054, delay-slot result operation, and padding. Its body is `sw $zero,0($gp); nop; sw $zero,0($gp); nop; addiu $sp,$sp,0x60; nop; addiu $sp,$sp,0x90; nop; addiu $sp,$sp,0x150; nop`, followed by the next frame at 0x002B4090. It has no local prologue or return. A temporary empty C probe emits 8 bytes and matches 0/1. Keep marker and catalogue row pending maintainer review; do not count it as a match or handwritten function.
+
+**5 November 2026, applied (USA v1.01, PAL, USA v2.00):** 68 unmatched rows of at most 400 bytes without `jr $ra`, plus three lead-reported rows, were re-read at every placement in all three releases. Each placement was checked for its position after a completed return or tail jump and for direct branch/jump targets, aligned loaded words and `lui`/`addiu`-`ori`-load pairs into the extent; hits were classified by section (packed halfword data and coincidental instruction words are not pointers). Results:
+
+- **Residue, removed** through the named `FUNCTION_RESIDUES` list (59 rows): every row of the 28/29 October follow-ups above, the "Suspected catalogue remnants" row except `func_00131CB0`, `func_003495B8`, `func_0034CE88`, `func_0029B848`, `func_003356E8`, `func_003172D0`, `func_00314CF8`, `func_00335270`, `func_0031D350`, `func_00129410`, `func_0011B580`, `func_0011FA48`, `func_0011C8C8`, `func_0011ED28`, `func_00123490`, `func_0012F998`, `func_00326CA8`, `func_0032FDC0`, `func_0031E6D8`, and the level rows `func_L00_0031A710`, `func_L05_0033CD40`, `func_L05_0033F4A8`, `func_L05_0037B6C0`, `func_L05_0037BB78`, `func_L09_003FB780`, `func_L01_0042C450`, `func_L23_0041E538`, `func_L25_00373ED0`, `func_L25_00373EE0`, `func_L25_00373F08`, `func_L30_0032AAF0`. No witness at any placement; the same names are removed from the PAL/US2 catalogues by `carry.py --entries`. Release-specific rows over the same PAL/US2 bytes (for example `func_PAL_003373BC`, `func_US2_0031E14C`) have other sizes and are not changed.
+- **Entry corrections** (`FUNCTION_ENTRY_OFFSETS`, 16 to 8 bytes): `func_0032A130`, `func_L03_0041B848`, `func_PAL_0032B920`, `func_PAL_L00_003E63F0`. Each starts with an 8-byte stack-restore residue; the code builds the address of the `jr $ra; nop` at +8 with `lui`/`addiu` at every placement (28/5/1/27). The callers now pass the symbol without `+ 8`; the four empty callbacks are C.
+- **Real functions, kept:** `func_002B9030` (jal thunk), `func_002B9380` (address pair), `func_002A1378` (jump target), `func_002A677C`, `func_002A08A0`, `func_001325E0` (jal), `func_00282848` (returns), `func_00131CB0` (crt0 passes it in `$t0` to the thread syscall).
+- **Kept pending:** `func_L00_00309DB0` (PAL copies start in the previous delay slot; the PAL level-20 word is packed halfword data, not a pointer) and `func_L00_00424BB8` (section 34).
+
 
 <a id="blocker-51"></a>
 
@@ -4334,13 +4344,19 @@ placement report and 382 unit tests passing. No-op callbacks are counted as
 their real individual entries; no original-assembly classification is involved.
 Hrugis instead has an 88-byte closed body plus
 an unreachable 8-byte return pair with no independent scanned entry witness;
-do not invent a second function or discard those bytes on that evidence alone.
+do not invent a second function or discard those bytes on that evidence alone. **5 November 2026:** a code witness exists. At
+`0x00418E1C`/`0x00418E24` (USA v1.01; same code in PAL and US2) `lui`/`addiu`
+build `0x004191E0` and pass it as `$a1` to a registration call. The split now
+accepts this `text` witness: 88-byte `func_L10_00419188` plus the empty C
+callback `func_L10_004191E0`. Its C draft is still 84/88 bytes (`nonmatching/levels/func_L10_00419188.c`).
 
 The retained `func_L00_00309DB0` residue hypothesis also has a PAL exception:
 all 27 PAL copies begin in the preceding return's delay slot, and an aligned
 loaded word in PAL level 20 equals that address with unproven pointer meaning.
 Resolve its predecessor extent and that word's provenance before a shared
-deletion. Direct or nearby address-pair absence alone is not proof of no entry.
+deletion. **5 November 2026:** that word is part of packed halfword data
+(`00190000 00190100 00320200`), not a pointer; the predecessor extent is still
+open, so the row stays. Direct or nearby address-pair absence alone is not proof of no entry.
 
 - Remove diagnostic source controls before comparing meaningful C. The eight
   overwritten initializers in `func_L02_00412D50`, ten dead initializers in

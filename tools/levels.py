@@ -841,6 +841,12 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_US2_L19_00353D38": (288, 16),
     "func_US2_L19_003DEC48": (3336, 8),
     "func_US2_L19_004131DC": (596, 4),
+    # Stack-restore residue, then an empty callback whose address is built with
+    # lui/addiu at every placement (US/PAL/US2); 5 November 2026.
+    "func_0032A130": (16, 8),
+    "func_L03_0041B848": (16, 8),
+    "func_PAL_0032B920": (16, 8),
+    "func_PAL_L00_003E63F0": (16, 8),
 }
 
 
@@ -889,6 +895,68 @@ FUNCTION_RESIDUES = {
     "func_002DE7F0": 28,
     "func_002E3E50": 4,
     "func_00335E28": 12,
+    # 5 November 2026 audit: each follows a completed return (or tail jump) and
+    # delay slot; no direct branch/jump, aligned loaded word or lui/addiu pair
+    # enters it at any placement of USA v1.01, PAL or USA v2.00 carrying the name.
+    "func_0033B538": 4,
+    "func_003495B8": 4,
+    "func_0034CE88": 12,
+    "func_L00_0031A710": 20,
+    "func_0029B848": 12,
+    "func_00288D40": 20,
+    "func_002ED570": 4,
+    "func_0029CEC8": 12,
+    "func_002ED9A8": 20,
+    "func_002EEBB0": 20,
+    "func_002ED880": 28,
+    "func_002ED848": 36,
+    "func_002ED8F0": 84,
+    "func_00280660": 12,
+    "func_002B80B8": 76,
+    "func_L05_0033CD40": 28,
+    "func_L05_0033F4A8": 156,
+    "func_002B0A08": 12,
+    "func_L05_0037B6C0": 12,
+    "func_L05_0037BB78": 20,
+    "func_L09_003FB780": 4,
+    "func_00130AAC": 4,
+    "func_00290718": 4,
+    "func_002FC460": 4,
+    "func_002FC510": 4,
+    "func_002FC618": 4,
+    "func_002FC868": 4,
+    "func_003380A8": 4,
+    "func_L25_00373ED0": 4,
+    "func_L25_00373F08": 4,
+    "func_0011B580": 8,
+    "func_0011FA48": 8,
+    "func_0011C8C8": 12,
+    "func_00272540": 12,
+    "func_002B49A0": 12,
+    "func_002DF630": 12,
+    "func_0031E6D8": 12,
+    "func_00326CA8": 12,
+    "func_0032FDC0": 12,
+    "func_L01_0042C450": 12,
+    "func_L23_0041E538": 12,
+    "func_0012F998": 16,
+    "func_0026FEF0": 20,
+    "func_002725C8": 20,
+    "func_00298D10": 20,
+    "func_002B8530": 20,
+    "func_L25_00373EE0": 20,
+    "func_L30_0032AAF0": 20,
+    "func_0011E920": 24,
+    "func_002B4068": 36,
+    "func_00123490": 44,
+    "func_0012FB10": 52,
+    "func_0011ED28": 56,
+    "func_00129410": 64,
+    "func_0031D350": 132,
+    "func_003356E8": 172,
+    "func_003172D0": 188,
+    "func_00335270": 252,
+    "func_00314CF8": 300,
 }
 
 
@@ -1010,15 +1078,35 @@ LEVEL_FUNCTION_SPLITS = {
                             (("func_L13_0043E8C0", 8), ("func_L13_0043E8C8", 8), ("func_L13_0043E8D0", 8))),
     "func_L06_0047C1D0": ("d456d82bfa98afa7", "shared", 7, "camvtbl", 1,
                             (("func_L06_0047C1D0", 8), ("func_L06_0047C1D8", 8), ("func_L06_0047C1E0", 8))),
+    # Hrugis: an 88-byte closed body, then an empty callback whose address the
+    # level's own code builds with lui/addiu and passes to a registration call.
+    "func_L10_00419188": ("741d326f9af76cac", "level", 1, "text", 1,
+                            (("func_L10_00419188", 88), ("func_L10_004191E0", 8))),
 }
+
+
+def code_address_pairs(text: bytes, base: int, target: int) -> int:
+    """How many `lui r,hi` + `addiu r2,r,lo` pairs (within eight words) in TEXT build TARGET."""
+    w, count = words(text), 0
+    for i, x in enumerate(w):
+        if x >> 26 != 0x0F:
+            continue
+        rt, hi = (x >> 16) & 31, (x & 0xFFFF) << 16
+        for y in w[i + 1:i + 9]:
+            if y >> 26 == 0x09 and (y >> 21) & 31 == rt:
+                lo = y & 0xFFFF
+                if (hi + (lo - 0x10000 if lo & 0x8000 else lo)) & 0xFFFFFFFF == target:
+                    count += 1
+                break
+    return count
 
 
 def split_level_rows(rows: list[tuple]) -> list[tuple]:
     """Apply only the named splits, verifying every complete body and dispatch witness.
 
     Both merged and fully split inputs are accepted. Partial, overlapping or
-    divergent metadata fails before any catalogue is written. Hrugis's unentered
-    tail is deliberately excluded: return-looking bytes alone are not an entry.
+    divergent metadata fails before any catalogue is written. Hrugis's tail is split
+    only with its measured code witness: return-looking bytes alone are not an entry.
     """
     by_name = {r[0]: r for r in rows}
     if len(by_name) != len(rows):
@@ -1055,6 +1143,16 @@ def split_level_rows(rows: list[tuple]) -> list[tuple]:
                    for level, p in locations if level == lv):
                 raise ValueError(f"{name}: another level extent overlaps the split")
             selected_table = table.get(lv, table.get("default")) if isinstance(table, dict) else table
+            if selected_table == "text" and len(parts) == 2:
+                # A code witness: the level's own text builds the second entry's
+                # address with a lui/addiu pair (e.g. to register it as a callback).
+                if code_address_pairs(text, base, address + parts[0][1]) != witnesses:
+                    raise ValueError(f"{name}: level {lv} code entry witnesses differ")
+                offset = 0
+                for i, (_, length) in enumerate(parts):
+                    keys[i].add(fingerprint(body[offset:offset + length], address + offset))
+                    offset += length
+                continue
             if selected_table not in ("camvtbl", "vtbl"):
                 raise ValueError(f"{name}: unknown dispatch table")
             raw = (DUMP / level_dir(lv) / f"{selected_table}.bin").read_bytes()

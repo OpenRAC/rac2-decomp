@@ -82,8 +82,6 @@ int func_002B4038(int value, int index) {
     return D_00240450[index].value == value;
 }
 
-INCLUDE_ASM("asm/game", func_002B4068);
-
 typedef int PoseVector128 __attribute__((mode(TI)));
 typedef struct {
     PoseVector128 initial, previous, current, delta;
@@ -119,8 +117,6 @@ void func_002B4090(char *self, PoseVector128 *point, float x, float y, float z)
 /* func_002B41A8 is matched in 002B41A8.c. */
 
 INCLUDE_ASM("asm/game", func_002B44C0);
-
-INCLUDE_ASM("asm/game", func_002B49A0);
 
 extern int D_001AA0F0 __attribute__((sda));
 
