@@ -816,7 +816,75 @@ void func_L00_00308408(int x, int y0, int w, int h) {
 
 /* func_L00_00308538 is defined in its own unit. */
 
-INCLUDE_ASM("asm/levels", func_L00_00308700);
+typedef int Q128 __attribute__((mode(TI)));
+
+typedef union {
+    struct {
+        int key;
+        int age;
+        unsigned char *data;
+        int pad;
+    } s;
+    Q128 q;
+} Ent_308700;
+
+typedef struct {
+    unsigned char *base;
+    short *info;
+    char pad8[0x28 - 8];
+    int active;
+    int pad2C;
+    Ent_308700 e[8];
+} Cache_308700;
+
+extern Cache_308700 D_L00_001C93A0;
+extern int D_L00_001B18D8[] __attribute__((sda));
+extern void func_00297550(unsigned char *, int, unsigned char *, short *);
+
+int func_L00_00308700(int key)
+{
+    int found;
+    int best;
+    int i;
+
+    if (D_L00_001C93A0.active == 0)
+        return 0;
+    do {
+        found = 0;
+        best = 0;
+        for (i = 0; i < 8; ++i) {
+            if (D_L00_001C93A0.e[i].s.key == key)
+                break;
+            if (D_L00_001C93A0.e[i].s.age < *(int *)((unsigned char *)&D_L00_001C93A0 + 0x34 + best * 16))
+                best = i;
+        }
+        do {
+            if (i == 8) {
+                Cache_308700 *c = &D_L00_001C93A0;
+                unsigned char **dp = &c->e[0].s.data;
+                Ent_308700 *e;
+                Ent_308700 *e0;
+                int off = best << 4;
+                func_00297550(*(unsigned char **)((char *)dp + off), key, D_L00_001C93A0.base, c->info);
+                e0 = c->e;
+                e = (Ent_308700 *)((char *)e0 + off);
+                e->s.key = key;
+                i = best;
+                found = 1;
+            }
+        } while (0);
+        if (i != 0) {
+            Ent_308700 *base = D_L00_001C93A0.e;
+            Ent_308700 *other = base + i;
+            Q128 tmp = other->q;
+            other->q = base->q;
+            base->q = tmp;
+        }
+    } while (0);
+    D_L00_001C93A0.e[0].s.age = D_L00_001B18D8[0];
+    return found;
+}
+
 
 /* rac1-decomp src/overlays/shared/menu_00249720.c: func_L00_0024B1B0 */
 /* stores a value into a table slot chosen by the current index */
