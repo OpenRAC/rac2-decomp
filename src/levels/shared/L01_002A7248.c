@@ -1336,7 +1336,7 @@ void func_L01_00324410(char *out, char *src, int *nums)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L01_00324550);
+/* func_L01_00324550 is in L01_00324550-narrowsave.c. */
 
 /* func_L01_003245E0 is defined in L01_002A7248-g8.c (this unit has no $gp access for it). */
 

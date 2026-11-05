@@ -338,7 +338,7 @@ void func_L08_0033CD18(s32 a0, s32 a1, ...) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L08_00389B68);
+/* func_L08_00389B68 is in L08_00389B68-narrowsave.c. */
 
 void func_L08_0039DBE8(unsigned char *obj) {
     struct {
