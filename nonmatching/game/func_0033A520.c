@@ -54,3 +54,8 @@ void func_0033A520(unsigned char *obj, void *arg)
     *(int *)func_00335E20(obj + 0x170) = 0x80F0F0F0;
     func_00335F88(obj + 0x170, 0.7f, 0.7f, 0.0f, 0.0f);
 }
+
+/* 5 November 2026 (w-c2): 360/360 bytes, 0/28, first +0x60 (same as above). Retail issues lui 0x4396/mtc1
+ * (300.0) before the lui/lwc1 of D_001B23A4, with the product in $f0 and 70.0 in $f1. Tried: `D * 300.0f`,
+ * `300.0f * D`, scalar extern instead of array, locals c/sc, direct expression with no group
+ * (356/360 bytes): the global load is always first or the registers rotate. Same ordering blocker. */

@@ -1,3 +1,4 @@
+/* 5 November 2026: retained body is 276/288, 0/27. Retail keeps la D (s0) and best<<4 (s1) apart across the call (5 saves, %hi in s4; the loop nop is alignment from the extra save). Local Cache* c + off, char* p += off, c reassigned, do-while(0) around call or call+store, natural form with -frac2-gcse-unsplit-edges or -mno-split-addresses: cse always merges into one D+off (s0). */
 /* 4 November 2026 current-RAC1 source trials; retained, not linked.
  * Three real RAC1 scan/swap/decode-phase trials give 272 or 276 bytes against 288, 0/27 USA
  * placements. The retained 276-byte owner-view form uses the complete cache representation for

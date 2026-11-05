@@ -72,3 +72,7 @@ int func_L01_0031B300(void *a0, void *a1, void *a2, void *a3) {
 fail:
     return 0;
 }
+/* 5 November 2026 (w-c2): the retained best group again gives 276/272, 0/5, only the extra `nop` after the
+ * second `lwc1 $f20` (retail's beql target is the addiu after it). Moving the group around the qcopy,
+ * grouping the 1.0f func_00282F20 call, or a plain load plus an empty group all keep 276 (or lose the
+ * register map). Nothing new unblocks it. */

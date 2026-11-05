@@ -1,3 +1,4 @@
+/* 5 November 2026: rechecked in an own -frac2-qcopy -frac2-qcopy-barrier unit: 360/360, 0/27, only `addiu $s1,$s1,0x60` after the first jal (retail before). Tried increment before v160, v60 = obj + 0x60 (same), base from v60 - 0x60 (356), precomputed hero-0x240 (reorders setup), and -g / -frac2-hazard-labels / -fno-schedule-insns2 on the unit: no change. */
 /* 3 November 2026: current RAC1 Camera fields and RAC2 neighbor reviewed.
  * The actual input is represented by its id +0x86 / state pointer +0x70
  * prefix. Hero addresses are formed within the incomplete owning byte object,

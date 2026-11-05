@@ -1,3 +1,5 @@
+/* 5 November 2026 (wave 2): `volatile unsigned short flags` stops the beql target steal, so the beqz+nop now match retail; still 144/148, 0/28: callback stays in v0 and cc1 fills the jalr slot with the a0 move (retail: v1, a0 move before jalr, nop slot). Tried -g, -frac2-hazard-labels, -frac2-keep-block-order, noreturn/variadic/long/float callback types, inline helper: no change. */
+/* 5 November 2026: pointer-based baseline rechecked at 144/148, 0/28; retail hoists the callback `lw $v1,0x64` into the first bnel slot and leaves nops in both the beqz and jalr slots (a0 move sits between), which the baseline never reproduces. */
 /* 4 November 2026 follow-up: nonmatching, not linked. The actual head-cache
  * store occurs once in the entry branch slot, using the getter's v0; the
  * loop backedge enters at the current-node state test. Do not add a cache

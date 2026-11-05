@@ -1,3 +1,4 @@
+/* 5 November 2026: rechecked with the unit's real func_L01_00324410(char *, char *, int *) prototype: 132/132, 0/11, only the frame differs (retail 0x2A0, sd ra 0x200 below sq s0 0x210). No existing flag gives ra below s0; needs a compiler change, so not retried. */
 /* opus-1 (v2139, 2026-11-03): FAILED, 132/132 bytes, 0/11 places with -mastra-quad-saves (frame 0x2A0 and the
  * varargs spill area exact; 5 save/restore instructions differ), default profile 0x290 frame with sd/ld s0.
  * Why s0 is `sq` but ra `sd`: the EE cc1 (stock 2.9-ee mips.c) keeps a per-register save mode, mips_reg_mode[],

@@ -1,3 +1,4 @@
+/* 5 November 2026: explicit `one` before the loop, guarded do-while, and the shift copied into both arms of the first if all keep the s6/s7 swap (do-while) or get worse (one: extra regs; shift in arms: cse reuses the loaded[] shift, 284/292). */
 /* 4 November 2026 current-RAC1 source trials; retained, not linked.
  * Six actual size/upload/bound-read groups, a page helper and loop-profile trials do not match.
  * The size-only group plus no-strength-reduce gives 292/292 bytes, 0/28 USA, first +0xA8: the
