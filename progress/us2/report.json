@@ -11,12 +11,7 @@
   "complete_code": "1261428",
   "complete_code_percent": 22.611763879199145,
   "total_units": 1251,
-  "complete_units": 1170,
-  "total_data": "381856",
-  "matched_data": "0",
-  "matched_data_percent": 0.0,
-  "complete_data": "0",
-  "complete_data_percent": 0.0
+  "complete_units": 1170
  },
  "categories": [
   {
@@ -31,12 +26,7 @@
     "matched_functions": 3014,
     "matched_functions_percent": 97.41435035552682,
     "complete_code": "853704",
-    "complete_code_percent": 81.62511330128389,
-    "total_data": "381856",
-    "matched_data": "0",
-    "matched_data_percent": 0.0,
-    "complete_data": "0",
-    "complete_data_percent": 0.0
+    "complete_code_percent": 81.62511330128389
    }
   },
   {

@@ -98,25 +98,6 @@ def complete_measures(units: list[dict]) -> dict:
     return {"complete_code": str(done), "complete_code_percent": 100.0 * done / total if total else 0.0}
 
 
-CODE_SECTIONS = {".vutext", "core.text", ".text"}
-
-
-def data_measures() -> dict:
-    """The boot executable's data, for the top-level measures and the executable category: every
-    loaded section of initialised data (core.data, core.rdata, the literal pools, .data, the lvl
-    vtables, legal.data and mc1.data; .bss has no bytes to compare). None of it is matched yet:
-    tools/build.py places C functions' code only and discards their objects' data, so all of it
-    still comes from retail's dumps. The levels' data is not measured."""
-    import elf
-    image = elf.read(levels.BOOT) if levels.BOOT.is_file() else None
-    if image is None:
-        return {}
-    total = sum(s["size"] for s in image["sections"]
-                if s["type"] == 1 and s["address"] and s["name"] not in CODE_SECTIONS)
-    return {"total_data": str(total), "matched_data": "0", "matched_data_percent": 0.0,
-            "complete_data": "0", "complete_data_percent": 0.0}
-
-
 def check() -> None:
     report = json.loads(REPORT.read_text())
     matched = {f["name"] for u in report["units"] for f in u["functions"] if f["fuzzy_match_percent"] == 100.0}
@@ -195,10 +176,10 @@ def release_report(version: str) -> dict:
         g = groups.setdefault(unit, {"rows": [], "source_path": source, "categories": cats})
         g["rows"].append({"name": name, "size": size, "address": address,
                           "matched": name in has_c and name in placed or name in by_hand})
-    return build_report(groups, title, data_measures())
+    return build_report(groups, title)
 
 
-def build_report(groups: dict, title, data: dict) -> dict:
+def build_report(groups: dict, title) -> dict:
     units = []
     for unit, g in sorted(groups.items()):
         rows = sorted(g["rows"], key=lambda r: r["address"])
@@ -222,10 +203,9 @@ def build_report(groups: dict, title, data: dict) -> dict:
         members = [u for u in units if cid in u["_category"]]
         rows = [r for u in members for r in u["_rows"]]
         cats.append({"id": cid, "name": cname,
-                     "measures": measures(rows) | complete_measures(members) | (data if cid == "executable" else {})})
+                     "measures": measures(rows) | complete_measures(members)})
     total = measures(allrows) | complete_measures(units)
     total.update({"total_units": len(units), "complete_units": sum(u["measures"]["complete_units"] for u in units)})
-    total.update(data)
     for u in units:
         del u["_rows"], u["_category"]
     return {"version": 2, "measures": total, "categories": cats, "units": units}
@@ -557,16 +537,14 @@ def main() -> None:
     wanted = [("executable", "Boot executable"), ("level_code", "Level code"), ("game", "Boot game code"),
               ("common", "Shared level code"), ("levels", "Level-specific code")]
     wanted += [(f"level_{n:02d}", title(n)) for n in sorted(levels.NAMES)]
-    data = data_measures()
     cats = []
     for cid, cname in wanted:
         members = [u for u in units if cid in u["_category"]]
         rows = [r for u in members for r in u["_rows"]]
         cats.append({"id": cid, "name": cname,
-                     "measures": measures(rows) | complete_measures(members) | (data if cid == "executable" else {})})
+                     "measures": measures(rows) | complete_measures(members)})
     total = measures(allrows) | complete_measures(units)
     total.update({"total_units": len(units), "complete_units": sum(u["measures"]["complete_units"] for u in units)})
-    total.update(data)
     for u in units:
         del u["_rows"], u["_category"]
     report = {"version": 2, "measures": total, "categories": cats, "units": units}
