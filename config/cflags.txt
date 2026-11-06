@@ -3627,6 +3627,13 @@ src/pal/game/00304D90-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/11_joba/L11_0039A270-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/23_damosel_orbit/L23_0041EDC8-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
 src/pal/levels/00_aranos_tutorial/L00_002FE768-state-g8.c	-O2 -G8 -ffunction-sections -g
+src/us2/game/002D5C08-g8.c	-O2 -G8 -ffunction-sections -fno-builtin
+src/us2/levels/15_gorn/L15_00432BA8-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/us2/game/002CC908-g8.c	-O2 -G8 -mastra-r5900-extern-buffer -ffunction-sections -fno-builtin
+src/us2/game/002F95E8-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
+src/us2/levels/10_hrugis_cloud/L10_00426260-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/us2/levels/05_feltzin_system/L05_00422838-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/us2/game/002D1F28-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L05_0039A808-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_003A6238-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_003EE450-cc-g8.c	-O2 -G8 -ffunction-sections
