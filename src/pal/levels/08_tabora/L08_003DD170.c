@@ -176,6 +176,98 @@ void func_PAL_L08_003DD368(Ent *a0)
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L08_003DD918);
+extern void func_002A8D70(void *, int, int, int, int, int, float, float, float);
+extern void func_00283658(void *, void *);
+extern void func_0029FCC0(void *, int, void *);
+extern void func_00282F20(void *, void *, float);
+extern int D_0018C0BC;
+extern void func_00282CC0(void *, void *, void *);
+extern void func_L03_00339128(void *, void *, int, int, int, int, int, float);
+extern void func_L01_003120A8(void *, void *, void *, int, int, int, int, float, float);
+extern float func_00283B98(float, float);
+extern int func_00283CF0(float);
+extern char *func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
+extern int func_001163B0(void);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L08_003DE160);
+/* func_PAL_L08_003DD918, the PAL copy of func_L08_003D9798: the same C, with speeds and
+   accelerations times 6/5 and each particle lifetime scaled to 50 Hz, (x * 5 + 2) / 6. */
+void func_PAL_L08_003DD918(char *object)
+{
+    float origin[4], end[4], start[4], step[4], matrix[12], point[4];
+    float velocity[4], accel[4], position[4];
+    char *state = *(char **)(object + 0x68), *particle;
+    float heading, angle;
+    int a, b, c;
+    func_002A8D70(object,1,1,0,1,0,0.5f,(float)*(u8 *)(state+0x34),1.0f);
+    func_00283658(matrix,object+0xC0);
+    func_0029FCC0(object,1,point);
+    qcopy_nc(origin,point);
+    matrix[2]=0;
+    qcopy_nc(start,origin);
+    func_00282F20(end,matrix,3.0f);
+    if (*(int *)(state+0x250)) {
+        if ((unsigned)(D_0018C0BC-17)<2) end[2]=*(float *)(state+0x218)-start[2];
+        else end[2]=*(float *)(state+0x248)-start[2];
+        if (end[2]>1.2f) end[2]=1.2f;
+        else if(end[2]<-1.2f) end[2]=-1.2f;
+    }
+    func_00282CC0(end,end,start);
+    func_L03_00339128(end,object,1,0x808080,127,30,255,0.5f);
+    func_L01_003120A8(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    func_00282F20(step,matrix+4,0.1f);
+    func_00282CC0(start,start,step);
+    func_00282CC0(end,end,step);
+    end[2]+=func_002A7878(-0.2f,0.2f);
+    func_L01_003120A8(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    func_00282F20(step,matrix+4,-0.2f);
+    func_00282CC0(start,start,step);
+    func_00282CC0(end,end,step);
+    end[2]+=func_002A7878(-0.2f,0.2f);
+    func_L01_003120A8(object,start,end,1,0,1,0,(float)*(u8 *)(state+0x34),1.0f);
+    heading=*(float *)(object+0xF8);
+    velocity[3]=0.6f; accel[3]=1.5f;
+    { int i; for(i=1;i>=0;i--) {
+        qcopy_nc(position,origin);
+        position[0]+=func_002A7878(-0.065f,0.065f);
+        position[1]+=func_002A7878(-0.065f,0.065f);
+        position[2]+=func_002A7878(-0.065f,0.065f);
+        velocity[0]=func_00283180(heading)*0.34000003f;
+        velocity[1]=func_00283198(heading)*0.34000003f;
+        velocity[2]=0;
+        velocity[2]=func_002A7878(0,0);
+        angle=func_002A7878(-90,90)*0.01745329424738884f;
+        accel[0]=func_00283180(func_00283B98(heading,angle))*0.010000001f;
+        accel[1]=func_00283198(func_00283B98(heading,angle))*0.010000001f;
+        accel[2]=0;
+        accel[2]=func_002A7878(0.018000001f,0.022000002f);
+        a=func_00283CF0((func_002A7878(2,4)*5.0f+2.0f)*0.16666667f);
+        b=func_00283CF0((func_002A7878(12,14.40000057220459f)*5.0f+2.0f)*0.16666667f);
+        c=func_00283CF0((func_002A7878(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
+        particle=func_002BAA28(position,velocity,accel,0x40101080,0x10101080,a,b,c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
+    }
+    }
+    velocity[3]=0.05f; accel[3]=0.07f;
+    { int i; for(i=1;i>=0;i--) {
+        qcopy_nc(position,origin);
+        position[0]+=func_002A7878(-0.2f,0.2f);
+        position[1]+=func_002A7878(-0.2f,0.2f);
+        position[2]+=func_002A7878(-0.2f,0.2f);
+        angle=func_002A7878(-10,10)*0.01745329424738884f;
+        velocity[0]=func_00283180(func_00283B98(heading,angle))*0.24000001f;
+        velocity[1]=func_00283198(func_00283B98(heading,angle))*0.24000001f;
+        velocity[2]=0;
+        velocity[2]=func_002A7878(0,0);
+        angle=func_002A7878(-90,90)*0.01745329424738884f;
+        accel[0]=func_00283180(func_00283B98(heading,angle))*0.010000001f;
+        accel[1]=func_00283198(func_00283B98(heading,angle))*0.010000001f;
+        accel[2]=0;
+        accel[2]=func_002A7878(0.014f,0.030000001f);
+        a=func_00283CF0((func_002A7878(2,4)*5.0f+2.0f)*0.16666667f);
+        b=func_00283CF0((func_002A7878(20,24)*5.0f+2.0f)*0.16666667f);
+        c=func_00283CF0((func_002A7878(200,240.00001525878906f)*5.0f+2.0f)*0.16666667f);
+        particle=func_002BAA28(position,velocity,accel,0x801010FF,0x801010FF,a,b,c,-1);
+        if(particle && (func_001163B0()&1)) particle[3]=0x48;
+    }
+    }
+}

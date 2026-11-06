@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00371E28);
-
 extern unsigned int D_001A7424 __attribute__((sda));
 extern int ref_L00_001A8F00_00 __attribute__((sda));
 typedef struct L00_0036FA68_Object {

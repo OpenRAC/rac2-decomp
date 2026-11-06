@@ -43,6 +43,3 @@ void func_PAL_L01_003C4768(char *object)
     *(int *)(hero + 0x1B8) = 0;
     *(int *)(hero + 0x18C0) = 0;
 }
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L01_003C4878);
-

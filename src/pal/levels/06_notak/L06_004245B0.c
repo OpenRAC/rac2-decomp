@@ -78,8 +78,6 @@ done:
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_004351A8);
-
 INCLUDE_ASM("asm/pal/levels", func_PAL_L06_004485C0);
 
 extern void func_36C158();
