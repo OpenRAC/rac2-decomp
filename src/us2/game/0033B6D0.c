@@ -40,7 +40,6 @@ int func_US2_0033BB98(int a0)
 	return a0;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033BC20);
 
 extern void func_0033AE18(unsigned char *owner, int value);
 

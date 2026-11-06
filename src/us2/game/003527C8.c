@@ -23,4 +23,3 @@ void func_US2_003527C8(unsigned char *object)
     func_003518E0(object, 3);
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_00352868);

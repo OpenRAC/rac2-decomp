@@ -20,19 +20,30 @@ u8 *func_US2_00344110(u8 *a0) {
     return a0;
 }
 
-
 INCLUDE_ASM("asm/us2/game", func_US2_00344170);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00344458);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00344480);
+extern int func_00336E40(void *);
+extern int *func_00336DA8(int, int);
+extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC30[], D_001ADC88[], D_001AE0C0[];
+extern char *D_001A8CFC[] __attribute__((sda));
+extern void func_003361E0(void *, void *, void *);
+extern void func_003369A8(void *, void *, void *);
+extern void func_00336710(void *, void *, void *);
+extern int *func_00335E20(void *);
+extern void func_00336390(void *, void *, int);
+extern void func_00336A30(void *, int);
+extern void func_00336A38(void *, void *);
+extern const char *func_00288FB8(int);
+extern void func_00335F88(void *, float, float, float, float);
+extern void func_003428E0(void *, void *);
+extern void func_00343028(void *, float, float);
+extern void func_00343038(void *, float);
+extern void func_00343798(void *, int);
+extern void func_US2_003444D0(u8 *, unsigned int);
 
-INCLUDE_ASM("asm/us2/game", func_US2_003444A0);
-
-INCLUDE_ASM("asm/us2/game", func_US2_003444C0);
-
-INCLUDE_ASM("asm/us2/game", func_US2_003444C8);
-
+/* func_US2_00344170, the v2.00 copy of func_00343260: the same C with the object's fields moved, a
+   text-flag call on the third text and another string id. */
 typedef int s32;
 typedef unsigned int u32;
 extern void func_003435B0(u8 *, u32);
@@ -45,3 +56,7 @@ void func_US2_003444D0(u8 *a0, u32 a1) {
 
 
 
+
+INCLUDE_ASM("asm/us2/game", func_US2_003444C0);
+
+INCLUDE_ASM("asm/us2/game", func_US2_003444C8);

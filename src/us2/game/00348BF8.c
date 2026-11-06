@@ -34,14 +34,6 @@ INCLUDE_ASM("asm/us2/game", func_US2_003492A8);
 
 INCLUDE_ASM("asm/us2/game", func_US2_003492B0);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348E50);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E58);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E60);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E68);
-
 
 typedef int s32;
 typedef unsigned char u8;
@@ -69,8 +61,6 @@ void func_US2_00348DA0(u8 *a0,f32 *a1) {
 
 
 void func_US2_00348E10(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0xB8) = a1; *(s32 *)(a0 + 0xBC) = a2; }
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E20);
 
 
 
@@ -115,3 +105,11 @@ char *func_US2_00349200(char *a0)
 
 
 
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E50);
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E58);
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E60);
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E68);
