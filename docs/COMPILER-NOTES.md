@@ -1191,6 +1191,16 @@ Implementations: [gcse_unsplit_edges.py](../tools/compiler/transformers/gcse_uns
 inferences from retail and comparison with GCC 2.95, not the recovered original
 patches. A lone lui at a branch target is not a unique signature of edge splitting.
 
+**6 November 2026, round 9 (not adopted):** three Lombyte sce-991111b candidates were
+env-gated in cc1 and swept over all 8595 non-SDK units and all 1206 near-miss files
+(-G0/-G8, labels renumbered). 0060 (no ADDRESS base for the static-chain/struct-value
+registers): 0 units change; one near miss moves (func_002BA0E0, 285 to 273 real rows, still
+1476/1472 bytes), and cc1 crashes on nonmatching/levels/func_L04_00441100.c. 0061 (unshared
+stack MEMs): 0 units, 0 near misses. 0065 (unsplit gcse edges by default): 33 matched units
+change (11 functions in three releases, e.g. L04_002E04A8.c), so it stays opt-in; it moves no
+listed near miss. The 13 scheduler/gcse near misses (func_00342BE8 ... func_L06_00382608)
+under 7 profiles at -G0/-G8 are unchanged by all three.
+
 Both Cygnus passes that run before cse (delete_null_pointer_checks and cygnus_merge_blocks,
 one "CYGNUS LOCAL law" block) start with find_basic_blocks, which puts a
 `(use (const_int 0))` after a call that ends a block. When cse then threads a branch past the
