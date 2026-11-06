@@ -56,7 +56,6 @@ typedef struct {
     char rest[0x684];
 } PurchaseMenuState;
 extern PurchaseMenuState D_L00_0022F7C0[];
-#define MENU ((char *)D_L00_0022F7C0)
 extern float D_L00_001AD570 __attribute__((sda));
 extern int D_L00_001B259C, D_L00_001B25A0, D_L00_001B25A4;
 typedef struct {
@@ -151,8 +150,8 @@ void func_PAL_L00_003776E8(void)
         func_002B4B70(0, 0);
         func_PAL_0028E9B8(1);
         if (!D_L00_0022F7C0[0].f60) {
-            func_00335370(MENU + 0xD0);
-            func_003353C8(MENU + 0xE0);
+            func_00335370(((char *)D_L00_0022F7C0) + 0xD0);
+            func_003353C8(((char *)D_L00_0022F7C0) + 0xE0);
         }
         func_002914B8();
         func_PAL_002F6208();
@@ -184,7 +183,7 @@ void func_PAL_L00_003776E8(void)
             for (i = 0; i < D_L00_0022F7C0[0].f34; i++) {
                 float stickScale = 0.0033333334f;
                 m = (char *)D_L00_0022F7C0[0].f2c + i * 256;
-                func_00283098(m + 16, MENU + 0xC0, (char *)D_L00_0022F7C0[0].f28 + 0xC0);
+                func_00283098(m + 16, ((char *)D_L00_0022F7C0) + 0xC0, (char *)D_L00_0022F7C0[0].f28 + 0xC0);
                 func_00282CC0(m + 16, m + 16, (char *)D_L00_0022F7C0[0].f28 + 16);
                 MF(0x2C) = *(float *)(*(char **)(m + 0x24) + 0x24) * D_L00_0022F7C0[0].f98;
                 if (*(short *)(m + 0xAA) == 0x10E3)
@@ -244,10 +243,10 @@ void func_PAL_L00_003776E8(void)
         func_PAL_L00_003771D8();
         D_L00_001B25A4 = D_00138180[0].pressed;
         if (D_L00_0022F7C0[0].f50 == 0 &&
-            *(int *)(MENU + 0x144 + D_L00_0022F7C0[0].f80 * 24) == 1) {
-            func_L00_0030C7C0(*(int *)(MENU + 0x140 + D_L00_0022F7C0[0].f80 * 24));
+            *(int *)(((char *)D_L00_0022F7C0) + 0x144 + D_L00_0022F7C0[0].f80 * 24) == 1) {
+            func_L00_0030C7C0(*(int *)(((char *)D_L00_0022F7C0) + 0x140 + D_L00_0022F7C0[0].f80 * 24));
             {
-                int selected = *(int *)(MENU + 0x140 + D_L00_0022F7C0[0].f80 * 24);
+                int selected = *(int *)(((char *)D_L00_0022F7C0) + 0x140 + D_L00_0022F7C0[0].f80 * 24);
                 unsigned int classIndex = D_00139568[selected];
                 func_L00_0030C748(((MenuShopClass *)D_L00_00262570)[classIndex].value, 8);
             }

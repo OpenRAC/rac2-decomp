@@ -1,7 +1,6 @@
 typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
 extern unsigned char D_00189E20[];
-#define H ((Hero *)D_00189E20)
 
 #include "include_asm.h"
 extern char *D_L16_001B2B1C;
@@ -49,7 +48,7 @@ void func_PAL_L16_003AD850(char *object)
         if (*(unsigned char *)(object + 32) == 1) {
             target = D_L16_001B2B1C + *(int *)(state + 1576) * 256;
             if (target == 0 || *(unsigned char *)(target + 32) == 254 || *(unsigned char *)(target + 32) == 253) {
-                if (func_002ACBC8((&H->c[128]), *(int *)(state + 1632))) {
+                if (func_002ACBC8((&((Hero *)D_00189E20)->c[128]), *(int *)(state + 1632))) {
                     clear_link(state);
                     *(unsigned char *)(object + 32) = 2;
                     goto active;

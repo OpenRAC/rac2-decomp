@@ -47,8 +47,6 @@ extern u8 *D_L14_001B259C;
 extern int D_L14_001B1938[4];
 extern char *D_L14_001C39C0[];
 
-#define HERO ((Hero *)D_00189E20)
-#define D_00189EA0 (HERO->position)
 
 void func_PAL_L14_0042E5F8(char *self)
 {
@@ -115,17 +113,17 @@ void func_PAL_L14_0042E5F8(char *self)
         if ((D_L14_001B20C8 & 15) == (((int)self >> 8) & 15)) {
             if (W(s, 0x2B8) == -1)
                 break;
-            if (W(s, 0x31C) && HERO->position[2] + 2.0f < F(self, 0x18) &&
-                func_00282E80(self + 0x10, D_00189EA0) < 16.0f) {
+            if (W(s, 0x31C) && ((Hero *)D_00189E20)->position[2] + 2.0f < F(self, 0x18) &&
+                func_00282E80(self + 0x10, (((Hero *)D_00189E20)->position)) < 16.0f) {
                 func_002A7750(self, 2, -1);
                 break;
             }
-            if (!W(s, 0x31C) && F(self, 0x18) < HERO->position[2] - 2.0f &&
-                func_00282E80(self + 0x10, D_00189EA0) < 8.0f)
+            if (!W(s, 0x31C) && F(self, 0x18) < ((Hero *)D_00189E20)->position[2] - 2.0f &&
+                func_00282E80(self + 0x10, (((Hero *)D_00189E20)->position)) < 8.0f)
                 func_002A7750(self, 3, -1);
         } else {
-            angle = func_00283248(HERO->position[0] - F(self, 0x10),
-                                 HERO->position[1] - F(self, 0x14));
+            angle = func_00283248(((Hero *)D_00189E20)->position[0] - F(self, 0x10),
+                                 ((Hero *)D_00189E20)->position[1] - F(self, 0x14));
             if (func_00283C80(F(self, 0xF8), angle) > 0.7853982449f)
                 func_002A7750(self, 4, -1);
         }
@@ -133,8 +131,8 @@ void func_PAL_L14_0042E5F8(char *self)
     case 4:
         if (func_002B3868(self) && B(self, 0x43) != 8)
             func_PAL_002A7E68(self, 8, 0, 17);
-        angle = func_00283248(HERO->position[0] - F(self, 0x10),
-                             HERO->position[1] - F(self, 0x14));
+        angle = func_00283248(((Hero *)D_00189E20)->position[0] - F(self, 0x10),
+                             ((Hero *)D_00189E20)->position[1] - F(self, 0x14));
         func_L01_00322288(self, angle);
         if (func_00283C80(F(self, 0xF8), angle) < 0.05235988274f)
             func_002A7750(self, 1, -1);
@@ -184,7 +182,7 @@ void func_PAL_L14_0042E5F8(char *self)
         }
         break;
     case 7:
-        if (func_L00_00329520(D_00189EA0, W(s, 0x2BC)))
+        if (func_L00_00329520((((Hero *)D_00189E20)->position), W(s, 0x2BC)))
             func_002A7750(self, 8, -1);
         break;
     case 8:

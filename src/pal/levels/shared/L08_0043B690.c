@@ -73,8 +73,6 @@ extern char D_L08_001B1FB0[];
 #define I(p, o) (*(int *)((u8 *)(p) + (o)))
 #define H(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define F(p, o) (*(float *)((u8 *)(p) + (o)))
-#define QUANTITY (*(s16 *)(D_001A7A00 + 0x1A))
-#define PRICE (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2])
 
 /* An interaction state machine at byte 0x20: offers an item for its price while
    the quantity at D_001A7A00+0x1A covers it, then buys the remaining quantity back
@@ -112,12 +110,12 @@ void func_PAL_L08_0043B690(u8 *self)
         func_L08_00435938();
         func_L01_003128C0(self);
         if (D_001395B8[0x1C]) {
-            if (QUANTITY <= 0)
+            if ((*(s16 *)(D_001A7A00 + 0x1A)) <= 0)
                 func_002A7750(self, 6, -1);
             else
                 func_002A7750(self, 7, -1);
         } else if (D_001395B8[0x1B]) {
-            if (QUANTITY < PRICE)
+            if ((*(s16 *)(D_001A7A00 + 0x1A)) < (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
                 func_002A7750(self, 3, -1);
             else
                 func_002A7750(self, 4, -1);
@@ -152,29 +150,29 @@ void func_PAL_L08_0043B690(u8 *self)
                 D_L08_001B29DC[I(data, 0x124)].x34 &= 0xFFFE;
                 D_L08_001B29DC[I(data, 0x124)].x31 = 1;
             }
-            if (QUANTITY < PRICE)
+            if ((*(s16 *)(D_001A7A00 + 0x1A)) < (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
                 func_002A7750(self, 3, -1);
             else
                 func_002A7750(self, 4, -1);
         }
         break;
     case 3:
-        if (QUANTITY >= PRICE)
+        if ((*(s16 *)(D_001A7A00 + 0x1A)) >= (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
             func_002A7750(self, 4, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x12F6, PRICE, -1);
+            func_L01_00324550(0x12F6, (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]), -1);
             func_L01_003246D0(self);
         }
         break;
     case 4:
-        if (QUANTITY < PRICE)
+        if ((*(s16 *)(D_001A7A00 + 0x1A)) < (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]))
             func_002A7750(self, 3, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x12E8, PRICE, -1);
+            func_L01_00324550(0x12E8, (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]), -1);
             func_L01_003246D0(self);
             if (D_00138324 & 0x10) {
                 func_00288AA0(D_L08_001BFD00, 0x5A);
-                QUANTITY -= PRICE;
+                (*(s16 *)(D_001A7A00 + 0x1A)) -= (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2]);
                 func_00288BE8(D_L08_001BFD00);
                 func_002A7750(self, 5, -1);
             }
@@ -206,14 +204,14 @@ void func_PAL_L08_0043B690(u8 *self)
             if (I(data, 0x120) != -1)
                 D_L08_001B29DC[I(data, 0x120)].xBC = 1;
             func_0029B3E0(0, -1);
-            if (QUANTITY <= 0)
+            if ((*(s16 *)(D_001A7A00 + 0x1A)) <= 0)
                 func_002A7750(self, 6, -1);
             else
                 func_002A7750(self, 7, -1);
         }
         break;
     case 6:
-        if (QUANTITY > 0)
+        if ((*(s16 *)(D_001A7A00 + 0x1A)) > 0)
             func_002A7750(self, 7, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
             if (!D_L08_001B1FA8)
@@ -224,19 +222,19 @@ void func_PAL_L08_0043B690(u8 *self)
         }
         break;
     case 7:
-        if (QUANTITY <= 0)
+        if ((*(s16 *)(D_001A7A00 + 0x1A)) <= 0)
             func_002A7750(self, 6, -1);
         else {
             n = D_001A7A00[0xA] ? 10 : 1;
             if (func_L01_003245E0(self, 10, 2.5f)) {
                 n *= 1000;
-                func_L01_00324550(0x12E9, QUANTITY, QUANTITY * n, -1);
+                func_L01_00324550(0x12E9, (*(s16 *)(D_001A7A00 + 0x1A)), (*(s16 *)(D_001A7A00 + 0x1A)) * n, -1);
                 func_L01_003246D0(self);
                 if (D_00138324 & 0x10) {
                     func_L08_00435938();
-                    D_001A79F8 += QUANTITY * n;
+                    D_001A79F8 += (*(s16 *)(D_001A7A00 + 0x1A)) * n;
                     func_002E5DA0(0, 0, self, func_002A7820(13, 17));
-                    QUANTITY = 0;
+                    (*(s16 *)(D_001A7A00 + 0x1A)) = 0;
                     func_L00_0030C710(150);
                     func_002A7750(self, 8, -1);
                 }

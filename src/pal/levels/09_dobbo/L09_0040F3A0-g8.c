@@ -53,9 +53,6 @@ extern void func_002A7470(char *, int, int, int), func_002AF000(void *, float, f
 extern void func_00282CC0(void *, void *, void *), func_00282CF0(void *, void *, void *);
 extern void func_002AEC48(char *, void *, int, float, float);
 
-#define HERO_POS (D_00189E20 + 0x80)
-#define HERO_ROT (D_00189E20 + 0x90)
-#define HERO_AIM (D_00189E20 + 0xE0)
 #define U8(p, o) (*(u8 *)((p) + (o)))
 #define U16(p, o) (*(u16 *)((p) + (o)))
 #define S16(p, o) (*(s16 *)((p) + (o)))
@@ -95,14 +92,14 @@ void func_PAL_L09_0040F3A0(char *obj) {
             func_002A7750(obj, 1, -1);
         }
         if (U8(obj, 0x20) == 3) {
-            if (!func_002ACBC8(HERO_POS, I32(data, 0x118)) || !D_001395B8.unlocked) {
+            if (!func_002ACBC8((D_00189E20 + 0x80), I32(data, 0x118)) || !D_001395B8.unlocked) {
                 D_L09_001B15A0 = 1;
             }
         }
         func_L01_003128C0(obj);
         break;
     case 1:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118))) {
+        if (func_002ACBC8((D_00189E20 + 0x80), I32(data, 0x118))) {
             if (func_00288AA0(D_L09_001BFC00, 99)) {
                 func_L01_003246D0(obj);
                 func_00288BE8(D_L09_001BFC00);
@@ -127,7 +124,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
         }
         break;
     case 3:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118))) {
+        if (func_002ACBC8((D_00189E20 + 0x80), I32(data, 0x118))) {
             if (D_001395B8.completed) {
                 if (func_00288AA0(D_L09_001BFC00, 103)) {
                     func_00288AA0(D_L09_001BFC00, 11);
@@ -154,7 +151,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
             U16(obj, 0x34) |= 1;
         }
         if (!func_002F5D10()) {
-            func_002DF3F8(HERO_POS, HERO_ROT);
+            func_002DF3F8((D_00189E20 + 0x80), (D_00189E20 + 0x90));
             D_L09_001B25A0[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
@@ -175,7 +172,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
             if (U8(obj, 0xB0) != 255 && !(U8(D_0019B2E8, U8(obj, 0xB0) + (D_001A79F0 << 4)) & 0x80)) {
                 func_002A0430(U8(obj, 0xB0));
             }
-            func_002DF3F8(HERO_POS, HERO_ROT);
+            func_002DF3F8((D_00189E20 + 0x80), (D_00189E20 + 0x90));
             func_0029B3E0(0, -1);
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
@@ -184,7 +181,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
         }
         break;
     case 6:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
+        if (func_002ACBC8((D_00189E20 + 0x80), I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
             && !D_L09_001B15A0) {
             if (func_00288AA0(D_L09_001BFC00, 102)) {
                 func_00288BE8(D_L09_001BFC00);
@@ -205,7 +202,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
             U16(obj, 0x34) &= 0xFFFE;
             D_L09_001B25A0[2] = 0;
             func_002A7750(obj, 8, -1);
-            func_002DF3F8(HERO_POS, HERO_ROT);
+            func_002DF3F8((D_00189E20 + 0x80), (D_00189E20 + 0x90));
             func_0029B3E0(0, -1);
             func_0029F338(obj);
             return;
@@ -228,7 +225,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
     rate = 0.3f;
     active = 0;
     if (U8(obj, 0x43) == 1) {
-        player = HERO_POS;
+        player = (D_00189E20 + 0x80);
         active = 1;
         if (func_00282E80(obj + 0x10, player) < 8.0f
             && func_00283C80(F32(obj, 0xF8), yawToHero(obj)) < 1.57079649f) {
@@ -239,7 +236,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
             }
         } else if (S16(data, 0x110)) {
             S16(data, 0x110) = 0;
-            qcopy(data + 0x100, HERO_AIM);
+            qcopy(data + 0x100, (D_00189E20 + 0xE0));
         }
         if (func_00282978(data + 0x112)) {
             S16(data, 0x112) = func_00283CF0((func_002A7878(180.0f, 300.0f) * 5.0f + 2.0f) * 0.16666667f);
@@ -249,7 +246,7 @@ void func_PAL_L09_0040F3A0(char *obj) {
             func_00282CC0(data + 0x100, data + 0x100, obj + 0x10);
         }
         if (S16(data, 0x110)) {
-            qcopy(target, HERO_AIM);
+            qcopy(target, (D_00189E20 + 0xE0));
             speed = 0.04f;
             rate = 0.3f;
         } else {

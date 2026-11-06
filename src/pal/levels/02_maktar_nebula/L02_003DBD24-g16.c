@@ -75,11 +75,9 @@ struct Actor {
 typedef struct { u8 prefix[0x160]; float amount; int reserved164; int kind; int detail; } EffectTuning;
 extern u8 D_L02_001BA500[];
 extern u8 D_L02_001BA3C0[];
-#define EFFECT ((EffectTuning *)D_L02_001BA3C0)
 extern int D_L02_001A903C;
 typedef struct { u8 prefix[0x229C]; int motion; u8 reserved22A0[0x1FC]; Actor *damage; } ResidentView;
 extern u8 D_00189E20[];
-#define RESIDENT ((ResidentView *)D_00189E20)
 extern u8 D_001A7A60[] MACRO_ADDR;
 extern Actor *D_L02_001B359C;
 extern float D_L02_001B03F0[4] __attribute__((sda));
@@ -130,7 +128,6 @@ extern void func_002A7A00(float *, float, float);
 extern void func_PAL_002B15D8(Actor *, int, float *, float, float, float, float, unsigned char);
 extern void func_L02_003DB6D8(Actor *);
 extern void func_L02_003D9608(Actor *);
-#define PROXY (D_L02_001B359C + self->state->proxy)
 
 /* Drive this actor's emergence, movement, attacks and destruction. */
 void func_PAL_L02_003DBD24(Actor *self)
@@ -155,10 +152,10 @@ void func_PAL_L02_003DBD24(Actor *self)
     yaw = func_00283248(target[0] - self->position[0], target[1] - self->position[1]);
     frame = func_0029F530(self);
     damageKind = 0;
-    if (RESIDENT->damage) {
-        damageKind = *(short *)((char *)RESIDENT->damage + 0xAA);
+    if (((ResidentView *)D_00189E20)->damage) {
+        damageKind = *(short *)((char *)((ResidentView *)D_00189E20)->damage + 0xAA);
     }
-    if (RESIDENT->motion == 7 || RESIDENT->damage == self || damageKind == 0xD08) {
+    if (((ResidentView *)D_00189E20)->motion == 7 || ((ResidentView *)D_00189E20)->damage == self || damageKind == 0xD08) {
         state->forced = 1;
     }
     switch (self->mode) {
@@ -171,8 +168,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             self->phase = 0;
             self->stateTime = 0;
             func_PAL_002A7E68(self, 0, 0, 3);
-            if (PROXY->anim) {
-                func_PAL_002A7E68(PROXY, 0, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 0, 0, 8);
                 break;
             }
             break;
@@ -182,8 +179,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 3) {
                 func_PAL_002A7E68(self, 3, 0, 8);
             }
-            if (PROXY->anim != 6) {
-                func_PAL_002A7E68(PROXY, 6, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 6) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 6, 0, 8);
             }
             self->position[2] = func_002A89A8(self->position, 0, 10.0f);
             func_00282CF0(direction, func_L02_003FC098(self->parent), self->position);
@@ -199,8 +196,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 4) {
                 func_PAL_002A7E68(self, 4, 0, 6);
             }
-            if (PROXY->anim != 7) {
-                func_PAL_002A7E68(PROXY, 7, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 7) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 7, 0, 8);
                 break;
             }
             break;
@@ -212,8 +209,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 5) {
                 func_PAL_002A7E68(self, 5, 3, 2);
             }
-            if (PROXY->anim != 8) {
-                func_PAL_002A7E68(PROXY, 8, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 8) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 8, 0, 8);
             }
             func_L02_003DB9E0(self);
             break;
@@ -225,15 +222,15 @@ void func_PAL_L02_003DBD24(Actor *self)
                 func_002E5CF8(0, 0, self);
             }
             if (self->x60 & 2) {
-                EFFECT->amount = 0.35f;
-                EFFECT->kind = 21;
-                EFFECT->detail = 0;
+                ((EffectTuning *)D_L02_001BA3C0)->amount = 0.35f;
+                ((EffectTuning *)D_L02_001BA3C0)->kind = 21;
+                ((EffectTuning *)D_L02_001BA3C0)->detail = 0;
                 func_00282C88(&state->xF0);
                 if (self->anim) {
                     func_PAL_002A7E68(self, 0, 0, 0);
                 }
-                if (PROXY->anim) {
-                    func_PAL_002A7E68(PROXY, 0, 0, 0);
+                if ((D_L02_001B359C + self->state->proxy)->anim) {
+                    func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 0, 0, 0);
                 }
                 func_002A7750(self, 5, 1);
                 state->timer = (((int)(func_00283CF0(func_002A7878(600.0f, 1200.0f))) * 5 + 2) / 6);
@@ -261,8 +258,8 @@ void func_PAL_L02_003DBD24(Actor *self)
                 if (self->anim != 3) {
                     func_PAL_002A7E68(self, 3, 0, 8);
                 }
-                if (PROXY->anim != 6) {
-                    func_PAL_002A7E68(PROXY, 6, 0, 8);
+                if ((D_L02_001B359C + self->state->proxy)->anim != 6) {
+                    func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 6, 0, 8);
                 }
                 func_00282C88(&state->xF0);
                 func_L02_003329C8(self, D_L02_001B03F0, 0.40000004f, state->x7C);
@@ -275,8 +272,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 4) {
                 func_PAL_002A7E68(self, 4, 0, 8);
             }
-            if (PROXY->anim != 7) {
-                func_PAL_002A7E68(PROXY, 7, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 7) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 7, 0, 8);
                 break;
             }
         } else if (self->phase == 2) {
@@ -288,8 +285,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 5) {
                 func_PAL_002A7E68(self, 5, 0, 8);
             }
-            if (PROXY->anim != 8) {
-                func_PAL_002A7E68(PROXY, 8, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 8) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 8, 0, 8);
                 break;
             }
         } else if (self->phase == 3 && (self->x60 & 2)) {
@@ -301,8 +298,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim) {
                 func_PAL_002A7E68(self, 0, 0, 8);
             }
-            if (PROXY->anim) {
-                func_PAL_002A7E68(PROXY, 0, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 0, 0, 8);
             }
         }
         func_L02_00321C30(self->position, D_L02_001B03F0, 0.20000002f);
@@ -315,8 +312,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 1) {
                 func_PAL_002A7E68(self, 1, 0, 12);
             }
-            if (PROXY->anim != 1) {
-                func_PAL_002A7E68(PROXY, 1, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 1) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 1, 0, 8);
             }
             self->phase = 1;
         }
@@ -326,8 +323,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 2) {
                 func_PAL_002A7E68(self, 2, 0, 12);
             }
-            if (PROXY->anim != 3) {
-                func_PAL_002A7E68(PROXY, 3, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 3) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 3, 0, 8);
             }
         }
         if (self->phase == 2 && facing < 0.17453295f) {
@@ -335,8 +332,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 1) {
                 func_PAL_002A7E68(self, 1, 0, 12);
             }
-            if (PROXY->anim != 1) {
-                func_PAL_002A7E68(PROXY, 1, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 1) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 1, 0, 8);
             }
         }
         if (self->phase == 1 && distance < 10.0f) {
@@ -351,7 +348,7 @@ void func_PAL_L02_003DBD24(Actor *self)
                 func_PAL_002A7E68(self, 1, 0, 8);
             }
         }
-        if (RESIDENT->damage) {
+        if (((ResidentView *)D_00189E20)->damage) {
             func_L02_003DB2F0(self);
         }
         if (func_00282978(&state->timer)) {
@@ -366,8 +363,8 @@ void func_PAL_L02_003DBD24(Actor *self)
         if (func_002B3868(self)) {
             if (self->previousAnim == 7) {
                 self->phase = 1;
-                if (PROXY->anim != 10) {
-                    func_PAL_002A7E68(PROXY, 10, 0, 8);
+                if ((D_L02_001B359C + self->state->proxy)->anim != 10) {
+                    func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 10, 0, 8);
                 }
             } else if (self->previousAnim == 6) {
                 self->phase = 0;
@@ -376,8 +373,8 @@ void func_PAL_L02_003DBD24(Actor *self)
                 if (self->anim != 6) {
                     func_PAL_002A7E68(self, 6, 0, 0);
                 }
-                if (PROXY->anim != 9) {
-                    func_PAL_002A7E68(PROXY, 9, 0, 8);
+                if ((D_L02_001B359C + self->state->proxy)->anim != 9) {
+                    func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 9, 0, 8);
                 }
                 self->phase = 0;
                 self->flags &= 0xEFFF;
@@ -386,8 +383,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 7) {
                 func_PAL_002A7E68(self, 7, 0, 0);
             }
-            if (PROXY->anim != 10) {
-                func_PAL_002A7E68(PROXY, 10, 0, 8);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 10) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 10, 0, 8);
             }
             self->phase = 1;
             state->x30 = 1.5f;
@@ -401,14 +398,14 @@ void func_PAL_L02_003DBD24(Actor *self)
                 if (self->anim != 8) {
                     func_PAL_002A7E68(self, 8, 0, 0);
                 }
-                if (PROXY->anim != 11) {
-                    func_PAL_002A7E68(PROXY, 11, 0, 8);
+                if ((D_L02_001B359C + self->state->proxy)->anim != 11) {
+                    func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 11, 0, 8);
                 }
                 self->phase = 2;
                 self->flags &= 0xEFFF;
             }
         }
-        if (self->phase == 1 && RESIDENT->damage) {
+        if (self->phase == 1 && ((ResidentView *)D_00189E20)->damage) {
             func_L02_003DB2F0(self);
             break;
         }
@@ -430,8 +427,8 @@ void func_PAL_L02_003DBD24(Actor *self)
         break;
     case 7:
         if (func_002B3868(self)) {
-            if (PROXY->anim != 7) {
-                func_PAL_002A7E68(PROXY, 7, 0, 12);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 7) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 7, 0, 12);
             }
             state->x24C += 0.27925274f;
             self->stateTime = 0;
@@ -444,8 +441,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             if (self->anim != 8) {
                 func_PAL_002A7E68(self, 8, 0, 17);
             }
-            if (PROXY->anim != 9) {
-                func_PAL_002A7E68(PROXY, 9, 0, 12);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 9) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 9, 0, 12);
             }
             state->x24C += 0.27925274f;
         } else if (frame > 45.0f) {
@@ -454,18 +451,18 @@ void func_PAL_L02_003DBD24(Actor *self)
         break;
     case 9:
         if (func_002B3868(self)) {
-            if (PROXY->anim != 12) {
-                func_PAL_002A7E68(PROXY, 12, 0, 12);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 12) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 12, 0, 12);
             }
         }
         func_PAL_L02_003DF388(self);
-        if (!(PROXY->x60 & 2)) {
+        if (!((D_L02_001B359C + self->state->proxy)->x60 & 2)) {
             break;
         }
         self->mode = state->savedMode;
         self->phase = state->savedPhase;
-        if (PROXY->anim != state->savedAnim) {
-            func_PAL_002A7E68(PROXY, state->savedAnim, 0, 12);
+        if ((D_L02_001B359C + self->state->proxy)->anim != state->savedAnim) {
+            func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), state->savedAnim, 0, 12);
         }
         break;
     case 10:
@@ -480,8 +477,8 @@ void func_PAL_L02_003DBD24(Actor *self)
             state->sound = -1;
             if (self->previousAnim == 7) {
                 self->phase = 1;
-                if (PROXY->anim != 13) {
-                    func_PAL_002A7E68(PROXY, 13, 0, 12);
+                if ((D_L02_001B359C + self->state->proxy)->anim != 13) {
+                    func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 13, 0, 12);
                 }
                 break;
             }
@@ -491,21 +488,21 @@ void func_PAL_L02_003DBD24(Actor *self)
                     func_PAL_002A7E68(self, 9, 0, 12);
                 }
             }
-            if (PROXY->anim != 13) {
-                func_PAL_002A7E68(PROXY, 13, 0, 12);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 13) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 13, 0, 12);
             }
             break;
         }
         if (self->phase == 0 && (self->x60 & 2)) {
             self->phase = 1;
-            if (PROXY->anim != 13) {
-                func_PAL_002A7E68(PROXY, 13, 0, 12);
+            if ((D_L02_001B359C + self->state->proxy)->anim != 13) {
+                func_PAL_002A7E68((D_L02_001B359C + self->state->proxy), 13, 0, 12);
             }
             if (self->anim != 7) {
                 func_PAL_002A7E68(self, 7, 0, 8);
                 break;
             }
-        } else if (self->phase == 1 && (PROXY->x60 & 2)) {
+        } else if (self->phase == 1 && ((D_L02_001B359C + self->state->proxy)->x60 & 2)) {
             func_002A7750(self, 11, -1);
         }
         break;
@@ -518,9 +515,9 @@ void func_PAL_L02_003DBD24(Actor *self)
                 D_L02_001A903C = 1;
             }
             self->x48 = 0.0f;
-            PROXY->x48 = 0.0f;
+            (D_L02_001B359C + self->state->proxy)->x48 = 0.0f;
             self->stateTime = 0;
-            func_00282CF0(direction, D_L02_001BA500, PROXY->position);
+            func_00282CF0(direction, D_L02_001BA500, (D_L02_001B359C + self->state->proxy)->position);
             func_00282F20(direction, direction, func_002A7878(0.10000001f, 0.14000002f));
             direction[2] += 0.080000006f;
             if (self->state->launcher) {
@@ -543,7 +540,7 @@ void func_PAL_L02_003DBD24(Actor *self)
         state->scale[0] = state->scale[1] = state->scale[2] = value;
         if (self->stateTime > 150) {
             self->x48 = 1.0f;
-            PROXY->x48 = 1.0f;
+            (D_L02_001B359C + self->state->proxy)->x48 = 1.0f;
             func_PAL_L00_003FB330(self->position, 1, 25, 2.0f, 20, 30, 40, 45, 1, 20.0f, 0, 1, 0, 0);
             func_0029FCC0(self, 2, direction);
             func_PAL_L00_003FB330(self->position, 0, 10, 0.7f, 5, 10, 5, 20, 1, 20.0f, 0, 0, 0, 0);
@@ -556,7 +553,7 @@ void func_PAL_L02_003DBD24(Actor *self)
             func_002A7A00(curve, 0.120000005f, 0.24000001f);
             func_PAL_002B15D8(self, 0xFFF, curve, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             func_002A7A00(curve, 0.16000001f, 0.32000002f);
-            func_PAL_002B15D8(PROXY, 0x1F, curve, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            func_PAL_002B15D8((D_L02_001B359C + self->state->proxy), 0x1F, curve, 3.0f, 6.0f, 3.0f, 6.0f, 255);
             func_002E5DA0(5, 0, self, 0xA44);
             func_L02_003DB6D8(self);
             state->scale[0] = state->scale[1] = state->scale[2] = 1.0f;

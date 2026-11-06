@@ -10,7 +10,6 @@ typedef struct { char pad[0x64]; int handle; char pad68[4]; int timer; unsigned 
 
 extern int D_001A8C64;
 extern unsigned char D_001A7BB0[] __attribute__((sda));
-#define D_001A7BB3 D_001A7BB0[3]
 extern int D_001A8CFC;
 extern int D_001A8D30 __attribute__((sda));
 extern int D_001A8D48 __attribute__((sda));
@@ -57,9 +56,9 @@ void func_PAL_0028C7C8(Selector *p)
 
     if (D_001A8C64) return;
     active = 0;
-    if (!D_001A7BB3 || func_00287E48() || !D_001A7BB3) {
+    if (!D_001A7BB0[3] || func_00287E48() || !D_001A7BB0[3]) {
         active = 1;
-        if (!D_001A7BB3) {
+        if (!D_001A7BB0[3]) {
             func_00290730();
             if (!func_00290748()) active = 0;
         }
@@ -71,7 +70,7 @@ void func_PAL_0028C7C8(Selector *p)
     }
     p->timeout = 150;
     p->timer = 24;
-    if (func_00282978(D_0018C316) && !D_001A7BB3) D_00138180.inhibit = 2;
+    if (func_00282978(D_0018C316) && !D_001A7BB0[3]) D_00138180.inhibit = 2;
     x = D_00138180.x;
     y = D_00138180.y;
     mag = func_00282C10(x * x + y * y);
@@ -165,7 +164,7 @@ void func_PAL_0028C7C8(Selector *p)
                 rr = InfoOf(id);
                 if (rr->valid && rr->ammo < D_00139688[id]) D_00139688[id] = rr->ammo;
             }
-            if (D_001A7BB3) func_00287E18();
+            if (D_001A7BB0[3]) func_00287E18();
             else {
                 func_00290728();
                 func_00290720();

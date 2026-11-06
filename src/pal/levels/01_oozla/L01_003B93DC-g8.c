@@ -74,7 +74,6 @@ typedef struct {
 } HeroTargetPrefix;
 typedef struct { u8 prefix[0x18]; u8 *object; } CollisionQueryPrefix;
 extern u8 D_00189E20[];
-#define HERO_TARGET ((HeroTargetPrefix *)D_00189E20)
 /* Mixed absolute/GP reads of the same mutable frame counter. */
 extern int D_L01_001B2088 MACRO_ADDR;
 extern int D_L01_001AFDB0 __attribute__((sda));
@@ -83,7 +82,6 @@ extern u8 *D_L01_001B255C __attribute__((sda));
 typedef struct { u8 prefix[0x30]; float position[4]; u8 rest[0x40]; } DestinationRecord;
 extern DestinationRecord *D_L01_001B264C MACRO_ADDR;
 extern u8 D_L01_001BF900[];
-#define COLLISION_QUERY ((CollisionQueryPrefix *)D_L01_001BF900)
 extern u8 D_L01_001AC5A0[] MACRO_ADDR;
 
 #define STATE_INT(o) (((int *)state)[(o)/4])
@@ -327,8 +325,8 @@ cancel_pursuit:
     }
     goto pursuit_distance;
 mirror_hero:
-    if (STATE_POINTER(0x240)==HERO_TARGET->object)
-        qcopy(state+0x2E0, HERO_TARGET->position);
+    if (STATE_POINTER(0x240)==((HeroTargetPrefix *)D_00189E20)->object)
+        qcopy(state+0x2E0, ((HeroTargetPrefix *)D_00189E20)->position);
 pursuit_distance:
     if (func_00282E80(object+0x10,STATE_POINTER(0x240)+0x10)<3.5f) {
         if (func_00282C48(*(float *)(object+0x18)-*(float *)(STATE_POINTER(0x240)+0x18))<0.5f) {
@@ -362,7 +360,7 @@ phase_attack:
     if (object[0x42]==10 && frame>=18.0f && frame<=25.0f) {
         for (i=0;i<5;i++) {
             if (func_002A8D70(0.5f,(float)state[0x34],1.0f,object,i,0x4000001,0,1,0) &&
-                COLLISION_QUERY->object==HERO_TARGET->object) state[0x35C]=1;
+                ((CollisionQueryPrefix *)D_L01_001BF900)->object==((HeroTargetPrefix *)D_00189E20)->object) state[0x35C]=1;
         }
     }
     if (!(frame>30.0f) && (object[0x42]==10 || object[0x43]==10)) goto phase_done;

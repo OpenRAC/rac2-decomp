@@ -43,8 +43,6 @@ typedef union { u8 b[0x100]; s16 h[0x80]; u16 u[0x80]; s32 i[0x40]; float f[0x40
 #define OBJ ((ObjectView *)obj)
 #define STATE ((ObjectView *)st)
 typedef union { u8 b[0x60]; float f[0x18]; u8 *p[0x18]; TI128 q[6]; } CollisionView;
-#define HERO ((HeroView *)D_00189E20)
-#define COLL ((CollisionView *)D_L18_001BFC00)
 extern u8 *D_L18_001C3C80[];
 extern float D_L18_001B1940[3];
 extern float D_L18_001B18F8 __attribute__((sda));
@@ -64,7 +62,7 @@ extern float D_L18_001B1934 __attribute__((sda));
 extern int D_L18_001B1938 __attribute__((sda));
 static inline int same_group(u8 *st) {
     int valid=0;
-    if(COLL->p[6] && STATE->p[0x9]) valid=H(COLL->p[6],0xaa)==H(STATE->p[0x9],0xaa);
+    if(((CollisionView *)D_L18_001BFC00)->p[6] && STATE->p[0x9]) valid=H(((CollisionView *)D_L18_001BFC00)->p[6],0xaa)==H(STATE->p[0x9],0xaa);
     return valid;
 }
 static inline float clamp_speed(float speed, float low, float high) {
@@ -105,13 +103,13 @@ void func_PAL_L18_0043C3F4(u8 *obj) {
             }
         }
         }
-        if(func_002761F8(obj+0x10,delta,0,obj,0) && !same_group(st)) qcopy(obj+0x10,&COLL->q[2]);
+        if(func_002761F8(obj+0x10,delta,0,obj,0) && !same_group(st)) qcopy(obj+0x10,&((CollisionView *)D_L18_001BFC00)->q[2]);
         else qcopy(obj+0x10,delta);
-        if(func_00277258(obj+0x10,0,obj,D_L18_001B18F8) && (obj[0x20]==0 || OBJ->f[0x6]-COLL->f[10]<0)) {
+        if(func_00277258(obj+0x10,0,obj,D_L18_001B18F8) && (obj[0x20]==0 || OBJ->f[0x6]-((CollisionView *)D_L18_001BFC00)->f[10]<0)) {
             if(!same_group(st)) {
-                func_00282F20((char *)pos,(char *)(u8 *)&COLL->q[4],D_L18_001B18F8);
-                func_00282CC0((char *)obj+0x10,(char *)(u8 *)&COLL->q[2],(char *)pos);
-                func_00283028(st+0x10,st+0x10,(u8 *)&COLL->q[4]);
+                func_00282F20((char *)pos,(char *)(u8 *)&((CollisionView *)D_L18_001BFC00)->q[4],D_L18_001B18F8);
+                func_00282CC0((char *)obj+0x10,(char *)(u8 *)&((CollisionView *)D_L18_001BFC00)->q[2],(char *)pos);
+                func_00283028(st+0x10,st+0x10,(u8 *)&((CollisionView *)D_L18_001BFC00)->q[4]);
                 func_002E5CF8(1,0,obj);
                 if(obj[0x20]!=0) goto bounce_done;
                 func_002A7750(obj,1,-1);
@@ -171,7 +169,7 @@ bounce_done:
         do {
             u8 *other=*targets;
             int valid=0;
-            if(other==HERO->p[0x2290/4]) {qcopy(delta,&HERO->q[8]); if(HERO->i[0x340/4]) valid=1;}
+            if(other==((HeroView *)D_00189E20)->p[0x2290/4]) {qcopy(delta,&((HeroView *)D_00189E20)->q[8]); if(((HeroView *)D_00189E20)->i[0x340/4]) valid=1;}
             else {qcopy(delta,other+0x10); if(U(other,0x34)&0x20) {u8 *owner=P(P(other,0x68),0x18);if(owner) {if(H(owner,0xc0)) valid=1;}}}
             if(valid) func_002A8F70(other,obj,0x10001,other+0x10,&D_001A8F20,STATE->f[0xc]);
             targets++;

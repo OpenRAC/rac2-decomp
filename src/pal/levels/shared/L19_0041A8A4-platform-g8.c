@@ -10,7 +10,6 @@ extern int D_001A79F0_gp SDATA(D_001A79F0);
 extern u8 D_0019B2E8[], D_0019B4A8[];
 typedef struct { u8 pad[0x464]; u8 slot[0]; } SlotTable;
 extern SlotTable D_L19_0021EA30;
-#define D_L19_0021EE94 D_L19_0021EA30.slot
 extern int D_L19_001B9D00 NOT_SDA;
 typedef struct {
     u8 pad00[0x80]; Vector position, rotation;
@@ -24,17 +23,6 @@ typedef struct {
     u8 pad2294[0x20]; u8 cameraMode;
 } PlatformPlayer;
 extern PlatformPlayer D_00189E20;
-#define D_0018C0B0 D_00189E20.currentActor
-#define D_0018C0D4 D_00189E20.cameraMode
-#define D_0018AA38 D_00189E20.actor
-#define D_0018A16E D_00189E20.platformMode
-#define D_0018A15C D_00189E20.platform
-#define D_0018A398 D_00189E20.alternateActive
-#define D_0018A3A8 D_00189E20.alternatePlatform
-#define D_00189EA0 D_00189E20.position
-#define D_00189EB0 D_00189E20.rotation
-#define D_00189F20 D_00189E20.relative
-#define D_00189F28 D_00189E20.relative.f[2]
 extern float D_L19_001B1BD0 __attribute__((sda));
 extern float D_L19_001B1BE0 __attribute__((sda));
 extern float D_L19_001B1BE4 __attribute__((sda));
@@ -132,11 +120,11 @@ void func_PAL_L19_0041A8A4(PlatformActor *actor)
         if (state->notify && actor->gateId != 0xff &&
                 (D_0019B2E8[actor->gateId + D_001A79F0_gp * 16] & 0x80))
             goto active;
-        if (D_L19_0021EE94[state->trigger])
+        if (D_L19_0021EA30.slot[state->trigger])
             goto active;
         if (!state->gate) goto inactive_actor;
         id = actor->packedGate;
-        if (D_L19_0021EE94[(short)id]) goto active;
+        if (D_L19_0021EA30.slot[(short)id]) goto active;
         index = D_0019B4A8[((int)(id << 16) >> 17) + D_001A79F0[0] * 0x400];
         if (id & 1) {
             if ((index >> 4) & 7) goto active;
@@ -221,16 +209,16 @@ finish_transition:
                 func_PAL_L18_002CFE30(0);
             }
             if (state->notify) {
-                if (D_0018C0D4) {
-                    saved_mode = D_0018C0D4;
-                    saved_player = D_0018C0B0;
-                    D_0018C0D4 = 0;
-                    D_0018C0B0 = D_0018AA38;
-                    func_002DF3F8(D_0018AA38 + 0x10, D_0018AA38 + 0xf0);
-                    D_0018C0D4 = saved_mode;
-                    D_0018C0B0 = saved_player;
+                if (D_00189E20.cameraMode) {
+                    saved_mode = D_00189E20.cameraMode;
+                    saved_player = D_00189E20.currentActor;
+                    D_00189E20.cameraMode = 0;
+                    D_00189E20.currentActor = D_00189E20.actor;
+                    func_002DF3F8(D_00189E20.actor + 0x10, D_00189E20.actor + 0xf0);
+                    D_00189E20.cameraMode = saved_mode;
+                    D_00189E20.currentActor = saved_player;
                 } else
-                    func_002DF3F8(&D_00189EA0, &D_00189EB0);
+                    func_002DF3F8(&D_00189E20.position, &D_00189E20.rotation);
             }
             func_002A7750(actor, 4, -1);
         }
@@ -246,11 +234,11 @@ finish_transition:
     state->velocity = (state->velocity + (height - actor->position.f[2]) * 0.005f) * 0.976f;
     actor->position.f[2] += state->velocity;
     if (actor->state) {
-        if ((!D_0018A16E && D_0018A15C == (u8 *)actor) || (D_0018A398 && D_0018A3A8 == (u8 *)actor)) {
+        if ((!D_00189E20.platformMode && D_00189E20.platform == (u8 *)actor) || (D_00189E20.alternateActive && D_00189E20.alternatePlatform == (u8 *)actor)) {
             if (!state->carryingPlayer)
                 state->velocity -= 0.020000001f;
             state->carryingPlayer = 1;
-            func_00282CF0(&temp, &D_00189EA0, &actor->position);
+            func_00282CF0(&temp, &D_00189E20.position, &actor->position);
             forward_dot = func_00282DB0(&temp, &actor->forward);
             right_dot = func_00282DB0(&temp, &actor->right);
             gain = D_L19_001B1BD0;
@@ -263,9 +251,9 @@ finish_transition:
                 D_L19_001B1BE0 * 1.44f, D_L19_001B1BE4 * 1.44f, D_L19_001B1BE8 * 1.2f);
             func_002AA898((float *)(&state->tilt.f[1]), (float *)(&state->tiltVelocity.f[1]), 0, target_y,
                 D_L19_001B1BE0 * 1.44f, D_L19_001B1BE4 * 1.44f, D_L19_001B1BE8 * 1.2f);
-            func_L01_00316C48(&D_00189EA0, &camera_out, &actor->position, &origin, &state->tilt);
-            func_00282CF0(&D_00189F20, &camera_out, &D_00189EA0);
-            D_00189F28 += actor->position.f[2] - point.f[2];
+            func_L01_00316C48(&D_00189E20.position, &camera_out, &actor->position, &origin, &state->tilt);
+            func_00282CF0(&D_00189E20.relative, &camera_out, &D_00189E20.position);
+            D_00189E20.relative.f[2] += actor->position.f[2] - point.f[2];
         } else {
             state->carryingPlayer = 0;
             func_002AA898((float *)(&state->tilt), (float *)(&state->tiltVelocity), 0, 0.0f,

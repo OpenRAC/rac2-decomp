@@ -167,9 +167,6 @@ typedef struct { char *entry[5]; } LinkTable;
 #define SP(o) (((StatePointer *)(state + (o)))->value)
 #define FLAGS(p) (*(unsigned short *)((p) + 0x34))
 #define AGE (*(unsigned short *)(object + 0x96))
-#define HERO ((ResidentHeroView *)D_00189E20)
-#define PLAYER (HERO->player)
-#define PLAYER_POS ((char *)HERO->position)
 
 void func_PAL_L23_0041B350(u8 *object)
 {
@@ -200,23 +197,23 @@ void func_PAL_L23_0041B350(u8 *object)
         return;
     func_PAL_L23_004207B8((char *)object);
     S32(0x604) = 0;
-    func_00282D30((char *)D_L23_001B36C0, PLAYER + 0xe0, D_L23_001B1488);
-    func_00282CC0((char *)D_L23_001B36C0, (char *)D_L23_001B36C0, PLAYER_POS);
-    func_00282D30((char *)D_L23_001B36D0, PLAYER + 0xe0, D_L23_001B148C);
-    func_00282CC0((char *)D_L23_001B36D0, (char *)D_L23_001B36D0, PLAYER_POS);
-    qcopy(state+(0x3f0),PLAYER_POS);
+    func_00282D30((char *)D_L23_001B36C0, (((ResidentHeroView *)D_00189E20)->player) + 0xe0, D_L23_001B1488);
+    func_00282CC0((char *)D_L23_001B36C0, (char *)D_L23_001B36C0, ((char *)((ResidentHeroView *)D_00189E20)->position));
+    func_00282D30((char *)D_L23_001B36D0, (((ResidentHeroView *)D_00189E20)->player) + 0xe0, D_L23_001B148C);
+    func_00282CC0((char *)D_L23_001B36D0, (char *)D_L23_001B36D0, ((char *)((ResidentHeroView *)D_00189E20)->position));
+    qcopy(state+(0x3f0),((char *)((ResidentHeroView *)D_00189E20)->position));
     func_L23_00418650(state + 0x3f0, 0.0f);
     qcopy(state+(0x3e0),object + 0x10);
     func_L23_00418650(state + 0x3e0, 0.0f);
     {
-        float playerHeight = func_002B0360(PLAYER_POS) - D_L23_001B36A4[0];
+        float playerHeight = func_002B0360(((char *)((ResidentHeroView *)D_00189E20)->position)) - D_L23_001B36A4[0];
         SF(0x5c0) = playerHeight;
         D_L23_001B3710[0] = SF(0x588) < playerHeight;
     }
     func_00282CF0(direction, state + 0x3f0, state + 0x3e0);
     SF(0x5b8) = func_00282DF0(direction);
     func_L23_004183F0((char *)object);
-    SF(0x5bc) = func_00282E48(((char *)object + 0x10), PLAYER_POS);
+    SF(0x5bc) = func_00282E48(((char *)object + 0x10), ((char *)((ResidentHeroView *)D_00189E20)->position));
     func_0029FCC0((char *)object, 0x2a, jointOffset);
     func_0029FC20((char *)object, 0x27, (char *)jointMatrix);
     func_00282D30((char *)D_L23_001B3860, (char *)jointMatrix, D_L23_001B1600);
@@ -227,7 +224,7 @@ void func_PAL_L23_0041B350(u8 *object)
     func_00282CC0((char *)D_L23_001B3880, jointPosition, blendedPosition);
     SB(0x404) = 0;
     if (SF(0x5bc) < D_L23_001B1634)
-        SB(0x404) = !func_002761F8(D_L23_001B3880, D_L23_001B36C0, 0x10, PLAYER, 0);
+        SB(0x404) = !func_002761F8(D_L23_001B3880, D_L23_001B36C0, 0x10, (((ResidentHeroView *)D_00189E20)->player), 0);
     if (!(D_L23_001B1648 / 2 < D_L23_001B36AC[0])) {
         func_00282948((char *)&D_L23_001B142C);
         if (object[0x20] == 7 &&
@@ -268,7 +265,7 @@ void func_PAL_L23_0041B350(u8 *object)
     }
 state4:
     func_L23_0041BFF0((char *)object);
-    HERO->state1e0 = 8;
+    ((ResidentHeroView *)D_00189E20)->state1e0 = 8;
     if (func_002B3868(object)) {
         func_L23_0041D930();
         func_0027D330(D_L23_001B13E4);
@@ -576,10 +573,10 @@ state20:
     func_L23_0041A648((char *)object);
     if (func_002B1C20(object, (DispatchContext *)(state + 0x140)) & 1) {
         func_002A7750(object, 4, 0);
-        HERO->field2294 = 0;
+        ((ResidentHeroView *)D_00189E20)->field2294 = 0;
         func_PAL_L00_002AF6C0();
-        func_L00_00310C88((LvlSlotCtx *)PLAYER, &HERO->slotList);
-        HERO->slotCount = 0;
+        func_L00_00310C88((LvlSlotCtx *)(((ResidentHeroView *)D_00189E20)->player), &((ResidentHeroView *)D_00189E20)->slotList);
+        ((ResidentHeroView *)D_00189E20)->slotCount = 0;
         func_PAL_L22_002C99C8(0, 1);
         D_L23_001B1694 = 0;
         return;
@@ -638,14 +635,14 @@ state_default:
         func_PAL_L23_00420578((char *)object);
     else
         func_L23_0041B5B0((char *)object);
-    if (func_L22_003B9428((unsigned int)PLAYER) && D_L23_001B3780 &&
+    if (func_L22_003B9428((unsigned int)(((ResidentHeroView *)D_00189E20)->player)) && D_L23_001B3780 &&
         (object[0x20] == 16 || object[0x20] == 12) && D_L23_001B1500 < SF(0x5bc)) {
-        char *attachment = (char *)func_L23_00423698((int)PLAYER) + 0x10;
+        char *attachment = (char *)func_L23_00423698((int)(((ResidentHeroView *)D_00189E20)->player)) + 0x10;
         height = func_002B0360(attachment) - D_L23_001B36A4[0];
         distance = func_00282E48(attachment, (char *)D_L23_001B3760);
         if (distance < D_L23_001B1500 * 0.6f && height < D_L23_001B14D0 - 2.0f) {
             func_PAL_L00_003FB330(attachment, 0, 15, 10, 15, 15, 15, 1, 2.0f, 20.0f, 0, 0, 0, 0);
-            func_L23_00423588((int)PLAYER, 1);
+            func_L23_00423588((int)(((ResidentHeroView *)D_00189E20)->player), 1);
         }
     }
     func_00282948((char *)&D_L23_001B3718[0]);

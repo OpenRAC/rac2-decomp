@@ -92,8 +92,6 @@ void func_PAL_00302018(PickupMoby *m)
     float matrix[12];
     int x,y,z;
     BoltVars *p=m->pVars;
-#define hero D_00189E20
-#define hit D_001BAF80
     switch(m->state) {
     case 0: {
         int collided;
@@ -109,12 +107,12 @@ void func_PAL_00302018(PickupMoby *m)
         func_00282CC0(scratch.ground.other,scratch.ground.other,&m->position[0]);
         collided=func_002761F8(scratch.ground.vector,scratch.ground.other,0x22,0,0);
         if(!p->flags54&&collided) {
-            qcopy_nc(p->position,&hit.position[0]);
+            qcopy_nc(p->position,&D_001BAF80.position[0]);
             func_00282C88(&p->rotation[0]);
-            p->rotation[2]=func_00283248(hit.normal[0],hit.normal[1]);
-            p->rotation[1]=func_00283248(hit.normal[2],func_00282E20(&hit.normal[0]));
-            if(hit.surface&&func_002AD0B0(hit.surface)) {
-                PickupMoby *surface=hit.surface;
+            p->rotation[2]=func_00283248(D_001BAF80.normal[0],D_001BAF80.normal[1]);
+            p->rotation[1]=func_00283248(D_001BAF80.normal[2],func_00282E20(&D_001BAF80.normal[0]));
+            if(D_001BAF80.surface&&func_002AD0B0(D_001BAF80.surface)) {
+                PickupMoby *surface=D_001BAF80.surface;
                 p->surface=surface;
                 func_002AD5F8(m,surface,p->position,&p->rotation[0],p->position,&p->rotation[0]);
             }
@@ -150,36 +148,36 @@ void func_PAL_00302018(PickupMoby *m)
     }
     case 1: {
         float distance, t;
-        distance=func_00282E80(&m->position[0],&hero.motion.position[0]);
-        if(!p->activated&&distance<hero.motion.pickupRadius&&func_00282C48(m->position[2]-hero.motion.position[2])<hero.motion.pickupHeight) p->activated=1;
+        distance=func_00282E80(&m->position[0],&D_00189E20.motion.position[0]);
+        if(!p->activated&&distance<D_00189E20.motion.pickupRadius&&func_00282C48(m->position[2]-D_00189E20.motion.position[2])<D_00189E20.motion.pickupHeight) p->activated=1;
         p->velocity[2]-=0.0043200003f;
         func_00282CC0(&m->position[0],&m->position[0],&p->velocity[0]);
         func_00283958(&p->spin[0],scratch.ground.basis);
         func_00283738(&m->orientation[0],scratch.ground.basis,&m->orientation[0]);
-        if(m->position[2]<p->initialHeight-2.0f&&m->position[2]<hero.motion.position[2]-2.0f) {
+        if(m->position[2]<p->initialHeight-2.0f&&m->position[2]<D_00189E20.motion.position[2]-2.0f) {
             t=func_002A7878(-15.0f,15.0f);
-            func_PAL_003033A8(m,hero.motion.moby,t*0.017453294f,0);
+            func_PAL_003033A8(m,D_00189E20.motion.moby,t*0.017453294f,0);
             goto sparkle;
         }
         if(func_00277258(&m->position[0],0x22,m,0.25f)) {
-            qcopy_nc(p->position,&hit.position[0]);
+            qcopy_nc(p->position,&D_001BAF80.position[0]);
             func_00282C88(&p->rotation[0]);
-            p->rotation[2]=func_00283248(hit.normal[0],hit.normal[1]);
-            p->rotation[1]=func_00283248(hit.normal[2],func_00282E20(&hit.normal[0]));
-            func_00282CF0(scratch.ground.vector,&m->position[0],&hit.position[0]);
+            p->rotation[2]=func_00283248(D_001BAF80.normal[0],D_001BAF80.normal[1]);
+            p->rotation[1]=func_00283248(D_001BAF80.normal[2],func_00282E20(&D_001BAF80.normal[0]));
+            func_00282CF0(scratch.ground.vector,&m->position[0],&D_001BAF80.position[0]);
             func_00283028(&p->velocity[0],&p->velocity[0],scratch.ground.vector);
-            if(hero.motion.magnetEnabled && (p->activated ||
-            (func_00282E80(&m->position[0],&hero.motion.position[0]) < hero.motion.pickupRadius &&
-            func_00282C48(m->position[2]-hero.motion.position[2]) < hero.motion.pickupHeight) ||
+            if(D_00189E20.motion.magnetEnabled && (p->activated ||
+            (func_00282E80(&m->position[0],&D_00189E20.motion.position[0]) < D_00189E20.motion.pickupRadius &&
+            func_00282C48(m->position[2]-D_00189E20.motion.position[2]) < D_00189E20.motion.pickupHeight) ||
             func_00278E78() != -1)) {
                 func_00282F20(&p->velocity[0],&p->velocity[0],0.16000001f);
-                func_PAL_003033A8(m,hero.motion.moby,0,0);
+                func_PAL_003033A8(m,D_00189E20.motion.moby,0,0);
             }
-            else if(func_00283248(scratch.ground.vector[2],func_00282E20(scratch.ground.vector))<0.78539824f&&func_00283248(hit.normal[2],func_00282E20(&hit.normal[0]))<0.78539824f) {
+            else if(func_00283248(scratch.ground.vector[2],func_00282E20(scratch.ground.vector))<0.78539824f&&func_00283248(D_001BAF80.normal[2],func_00282E20(&D_001BAF80.normal[0]))<0.78539824f) {
                 m->state=2;
                 p->hopLength=p->hopRemaining=func_00283CF0((func_002A7878(30,40)*5.0f+2.0f)*0.16666667f);
-                if(hit.surface&&func_002AD0B0(hit.surface)) {
-                    PickupMoby *surface=hit.surface;
+                if(D_001BAF80.surface&&func_002AD0B0(D_001BAF80.surface)) {
+                    PickupMoby *surface=D_001BAF80.surface;
                     p->surface=surface;
                     func_002AD5F8(m,surface,p->position,&p->rotation[0],p->position,&p->rotation[0]);
                 }
@@ -191,8 +189,8 @@ void func_PAL_00302018(PickupMoby *m)
     }
     case 2: {
         float distance, r, s;
-        distance=func_00282E80(&m->position[0],&hero.motion.position[0]);
-        if(!p->activated&&distance<hero.motion.pickupRadius&&func_00282C48(m->position[2]-hero.motion.position[2])<hero.motion.pickupHeight)p->activated=1;
+        distance=func_00282E80(&m->position[0],&D_00189E20.motion.position[0]);
+        if(!p->activated&&distance<D_00189E20.motion.pickupRadius&&func_00282C48(m->position[2]-D_00189E20.motion.position[2])<D_00189E20.motion.pickupHeight)p->activated=1;
         func_00301F18(m,scratch.ground.other,0);
         scratch.ground.other[2]+=0.25f;
         func_002AB6D8(&m->orientation[0],scratch.ground.vector);
@@ -213,10 +211,10 @@ void func_PAL_00302018(PickupMoby *m)
     }
     case 3: {
         int v;
-        BoltHeroMotion *motion = &hero.motion;
+        BoltHeroMotion *motion = &D_00189E20.motion;
         float distance, s;
         distance=func_00282E80(&m->position[0],motion->position);
-        if(p->activated || (distance<hero.motion.pickupRadius&&func_00282C48(m->position[2]-hero.motion.position[2])<hero.motion.pickupHeight)) {
+        if(p->activated || (distance<D_00189E20.motion.pickupRadius&&func_00282C48(m->position[2]-D_00189E20.motion.position[2])<D_00189E20.motion.pickupHeight)) {
             func_PAL_003033A8(m,motion->moby,0,0);
         }
         else if((u32)D_001B1B60_gp<(u32)m&&distance>32.0f&&!m->visible) {
@@ -262,12 +260,12 @@ void func_PAL_00302018(PickupMoby *m)
         float t, s;
         v=0;
         if((s16)p->target->classId==0){
-            func_00282CF0(scratch.ground.vector,&m->position[0],&hero.motion.cameraPosition[0]);
-            func_002830C0(scratch.ground.vector,scratch.ground.vector,&hero.rotation[0]);
+            func_00282CF0(scratch.ground.vector,&m->position[0],&D_00189E20.motion.cameraPosition[0]);
+            func_002830C0(scratch.ground.vector,scratch.ground.vector,&D_00189E20.rotation[0]);
             if(scratch.ground.vector[2]<0)v=1;
         }
         if(v){
-            func_00282F20(scratch.ground.vector,&hero.matrix[8],0.16000001f);
+            func_00282F20(scratch.ground.vector,&D_00189E20.matrix[8],0.16000001f);
             func_00282CF0(scratch.ground.other,scratch.ground.vector,&p->velocity[0]);
             func_002AC9F8(scratch.ground.other,0.020000001f);
             func_00282CC0(&p->velocity[0],&p->velocity[0],scratch.ground.other);
@@ -280,19 +278,19 @@ void func_PAL_00302018(PickupMoby *m)
             }
             func_002AA2E8(&p->acceleration,0.64000005f,t);
         }
-        speed=func_00282DF0(&hero.motion.velocity[0]);
+        speed=func_00282DF0(&D_00189E20.motion.velocity[0]);
         if(speed>0.080000006f){
-            func_00282F20(scratch.ground.vector,&hero.motion.velocity[0],speed-0.080000006f);
+            func_00282F20(scratch.ground.vector,&D_00189E20.motion.velocity[0],speed-0.080000006f);
             func_00282CC0(&m->position[0],&m->position[0],scratch.ground.vector);
         }
         func_00283958(&p->spin[0],scratch.attract.basis);
         func_00283738(&m->orientation[0],scratch.attract.basis,&m->orientation[0]);
         func_00282CC0(&m->position[0],&m->position[0],&p->velocity[0]);
-        if((s16)p->target->classId==0)func_00282CF0(scratch.attract.offset,&hero.motion.boltTarget[0],&m->position[0]);
+        if((s16)p->target->classId==0)func_00282CF0(scratch.attract.offset,&D_00189E20.motion.boltTarget[0],&m->position[0]);
         else func_00282CF0(scratch.attract.offset,p->target->position,&m->position[0]);
         if(func_00282DF0(scratch.attract.offset)>p->acceleration) {
             if(p->angleZ!=0||p->angleX!=0){
-                func_00283098(scratch.attract.offset,scratch.attract.offset,&hero.rotation[0]);
+                func_00283098(scratch.attract.offset,scratch.attract.offset,&D_00189E20.rotation[0]);
                 s=func_00283248(scratch.attract.offset[0],scratch.attract.offset[1]);
                 func_00282C88(scratch.attract.angles);
                 scratch.attract.angles[1]=p->angleX;
@@ -300,7 +298,7 @@ void func_PAL_00302018(PickupMoby *m)
                 scratch.attract.angles[2]=p->angleZ;
                 func_002833F0(matrix,scratch.attract.angles);
                 func_00283098(scratch.attract.offset,scratch.attract.offset,matrix);
-                func_00283098(scratch.attract.offset,scratch.attract.offset,hero.matrix);
+                func_00283098(scratch.attract.offset,scratch.attract.offset,D_00189E20.matrix);
             }
             func_00282F20(scratch.attract.offset,scratch.attract.offset,p->acceleration);
             func_00282CC0(&m->position[0],&m->position[0],scratch.attract.offset);

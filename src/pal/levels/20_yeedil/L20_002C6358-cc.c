@@ -41,7 +41,6 @@ typedef struct {
     int field22b0;
     unsigned char vehicle_mode;
 } HeroCapsuleState;
-#define CAPSULE (*(HeroCapsuleState *)D_00189E20)
 extern float func_002AA2E8(float *, float, float);
 extern float func_00282E80(char *, char *);
 extern float func_002AA3A8(float *, float *, float, float, float, float);
@@ -72,32 +71,32 @@ void func_PAL_L20_002C6358(void)
         initial->radius_target = 0.44999998807907104f;
         break;
     }
-    if (CAPSULE.control_mode == 4) {
-        if (CAPSULE.takeoff_frame < CAPSULE.state_timer && !CAPSULE.past_jump_apex)
-            CAPSULE.bottom_target = CAPSULE.field4b8;
-    } else if (CAPSULE.move_state == 6) {
-        CAPSULE.bottom_target = 0.5f;
-    } else if (CAPSULE.move_state == 4) {
-        CAPSULE.top_target = 0.3500000238418579f;
-    } else if ((unsigned)(CAPSULE.control_mode - 17) < 2) {
-        CAPSULE.top_target = 0.0f;
-        CAPSULE.bottom_target = 0.0f;
-    } else if (CAPSULE.field1492 && CAPSULE.field340) {
-        CAPSULE.top_target = 0.8f;
-        CAPSULE.bottom_target = 0.9f;
-    } else if (CAPSULE.move_state == 124) {
-        CAPSULE.radius_target = 0.8f;
+    if ((*(HeroCapsuleState *)D_00189E20).control_mode == 4) {
+        if ((*(HeroCapsuleState *)D_00189E20).takeoff_frame < (*(HeroCapsuleState *)D_00189E20).state_timer && !(*(HeroCapsuleState *)D_00189E20).past_jump_apex)
+            (*(HeroCapsuleState *)D_00189E20).bottom_target = (*(HeroCapsuleState *)D_00189E20).field4b8;
+    } else if ((*(HeroCapsuleState *)D_00189E20).move_state == 6) {
+        (*(HeroCapsuleState *)D_00189E20).bottom_target = 0.5f;
+    } else if ((*(HeroCapsuleState *)D_00189E20).move_state == 4) {
+        (*(HeroCapsuleState *)D_00189E20).top_target = 0.3500000238418579f;
+    } else if ((unsigned)((*(HeroCapsuleState *)D_00189E20).control_mode - 17) < 2) {
+        (*(HeroCapsuleState *)D_00189E20).top_target = 0.0f;
+        (*(HeroCapsuleState *)D_00189E20).bottom_target = 0.0f;
+    } else if ((*(HeroCapsuleState *)D_00189E20).field1492 && (*(HeroCapsuleState *)D_00189E20).field340) {
+        (*(HeroCapsuleState *)D_00189E20).top_target = 0.8f;
+        (*(HeroCapsuleState *)D_00189E20).bottom_target = 0.9f;
+    } else if ((*(HeroCapsuleState *)D_00189E20).move_state == 124) {
+        (*(HeroCapsuleState *)D_00189E20).radius_target = 0.8f;
     }
-    if (!CAPSULE.wall_hit || CAPSULE.previous_control_mode == 18 ||
-        CAPSULE.field22b0 == 18 ||
-        (CAPSULE.vehicle_mode == 0 && CAPSULE.capsule_bottom < 0.53f) ||
-        CAPSULE.control_mode == 17 || CAPSULE.base_condition ||
-        func_00282E80((char *)&CAPSULE + 0x240, (char *)&CAPSULE + 0x80) >
-            CAPSULE.radius * 0.5f) {
-        func_002AA2E8(&CAPSULE.capsule_top, CAPSULE.top_target, 0.024f);
-        func_002AA2E8(&CAPSULE.capsule_bottom, CAPSULE.bottom_target, 0.024f);
-        func_002AA3A8(&CAPSULE.radius, &CAPSULE.radius_velocity,
-                     CAPSULE.radius_target, 0.028800001f, 0.43200004f, 0.080000006f);
+    if (!(*(HeroCapsuleState *)D_00189E20).wall_hit || (*(HeroCapsuleState *)D_00189E20).previous_control_mode == 18 ||
+        (*(HeroCapsuleState *)D_00189E20).field22b0 == 18 ||
+        ((*(HeroCapsuleState *)D_00189E20).vehicle_mode == 0 && (*(HeroCapsuleState *)D_00189E20).capsule_bottom < 0.53f) ||
+        (*(HeroCapsuleState *)D_00189E20).control_mode == 17 || (*(HeroCapsuleState *)D_00189E20).base_condition ||
+        func_00282E80((char *)&(*(HeroCapsuleState *)D_00189E20) + 0x240, (char *)&(*(HeroCapsuleState *)D_00189E20) + 0x80) >
+            (*(HeroCapsuleState *)D_00189E20).radius * 0.5f) {
+        func_002AA2E8(&(*(HeroCapsuleState *)D_00189E20).capsule_top, (*(HeroCapsuleState *)D_00189E20).top_target, 0.024f);
+        func_002AA2E8(&(*(HeroCapsuleState *)D_00189E20).capsule_bottom, (*(HeroCapsuleState *)D_00189E20).bottom_target, 0.024f);
+        func_002AA3A8(&(*(HeroCapsuleState *)D_00189E20).radius, &(*(HeroCapsuleState *)D_00189E20).radius_velocity,
+                     (*(HeroCapsuleState *)D_00189E20).radius_target, 0.028800001f, 0.43200004f, 0.080000006f);
     }
 }
 

@@ -12,11 +12,8 @@ typedef union { Q q; float f[4]; } V;
 #define F(p, o) (*(float *)((p) + (o)))
 
 extern u8 D_001A7AFF MACRO_ADDR, D_001A7B28[] MACRO_ADDR, D_001A7B61 MACRO_ADDR;
-#define D_001A7B29 D_001A7B28[1]
 extern u8 D_L14_001A7C88[] MACRO_ADDR, D_001A7A40 MACRO_ADDR;
-#define D_L14_001A7C8F D_L14_001A7C88[7]
 extern s32 D_L14_001B22E4[] MACRO_ADDR;
-#define BUSY D_L14_001B22E4[1]
 
 extern s32 D_00138324 NOT_SDA;
 extern s32 D_001A79F8 MACRO_ADDR; /* the player's bolts */
@@ -27,7 +24,7 @@ extern char D_00139768[];
 typedef struct { char pad[0x28]; s32 lo; s32 hi; } PriceTable;
 extern PriceTable D_L14_00291850;
 extern s32 D_L14_00291878 NOT_SDA, D_L14_0029187C NOT_SDA;
-#define PRICE_LT(m) (D_L14_001A7C8F ? (m) < D_L14_0029187C : (m) < D_L14_00291878)
+#define PRICE_LT(m) (D_L14_001A7C88[7] ? (m) < D_L14_0029187C : (m) < D_L14_00291878)
 
 typedef struct { char pad[0x80]; char obj[0x60]; V pos; } HeroRecord;
 extern HeroRecord D_00189E20;
@@ -67,7 +64,7 @@ void func_PAL_L14_0042B28C(s32 obj) {
     switch (B(obj, 0x20)) {
     case 0:
         I(data, 0x120) = 0;
-        if (D_001A7AFF || D_001A7B29 || (p = (s32)D_00139768, I(p, 0x7C) < 0)) {
+        if (D_001A7AFF || D_001A7B28[1] || (p = (s32)D_00139768, I(p, 0x7C) < 0)) {
             func_0029F338(obj);
             return;
         }
@@ -88,14 +85,14 @@ void func_PAL_L14_0042B28C(s32 obj) {
         }
         break;
     case 2:
-        BUSY = 1;
+        D_L14_001B22E4[1] = 1;
         if (D_L14_001A8F00 == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
         }
         if (!func_002F5D10()) {
             F(obj, 0xf8) = func_00283B98(F(obj, 0xf8), 3.1415927f);
-            BUSY = 0;
+            D_L14_001B22E4[1] = 0;
             B(obj, 0x31) = 1;
             H(obj, 0x34) &= 0xfffe;
             if (func_L14_00425C08(obj)) {
@@ -111,21 +108,21 @@ void func_PAL_L14_0042B28C(s32 obj) {
     case 3:
         {
             s32 bolts = D_001A79F8;
-            if (D_L14_001A7C8F ? D_L14_00291850.hi <= bolts : D_L14_00291850.lo <= bolts) {
+            if (D_L14_001A7C88[7] ? D_L14_00291850.hi <= bolts : D_L14_00291850.lo <= bolts) {
                 func_002A7750(obj, 4, -1);
                 break;
             }
         }
         if (func_L01_003245E0(obj, 10, 2.5f)) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x1327, D_L14_001A7C8F ? D_L14_00291850.hi : D_L14_00291850.lo, -1);
+            func_L01_00324550(0x1327, D_L14_001A7C88[7] ? D_L14_00291850.hi : D_L14_00291850.lo, -1);
             func_L01_003246D0(obj);
         }
         break;
     case 4:
         {
             s32 bolts = D_001A79F8;
-            if (D_L14_001A7C8F ? bolts < D_L14_00291850.hi : bolts < D_L14_00291850.lo) {
+            if (D_L14_001A7C88[7] ? bolts < D_L14_00291850.hi : bolts < D_L14_00291850.lo) {
                 func_L00_0030C710(150);
                 func_002A7750(obj, 3, -1);
                 break;
@@ -133,12 +130,12 @@ void func_PAL_L14_0042B28C(s32 obj) {
         }
         if (func_L01_003245E0(obj, 10, 2.5f)) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x1328, D_L14_001A7C8F ? D_L14_00291850.hi : D_L14_00291850.lo, -1);
+            func_L01_00324550(0x1328, D_L14_001A7C88[7] ? D_L14_00291850.hi : D_L14_00291850.lo, -1);
             func_L01_003246D0(obj);
             if (D_00138324 & 0x10) {
                 {
                     s32 bolts = D_001A79F8;
-                    D_001A79F8 = bolts - (D_L14_001A7C8F ? D_L14_00291850.hi : D_L14_00291850.lo);
+                    D_001A79F8 = bolts - (D_L14_001A7C88[7] ? D_L14_00291850.hi : D_L14_00291850.lo);
                 }
                 if (func_00288AA0(D_L14_001BF700, 0x7f)) {
                     func_00288BE8(D_L14_001BF700);
@@ -148,7 +145,7 @@ void func_PAL_L14_0042B28C(s32 obj) {
         }
         break;
     case 5:
-        BUSY = 1;
+        D_L14_001B22E4[1] = 1;
         if (D_L14_001A8F00 == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
@@ -158,7 +155,7 @@ void func_PAL_L14_0042B28C(s32 obj) {
             B(I(data, 0x120), 0x31) = 0;
         }
         if (!func_002F5D10()) {
-            BUSY = 0;
+            D_L14_001B22E4[1] = 0;
             B(obj, 0x31) = 1;
             H(obj, 0x34) &= 0xfffe;
             if (B(obj, 0x21) != 0xff) func_002A8598(B(obj, 0x21), 1);
@@ -166,8 +163,8 @@ void func_PAL_L14_0042B28C(s32 obj) {
                 func_0029F338(I(data, 0x120));
                 I(data, 0x120) = 0;
             }
-            if (!D_001A7B29) {
-                D_001A7B29 = 1;
+            if (!D_001A7B28[1]) {
+                D_001A7B28[1] = 1;
                 D_001A7B61 = 1;
             }
             func_0029B3E0(0, -1);

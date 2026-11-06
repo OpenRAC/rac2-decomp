@@ -114,8 +114,6 @@ typedef struct {
     unsigned char pad15C[0x370 - 0x15C];
     HopVector direction;
 } HopSavedState;
-#define HOP_SAVED (*(HopSavedState *)D_L00_001B8C80)
-#define HOP_PLAYER (*(HopPlayer *)&D_00189E20)
 
 extern f32 func_002AA898(f32 *position, f32 target, f32 *velocity,
                          f32 acceleration, f32 damping, f32 limit, s32 direction);
@@ -126,174 +124,174 @@ extern int D_00189E20;
 void func_PAL_L00_002B6B38(void) {
     float probe_start[4], probe_end[4], yaw, speed, rate;
 
-    if (HOP_PLAYER.state == 10) {
+    if ((*(HopPlayer *)&D_00189E20).state == 10) {
         func_L00_002B54F8(0.7f, 0.0f);
-        qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
-        HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
-    } else if (HOP_PLAYER.state == 16) {
-        if (HOP_PLAYER.state_timer >= 46) {
-            func_002AA2E8(&HOP_PLAYER.jump_gravity, 0.010000001f, 0.0028000001f);
+        qcopy((*(HopPlayer *)&D_00189E20).momentum.f, (*(HopPlayer *)&D_00189E20).move_impulse.f);
+        (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).flat_speed;
+    } else if ((*(HopPlayer *)&D_00189E20).state == 16) {
+        if ((*(HopPlayer *)&D_00189E20).state_timer >= 46) {
+            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).jump_gravity, 0.010000001f, 0.0028000001f);
         }
-        if (HOP_PLAYER.state_timer < 46) {
-            HOP_PLAYER.target_speed = HOP_PLAYER.field454;
+        if ((*(HopPlayer *)&D_00189E20).state_timer < 46) {
+            (*(HopPlayer *)&D_00189E20).target_speed = (*(HopPlayer *)&D_00189E20).field454;
         } else {
-            HOP_PLAYER.target_speed = 0.07000001f;
+            (*(HopPlayer *)&D_00189E20).target_speed = 0.07000001f;
         }
         func_L00_002B41B8(0.0176f, 0.018000001f);
-        func_L00_002D3BD8(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
-        func_L00_002D3798(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, HOP_PLAYER.ground_speed);
-    } else if (HOP_PLAYER.state == 27) {
-        if (HOP_PLAYER.state_timer >= 34) {
+        func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, 0.0f);
+        func_L00_002D3798((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).ground_speed);
+    } else if ((*(HopPlayer *)&D_00189E20).state == 27) {
+        if ((*(HopPlayer *)&D_00189E20).state_timer >= 34) {
             func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, 0.30019668f);
             func_L00_002B6198(0.008f);
         }
-        if (HOP_PLAYER.anim_frame >= 13.0f && HOP_PLAYER.anim_frame <= 30.0f) {
-            if (HOP_PLAYER.anim_frame > 27.0f) {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.0f, 0.0032000002f);
+        if ((*(HopPlayer *)&D_00189E20).anim_frame >= 13.0f && (*(HopPlayer *)&D_00189E20).anim_frame <= 30.0f) {
+            if ((*(HopPlayer *)&D_00189E20).anim_frame > 27.0f) {
+                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.0f, 0.0032000002f);
             } else {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.040000003f, 0.0032000002f);
+                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.040000003f, 0.0032000002f);
             }
         }
         probe_start[1] = 0.0f;
-        probe_start[0] = HOP_PLAYER.ledge_jump_speed;
-        probe_start[2] = func_00282DB0(HOP_PLAYER.velocity.f, HOP_PLAYER.field20.f);
-        func_00283098(HOP_PLAYER.velocity.f, probe_start, &HOP_PLAYER);
-    } else if (HOP_PLAYER.state == 72) {
-        if (HOP_PLAYER.anim_frame >= 5.0f && HOP_PLAYER.anim_frame <= 18.0f) {
-            if (HOP_PLAYER.anim_frame > 15.0f) {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.0f, 0.0032000002f);
+        probe_start[0] = (*(HopPlayer *)&D_00189E20).ledge_jump_speed;
+        probe_start[2] = func_00282DB0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).field20.f);
+        func_00283098((*(HopPlayer *)&D_00189E20).velocity.f, probe_start, &(*(HopPlayer *)&D_00189E20));
+    } else if ((*(HopPlayer *)&D_00189E20).state == 72) {
+        if ((*(HopPlayer *)&D_00189E20).anim_frame >= 5.0f && (*(HopPlayer *)&D_00189E20).anim_frame <= 18.0f) {
+            if ((*(HopPlayer *)&D_00189E20).anim_frame > 15.0f) {
+                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.0f, 0.0032000002f);
             } else {
-                func_002AA2E8(&HOP_PLAYER.ledge_jump_speed, 0.025000002f, 0.0032000002f);
+                func_002AA2E8(&(*(HopPlayer *)&D_00189E20).ledge_jump_speed, 0.025000002f, 0.0032000002f);
             }
         }
         probe_start[1] = 0.0f;
-        probe_start[0] = HOP_PLAYER.ledge_jump_speed;
-        probe_start[2] = func_00282DB0(HOP_PLAYER.velocity.f, HOP_PLAYER.field20.f);
-        func_00283098(HOP_PLAYER.velocity.f, probe_start, &HOP_PLAYER);
-    } else if (HOP_PLAYER.state == 11) {
-        HOP_PLAYER.move_yaw = HOP_PLAYER.takeoff_yaw;
-        qcopy(HOP_PLAYER.move_dir.f, HOP_PLAYER.field480.f);
+        probe_start[0] = (*(HopPlayer *)&D_00189E20).ledge_jump_speed;
+        probe_start[2] = func_00282DB0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).field20.f);
+        func_00283098((*(HopPlayer *)&D_00189E20).velocity.f, probe_start, &(*(HopPlayer *)&D_00189E20));
+    } else if ((*(HopPlayer *)&D_00189E20).state == 11) {
+        (*(HopPlayer *)&D_00189E20).move_yaw = (*(HopPlayer *)&D_00189E20).takeoff_yaw;
+        qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopPlayer *)&D_00189E20).field480.f);
         func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, 0.13962635f);
-        if (HOP_PLAYER.field4D4 != 3) {
-            HOP_PLAYER.ground_speed = HOP_PLAYER.air_target_speed;
+        if ((*(HopPlayer *)&D_00189E20).field4D4 != 3) {
+            (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).air_target_speed;
         } else {
-            HOP_PLAYER.ground_speed = 0.0f;
+            (*(HopPlayer *)&D_00189E20).ground_speed = 0.0f;
         }
-        if (HOP_PLAYER.field52D) {
-            float drift = HOP_PLAYER.stick_magnitude * 0.10000001f;
+        if ((*(HopPlayer *)&D_00189E20).field52D) {
+            float drift = (*(HopPlayer *)&D_00189E20).stick_magnitude * 0.10000001f;
 
             if (drift < 0.040000003f) drift = 0.040000003f;
-            func_002AA2E8(&HOP_PLAYER.high_jump_drift_speed, drift, 0.014800001f);
-            HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
-        } else if (HOP_PLAYER.field49E && HOP_PLAYER.field4AE < 10) {
-            func_002AA2E8(&HOP_PLAYER.high_jump_drift_speed, 0.0f, 0.0032000002f);
+            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).high_jump_drift_speed, drift, 0.014800001f);
+            (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).flat_speed;
+        } else if ((*(HopPlayer *)&D_00189E20).field49E && (*(HopPlayer *)&D_00189E20).field4AE < 10) {
+            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).high_jump_drift_speed, 0.0f, 0.0032000002f);
         } else {
-            func_002AA2E8(&HOP_PLAYER.high_jump_drift_speed, 0.084f, 0.0032000002f);
+            func_002AA2E8(&(*(HopPlayer *)&D_00189E20).high_jump_drift_speed, 0.084f, 0.0032000002f);
         }
-        if (!HOP_PLAYER.field22C3) {
-            HOP_PLAYER.velocity.f[0] = func_00283180(HOP_PLAYER.high_jump_drift_yaw) * HOP_PLAYER.high_jump_drift_speed;
-            HOP_PLAYER.velocity.f[1] = func_00283198(HOP_PLAYER.high_jump_drift_yaw) * HOP_PLAYER.high_jump_drift_speed;
+        if (!(*(HopPlayer *)&D_00189E20).field22C3) {
+            (*(HopPlayer *)&D_00189E20).velocity.f[0] = func_00283180((*(HopPlayer *)&D_00189E20).high_jump_drift_yaw) * (*(HopPlayer *)&D_00189E20).high_jump_drift_speed;
+            (*(HopPlayer *)&D_00189E20).velocity.f[1] = func_00283198((*(HopPlayer *)&D_00189E20).high_jump_drift_yaw) * (*(HopPlayer *)&D_00189E20).high_jump_drift_speed;
         } else {
-            func_L00_002D3BD8(probe_start, HOP_PLAYER.field470.f, HOP_PLAYER.high_jump_drift_speed);
+            func_L00_002D3BD8(probe_start, (*(HopPlayer *)&D_00189E20).field470.f, (*(HopPlayer *)&D_00189E20).high_jump_drift_speed);
             func_L00_002D3B58(probe_start, probe_start, 0.0f);
-            func_L00_002D3BD8(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
-            func_00282CC0(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
+            func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, 0.0f);
+            func_00282CC0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, probe_start);
         }
-        if (!HOP_PLAYER.field22C3 && !HOP_PLAYER.field52D) {
-            float drift = HOP_PLAYER.air_target_speed * func_00283198(func_00283C80(HOP_PLAYER.takeoff_yaw, HOP_PLAYER.high_jump_drift_yaw));
+        if (!(*(HopPlayer *)&D_00189E20).field22C3 && !(*(HopPlayer *)&D_00189E20).field52D) {
+            float drift = (*(HopPlayer *)&D_00189E20).air_target_speed * func_00283198(func_00283C80((*(HopPlayer *)&D_00189E20).takeoff_yaw, (*(HopPlayer *)&D_00189E20).high_jump_drift_yaw));
 
-            HOP_PLAYER.velocity.f[0] += func_00283180(HOP_PLAYER.takeoff_yaw) * drift;
-            HOP_PLAYER.velocity.f[1] += func_00283198(HOP_PLAYER.takeoff_yaw) * drift;
+            (*(HopPlayer *)&D_00189E20).velocity.f[0] += func_00283180((*(HopPlayer *)&D_00189E20).takeoff_yaw) * drift;
+            (*(HopPlayer *)&D_00189E20).velocity.f[1] += func_00283198((*(HopPlayer *)&D_00189E20).takeoff_yaw) * drift;
         }
         func_L00_002B54F8(0.7f, 0.0f);
-        qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
-    } else if (HOP_PLAYER.state == 17) {
-        HOP_PLAYER.move_yaw = HOP_PLAYER.field4F0.f[3];
-        qcopy(HOP_PLAYER.move_dir.f, HOP_PLAYER.field4F0.f);
-        if (HOP_PLAYER.state_timer >= 8) {
+        qcopy((*(HopPlayer *)&D_00189E20).momentum.f, (*(HopPlayer *)&D_00189E20).move_impulse.f);
+    } else if ((*(HopPlayer *)&D_00189E20).state == 17) {
+        (*(HopPlayer *)&D_00189E20).move_yaw = (*(HopPlayer *)&D_00189E20).field4F0.f[3];
+        qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopPlayer *)&D_00189E20).field4F0.f);
+        if ((*(HopPlayer *)&D_00189E20).state_timer >= 8) {
             func_L00_002B3EF8(-1, 0.060480002f, 0.28800002f, 0.23736483f);
         }
-        if (HOP_PLAYER.state_timer >= 7) {
-            if (!HOP_PLAYER.field348) {
-                HOP_PLAYER.velocity.f[0] = func_00283180(HOP_PLAYER.move_yaw) * 0.09800001f;
-                HOP_PLAYER.velocity.f[1] = func_00283198(HOP_PLAYER.move_yaw) * 0.09800001f;
+        if ((*(HopPlayer *)&D_00189E20).state_timer >= 7) {
+            if (!(*(HopPlayer *)&D_00189E20).field348) {
+                (*(HopPlayer *)&D_00189E20).velocity.f[0] = func_00283180((*(HopPlayer *)&D_00189E20).move_yaw) * 0.09800001f;
+                (*(HopPlayer *)&D_00189E20).velocity.f[1] = func_00283198((*(HopPlayer *)&D_00189E20).move_yaw) * 0.09800001f;
             } else {
-                func_L00_002D3BD8(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, 0.0f);
-                func_00282F20(probe_start, HOP_PLAYER.move_dir.f, 0.09800001f);
-                func_00282CC0(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, probe_start);
+                func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, 0.0f);
+                func_00282F20(probe_start, (*(HopPlayer *)&D_00189E20).move_dir.f, 0.09800001f);
+                func_00282CC0((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, probe_start);
             }
         }
-        HOP_PLAYER.ground_speed = HOP_PLAYER.flat_speed;
-    } else if (HOP_PLAYER.state == 0x81 && !D_001A8FF0) {
-        func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, HOP_PLAYER.field494);
-        HOP_PLAYER.ground_speed = 0.0f;
+        (*(HopPlayer *)&D_00189E20).ground_speed = (*(HopPlayer *)&D_00189E20).flat_speed;
+    } else if ((*(HopPlayer *)&D_00189E20).state == 0x81 && !D_001A8FF0) {
+        func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&D_00189E20).field494);
+        (*(HopPlayer *)&D_00189E20).ground_speed = 0.0f;
     } else {
-        if (HOP_PLAYER.state == 44) {
-            yaw = HOP_PLAYER.yaw;
-            HOP_PLAYER.yaw_error = func_002AA898(&yaw, HOP_PLAYER.move_yaw, &HOP_PLAYER.yaw_rate,
+        if ((*(HopPlayer *)&D_00189E20).state == 44) {
+            yaw = (*(HopPlayer *)&D_00189E20).yaw;
+            (*(HopPlayer *)&D_00189E20).yaw_error = func_002AA898(&yaw, (*(HopPlayer *)&D_00189E20).move_yaw, &(*(HopPlayer *)&D_00189E20).yaw_rate,
                                       0.02592f, 0.28800002f, 0.14660768f, 0);
             {
-                float delta = func_00283BE0(yaw, HOP_PLAYER.yaw);
+                float delta = func_00283BE0(yaw, (*(HopPlayer *)&D_00189E20).yaw);
 
                 func_L00_002AA0F0(0.0f, 0.0f, delta);
             }
         } else {
-            float saved = HOP_PLAYER.move_yaw;
+            float saved = (*(HopPlayer *)&D_00189E20).move_yaw;
 
-            qcopy(probe_start, HOP_PLAYER.move_dir.f);
-            if (HOP_PLAYER.field1454) {
-                HOP_PLAYER.move_yaw = HOP_SAVED.yaw;
-                qcopy(HOP_PLAYER.move_dir.f, HOP_SAVED.direction.f);
+            qcopy(probe_start, (*(HopPlayer *)&D_00189E20).move_dir.f);
+            if ((*(HopPlayer *)&D_00189E20).field1454) {
+                (*(HopPlayer *)&D_00189E20).move_yaw = (*(HopSavedState *)D_L00_001B8C80).yaw;
+                qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopSavedState *)D_L00_001B8C80).direction.f);
             }
-            func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, HOP_PLAYER.field494);
-            if (HOP_PLAYER.field1454) {
-                HOP_PLAYER.field1458 = saved;
-                qcopy(HOP_PLAYER.field1440.f, probe_start);
-                HOP_PLAYER.move_yaw = saved;
-                qcopy(HOP_PLAYER.move_dir.f, HOP_PLAYER.field1440.f);
+            func_L00_002B3EF8(0, 0.057600003f, 0.28800002f, (*(HopPlayer *)&D_00189E20).field494);
+            if ((*(HopPlayer *)&D_00189E20).field1454) {
+                (*(HopPlayer *)&D_00189E20).field1458 = saved;
+                qcopy((*(HopPlayer *)&D_00189E20).field1440.f, probe_start);
+                (*(HopPlayer *)&D_00189E20).move_yaw = saved;
+                qcopy((*(HopPlayer *)&D_00189E20).move_dir.f, (*(HopPlayer *)&D_00189E20).field1440.f);
             }
         }
         func_L00_002B54F8(0.7f, 0.0f);
-        qcopy(HOP_PLAYER.momentum.f, HOP_PLAYER.move_impulse.f);
+        qcopy((*(HopPlayer *)&D_00189E20).momentum.f, (*(HopPlayer *)&D_00189E20).move_impulse.f);
         rate = 0.008f;
-        if (HOP_PLAYER.target_speed < D_001A7DC0 * 0.004f) {
-            if (HOP_PLAYER.control_mode == 2) {
-                float decel = HOP_PLAYER.fieldA84;
+        if ((*(HopPlayer *)&D_00189E20).target_speed < D_001A7DC0 * 0.004f) {
+            if ((*(HopPlayer *)&D_00189E20).control_mode == 2) {
+                float decel = (*(HopPlayer *)&D_00189E20).fieldA84;
 
-                if (HOP_PLAYER.field1492) decel = 6.8e-05f;
-                speed = func_L00_002D3A58(HOP_PLAYER.velocity.f);
+                if ((*(HopPlayer *)&D_00189E20).field1492) decel = 6.8e-05f;
+                speed = func_L00_002D3A58((*(HopPlayer *)&D_00189E20).velocity.f);
                 func_002AA2E8(&speed, 0.0f, decel);
-                func_L00_002D3BD8(HOP_PLAYER.velocity.f, HOP_PLAYER.velocity.f, speed);
+                func_L00_002D3BD8((*(HopPlayer *)&D_00189E20).velocity.f, (*(HopPlayer *)&D_00189E20).velocity.f, speed);
                 return;
             }
-            if (HOP_PLAYER.field34A) {
+            if ((*(HopPlayer *)&D_00189E20).field34A) {
                 rate = 0.0044f;
-            } else if (HOP_PLAYER.field524) {
+            } else if ((*(HopPlayer *)&D_00189E20).field524) {
                 rate = 0.00080000004f;
             } else {
                 rate = 0.0032000002f;
             }
         }
-        if (HOP_PLAYER.field528 && HOP_PLAYER.field1492) {
+        if ((*(HopPlayer *)&D_00189E20).field528 && (*(HopPlayer *)&D_00189E20).field1492) {
             rate = 0.00020000001f;
-            if (HOP_PLAYER.stick_magnitude > 0.9f) {
+            if ((*(HopPlayer *)&D_00189E20).stick_magnitude > 0.9f) {
                 func_L00_002B47A8(probe_start, probe_end, 0, 0.5f, -1.5f);
-                probe_start[0] += func_00283180(HOP_PLAYER.move_yaw) * 0.7f;
-                probe_start[1] += func_00283198(HOP_PLAYER.move_yaw) * 0.7f;
-                probe_end[0] += func_00283180(HOP_PLAYER.move_yaw) * 0.7f;
-                probe_end[1] += func_00283198(HOP_PLAYER.move_yaw) * 0.7f;
+                probe_start[0] += func_00283180((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
+                probe_start[1] += func_00283198((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
+                probe_end[0] += func_00283180((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
+                probe_end[1] += func_00283198((*(HopPlayer *)&D_00189E20).move_yaw) * 0.7f;
                 if (func_002761F8(probe_start, probe_end, 2, 0, 0) && func_00278E78() != 7) {
-                    HOP_PLAYER.target_speed = 0.10000001f;
+                    (*(HopPlayer *)&D_00189E20).target_speed = 0.10000001f;
                     rate = 0.004f;
                 }
             }
-            if (HOP_PLAYER.state == 15) {
+            if ((*(HopPlayer *)&D_00189E20).state == 15) {
                 func_L00_002B39F0(0, 0.050000004f);
                 rate = 0.0012f;
             }
-            if (HOP_PLAYER.field320 > 0.2617994248867035f) {
-                HOP_PLAYER.target_speed = 0.0f;
-                rate = HOP_PLAYER.field320 * 0.004583662f;
+            if ((*(HopPlayer *)&D_00189E20).field320 > 0.2617994248867035f) {
+                (*(HopPlayer *)&D_00189E20).target_speed = 0.0f;
+                rate = (*(HopPlayer *)&D_00189E20).field320 * 0.004583662f;
             }
         }
         func_L00_002B6198(rate);

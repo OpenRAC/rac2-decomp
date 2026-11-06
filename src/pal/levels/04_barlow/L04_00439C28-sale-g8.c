@@ -4,7 +4,6 @@
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
-#define COST ((WeaponSettings *)(D_L04_0027B470 + D_00139568[0x27]*0xE0))->cost
 #define INT(p,o) (*(int *)((char *)(p)+(o)))
 #define FLOAT(p,o) (*(float *)((char *)(p)+(o)))
 #define HALF(p,o) (*(short *)((char *)(p)+(o)))
@@ -160,25 +159,25 @@ void func_PAL_L04_00439C28(char *object)
             object[0x31] = 1;
             UHALF(object,0x34) &= 0xfffe;
             if (((u8 *)object)[0x43] != 1) func_PAL_002A7E68(object,1,0,10);
-            if (D_001A79F8[0] < COST) func_002A7750(object,3,-1);
+            if (D_001A79F8[0] < ((WeaponSettings *)(D_L04_0027B470 + D_00139568[0x27]*0xE0))->cost) func_002A7750(object,3,-1);
             else func_002A7750(object,4,-1);
         }
         break;
     case 3:
-        if (COST < D_001A79F8[0]) func_002A7750(object,4,-1);
+        if (((WeaponSettings *)(D_L04_0027B470 + D_00139568[0x27]*0xE0))->cost < D_001A79F8[0]) func_002A7750(object,4,-1);
         else if (func_L01_003245E0((u8 *)object,10,2.5f)) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x12F2,COST,-1);
+            func_L01_00324550(0x12F2,((WeaponSettings *)(D_L04_0027B470 + D_00139568[0x27]*0xE0))->cost,-1);
             func_L01_003246D0((int)object);
         }
         break;
     case 4:
-        if (D_001A79F8[0] < COST) {
+        if (D_001A79F8[0] < ((WeaponSettings *)(D_L04_0027B470 + D_00139568[0x27]*0xE0))->cost) {
             func_L00_0030C710(150);
             func_002A7750(object,3,-1);
         } else if (func_L01_003245E0((u8 *)object,10,2.5f) && func_002ACBC8(D_00189E20.position,INT(vars,0x120))) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x12F1,COST,-1);
+            func_L01_00324550(0x12F1,((WeaponSettings *)(D_L04_0027B470 + D_00139568[0x27]*0xE0))->cost,-1);
             func_L01_003246D0((int)object);
             if (D_00138324 & 16) {
                 func_00288AA0((u8 *)D_L04_001BF880,60);
@@ -208,7 +207,7 @@ void func_PAL_L04_00439C28(char *object)
             UHALF(object,0x34) &= 0xfffe;
             if (((u8 *)object)[0x21] != 255) func_002A8598(((u8 *)object)[0x21],1);
             if (!D_001A7B1F) {
-                D_001A79F8[0] = D_001A79F8[0] - COST;
+                D_001A79F8[0] = D_001A79F8[0] - ((WeaponSettings *)(D_L04_0027B470 + D_00139568[0x27]*0xE0))->cost;
                 func_L00_0030C710(150);
                 func_00288308(39);
                 func_002AD860(39);

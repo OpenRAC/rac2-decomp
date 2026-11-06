@@ -3,8 +3,6 @@
    func_0026F718/F788/F790 become their PAL neighbours func_0026F720/F790/F798. */
 #include "common.h"
 
-#define scene (&D_001B8840)
-#define state (&D_00152C00)
 #define W(p,o) (*(int *)((char *)(p)+(o)))
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 #define UH(p,o) (*(unsigned short *)((char *)(p)+(o)))
@@ -169,8 +167,8 @@ int func_PAL_002EA0B0(void)
 
     int result = 0;
 
-    state->frame++;
-    switch (state->mode) {
+    (&D_00152C00)->frame++;
+    switch ((&D_00152C00)->mode) {
     case 0:
     case 3:
         func_002F5220();
@@ -178,20 +176,20 @@ int func_PAL_002EA0B0(void)
         func_002E5F60();
         func_0026F720();
         func_002B9390();
-        scene->streamFrame++;
-        scene->frame++;
+        (&D_001B8840)->streamFrame++;
+        (&D_001B8840)->frame++;
         {
             int skipIndex, advance, chunkLength;
-            for (skipIndex=0; W(D_00261FE0,scene->selected*32 + skipIndex*8)>=0; skipIndex++) {
-                if (scene->frame==(W(D_00261FE0,scene->selected*32 + skipIndex*8)*5+2)/6) {
-                    advance=(W(D_00261FE0,scene->selected*32 + skipIndex*8+4)*5+2)/6;
+            for (skipIndex=0; W(D_00261FE0,(&D_001B8840)->selected*32 + skipIndex*8)>=0; skipIndex++) {
+                if ((&D_001B8840)->frame==(W(D_00261FE0,(&D_001B8840)->selected*32 + skipIndex*8)*5+2)/6) {
+                    advance=(W(D_00261FE0,(&D_001B8840)->selected*32 + skipIndex*8+4)*5+2)/6;
                     chunkLength=D_001A7B90 ? 80 : 96;
-                    scene->frame+=advance;
-                    scene->streamFrame+=advance;
-                    if (scene->streamFrame>=chunkLength) {
-                        scene->chunk=scene->frame/chunkLength;
-                        func_00294070(scene->chunk);
-                        scene->streamFrame=scene->frame%chunkLength;
+                    (&D_001B8840)->frame+=advance;
+                    (&D_001B8840)->streamFrame+=advance;
+                    if ((&D_001B8840)->streamFrame>=chunkLength) {
+                        (&D_001B8840)->chunk=(&D_001B8840)->frame/chunkLength;
+                        func_00294070((&D_001B8840)->chunk);
+                        (&D_001B8840)->streamFrame=(&D_001B8840)->frame%chunkLength;
                     }
                     break;
                 }
@@ -202,53 +200,53 @@ int func_PAL_002EA0B0(void)
         {
         int limit, skip;
         limit=D_001A7B90 ? 80 : 96;
-        skip=state->skip;
-        if ((D_00138180.pressed&0x9FF) && scene->frame>=11 && D_001B15A0==0.0f && scene->frame<scene->endFrame-25) skip=1;
+        skip=(&D_00152C00)->skip;
+        if ((D_00138180.pressed&0x9FF) && (&D_001B8840)->frame>=11 && D_001B15A0==0.0f && (&D_001B8840)->frame<(&D_001B8840)->endFrame-25) skip=1;
         if (skip) {
             if ((unsigned short)((unsigned short)D_001A63A8.mode-6)>=2) D_001A63A8.mode=5;
-            if (state->mode==0) {
-                scene->frame=scene->endFrame-25;
-                scene->chunk=scene->frame/limit;
-                func_00294070(scene->chunk);
-                scene->streamFrame=scene->frame%limit;
-                if (state->skip) state->skip=0;
+            if ((&D_00152C00)->mode==0) {
+                (&D_001B8840)->frame=(&D_001B8840)->endFrame-25;
+                (&D_001B8840)->chunk=(&D_001B8840)->frame/limit;
+                func_00294070((&D_001B8840)->chunk);
+                (&D_001B8840)->streamFrame=(&D_001B8840)->frame%limit;
+                if ((&D_00152C00)->skip) (&D_00152C00)->skip=0;
                 else func_0027D330(4);
                 D_001B15A0=1.0f;
             } else {
-                if (state->skip) state->skip=0;
-                if (scene->frame<5) state->fadeStart=-5;
-                else state->fadeStart=scene->frame-1;
+                if ((&D_00152C00)->skip) (&D_00152C00)->skip=0;
+                if ((&D_001B8840)->frame<5) (&D_00152C00)->fadeStart=-5;
+                else (&D_00152C00)->fadeStart=(&D_001B8840)->frame-1;
             }
         }
         }
-        if (state->mode==3) {
+        if ((&D_00152C00)->mode==3) {
             int j;
-            j=state->fadeStart;
-            if (j==0) j=scene->endFrame-6;
-            if (scene->frame>=j) {
-                D_001B15A0=(scene->frame-j)*0.2f;
-                if (D_001B15A0>1.0f) scene->frame=scene->endFrame;
+            j=(&D_00152C00)->fadeStart;
+            if (j==0) j=(&D_001B8840)->endFrame-6;
+            if ((&D_001B8840)->frame>=j) {
+                D_001B15A0=((&D_001B8840)->frame-j)*0.2f;
+                if (D_001B15A0>1.0f) (&D_001B8840)->frame=(&D_001B8840)->endFrame;
                 if (D_001B15A0>1.0f) D_001B15A0=1.0f;
             }
         }
-        if (scene->frame>=scene->endFrame) {
+        if ((&D_001B8840)->frame>=(&D_001B8840)->endFrame) {
             if ((unsigned short)((unsigned short)D_001A63A8.mode-6)>=2) D_001A63A8.mode=5;
             func_002FC138();
             D_001B9040.fieldOfView=0.62f;
             func_0027AB40();
             {
                 int cleanupIndex;
-                for (cleanupIndex=0;cleanupIndex<scene->objectCount;cleanupIndex++) {
-                    PlaybackMoby *object=scene->objects[cleanupIndex];
+                for (cleanupIndex=0;cleanupIndex<(&D_001B8840)->objectCount;cleanupIndex++) {
+                    PlaybackMoby *object=(&D_001B8840)->objects[cleanupIndex];
                     if (object) {
                         object->classData->count--;
                         object->classData->slots[object->classData->count]=0;
                         func_0029F338(object);
                     }
-                    if (state->extra) func_0029F338(state->extra);
+                    if ((&D_00152C00)->extra) func_0029F338((&D_00152C00)->extra);
                 }
             }
-            state->object->flags&=0xFFFE;
+            (&D_00152C00)->object->flags&=0xFFFE;
             {
                 int resetIndex;
                 for (resetIndex=0;D_00214920[resetIndex];resetIndex++) if (D_00214920[resetIndex]->mobyState) D_00214920[resetIndex]->mobyState=8;
@@ -259,28 +257,28 @@ int func_PAL_002EA0B0(void)
                     if (!(B(p,0x20)&0x80) && (H(p,0xAA)==0x4A || H(p,0xAA)==0xCB)) UH(p,0x34)&=0xFF7F;
                 }
             }
-            if (state->mode==0) {
+            if ((&D_00152C00)->mode==0) {
                 if (!func_002B49E0(3,1,4,0,0)) D_001B1694=1;
             } else func_002B4B70(0,0);
         } else {
             {
                 int chunkLength=D_001A7B90 ? 80 : 96;
-                if (scene->streamFrame>=chunkLength) {
-                    scene->chunk++;
-                    func_00294070(scene->chunk);
+                if ((&D_001B8840)->streamFrame>=chunkLength) {
+                    (&D_001B8840)->chunk++;
+                    func_00294070((&D_001B8840)->chunk);
                 }
             }
-            func_002AB6D8(state->object->matrix,state->object->rotation);
-            state->object->rotation[0]=0;
-            state->object->rotation[1]=0;
-            func_00283410(matrix,state->object->rotation);
-            qcopy(point,state->object->position);
+            func_002AB6D8((&D_00152C00)->object->matrix,(&D_00152C00)->object->rotation);
+            (&D_00152C00)->object->rotation[0]=0;
+            (&D_00152C00)->object->rotation[1]=0;
+            func_00283410(matrix,(&D_00152C00)->object->rotation);
+            qcopy(point,(&D_00152C00)->object->position);
             point[2]=func_002A89A8(point,0,0.5f);
             {
             char *key, *rotation;
             int last, i;
             float angle;
-            key=scene->keys+scene->streamFrame*32;
+            key=(&D_001B8840)->keys+(&D_001B8840)->streamFrame*32;
             last=B(key,0xC);
             rotation=key+0x10;
             D_001B9040.fieldOfView=F(rotation,0xC);
@@ -288,7 +286,7 @@ int func_PAL_002EA0B0(void)
             qcopy(D_001B5200.position,key);
             func_002830C0(D_001B5200.position,D_001B5200.position,matrix);
             func_00282CC0(D_001B5200.position,D_001B5200.position,point);
-            angle=func_00283B98(F(rotation,8),state->object->rotation[2]);
+            angle=func_00283B98(F(rotation,8),(&D_00152C00)->object->rotation[2]);
             func_00129178(temp);
             func_001292C0(temp,temp,F(key,0x10));
             func_00129368(temp,temp,F(rotation,4));
@@ -297,35 +295,35 @@ int func_PAL_002EA0B0(void)
             D_001B5200.forward[1]=-temp[9]; D_001B5200.right[1]=-temp[1]; D_001B5200.up[1]=temp[5];
             D_001B5200.forward[2]=-temp[10]; D_001B5200.right[2]=-temp[2]; D_001B5200.up[2]=temp[6];
             {
-                for (i=0;i<scene->objectCount;i++) {
+                for (i=0;i<(&D_001B8840)->objectCount;i++) {
                     char *p;
-                    PlaybackMoby *object=scene->objects[i];
-                    int half=scene->streamFrame>>1;
+                    PlaybackMoby *object=(&D_001B8840)->objects[i];
+                    int half=(&D_001B8840)->streamFrame>>1;
                     object->frame=half;
                     object->nextFrame=half+1;
                     func_0029F390(object);
-                    object->animTime=func_00283CE0(scene->streamFrame&1)*0.5f;
-                    if (last && (scene->streamFrame&1)) object->animTime=1.0f;
+                    object->animTime=func_00283CE0((&D_001B8840)->streamFrame&1)*0.5f;
+                    if (last && ((&D_001B8840)->streamFrame&1)) object->animTime=1.0f;
                     p=object->keys;
                     func_00282D30(temp,p+object->frame*16,1.0f-object->animTime);
                     func_00282D30(temp+4,p+object->nextFrame*16,object->animTime);
                     func_00282CC0(object->position,temp,temp+4);
                     func_002830C0(object->position,object->position,matrix);
                     func_00282CC0(object->position,object->position,point);
-                    object->rotation[2]=state->object->rotation[2];
+                    object->rotation[2]=(&D_00152C00)->object->rotation[2];
                     object->animId=255;
                     func_002A0F48(object);
                     if (object->classId==0) {
                         object->shadowRange=0;
-                        if (state->mode==0) {
-                            if (scene->frame<73) object->shadowRange=24;
+                        if ((&D_00152C00)->mode==0) {
+                            if ((&D_001B8840)->frame<73) object->shadowRange=24;
                         } else {
-                            if (scene->frame>=143) object->shadowRange=24;
+                            if ((&D_001B8840)->frame>=143) object->shadowRange=24;
                         }
                     } else if (object->classId==10) {
                         object->shadowRange=0;
-                        if (state->mode==0) { if (scene->frame<279) object->shadowRange=24; }
-                        else if (scene->frame>=174) object->shadowRange=24;
+                        if ((&D_00152C00)->mode==0) { if ((&D_001B8840)->frame<279) object->shadowRange=24; }
+                        else if ((&D_001B8840)->frame>=174) object->shadowRange=24;
                     }
                     if (object->shadowRange) func_002A9548(object);
                     if (object->classId==10) func_0026F798(object);
@@ -344,20 +342,20 @@ int func_PAL_002EA0B0(void)
                             if(j==D_00214920[cast]->classId) {p=D_00214920[cast];break;}
                         }
                         if(p) {
-                            if(state->mode==0) {
+                            if((&D_00152C00)->mode==0) {
                                 int offset,color;
                                 offset=D_0018C31C ? 144 : -18;
-                                if(scene->frame<((504-offset)*5+2)/6) {
-                                    color=(int)((scene->frame-((360.0f-offset)*5.0f+2.0f)*0.16666667f)*1.8000001f);
+                                if((&D_001B8840)->frame<((504-offset)*5+2)/6) {
+                                    color=(int)(((&D_001B8840)->frame-((360.0f-offset)*5.0f+2.0f)*0.16666667f)*1.8000001f);
                                     if(color>255) color=255;
                                     if(color<0) color=0;
                                     p->color=color | (color<<8) | (color<<16);
-                                    if(scene->frame>((420-offset)*5+2)/6) {
-                                        object->effectScale=(int)((scene->frame-((420.0f-offset)*5.0f+2.0f)*0.16666667f)*1.44f);
+                                    if((&D_001B8840)->frame>((420-offset)*5+2)/6) {
+                                        object->effectScale=(int)(((&D_001B8840)->frame-((420.0f-offset)*5.0f+2.0f)*0.16666667f)*1.44f);
                                         object->partFlags=0;
                                         func_0027CDC8(func_002E7338,object);
                                     }
-                                    if(scene->frame>((464-offset)*5+2)/6) {
+                                    if((&D_001B8840)->frame>((464-offset)*5+2)/6) {
                                         D_001B15A4+=0.0324f;
                                         if(D_001B15A4>1.0f) D_001B15A4=1.0f;
                                     }
@@ -367,11 +365,11 @@ int func_PAL_002EA0B0(void)
                                     if(D_001B15A4<0.0f) D_001B15A4=0.0f;
                                 }
                             } else {
-                                if(scene->frame<125) {
-                                    int color=((125-scene->frame)*255)/125;
+                                if((&D_001B8840)->frame<125) {
+                                    int color=((125-(&D_001B8840)->frame)*255)/125;
                                     p->color=color|(color<<8)|(color<<16);
                                 } else {
-                                    int color=(int)(func_00283180(func_00283CE0((scene->frame&63)-32)*0.09817477f)*80.0f)+120;
+                                    int color=(int)(func_00283180(func_00283CE0(((&D_001B8840)->frame&63)-32)*0.09817477f)*80.0f)+120;
                                     p->color=color|(color<<8)|(color<<16);
                                 }
                             }
@@ -392,7 +390,7 @@ int func_PAL_002EA0B0(void)
         func_002E5F60();
         func_0026F720();
         func_002B9390();
-        if (state->frame==0) {
+        if ((&D_00152C00)->frame==0) {
             func_002B72E8(0);
             func_002B7CE0(0);
             D_001A63A8.requestedFrame=0x138E;
@@ -402,34 +400,34 @@ int func_PAL_002EA0B0(void)
                 func_001261F0(0);
             }
             func_002B6D28();
-            state->object->opacity=255;
-            state->object->updateState=0;
-            if (state->curveIndex>=0) {
+            (&D_00152C00)->object->opacity=255;
+            (&D_00152C00)->object->updateState=0;
+            if ((&D_00152C00)->curveIndex>=0) {
                 char *global;
-                state->hero=func_0029EFD0(0);
+                (&D_00152C00)->hero=func_0029EFD0(0);
                 global=D_00189E20;
-                state->hero->drawDistance=0x1FF;
-                state->hero->opacity=255;
-                state->hero->updateState=0;
-                state->hero->flags|=6;
-                state->hero->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
+                (&D_00152C00)->hero->drawDistance=0x1FF;
+                (&D_00152C00)->hero->opacity=255;
+                (&D_00152C00)->hero->updateState=0;
+                (&D_00152C00)->hero->flags|=6;
+                (&D_00152C00)->hero->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
                 if (B(D_001CE4EA,0)!=255 && H(global,0x24FC)==0) {
-                    state->companion=func_0029EFD0(10);
-                    state->companion->drawDistance=0x1FF;
-                    state->companion->opacity=255;
-                    state->companion->updateState=0;
-                    state->companion->flags|=6;
-                    state->companion->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
-                } else state->companion=0;
+                    (&D_00152C00)->companion=func_0029EFD0(10);
+                    (&D_00152C00)->companion->drawDistance=0x1FF;
+                    (&D_00152C00)->companion->opacity=255;
+                    (&D_00152C00)->companion->updateState=0;
+                    (&D_00152C00)->companion->flags|=6;
+                    (&D_00152C00)->companion->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
+                } else (&D_00152C00)->companion=0;
             }
             func_00335438(D_001B5200.position,D_001B5200.rotation,1,0,0);
-            state->cameraBlend=0;
-            state->cameraVelocity=0;
-            if (state->curveIndex>=0) {
+            (&D_00152C00)->cameraBlend=0;
+            (&D_00152C00)->cameraVelocity=0;
+            if ((&D_00152C00)->curveIndex>=0) {
                 char *curve;
                 float maximum, angle, factor;
-                curve=(char *)D_001F1700[state->curveIndex];
-                maximum=state->cameraBlend;
+                curve=(char *)D_001F1700[(&D_00152C00)->curveIndex];
+                maximum=(&D_00152C00)->cameraBlend;
                 {
                     int pathIndex;
                     for (pathIndex=1;pathIndex<W(curve,0)-1;pathIndex++) {
@@ -470,105 +468,105 @@ int func_PAL_002EA0B0(void)
                     int rampIndex;
                     for(rampIndex=0;rampIndex<20;rampIndex++) F(curve+rampIndex*16,0x1C)=F(curve+rampIndex*16,0x1C)*0.05f*rampIndex;
                 }
-                state->length=func_00282E48(curve+0x10,curve+0x20);
-                state->progress=0;
-                state->speed=0;
+                (&D_00152C00)->length=func_00282E48(curve+0x10,curve+0x20);
+                (&D_00152C00)->progress=0;
+                (&D_00152C00)->speed=0;
                 /* These copies do not overlap the state pointer/length fields. */
-                qcopy_nc(state->startPosition,state->object->position);
-                qcopy_nc(state->endPosition,curve+0x10);
-                qcopy_nc(state->startRotation,state->object->rotation);
-                state->endRotation[0]=F(curve,0x1C);
+                qcopy_nc((&D_00152C00)->startPosition,(&D_00152C00)->object->position);
+                qcopy_nc((&D_00152C00)->endPosition,curve+0x10);
+                qcopy_nc((&D_00152C00)->startRotation,(&D_00152C00)->object->rotation);
+                (&D_00152C00)->endRotation[0]=F(curve,0x1C);
                 angle=func_00282E80(curve+0x20,curve+0x10);
-                state->endRotation[1]=func_00283248(angle,F(curve,0x18)-F(curve,0x28));
-                state->endRotation[2]=func_00283248(F(curve,0x20)-F(curve,0x10),F(curve,0x24)-F(curve,0x14));
+                (&D_00152C00)->endRotation[1]=func_00283248(angle,F(curve,0x18)-F(curve,0x28));
+                (&D_00152C00)->endRotation[2]=func_00283248(F(curve,0x20)-F(curve,0x10),F(curve,0x24)-F(curve,0x14));
             }
         }
-        if (state->cameraStart>=0 && state->cameraEnd>=0) {
+        if ((&D_00152C00)->cameraStart>=0 && (&D_00152C00)->cameraEnd>=0) {
             float angle;
-            func_002AA548(&state->cameraBlend,&state->cameraVelocity,1.0f,0.00026640002f,0.00026640002f,0.010000001f);
-            func_00282D08(matrix,D_001B1C4C[0]+state->cameraStart*128+0x30,D_001B1C4C[0]+state->cameraEnd*128+0x30,state->cameraBlend);
+            func_002AA548(&(&D_00152C00)->cameraBlend,&(&D_00152C00)->cameraVelocity,1.0f,0.00026640002f,0.00026640002f,0.010000001f);
+            func_00282D08(matrix,D_001B1C4C[0]+(&D_00152C00)->cameraStart*128+0x30,D_001B1C4C[0]+(&D_00152C00)->cameraEnd*128+0x30,(&D_00152C00)->cameraBlend);
             func_00282C88(matrix+4);
-            angle=func_00283BE0(F(D_001B1C4C[0]+state->cameraEnd*128,0x74),F(D_001B1C4C[0]+state->cameraStart*128,0x74));
-            matrix[5]=angle*state->cameraBlend;
-            matrix[5]=func_00283B98(F(D_001B1C4C[0]+state->cameraStart*128,0x74),matrix[5]);
-            angle=func_00283BE0(F(D_001B1C4C[0]+state->cameraEnd*128,0x78),F(D_001B1C4C[0]+state->cameraStart*128,0x78));
-            matrix[6]=angle*state->cameraBlend;
-            matrix[6]=func_00283B98(F(D_001B1C4C[0]+state->cameraStart*128,0x78),matrix[6]);
+            angle=func_00283BE0(F(D_001B1C4C[0]+(&D_00152C00)->cameraEnd*128,0x74),F(D_001B1C4C[0]+(&D_00152C00)->cameraStart*128,0x74));
+            matrix[5]=angle*(&D_00152C00)->cameraBlend;
+            matrix[5]=func_00283B98(F(D_001B1C4C[0]+(&D_00152C00)->cameraStart*128,0x74),matrix[5]);
+            angle=func_00283BE0(F(D_001B1C4C[0]+(&D_00152C00)->cameraEnd*128,0x78),F(D_001B1C4C[0]+(&D_00152C00)->cameraStart*128,0x78));
+            matrix[6]=angle*(&D_00152C00)->cameraBlend;
+            matrix[6]=func_00283B98(F(D_001B1C4C[0]+(&D_00152C00)->cameraStart*128,0x78),matrix[6]);
             func_00335370(matrix);
             func_003353C8(matrix+4);
         }
-        if (state->curveIndex>=0) {
+        if ((&D_00152C00)->curveIndex>=0) {
             char *p;
             PlaybackBones *bones;
             int *table;
-            if (state->frame<100) {
+            if ((&D_00152C00)->frame<100) {
                 float angle, factor, blend;
-                angle=func_00283CE0(state->frame);
+                angle=func_00283CE0((&D_00152C00)->frame);
                 factor=func_00283CE0(75);
                 blend=(1.0f-func_00283180(angle*(3.1415927f/factor)))*0.5f;
-                if(state->frame>=75) blend=1.0f;
-                func_00282D08(state->object->position,state->startPosition,state->endPosition,blend);
-                state->object->rotation[0]=state->endRotation[0]*blend;
-                angle=func_00283BE0(state->endRotation[1],state->startRotation[1]);
-                state->object->rotation[1]=func_00283B98(state->startRotation[1],angle*blend);
-                angle=func_00283BE0(state->endRotation[2],state->startRotation[2]);
-                state->object->rotation[2]=func_00283B98(state->startRotation[2],angle*blend);
-                func_00283410(matrix,state->object->rotation);
-                func_00283678(state->object->matrix,matrix);
-                func_002A10E8(state->object);
+                if((&D_00152C00)->frame>=75) blend=1.0f;
+                func_00282D08((&D_00152C00)->object->position,(&D_00152C00)->startPosition,(&D_00152C00)->endPosition,blend);
+                (&D_00152C00)->object->rotation[0]=(&D_00152C00)->endRotation[0]*blend;
+                angle=func_00283BE0((&D_00152C00)->endRotation[1],(&D_00152C00)->startRotation[1]);
+                (&D_00152C00)->object->rotation[1]=func_00283B98((&D_00152C00)->startRotation[1],angle*blend);
+                angle=func_00283BE0((&D_00152C00)->endRotation[2],(&D_00152C00)->startRotation[2]);
+                (&D_00152C00)->object->rotation[2]=func_00283B98((&D_00152C00)->startRotation[2],angle*blend);
+                func_00283410(matrix,(&D_00152C00)->object->rotation);
+                func_00283678((&D_00152C00)->object->matrix,matrix);
+                func_002A10E8((&D_00152C00)->object);
                 if(D_001B15A0>0.0f) {
                     D_001B15A0-=0.125f;
                     if(D_001B15A0<0.0f) D_001B15A0=0.0f;
                 }
-                state->object->effectOpacity=(unsigned short)state->frame>>2;
-                if(blend<1.0f) func_002E8F80(state->object,-0.075f);
+                (&D_00152C00)->object->effectOpacity=(unsigned short)(&D_00152C00)->frame>>2;
+                if(blend<1.0f) func_002E8F80((&D_00152C00)->object,-0.075f);
             } else {
                 PlaybackCurve *curve;
                 float step;
-                curve=D_001F1700[state->curveIndex];
-                state->speed+=0.8f;
-                if(state->speed>100.0f) state->speed=100.0f;
+                curve=D_001F1700[(&D_00152C00)->curveIndex];
+                (&D_00152C00)->speed+=0.8f;
+                if((&D_00152C00)->speed>100.0f) (&D_00152C00)->speed=100.0f;
                 if((D_00138180.pressed&0x50) && D_001B15A0<0.1f) D_001B15A0=0.1f;
-                step=state->speed*0.020000001f/state->length;
-                if((float)curve->count-step*12.0f<state->progress && D_001B15A0<0.1f) D_001B15A0=0.1f;
+                step=(&D_00152C00)->speed*0.020000001f/(&D_00152C00)->length;
+                if((float)curve->count-step*12.0f<(&D_00152C00)->progress && D_001B15A0<0.1f) D_001B15A0=0.1f;
                 if(D_001B15A0>0.0f) {
                     D_001B15A0+=0.1f;
                     if(D_001B15A0>1.0f) D_001B15A0=1.0f;
                 }
-                if(state->object->effectOpacity<160) state->object->effectOpacity+=8;
-                state->progress+=step;
-                func_002E9110(state->object);
-                if(state->progress>(float)(curve->count-1) || D_001B15A0>=1.0f) D_001A8B84=1;
+                if((&D_00152C00)->object->effectOpacity<160) (&D_00152C00)->object->effectOpacity+=8;
+                (&D_00152C00)->progress+=step;
+                func_002E9110((&D_00152C00)->object);
+                if((&D_00152C00)->progress>(float)(curve->count-1) || D_001B15A0>=1.0f) D_001A8B84=1;
                 else {
-                    func_002C9828(curve,1,state->object->position,state->object->rotation,0,state->progress);
-                    state->object->rotation[0]=state->object->rotation[3];
-                    func_00283410(matrix,state->object->rotation);
-                    func_00283678(state->object->matrix,matrix);
-                    func_002A10E8(state->object);
+                    func_002C9828(curve,1,(&D_00152C00)->object->position,(&D_00152C00)->object->rotation,0,(&D_00152C00)->progress);
+                    (&D_00152C00)->object->rotation[0]=(&D_00152C00)->object->rotation[3];
+                    func_00283410(matrix,(&D_00152C00)->object->rotation);
+                    func_00283678((&D_00152C00)->object->matrix,matrix);
+                    func_002A10E8((&D_00152C00)->object);
                 }
             }
-            qcopy_nc(state->hero->rotation,state->object->rotation);
-            func_00283098(state->hero->position,D_001AC1B0,state->object->matrix);
-            func_00282CC0(state->hero->position,state->hero->position,state->object->position);
-            func_002A0F48(state->hero);
-            p=state->hero->classData;
+            qcopy_nc((&D_00152C00)->hero->rotation,(&D_00152C00)->object->rotation);
+            func_00283098((&D_00152C00)->hero->position,D_001AC1B0,(&D_00152C00)->object->matrix);
+            func_00282CC0((&D_00152C00)->hero->position,(&D_00152C00)->hero->position,(&D_00152C00)->object->position);
+            func_002A0F48((&D_00152C00)->hero);
+            p=(&D_00152C00)->hero->classData;
             bones=(PlaybackBones *)P(p,0x48);
             table=&bones->a1C[bones->n10];
             func_002A1130(table+bones->n13,bones->a1C[0],D_001B4580,B(p,8));
-            state->hero->joints=D_001B4580;
-            state->hero->previousJoints=D_001B4580;
-            if(state->companion) {
-                qcopy_nc(state->companion->rotation,state->object->rotation);
-                func_00283098(state->companion->position,D_001AC1C0,state->object->matrix);
-                func_00282CC0(state->companion->position,state->companion->position,state->object->position);
-                func_002A0F48(state->companion);
+            (&D_00152C00)->hero->joints=D_001B4580;
+            (&D_00152C00)->hero->previousJoints=D_001B4580;
+            if((&D_00152C00)->companion) {
+                qcopy_nc((&D_00152C00)->companion->rotation,(&D_00152C00)->object->rotation);
+                func_00283098((&D_00152C00)->companion->position,D_001AC1C0,(&D_00152C00)->object->matrix);
+                func_00282CC0((&D_00152C00)->companion->position,(&D_00152C00)->companion->position,(&D_00152C00)->object->position);
+                func_002A0F48((&D_00152C00)->companion);
             }
         } else {
             D_001A8B84=1;
             D_001B15A0=1.0f;
         }
-        func_002E64A0(state->object);
-        func_0027CFD0(func_002E7B48,state->object);
+        func_002E64A0((&D_00152C00)->object);
+        func_0027CFD0(func_002E7B48,(&D_00152C00)->object);
         func_00272368();
         func_002E4AC8();
         func_002914B8();

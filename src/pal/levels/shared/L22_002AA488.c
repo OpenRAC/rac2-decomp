@@ -78,7 +78,6 @@ typedef struct {
 /* Every access names the resident block through a struct cast, so the address's
    %hi stays in one saved register and each stretch of the body re-materialises
    its own %lo base. */
-#define HERO ((Hero_002AA678 *)D_00189E20)
 
 /* Per-frame update of the hero's effect slot (0x1870): spends the counted charges
    on the two level-specific actions, fades the effect out (releasing it at zero)
@@ -88,83 +87,82 @@ void func_PAL_L22_002AA488(void) {
     int available;
     int i;
 
-    if (HERO->unk1E0)
+    if (((Hero_002AA678 *)D_00189E20)->unk1E0)
         return;
-    if (HERO->unk2294 == 1 && func_L00_0032EF10(16, 6, 0) && !func_L22_003B9428(HERO->unk2290) &&
-        HERO->counts->unkC) {
+    if (((Hero_002AA678 *)D_00189E20)->unk2294 == 1 && func_L00_0032EF10(16, 6, 0) && !func_L22_003B9428(((Hero_002AA678 *)D_00189E20)->unk2290) &&
+        ((Hero_002AA678 *)D_00189E20)->counts->unkC) {
         func_L00_002D36E0(v, 1, 2.0f, -2.1f, 8.7f);
-        ref_L22_002AA678_00(HERO->unk2290, v, 1);
-        HERO->counts->unkC--;
+        ref_L22_002AA678_00(((Hero_002AA678 *)D_00189E20)->unk2290, v, 1);
+        ((Hero_002AA678 *)D_00189E20)->counts->unkC--;
     }
     available = 1;
-    if (!HERO->counts->unk8 || func_L22_003B9428(HERO->unk2290))
+    if (!((Hero_002AA678 *)D_00189E20)->counts->unk8 || func_L22_003B9428(((Hero_002AA678 *)D_00189E20)->unk2290))
         available = 0;
-    if ((unsigned)(HERO->unk2294 - 0x5D) <= 1)
+    if ((unsigned)(((Hero_002AA678 *)D_00189E20)->unk2294 - 0x5D) <= 1)
         available = 0;
-    if (HERO->active) {
-        if (!HERO->counts->unk8) {
-            if (HERO->effect) {
-                if (HERO->effect->flags & 2)
-                    HERO->fading = 1;
-                if (HERO->fading) {
-                    if (HERO->effect->fade == 0) {
-                        func_L00_00310C88(HERO->unk2290, &HERO->effect);
-                        HERO->active = 0;
+    if (((Hero_002AA678 *)D_00189E20)->active) {
+        if (!((Hero_002AA678 *)D_00189E20)->counts->unk8) {
+            if (((Hero_002AA678 *)D_00189E20)->effect) {
+                if (((Hero_002AA678 *)D_00189E20)->effect->flags & 2)
+                    ((Hero_002AA678 *)D_00189E20)->fading = 1;
+                if (((Hero_002AA678 *)D_00189E20)->fading) {
+                    if (((Hero_002AA678 *)D_00189E20)->effect->fade == 0) {
+                        func_L00_00310C88(((Hero_002AA678 *)D_00189E20)->unk2290, &((Hero_002AA678 *)D_00189E20)->effect);
+                        ((Hero_002AA678 *)D_00189E20)->active = 0;
                         return;
                     }
-                    func_002AA2E8(&HERO->effect->fade, 0, 0.08400001f);
+                    func_002AA2E8(&((Hero_002AA678 *)D_00189E20)->effect->fade, 0, 0.08400001f);
                 }
             } else
-                HERO->active = 0;
+                ((Hero_002AA678 *)D_00189E20)->active = 0;
         }
     }
-    if (HERO->active) {
+    if (((Hero_002AA678 *)D_00189E20)->active) {
         if (!(D_00138320 & 0x20) || !available) {
-            if (HERO->effect) {
-                if (HERO->effect->flags & 2)
-                    HERO->fading = 1;
-                if (HERO->fading) {
-                    if (HERO->effect->fade == 0) {
-                        func_L00_00310C88(HERO->unk2290, &HERO->effect);
-                        HERO->active = 0;
+            if (((Hero_002AA678 *)D_00189E20)->effect) {
+                if (((Hero_002AA678 *)D_00189E20)->effect->flags & 2)
+                    ((Hero_002AA678 *)D_00189E20)->fading = 1;
+                if (((Hero_002AA678 *)D_00189E20)->fading) {
+                    if (((Hero_002AA678 *)D_00189E20)->effect->fade == 0) {
+                        func_L00_00310C88(((Hero_002AA678 *)D_00189E20)->unk2290, &((Hero_002AA678 *)D_00189E20)->effect);
+                        ((Hero_002AA678 *)D_00189E20)->active = 0;
                         return;
                     }
-                    func_002AA2E8(&HERO->effect->fade, 0, 0.08400001f);
+                    func_002AA2E8(&((Hero_002AA678 *)D_00189E20)->effect->fade, 0, 0.08400001f);
                 }
             } else
-                HERO->active = 0;
-        } else if (HERO->counts->unk8)
-            HERO->fading = 0;
+                ((Hero_002AA678 *)D_00189E20)->active = 0;
+        } else if (((Hero_002AA678 *)D_00189E20)->counts->unk8)
+            ((Hero_002AA678 *)D_00189E20)->fading = 0;
     }
-    if (!HERO->active && available && func_L00_0032EF10(32, 7, 0)) {
-        Effect_002AA678 *p = func_L00_00310BC8(HERO->unk2290, 2);
-        HERO->fading = 0;
-        HERO->effect = p;
+    if (!((Hero_002AA678 *)D_00189E20)->active && available && func_L00_0032EF10(32, 7, 0)) {
+        Effect_002AA678 *p = func_L00_00310BC8(((Hero_002AA678 *)D_00189E20)->unk2290, 2);
+        ((Hero_002AA678 *)D_00189E20)->fading = 0;
+        ((Hero_002AA678 *)D_00189E20)->effect = p;
         if (p) {
-            HERO->active = 1;
-            func_L00_00311080(HERO->unk2290, p, 13, 0, 7, 1);
+            ((Hero_002AA678 *)D_00189E20)->active = 1;
+            func_L00_00311080(((Hero_002AA678 *)D_00189E20)->unk2290, p, 13, 0, 7, 1);
         }
     }
-    if (!HERO->active || !HERO->effect || HERO->fading)
+    if (!((Hero_002AA678 *)D_00189E20)->active || !((Hero_002AA678 *)D_00189E20)->effect || ((Hero_002AA678 *)D_00189E20)->fading)
         return;
-    func_002AA2E8(&HERO->effect->fade, 1, 0.156f);
-    HERO->effect->unk28 = 2;
-    func_L00_00310D30(HERO->unk2290, HERO->effect);
-    func_00282948(&HERO->timer);
-    if (HERO->effect->state == 4 && !HERO->timer) {
-        HERO->timer = 4;
+    func_002AA2E8(&((Hero_002AA678 *)D_00189E20)->effect->fade, 1, 0.156f);
+    ((Hero_002AA678 *)D_00189E20)->effect->unk28 = 2;
+    func_L00_00310D30(((Hero_002AA678 *)D_00189E20)->unk2290, ((Hero_002AA678 *)D_00189E20)->effect);
+    func_00282948(&((Hero_002AA678 *)D_00189E20)->timer);
+    if (((Hero_002AA678 *)D_00189E20)->effect->state == 4 && !((Hero_002AA678 *)D_00189E20)->timer) {
+        ((Hero_002AA678 *)D_00189E20)->timer = 4;
         for (i = 0; i < 2; i++) {
-            func_0029FCC0(HERO->unk2290, i + 3, v);
-            func_002AFD88(HERO->unk2290, v, 1.4f, 0, 0);
-            if (HERO->counts->unk8) {
-                ref_L22_002AA678_01(HERO->unk2290, v, 0, 0, HERO->counts->unk0 != 0);
-                HERO->counts->unk8--;
+            func_0029FCC0(((Hero_002AA678 *)D_00189E20)->unk2290, i + 3, v);
+            func_002AFD88(((Hero_002AA678 *)D_00189E20)->unk2290, v, 1.4f, 0, 0);
+            if (((Hero_002AA678 *)D_00189E20)->counts->unk8) {
+                ref_L22_002AA678_01(((Hero_002AA678 *)D_00189E20)->unk2290, v, 0, 0, ((Hero_002AA678 *)D_00189E20)->counts->unk0 != 0);
+                ((Hero_002AA678 *)D_00189E20)->counts->unk8--;
             }
         }
     }
 }
 
-#undef HERO
 
 /* Restarts the run: resets the racer's state block, plays the two subsystem
    start-ups, then arms the racer for the mode the caller asked for.

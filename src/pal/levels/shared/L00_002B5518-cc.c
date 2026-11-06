@@ -15,7 +15,6 @@ typedef struct {
 } CollisionView;
 
 extern unsigned char D_L00_001BF210[];
-#define HIT ((CollisionView *)D_L00_001BF210)
 
 /* Field names follow RAC1's hero collision step (hero_collision.c). */
 typedef struct {
@@ -55,7 +54,6 @@ typedef struct {
 } PlayerView;
 
 extern PlayerView D_00189E20_view __asm__("D_00189E20");   /* the player record, as func_PAL_L00_002B5518 reads it */
-#define PLAYER (&D_00189E20_view)
 extern int D_L16_001A8FF0 __attribute__((sda));
 
 extern void func_00282C88(void *);
@@ -127,47 +125,47 @@ int func_PAL_L00_002B5518(int mode)
     float extent;
     int facingUp, iteration, hit;
 
-    if (PLAYER->collision_off_frames) return 1;
-    qcopy(&previous, &PLAYER->position);
+    if ((&D_00189E20_view)->collision_off_frames) return 1;
+    qcopy(&previous, &(&D_00189E20_view)->position);
     func_00282C88(&offset);
-    if (PLAYER->path_constrain_pending) {
+    if ((&D_00189E20_view)->path_constrain_pending) {
         func_L00_002D49F0();
-        PLAYER->path_constrain_pending = 0;
+        (&D_00189E20_view)->path_constrain_pending = 0;
     }
     facingUp = 0;
-    if (func_00282DB0(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
-    switch (PLAYER->control_mode) {
+    if (func_00282DB0(&(&D_00189E20_view)->basis, &(&D_00189E20_view)->up) > -0.92f) facingUp = 1;
+    switch ((&D_00189E20_view)->control_mode) {
     case 17:
         break;
     case 15:
         func_00282C88(&offset);
         offset.z = 0.8f;
-        func_00283098(&offset, &offset, PLAYER->moby + 0xc0);
+        func_00283098(&offset, &offset, (&D_00189E20_view)->moby + 0xc0);
         break;
     default:
-        if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
-            if (PLAYER->state == 2) {
+        if ((&D_00189E20_view)->gravity_mode || (&D_00189E20_view)->timer || facingUp) {
+            if ((&D_00189E20_view)->state == 2) {
                 func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 5.0f);
-            } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
+            } else if ((&D_00189E20_view)->gravity_mode == 1 || (&D_00189E20_view)->timer) {
                 func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_L16_001A8FF0) {
                 func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
+                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, (&D_00189E20_view)->capsule_bottom);
             }
         } else {
-            offset.z = PLAYER->capsule_bottom;
+            offset.z = (&D_00189E20_view)->capsule_bottom;
         }
         break;
     }
-    func_00282CC0(&PLAYER->position, &PLAYER->position, &offset);
+    func_00282CC0(&(&D_00189E20_view)->position, &(&D_00189E20_view)->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
-        if (PLAYER->control_mode == 17) {
-            if (!func_00277258(0.6f, &PLAYER->position, 0x24, PLAYER->moby)) break;
-        } else if (PLAYER->control_mode == 15) {
-            if (!func_00277258(0.54f, &PLAYER->position, 0x24, PLAYER->moby)) break;
+        if ((&D_00189E20_view)->control_mode == 17) {
+            if (!func_00277258(0.6f, &(&D_00189E20_view)->position, 0x24, (&D_00189E20_view)->moby)) break;
+        } else if ((&D_00189E20_view)->control_mode == 15) {
+            if (!func_00277258(0.54f, &(&D_00189E20_view)->position, 0x24, (&D_00189E20_view)->moby)) break;
         } else {
-            PlayerView *player = PLAYER;
+            PlayerView *player = (&D_00189E20_view);
             if (player->gravity_mode || facingUp) {
                 hit = func_00277258(player->capsule_radius, &player->position, 0x24, player->moby);
                 if (!player->locked)
@@ -183,15 +181,15 @@ int func_PAL_L00_002B5518(int mode)
                 if (!hit) break;
             }
         }
-        qcopy(&PLAYER->position, &HIT->position);
-        qcopy(&PLAYER->wall_contact_normal, &HIT->normal);
-        qcopy(&PLAYER->wall_contact_point, &HIT->point);
-        PLAYER->wall_hit = 1;
-        PLAYER->coll_hit_moby = HIT->moby;
+        qcopy(&(&D_00189E20_view)->position, &((CollisionView *)D_L00_001BF210)->position);
+        qcopy(&(&D_00189E20_view)->wall_contact_normal, &((CollisionView *)D_L00_001BF210)->normal);
+        qcopy(&(&D_00189E20_view)->wall_contact_point, &((CollisionView *)D_L00_001BF210)->point);
+        (&D_00189E20_view)->wall_hit = 1;
+        (&D_00189E20_view)->coll_hit_moby = ((CollisionView *)D_L00_001BF210)->moby;
     }
-    func_00282CF0(&PLAYER->position, &PLAYER->position, &offset);
-    func_00282CF0(&displacement, &PLAYER->position, &previous);
-    if (func_00282DF0(&displacement) > PLAYER->capsule_radius * 1.5f) {
+    func_00282CF0(&(&D_00189E20_view)->position, &(&D_00189E20_view)->position, &offset);
+    func_00282CF0(&displacement, &(&D_00189E20_view)->position, &previous);
+    if (func_00282DF0(&displacement) > (&D_00189E20_view)->capsule_radius * 1.5f) {
         if (mode == 15) {
             if (displacement.x > 512.0f) displacement.x = 512.0f;
             else if (displacement.x < -512.0f) displacement.x = -512.0f;
@@ -199,8 +197,8 @@ int func_PAL_L00_002B5518(int mode)
             else if (displacement.y < -512.0f) displacement.y = -512.0f;
             if (displacement.z > 512.0f) displacement.z = 512.0f;
             else if (displacement.z < -512.0f) displacement.z = -512.0f;
-            func_00282F20(&displacement, &displacement, PLAYER->capsule_radius);
-            func_00282CC0(&PLAYER->position, &previous, &displacement);
+            func_00282F20(&displacement, &displacement, (&D_00189E20_view)->capsule_radius);
+            func_00282CC0(&(&D_00189E20_view)->position, &previous, &displacement);
         }
         return -1;
     }

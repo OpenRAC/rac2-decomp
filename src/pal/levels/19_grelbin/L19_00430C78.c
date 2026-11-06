@@ -40,10 +40,7 @@ extern u8 D_L19_001BFC40[];
 
 #define H(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define I(p, o) (*(int *)((u8 *)(p) + (o)))
-#define QUANTITY D_001A79F8[9]
 /* The two prices in the level's table, each with a second value used when the flag is set. */
-#define PRICE_A (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14])
-#define PRICE_B (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16])
 
 void func_PAL_L19_00430C78(u8 *self)
 {
@@ -63,11 +60,11 @@ void func_PAL_L19_00430C78(u8 *self)
             I(self, 0x98) = I(*(u8 **)(self + 0x24), 0x10);
             if (D_001395B8[0x89]) {
                 func_L19_0042A860();
-                if (QUANTITY < 1)
+                if (D_001A79F8[9] < 1)
                     func_002A7750(self, 7, -1);
                 else
                     func_002A7750(self, 8, -1);
-            } else if (QUANTITY < PRICE_B)
+            } else if (D_001A79F8[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
                 func_002A7750(self, 4, -1);
             else
                 func_002A7750(self, 5, -1);
@@ -76,7 +73,7 @@ void func_PAL_L19_00430C78(u8 *self)
             func_L19_0042A860();
             H(self, 0x34) = (H(self, 0x34) & 0xFFBE) | 0x1000;
             I(self, 0x98) = I(*(u8 **)(self + 0x24), 0x10);
-            if (QUANTITY < PRICE_A)
+            if (D_001A79F8[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]))
                 func_002A7750(self, 1, -1);
             else
                 func_002A7750(self, 2, -1);
@@ -86,18 +83,18 @@ void func_PAL_L19_00430C78(u8 *self)
         }
         break;
     case 1:
-        if (QUANTITY >= PRICE_A)
+        if (D_001A79F8[9] >= (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]))
             func_002A7750(self, 2, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x132E, PRICE_A, -1);
+            func_L01_00324550(0x132E, (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]), -1);
             func_L01_003246D0(self);
         }
         break;
     case 2:
-        if (QUANTITY < PRICE_A)
+        if (D_001A79F8[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]))
             func_002A7750(self, 1, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x132F, PRICE_A, -1);
+            func_L01_00324550(0x132F, (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]), -1);
             func_L01_003246D0(self);
             if (D_00138324 & 0x10) {
                 func_00288AA0(D_L19_001BFC40, 0x9A);
@@ -121,7 +118,7 @@ void func_PAL_L19_00430C78(u8 *self)
             D_L19_001B2724[1] = 0;
             self[0x31] = 1;
             H(self, 0x34) &= 0xFFFE;
-            QUANTITY -= PRICE_A;
+            D_001A79F8[9] -= (D_L19_001A7C80[0xF] ? D_L19_0028E950[15] : D_L19_0028E950[14]);
             if (self[0x21] != 0xFF)
                 func_002A8598(self[0x21], 1);
             if (I(data, 0x80) != -1) {
@@ -129,25 +126,25 @@ void func_PAL_L19_00430C78(u8 *self)
                 I(data, 0x80) = -1;
             }
             func_0029B3E0(0, -1);
-            if ((u32)QUANTITY <= PRICE_B)
+            if ((u32)D_001A79F8[9] <= (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
                 func_002A7750(self, 4, -1);
             else
                 func_002A7750(self, 5, -1);
         }
         break;
     case 4:
-        if (QUANTITY >= PRICE_B)
+        if (D_001A79F8[9] >= (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
             func_002A7750(self, 5, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x1330, PRICE_B, -1);
+            func_L01_00324550(0x1330, (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]), -1);
             func_L01_003246D0(self);
         }
         break;
     case 5:
-        if (QUANTITY < PRICE_B)
+        if (D_001A79F8[9] < (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]))
             func_002A7750(self, 4, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x1331, PRICE_B, -1);
+            func_L01_00324550(0x1331, (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]), -1);
             func_L01_003246D0(self);
             if (D_00138324 & 0x10) {
                 func_00288AA0(D_L19_001BFC40, 0x99);
@@ -163,7 +160,7 @@ void func_PAL_L19_00430C78(u8 *self)
             H(self, 0x34) |= 1;
         }
         if (!func_002F5D10()) {
-            QUANTITY -= PRICE_B;
+            D_001A79F8[9] -= (D_L19_001A7C80[0xF] ? D_L19_0028E950[17] : D_L19_0028E950[16]);
             D_L19_001B2724[1] = 0;
             self[0x31] = 1;
             H(self, 0x34) &= 0xFFFE;
@@ -181,14 +178,14 @@ void func_PAL_L19_00430C78(u8 *self)
             else
                 func_00288E18(0xA10, 0x67);
             func_0029B3E0(0, -1);
-            if (QUANTITY < 1)
+            if (D_001A79F8[9] < 1)
                 func_002A7750(self, 7, -1);
             else
                 func_002A7750(self, 8, -1);
         }
         break;
     case 7:
-        if (QUANTITY > 0)
+        if (D_001A79F8[9] > 0)
             func_002A7750(self, 8, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
             if (!D_L19_001B1FB8[0])
@@ -199,27 +196,27 @@ void func_PAL_L19_00430C78(u8 *self)
         }
         break;
     case 8:
-        if (QUANTITY < 1)
+        if (D_001A79F8[9] < 1)
             func_002A7750(self, 7, -1);
         else if (func_L01_003245E0(self, 10, 2.5f)) {
             if (func_00288D58()) {
-                func_L01_00324550(0x1333, QUANTITY, QUANTITY * 30000, -1);
+                func_L01_00324550(0x1333, D_001A79F8[9], D_001A79F8[9] * 30000, -1);
                 func_L01_003246D0(self);
                 if (D_00138324 & 0x10) {
                     func_L19_0042A860();
-                    D_001A79F8[0] += QUANTITY * 30000;
-                    QUANTITY = 0;
+                    D_001A79F8[0] += D_001A79F8[9] * 30000;
+                    D_001A79F8[9] = 0;
                     func_L00_0030C710(((s32)(180) * 5 + 2) / 6);
                     func_002E5DA0(0, 0, (char *)self, func_002A7820(13, 17));
                     func_002A7750(self, 9, -1);
                 }
             } else {
-                func_L01_00324550(0x1333, QUANTITY, QUANTITY * 3000, -1);
+                func_L01_00324550(0x1333, D_001A79F8[9], D_001A79F8[9] * 3000, -1);
                 func_L01_003246D0(self);
                 if (D_00138324 & 0x10) {
                     func_L19_0042A860();
-                    D_001A79F8[0] += QUANTITY * 3000;
-                    QUANTITY = 0;
+                    D_001A79F8[0] += D_001A79F8[9] * 3000;
+                    D_001A79F8[9] = 0;
                     func_L00_0030C710(((s32)(180) * 5 + 2) / 6);
                     func_002A7750(self, 9, -1);
                 }

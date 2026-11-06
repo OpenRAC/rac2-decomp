@@ -108,8 +108,6 @@ extern int func_00282948(int *);
 extern void func_PAL_L00_002AF458(void);
 
 /* Field views retain the measured resident layout without asserting its extent. */
-#define ACTION D_00189E20.action
-#define MOTION D_00189E20.motion
 
 /* Equipped-item input for the current hero state, as in RAC1's
  * process_hero_item_action_input: starts the matching move and returns 1 when
@@ -142,15 +140,15 @@ int func_PAL_L01_002C1C58(void)
     switch (request) {
     case 10:
         if (D_00189E20.attackDisabled) break;
-        if (MOTION < 2 || (MOTION == 4 && D_00189E20.canAttack)) {
+        if (D_00189E20.motion < 2 || (D_00189E20.motion == 4 && D_00189E20.canAttack)) {
             if (func_L00_0032EF10(mask, 8, &scratch.attackBuffered)) {
                 object = D_00189E20.actionObject;
                 if (!object) goto clearPending;
                 if (!func_L00_002B3248((unsigned char *)object) || *(unsigned char *)(object + 0x20))
                     goto clearPending;
                 if ((D_00138180.buttons.word.buffered & 8) ||
-                    ((ACTION == 1 || ACTION == 0x1D) && D_00189E20.transitionTimer > 17)) {
-                    if ((ACTION == 1 || ACTION == 0x1D) && D_00189E20.transitionTimer > 17) {
+                    ((D_00189E20.action == 1 || D_00189E20.action == 0x1D) && D_00189E20.transitionTimer > 17)) {
+                    if ((D_00189E20.action == 1 || D_00189E20.action == 0x1D) && D_00189E20.transitionTimer > 17) {
                         func_PAL_L00_002BA480();
                         goto clearPending;
                     }
@@ -160,18 +158,18 @@ int func_PAL_L01_002C1C58(void)
                 }
             }
         } else {
-            if (ACTION == 7 || ACTION == 9 || ACTION == 0x89 || ACTION == 8 || ACTION == 6 ||
-                (ACTION == 0xE && D_00189E20.animationFrame > 32.0f) ||
-                (ACTION == 0xB && D_00189E20.airStyle != 3 && D_00189E20.animationFrame > 18.0f) ||
-                (ACTION == 0xB && D_00189E20.airStyle == 3 && D_00189E20.animationFrame > 20.0f) ||
-                ACTION == 0x2C || ACTION == 0x11) {
+            if (D_00189E20.action == 7 || D_00189E20.action == 9 || D_00189E20.action == 0x89 || D_00189E20.action == 8 || D_00189E20.action == 6 ||
+                (D_00189E20.action == 0xE && D_00189E20.animationFrame > 32.0f) ||
+                (D_00189E20.action == 0xB && D_00189E20.airStyle != 3 && D_00189E20.animationFrame > 18.0f) ||
+                (D_00189E20.action == 0xB && D_00189E20.airStyle == 3 && D_00189E20.animationFrame > 20.0f) ||
+                D_00189E20.action == 0x2C || D_00189E20.action == 0x11) {
                 if (D_00189E20.transitionTimer > 8) {
                     int airWindow = 0xC;
-                    if (ACTION == 0xB || ACTION == 0xE) airWindow = 0xF;
+                    if (D_00189E20.action == 0xB || D_00189E20.action == 0xE) airWindow = 0xF;
                     if (!func_L00_0032EF10(mask, airWindow, 0)) goto clearPending;
                     if ((!D_00189E20.highAttack && D_00189E20.height > 0.1f) ||
                         (D_00189E20.highAttack && D_00189E20.height > 0.57f) ||
-                        (ACTION == 8 && D_00189E20.height > 0.57f)) {
+                        (D_00189E20.action == 8 && D_00189E20.height > 0.57f)) {
                         if (!D_00189E20.attackBlock && !D_00189E20.pendingAttack)
                             func_PAL_L01_002BEC60(0x14, 1);
                     } else {
@@ -180,9 +178,9 @@ int func_PAL_L01_002C1C58(void)
                     goto clearPending;
                 }
             }
-            if (MOTION == 6) {
+            if (D_00189E20.motion == 6) {
                 timing = D_L01_0025EC90[D_00189E20.animationIndex];
-                if (ACTION == 0x15 && D_00189E20.transitionTimer > 25) {
+                if (D_00189E20.action == 0x15 && D_00189E20.transitionTimer > 25) {
                     if (D_00189E20.actionLock) goto checkAnimationLock;
                     if (D_00189E20.animationLock) goto clearPending;
                     if ((float)*(int *)(timing + 0x10) <= D_00189E20.animationFrame &&
@@ -216,8 +214,8 @@ clearPending:
         break;
 
     case 22: case 65:
-        if (ACTION == 1 || ACTION == 0x1D ||
-            (MOTION > 1 && MOTION != 12 && (MOTION != 4 || !D_00189E20.canAttack)) ||
+        if (D_00189E20.action == 1 || D_00189E20.action == 0x1D ||
+            (D_00189E20.motion > 1 && D_00189E20.motion != 12 && (D_00189E20.motion != 4 || !D_00189E20.canAttack)) ||
             (D_00189E20.queuedAction && D_00189E20.queuedAction != 22 && D_00189E20.queuedAction != 65)) break;
         if (!(D_00138180.buttons.word.buffered & 0x20) || D_00189E20.actionAge < 19) break;
         if (func_L00_002D4040(request)) {
@@ -258,17 +256,17 @@ clearPending:
     case 12: case 15: case 17: case 31: {
         int actionAge;
         int actionWindow;
-        if (((MOTION != 0 || ACTION == 0x1D) && MOTION != 1 && MOTION != 12 &&
-             MOTION != 5 && MOTION != 15 && (MOTION != 4 || !D_00189E20.allowAction) &&
-             (ACTION != 0x22 || !(D_00189E20.animationFrame > 55.0f))) || D_00189E20.busy) break;
+        if (((D_00189E20.motion != 0 || D_00189E20.action == 0x1D) && D_00189E20.motion != 1 && D_00189E20.motion != 12 &&
+             D_00189E20.motion != 5 && D_00189E20.motion != 15 && (D_00189E20.motion != 4 || !D_00189E20.allowAction) &&
+             (D_00189E20.action != 0x22 || !(D_00189E20.animationFrame > 55.0f))) || D_00189E20.busy) break;
         actionAge = D_00189E20.actionAge;
         actionWindow = actionAge;
         if (actionAge >= 6) actionWindow = 6;
         if (!func_L00_0032EF10(mask, actionWindow, &scratch.actionBuffered) && !(D_00138180.buttons.word.buffered & 0x20)) break;
         if (actionAge < 19) break;
         if (func_L00_002D4040(-1)) {
-            if (MOTION == 12 || MOTION == 0 || ACTION == 3 ||
-                (MOTION == 1 && D_00189E20.blend < 0.7f)) {
+            if (D_00189E20.motion == 12 || D_00189E20.motion == 0 || D_00189E20.action == 3 ||
+                (D_00189E20.motion == 1 && D_00189E20.blend < 0.7f)) {
                 func_PAL_L01_002BEC60(0x22, 1);
                 goto complete;
             }
@@ -282,8 +280,8 @@ clearPending:
     case 53: {
         int wrenchAge;
         int wrenchWindow;
-        if (MOTION > 1 && (MOTION != 4 || !D_00189E20.canAttack)) break;
-        if (ACTION != 1) {
+        if (D_00189E20.motion > 1 && (D_00189E20.motion != 4 || !D_00189E20.canAttack)) break;
+        if (D_00189E20.action != 1) {
             wrenchAge = D_00189E20.actionAge;
             wrenchWindow = 8;
             if (wrenchAge < 8) wrenchWindow = wrenchAge;
@@ -299,11 +297,11 @@ clearPending:
 complete:
     if (D_00189E20.transitionTimer == previousTimer) {
         if (D_001A7B2E && D_001A7398[1] == 0x36 &&
-            ACTION != 0x1D && ACTION != 1 &&
+            D_00189E20.action != 0x1D && D_00189E20.action != 1 &&
             !(D_00189E20.flags & 0xFFFFFFFF00000000UL)) {
             func_00282948(&D_L01_001A7CC4);
             if (D_L01_001A7CC4 &&
-                (MOTION < 2 || MOTION == 12 || ((MOTION == 2 || MOTION == 4) && D_00189E20.platformMode)) &&
+                (D_00189E20.motion < 2 || D_00189E20.motion == 12 || ((D_00189E20.motion == 2 || D_00189E20.motion == 4) && D_00189E20.platformMode)) &&
                 (D_00138180.buttons.both & 0x800000008UL) == 0x800000008UL)
                 func_PAL_L01_002BEC60(0x7B, 1);
             if (D_00138180.buttons.word.pressed & 8) D_L01_001A7CC4 = 25;

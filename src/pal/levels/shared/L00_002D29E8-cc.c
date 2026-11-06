@@ -28,7 +28,6 @@ typedef struct {
     u8 pad1[0x2290 - 0xC4C];
     u8 *object;
 } HeroAnimation24E8;
-#define HA ((HeroAnimation24E8 *)D_00189E20)
 
 extern u8 D_00188660[];
 extern u8 D_L00_001B4400[];
@@ -68,18 +67,18 @@ void func_PAL_L00_002D29E8(void)
     base = D_00189E20;
     obj = *(AnimObject **)(base + 0x2290);
     func_L00_002D1F60();
-    HA->flags &= ~3;
+    ((HeroAnimation24E8 *)D_00189E20)->flags &= ~3;
     oldFrame = obj->frame;
     oldTime = obj->time;
     same = obj->seq == obj->nextSeq;
     if (obj->seq == obj->nextSeq) {
-        obj->time = oldTime + ((HA->speed) * 1.2f) * HA->rate;
-    } else if (HA->curve >= 0) {
-        frame = HA->step;
-        obj->time = D_L00_0025DB20[HA->curve][frame];
-        HA->step = frame + 1;
+        obj->time = oldTime + ((((HeroAnimation24E8 *)D_00189E20)->speed) * 1.2f) * ((HeroAnimation24E8 *)D_00189E20)->rate;
+    } else if (((HeroAnimation24E8 *)D_00189E20)->curve >= 0) {
+        frame = ((HeroAnimation24E8 *)D_00189E20)->step;
+        obj->time = D_L00_0025DB20[((HeroAnimation24E8 *)D_00189E20)->curve][frame];
+        ((HeroAnimation24E8 *)D_00189E20)->step = frame + 1;
     } else {
-        obj->time = oldTime + ((HA->rate) * 1.2f);
+        obj->time = oldTime + ((((HeroAnimation24E8 *)D_00189E20)->rate) * 1.2f);
     }
     if (obj->time > 0.99f && obj->time < 1.01f)
         obj->time = 1.0f;
@@ -93,23 +92,23 @@ void func_PAL_L00_002D29E8(void)
                 obj->seq = obj->nextSeq;
                 obj->triggers = obj->model->seqs[obj->seq]->triggers;
             }
-            HA->curve = -1;
-            HA->flags |= 1;
+            ((HeroAnimation24E8 *)D_00189E20)->curve = -1;
+            ((HeroAnimation24E8 *)D_00189E20)->flags |= 1;
             obj->current = buffer;
             obj->frame = obj->nextFrame;
             func_00282AB0(buffer, buffer + 0x600, 0x600);
             obj->nextFrame++;
-            if (HA->request) {
-                HA->request = 0;
-                HA->rate = 1.0f / 0.0f; /* Retail uses a pooled positive infinity. */
+            if (((HeroAnimation24E8 *)D_00189E20)->request) {
+                ((HeroAnimation24E8 *)D_00189E20)->request = 0;
+                ((HeroAnimation24E8 *)D_00189E20)->rate = 1.0f / 0.0f; /* Retail uses a pooled positive infinity. */
                 /* Convert the cleared request, retaining the shared floating zero. */
-                obj->time = HA->request;
+                obj->time = ((HeroAnimation24E8 *)D_00189E20)->request;
                 obj->nextFrame = *(u8 *)(D_00189E20 + 0xC44);
                 obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)(buffer + 0x600));
                 func_L00_002D24B8();
                 func_L00_002D20D0();
-            } else if (HA->queued != -1 && HA->queuedFrame < obj->nextFrame) {
-                HA->rate = 0.33333334f;
+            } else if (((HeroAnimation24E8 *)D_00189E20)->queued != -1 && ((HeroAnimation24E8 *)D_00189E20)->queuedFrame < obj->nextFrame) {
+                ((HeroAnimation24E8 *)D_00189E20)->rate = 0.33333334f;
                 obj->time = 0.0f;
                 obj->nextFrame = *(u8 *)(D_00189E20 + 0xC40);
                 obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)(buffer + 0x600));
@@ -118,13 +117,13 @@ void func_PAL_L00_002D29E8(void)
                 entry = obj->model->seqs[obj->nextSeq];
                 if ((u32)obj->nextFrame >= (u32)entry->count) {
                     obj->nextFrame = 0;
-                    HA->flags |= 2;
+                    ((HeroAnimation24E8 *)D_00189E20)->flags |= 2;
                 }
                 obj->next = func_L00_002A4DB0((char *)obj, obj->nextSeq, obj->nextFrame, (s32)D_L00_001B4A00);
                 obj->time -= 1.0f;
-                obj->time /= HA->rate;
-                HA->rate = *(float *)obj->current;
-                obj->time *= HA->rate;
+                obj->time /= ((HeroAnimation24E8 *)D_00189E20)->rate;
+                ((HeroAnimation24E8 *)D_00189E20)->rate = *(float *)obj->current;
+                obj->time *= ((HeroAnimation24E8 *)D_00189E20)->rate;
             }
         } while (obj->time >= 1.0f);
     }
@@ -160,10 +159,10 @@ void func_PAL_L00_002D29E8(void)
     }
     func_L00_002D1ED8();
     func_L00_002D2070();
-    prior = HA->frame;
+    prior = ((HeroAnimation24E8 *)D_00189E20)->frame;
     time = func_0029F530((char *)obj);
-    HA->frame = time;
-    if (time >= prior) HA->delta = time - prior;
-    else HA->delta = delta;
-    HA->changing = obj->seq != obj->nextSeq;
+    ((HeroAnimation24E8 *)D_00189E20)->frame = time;
+    if (time >= prior) ((HeroAnimation24E8 *)D_00189E20)->delta = time - prior;
+    else ((HeroAnimation24E8 *)D_00189E20)->delta = delta;
+    ((HeroAnimation24E8 *)D_00189E20)->changing = obj->seq != obj->nextSeq;
 }

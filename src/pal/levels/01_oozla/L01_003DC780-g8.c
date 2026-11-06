@@ -25,7 +25,6 @@ typedef int Quad __attribute__((mode(TI)));
 #define H(p,o) (*(s16 *)((u8 *)(p)+(o)))
 typedef struct { u8 pad[0x34E]; s16 mode; } Hero;
 extern Hero D_00189E20 NOT_SDA;
-#define HERO ((u8 *)&D_00189E20)
 extern u8 *D_L01_001B255C;
 extern u8 D_L01_002A4E20[];
 extern f32 D_L01_001B0768 __attribute__((sda));
@@ -88,8 +87,8 @@ void func_PAL_L01_003DC780(u8 *m)
         if(!other || other[0x20]==0xFE || other[0x20]==0xFD) m[0x20]=2;
         break;
     case 2:
-        if(D_00189E20.mode==0 && *(u8 **)(HERO+0x33C)==m) {
-            func_00282CF0(relative,HERO+0x80,m+0x10);
+        if(D_00189E20.mode==0 && *(u8 **)(((u8 *)&D_00189E20)+0x33C)==m) {
+            func_00282CF0(relative,((u8 *)&D_00189E20)+0x80,m+0x10);
             x=func_00282DB0(relative,m+0xC0);
             y=func_00282DB0(relative,m+0xD0);
             k=D_L01_001B076C;
@@ -99,9 +98,9 @@ void func_PAL_L01_003DC780(u8 *m)
             scale=k*x;
             func_002AA898(s+0x60,pitch,s+0x70,D_L01_001B077C*1.44f,D_L01_001B0780*1.44f,D_L01_001B0784*1.2f,0);
             func_002AA898(s+0x64,scale,s+0x74,D_L01_001B077C*1.44f,D_L01_001B0780*1.44f,D_L01_001B0784*1.2f,0);
-            func_L01_00316C48(HERO+0x80,move,m+0x10,oldAngle,s+0x60);
-            func_00282CF0(HERO+0x100,move,HERO+0x80);
-            F(HERO,0x108)+=F(m,0x18)-oldPos[2];
+            func_L01_00316C48(((u8 *)&D_00189E20)+0x80,move,m+0x10,oldAngle,s+0x60);
+            func_00282CF0(((u8 *)&D_00189E20)+0x100,move,((u8 *)&D_00189E20)+0x80);
+            F(((u8 *)&D_00189E20),0x108)+=F(m,0x18)-oldPos[2];
         } else {
             speed=D_L01_001B0774;
             step=(F(s,0x84)-F(m,0x18))*0.020000001f;

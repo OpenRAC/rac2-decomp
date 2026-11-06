@@ -75,7 +75,6 @@ extern void func_L00_002D6B70(int);
 extern void func_00291450(int);
 extern void func_00283098(void *, void *, void *);
 
-#define HERO ((Hero *)D_00189E20)
 #define TYPE(m) (*(short *)((m) + 0xAA))
 
 void func_PAL_L00_003AA2D8(char *moby)
@@ -86,7 +85,7 @@ void func_PAL_L00_003AA2D8(char *moby)
     char *state = *(char **)(moby + 0x68);
     char *target = 0;
     float previousRange, horizontal, vertical;
-    int specialMode = HERO->i[0x1244 / 4] == 3;
+    int specialMode = ((Hero *)D_00189E20)->i[0x1244 / 4] == 3;
 
     if (D_L00_001A8F00 == 8)
         return;
@@ -112,8 +111,8 @@ void func_PAL_L00_003AA2D8(char *moby)
         dst[1] = muzzle[1];
         dst[2] = muzzle[2];
     }
-    func_00282D30(playerPoint, (char *)HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-    func_00282CC0(playerPoint, &HERO->f[0x80 / 4], playerPoint);
+    func_00282D30(playerPoint, (char *)((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
+    func_00282CC0(playerPoint, &((Hero *)D_00189E20)->f[0x80 / 4], playerPoint);
     vertical = D_L00_001B2870;
     D_L00_001B2868 = D_L00_001B2870 = 0.1047197655f;
     *(int *)(state + 0x2C) = 0;
@@ -132,19 +131,19 @@ void func_PAL_L00_003AA2D8(char *moby)
             }
             if (!locked || *(u8 *)(locked + 0x20) == 0xFE || *(u8 *)(locked + 0x20) == 0xFD
                 || (component && *component <= 0.0f && !func_002ABB78(locked))
-                || !*(u8 *)(locked + 0x31) || HERO->h[0x24EC / 2]) {
+                || !*(u8 *)(locked + 0x31) || ((Hero *)D_00189E20)->h[0x24EC / 2]) {
                 target = 0;
                 *(short *)(state + 4) = -1;
                 *(int *)state = 0;
                 *(int *)(state + 8) = 0;
             } else {
-                HERO->ptr[0xBF8 / 4] = locked;
+                ((Hero *)D_00189E20)->ptr[0xBF8 / 4] = locked;
             }
         }
     }
-    if (!HERO->i[0x1500 / 4] && *(u8 *)(moby + 0x20) == 1 && !HERO->h[0x24EC / 2] && *(short *)(state + 6) == 0) {
+    if (!((Hero *)D_00189E20)->i[0x1500 / 4] && *(u8 *)(moby + 0x20) == 1 && !((Hero *)D_00189E20)->h[0x24EC / 2] && *(short *)(state + 6) == 0) {
         char *candidate;
-        func_002AF000(offset, 1.0f, HERO->f[0x778 / 4], HERO->f[0x774 / 4]);
+        func_002AF000(offset, 1.0f, ((Hero *)D_00189E20)->f[0x778 / 4], ((Hero *)D_00189E20)->f[0x774 / 4]);
         candidate = func_L00_00324D18(playerPoint, offset, vertical, horizontal, previousRange, 0.7853982449f, 0.6108652949f, 1);
         if (candidate) {
             if (candidate == *(char **)(state + 0x30)) {
@@ -178,10 +177,10 @@ void func_PAL_L00_003AA2D8(char *moby)
                 *(int *)(state + 0x34) = ((s32)D_L00_001AF6CC * 5 + 2) / 6;
         }
         *(char **)(state + 0x30) = candidate;
-    } else if (HERO->i[0x1500 / 4]) {
+    } else if (((Hero *)D_00189E20)->i[0x1500 / 4]) {
         *(int *)state = 0;
     }
-    if (HERO->i[0x2294 / 4] == 29 || HERO->i[0x1500 / 4]) {
+    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 29 || ((Hero *)D_00189E20)->i[0x1500 / 4]) {
         func_00273318(moby, 1.0f, *(float *)(state + 0xC) > 0.0f && func_L00_002D4040(-1) ? 0x600000FF : 0x600FFF0F, 0, 0x26, 0.0f, -1, 90.0f, 4);
     }
     if (*(char **)state) {
@@ -189,25 +188,25 @@ void func_PAL_L00_003AA2D8(char *moby)
         func_00273318(moby, func_00282C48(0.9f - distance * 0.006666667f * 0.65f), 0xFF0FFF0F, targetPosition, 0x26, 0.0f, -1, 90.0f, 4);
     }
     if (*(int *)(state + 0x28) > 0
-        && (*(int *)(state + 0x28) > 6 || !(D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) || !func_L00_002D4040(-1)))
+        && (*(int *)(state + 0x28) > 6 || !(D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) || !func_L00_002D4040(-1)))
         (*(int *)(state + 0x28))--;
     if (*(u8 *)(moby + 0x42) == *(u8 *)(moby + 0x43) && (*(u8 *)(moby + 0x60) & 2))
         func_002A75E0(moby, 1, 0, 2, 0);
     switch (*(u8 *)(moby + 0x20)) {
     case 1: {
         int ready;
-        if (HERO->i[0x2294 / 4] == 1)
+        if (((Hero *)D_00189E20)->i[0x2294 / 4] == 1)
             func_PAL_L00_002C4480(29, 1);
         ready = 1;
-        if (HERO->i[0x2294 / 4] == 29)
+        if (((Hero *)D_00189E20)->i[0x2294 / 4] == 29)
         {
             ready = 0;
-            if (func_00282948(&HERO->i[0x2534 / 4]))
+            if (func_00282948(&((Hero *)D_00189E20)->i[0x2534 / 4]))
                 ready = 1;
         }
         else
-            HERO->i[0x2534 / 4] = 33;
-        if (func_002829D8(state + 0xC) && !HERO->b[0x22BC] && (D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) && ready) {
+            ((Hero *)D_00189E20)->i[0x2534 / 4] = 33;
+        if (func_002829D8(state + 0xC) && !((Hero *)D_00189E20)->b[0x22BC] && (D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) && ready) {
             if (func_L00_002D3F30(-1, 1)) {
                 int count, i;
                 D_L00_001B2874 = 1;
@@ -245,7 +244,7 @@ void func_PAL_L00_003AA2D8(char *moby)
                 count = func_00277F48(0.5f, muzzle, 0, moby, 0);
                 for (i = 0; i < count; i++) {
                     float *component;
-                    if (D_L00_001C3280[i] == HERO->ptr[0x2290 / 4])
+                    if (D_L00_001C3280[i] == ((Hero *)D_00189E20)->ptr[0x2290 / 4])
                         continue;
                     component = func_002AB1F0(D_L00_001C3280[i]);
                     if (!component)
@@ -269,7 +268,7 @@ void func_PAL_L00_003AA2D8(char *moby)
                     func_PAL_L00_003E74D8(center, 0x19, 1);
                 }
             } else {
-                if ((D_00138180[0x1A4 / 4] & HERO->i[0x1230 / 4]) || D_L00_001B2874 == 1) {
+                if ((D_00138180[0x1A4 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) || D_L00_001B2874 == 1) {
                     func_002E5CF8(1, 0, moby);
                     D_L00_001B2874 = 0;
                 }
@@ -279,7 +278,7 @@ void func_PAL_L00_003AA2D8(char *moby)
                 }
             }
         }
-        if (!((D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) && func_L00_002D4040(-1) && HERO->b[0x22B8])) {
+        if (!((D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) && func_L00_002D4040(-1) && ((Hero *)D_00189E20)->b[0x22B8])) {
             if (*(int *)(state + 0x3C) >= 0) {
                 func_L00_002D6B70(*(int *)(state + 0x3C));
                 *(int *)(state + 0x3C) = -1;
@@ -287,8 +286,8 @@ void func_PAL_L00_003AA2D8(char *moby)
         }
         if (*(int *)(state + 0x3C) > 0 && !func_L00_002D6978(*(int *)(state + 0x3C) - 1))
             *(int *)(state + 0x3C) = -1;
-        if (!((D_00138180[0x1A0 / 4] & HERO->i[0x1230 / 4]) && func_L00_002D4040(-1))
-            && !(HERO->i[0x1D8 / 4] < 8 && HERO->b[0x22B8])) {
+        if (!((D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) && func_L00_002D4040(-1))
+            && !(((Hero *)D_00189E20)->i[0x1D8 / 4] < 8 && ((Hero *)D_00189E20)->b[0x22B8])) {
             func_PAL_L00_002AF6C0();
             *(short *)(state + 0x10) = 0;
         }
@@ -309,10 +308,10 @@ void func_PAL_L00_003AA2D8(char *moby)
             qzero_nc(offset);
             offset[0] = 2.0f;
             offset[2] = 2.0f;
-            func_00283098(offset, offset, &HERO->f[0x730 / 4]);
-            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[0] = HERO->f[0x80 / 4] + offset[0];
-            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[1] = HERO->f[0x84 / 4] + offset[1];
-            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[2] = HERO->f[0x88 / 4] + offset[2];
+            func_00283098(offset, offset, &((Hero *)D_00189E20)->f[0x730 / 4]);
+            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[0] = ((Hero *)D_00189E20)->f[0x80 / 4] + offset[0];
+            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[1] = ((Hero *)D_00189E20)->f[0x84 / 4] + offset[1];
+            (*(int *)(state + 0x24) + D_L00_001C6F40)->position[2] = ((Hero *)D_00189E20)->f[0x88 / 4] + offset[2];
             (*(int *)(state + 0x24) + D_L00_001C6F40)->position[3] = 4.0f;
             {
                 float b;

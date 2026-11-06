@@ -51,7 +51,6 @@ extern float D_L00_001B154C __attribute__((sda));
 extern int D_L00_001B1560 __attribute__((sda));
 extern float D_L00_001B1574 __attribute__((sda));
 extern char D_L00_001B8E20[];
-#define HERO ((Hero *)D_00189E20)
 void func_PAL_L00_004266C8(char *moby, void *out)
 {
     float sp[4], tmp[4];
@@ -61,7 +60,7 @@ void func_PAL_L00_004266C8(char *moby, void *out)
     char *v;
     int use;
     float d;
-    if (HERO->h[0x348 / 2] != 0 || D_L00_001A8FF0 != 0 || (s->hEE != 0 && HERO->h[0x34E / 2] != 0)) {
+    if (((Hero *)D_00189E20)->h[0x348 / 2] != 0 || D_L00_001A8FF0 != 0 || (s->hEE != 0 && ((Hero *)D_00189E20)->h[0x34E / 2] != 0)) {
         s->hEC = 0xC;
         s->fD6 = 1;
         s->hEE = 1;
@@ -95,7 +94,7 @@ void func_PAL_L00_004266C8(char *moby, void *out)
     }
     c = cam + 0x30;
     func_00334710(moby, sp);
-    if (HERO->i[0x2294 / 4] == 0x74) {
+    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x74) {
         func_00282D30(out, c, func_00282DB0(s, c));
         func_00282CF0(s, s, out);
         func_00282D30(out, c, func_00282DB0(c, s->a60));
@@ -116,10 +115,10 @@ void func_PAL_L00_004266C8(char *moby, void *out)
     } else {
         switch (s->st) {
         case 2:
-            if (HERO->i[0x2294 / 4] == 0x11
-                || (HERO->b[0x49E] != 0 && HERO->f[0x31C / 4] > 0.2f)) {
+            if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x11
+                || (((Hero *)D_00189E20)->b[0x49E] != 0 && ((Hero *)D_00189E20)->f[0x31C / 4] > 0.2f)) {
                 u16 t;
-                if (HERO->i[0x2294 / 4] != 0x11) {
+                if (((Hero *)D_00189E20)->i[0x2294 / 4] != 0x11) {
                     d = func_003348A8(moby, s->rB0);
                     if (!(d < D_L00_001B1504) && !(D_L00_001B1500 < d))
                         goto next;
@@ -131,7 +130,7 @@ void func_PAL_L00_004266C8(char *moby, void *out)
             }
         next:
             use = 0;
-            if (HERO->h[0x34C / 2] != 0 && (HERO->b[0x49E] == 0 || HERO->h[0x4AE / 2] >= 0x10)) {
+            if (((Hero *)D_00189E20)->h[0x34C / 2] != 0 && (((Hero *)D_00189E20)->b[0x49E] == 0 || ((Hero *)D_00189E20)->h[0x4AE / 2] >= 0x10)) {
                 use = 1;
             } else {
                 if (func_00334730(tmp, 1) != 1)

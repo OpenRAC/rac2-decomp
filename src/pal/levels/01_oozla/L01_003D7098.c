@@ -93,7 +93,6 @@ extern f32 func_00282E20(void *);
 extern void func_002AEC48(void *, void *, s32, f32, f32);
 extern void func_002AF1D0(void *, void *, s32, s32);
 
-#define ITEM_COST ((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost
 #define STATE_CHILD (*(u8 **)(state + 0x128))
 
 /* An item vendor: offers the current item table entry, compares its cost with D_001A79F8, takes
@@ -116,7 +115,7 @@ void func_PAL_L01_003D7098(PurchaseMoby *moby)
             goto remove_self;
         flag = D_0013978C;
         if (flag >> 7) {
-            if (D_001A79F8[0] < ITEM_COST)
+            if (D_001A79F8[0] < ((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost)
                 func_002A7750(moby, 3, -1);
             else
                 func_002A7750(moby, 4, -1);
@@ -159,28 +158,28 @@ void func_PAL_L01_003D7098(PurchaseMoby *moby)
             moby->flags &= 0xFFFE;
             *(u16 *)(STATE_CHILD + 0x34) &= 0xFFFE;
             STATE_CHILD[0x31] = 1;
-            if (D_001A79F8[0] < ITEM_COST)
+            if (D_001A79F8[0] < ((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost)
                 func_002A7750(moby, 3, -1);
             else
                 func_002A7750(moby, 4, -1);
         }
         break;
     case 3:
-        if (ITEM_COST < D_001A79F8[0]) {
+        if (((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost < D_001A79F8[0]) {
             func_002A7750(moby, 4, -1);
         } else if (func_L01_003245E0(moby, 10, 2.5f)) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x1300, ITEM_COST, -1);
+            func_L01_00324550(0x1300, ((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost, -1);
             func_L01_003246D0(moby);
         }
         break;
     case 4:
-        if (D_001A79F8[0] < ITEM_COST) {
+        if (D_001A79F8[0] < ((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost) {
             func_L00_0030C710(150);
             func_002A7750(moby, 3, -1);
         } else if (func_L01_003245E0(moby, 10, 2.5f)) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x12FE, ITEM_COST, -1);
+            func_L01_00324550(0x12FE, ((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost, -1);
             func_L01_003246D0(moby);
             if ((D_00138324 & 0x10) && func_00288AA0(D_L01_001BF6C0, 40)) {
                 func_00288BE8(D_L01_001BF6C0);
@@ -206,7 +205,7 @@ void func_PAL_L01_003D7098(PurchaseMoby *moby)
             STATE_CHILD[0x31] = 1;
             func_002A8598(moby->group, 1);
             if (!D_001A7B26[0]) {
-                D_001A79F8[0] = D_001A79F8[0] - ITEM_COST;
+                D_001A79F8[0] = D_001A79F8[0] - ((VendorItem *)(D_L01_002637A0 + D_00139568[0x2E] * sizeof(VendorItem)))->cost;
                 func_L00_0030C710(150);
                 func_00288308(46);
                 func_002AD860(46);

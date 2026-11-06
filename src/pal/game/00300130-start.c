@@ -31,7 +31,6 @@ typedef struct {
     float previewFrom[4], previewTo[4];
 } ResidentPreviewPrefix;
 extern unsigned char D_00189E20[];
-#define PREVIEW ((ResidentPreviewPrefix *)D_00189E20)
 /* The voice player's request block (see 00289178.c). */
 typedef struct {
     char pad00[0x24];
@@ -51,8 +50,8 @@ void func_PAL_00300130(void)
 {
     D_001B2310.count = ((s32)(D_001AD7F8) * 5 + 2) / 6;
     D_001B2310.rate = 1.0f / func_00283CE0(D_001B2310.count);
-    qcopy(D_001B2310.from, PREVIEW->previewFrom);
-    qcopy(D_001B2310.to, PREVIEW->previewTo);
+    qcopy(D_001B2310.from, ((ResidentPreviewPrefix *)D_00189E20)->previewFrom);
+    qcopy(D_001B2310.to, ((ResidentPreviewPrefix *)D_00189E20)->previewTo);
     D_001B2310.elapsed = 0;
     if (!D_001A63A8.active && D_001A63A8.key == -1) {
         /* key before selection: the second store of the pair then holds the

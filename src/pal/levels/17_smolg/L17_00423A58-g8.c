@@ -13,10 +13,7 @@ typedef union { Q q; float f[4]; } V;
 /* An offset from a macro-addressed symbol is two words long and never fills a
    delay slot, while a bare macro-addressed scalar can. Retail shows both. */
 extern u8 D_001A7BD8[] MACRO_ADDR, D_L17_001A7C88[] MACRO_ADDR, D_001A7A40 MACRO_ADDR;
-#define D_001A7BDA D_001A7BD8[2]
-#define D_L17_001A7C8F D_L17_001A7C88[7]
 extern s32 D_L17_001B2964[] MACRO_ADDR;
-#define BUSY D_L17_001B2964[1]
 
 extern s32 D_001397F0 NOT_SDA, D_00138324 NOT_SDA;
 extern s32 D_001A79F8 MACRO_ADDR; /* the player's bolts */
@@ -27,7 +24,7 @@ extern u8 D_L17_001BFDC0[];
 typedef struct { char pad[0x30]; s32 lo; s32 hi; } PriceTable;
 extern PriceTable D_L17_0028C550;
 extern s32 D_L17_0028C580 NOT_SDA, D_L17_0028C584 NOT_SDA;
-#define PRICE_LT(m) (D_L17_001A7C8F ? (m) < D_L17_0028C584 : (m) < D_L17_0028C580)
+#define PRICE_LT(m) (D_L17_001A7C88[7] ? (m) < D_L17_0028C584 : (m) < D_L17_0028C580)
 
 typedef struct { char pad[0x80]; char obj[0x60]; V pos; } HeroRecord;
 extern HeroRecord D_00189E20;
@@ -62,7 +59,7 @@ void func_PAL_L17_00423A58(s32 obj) {
     func_L04_00423178(obj);
     switch (B(obj, 0x20)) {
     case 0:
-        if (D_001A7BDA) goto destroy;
+        if (D_001A7BD8[2]) goto destroy;
         if (D_001397F0 & 0x200) {
             s32 bolts = D_001A79F8;
             if (PRICE_LT(bolts)) func_002A7750(obj, 3, -1);
@@ -80,13 +77,13 @@ void func_PAL_L17_00423A58(s32 obj) {
         }
         break;
     case 2:
-        BUSY = 1;
+        D_L17_001B2964[1] = 1;
         if (D_L17_001A8F00 == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
         }
         if (!func_002F5D10()) {
-            BUSY = 0;
+            D_L17_001B2964[1] = 0;
             {
                 s32 p = D_L17_001B2D0C + (I(data, 0x120) << 7);
                 func_L00_002B9D60(p + 0x30, p + 0x70, 0, 1);
@@ -103,21 +100,21 @@ void func_PAL_L17_00423A58(s32 obj) {
     case 3:
         {
             s32 bolts = D_001A79F8;
-            if (D_L17_001A7C8F ? D_L17_0028C550.hi < bolts : D_L17_0028C550.lo < bolts) {
+            if (D_L17_001A7C88[7] ? D_L17_0028C550.hi < bolts : D_L17_0028C550.lo < bolts) {
                 func_002A7750(obj, 4, -1);
                 break;
             }
         }
         if (func_L01_003245E0(obj, 10, 4.f)) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x1329, D_L17_001A7C8F ? D_L17_0028C550.hi : D_L17_0028C550.lo, -1);
+            func_L01_00324550(0x1329, D_L17_001A7C88[7] ? D_L17_0028C550.hi : D_L17_0028C550.lo, -1);
             func_L01_003246D0(obj);
         }
         break;
     case 4:
         {
             s32 bolts = D_001A79F8;
-            if (D_L17_001A7C8F ? bolts < D_L17_0028C550.hi : bolts < D_L17_0028C550.lo) {
+            if (D_L17_001A7C88[7] ? bolts < D_L17_0028C550.hi : bolts < D_L17_0028C550.lo) {
                 func_L00_0030C710(150);
                 func_002A7750(obj, 3, -1);
                 break;
@@ -125,7 +122,7 @@ void func_PAL_L17_00423A58(s32 obj) {
         }
         if (func_L01_003245E0(obj, 10, 4.f)) {
             func_L00_0030C710(150);
-            func_L01_00324550(0x132a, D_L17_001A7C8F ? D_L17_0028C550.hi : D_L17_0028C550.lo, -1);
+            func_L01_00324550(0x132a, D_L17_001A7C88[7] ? D_L17_0028C550.hi : D_L17_0028C550.lo, -1);
             func_L01_003246D0(obj);
             if ((D_00138324 & 0x10) && func_00288AA0(D_L17_001BFDC0, 0x8a)) {
                 func_00288AA0(D_L17_001BFDC0, 0x12);
@@ -136,19 +133,19 @@ void func_PAL_L17_00423A58(s32 obj) {
         }
         break;
     case 5:
-        BUSY = 1;
+        D_L17_001B2964[1] = 1;
         if (D_L17_001A8F00 == 2) {
             B(obj, 0x31) = 0;
             H(obj, 0x34) |= 1;
         }
         if (!func_002F5D10()) {
-            BUSY = 0;
+            D_L17_001B2964[1] = 0;
             B(obj, 0x31) = 1;
             H(obj, 0x34) &= 0xfffe;
-            if (!D_001A7BDA) {
+            if (!D_001A7BD8[2]) {
                 {
                     s32 bolts = D_001A79F8;
-                    D_001A79F8 = bolts - (D_L17_001A7C8F ? D_L17_0028C584 : D_L17_0028C580);
+                    D_001A79F8 = bolts - (D_L17_001A7C88[7] ? D_L17_0028C584 : D_L17_0028C580);
                 }
                 func_L00_0030C710(150);
                 func_002AD7B8(0x12);

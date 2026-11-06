@@ -5,8 +5,6 @@ typedef int HeroQ __attribute__((mode(TI)));
 typedef union { unsigned char b[0x2600]; signed char c[0x2600]; short h[0x1300]; unsigned short uh[0x1300]; int i[0x980]; unsigned int u[0x980]; float f[0x980]; char *ptr[0x980]; HeroQ q[0x260]; } Hero;
 extern unsigned char D_00189E20[];
 extern unsigned char D_00138180[];
-#define H ((Hero *)D_00189E20)
-#define PAD ((Hero *)D_00138180)
 
 extern u8 D_00139581[];
 extern int D_L00_001A8F00;
@@ -58,8 +56,8 @@ void func_PAL_L02_0042DE18(unsigned char *object) {
     int phase;
 
     func_L00_003FE8D0(object);
-    if (H->i[2213] == 1) func_PAL_L00_002C4480(29, 1);
-    if (H->ptr[1300] != 0) H->ptr[766] = H->ptr[1300];
+    if (((Hero *)D_00189E20)->i[2213] == 1) func_PAL_L00_002C4480(29, 1);
+    if (((Hero *)D_00189E20)->ptr[1300] != 0) ((Hero *)D_00189E20)->ptr[766] = ((Hero *)D_00189E20)->ptr[1300];
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
         func_002A75E0(object, 1, 0, 5, 0);
     if (state->repeat != 0 && func_00282978(&state->repeat)) func_PAL_L00_002AF6C0();
@@ -67,30 +65,30 @@ void func_PAL_L02_0042DE18(unsigned char *object) {
     func_00282CC0(origin, origin, object + 0x10);
     func_002829D8(&state->timer);
     allowed = 1;
-    if (H->i[2213] == 29) {
-        if (!func_00282948(&H->i[2381])) allowed = 0;
+    if (((Hero *)D_00189E20)->i[2213] == 29) {
+        if (!func_00282948(&((Hero *)D_00189E20)->i[2381])) allowed = 0;
         else {
             if (state->timer > 0.0f || !func_L00_002D4040(-1) || object[0x20] != 1)
                 color = 0x600000FF;
             else color = 0x600FFF0F;
             func_00273318(1.0f, 0.0f, 90.0f, object, color, 0, 31, -1, 4);
         }
-    } else H->i[2381] = 33;
+    } else ((Hero *)D_00189E20)->i[2381] = 33;
     phase = (u8)object[0x20];
     if (phase == 1) {
-        if (D_L00_001A8F00 != 0 || !allowed || state->timer != 0.0f || H->b[8892] != 0 ||
-            (u8)object[0x42] > 1 || !(PAD->u[104] & H->u[1164]) || H->i[1168] < 19) return;
+        if (D_L00_001A8F00 != 0 || !allowed || state->timer != 0.0f || ((Hero *)D_00189E20)->b[8892] != 0 ||
+            (u8)object[0x42] > 1 || !(((Hero *)D_00138180)->u[104] & ((Hero *)D_00189E20)->u[1164]) || ((Hero *)D_00189E20)->i[1168] < 19) return;
         if (func_L00_002D4040(-1)) {
             func_L00_002D3F30(-1, 1);
             D_L00_001B2BE8 = phase;
-            if (H->i[2213] != 29) func_002A75E0(object, 2, 0, 2, 0);
+            if (((Hero *)D_00189E20)->i[2213] != 29) func_002A75E0(object, 2, 0, 2, 0);
             func_002E5CF8(0, 0, object);
             func_PAL_L00_002AF458();
             object[0x20] = 2;
             state->delay = ((s32)D_L00_001B0C00 * 5 + 2) / 6;
             state->repeat = ((s32)D_L00_001B0C08 * 5 + 2) / 6;
             state->index = 0;
-        } else if ((PAD->u[105] & H->u[1164]) || D_L00_001B2BE8 == 1) {
+        } else if ((((Hero *)D_00138180)->u[105] & ((Hero *)D_00189E20)->u[1164]) || D_L00_001B2BE8 == 1) {
             func_002E5CF8(1, 0, object);
             D_L00_001B2BE8 = 0;
         }
@@ -113,7 +111,7 @@ void func_PAL_L02_0042DE18(unsigned char *object) {
             if (member != 0) {
                 any = 1;
                 if ((*(s16 *)(member + 0xAA) != 0x5D8 || (u8)member[0x20] == 0xFE ||
-                     (u8)member[0x20] == 0xFD) && !(PAD->u[104] & H->u[1164])) *list = 0;
+                     (u8)member[0x20] == 0xFD) && !(((Hero *)D_00138180)->u[104] & ((Hero *)D_00189E20)->u[1164])) *list = 0;
             }
         }
         if (!any) object[0x20] = 1;

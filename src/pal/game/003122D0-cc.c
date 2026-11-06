@@ -113,7 +113,6 @@ extern char D_00189E20[];
 extern char D_001BF000[];
 extern int D_0018C0BC;
 
-#define HERO ((CrateHero *)D_00189E20)
 
 extern void func_PAL_00313A70(CrateMoby *);
 extern CrateHit *func_002A9640(CrateMoby *, int, int);
@@ -201,10 +200,10 @@ void func_PAL_003122D0(CrateMoby *moby)
             vars->f100 = 0;
         }
         if (moby->oClass == 0x1F9 &&
-            (HERO->f270 == moby || HERO->collHitMoby == moby ||
-             (HERO->groundMoby == moby && HERO->airFrames == 0) ||
-             HERO->ledgeMoby == moby || touched)) {
-            if (HERO->f229C == 15) {
+            (((CrateHero *)D_00189E20)->f270 == moby || ((CrateHero *)D_00189E20)->collHitMoby == moby ||
+             (((CrateHero *)D_00189E20)->groundMoby == moby && ((CrateHero *)D_00189E20)->airFrames == 0) ||
+             ((CrateHero *)D_00189E20)->ledgeMoby == moby || touched)) {
+            if (((CrateHero *)D_00189E20)->f229C == 15) {
                 func_PAL_00313538(moby, 1, 0);
                 func_PAL_003133E0(moby);
                 break;
@@ -257,9 +256,9 @@ void func_PAL_003122D0(CrateMoby *moby)
             burst.f14 = 1;
             func_00277F48(position, 16, moby, &burst, radius + radius);
             burst.f14 = 0x30000;
-            target = func_00277F48(position, 16, HERO->moby, 0, radius * 3.0f);
+            target = func_00277F48(position, 16, ((CrateHero *)D_00189E20)->moby, 0, radius * 3.0f);
             if (target != 0) {
-                func_002A9850(moby, position, D_001BF000, target, HERO->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
+                func_002A9850(moby, position, D_001BF000, target, ((CrateHero *)D_00189E20)->moby, 0x10000, 0, 0x30000, 4.0f, 1.0f, 1.0f);
             }
             vars->burstFrame++;
         } else if (vars->respawns != 0) {

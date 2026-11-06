@@ -100,7 +100,6 @@ extern int func_L00_002FCF18(void *, float, float, float, float, float);
 extern int func_00282978(void *);
 extern void func_00291450(int);
 
-#define HERO ((Hero *)D_00189E20)
 
 static __inline__ void MarkTarget(void *moby, float alpha, unsigned int color, void *position, int kind, float a, int b, float c, int d)
 {
@@ -128,25 +127,25 @@ void func_PAL_L00_003CC93C(Moby *moby)
         vars->sound = -1;
     }
     func_002829D8(vars);
-    if (HERO->i[0x2294 / 4] == 1)
+    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 1)
         func_PAL_L00_002C4480(0x1D, 1);
     ready = 1;
-    if (HERO->i[0x2294 / 4] == 0x1D) {
-        if (func_00282948(&HERO->i[0x2534 / 4]) == 0)
+    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x1D) {
+        if (func_00282948(&((Hero *)D_00189E20)->i[0x2534 / 4]) == 0)
             ready = 0;
     } else {
-        HERO->i[0x2534 / 4] = 0x21;
+        ((Hero *)D_00189E20)->i[0x2534 / 4] = 0x21;
     }
-    if (HERO->i[0x1450 / 4] != 0)
-        HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
+    if (((Hero *)D_00189E20)->i[0x1450 / 4] != 0)
+        ((Hero *)D_00189E20)->i[0xBF8 / 4] = ((Hero *)D_00189E20)->i[0x1450 / 4];
     vars->unknown20 = 0;
-    if (HERO->h[0x24EC / 2] != 0) {
+    if (((Hero *)D_00189E20)->h[0x24EC / 2] != 0) {
         func_00282D30(&direction, &moby->forward, -1.0f);
     } else {
-        qcopy(&direction, &HERO->q[0x760 / 16]);
+        qcopy(&direction, &((Hero *)D_00189E20)->q[0x760 / 16]);
     }
-    func_00282D30(&origin, HERO->ptr[0x2290 / 4] + 0xE0, 0.75f);
-    func_00282CC0(&origin, &HERO->q[0x80 / 16], &origin);
+    func_00282D30(&origin, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.75f);
+    func_00282CC0(&origin, &((Hero *)D_00189E20)->q[0x80 / 16], &origin);
     count = 0;
     func_00282A88(list, 0x80);
     func_L00_0037E000(moby);
@@ -167,7 +166,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
 
             if (info != 0)
                 height = info[4];
-            if (HERO->i[0x1450 / 4] == 0) {
+            if (((Hero *)D_00189E20)->i[0x1450 / 4] == 0) {
                 float distance = func_00282E48(D_L00_001B8DC0, &mobys[i]->position) * 0.00666666683f;
 
                 func_00282D30(&aim, &mobys[i]->up, height);
@@ -178,10 +177,10 @@ void func_PAL_L00_003CC93C(Moby *moby)
         } while (i < count);
     }
     target = 0;
-    if (D_L00_001A8F00 == 0 && vars->cooldown == 0.0f && HERO->b[0x22BC] == 0 &&
-        (D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) && HERO->i[0x1240 / 4] >= 0x13 && ready != 0) {
-        if (HERO->i[0x1450 / 4] != 0)
-            HERO->i[0xBF8 / 4] = HERO->i[0x1450 / 4];
+    if (D_L00_001A8F00 == 0 && vars->cooldown == 0.0f && ((Hero *)D_00189E20)->b[0x22BC] == 0 &&
+        (D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) && ((Hero *)D_00189E20)->i[0x1240 / 4] >= 0x13 && ready != 0) {
+        if (((Hero *)D_00189E20)->i[0x1450 / 4] != 0)
+            ((Hero *)D_00189E20)->i[0xBF8 / 4] = ((Hero *)D_00189E20)->i[0x1450 / 4];
         if (func_L00_002D4040(-1)) {
             Vec start, step, muzzle, offset;
             int hits;
@@ -194,7 +193,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
             func_00282CC0(start, start, &moby->position);
             func_00282D30(step, &moby->right, 0.275f);
             func_00282CC0(start, start, step);
-            hits = func_00277F48(1.0f, start, 1, HERO->ptr[0x2290 / 4], 0);
+            hits = func_00277F48(1.0f, start, 1, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0);
             if (hits != 0) {
                 for (j = 0; j < hits; j++) {
                     Moby *hit = D_L00_001C3280[j];
@@ -236,19 +235,19 @@ void func_PAL_L00_003CC93C(Moby *moby)
             if (info != 0)
                 strength = info[4];
         fire:
-            if (HERO->ptr[0xBF8 / 4] != 0)
-                shot = func_PAL_L00_0040E9F0(moby, muzzle, HERO->ptr[0xBF8 / 4], D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
+            if (((Hero *)D_00189E20)->ptr[0xBF8 / 4] != 0)
+                shot = func_PAL_L00_0040E9F0(moby, muzzle, ((Hero *)D_00189E20)->ptr[0xBF8 / 4], D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
             else
                 shot = func_PAL_L00_0040E9F0(moby, muzzle, target, D_L00_001A8F20, strength, 2.0f, 5.0f, 0.6f);
             if (shot != 0)
                 shot->owner = moby;
             func_L00_002D3F30(-1, 1);
             D_L00_001B2AD0 = 1;
-        } else if ((D_00138180[0x1A4 / 4] & HERO->u[0x1230 / 4]) || D_L00_001B2AD0 == 1) {
+        } else if ((D_00138180[0x1A4 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) || D_L00_001B2AD0 == 1) {
             func_002E5CF8(2, 0, moby);
             D_L00_001B2AD0 = 0;
         }
-        if (!(D_00138180[0x1A0 / 4] & HERO->u[0x1230 / 4]) || HERO->b[0x22B8] == 0) {
+        if (!(D_00138180[0x1A0 / 4] & ((Hero *)D_00189E20)->u[0x1230 / 4]) || ((Hero *)D_00189E20)->b[0x22B8] == 0) {
             if (vars->sound >= 0) {
                 func_L00_002D6B70(vars->sound);
                 vars->sound = -1;
@@ -289,7 +288,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
             scale *= 0.5f;
             blue = t * scale;
         }
-        if (HERO->h[0x24EC / 2] != 0) {
+        if (((Hero *)D_00189E20)->h[0x24EC / 2] != 0) {
             func_00282D30(flash, &moby->forward, -1.0f);
             *(Quad *)offset = 0;
             offset[0] = 0.513000011f;
@@ -299,7 +298,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
             func_00283098(offset, offset, &moby->right);
             func_00282CC0(spot, &moby->position, offset);
         } else {
-            qcopy(flash, &HERO->q[0x760 / 16]);
+            qcopy(flash, &((Hero *)D_00189E20)->q[0x760 / 16]);
             *(Quad *)offset = 0;
             offset[0] = 0.513000011f;
             offset[1] = -1.0f;
@@ -309,7 +308,7 @@ void func_PAL_L00_003CC93C(Moby *moby)
             func_00282CC0(spot, &moby->position, offset);
         }
         func_00282CC0(spot, spot, flash);
-        func_00282D30(offset, HERO->ptr[0x2290 / 4] + 0xE0, 0.3f);
+        func_00282D30(offset, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0xE0, 0.3f);
         func_00282CC0(spot, spot, offset);
         if (vars->light == -1) {
             vars->light = func_L00_002FCF18(spot, 8.0f, 0.0f, red, green, blue);
