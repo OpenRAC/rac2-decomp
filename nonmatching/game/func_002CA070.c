@@ -14,6 +14,21 @@
  * Locals declared page, c, upd, init with stores next, upd, page, c, init (a, b first) give page
  * $a2 and c $a3 as retail but swap upd and 0x18 (7 rows). Reopen only with a source cause for one
  * more reference to the init or upd value, or a different call/struct shape for case 8.
+ * Same day, second pass. An instrumented local-alloc (printing each qty's refs, birth/death in half-luids
+ * and QTY_CMP_PRI) gives this draft's case-8 block: init 5 refs [12,44] 3125 $v0, 0x18 3 refs
+ * [24,34] 3000 $v1, page 5 [6,40] 2941 $a1, c 4 [8,36] 2857 $a2, upd 4 [10,38] 2857 $a3.
+ * Retail needs upd > page > c below 3000: with these refs, page life >= 36 and c life >= 30
+ * while upd stays at 28. The only schedule that does it loads page's %hi before D_00210A40's
+ * and stores ..., init, upd, page, c (c last). rank_for_schedule compares INSN_REG_WEIGHT before
+ * LUID, so page's last store (it ends page and the menu base, weight -2) always goes early.
+ * Also measured: a function-wide `list` variable shared by the cases (as retail's shared case
+ * tails suggest) makes page's value global and unties its %hi, but reaches at most 6 of 10
+ * register checks; a 300,000-sample grammar mixing constants, case-local and function-wide
+ * variables for all five values, chained stores and both call spellings: at most 6 of 10;
+ * every single flag and every pair of 48 flags on three base drafts: no gain; a direct
+ * func_002CB510(0) call gives all five registers but compiles to jal (MIPS defines
+ * NO_FUNCTION_CSE), where retail calls through the stored value; a null-guarded call keeps the
+ * branch.
  */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the measured int returns of func_002CB510 and func_0029D830 and the void contract of func_002DE3A0.
