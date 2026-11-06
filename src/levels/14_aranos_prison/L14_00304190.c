@@ -747,7 +747,6 @@ void func_L14_003DFA10(char *arg0, char *arg1) {
     func_4209A0(*(int *)(v + 0x0), buf, arg1);
 }
 
-INCLUDE_ASM("asm/levels", func_L14_003DFA60);
 
 void func_L14_003E1DD0(char *arg0) {
     char *s0 = *(char **)(arg0 + 0x68);

@@ -1,3 +1,69 @@
+/* 6 November 2026, round 10: best compliant form (no dead test) is 744/752 bytes, 0/8 USA,
+ * 81 differing words by aligned diff; listing below. Same profile as round 9 (-fno-gcse).
+ * Each of the four 203.0f roundings is `t = scale * k + half; do { y = t; } while (0);`
+ * (the func_L02_003FE768 idiom), and a 45+50-run hill-climb ordered the constants.
+ * Why $s1 stays out: in the 752 form, $s1 holds `active` (1) for the helper's compares;
+ * the empty conditionals survive to reload (flow1 deletes only the dead `scaled = 1.0f`)
+ * and jump2 deletes them after allocation. That same branch is also the block boundary that
+ * keeps id a pseudo in $a0 (retail's early `daddu $a0,$v0`) and puts the call arguments after
+ * each rounding. Post-reload, only jump2 removes real uses (reload_cse_simplify_set never
+ * turns a register into a constant; noop-set deletion needs $s1 already set), so a $s1 save
+ * with no use needs an empty or identical-arm conditional. No compliant shape found.
+ * Left (compliant): no $s1 save (obj in $s1, frame offsets), id combined into `a0 = v0`
+ * (late daddu), k/zero in f21/f22 (retail f22/f21), argument order, 23.0f roundings.
+ * No gain: groups around the lookups or the whole rounding (95-98), a group inside the helper
+ * (756 bytes), groups on the 23.0f/373.0f roundings (756, alignment nops), `text` reused for id,
+ * a field pointer `obj + 0x20` set first, declaration orders.
+ */
+/* Round 10 compliant listing (744/752):
+
+static __inline__ int menu_coord(float scale, float value, float half)
+{
+    return (int)(scale * value + half);
+}
+
+void func_L02_003C43F0(char *obj) {
+    char *text;
+    int state;
+    char *id;
+    int y, entry;
+    float one, zero, half, k, t;
+
+    half = 0.5f;
+    entry = 0x8710;
+    zero = 0.0f;
+    id = func_00336D50(D_L02_001A904C + entry, 0x70);
+    k = 203.0f;
+    t = D_L02_001B3E04 * k + half;
+    do { y = t; } while (0);
+    one = 1.0f;
+    func_00300A00(id, 0x60442D00, 258.0f, (float)y, one, one, zero);
+    id = func_00336D50(D_L02_001A904C + entry, 0x6F);
+    t = D_L02_001B3E04 * k + half;
+    do { y = t; } while (0);
+    func_00300A00(id, 0x60442D00, 258.0f, (float)y, one, one, zero);
+    id = func_00336D50(D_L02_001A904C + entry, 0x71);
+    t = D_L02_001B3E04 * k + half;
+    do { y = t; } while (0);
+    func_00300A00(id, 0x55F0C070, 258.0f, (float)y, one, one, zero);
+    id = func_00336D50(D_L02_001A904C + entry, 0x72);
+    t = D_L02_001B3E04 * k + half;
+    do { y = t; } while (0);
+    func_00300A00(id, 0x55F0C070, 258.0f, (float)y, one, one, zero);
+    func_002FC560(0x47, 0x5360BUL);
+    state = *(unsigned char *)(obj + 0x20);
+    if (state == 7) {
+        text = func_00288FB8(0x2F5C);
+        func_0027FBD8(254, menu_coord(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
+    } else if (state != 8 && state != 5) {
+        text = func_00288FB8(0x2F5B);
+        func_0027FBD8(262, menu_coord(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
+    }
+    text = func_00288FB8(0x2F5A);
+    func_0027FBD8(254, menu_coord(D_L02_001B3E04, 373.0f, 0.5f), 0x88FFFFFF, text, -1);
+}
+
+*/
 /* 6 November 2026, Codex (stopped at its usage limit): without the inadmissible dead-test helpers the best compliant form is 744/752 bytes, 0/8; it lacks retail's unused $s1 save/restore, and rounding and argument scheduling differ. Typed argument interleavings and constant-initialisation orders did not help. */
 /* 6 November 2026, round 9: best body below (752/752, 0/8 USA, ~9 words, was ~19).
  * Same profile, plus -fno-gcse (as round 4 used):

@@ -1,3 +1,15 @@
+/* 6 November 2026, round 10: hill-climbed order of the cached inputs and the
+ * independent parameter stores; 944/964 bytes, USA v1.01 0/1, 52 real differing
+ * instructions (was 58). No matched sibling exists: no other retail routine has
+ * this field/constant set. -fno-schedule-insns (+/- -fno-sched-interblock) gives
+ * 101; -frac2-keep-block-zero-copy ties. $f20 reasoning: retail's 15.0 pseudo was
+ * not combined into the $f12 move, so it must have had a later use that crossed
+ * the first call and vanished after flow. CSE folds every later use tried
+ * (r/3600, r*4 to short, r+5 to u8, r/15, (u8)r, (short)r, an inline two-timer
+ * helper); none gave $f20. Recheck: a `target` copy (0 or hit) and clearing
+ * `hit` on a mismatch both give a retest, but GCC does not thread the
+ * other==0/mismatch paths (60-63).
+ */
 /* 6 November 2026, Codex own-unit replay: retained C, not a linked match.
  * Profile: game -O2 -G8 -ffunction-sections -frac2-qcopy.
  * USA v1.01 and v2.00: 944/964 bytes, 0/1 places each; PAL absent.
@@ -155,52 +167,52 @@ void func_L17_003E8A58(char *object)
         state->f6E8=0;state->f6EC=0;state->f6C0.f[3]=F(object,0xf8);
         state->f48=func_00283CF0(15.0f);state->f4A=func_00283CF0(12.8f);
         state->f70=14;state->f71=13;state->f76=8;state->f29=1;state->f75=7;state->f77=9;
-        vf80=D_L17_001B0F38*0.016666668f;
-        vf84=0.00416666688f;
-        vf94=D_L17_001B0E40+0.1f;
         vf7C=0.333333343f;
-        vf88=0.00833333377f;
         vf8C=0.00138888892f;
-        vf9C=0.4f;
         vf700=(float)state->f34;
+        vf118=D_L17_001B0E48;
+        vf94=D_L17_001B0E40+0.1f;
+        vf9C=0.4f;
+        vf88=0.00833333377f;
         vfB8=0.01f;
         vf90=D_L17_001B0E40;
         vf14C=state->f684;
-        vfA0=40.0f;
-        vf11C=D_L17_001B0E48;
+        vf84=0.00416666688f;
         vf120=1.308997035f;
+        vf80=D_L17_001B0F38*0.016666668f;
         vf13C=0.01111111138f;
+        vfA0=40.0f;
         vf30=1.0f;
-        vf118=D_L17_001B0E48;
+        vf11C=D_L17_001B0E48;
         state->fD3=12;
-        state->f80=vf80;
         state->f84=vf84;
-        state->f94=vf94;
         state->fCC=7;
+        state->fA8=3;
+        state->f94=vf94;
         state->fCE=4;
         state->fCD=20;
-        state->fCF=9;
-        state->fD2=6;
         state->fD5=1;
-        state->fA8=3;
+        state->f14C=vf14C;
         state->f7C=vf7C;
+        state->fA0=vfA0;
+        state->f80=vf80;
+        state->fD2=6;
         state->f8C=vf8C;
         state->f88=vf88;
         state->f9C=vf9C;
+        state->fCF=9;
         state->f700=vf700;
         state->f26=60;
         state->fB8=vfB8;
         state->f90=vf90;
-        state->f14C=vf14C;
-        state->fA0=vfA0;
         state->f11C=vf11C;
         state->f13C=vf13C;
+        state->f98=0;
         state->f120=vf120;
         state->f148|=16;
         state->f28=3;
         state->f30=vf30;
         state->f118=vf118;
-        state->f98=0;
         if(state->f680==-1 || state->f684==-1) {func_0029F338(object);return;}
         if((unsigned)(state->f6B8+1)<2) func_002A7750(object,3,0);else func_002A7750(object,1,5);
         state->f730=1;state->f720=state->f744;
@@ -218,3 +230,4 @@ damage:;
     state->f69E=func_002B3BA8(object,state->f680,0,0,0.0f,0.0f);
     state->f6A4=state->f250;
 }
+

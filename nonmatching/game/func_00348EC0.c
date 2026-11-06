@@ -1,3 +1,11 @@
+/* 6 November 2026, round 10: best C below unchanged (14 real rows), about 105 check.py runs.
+ * MACRO_ADDR on D_001A7344 gives retail's height v0 (lw v0 macro, no %hi pseudo), but then
+ * sp takes v1 and count a0 (16-26 over 54 group/order variants, h and spf locals included).
+ * Half first with spf in the group gives retail's FPRs and spf order, GPRs still off (14+).
+ * No change from: static inline round/centring helpers (11-25), sda array D_001AE5F0 (27),
+ * scalar/plain D_001B23A4, operand order swaps, x / 2.0f, -fno-sched-interblock (same),
+ * -fno-schedule-insns (81), -fno-schedule-insns2 (40). Retail needs v0 and v1 busy across sp.
+ */
 /* 6 November 2026, Codex worker: best C below retained unchanged after 137 check.py
  * runs (including baseline and final confirmation): 644/644 bytes, 0/28 USA,
  * 14 real instruction rows. No improvement from new lifetime pipelines: reusing a

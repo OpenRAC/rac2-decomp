@@ -1,3 +1,18 @@
+/* 6 November 2026, Antigravity follow-up: Exhaustive Haifa scheduler source trace
+ * and compiler analysis (haifa-sched.c:4075 rank_for_schedule, 5237 find_pre_sched_live).
+ * In sched1, all 10 quad stores (UV and color) tie on priority (77) and depend count (1).
+ * In rank_for_schedule, INSN_REG_WEIGHT(tmp) - INSN_REG_WEIGHT(tmp2) prefers instructions
+ * with smaller contribution to register pressure. find_pre_sched_live decrements reg_weight
+ * for each REG_DEAD note. Whichever store uses pseudo-register `color` last receives a
+ * REG_DEAD note and reg_weight = -1, while the stores of zero (uv[0][0], uv[0][1]) have
+ * reg_weight = 0. Consequently, the killing color store always outranks the zero stores at
+ * cycle 32 and is scheduled first, which sched2 preserves (emitting it at +0x108 instead of
+ * +0x110). Tested expression/statement interleavings, dx/dy local variables, and per-vertex
+ * chained stores; all either tie at 3 diffs or worsen. Under the 6 November 2026 AGENTS.md rules
+ * (no volatile, no inline asm, no aliases, no padding/fake wrappers), this scheduler tie-break
+ * cannot be closed in C without compiler changes or evidence that color was live after the stores.
+ * 868/868 bytes, 0/27 places, 3 positions differ (+0x108/+0x10C/+0x110). INCLUDE_ASM restored.
+ */
 /* 6 November 2026, Codex follow-up: 190 valid source variants, no improvement
  * over the retained 868-byte / 3-position / USA 0-of-27 result. Fifteen genuine
  * multi-field position/camera/UV/color layout combinations tie exactly. A

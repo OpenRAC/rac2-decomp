@@ -1,3 +1,16 @@
+/* 6 November 2026, round 10b: no gain (101 words, ~45 runs). Branch row b keeps 16-17 refs and outranks side; the i-loop copy takes $s0 only inside a group, which splits row and quotient; six index-test spellings and five flags give no slti/bnel; spill slots follow pseudo number and the uv base comes first here. */
+/* 6 November 2026, round 10: 1376/1376 bytes, 0/2, 101 differing words excluding
+ * relocation fields (was 279), first +0xa0. Profile adds -fno-sched-interblock
+ * (stops arg moves above the j&1 test; v now lands in a0). Changes: branch-loop args
+ * as ((ADVector (*)[4])(s+0x420))[k]+branch (keeps s in $s7, frame 0x320);
+ * vertex v = (ADVector *)(j*16 + (int)q); setup chains q[0]=q[1]=q[2] and a forward
+ * n loop (setup now matches); i-loop rows b = i*16 + s; a = b; b += 0x30;
+ * a += 0x20 with no group (copy kept, quotient spilled, one subu tail); branch
+ * rows the same with a do { b = ... } while (0) group (gives s one more weighted
+ * ref so s beats &previous for $s7). Remaining: branch row b (17 refs) outranks
+ * the uv giv and side, so side lands in $s5 not $s4 and k in $s4 not $s3; i-loop
+ * copy gets $s5 not $s0; index tests give beql/bltz, retail beqz/slti/bnel;
+ * spill-slot order differs. */
 /* 6 November 2026, round 9: the func_L13_0041AB30 idiom (p = s + i*16; r = p;
  * do { r += 0x20; } while (0); p += 0x30; same for the 0x420/0x460 branch rows)
  * stays at 1420/1376 bytes, 0/2, 281 rows (279 before); -g and
@@ -65,13 +78,13 @@ void func_L13_0041AD00(char *obj) {
     flags |= (long)D_L13_001B1648<<4;
     flags |= (long)D_L13_001B164C<<6;
     flags |= 0x8000000000UL;
-    q[0].state=q[2].state=q[1].state=0xff9000000260UL;
-    q[0].texture=q[2].texture=q[1].texture=texture;
-    q[2].primitive=q[1].primitive=q[0].primitive=0;
-    q[0].flags=q[2].flags=q[1].flags=flags;
-    for (n=3;n>=0;n--) {
-        q[2].uv[3-n][1]=q[1].uv[3-n][1]=q[0].uv[3-n][1]=D_L13_001B1660_abs[3-n][1];
-        q[2].color[3-n]=q[1].color[3-n]=q[0].color[3-n]=*(int *)(s+0x14);
+    q[0].state=q[1].state=q[2].state=0xff9000000260UL;
+    q[0].texture=q[1].texture=q[2].texture=texture;
+    q[0].primitive=q[1].primitive=q[2].primitive=0;
+    q[0].flags=q[1].flags=q[2].flags=flags;
+    for (n=0;n<4;n++) {
+        q[0].uv[n][1]=q[1].uv[n][1]=q[2].uv[n][1]=D_L13_001B1660_abs[n][1];
+        q[0].color[n]=q[1].color[n]=q[2].color[n]=*(int *)(s+0x14);
     }
     func_00282C88(&side);
     for (i=0;i<31;i++) {
@@ -82,20 +95,27 @@ void func_L13_0041AD00(char *obj) {
             func_00282DD8(&side,&delta,&segment);
             func_00282F20(&side,&side,0.1f);
         } else func_00282C88(&side);
+        {
+        char *a, *b;
+        b = (char *)(i*16 + (int)s);
+        a = b;
+        b += 0x30;
+        a += 0x20;
         for (j=0;j<4;j++) {
             ADVector *v;
             if (j<2) {
-                v = &q[0].vertex[j];
-                v->q = *(Vector128 *)(s+(0x20+i*16));
+                v = (ADVector *)(j*16 + (int)q);
+                v->q = *(Vector128 *)a;
                 if (j&1) func_00282CC0(v,v,&previous);
                 else func_00282CF0(v,v,&previous);
             } else {
-                v = &q[0].vertex[j];
-                v->q = *(Vector128 *)(s+(0x30+i*16));
+                v = (ADVector *)(j*16 + (int)q);
+                v->q = *(Vector128 *)b;
                 if (j&1) func_00282CC0(v,v,&side);
                 else func_00282CF0(v,v,&side);
             }
             q[0].uv[j][0]=D_L13_001B1660_gp[j][0]+func_00283CE0(i-(i/4)*4)*0.25f;
+        }
         }
         func_00280B90(q,matrix,0);
     }
@@ -109,26 +129,33 @@ void func_L13_0041AD00(char *obj) {
             for (k=0;k<3;k++) {
                 previous.q = side.q;
                 if (k<2) {
-                    func_00282CF0(&segment,s+(0x420+k*64)+branch*16,s+(0x4a0+k*64)+branch*16);
-                    func_00282CF0(&delta,s+(0x460+k*64)+branch*16,&camera);
+                    func_00282CF0(&segment,((ADVector (*)[4])(s+0x420))[k]+branch,((ADVector (*)[4])(s+0x4a0))[k]+branch);
+                    func_00282CF0(&delta,((ADVector (*)[4])(s+0x460))[k]+branch,&camera);
                     func_00282DD8(&side,&delta,&segment);
                     func_00282F20(&side,&side,0.1f);
                 } else func_00282C88(&side);
                 if (!k) previous.q = side.q;
+                {
+                char *a, *b;
+                do { b = (char *)(((ADVector (*)[4])s)[k]+branch); } while (0);
+                a = b;
+                b += 0x460;
+                a += 0x420;
                 for (j=0;j<4;j++) {
-            ADVector *v;
+                    ADVector *v;
                     if (j<2) {
-                        v = &q[0].vertex[j];
-                        v->q = *(Vector128 *)(s+(0x420+k*64)+branch*16);
+                        v = (ADVector *)(j*16 + (int)q);
+                        v->q = *(Vector128 *)a;
                         if (j&1) func_00282CC0(v,v,&previous);
                         else func_00282CF0(v,v,&previous);
                     } else {
-                        v = &q[0].vertex[j];
-                        v->q = *(Vector128 *)(s+(0x460+k*64)+branch*16);
+                        v = (ADVector *)(j*16 + (int)q);
+                        v->q = *(Vector128 *)b;
                         if (j&1) func_00282CC0(v,v,&side);
                         else func_00282CF0(v,v,&side);
                     }
                     q[0].uv[j][0]=D_L13_001B1660_gp[j][0]+func_00283CE0(k-(k/4)*4)*0.25f;
+                }
                 }
                 func_00280B90(q,matrix,0);
             }

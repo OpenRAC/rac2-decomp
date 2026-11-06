@@ -1,3 +1,18 @@
+/* 6 November 2026, round 10c: no gain (14 rows by real count, 13 runs). Retail needs priority obj > base > stride > p; our base is 0.125 because of the REG_EQUIV `*= 2` (local-alloc.c:855), 0.25 without it, so it also needs a second set that combine cannot fold. Reusing n for obj[0x23] in case 2 (17 rows) lifts stride to 0.300, just under p's 0.304; case orders, per-case p reads and idx locals with groups are worse. */
+/* 6 November 2026 (round 10): best now 412/412 bytes, 0/1 USA, 15 real rows, in its
+ * own unit with -O2 -G0 -ffunction-sections -fno-schedule-insns (29 units use it).
+ * Mechanism: tbl/n are reused in cases 1/2 (record pointer, call result); combine
+ * absorbs those refs, and without sched1 REG_BASIC_BLOCK is not recomputed, so
+ * base/stride stay global: obj s0, stride s2, hi temp v0, case 0 beql/lh and size
+ * match. Left: p s1 / base s3 (retail base s1, p s3) and case 1 v0/v1 swapped.
+ * Priorities (global.c): obj .415 > p .304 > stride .139 > base .125; base/stride
+ * lengths are doubled by REG_EQUIV. Groups weight p's lh as much as base/stride
+ * (y/z forms: p rises); only ~7 nested groups on the sets would reorder. With
+ * sched1 on, the same C is 416 (sched recomputes REG_BASIC_BLOCK to block 6).
+ * Case 1 `n = idx; &D[n * 0x150]` gives 14 rows but puts idx in s2.
+ * No help: -flive-range, -funroll-loops loops (400-408), case-0 forms with a
+ * record/index local, struct-array table, float local, switch-value local.
+ */
 /* 6 November 2026 (round 9): still 416/412 bytes, 0/1 USA. The extra word is
  * case 0's first `lh a1, 0x36(p)`: retail fills the beql slot with it (s0 = obj is
  * live there), ours fills it with `ld s0` because local-alloc gives the table base
@@ -64,30 +79,35 @@ extern void func_002A7750(u8 *, s32, s32);
 extern s32 func_00273B70(u8 *);
 extern void func_0029F338(void *);
 
-#define REC(o) (&D_L03_00259A30[*(s16 *)(p + 0x36) * 0x150])
-
 void func_L03_00421930(u8 *obj)
 {
     u8 *p = *(u8 **)(obj + 0x68);
+    char *tbl;
+    s32 n;
 
     switch (obj[0x20]) {
     case 0:
-        func_L00_00322A98(obj, REC(obj));
-        func_L00_00322AC0(REC(obj), 0x28, 2, 0.0f);
-        func_L00_00322AC0(REC(obj), 0x14, 4, 0.0f);
-        func_L00_00322AC0(REC(obj), 0xA, 6, 0.0f);
+        tbl = D_L03_00259A30;
+        n = 0x150;
+        func_L00_00322A98(obj, &tbl[*(s16 *)(p + 0x36) * n]);
+        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x28, 2, 0.0f);
+        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x14, 4, 0.0f);
+        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0xA, 6, 0.0f);
         func_002A7750(obj, 1, -1);
         break;
     case 1:
-        func_L00_00322BE0(REC(obj), 0);
-        if (func_00273B70(obj) != 0) {
+        tbl = &D_L03_00259A30[*(s16 *)(p + 0x36) * 0x150];
+        func_L00_00322BE0(tbl, 0);
+        n = func_00273B70(obj);
+        if (n != 0) {
             func_002A7750(obj, 2, -1);
             *(u16 *)(obj + 0x34) |= 0x2800;
         }
         break;
     case 2:
         func_00273B70(obj);
-        func_L00_00322EC8(REC(obj));
+        tbl = &D_L03_00259A30[*(s16 *)(p + 0x36) * 0x150];
+        func_L00_00322EC8(tbl);
         if (obj[0x23] < 2) {
             func_0029F338(obj);
         } else {

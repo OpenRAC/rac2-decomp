@@ -2374,22 +2374,7 @@ field view shortens the body to 984 bytes; disabling GCSE or sched1 gives 996.
 Independent alias/lifetime evidence is the next useful input, not more identical
 loop spellings.
 
-**6 November 2026, `func_L23_0041CA58`:** a separate unit with
-`-O2 -G0 -ffunction-sections -frac2-qcopy` and direct typed accesses to the
-47 state counts recovers the state/counts saved-register roles and a missing
-counts-pointer copy in the inherited 564-byte diagnostic. It still differs
-in 66 instruction words after relocation fields are masked (76 initially),
-and fails its one placement in each release. That diagnostic retains a dead
-remainder assignment solely to preserve the otherwise unused divide guard;
-it is not eligible under the worker's explicit no-dead-store constraint.
-Removing the assignment gives the retained 540/564-byte C, 0/1 in USA v1.01,
-v2.00 and PAL. The source's 0x140 frame also lacks retail's unexplained 0x20
-bytes. Meaningful one-pass groups, helper transfers, natural vector views,
-loop/counter lifetimes and bounded standard optimization controls do not
-close these differences. Recover the guard's real source/control flow and
-scratch ownership before adding artificial uses or padding; see the
-[retained source](../nonmatching/levels/func_L23_0041CA58.c). No linked build
-was run for this worker attempt.
+**6 November 2026, `func_L23_0041CA58`, resolved:** 1/1 in its own `-O2 -G0 -ffunction-sections -frac2-qcopy` unit. It is the level-22 routine `func_L22_003A36A0` without its second probe loop; the unused `i % 3` result (as in L22) gives retail's lone zero-divisor guard.
 
 The way out that closed two of these: jump2 cross-jumps two arms that end the same, the branch
 goes, and the load that fed it stays dead, because flow ran before jump2. `func_L18_00432630`

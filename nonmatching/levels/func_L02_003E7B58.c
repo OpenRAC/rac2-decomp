@@ -1,3 +1,9 @@
+/* 6 November 2026, round 10: unchanged, 11 real rows. -fno-sched-interblock ties (11) on this
+ * and all five earlier forms; -fno-schedule-insns (alone or with it) gives 92. Local-alloc ranks
+ * primitive (2 refs, 4-insn span after sched1) just above colour (7 refs, 30-insn span). Order
+ * searches (~3400 compiles, chained or split colour, band = 0 hoisted) reach colour $v1/primitive
+ * $a0/mode $a1/flags $a2 (best 24 rows), but then band always takes $a0, never retail's $a1: the
+ * primitive store never lands after sched1's band init. */
 /* 6 November 2026, Codex worker: best unchanged, 972/972, 0/1 USA, 11 real
  * instruction differences, excluding relocations. 148 new variants: all 78
  * contiguous one-pass groups of the 12 packet-setup statements (best 43 rows),

@@ -1,3 +1,22 @@
+/* 6 November 2026, round 10: the retained C below still uses a dead-test helper
+ * (`scaled = 1.0f` is never read), so it is not admissible under blocker 26.
+ * Compliant best (no dead test, plain `return (int)(scale * value + half)` or inline
+ * casts): 736/736, 0/2 places, 42 real words off, own -O2 -G0 -ffunction-sections
+ * -fno-gcse unit. Form: kx = 112.0f; s = D_L04_001B2D44; half = 0.5f; ky = 142.0f;
+ * one `do { x1 = (int)(s * kx + half); } while (0);` group per rounding (box 2: fy
+ * group before fx), final x4/y4 as below. Without groups: 732/736, 70 words.
+ * The two box chains still interleave (cvt.w.s after both mul/add) and 112/142/0.5
+ * land in f21/f20/f22 instead of f22/f21/f20; only a branch kept through sched2
+ * separates them, which only the dead test gives.
+ * Measured, no gain (~200 runs): -fno-schedule-insns (720-724 bytes, 129+),
+ * -fno-schedule-insns2 (720, 142), -fno-sched-interblock (no change: 42/5),
+ * -fno-rerun-loop-opt, -fno-strength-reduce; lesson-28 roundings written as call
+ * arguments (63-69, 732 bytes); constants inside groups (70); nested mul/cvt
+ * groups (65); hill-climb over statement order in three blocks (best 42).
+ * Donor search: sibling boxes func_L05_0041DF58 and func_L15_0042E1B0 are also
+ * unmatched; matched L00_003DDEC8/L00_004003F0 use the same dead-test helper;
+ * no RAC1/RAC4 donor found.
+ */
 /* 6 November 2026, Codex follow-up: best retained C below is 736/736 bytes,
  * 0/2 USA v1.01 places (04:00417028, 11:00406B28), seven instruction words off
  * at each place, excluding relocation values. US2/PAL identity remains absent.

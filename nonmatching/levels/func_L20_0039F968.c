@@ -1,3 +1,18 @@
+/* 6 November 2026, round 10: 996/996, 0/1 USA, 10 real rows (was 13), first diff +0xC8.
+ * Lesson 28: drop the `speed` local and pass D_L20_001AED58 * 0.017453294f directly; the
+ * pre-blez block (sll a3, lui t0, addiu s0, lwc1) now matches. Left: copy-loop sum only,
+ * src = (last*16 + i*400) + (D-16) here vs last*16 + (i*400 + (D-16)) in retail. Cause: loop.c
+ * expands a movable `D + -16` (PLUS) into the giv add_val, but keeps a lo_sum const as one reg;
+ * retail needs the const kept AND cse2 relating it to D. Dead ends this round: lesson-27 flags
+ * (-fno-sched-interblock, -fno-schedule-insns[2], -fno-gcse, -fno-cse-*), dst/src block or
+ * if-scope locals (D hoisted out of the outer loop, 980 bytes), `D[0] - 1 + i*25 + h` and
+ * other canonical D-16 spellings (back to this sum), `&D[i][-1] + h` (0xFFFFFFF0 offset: cse2
+ * cannot relate, extra lui), function-level `history` for one or both sides, tab = D before
+ * the loop (9 rows old count but D lands before blez). Only sibling: func_L00_003C4F78 copies.
+ * Round 10b (no gain): row base before the count test (D hoisted to fp, mult before blez),
+ * `row = D[0]; &row[i*25 + h]` (retail sum, D before blez), char [25][16] and byte-offset views
+ * and a second index k = last - 1 (canonicalize back). Retail's explicit mult rules out a row giv.
+ */
 /* 6 November 2026, Codex follow-up: current compiler reproduces the incoming
  * retained body at 996/996 bytes, 0/1 USA v1.01 places, 14 real instruction
  * differences (not the historical nine). Removing the history table-pointer local
@@ -117,15 +132,13 @@ void func_L20_0039F968(unsigned char *object) {
         if (func_L02_002F1658()) {
             Vector *head;
             int historyIndex;
-            float speed;
             ++counts[i];
             if (counts[i] > 24) counts[i] = 25;
             last = counts[i] - 1;
-            speed = D_L20_001AED58;
             for (historyIndex = last; historyIndex > 0; --historyIndex)
                 qcopy_nc(&D_L20_00234880[i][historyIndex], &D_L20_00234880[i][historyIndex - 1]);
             head = D_L20_00234880[i];
-            func_002AB668(&rotation, (int)&D_L20_00235500[i], speed * 0.017453294f);
+            func_002AB668(&rotation, (int)&D_L20_00235500[i], D_L20_001AED58 * 0.017453294f);
             func_002ACDE8(head, head, &rotation);
             func_002ACB48(head->f, 0.125f);
             length = func_00282DF0(head);

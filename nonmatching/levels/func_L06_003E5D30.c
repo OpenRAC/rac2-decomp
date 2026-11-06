@@ -1,3 +1,17 @@
+/* 6 November 2026, round 10: no change, 976/976 bytes, 112 real differences, 0/3 places.
+ * No matched sibling: the only other 0xD10-frame copies are this shared routine at
+ * L13/L17; the RAC1 donor order (f[1] before f[3], no groups) gives 225-227.
+ * Regalloc: the extra pseudo is a loop copy of k * 16 (buf cursor base, $s5);
+ * the strand offset (5 refs, live 91) always ranks below the state pointer
+ * (12 refs, live 137), so it is spilled whenever one callee-saved register is
+ * short. Without the f[1] group the buf cursor is retail's, but the state
+ * pointer takes $fp and the strand offset still spills. About 160 trials, none
+ * better: greedy and random toggles of 17 group/form options, 1-based smoothing
+ * (1000 bytes), st-> instead of pos/vel (170+), pointer locals, a y local,
+ * declaration and phase forms, and the flags -fno-sched-interblock,
+ * -fno-schedule-insns(2), -fno-gcse, -fmove-all-movables, -fno-rerun-loop-opt,
+ * -fno-rerun-cse-after-loop, -frac2-keep-block-zero-copy/order and nine others.
+ */
 /* 6 November 2026, Codex follow-up: 976/976 bytes, 0/3 USA v1.01 places,
  * own -O2 -G8 -ffunction-sections unit. Retained C improves from 137 to 112
  * differing instruction words, masking only relocation fields. check.py's

@@ -1,3 +1,17 @@
+/* 6 November 2026, round 10: no change (2 words), ~150 runs. Flags (-fno-sched-interblock,
+ * -fno-schedule-insns 15, -fno-sched-spec, keep-block-order, gcse-unsplit-edges, zero-ti-por,
+ * keep-block-zero-copy, sticky-volatile-refs, hazard-labels, move-all-movables): none better.
+ * Cause of s7/fp without a group (greg dump): the gcse address pseudos for &position/&angles
+ * tie at refs 4, live 520, so regno order gives position s7; a group must add one weighted
+ * angles ref. Swapping the output copies fixes it (order wrong). Groups only around the anchor
+ * func_002833F0 fix s7/fp and the last call, but any group start at line 71-73 moves the
+ * rotation.f[1] store out of the spin jal slot, an end there puts object+0xc0 after the anchor
+ * jal, and an end after func_00282D30(origin) (barrier on &offset) flips func_00283738 and
+ * func_00282D30 arg order. Outer group to the end + inner 37-73: 5 rows (object+0xc0 only).
+ * Groups on the output copies swap s5/s6 and add a nop. A pointer local for &angles, the
+ * inverted parent test, and arm-copy order: worse. No nested-call form exists here (all
+ * callees on this path are void). Keep the retained source below.
+ */
 /* 6 November 2026, round 9: no change (2 words). -frac2-sticky-volatile-refs: same 2 words.
  * Cause (sched dumps): the group's LOOP_END note makes the first insn after it (a0 = origin)
  * a barrier, so a1 and a2 tie and luid puts a1 first. With no barrier in that block the order

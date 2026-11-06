@@ -1,3 +1,18 @@
+/* 6 November 2026, round ten: 572/576 bytes, 0/1 USA boot, 25 differing
+ * instruction positions after relocation (was 32). Same game -O2 -G0 unit.
+ * D_001A7100/D_001A7110 are the CdSafeState count and error that the IOP
+ * writes through SIF DMA; AGENTS.md allows volatile there (001334B8-g8.c already
+ * declares them so). Volatile on them keeps retail's store order: 7100 first,
+ * 7110 last after the payload, with no one-pass groups. The tail now equals
+ * retail's sched2 order; only reorg still moves `daddu $a2,$sp` into the jal
+ * slot (retail: nop). -frac2-sticky-volatile-refs, an array payload and
+ * a 45-step tail hill-climb do not change it. Volatile on the RPC server
+ * fields changes nothing. Server/limit registers remain: global alloc ranks
+ * server (refs 10, live 10) above each hoisted -1 limit (refs 5, live 6).
+ * Unit flags -fno-sched-interblock, -fno-schedule-insns (34 rows) and nine
+ * other -fno-* flags do not help; split server locals, a limit local and
+ * server-before-delay (556) neither. About 45 check.py runs.
+ */
 /* 6 November 2026, plain-C follow-up (supersedes the qualified source below).
  * Game -O2 -G0 -ffunction-sections, separate unit; USA boot check.py only:
  * removing all volatile qualifiers from the previous best gives 552/576 bytes,
@@ -84,8 +99,10 @@ extern long D_001A74D8[] __attribute__((sda));
 extern int D_001A7180[] __attribute__((sda));
 extern u8 D_001A7040[] __attribute__((sda));
 extern u8 D_001A7140[] __attribute__((sda));
-extern int D_001A7100[] __attribute__((sda));
-extern int D_001A7110[] __attribute__((sda));
+/* CdSafeState count and error (RAC1 sound_read_work): the IOP writes them through
+ * SIF DMA, as in 001334B8-g8.c, so they are volatile. */
+extern volatile int D_001A7100[] __attribute__((sda));
+extern volatile int D_001A7110[] __attribute__((sda));
 extern void *D_001A7064[] __attribute__((sda));
 extern void *D_001A7164[] __attribute__((sda));
 extern char D_001A7500[], D_001A7528[];
@@ -156,17 +173,13 @@ int func_00131DE8(int options)
         } while (delay != -1);
     } while (server == 0);
 
+    D_001A7100[0] = 0;
     *(int *)D_00146CC0 = 0;
-    do {
-        D_001A7100[0] = 0;
-    } while (0);
     *(int *)D_00147CC0 = 0;
-    do {
-        D_001A7110[0] = 0;
-    } while (0);
     D_001A74A8[0] = 0xFFC;
     D_001A74AC[0] = 0xFFC;
     init.read_active = D_001A7100;
     init.options = options;
+    D_001A7110[0] = 0;
     return func_00132C48(0, 8, &init);
 }

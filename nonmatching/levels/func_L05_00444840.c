@@ -13,6 +13,23 @@
  * Baseline C below retains retail lines 93-94 (addiu a3,zero,0x28; daddu a2,zero,zero); remaining diff is
  * solely +0x124 (mine a1, retail a2) and +0x128 (mine a2, retail a1).
  */
+/* 6 November 2026 (round 10c): still 2 rows. Why no group placement can work:
+ * in sched2, rank_for_schedule breaks the a1/a2/a3 tie by INSN_DEPEND count.
+ * A loop-note barrier insn depends on every earlier insn (all args +1), and a
+ * pre-barrier set of a2 (i = 0) or a3 (range = 40) adds one more to that arg
+ * only. Retail's a2, a1, a3 with a3=40 before a2=0 needs a2 alone boosted
+ * while range = 40 is emitted first, which the barrier forbids; so retail's
+ * a2-first came from sched1 (LUID order), where all three args tie (same
+ * weight, priority and 7 dependents; dumped). Only an unsubstituted
+ * a2 = P with P dying (weight 0) would put a2 first. Tried (about 40
+ * compiles): i = 0 before the call, after the call, after dx, as the
+ * group's first statement (4 rows); range = 40 alone in a group; both
+ * outside (106-130); for/while/do(1)/inverted-test scans inside the group
+ * (3-113); range = 40 as the -1 exit arm (54); groups around the call, dx or
+ * dy (4-24); exclusion and second scan reusing i (2-27); a pos local for
+ * object + 0x10 at four places or assigned in the argument (28-129); goto
+ * outer loop (ori args, 176). A py set in both exclusion arms gives
+ * a2 = P but swaps the target stack slots (6 rows) and is not clean C. */
 /* 6 November 2026, lead: with -freduce-all-givs (2 rows: a1/a2 setup order before the second func_L05_00444D60 call; retail's first call keeps a1-then-a2): no change from int[2]/struct/shared int[4] target locals, pointer temporaries for either argument, a 150-step hill-climb over the 16 local declarations. */
 /* 6 November 2026 (round 6), USA v1.01, check.py only: 736/736 bytes, 0/4
  * places, 7 differing rows. Profile: -O2 -G8 -ffunction-sections (the

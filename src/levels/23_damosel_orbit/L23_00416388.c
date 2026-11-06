@@ -279,7 +279,7 @@ s32 func_L23_0041C8C0(char *obj, TI128 *pos, s32 type, s32 arg3) {
     return i;
 }
 
-INCLUDE_ASM("asm/levels", func_L23_0041CA58);
+/* func_L23_0041CA58 is defined in L23_0041CA58.c. */
 
 /* The two sda declarations give retail's bare-symbol forms in this -G0 unit: the store through
  * $at and the unsplit address pair of the small array. */

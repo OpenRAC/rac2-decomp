@@ -1,3 +1,14 @@
+/* 6 November 2026 (round 10): still five words. Measured: the PRE table size
+ * stayed 89..97 buckets over ~7,000 generated equivalent forms (pointer/index
+ * packet and uv forms, struct or .bits translation copy, ring/cur/clamp forms,
+ * shared or separate loop counters, scoped step, blend as first parameter),
+ * 19 cse/loop/address flags and -G0..-G64 (all 93), and an inlined frame
+ * helper (93). In that window only 97 buckets put matrix before &matrix[3],
+ * and there half (bucket 64) falls before &matrix[3] (86), so the bucket model
+ * cannot give retail order without ~45 more pre-gcse insns. A single one-pass
+ * group at each of 164 placements (top or scoped step) gives no gain. The
+ * D_001A89E0_gp SDATA view is the reviewed header macro, not a #define alias.
+ */
 /* 6 November 2026 (round 8): declaring `step` right after `ring` leaves five
  * words, all one swap: retail step+1 0x964 / &matrix[3] 0x96C, ours reversed.
  * Slots follow gcse PRE reaching-register order = expression-hash bucket order

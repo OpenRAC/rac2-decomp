@@ -1,3 +1,11 @@
+/* 6 November 2026 (round 10): retail survey of the exempted roles shows the rule is too
+ * wide. No-nop witnesses are all at function entry (cleared history: f_002EF240 in 28
+ * level programs, boot f_00283CE0, handwritten boot f_00129218/2C0/368); the only built
+ * beneficiary is func_00283CE0 (own section). After a gas-filled branch slot the same
+ * roles keep the nop (this site, 27 programs). A rule that exempts only when both
+ * history slots were already dummy before the mtc1 fits every site. Any C giving
+ * retail's bytes gives gas the same history, so no C or flag change can add the nop.
+ */
 /* 6 November 2026: own unit with -frac2-keep-block-order -frac2-hazard-labels does not
  * add the missing nop: the gap is gas's mtc1 a0->f0 / cvt.s.w exemption
  * (tools/compiler/transformers/restrict_mtc1_exemption.py), a toolchain question, not C.

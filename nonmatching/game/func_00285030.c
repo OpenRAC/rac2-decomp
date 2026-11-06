@@ -1,3 +1,26 @@
+/* 6 November 2026, round 10c: unchanged best, 680/680, 0/28, 6 rows. Unit flags change nothing
+ * on the retained or the t[2]-before-t[1] form: -fno-sched-interblock, -fno-sched-spec,
+ * -fno-expensive-optimizations, -frac2-keep-block-order, -frac2-qcopy (6 each); -fno-schedule-insns
+ * gives 688 bytes; -fstrict-aliasing 125 rows, -fno-gcse 127. Call-as-argument forms of the
+ * func_00125F20 cursor, three cursor spellings of the final packet and s2 set early (merges with s,
+ * 668 bytes) tie or worsen. 0x8000 in an early s32 local stays a global register (51-138 rows).
+ * q[2] stored once after the if/else: 48. With 0x106 in block (7 rows) the sched1 trace shows 0x106
+ * outranks the la by its store-to-load edge, so it issues at cycle 5 beside the header store and
+ * cannot take v1; a 60-step hill-climb of that block stays at 7.
+ */
+/* 6 November 2026, round 10: unchanged best, 680/680, 0/28, 6 rows. Exhaustive GCC 2.95.2 RTL
+ * and scheduler trace analysis identifies the precise compiler conflict:
+ * 1. Setting both 0x4410 and 0x106 in early locals (w and w2) allows reload rematerialization to
+ *    give retail's exact la/0x4410/0x106 schedule (00285224, 00285228, 0028522C) and registers ($v0, $v1).
+ * 2. However, because w and w2 are absent from block 3 during sched1, the ALU unit at cycle 6 is idle
+ *    and eagerly schedules 0x8000 alongside t[1]'s store (insn 309).
+ * 3. This causes 0x8000's extended fake_birth in local-alloc to conflict with 0xE and 0x30003; having
+ *    3 references, 0x8000 takes $a2 first, forcing 0xE to $t0 and 0x30003 to $t2 (6 differing rows).
+ * 4. Emitting 0x106 inside block 3 fills cycle 6 ALU and delays 0x8000 to cycle 8, yielding retail's exact
+ *    $a2, $t0, $a2 allocation, but 0x106 is then scheduled before the la of &D_001A6480 and takes $t2 (7 rows).
+ * 5. Swapping packet stores t[1] and t[2] yielded a 5-diff variant with 0x30003 in $t0, but the
+ *    underlying priority tie between &D_001A6480 and 0x106 remains. Retaining best 680-byte 6-row source.
+ */
 /* 6 November 2026, round 9: unchanged best, 680/680, 0/28, 6 rows. With 0x4410 and 0x106 both in
  * early locals (retail la/0x4410/0x106 order), a 150-step hill-climb over the final packet order
  * stayed at 6. Also tied or worse: no s2 (6), s2 declared before t (6), 0xE as an early local (73,
@@ -59,6 +82,7 @@ void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
     u8 *p;
     long *q;
     long w;
+    long w2;
 
     tbw = tw - 6;
     if (tbw <= 0) tbw = 1;
@@ -76,6 +100,7 @@ void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
     *(u32 *)(D_001B22A8[0] + 8) = 0;
     *(u32 *)(D_001B22A8[0] + 0xC) = 0x5000000E;
     w = 0x4410;
+    w2 = 0x106;
     {
         long *t = (long *)(D_001B22A8[0] + 0x10);
         D_001B22A8[0] = (s32)t;
@@ -104,7 +129,7 @@ void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
         t[3] = 0x47;
         t[4] = 0x4400000000008001UL;
         t[5] = w;
-        t[6] = 0x106;
+        t[6] = w2;
         t[7] = 0;
         t[8] = (0x8000 - s2->h160 * 8) | ((long)(0x8000 - s2->h162 * 8) << 16);
         t[9] = (s2->h160 * 8 + 0x8000) | ((long)(s2->h162 * 8 + 0x7FF0) << 16);

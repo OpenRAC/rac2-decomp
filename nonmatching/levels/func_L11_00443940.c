@@ -1,3 +1,4 @@
+/* 6 November 2026, round 10b: no admissible donor. Every other copy of this routine (L02_003FDDE8; the 194-instruction copy in levels 02/03/04/09/12/17/20/30; L04_0040C880, L11_003FC4D8) is unmatched, and every matched sibling of the rounding helper (L11_004456A0, L02_003FF6E8, L00_004003F0, L00_003DDEC8, game 0032F3D0/002D2188/00326A10) uses the same dead display-mode test. Retail's daddu a2,v0 ... daddu a0,a2 needs a block boundary between the label call and the draw; without the dead test lesson-27 flags, -frac2-* switches and nested calls stay at 904-924 bytes. */
 /* 6 November 2026 (Codex follow-up), USA v1.01, check.py only:
  * Retained round-7 C unchanged: 924/924 bytes, 0/1 places. The baseline has
  * 25 instruction-word differences when relocation immediate bits are excluded

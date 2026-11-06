@@ -1,3 +1,14 @@
+/* 6 November 2026, round 10: no gain, retained C still 584/584, 68 rows.
+ * Own-unit flags on this C: -fno-sched-interblock, -fno-rerun-loop-opt,
+ * -fmove-all-movables and pairs tie (the outer loop is phony here);
+ * -fno-schedule-insns 73 rows; -fno-gcse 556 bytes. On the real for-loop
+ * form (596 bytes, 124 rows) the same flags give 592-596 bytes / 122-125
+ * rows, -fno-gcse 576. Loop dump of that form: timer << 16 moves with
+ * savings 2 life 2, but flags & 7, constant 2 and both stack addresses are
+ * cross-block movables that move because maybe_never is 0. Donor search:
+ * only the identical L15 copy (f_0035A218) shares the constants and digit
+ * sequence; RAC1 draw_number callers have a different shape.
+ */
 /* 6 November 2026, follow-up: retained source rechecked at 584/584 bytes,
  * 0/2 USA v1.01 placements; first difference +0x9C. Counting unequal
  * instruction words while masking only relocation bits gives 75 differences

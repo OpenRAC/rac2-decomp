@@ -1,3 +1,12 @@
+/* 6 November 2026, round 10: frame now 0x1D0 like retail; 3 real words left (c2.y/c2.z/c3.z
+ * store order at +0x224/+0x230/+0x238). The offset vector is the first member of the same
+ * 64-byte scratch type func_L30_0041B848 uses ({angles; rotation[3]}, angles reused as the
+ * size offset); its rotation[3] puts the corners at sp+0x120 as in retail. rotation is unused
+ * here, so this needs a ruling before src/. sched1 model: 2 issues/cycle, one memory unit;
+ * ties go by priority, then REG_DEAD weight (the last use of 1.0 is picked first), then
+ * LUID. h is ready at t31 and slots t26-t30 hold five stores; retail holds four, so one
+ * memory op is still missing. Store-order climbs (120 + 110 + 250 steps, with clears and a
+ * named h), -fno-sched-interblock/-fno-sched-spec and do/while groups (748 bytes) gain nothing. */
 /* 6 November 2026, round 9: unchanged, 3 real words (c2.y/c2.z/c3.z store order). sched1 has h ready only at t31 and four early stores to fill t26-t30, so one 1.0 store is forced at t30; retail needs one more memory op before reload. 170-step climb with a corrected metric (frame offset +0x30 masked), chained clears, corner copies and -fno-regmove/-fno-caller-saves stay at 3. The 0x1A0/0x1D0 frame gap closes only with an unused 48-byte local (rejected as padding). */
 /* 6 November 2026, round 5: corner-store order 3 words off (was 5);
  * USA v1.01 default -O2 -G0 -ffunction-sections, 740/740, 0/6 places.
@@ -76,7 +85,7 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     B971Packet packet;
     float tmp[2];
     float transform[4][4] __attribute__((aligned(16)));
-    float offset[4];
+    struct { float angles[4]; float rotation[3][4]; } scratch;
     Corner corners[4];
     float c, sn;
     float *out;
@@ -107,8 +116,8 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     func_00282DD8(transform[1], transform[0], D_0018A0E0);
     func_00282F20(transform[1], transform[1], 1.0f);
     func_00282DD8(transform[2], transform[1], transform[0]);
-    func_00282D30(offset, transform[0], size);
-    func_00282CC0(transform[3], transform[3], offset);
+    func_00282D30(scratch.angles, transform[0], size);
+    func_00282CC0(transform[3], transform[3], scratch.angles);
     corners[0].bits = 0; corners[1].bits = 0; corners[2].bits = 0; corners[3].bits = 0;
     corners[0].f[1] = -1;
     corners[3].f[2] = -(1 - skew * 0.3f);

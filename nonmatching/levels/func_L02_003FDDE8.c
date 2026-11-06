@@ -1,6 +1,17 @@
 /* 6 November 2026, USA v1.01, check.py only: 964/964 compiled bytes (exact size),
  * 0/1 places match. 20 non-reloc instruction differences remain across 4 draws
  * under `-O2 -G8 -ffunction-sections -fno-rerun-loop-opt -fno-gcse`.
+ * 6 November 2026 (round 10): the retained C below is NOT admissible: scaled_coord's
+ * `if (result != 0 && mode == active) scaled = 1.0f;` is a dead test (blocker 26), and
+ * `#define TABLE` is a second name for D_L02_001B1190 (new AGENTS.md rule). Compliant form
+ * (no dead test, no TABLE alias, no field copy; draw 3 body in a one-pass do/while(0) group)
+ * measures 952/964 bytes, 68 real rows. Cause: combine folds `label = v0; a0 = label` into
+ * `a0 = v0` within one block, so label never lives in $a2 (retail `daddu $a2,$v0` ... `daddu
+ * $a0,$a2` in all four draws). Tried without effect: call written as the draw argument,
+ * inline draw_text helper taking label, do/while(0) groups around the label call, if/else vs
+ * ternary colour, 110-step statement-order hill-climb. Only a block split between the label
+ * call and the draw call keeps the copy; no real source construct for it is known.
+ *
  * Prologue and epilogue are byte-for-byte identical to retail (frame 0x60, saving
  * $s0..$s6 and $f20..$f22). All callee-saved registers match retail assignments:
  * $s0 (object), $s1 (0x8710 / 0xE0), $s2 (state / &D_L02_00264A70), $s3 (enabled / &D_00139568),
