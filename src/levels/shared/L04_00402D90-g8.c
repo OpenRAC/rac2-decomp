@@ -128,8 +128,6 @@ typedef unsigned int AttackQuad __attribute__((mode(TI)));
 typedef struct { int v[5]; } AttackChoices;
 extern AttackChoices D_L04_001B0A10;
 extern struct { unsigned char pad[0x80]; float position[4]; unsigned char pad90[0x2290-0x90]; unsigned char *hero; } D_00189E20;
-#define D_00189F00 ((unsigned char *)&D_00189E20 + 0xe0)
-#define D_L04_0018C0B0 D_00189E20.hero
 typedef struct {
  unsigned char pad0[0x260]; int triggerList;
  unsigned char pad264[0x10]; short elevated;
@@ -177,12 +175,12 @@ void func_L04_0040EF50(unsigned char *m)
  unsigned char *target; float pitch,yaw,aimPitch,aimYaw,extra; AttackState *p=*(AttackState **)(m+0x68); unsigned char *d; int count,i,state,choice;
  choices=D_L04_001B0A10;
  func_00282D30(probe,p->offset,3);
- func_00282CC0(probe,probe,D_00189F00);
- count=func_00277F48(probe,0.7f,0,D_L04_0018C0B0,0);
+ func_00282CC0(probe,probe,((unsigned char *)&D_00189E20 + 0xe0));
+ count=func_00277F48(probe,0.7f,0,D_00189E20.hero,0);
  if(count) {
   func_00282D30(delta,p->offset,7);
   for(i=0;i<count;i++) if(func_002ABB78(D_L04_001C3B40[i]) || H(D_L04_001C3B40[i],0xaa)==0x85)
-   func_002A8F70(D_L04_001C3B40[i],D_L04_0018C0B0,0x10000,D_00189E20.position,delta,1);
+   func_002A8F70(D_L04_001C3B40[i],D_00189E20.hero,0x10000,D_00189E20.position,delta,1);
  }
  func_L04_0040E460(m);
  if((D_L04_002C63C0[D_L04_001B090C].flags&1) && p->triggerList!=-1) {

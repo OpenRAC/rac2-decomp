@@ -35,8 +35,6 @@ extern char D_00189EA0[];
 extern char D_0018A0E0[];
 extern s32 D_00138320[];
 extern PadSt D_00138180;
-#define pad_held_r D_00138320
-#define controller_state D_00138180
 extern int func_L00_00424978(void *);
 extern void func_L00_00424940(void *);
 extern f32 func_00283C80(f32, f32);
@@ -102,7 +100,7 @@ void func_L06_0047A408(char *arg) {
         && func_00283C80(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw, ref_L06_0047A408_03) >= 1.396263599395752f) {
         goto stop;
     }
-    if (params->l_buttons_end != 0 && params->type == 5 && (pad_held_r[0] & 4)) {
+    if (params->l_buttons_end != 0 && params->type == 5 && (D_00138320[0] & 4)) {
 stop:
         if (params->timer != 0) {
             params->done = 1;
@@ -169,7 +167,7 @@ stop:
         }
         func_L00_00424C00();
     } else if (params->type == 1 || params->type == 7 || params->type == 10 || params->type == 9) {
-        PadSt *pad = &controller_state;
+        PadSt *pad = &D_00138180;
         if (pad->analog[0] != 0.0f || pad->analog[1] != 0.0f) {
             params->timer = 200;
         }

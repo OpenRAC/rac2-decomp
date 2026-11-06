@@ -44,7 +44,6 @@ extern void func_002B0668(void *);
 extern void func_L01_00326DD8(void *, int, float, void *);
 extern void func_L01_00331CA0(void *, int, void *, float);
 
-#define hero ((WeatherHero *)(D_L01_001B94C0 - 0x140))
 
 void func_L01_00399510(char *m)
 {
@@ -97,9 +96,9 @@ void func_L01_00399510(char *m)
         z = func_00283CE0(count);
         scale = 1.0f - (x > y ? x : y) * D_L01_001AF654;
         count = func_00283CF0(z * scale);
-        *(WeatherQuad *)(origin) = *(WeatherQuad *)(hero->position);
-        func_L00_00323F28(origin, origin, 16.0f, hero->rotation[2], hero->rotation[1]);
-        origin[2] = hero->position[2] + D_L01_001AF630;
+        *(WeatherQuad *)(origin) = *(WeatherQuad *)(((WeatherHero *)(D_L01_001B94C0 - 0x140))->position);
+        func_L00_00323F28(origin, origin, 16.0f, ((WeatherHero *)(D_L01_001B94C0 - 0x140))->rotation[2], ((WeatherHero *)(D_L01_001B94C0 - 0x140))->rotation[1]);
+        origin[2] = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] + D_L01_001AF630;
         for (i = 0; i < count; i++) {
             float offset, length, z, floor, scale;
             *(WeatherQuad *)(pos) = *(WeatherQuad *)(origin);
@@ -109,7 +108,7 @@ void func_L01_00399510(char *m)
             offset = func_00283198(func_002A7878(0.0f, 6.2831854820251465f));
             offset *= func_002A7878(0.0f, D_L01_001AF634);
             pos[1] += offset;
-            func_00282CF0(velocity, pos, hero->position);
+            func_00282CF0(velocity, pos, ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position);
             length = func_00282E20(velocity);
             if (length <= 8.0f) {
                 velocity2[0] = D_L01_001B2EF0[0] + func_002A7878(-jitter, jitter);
@@ -125,9 +124,9 @@ void func_L01_00399510(char *m)
                 velocity2[2] = -(scale * 0.01666666753590107f);
                 velocity2[3] = 0.0f;
             }
-            D_L01_001B27B0 = hero->position[2] - D_L01_001AF648;
+            D_L01_001B27B0 = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] - D_L01_001AF648;
             z = func_002B0520(pos);
-            top = hero->position[2] + D_L01_001AF630;
+            top = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] + D_L01_001AF630;
             if (z < top) {
                 int flag = 0;
                 floor = z < D_L01_001B27B0 ? D_L01_001B27B0 : z;
@@ -137,8 +136,8 @@ void func_L01_00399510(char *m)
             }
         }
         count = (int)((float)count * 1.4f);
-        *(WeatherQuad *)(origin) = *(WeatherQuad *)(hero->position);
-        origin[2] = hero->position[2] + D_L01_001AF630;
+        *(WeatherQuad *)(origin) = *(WeatherQuad *)(((WeatherHero *)(D_L01_001B94C0 - 0x140))->position);
+        origin[2] = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] + D_L01_001AF630;
         for (i = 0; i < count; i++) {
             float offset, z, floor;
             velocity[0] = D_L01_001B2EF0[0] + func_002A7878(-jitter, jitter);
@@ -152,9 +151,9 @@ void func_L01_00399510(char *m)
             offset = func_00283198(func_002A7878(0.0f, 6.2831854820251465f));
             offset *= func_002A7878(0.0f, 8.0f);
             pos[1] += offset;
-            D_L01_001B27B0 = hero->position[2] - D_L01_001AF648;
+            D_L01_001B27B0 = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] - D_L01_001AF648;
             z = func_002B0520(pos);
-            top = hero->position[2] + D_L01_001AF630;
+            top = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] + D_L01_001AF630;
             if (z < top) {
                 floor = z < D_L01_001B27B0 ? D_L01_001B27B0 : z;
                 if (special == 0) func_L01_00326DD8(pos, 0, floor, velocity);
@@ -168,8 +167,8 @@ void func_L01_00399510(char *m)
     }
     if (extras) {
         *(WeatherQuad *)(origin) = *(WeatherQuad *)(D_L01_001B94C0);
-        func_L00_00323F28(origin, origin, 30.0f, hero->rotation[2], hero->rotation[1]);
-        origin[2] = hero->position[2] + D_L01_001AF630;
+        func_L00_00323F28(origin, origin, 30.0f, ((WeatherHero *)(D_L01_001B94C0 - 0x140))->rotation[2], ((WeatherHero *)(D_L01_001B94C0 - 0x140))->rotation[1]);
+        origin[2] = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] + D_L01_001AF630;
         for (i = 0; i < count; i++) {
             float offset;
             *(WeatherQuad *)(pos) = *(WeatherQuad *)(origin);
@@ -182,8 +181,8 @@ void func_L01_00399510(char *m)
             func_002B0668(pos);
         }
         *(WeatherQuad *)(origin) = *(WeatherQuad *)(D_L01_001B94C0);
-        func_L00_00323F28(origin, origin, 4.0f, hero->rotation[2], hero->rotation[1]);
-        origin[2] = hero->position[2] + D_L01_001AF630;
+        func_L00_00323F28(origin, origin, 4.0f, ((WeatherHero *)(D_L01_001B94C0 - 0x140))->rotation[2], ((WeatherHero *)(D_L01_001B94C0 - 0x140))->rotation[1]);
+        origin[2] = ((WeatherHero *)(D_L01_001B94C0 - 0x140))->position[2] + D_L01_001AF630;
         for (i = 0; i < count; i++) {
             float offset;
             *(WeatherQuad *)(pos) = *(WeatherQuad *)(origin);

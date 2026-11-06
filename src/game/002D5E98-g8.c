@@ -255,9 +255,6 @@ typedef struct {
 
 extern char D_001C4FA0[];
 extern char D_00138180[];
-#define ROOT ((PageRoot *)D_001F2840)
-#define MAP ((PageMap *)D_001C4FA0)
-#define PAD ((PagePad *)D_00138180)
 
 extern PagePreview D_0025A6E0;
 extern u8 D_0025E680[];
@@ -282,18 +279,18 @@ int func_002D7698(PageMenu *menu)
 {
     int previous, count, old, next, mapped;
 
-    previous = MAP->page;
-    if (*(PageMenu **)(ROOT->owner + 0xE8) != menu) {
-        if (MAP->page < 28)
-            menu->selection[MAP->page] = -1;
+    previous = ((PageMap *)D_001C4FA0)->page;
+    if (*(PageMenu **)(((PageRoot *)D_001F2840)->owner + 0xE8) != menu) {
+        if (((PageMap *)D_001C4FA0)->page < 28)
+            menu->selection[((PageMap *)D_001C4FA0)->page] = -1;
         return 0;
     }
-    if ((PAD->buttons & 0xD00) && !ROOT->lock && ROOT->owner != D_0025E680)
+    if ((((PagePad *)D_00138180)->buttons & 0xD00) && !((PageRoot *)D_001F2840)->lock && ((PageRoot *)D_001F2840)->owner != D_0025E680)
         return 1;
 
     /* Next and previous available page. */
-    if (PAD->buttons & 8) {
-        for (next = MAP->page + 1; next < 28; next++) {
+    if (((PagePad *)D_00138180)->buttons & 8) {
+        for (next = ((PageMap *)D_001C4FA0)->page + 1; next < 28; next++) {
             if (D_001A7BC8[next] || D_001A79F0 == next) {
                 if (func_00295A10(next) < 0)
                     return 0;
@@ -302,8 +299,8 @@ int func_002D7698(PageMenu *menu)
             }
         }
     }
-    if (PAD->buttons & 4) {
-        for (next = MAP->page - 1; next >= 0; next--) {
+    if (((PagePad *)D_00138180)->buttons & 4) {
+        for (next = ((PageMap *)D_001C4FA0)->page - 1; next >= 0; next--) {
             if (D_001A7BC8[next] || D_001A79F0 == next) {
                 if (func_00295A10(next) < 0)
                     return 0;
@@ -312,7 +309,7 @@ int func_002D7698(PageMenu *menu)
             }
         }
     }
-    if (MAP->page != previous) {
+    if (((PageMap *)D_001C4FA0)->page != previous) {
         func_002E5E58(3, 0, 0);
         func_0029D830();
     }
@@ -321,27 +318,27 @@ int func_002D7698(PageMenu *menu)
     count = func_0029DB28((int *)0x70000000, 0, (int *)0x70000100, 1);
     menu->count = count;
     if (count) {
-        u32 buttons = PAD->buttons;
+        u32 buttons = ((PagePad *)D_00138180)->buttons;
         int *selections = menu->selection;
         {
-            int *entry = &selections[MAP->page];
+            int *entry = &selections[((PageMap *)D_001C4FA0)->page];
             old = *entry;
             if (buttons & 0x1000)
                 *entry = (old + count - 1) % count;
         }
         if (buttons & 0x4000) {
-            int *entry = &selections[MAP->page];
+            int *entry = &selections[((PageMap *)D_001C4FA0)->page];
             *entry = (*entry + 1) % menu->count;
         }
         {
-            int *entry = &selections[MAP->page];
+            int *entry = &selections[((PageMap *)D_001C4FA0)->page];
             if (*entry != old)
                 func_002E5E58(3, 0, 0);
         }
-        if ((buttons & 0x5000) || MAP->page != previous) {
+        if ((buttons & 0x5000) || ((PageMap *)D_001C4FA0)->page != previous) {
             int *entry;
             D_0025A6E0.timer = -576;
-            entry = &selections[MAP->page];
+            entry = &selections[((PageMap *)D_001C4FA0)->page];
             D_0025A6E0.item = ((int *)0x70000000)[*entry];
             *D_0025A620 = ((int *)0x70000100)[*entry];
         }
@@ -351,12 +348,12 @@ int func_002D7698(PageMenu *menu)
     }
 
     /* Back. */
-    if ((PAD->buttons & 0x10) && ROOT->owner != D_0025E680) {
-        int back = *(int *)(ROOT->owner + 0xE0);
+    if ((((PagePad *)D_00138180)->buttons & 0x10) && ((PageRoot *)D_001F2840)->owner != D_0025E680) {
+        int back = *(int *)(((PageRoot *)D_001F2840)->owner + 0xE0);
         int status;
         if (back)
-            ROOT->current = back;
-        else if (!ROOT->lock) {
+            ((PageRoot *)D_001F2840)->current = back;
+        else if (!((PageRoot *)D_001F2840)->lock) {
             status = -1;
             goto done;
         }
@@ -366,25 +363,25 @@ done:
     }
 
     /* Open the page's special screen. */
-    if ((PAD->buttons & 0x20) && MAP->page >= 0) {
-        if (ROOT->active)
+    if ((((PagePad *)D_00138180)->buttons & 0x20) && ((PageMap *)D_001C4FA0)->page >= 0) {
+        if (((PageRoot *)D_001F2840)->active)
             return 0;
-        if (MAP->page == 0)
+        if (((PageMap *)D_001C4FA0)->page == 0)
             mapped = 21;
-        else if (MAP->page == 24)
+        else if (((PageMap *)D_001C4FA0)->page == 24)
             mapped = 0;
         else
-            mapped = MAP->page;
-        if (MAP->page >= 0) {
+            mapped = ((PageMap *)D_001C4FA0)->page;
+        if (((PageMap *)D_001C4FA0)->page >= 0) {
             unsigned int word = (unsigned)mapped >> 2;
             int bit = 1 << (mapped & 0x1F);
             if (D_00139768[word] & bit) {
-                D_001A72D4 = ROOT->saved;
+                D_001A72D4 = ((PageRoot *)D_001F2840)->saved;
                 func_002C9E60(0);
-                ROOT->savedMode = D_001A7478;
-                ROOT->savedOwner = ROOT->owner;
-                ROOT->page = MAP->page;
-                ROOT->savedCurrent = ROOT->field8;
+                ((PageRoot *)D_001F2840)->savedMode = D_001A7478;
+                ((PageRoot *)D_001F2840)->savedOwner = ((PageRoot *)D_001F2840)->owner;
+                ((PageRoot *)D_001F2840)->page = ((PageMap *)D_001C4FA0)->page;
+                ((PageRoot *)D_001F2840)->savedCurrent = ((PageRoot *)D_001F2840)->field8;
                 D_001A7478 = 2;
                 func_00288AA0(D_001BAD40, mapped);
                 func_00288BE8(D_001BAD40);

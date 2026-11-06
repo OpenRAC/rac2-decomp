@@ -98,7 +98,6 @@ extern void func_002ACDE8(void *, void *, void *);
 extern float func_00283B98(float, float);
 extern int func_L00_003D2A00(u8 *, void *, void *, Hit *);
 
-#define HERO ((Hero *)D_00189E20)
 
 static inline void SetShake(float amount)
 {
@@ -130,10 +129,10 @@ void func_L00_003D1D28(u8 *self)
         if (func_00282978(&st->t4))
             self[0x20] = 1;
     }
-    if (HERO->i[0x2294 / 4] == 1)
+    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 1)
         ref_L00_003D1D28_00(0x1D, 1);
     func_002829D8(st);
-    if (HERO->i[0x2294 / 4] == 0x1D) {
+    if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x1D) {
         u32 color;
         if (st->timer > 0.0f && func_L00_002D4040(-1))
             color = 0x600000FF;
@@ -156,15 +155,15 @@ void func_L00_003D1D28(u8 *self)
         int variant = 3;
         int none = 0;
         ready = 1;
-        if (HERO->i[0x2294 / 4] == 0x1D) {
-            if (func_00282948(&HERO->i[0x2534 / 4]) == 0)
+        if (((Hero *)D_00189E20)->i[0x2294 / 4] == 0x1D) {
+            if (func_00282948(&((Hero *)D_00189E20)->i[0x2534 / 4]) == 0)
                 ready = 0;
         } else {
-            HERO->i[0x2534 / 4] = 0x28;
+            ((Hero *)D_00189E20)->i[0x2534 / 4] = 0x28;
         }
-        if (self[0x20] == 1 && HERO->b[0x22BC] == 0 && st->timer == 0.0f && HERO->i[0x1240 / 4] >= 0x17 && ready) {
-            if ((((Hero *)D_00138180)->i[0x1A0 / 4] & HERO->i[0x1230 / 4]) && func_L00_002D3F30(-1, 1)) {
-                if (HERO->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)D_L00_00262570 + D_001395AC * 0xE0))->id || HERO->i[0x229C / 4] != 0 || HERO->h[0x24EC / 2] != 0) {
+        if (self[0x20] == 1 && ((Hero *)D_00189E20)->b[0x22BC] == 0 && st->timer == 0.0f && ((Hero *)D_00189E20)->i[0x1240 / 4] >= 0x17 && ready) {
+            if ((((Hero *)D_00138180)->i[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) && func_L00_002D3F30(-1, 1)) {
+                if (((Hero *)D_00189E20)->ptr[0x2290 / 4][0x43] == ((WeaponEntry *)((u8 *)D_L00_00262570 + D_001395AC * 0xE0))->id || ((Hero *)D_00189E20)->i[0x229C / 4] != 0 || ((Hero *)D_00189E20)->h[0x24EC / 2] != 0) {
                     st->t40 = 1;
                     st->t6 = D_L00_001B01E8;
                 } else {
@@ -187,10 +186,10 @@ void func_L00_003D1D28(u8 *self)
                 st->t44 = D_L00_001B021C;
                 st->f48 = 1.0f / func_00283CE0(st->t44);
                 st->t44 += 2;
-            } else if (((Hero *)D_00138180)->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) {
+            } else if (((Hero *)D_00138180)->i[0x1A4 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) {
                 func_002E5CF8(5, 0, self);
             }
-            if (!(((Hero *)D_00138180)->i[0x1A0 / 4] & HERO->i[0x1230 / 4]) || !func_L00_002D4040(-1) || HERO->b[0x22B8] == 0) {
+            if (!(((Hero *)D_00138180)->i[0x1A0 / 4] & ((Hero *)D_00189E20)->i[0x1230 / 4]) || !func_L00_002D4040(-1) || ((Hero *)D_00189E20)->b[0x22B8] == 0) {
                 if (st->handle >= 0) {
                     func_L00_002D6B70(st->handle);
                     st->handle = -1;
@@ -295,9 +294,9 @@ void func_L00_003D1D28(u8 *self)
                     func_00282CC0(a, a, turret + 0x10);
                     func_00282D30(b, turret + 0xC0, 0.275f);
                     func_00282CC0(a, a, b);
-                    n = func_00277F48(1.5f, a, 1, HERO->ptr[0x2290 / 4], 0);
+                    n = func_00277F48(1.5f, a, 1, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0);
                     for (h = 0; h < n; h++) {
-                        if (D_L00_001C3280[h] != HERO->ptr[0x2290 / 4]) {
+                        if (D_L00_001C3280[h] != ((Hero *)D_00189E20)->ptr[0x2290 / 4]) {
                             func_00282D30(hit.pos, turret + 0xD0, -1.5f);
                             hit.pos[3] = 5627.925f;
                             func_002A8E20(D_L00_001C3280[h], &hit);
@@ -307,16 +306,16 @@ void func_L00_003D1D28(u8 *self)
                     func_00283410(mtx, D_L00_001B0190);
                     func_00283678(inv, mtx);
                     func_0029FCC0(turret, 0, origin);
-                    if (HERO->h[0x24EC / 2] == 1) {
+                    if (((Hero *)D_00189E20)->h[0x24EC / 2] == 1) {
                         func_00282D30(up, turret + 0xD0, -1.0f);
                         func_00282D30(side, turret + 0xC0, -1.0f);
                         func_00282D30(fwd, turret + 0xE0, 0.1f);
                         func_00283738(basis, turret + 0xC0, inv);
                     } else {
-                        qcopy(up, HERO->b + 0x730);
-                        qcopy(side, HERO->b + 0x740);
-                        func_00282D30(fwd, HERO->b + 0x750, -0.1f);
-                        func_00283738(basis, HERO->b + 0x730, inv);
+                        qcopy(up, ((Hero *)D_00189E20)->b + 0x730);
+                        qcopy(side, ((Hero *)D_00189E20)->b + 0x740);
+                        func_00282D30(fwd, ((Hero *)D_00189E20)->b + 0x750, -0.1f);
+                        func_00283738(basis, ((Hero *)D_00189E20)->b + 0x730, inv);
                     }
                     qcopy(shot->q30, up);
                     spread = 1.0471977f;
