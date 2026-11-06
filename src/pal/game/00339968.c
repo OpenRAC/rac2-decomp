@@ -38,7 +38,6 @@ void func_PAL_00339DC8(int object, int value, int count)
 INCLUDE_ASM("asm/pal/game", func_PAL_00339E30);
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033A248);
 
 
 /* clamps a caller-supplied terminator value (-1 meaning unset) to 180, then runs two callees on two sub-objects of one handle, the second with a float pair */

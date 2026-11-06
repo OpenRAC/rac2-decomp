@@ -1,3 +1,92 @@
 #include "include_asm.h"
+#include "common.h"
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L26_002FD970);
+typedef unsigned int Quad __attribute__((mode(TI)));
+typedef union { Quad q; float f[4]; } Vec;
+typedef struct {
+    char pad[0x30];
+    int mode, timer;
+    char gap38[0x44 - 0x38];
+    short count;
+    char gap46[0x18C - 0x46];
+    char *parts[0];
+} Hero;
+extern Hero D_L26_001BC880;
+typedef struct { char pad[0x34]; unsigned short flags; char gap[0xAA - 0x36]; short id; } Object;
+extern int D_001A79F0[] __attribute__((sda));
+extern float D_L26_001A9450[][4] SDATA(D_L26_001A9450);
+extern float D_L26_001A9420[] __attribute__((sda));
+extern float D_L26_001A9420_gp SDATA(D_L26_001A9420);
+extern unsigned int D_L26_001A9428[] __attribute__((sda));
+extern unsigned int D_L26_001A9428_gp SDATA(D_L26_001A9428);
+extern int D_L26_001A9430[] __attribute__((sda));
+extern int D_L26_001A9430_gp SDATA(D_L26_001A9430);
+extern int D_L26_001A9438[] __attribute__((sda));
+extern int D_L26_001A9440[] __attribute__((sda));
+extern void func_L00_002FC980(void);
+extern void func_US2_002E72D8(void *);
+extern void func_L00_00326048(char *, float *, int, int, float);
+extern void func_0029FC20(char *, int, char *);
+extern void func_002830C0(void *, void *, void *);
+extern void func_00282F20(void *, void *, float);
+extern unsigned int func_00283D38(unsigned int, unsigned int, float);
+extern char *func_002BAA28(void *, void *, void *, unsigned int, unsigned int, int, int, int, int);
+extern int func_00283CF0(float);
+extern float func_002A7878(float, float);
+extern int func_002A7820(int, int);
+
+/* func_US2_L26_002FD970, the USA v2.00 copy of func_L26_002FCCC0: the same C, where the id 4000 call
+   to func_L00_00326048 also requires D_001A79F0 != 51, and func_002E64A0 becomes func_US2_002E72D8. */
+void func_US2_L26_002FD970(void) {
+    Vec transform[4];
+    Vec position;
+    Vec velocity;
+    Vec acceleration;
+    Hero *hero;
+    char **slot;
+    char *object;
+    char *effect;
+    unsigned int color;
+    int kind;
+    int duration;
+    int size;
+    int i;
+    int j;
+    int flags = -1;
+    func_L00_002FC980();
+    for (i = 0; i < D_L26_001BC880.count; i++) {
+        hero = &D_L26_001BC880;
+        slot = &hero->parts[i];
+        object = *slot;
+        if (object && ((Object *)object)->id == 0xE29) {
+            ((Object *)object)->flags |= 0x800;
+        }
+        if (((Object *)object)->id == 0xD54) func_US2_002E72D8(object);
+        if (object && *(short *)(object + 0xAA) == 4000 && D_001A79F0[0] != 51 && *(char **)(object + 0x68))
+            func_L00_00326048(object, (float *)(*(char **)(object + 0x68) + 0xC),
+                              (int)0x80AAAAD2, (int)0x80396464, 0.061086535f);
+    }
+    if (D_001A79F0[0] == 26 && D_L26_001BC880.mode == 0 && D_L26_001BC880.timer < 260) {
+        object = D_L26_001BC880.parts[3];
+        func_0029FC20(object, 0, (char *)transform);
+        object += 0x10;
+        qcopy((transform + 3), object);
+        for (j = 0; j < 8; j++) {
+            func_002830C0(&position, D_L26_001A9450[j & 1], transform);
+            func_00282F20(&velocity, transform, 0.06666667f);
+            velocity.f[3] = D_L26_001A9420_gp;
+            qzero_nc(&acceleration);
+            acceleration.f[3] = D_L26_001A9420[1];
+            color = func_00283D38(D_L26_001A9428_gp, D_L26_001A9428[1], func_002A7878(0.0f, 1.0f));
+            {
+                unsigned int rgb = color & 0xFFFFFF;
+                kind = func_002A7820(D_L26_001A9430_gp, D_L26_001A9430[1]);
+                duration = func_002A7820(D_L26_001A9438[0], D_L26_001A9438[1]);
+                size = func_002A7820(D_L26_001A9440[0], D_L26_001A9440[1]);
+                effect = func_002BAA28(&position, &velocity, &acceleration, color, rgb,
+                                       kind, duration, size, flags);
+                if (effect) effect[9] = func_00283CF0(2.0f) - 16;
+            }
+        }
+    }
+}

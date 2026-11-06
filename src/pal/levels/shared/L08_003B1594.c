@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L08_003B1594);
-
 #include "common.h"
 extern u8 *D_0018C0B0;
 extern float func_002A7878(float, float);

@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L12_003E4E5C);
-
 
 #include "common.h"
 extern u8 D_L12_001B9E00[];

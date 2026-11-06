@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_00405268);
-
 #include "common.h"
 typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
 extern void func_00282CF0(void *, void *, void *);

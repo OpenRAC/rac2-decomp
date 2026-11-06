@@ -56,6 +56,3 @@ void func_PAL_L07_003EB648(char *arg, int a1, int a2, int a3, int a4)
     r = ((s32)(func_002A7820(0x2D, 0x4B)) * 5 + 2) / 6;
     func_L07_002E2090(arg, a1, a2, arg + 0xF0, r, a3, a4);
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L07_003EEC8C);

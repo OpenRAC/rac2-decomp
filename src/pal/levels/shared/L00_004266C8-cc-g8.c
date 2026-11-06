@@ -1,7 +1,5 @@
-/* Closer B, 2026-11-01: PAL copy of func_L00_004212B8 (matched); 1916/1916, profile -O2 -G8 -ffunction-sections -g.
- * Only $s3/$s4 differ: retail gives the D_00189E20 high part and `use` s3, `out` s4; here the reverse. 50 Hz: the
- * 0xC and 0xD limits, and timers scaled by (D * 5 + 2) / 6 read as int. A static inline for the scale changes nothing.
- */
+/* func_PAL_L00_004266C8, the PAL copy of func_L00_004212B8: the same C, where the 15 and 16 frame limits
+   become 12 and 13 and the timers are scaled by (D * 5 + 2) / 6. */
 #include "common.h"
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; float f[0x980]; } Hero;
 extern char D_00189E20[];
@@ -136,7 +134,9 @@ void func_PAL_L00_004266C8(char *moby, void *out)
             if (HERO->h[0x34C / 2] != 0 && (HERO->b[0x49E] == 0 || HERO->h[0x4AE / 2] >= 0x10)) {
                 use = 1;
             } else {
-                if (func_00334730(tmp, 1) != 1 || func_00282DB0(tmp, c) < func_00282DF0(s->a10))
+                if (func_00334730(tmp, 1) != 1)
+                    use = 1;
+                else if (func_00282DB0(tmp, c) < func_00282DF0(s->a10))
                     use = 1;
             }
             v = (char *)tmp;

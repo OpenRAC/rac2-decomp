@@ -29,10 +29,6 @@ void func_PAL_L02_003D1828(unsigned char *arg0) {
     }
 }
 
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_003D18D8);
-
-
 #include "common.h"
 extern void func_L02_00333438(char *, char *);
 extern int func_L01_00321178(char *, char *);

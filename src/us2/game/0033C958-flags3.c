@@ -36,6 +36,42 @@ void func_US2_0033DC68(char *object)
     func_0027FAA8(0x100, 0xBE, color, buffer, -1);
 }
 
+extern unsigned char D_001A7BB3 __attribute__((sda));
+extern unsigned char D_001A7BB2 __attribute__((sda));
+extern void func_0027F110(void);
+extern void func_0027F120(void);
+
+/* func_US2_0033E9B8, the v2.00 copy of func_0033D970: the same C with func_0027F120 before the text and
+ * func_0027F110 after it. func_0027FAA8 must be declared int here (as in this unit), not void: the ignored
+ * call value is what leaves the second test in $v1, so this cannot live in 0033C958.c, which declares it void. */
+void func_US2_0033E9B8(char *object)
+{
+    char buffer[128];
+    SolTextPair2 pair;
+    char *first;
+    char *label;
+    char *second;
+    char *format;
+    int color;
+
+    func_US2_0033BF90(object + 8);
+    func_0027F120();
+    color = *(int *)(object + 0x2D8) == 0 ? (int)0x80D0D0D0 : 0x70808080;
+    pair = D_L00_001AE110;
+    format = D_L00_001AE118;
+    first = func_00288FB8(0x2C30);
+    second = func_00288FB8(pair.ids[D_001A7BB2 != 0]);
+    func_00115DA8(buffer, format, first, second);
+    func_0027FAA8(0x100, 0x96, color, buffer, -1);
+
+    color = *(int *)(object + 0x2D8) == 1 ? (int)0x80D0D0D0 : 0x70808080;
+    label = func_00288FB8(0x3079);
+    second = func_00288FB8(pair.ids[D_001A7BB3 != 0]);
+    func_00115DA8(buffer, format, label, second);
+    func_0027FAA8(0x100, 0xBE, color, buffer, -1);
+    func_0027F110();
+}
+
 extern void func_US2_0033BF90();
 extern void func_002DAF68();
 extern void func_US2_003378A0();

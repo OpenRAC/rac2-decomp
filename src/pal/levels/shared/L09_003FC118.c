@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_003FC118);
-
 extern unsigned int D_L09_001FE6C0[];
 extern float func_00282E80(char *a, int b);
 

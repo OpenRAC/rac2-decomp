@@ -92,6 +92,90 @@ void func_PAL_L20_0044CAA8(char *arg0) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0044CEB0);
+extern int func_00282948(void *);
+extern void func_L00_003294F0(char *, int);
+extern void func_PAL_L20_0044D1C8(char *);
+
+/* func_PAL_L20_0044CEB0, the PAL copy of func_L20_004473B0: the same C, with the four timers at
+   0x74-0x80 scaled to 50 Hz when the object starts (case 0). */
+void func_PAL_L20_0044CEB0(char *arg0) {
+    char *state;
+    TI128 pos, rot, delta;
+    float accel;
+
+    state = *(char **)(arg0 + 0x68);
+    qcopy(&pos, arg0 + 0x10);
+    qcopy(&rot, arg0 + 0xF0);
+    switch (*(unsigned char *)(arg0 + 0x20)) {
+    case 0:
+        qcopy(state + 0x60, arg0 + 0x10);
+        *(int *)(state + 0x5C) |= 1;
+        *(int *)(state + 0x74) = (*(int *)(state + 0x74) * 5 + 2) / 6;
+        *(int *)(state + 0x78) = (*(int *)(state + 0x78) * 5 + 2) / 6;
+        *(int *)(state + 0x7C) = (*(int *)(state + 0x7C) * 5 + 2) / 6;
+        *(int *)(state + 0x80) = (*(int *)(state + 0x80) * 5 + 2) / 6;
+        func_L00_003294F0(arg0, 1);
+        func_002A7750((int)arg0, 4, -1);
+        break;
+    case 1:
+        if (func_002B3868(arg0) != 0) {
+            *(int *)(state + 0x88) = 0;
+            *(int *)(state + 0x84) = *(int *)(state + 0x74);
+        }
+        if (func_00282948(state + 0x84) != 0) {
+            func_002A7750((int)arg0, 2, -1);
+        }
+        {
+            int duration = *(int *)(state + 0x74);
+            float speed = *(float *)(state + 0x70);
+            float start = *(float *)(state + 0x68) + speed;
+            accel = (speed * 4.0f) / (float)(duration * duration);
+            func_002AA548(arg0 + 0x18, state + 0x88, start, accel,
+                          accel, accel * (float)duration);
+        }
+        break;
+    case 2:
+        if (func_002B3868(arg0) != 0) {
+            *(int *)(state + 0x84) = *(int *)(state + 0x78);
+        }
+        if (func_00282948(state + 0x84) != 0) {
+            func_002A7750((int)arg0, 3, -1);
+        }
+        break;
+    case 3:
+        if (func_002B3868(arg0) != 0) {
+            *(int *)(state + 0x88) = 0;
+            *(int *)(state + 0x84) = *(int *)(state + 0x7C);
+        }
+        if (func_00282948(state + 0x84) != 0) {
+            func_002A7750((int)arg0, 4, -1);
+        }
+        {
+            int duration = *(int *)(state + 0x74);
+            float speed = *(float *)(state + 0x70);
+            float start = *(float *)(state + 0x68);
+            accel = (speed * 4.0f) / (float)(duration * duration);
+            func_002AA548(arg0 + 0x18, state + 0x88, start, accel,
+                          accel, accel * (float)duration);
+        }
+        break;
+    case 4:
+        if (func_002B3868(arg0) != 0) {
+            *(int *)(state + 0x84) = *(int *)(state + 0x80);
+        }
+        if (func_00282948(state + 0x84) != 0) {
+            func_002A7750((int)arg0, 1, -1);
+        }
+        break;
+    }
+    if (func_002B38B8(arg0) == 0) {
+        if (0.0f < *(float *)(state + 0x8C)) {
+            func_PAL_L20_0044D1C8(arg0);
+            *(float *)(state + 0x8C) = -1000.0f;
+        }
+    }
+    func_00282CF0(&delta, arg0 + 0x10, &pos);
+    func_002AD6F0(state + 0x20, &delta, &rot, arg0 + 0xF0);
+}
 
 

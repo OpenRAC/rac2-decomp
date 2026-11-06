@@ -129,5 +129,4 @@ stop:
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_003F96E8);
 

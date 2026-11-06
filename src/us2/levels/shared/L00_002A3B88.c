@@ -2,4 +2,3 @@
 
 INCLUDE_ASM("asm/us2/levels", func_US2_L00_002A3B88);
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L00_002A4928);

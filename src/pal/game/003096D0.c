@@ -106,10 +106,3 @@ void func_PAL_0030A078(X *x) {
     qcopy(&g->v10, &a);
     g->f0C = 1;
 }
-
-
-
-INCLUDE_ASM("asm/pal/game", func_PAL_0030A9D8);
-
-
-

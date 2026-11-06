@@ -1,7 +1,6 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_00409B48);
 
 
 #include "common.h"

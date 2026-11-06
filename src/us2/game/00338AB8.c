@@ -77,10 +77,27 @@ void func_US2_00338AB8(char *obj, void *pool)
     **(int **)(obj + 4) = 0;
 }
 
-
-INCLUDE_ASM("asm/us2/game", func_US2_00338CD8);
-
 INCLUDE_ASM("asm/us2/game", func_US2_00338D48);
+
+
+extern int func_0027F178(unsigned char *text, int length); /* text width */
+
+/* func_US2_00338CD8, the v2.00 copy of func_00337E30, which also stores its second argument at
+   +0x1C4. */
+void func_US2_00338CD8(unsigned char *p, int a1, int a2, float f12, float f13)
+{
+    unsigned char *q = p + 168;
+
+    *(int *)(p + 452) = a1;
+    *(float *)(*(int *)p) = f12;
+    *(float *)(*(int *)p + 4) = f13;
+    p[423] = 0;
+    *(int *)(p + 440) = a2;
+    *(int *)(p + 472) = (int)q;
+    *(int *)(p + 468) = func_0027F178(q, -1);
+    *(int *)(p + 432) = 1;
+    *(float *)(*(int *)(p + 4)) = 1.0f;
+}
 
 extern void func_00115AC0(void *, int, int);
 extern void func_US2_00338D48(void *, int, int, float, float);
@@ -98,11 +115,8 @@ void func_US2_00338F18(int object, int value, int count)
 
 INCLUDE_ASM("asm/us2/game", func_US2_00338F80);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00338F88);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00339398);
 
-INCLUDE_ASM("asm/us2/game", func_US2_003395F0);
 
 /* clamps a caller-supplied terminator value (-1 meaning unset) to 180, then runs two callees on two sub-objects of one handle, the second with a float pair */
 void func_US2_00339678(int object, int value, int count)

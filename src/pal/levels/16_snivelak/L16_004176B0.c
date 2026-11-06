@@ -158,7 +158,6 @@ void func_PAL_L16_00417FD8(char *arg0) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L16_004180B0);
 
 
 extern void func_00282CF0(void *, void *, void *);

@@ -8,6 +8,11 @@ int func_PAL_00299518(void) {
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00299520);
+int func_PAL_00299520(void) {
+    int value = D_PAL_001B1A3C;
+    D_PAL_001B1A3C = 0;
+    return value != 0;
+}
+
 
 INCLUDE_ASM("asm/pal/game", func_PAL_00299538);

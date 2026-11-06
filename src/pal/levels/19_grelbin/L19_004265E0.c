@@ -76,6 +76,3 @@ void func_PAL_L19_004265E0(char *obj)
         break;
     }
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L19_00427570);

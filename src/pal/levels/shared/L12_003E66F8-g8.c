@@ -135,3 +135,12 @@ void func_PAL_L12_003E7E08(char *obj) {
     }
     func_PAL_002B14F8(obj, s + 0x2B0, 1, 1, D_L12_001B0B64);
 }
+
+/* func_PAL_L12_003E66F8, the PAL copy of func_L12_003E2448: the same C, where the word read of
+   D_L12_001B0B0C (a `lhu` in USA) takes the 50 Hz scale. */
+extern int D_L12_001B0B0C __attribute__((sda));
+
+void func_PAL_L12_003E66F8(unsigned char *a0) {
+    *(unsigned char *)(a0 + 0x95) = 9;
+    *(unsigned short *)(*(unsigned int *)(a0 + 0x68) + 0x29E) = ((s32)(D_L12_001B0B0C) * 5 + 2) / 6;
+}

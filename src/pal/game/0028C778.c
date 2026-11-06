@@ -15,7 +15,6 @@ void func_PAL_0028C778(u8 *object) {
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0028D0C0);
 
 
 

@@ -28,11 +28,23 @@ void func_US2_00280380(int x, int y, u64 color, u8 *text, int length, float scal
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_00280440);
+float func_US2_002804C0(u8 *text, int length, int limit, float minimum) {
+    float scale = 1.0f;
+    int width;
 
-INCLUDE_ASM("asm/us2/game", func_US2_002804C0);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00280550);
+    if (text != 0) {
+        width = func_0027F288(text, length, scale);
+    } else {
+        width = 0;
+    }
+    if (limit < width) {
+        scale = (float)limit / (float)width;
+        if (scale < minimum) {
+            scale = minimum;
+        }
+    }
+    return scale;
+}
 
 extern void func_US2_00280550(float);
 

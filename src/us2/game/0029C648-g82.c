@@ -101,3 +101,103 @@ states:
         func_US2_0029C648();
     }
 }
+
+/* func_US2_0029CCB8, the v2.00 copy of func_0029BEB8: the same C with one more test and the menu's new offset. */
+extern int D_001A9A50 __attribute__((sda));
+extern short D_0018A000[];
+extern int D_001A8C64;
+extern void func_US2_0033B720(void *);
+
+void func_US2_0029CCB8(void) {
+    if (D_001A9A50 != 0 && D_0018A000[0] == 0 && D_001A8C64 == 0 && D_001A9A54 != 0 && D_001A8CFC[0] != 0)
+        func_US2_0033B720(D_001A8CFC[0] + 0x3F7B0);
+}
+
+/* func_US2_0029CD18, the v2.00 copy of func_0029BF08: the callback tables at their new offsets,
+   a menu test before them and the camera scale moved out to func_US2_0029CC48. */
+extern int D_001A79F0[] __attribute__((sda));
+extern void func_00290680(void);
+extern void func_US2_0029CC48(void);
+extern int func_002857B0(void);
+extern int ref_US2_0029CD18_00(int);
+
+typedef unsigned int (*CbCd)(void);
+typedef struct { void *cb; int pad; } SlotCd;
+typedef struct {
+    char pad0[0x79D4];
+    void *cb1;
+    char pad1[0x79F4 - 0x79D8];
+    void *cb2;
+    char pad2[0x79FC - 0x79F8];
+    SlotCd slot[4];
+    SlotCd slot2[2];
+} SubCd;
+
+/* The same table seen from its other end: the callback pointer is the second word. */
+typedef struct { int pad; void *fn; } FnCd;
+
+void func_US2_0029CD18(void)
+{
+    int result;
+    int i;
+    CbCd fn;
+    SubCd *sub;
+    char *g;
+
+    if (ref_L00_0030CDB0_00[0] != 0)
+        return;
+
+    if (D_001A8CFC[0] == 0)
+        goto states;
+
+    if (D_001A8BB0[0] == 4) {
+        if (func_002857B0() == 8)
+            return;
+    }
+
+    func_00290680();
+    result = 0;
+    func_US2_0029CCB8();
+
+    fn = (CbCd)((SubCd *)(D_001A8CFC[0] + 0x38000))->cb2;
+    if (fn != 0)
+        result = fn() != 0;
+
+    for (i = 0; i < 4; i++) {
+        sub = (SubCd *)(D_001A8CFC[0] + 0x38000);
+        if (sub->slot[i].cb != 0)
+            result |= ((CbCd)((FnCd *)(D_001A8CFC[0] + 0x3F9F8))[i].fn)();
+    }
+
+    for (i = 0; i < 2; i++) {
+        sub = (SubCd *)(D_001A8CFC[0] + 0x38000);
+        if (sub->slot2[i].cb != 0)
+            result |= ((CbCd)((FnCd *)(D_001A8CFC[0] + 0x3FA18))[i].fn)();
+    }
+
+    if (result != 0) {
+        if (D_001A79F0[0] == 8 || D_001A79F0[0] == 0x13) {
+            if (ref_US2_0029CD18_00(2))
+                func_US2_0029CC48();
+        }
+    }
+
+    if (result != 0)
+        return;
+
+states:
+    if (D_001A8BB0[0] != 0 && D_001A8BB0[0] != 5) {
+        if (D_001A8BB0[0] == 4) {
+            if (func_00285840() != 7)
+                return;
+        }
+    }
+
+    g = D_001A8CFC[0];
+    if (g != 0) {
+        char *b = g + 0x38000;
+        g = (char *)((SubCd *)b)->cb1;
+        ((CbCd)g)();
+        func_US2_0029CC48();
+    }
+}

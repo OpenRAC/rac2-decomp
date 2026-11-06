@@ -2,8 +2,6 @@
 
 INCLUDE_ASM("asm/us2/game", func_US2_0034BDA8);
 
-INCLUDE_ASM("asm/us2/game", func_US2_0034BDB0);
-
 INCLUDE_ASM("asm/us2/game", func_US2_0034C008);
 
 extern int func_00335E20(unsigned char *field);
@@ -127,6 +125,7 @@ void func_US2_0034DB68(int *self, int value)
 INCLUDE_ASM("asm/us2/game", func_US2_0034DBC8);
 
 INCLUDE_ASM("asm/us2/game", func_US2_0034DBD8);
+
 
 INCLUDE_ASM("asm/us2/game", func_US2_0034DBE0);
 

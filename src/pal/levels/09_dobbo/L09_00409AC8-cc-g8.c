@@ -22,6 +22,22 @@ void func_PAL_L09_00409AC8(char *a0, s32 a1) {
     func_PAL_002A7E68(a0, 7, 0, (((int)(a1) * 5 + 2) / 6));
 }
 
+extern f32 D_PAL_001B1424 __attribute__((sda));
+
+/* func_PAL_L09_00409B48, the same C as func_PAL_L09_00409AC8, where state 7 becomes 6, 3.0f becomes
+   1.75f and D_PAL_001B1420 becomes D_PAL_001B1424. */
+void func_PAL_L09_00409B48(char *a0, s32 a1) {
+    char *v = a0;
+    f32 f = D_PAL_001B1424 * 0.020000001f;
+    char *p = *(char **)(v + 0x68);
+    *(f32 *)(p + 0x1D4) = 1.75f;
+    *(f32 *)(p + 0x1D0) = f;
+    if (*(u8 *)(v + 0x43) == 6) {
+        return;
+    }
+    func_PAL_002A7E68(a0, 6, 0, (((int)(a1) * 5 + 2) / 6));
+}
+
 /* Small-data handles: the resident mode word (-0x7600 -> 0x001A79F0), the resident
    release word (-0x5FB0 -> 0x001A9040) and the level's record table (0x386C ->
    0x001B285C), all read with $gp pinned at 0x001AEFF0. */

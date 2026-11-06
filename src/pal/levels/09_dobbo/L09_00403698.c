@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_00403698);
-
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union EffectVector { Quadword bits; float value[4]; } EffectVector;

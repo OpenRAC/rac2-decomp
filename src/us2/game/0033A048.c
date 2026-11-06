@@ -18,6 +18,3 @@ void *func_US2_0033A048(char *a0)
     func_00336968(a0 + 576);
     return a0;
 }
-
-
-INCLUDE_ASM("asm/us2/game", func_US2_0033A0B8);

@@ -1,3 +1,15 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0030B2C8);
+typedef unsigned char u8;
+typedef unsigned long u64;
+extern u64 func_0027C878(int);
+extern void func_PAL_0027FB48(float, float, u64, u8 *, int, float, u64, u8 *);
+extern u8 D_00263EF0[];
+
+/* Scaled FontPrint: the text is drawn at (x, y) with font texture 2. */
+void func_PAL_L04_0030B2C8(float x, float y, u64 color, u8 *text, int length, float scale) {
+    u64 texture;
+
+    texture = func_0027C878(2);
+    func_PAL_0027FB48(x, y, color, text, length, scale, texture, D_00263EF0);
+}

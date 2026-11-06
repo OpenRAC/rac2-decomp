@@ -1,8 +1,6 @@
 #include "include_asm.h"
 #include "common.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_0042B28C);
-
 /* func_PAL_L14_0042BC18, the PAL copy of func_L14_004265B8: the same C, where the fade length 0x7D
    becomes 0x68 and both timers take the 50 Hz scale, the fade timer first. */
 extern char *D_L14_001B268C __attribute__((sda));

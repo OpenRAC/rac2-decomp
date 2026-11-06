@@ -36,6 +36,3 @@ int func_PAL_L00_00415648(char *object)
         result = 2;
     return result;
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00415690);

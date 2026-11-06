@@ -4,7 +4,7 @@
 
 /* func_PAL_L04_003FD8F0 is in L04_003FD4F8-homing.c. */
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_003FDE38);
+/* func_PAL_L04_003FDE38 is in L04_003FDE38-zero.c. */
 
 #include "common.h"
 typedef int Q16_B0e5d8f83 __attribute__((mode(TI)));
