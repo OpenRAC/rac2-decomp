@@ -121,7 +121,6 @@ typedef struct { u16 count; u16 pad; u32 maximum; u32 levels; } Statistics;
 extern Statistics D_0018C360[];
 extern Statistics D_0018C750[];
 extern s32 D_L18_001A8F00;
-extern s32 D_L19_001A9010;
 extern s32 D_L18_001A8FF4 __attribute__((sda));
 extern f32 D_L18_001A7CD8 __attribute__((sda));
 extern f32 D_L18_001A7CDC __attribute__((sda));

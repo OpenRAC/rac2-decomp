@@ -1,0 +1,166 @@
+/* func_US2_003400E0, the USA v2.00 copy of func_0033F218. */
+extern int func_00336E40(void *);
+extern int *func_00336DA8(int, int);
+extern void func_003361E0(void *, char *, void *);
+extern void func_US2_003377B0(void *, char *, void *);
+extern void func_00336710(void *, char *, void *);
+extern void func_00335F88(void *, float, float, float, float);
+extern void func_00335E38(void *, float, float, float, float);
+extern unsigned int *func_00335E20(void *);
+extern void *func_00335E18(void *);
+extern void func_00335EB0(void *, void *);
+extern void func_00336390(void *, char *, int);
+extern void func_00335E68(void *, int);
+extern int func_00115DA8(char *, char *, ...);
+extern float func_00283B98(float, float);
+extern float func_00283180(float);
+extern float func_00283198(float);
+extern unsigned int func_00288FB8(int);
+extern void func_00336A38(void *, unsigned int);
+extern void func_00336408(void *, int, int, char *, void *);
+extern void func_00336CC8(void *, int);
+extern void func_US2_00337A38(void *, int);
+extern void func_00336B98(void *, int);
+extern void func_00336498(void *, unsigned int, unsigned int);
+extern void func_003364B0(void *, unsigned int, unsigned int);
+extern void func_00336CE0(void *, unsigned int);
+extern void func_00336CC0(void *, int);
+extern void func_US2_00340AA8(void *, int);
+extern char *D_001A8CFC;
+extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[];
+extern char D_001ADFA0[], D_001ADFA8[], D_001ADD60[], D_001ADFB0[], D_001ADFB8[];
+extern char D_001ADFC0[], D_001ADFC8[], D_001ADFD0[], D_001ADFD8[];
+extern char D_001ADFE0[], D_001ADFF0[], D_001AE000[], D_001AE010[], D_001AE020[];
+extern char D_001ADD58[], D_001AE030[], D_001AE040[];
+extern unsigned int D_001ADB30 __attribute__((sda));
+extern unsigned int D_001ADB38 __attribute__((sda));
+
+/* Initializes the menu's named widgets, resource IDs, colors and radial entries. */
+void func_US2_003400E0(char *self, void *owner)
+{
+    char name[16];
+    int i;
+    int j;
+    /* the widgets the last part of the function sets up are reached from here */
+    char *base = self + 0x3B0;
+    char *widget;
+    *(void **)(self + 0x810) = owner;
+    if (owner) {
+        int *allocation = func_00336DA8(16, func_00336E40(owner));
+        *(int **)(self + 0x80C) = allocation;
+        allocation[1] = 0;
+        allocation[2] = 0;
+        allocation[3] = 0;
+        allocation[0] = 0;
+    }
+    *(int *)(self + 0xAB8) = 1;
+    (*(float **)(self + 0x80C))[0] = 250.0f;
+    (*(float **)(self + 0x80C))[1] = 200.0f;
+    *(int *)(self + 0x814) = 0;
+    *(int *)(self + 0x818) = 0;
+    *(int *)(self + 0x81C) = 0;
+    func_003361E0(self, D_001ADC10, owner);
+    func_003361E0((self + 0x4C), D_001ADC18, owner);
+    func_003361E0((self + 0xE4), D_001ADC20, owner);
+    func_003361E0((self + 0x130), D_001ADC28, owner);
+    func_003361E0((self + 0x98), D_001ADFA0, owner);
+    func_US2_003377B0(self + 0x8D8, D_001ADFA8, owner);
+    func_US2_003377B0((self + 0x930), D_001ADD60, owner);
+    func_US2_003377B0((self + 0x988), D_001ADFB0, owner);
+    func_US2_003377B0((self + 0x9E0), D_001ADFB8, owner);
+    func_003361E0((self + 0x17C), D_001ADFC0, owner);
+    func_003361E0((self + 0x1C8), D_001ADFC8, owner);
+    func_003361E0((self + 0x214), D_001ADFD0, owner);
+    func_00336710((self + 0x7D0), D_001ADFD8, owner);
+    func_00335F88((self + 0x7D0), 32.0f, 32.0f, 0.0f, 0.0f);
+    *func_00335E20(self) = 0x60442D00;
+    *func_00335E20((self + 0x4C)) = 0x60241700;
+    *func_00335E20((self + 0xE4)) = 0x55F0C070;
+    *func_00335E20((self + 0x98)) = 0x60241700;
+    *func_00335E20((self + 0x130)) = 0x55F0C070;
+    *func_00335E20((self + 0x17C)) = 0x55F0C070;
+    *func_00335E20((self + 0x1C8)) = 0x55F0C070;
+    *func_00335E20((self + 0x214)) = 0x70FFFEED;
+    *func_00335E20((self + 0x7D0)) = 0x60F0F0B0;
+    *func_00335E20(self + 0x8D8) = 0x80F0F0F0;
+    *func_00335E20((self + 0x930)) = 0x80F0F0F0;
+    *func_00335E20((self + 0x988)) = 0x80F0F0F0;
+    *func_00335E20((self + 0x9E0)) = 0x80F0F0F0;
+    func_00336390(self, D_001A8CFC + 0x8710, 99);
+    func_00336390((self + 0x4C), D_001A8CFC + 0x8710, 100);
+    func_00336390((self + 0x98), D_001A8CFC + 0x8710, 41);
+    func_00336390((self + 0xE4), D_001A8CFC + 0x8710, 102);
+    func_00336390((self + 0x130), D_001A8CFC + 0x8710, 101);
+    func_00336390((self + 0x17C), D_001A8CFC + 0x8710, 93);
+    func_00336390((self + 0x1C8), D_001A8CFC + 0x8710, 35);
+    func_00336390((self + 0x214), D_001A8CFC + 0x8710, 94);
+    func_003361E0((self + 0x2A8), D_001ADFE0, owner);
+    func_00336390((self + 0x2A8), D_001A8CFC + 0x8710, 7);
+    func_00335F88((self + 0x2A8), 1.0f, 1.0f, 0.0f, 0.0f);
+    func_00335E38((self + 0x2A8), 125.0f, 208.0f, 0.0f, 0.0f);
+    *func_00335E20((self + 0x2A8)) = 0x60442D00;
+    func_003361E0((self + 0x2F4), D_001ADFF0, owner);
+    func_00336390((self + 0x2F4), D_001A8CFC + 0x8710, 6);
+    func_00335F88((self + 0x2F4), 1.0f, 1.0f, 0.0f, 0.0f);
+    func_00335E38((self + 0x2F4), 125.0f, 208.0f, 0.0f, 0.0f);
+    *func_00335E20((self + 0x2F4)) = 0x55F0C070;
+    func_003361E0((self + 0x5A0), D_001AE000, owner);
+    func_00336390((self + 0x5A0), D_001A8CFC + 0x8710, 16);
+    func_00335E38((self + 0x5A0), 125.0f, 208.0f, 0.0f, 0.0f);
+    *func_00335E20((self + 0x5A0)) = 0x80FFDE8D;
+    func_00335E68((self + 0x5A0), 1);
+    *(int *)(self + 0x7CC) = 0;
+    for (i = 0; i < 8; i++) {
+        float angle, x;
+        char *entry, *icon;
+        unsigned int panelColor = 0x60442D00;
+        unsigned int iconColor = 0x60F0F0B0;
+        func_00115DA8(name, D_001AE010, i);
+        entry = self + (i * 0x4C + 0x340);
+        func_003361E0(entry, name, owner);
+        func_00336390(entry, D_001A8CFC + 0x8710, i + 8);
+        func_00335F88(entry, 1.0f, 1.0f, 0.0f, 0.0f);
+        func_00335E38(entry, (*(float **)(self + 0x80C))[0] + 113.0f,
+            (*(float **)(self + 0x80C))[1] + -72.0f, 0.0f, 0.0f);
+        *func_00335E20(entry) = panelColor;
+        func_00115DA8(name, D_001AE020, i);
+        icon = self + (i * 0x3C + 0x5EC);
+        func_00336710(icon, name, owner);
+        func_00335E68(icon, 0);
+        angle = func_00283B98(((float)i + (float)i) * 0.3926990926f - 3.141592741f, 1.570796371f);
+        x = (float)((int)(func_00283180(angle) * 82.13999939f) + 348);
+        func_00335E38(icon, x,
+            (float)((int)(func_00283198(angle) * 76.44200134f) + 109), 0.0f, 0.0f);
+        func_00335F88(icon, 32.0f, 32.0f, 0.0f, 0.0f);
+        *func_00335E20(icon) = iconColor;
+    }
+    for (j = 1; j < 8; j++) {
+        func_00335EB0(self + (j * 0x4C + 0x340), func_00335E18(base + (0x340 - 0x3B0)));
+        func_00335EB0(self + (j * 0x3C + 0x5EC), func_00335E18(base + (0x5EC - 0x3B0)));
+    }
+    func_00335EB0((base + (0x2A8 - 0x3B0)), func_00335E18(base + (0x340 - 0x3B0)));
+    widget = base + (0x828 - 0x3B0);
+    func_US2_003377B0(widget, D_001ADD58, owner);
+    *(int *)(widget + 0x54) = 0;
+    func_US2_003377B0(base + (0x880 - 0x3B0), D_001AE030, owner);
+    *func_00335E20(base + (0x828 - 0x3B0)) = 0x80F0F0F0;
+    *func_00335E20(base + (0x880 - 0x3B0)) = 0x80F0F0F0;
+    func_00336A38(base + (0x828 - 0x3B0), func_00288FB8(0x2BE9));
+    self[0xA78] = 0;
+    func_00336A38(base + (0x880 - 0x3B0), (unsigned int)(base + (0xA78 - 0x3B0)));
+    func_00336A38(base + (0x8D8 - 0x3B0), func_00288FB8(0x2BF1));
+    func_00336A38((base + (0x930 - 0x3B0)), func_00288FB8(0x2BE5));
+    func_00336A38((base + (0x988 - 0x3B0)), D_001ADB30);
+    func_00336A38((base + (0x9E0 - 0x3B0)), D_001ADB38);
+    func_00335F88((base + (0x988 - 0x3B0)), 1.25f, 1.25f, 0.0f, 0.0f);
+    func_00335F88((base + (0x9E0 - 0x3B0)), 1.25f, 1.25f, 0.0f, 0.0f);
+    func_00336408(base + (0x260 - 0x3B0), 32, 0, D_001AE040, owner);
+    func_00336CC8(base + (0x260 - 0x3B0), 5);
+    func_US2_00337A38(base + (0x260 - 0x3B0), 100);
+    func_00336B98(base + (0x260 - 0x3B0), 0);
+    func_00336498(base + (0x260 - 0x3B0), 0x6049C1FF, 0x60001EFF);
+    func_003364B0(base + (0x260 - 0x3B0), 0x50F0C070, 0x50F0C070);
+    func_00336CE0(base + (0x260 - 0x3B0), 0x80000000);
+    func_00336CC0(base + (0x260 - 0x3B0), 0);
+    func_US2_00340AA8(self, 0);
+}

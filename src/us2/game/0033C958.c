@@ -430,5 +430,3 @@ char *func_US2_0033F690(char *object)
 
 
 
-
-INCLUDE_ASM("asm/us2/game", func_US2_003400E0);

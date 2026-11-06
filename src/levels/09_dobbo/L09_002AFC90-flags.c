@@ -3,7 +3,7 @@
 
 typedef unsigned char u8;
 extern int D_001A79F0 __attribute__((sda));
-extern int D_L11_001A9010 __attribute__((sda));
+extern int D_L09_001A9010 __attribute__((sda));
 extern u8 D_001A7B0B __attribute__((sda));
 extern void func_00282A88(void *, int);
 extern float func_00282C48(float);
@@ -98,7 +98,7 @@ void func_L09_002AFC90(void)
         if (D_00189E20.attack && active &&
             (D_00189E20.state != 0x38 || D_00189E20.animationDone)) {
             if (D_00189E20.health) { func_L09_002C3580(0x38,1); return; }
-            if (D_001A79F0 == 2 && D_L11_001A9010) { func_L09_002C3580(0x7d,1); return; }
+            if (D_001A79F0 == 2 && D_L09_001A9010) { func_L09_002C3580(0x7d,1); return; }
             if (*(int *)(*(u8 **)(D_00189E20.object + 0x24) + 0x1f0)) { func_L09_002C3580(0x79,1); return; }
             func_L09_002C3580(0x39,1); return;
         }

@@ -1,6 +1,35 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_002D6024);
+#include "common.h"
+
+/* func_US2_002D6024, the v2.00 copy of func_002D53F0: a text draw whose y also moves in display mode 1. */
+extern float D_001B23A4[] __attribute__((sda));
+extern int D_001B23A0[] __attribute__((sda));
+extern void func_0027C540(long);
+extern void func_US2_0029D368(void);
+extern s32 func_00288FB8(s32);
+extern void func_0027F980(int, int, u64, u8 *, int);
+extern void func_0027C660(void);
+
+static __inline__ int scaled_screen_coord(float value, float offset)
+{
+    float scaled = value * D_001B23A4[0] + 0.5f;
+    if (D_001B23A0[0] == 1)
+        return (int)(scaled + offset);
+    return (int)scaled;
+}
+
+int func_US2_002D6024(void)
+{
+    int y;
+
+    func_0027C540(0);
+    func_US2_0029D368();
+    y = scaled_screen_coord(329.0f, -36.0f);
+    func_0027F980(0x1C7, y, 0x80F0F0F0ULL, (u8 *)func_00288FB8(0x2BE5), -1);
+    func_0027C660();
+    return 0;
+}
 
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
