@@ -26,17 +26,11 @@ void func_US2_00280380(int x, int y, u64 color, u8 *text, int length, float scal
     texture = func_US2_0027CED8(1);
     func_US2_0027FCB0(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
 }
-
-
-INCLUDE_ASM("asm/us2/game", func_US2_00280440);
-
-INCLUDE_ASM("asm/us2/game", func_US2_002804C0);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00280550);
-
 extern void func_US2_00280550(float);
 
 void func_US2_00280B20(void) {
     func_US2_00280550(1.0f);
 }
 
+
+INCLUDE_ASM("asm/us2/game", func_US2_002804C0);

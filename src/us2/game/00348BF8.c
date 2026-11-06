@@ -1,6 +1,46 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348BF8);
+extern int func_00336E40(void *);
+extern void *func_00336DA8(int, int);
+extern void *func_US2_003377B0(void *, void *, void *);
+extern char D_001AE5A8[];
+
+/* func_US2_00348BF8, the USA v2.00 copy of func_00347EC8: the same C, where the fields move 0x10 on
+   and the new field at 0x54 is cleared too. */
+void func_US2_00348BF8(char *object, void *data)
+{
+    int *position;
+    *(int *)(object + 0x60) = 0;
+    *(int *)(object + 0xC0) = 0;
+    *(void **)(object + 0x58) = data;
+    if (data) {
+        position = func_00336DA8(16, func_00336E40(data));
+        *(int **)(object + 0x5C) = position;
+        position[1] = 0; position[2] = 0; position[3] = 0; position[0] = 0;
+    }
+    func_US2_003377B0(object, D_001AE5A8, data);
+    *(int *)(object + 0xAC) = 0x70FFFEED;
+    *(int *)(object + 0xB0) = 0x80F0F0F0;
+    *(int *)(object + 0xB4) = 0x80808080;
+    *(int *)(object + 0xBC) = 32;
+    *(int *)(object + 0x54) = 0;
+    *(int *)(object + 0xB8) = 0;
+    *(int *)(object + 0xC4) = 0;
+    *(int *)(object + 0xC8) = 0;
+    *(int *)(object + 0xCC) = -1;
+}
+
+INCLUDE_ASM("asm/us2/game", func_US2_003492A8);
+
+INCLUDE_ASM("asm/us2/game", func_US2_003492B0);
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E50);
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E58);
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E60);
+
+INCLUDE_ASM("asm/us2/game", func_US2_00348E68);
 
 
 typedef int s32;
@@ -30,8 +70,9 @@ void func_US2_00348DA0(u8 *a0,f32 *a1) {
 
 void func_US2_00348E10(u8 *a0, s32 a1, s32 a2) { *(s32 *)(a0 + 0xB8) = a1; *(s32 *)(a0 + 0xBC) = a2; }
 
-
 INCLUDE_ASM("asm/us2/game", func_US2_00348E20);
+
+
 
 void func_US2_00348E28(u8 *a0,f32 f0,f32 f1) {
  (*(f32 **)(a0+0x5C))[0]=f0;
@@ -41,15 +82,11 @@ void func_US2_00348E28(u8 *a0,f32 f0,f32 f1) {
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348E50);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348E58);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348E60);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348E68);
 
-INCLUDE_ASM("asm/us2/game", func_US2_00348E70);
+/* func_US2_00348E70 is built from 00348E70-menu.c. */
 
 extern void Faac80289_FUN_003361A8(char *p);
 extern void Faac80289_FUN_00336968(char *p);
@@ -77,6 +114,4 @@ char *func_US2_00349200(char *a0)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_003492A8);
 
-INCLUDE_ASM("asm/us2/game", func_US2_003492B0);

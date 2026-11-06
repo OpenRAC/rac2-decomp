@@ -9,6 +9,16 @@ char *func_US2_0033CD80(char *object)
     return object;
 }
 
+INCLUDE_ASM("asm/us2/game", func_US2_0033FDD8);
+
+INCLUDE_ASM("asm/us2/game", func_US2_0033FF68);
+
+INCLUDE_ASM("asm/us2/game", func_US2_003400E0);
+
+INCLUDE_ASM("asm/us2/game", func_US2_0033F398);
+
+INCLUDE_ASM("asm/us2/game", func_US2_0033E8B0);
+
 extern void Fe524d931_FUN_0033AE28(char *p);
 extern void Fe524d931_FUN_0033B018(char *p, float x, float y);
 extern void Fe524d931_FUN_002E5E58(int a, int b, int c);
@@ -242,9 +252,6 @@ char *func_US2_0033E750(char *object)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033E8B0);
-
-INCLUDE_ASM("asm/us2/game", func_US2_0033E9B8);
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
@@ -355,7 +362,6 @@ int func_US2_0033F360(int owner)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033F398);
 
 void func_US2_0033F3B8(unsigned char *owner, float *records)
 {
@@ -433,9 +439,4 @@ char *func_US2_0033F690(char *object)
 
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_0033FDD8);
 
-
-INCLUDE_ASM("asm/us2/game", func_US2_0033FF68);
-
-INCLUDE_ASM("asm/us2/game", func_US2_003400E0);

@@ -3639,6 +3639,14 @@ src/us2/levels/shared/L00_00409CF0.c	-O2 -G0 -ffunction-sections -frac2-hazard-l
 src/us2/levels/shared/L00_0037F858-init-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -Wa,-G8
 src/us2/game/0033A0B8-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/us2/levels/01_oozla/L01_002C1D90-action-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/us2/levels/20_yeedil/L20_00441AD8-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/us2/game/00280550-fpw-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32 -mno-split-addresses
+src/us2/levels/shared/L08_003F7AB0-g8.c	-O2 -G8 -ffunction-sections
+src/us2/game/00348E70-menu.c	-O2 -G0 -ffunction-sections -fno-strength-reduce
+src/us2/game/0027FCB0-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32
+src/us2/game/002D5C58-g8.c	-fno-builtin -O2 -G8 -ffunction-sections
+src/us2/game/002D5D10-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
+src/us2/levels/11_joba/L11_00433090-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L05_0039A808-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_003A6238-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_003EE450-cc-g8.c	-O2 -G8 -ffunction-sections
