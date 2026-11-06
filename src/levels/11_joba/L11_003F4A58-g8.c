@@ -19,7 +19,6 @@ extern void func_00282CC0(char *, char *, char *);
 
 
 
-extern int D_L18_001C9D40;
 
 
 extern s32 func_002E59B0(void *, s32);
@@ -58,8 +57,6 @@ extern void func_002E59F8(int);
 
 extern void func_L11_003F4A58(char *,int);
 
-extern struct { u8 pad[24];u8 *object;u8 pad1[4];float position[4] __attribute__((aligned(16))); } D_L18_001BFC00;
-extern int D_L18_001B2348 __attribute__((sda));
 typedef struct {
  u8 pad[0x7e4]; u8 *attached; u8 gap[0x1c]; s16 timer, mode;
 } DamoselBeamState;

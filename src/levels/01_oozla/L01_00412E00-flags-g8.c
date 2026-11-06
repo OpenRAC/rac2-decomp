@@ -1,9 +1,9 @@
 #include "include_asm.h"
 
 
-extern double D_L13_001AEC00 __attribute__((sda));
-extern double D_L13_001AEC08 __attribute__((sda));
-extern double D_L13_001AEC10 __attribute__((sda));
+extern double D_L01_001B1950 __attribute__((sda));
+extern double D_L01_001B1958 __attribute__((sda));
+extern double D_L01_001B1960 __attribute__((sda));
 extern void func_3248E0(unsigned char *, int, int);
 extern int func_326C70(unsigned char *, int, int);
 extern void func_333240(void *, void *, void *, void *, int, int, int, int, int, int, int);
@@ -31,7 +31,7 @@ void func_L01_00412E00(unsigned char *a0) {
         a0[0xA8] = 0xFF;
         break;
     case 2:
-        func_333240(a0, &D_L13_001AEC10, &D_L13_001AEC08, &D_L13_001AEC00, 0xFFFF, 0, -1, 0,
+        func_333240(a0, &D_L01_001B1960, &D_L01_001B1958, &D_L01_001B1950, 0xFFFF, 0, -1, 0,
                     0xFFFF, 0xFF, 0);
         func_314008(a0);
         break;

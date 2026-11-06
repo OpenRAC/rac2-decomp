@@ -15,6 +15,10 @@
 
 4. nonmatching/functional.tsv (C for the native port only, never counted) lists only functions
    that are still INCLUDE_ASM or ASM_FUNC in src/, once each, with a file under nonmatching/functional/.
+5. A level's own files (src/levels/NN_*/) name its data D_LNN_..., its address in that level, never
+   another level's name: C matched beside another level's copy keeps that level's names, which the
+   build resolves but other readers of the C take for that level's address (OpenRAC's port read
+   Damosel's particle settings at Damosel's address in Joba and crashed).
 
 Exits nonzero, listing every problem, on failure.
 """
@@ -203,6 +207,18 @@ def check_hygiene(errors: list) -> None:
                 errors.append(f"{f}: per-level copies (LVL_ names); one definition per function (AGENTS.md)")
 
 
+LEVEL_DATA = re.compile(r"\bD_L(\d\d)_[0-9A-Fa-f]{8}\b")
+
+
+def check_level_data_names(errors: list) -> None:
+    for path in sorted((ROOT / "src/levels").glob("[0-9][0-9]_*/**/*.c")):
+        level = path.relative_to(ROOT / "src/levels").parts[0][:2]
+        for name in sorted({m.group(0) for m in LEVEL_DATA.finditer(path.read_text(errors="replace"))
+                            if m.group(1) != level}):
+            errors.append(f"{path.relative_to(ROOT)}: {name} is another level's name; use level {level}'s "
+                          f"D_L{level}_<its address in level {level}>")
+
+
 def main() -> int:
     errors: list = []
     check_hygiene(errors)
@@ -212,6 +228,7 @@ def main() -> int:
             known[version] = check_catalogues(errors, v["config"])
             print(f"{version}: {len(known[version])} catalogue names")
     check_functional(check_sources(known, errors), errors)
+    check_level_data_names(errors)
     if errors:
         print(f"\n{len(errors)} problem(s):", file=sys.stderr)
         for e in errors[:200]:

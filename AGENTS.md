@@ -58,6 +58,9 @@ program's `placed.json`, not merely that the complete image prints `OK`.
   functions). Readable names go in `include/names.h` as `#define`s, never by renaming the function.
 - Data: `D_XXXXXXXX` for the boot's resident data (below `0x1A7C80`, the same in every program),
   `D_LNN_XXXXXXXX` for a level's data (its address in level NN).
+  A level's own file (`src/levels/NN_*/`) uses only level NN's names, even when the C was matched
+  beside another level's copy: rename `D_L18_001B0730` in a Joba file to Joba's `D_L11_001AECB8`
+  (the address that level's own code forms). `tests/check_repository.py` checks it.
 - **Never write a level address as a number.** A level function is linked into every level that
   has it, each with its own addresses; the build reads each symbol's value per program from the
   retail bytes. A hard-coded address only works in one level.

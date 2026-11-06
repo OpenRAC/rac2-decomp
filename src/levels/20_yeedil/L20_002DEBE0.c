@@ -127,7 +127,7 @@ extern void func_002B49E0(int a, int b, int c, int d, int e);
 
 extern int D_L20_001FFE40[];
 
-extern int D_L00_001A8FDC __attribute__((sda));
+extern int D_L20_001A8FDC __attribute__((sda));
 
 extern int D_L20_00294F98;
 
@@ -141,7 +141,7 @@ void func_L20_0036E720(void)
     other = &D_L20_00294F98;
     *(int *)(base + 0x40) = (int)other;
     *(int *)(base + 0x41) = 0xB;
-    D_L00_001A8FDC = 1;
+    D_L20_001A8FDC = 1;
     func_002B49E0(3, 1, 0xB, 0, 0);
 }
 
