@@ -1,8 +1,3 @@
-/* PAL copy of func_L00_003FEEA0: 1744/1744 bytes, all opcodes and registers right. The only
- * difference is the 0xF0/0xF4 spill-slot pair, swapped. This is the gcse bucket rotation: with
- * dcc1 the plain build has 191 buckets, and RAC_S=183, 193 or 199 gives an exact function, so
- * the body wants 3 to 6 more (or about 16 fewer) insns at gcse with the same final code.
- */
 #include "common.h"
 
 extern void func_00300190(void *, void *);
@@ -98,11 +93,16 @@ typedef struct EffectWorkspace {
     EffectVector offset, step;
 } EffectWorkspace;
 
+/* func_PAL_L00_00403780, the PAL copy of func_L00_003FEEA0: the same C at 50 Hz, where the life 50
+   becomes 42, the steps 0.0040555559f, 0.05235989f and 0.10471977f become 0.00584f, 0.062831864f and
+   0.12566373f, the timer takes the 5/6 scale and the two per-frame factors (x - 1.0f) take 1.2f.
+   The three initial values on result, kind and swept give gcse its 193 buckets: self + 0x10 then
+   numbers ahead of the workspace's tmp, as retail's spill slots have them. */
 void func_PAL_L00_00403780(char *self)
 {
     EffectState *p = *(EffectState **)(self + 0x68);
     EffectWorkspace work;
-    int i, result, kind, swept;
+    int i, result = 0, kind = 0, swept = 0;
     float radius, extra, speed, scale;
     float fadeRadius;
     int remaining;
@@ -114,7 +114,7 @@ void func_PAL_L00_00403780(char *self)
         qcopy(work.old.f, self + 0x10);
         func_00282CC0(self + 0x10, self + 0x10, p);
         func_002FEE70(p->rotation, p, 0);
-        func_002FE880(self + 0x10, p, 0.005840000230818987f);
+        func_002FE880(self + 0x10, p, 0.00584f);
         func_00282948(&p->trail);
         if (p->trail) {
             for (i = 0; i < 3; i++) {
@@ -215,14 +215,14 @@ void func_PAL_L00_00403780(char *self)
             work.tmp.f[2] = 0;
             func_00282DD8(work.tmp.f, work.tmp.f, work.normal.f);
             func_00282F20(work.tmp.f, work.tmp.f, 1.0f);
-            func_002AB668(p->axis.f, work.tmp.f, func_002A7878(0.06283186376094818f, 0.10482405126094818f));
+            func_002AB668(p->axis.f, work.tmp.f, func_002A7878(0.062831864f, 0.12566373f));
             func_002E5CF8(1, 0, self);
             p->bounces += 1;
             if (p->bounces >= 4) {
                 qcopy(self + 0x10, D_L00_001BF230);
                 self[0x20] = 1;
-                p->timer = (D_L00_001B0C44 * 5 + 2) / 6;
-                speed = D_L00_001B0C28 * 0.06283186376094818f;
+                p->timer = ((s32)(D_L00_001B0C44) * 5 + 2) / 6;
+                speed = D_L00_001B0C28 * 0.062831864f;
                 if (p->charged) {
                     speed *= D_L00_001B0C34;
                 }
@@ -232,7 +232,7 @@ void func_PAL_L00_00403780(char *self)
                 func_00282CF0(p, p, work.step.f);
                 func_00282F20(p, p, speed);
                 qcopy(p->axis.f, work.tmp.f);
-                p->axis.f[3] = 0.06283186376094818f;
+                p->axis.f[3] = 0.062831864f;
             }
         }
         break;
