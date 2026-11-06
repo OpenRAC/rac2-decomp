@@ -14,6 +14,11 @@
  * temporaries, loop forms, hoisted object+192, typed object copy, late declarations) keeps
  * the code only at 121 buckets; every spelling that changes max_cuid changes the code.
  * Every single flag and every pair of the project's flags: no change.
+ * One lean spelling found: building gs[3] in a local and storing it once keeps the code
+ * identical and lowers max_cuid from 242 to 239 (gs[1] through a local, data read as
+ * ((float *)data)[4], late declarations, vertex pointers and a hoisted object+192 are
+ * code-neutral but do not lower it). About 17 more such insns are still to be found; a
+ * 100,000-sample random search over 21 spellings found no other code-preserving reduction.
  */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 1108/1108 bytes, 0/27 placements; first difference 0x4c.
