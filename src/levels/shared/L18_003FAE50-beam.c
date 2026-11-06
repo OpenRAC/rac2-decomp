@@ -1,22 +1,5 @@
-/* GPT-6.1 Sol (high), task v1028, 29 October 2026. Nonmatching.
- * Pinned upstream profile: -O2 -G32 -Wa,-G32 -ffunction-sections.
- * USA v1.01: 1208/1208 bytes, 0 of 3 places match; first mismatch +0x50.
- * Replaces the previous 1216-byte draft. All declarations are retained below.
- * Compute RGB from the faded color inside the segment loop: this prevents the
- * outer mask hoist and recovers the inner loop's saved-register assignments.
- * Snapshot the original color separately, then update the named faded value.
- * V coordinates use the actual overlapping D_L18_001B0534 view with nosda;
- * U coordinates retain the gp-relative D_L18_001B0530 view.
- * Incrementing segment before the second draw recovers its earlier reload.
- * Remaining: next-vector/segment spill slots are exchanged (0x110/0x114),
- * absolute f13 load setup, UV cursor allocation, and the first end-cap bc1fl.
- * Ordinary initial vector copy, explicit vector pointers and UV cursors worsen
- * the instruction match; no-gcse/strength-reduce/loop-pass changes do not fix it.
- * The previous -mno-split-addresses profile improves UV allocation but worsens
- * endpoint address scheduling. Reopen with lifetime evidence for those cursors.
- * No linked build or runtime validation; US2/PAL not checked in this task.
- */
 #include "common.h"
+
 typedef int Vector128 __attribute__((mode(TI)));
 
 typedef struct { unsigned char pad[0x70]; long f70,f78,f80,f88; } QuadPacket;
@@ -25,10 +8,11 @@ typedef union { QuadPacket raw; QuadPayload view; } BeamPacket;
 typedef struct { Vector128 start,next,ray,firstSide,secondSide,step; BeamPacket packet; Vector128 scratch; } BeamWorkspace;
 extern Vector128 D_L18_002A08C0[11],D_L18_002A0970[11];
 extern char D_L18_001B97C0[];
-extern float D_L18_001B0534[7] __attribute__((nosda));
+extern float D_L18_001B0534[] MACRO_ADDR;
 extern float D_L18_001B0530[4][2] __attribute__((sda));
 extern unsigned int D_L18_001B0550 __attribute__((sda)),D_L18_001B0554 __attribute__((sda));
-extern float D_L18_001B0558 __attribute__((sda)),D_L18_001B0560 __attribute__((sda)),D_L18_001B0564 __attribute__((nosda));
+extern float D_L18_001B0558 __attribute__((sda));
+extern float D_L18_001B0560[] __attribute__((sda));
 extern float D_L18_001B0568 __attribute__((sda)),D_L18_001B056C __attribute__((sda)),D_L18_001B0570 __attribute__((sda));
 extern void func_00282CF0(void *,void *,void *);
 extern void func_00282D30(void *,void *,float);
@@ -38,6 +22,18 @@ extern void func_00282DD8(void *,void *,void *);
 extern void func_00282F20(void *,void *,float);
 extern void func_00281DE8(QuadPacket *,int,int,int);
 extern void func_00280B90(void *,void *,int);
+/* Gives the two outer vertices of the beam's first or last segment the
+ * alpha-free colour, which fades both ends of the beam out. */
+static __inline__ void BeamFadeEnds(BeamPacket *packet,unsigned int rgb,const int *segment)
+{
+    if(*segment==0) {
+        packet->view.colors[0]=rgb;
+        packet->view.colors[1]=rgb;
+    } else if((float)*segment==D_L18_001B0570-1.0f) {
+        packet->view.colors[2]=rgb;
+        packet->view.colors[3]=rgb;
+    }
+}
 void func_L18_003FAE50(char *object)
 {
     BeamWorkspace local;
@@ -45,17 +41,19 @@ void func_L18_003FAE50(char *object)
     unsigned int faded,rgb,endColor;
     float alpha;
     unsigned int alphaByte,sourceColor;
-    int beam,segment,i;
+    int beam,i;
     for(beam=0;beam<11;beam++) {
         qcopy(&local.start,&D_L18_002A08C0[beam]);
         func_00282CF0(&local.step,&D_L18_002A0970[beam],&local.start);
         func_00282D30(&local.step,&local.step,1.0f/D_L18_001B0570);
         func_00282CC0(&local.next,&local.start,&local.step);
-        alpha=func_002A7878(D_L18_001B0560,D_L18_001B0564);
+        alpha=func_002A7878(D_L18_001B0560[0],D_L18_001B0560[1]);
         sourceColor=D_L18_001B0550;
         alphaByte=sourceColor>>24;
         faded=sourceColor&0xffffffu;
         faded|=(unsigned int)(int)(alpha*(float)(int)alphaByte)<<24;
+        {
+        int segment;
         for(segment=0;(float)segment<D_L18_001B0570;) {
             rgb=faded&0xffffffu;
             func_00282CF0(&local.ray,&local.start,&local.next);
@@ -70,13 +68,9 @@ void func_L18_003FAE50(char *object)
             local.packet.view.colors[2]=faded;
             local.packet.view.colors[1]=faded;
             local.packet.view.colors[0]=faded;
-            if(segment==0) {
-                local.packet.view.colors[0]=rgb;
-                local.packet.view.colors[1]=rgb;
-            } else if((float)segment==D_L18_001B0570-1.0f) {
-                local.packet.view.colors[2]=rgb;
-                local.packet.view.colors[3]=rgb;
-            }
+            {
+            int index=segment;
+            BeamFadeEnds(&local.packet,rgb,&segment);
             for(i=0;i<4;i++) {
                 local.packet.view.uv[i][0]=D_L18_001B0530[i][0]+*(float *)(state+0x8c);
                 local.packet.view.uv[i][1]=D_L18_001B0534[i*2];
@@ -113,10 +107,12 @@ void func_L18_003FAE50(char *object)
                 local.packet.view.colors[2]=endColor&0xffffffu;
                 local.packet.view.colors[3]=endColor&0xffffffu;
             }
-            segment++;
+            segment=index+1;
+            }
             func_00280B90(&local.packet.raw,0,0);
             qcopy(&local.start,&local.next);
             func_00282CC0(&local.next,&local.next,&local.step);
+        }
         }
     }
     *(float *)(state+0x8c)+=D_L18_001B0558;
