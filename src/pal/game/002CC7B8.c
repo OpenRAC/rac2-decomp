@@ -19,4 +19,6 @@ int func_PAL_002CC8C8(int mode)
 
 
 
+INCLUDE_ASM("asm/pal/game", func_PAL_002CC950);
+
 INCLUDE_ASM("asm/pal/game", func_PAL_002CCAC8);

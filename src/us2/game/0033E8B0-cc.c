@@ -10,8 +10,7 @@
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
-extern volatile unsigned char D_US2_001A7BBA __attribute__((sda));
-extern volatile unsigned char D_US2_001A7BBB __attribute__((sda));
+extern unsigned char D_US2_001A7BB8[] __attribute__((sda));
 
 int func_US2_0033E8B0(char *a0, int a1)
 {
@@ -34,10 +33,10 @@ int func_US2_0033E8B0(char *a0, int a1)
         Fc558ca70_FUN_002E5E58(4, 0, 0);
         switch (*(int *)(a0 + 728)) {
         case 0:
-            D_US2_001A7BBA = D_US2_001A7BBA == 0;
+            D_US2_001A7BB8[2] = D_US2_001A7BB8[2] == 0;
             break;
         case 1:
-            D_US2_001A7BBB = D_US2_001A7BBB == 0;
+            D_US2_001A7BB8[3] = D_US2_001A7BB8[3] == 0;
             break;
         }
     }

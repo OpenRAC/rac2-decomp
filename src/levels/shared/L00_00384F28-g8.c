@@ -5,7 +5,8 @@ extern unsigned char *D_L00_001B1EA0[] __attribute__((sda));
 extern void func_L00_00383B90(void *);
 
 
-void func_L00_00384F28(void)
+/* func_L00_00383B90 passes its object in a0; this handler does not read it. */
+void func_L00_00384F28(void *self)
 {
     unsigned char *object=D_L00_001B1EA0[0];
     short type=*(short *)(D_L00_001AC0C0[0]+0xAA);

@@ -21,8 +21,7 @@ extern int D_L09_001B17E4 __attribute__((sda));
 extern float D_L09_001B17E8 __attribute__((sda));
 extern int D_L00_001A8FB4 __attribute__((sda));
 extern int D_001A79F0 __attribute__((section(".sdata")));
-/* Volatile: retail keeps its store out of the branch delay slot. */
-extern volatile int D_L09_001B25A8 __attribute__((section(".sdata")));
+extern int D_L09_001B25A0[] __attribute__((sda));
 extern int D_00138324 __attribute__((nosda));
 extern char D_00188660[];
 typedef struct {
@@ -133,13 +132,13 @@ void func_US2_L09_004116E0(u8 *obj)
         break;
     case 3:
         if (func_002F5D10()) {
-            D_L09_001B25A8 = 1;
+            D_L09_001B25A0[2] = 1;
             break;
         }
     case 4: {
         int lvl;
 
-        D_L09_001B25A8 = 0;
+        D_L09_001B25A0[2] = 0;
         obj[0x31] = 1;
         lvl = D_001A79F0;
         *(u16 *)(obj + 0x34) &= ~1;

@@ -290,7 +290,7 @@ document used to give (the region test reads 0) was not the cause: retail reads 
 ## Rules that still apply
 
 - Honest flags only: per-file flags; no per-function overrides, inline asm, `GLOBAL_ASM`,
-  `#define` aliases, `volatile` barriers or hardcoded addresses in matched C.
+  `#define` aliases, `volatile` barriers or hardcoded program addresses in matched C.
 - Never Sony SDK source, samples or headers. Refer to the third-party rac1 decompilation only
   as "the NTSC decomp".
 - PRs never touch the report. After merging, the maintainer rebuilds every release and pushes

@@ -77,8 +77,6 @@ void func_US2_00338AB8(char *obj, void *pool)
     **(int **)(obj + 4) = 0;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_00338D48);
-
 
 extern int func_0027F178(unsigned char *text, int length); /* text width */
 

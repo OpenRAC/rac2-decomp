@@ -13,5 +13,3 @@ void func_US2_00287108(void)
     D_0018A000 = 10;
     func_002B4B70(0, 0);
 }
-
-INCLUDE_ASM("asm/us2/game", func_US2_00287140);

@@ -180,19 +180,27 @@ each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
   independently evidenced file-scope padding are permitted. No register pins, empty asm
   barriers, fake dependencies or false prototypes. A helper
   or primitive is not a match: validate its actual compiled bytes and every linked place.
-- **No `volatile` in matched C.** The qualifier is not allowed anywhere in C that links
-  into a program: not on a field, pointer, cast, global or local, not for memory-mapped
-  hardware, and not when it reproduces a reload or store sequence measured in retail.
-  The same goes for inline asm beyond the reviewed shared helpers above, `#define`
-  aliases that give a symbol a second name or an offset view in a unit, and hardcoded
-  addresses. A function that matches only with one of these is a near miss: its C goes
-  to `nonmatching/` with a line in `nonmatching/README.md`, and its `INCLUDE_ASM`
-  marker goes back.
+- **`volatile` describes the memory.** Use it on hardware registers
+  (`0x10000000`-`0x12002000`) and on memory a second context writes (an interrupt
+  handler, another thread, DMA or the IOP), naming that writer in a comment. It is not
+  allowed anywhere else in C that links: not to reproduce a reload, store order, delay
+  slot or allocation in ordinary data, even when measured in retail, and not on a local,
+  a jump table or a per-unit cast of a global other units read plainly. A retail reload
+  is evidence of a missing cause such as a struct member, type or alias, not of a
+  qualifier.
+- **Addresses.** Code and data in a program image are always symbols, never numbers.
+  Hardware registers and the scratchpad have no symbol: write them as integer constants,
+  named in a shared header once known.
+- **No other steering.** Inline asm beyond the reviewed shared helpers above and
+  `#define` aliases that give a symbol a second name or an offset view in a unit are not
+  allowed either. A function that matches only with a form these rules forbid is a near
+  miss: its C goes to `nonmatching/` with a line in `nonmatching/README.md`, and its
+  `INCLUDE_ASM` marker goes back.
 - **Check current RAC1 before rejecting a method.** Inspect its current source and build
   inputs, rather than treating an old experiment or private worker restriction as a ban.
   Methods used there are available here, subject to the same sourcing and strict-build
-  checks. The exception is `volatile`: RAC1's volatile fields are not a precedent here
-  (see the rule above). Typed integer/FP argument interleavings are
+  checks. The exception is `volatile`: RAC1's volatile fields on ordinary data are not a
+  precedent here (see the rule above). Typed integer/FP argument interleavings are
   permitted when the EE ABI preserves each register bank's argument order, count and
   widths, stack arguments, return contract and side effects. Do not invent accesses or
   change the callee's physical interface to influence allocation. See

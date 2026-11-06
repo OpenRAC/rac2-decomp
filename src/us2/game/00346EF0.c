@@ -71,8 +71,4 @@ char *func_US2_003475F0(char *p)
 
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_00347680);
-
-INCLUDE_ASM("asm/us2/game", func_US2_003481E0);
-
 INCLUDE_ASM("asm/us2/game", func_US2_00348628);

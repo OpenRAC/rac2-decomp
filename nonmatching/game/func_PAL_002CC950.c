@@ -1,4 +1,10 @@
-/* func_US2_002CCAA0, the USA v2.00 copy of func_002CBAE0: the same C, where rename func_0029C290 becomes func_US2_0029D0C8; rename func_002D6F38 becomes func_US2_002D7BA0; rename func_0029C300 becomes func_US2_0029D138. */
+/* 7 November 2026: exact in PAL (every place of func_PAL_002CC950 matches, as below, compiled as a
+ * -g8.c unit with `-O2 -G8 -ffunction-sections`), but only with the qualifier `volatile` on D_001AB910, which matched C may not contain
+ * (AGENTS.md, "No `volatile` in matched C"). Without it the function is shorter than retail by the
+ * rereads or the store sequence the qualifier forces. Reopen with a non-volatile form that keeps retail's
+ * reads and stores.
+ */
+/* func_PAL_002CC950, the PAL copy of func_002CBAE0: the same C, where rename func_0029CE38 becomes func_PAL_0029D7D0; rename func_0029C290 becomes func_PAL_0029CC28; rename func_002D6F38 becomes func_PAL_002D7B68; rename func_0029C300 becomes func_PAL_0029CC98. */
 /* The three handler slots and the string table are read through $gp, so this
  * function needs the -G8 profile of the sibling file. */
 extern void (*D_001AA420)(int) __attribute__((sda));
@@ -41,12 +47,12 @@ extern char D_0025A058[];
 extern char D_00259B48[];
 extern volatile int D_001AB910 __attribute__((sda));
 extern int (*D_00210ACC[])(int);
-extern void func_0029CE38(void);
-extern int func_US2_0029D0C8(int);
-extern int func_US2_002D7BA0(int);
-extern int func_US2_0029D138(int);
+extern void func_PAL_0029D7D0(void);
+extern int func_PAL_0029CC28(int);
+extern int func_PAL_002D7B68(int);
+extern int func_PAL_0029CC98(int);
 
-int func_US2_002CCAA0(void)
+int func_PAL_002CC950(void)
 {
     int result = 0;
 
@@ -58,13 +64,13 @@ int func_US2_002CCAA0(void)
             result = 1;
         }
     } else if (D_001F2840.source == D_0025A738) {
-        func_0029CE38();
+        func_PAL_0029D7D0();
     } else if (D_001F2840.source == D_0025A498 && !D_001AB910) {
-        func_US2_0029D0C8(0);
+        func_PAL_0029CC28(0);
     } else if (D_001F2840.source == D_0025A190 && !D_001AB910) {
-        if (func_US2_002D7BA0(0))
+        if (func_PAL_002D7B68(0))
             D_001F2840.state = D_001F2840.value == 4 ? 2 : 1;
-        func_US2_0029D138(D_00138180.flags);
+        func_PAL_0029CC98(D_00138180.flags);
         result = D_001F2840.destination != D_0025A498;
     } else if ((D_001F2840.source == D_0025A058 && !D_001AB910)
                || (D_001F2840.source == D_00259B48 && !D_001AB910)) {

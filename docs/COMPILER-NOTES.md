@@ -34,9 +34,9 @@ source method or adding a compiler mechanism. At revision
 - [`movie/vobuf.c`](https://github.com/OpenRAC/rac1-decomp/blob/e7e787ed94f0d56c1ab617e7abdb83ac6db787ec/src/game/movie/vobuf.c#L68)
   and [`hud.c`](https://github.com/OpenRAC/rac1-decomp/blob/e7e787ed94f0d56c1ab617e7abdb83ac6db787ec/src/game/hud.c#L469)
   use volatile memory fields to retain reloads. That route is not available here:
-  the `volatile` qualifier is not allowed in matched C, measured or not, MMIO
-  included (AGENTS.md, Rules). A function that only matches with it stays in
-  `nonmatching/`.
+  `volatile` describes memory, so it is for hardware registers and memory a second
+  context writes, never for a measured reload in ordinary data (AGENTS.md, Rules). A
+  function that only matches with it stays in `nonmatching/`.
 - [`map.c`](https://github.com/OpenRAC/rac1-decomp/blob/e7e787ed94f0d56c1ab617e7abdb83ac6db787ec/src/game/map.c#L642)
   declares the same target with different integer/FP interleavings. The EE assigns
   the two banks independently. A typed interleaving may change argument setup

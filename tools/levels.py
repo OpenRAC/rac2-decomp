@@ -888,6 +888,7 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_L07_003EA44C": (2040, 4),
     "func_PAL_L07_003EEC8C": (2532, 4),
     "func_PAL_L07_003F85AC": (1388, 4),
+    # Retired by RELEASE_ROW_MERGES, but the entry repair must run first so their bodies fingerprint alike: keep.
     "func_PAL_L08_003B1594": (796, 4),
     "func_PAL_L08_003DF82C": (992, 4),
     "func_PAL_L08_003FB594": (2372, 4),
@@ -1376,6 +1377,20 @@ RELEASE_FUNCTION_SPLITS = {
 RELEASE_PLACE_SPLITS = {
     "func_PAL_L12_0042F4F0": (0x260, 0x3C030020, "func_PAL_L30_0041C5B0", 0x3C030080),
     "func_US2_L12_0042B340": (0x260, 0x3C030020, "func_US2_L30_004177A0", 0x3C030080),
+}
+
+
+# A release's rows that are one function in different levels: the row that stays,
+# then the rows whose places it takes. Each merged row was carried with an entry
+# 4 bytes early (FUNCTION_ENTRY_OFFSETS), so its fingerprint only joined the kept
+# row's after that repair. tools/carry.py --entries checks every merged place.
+RELEASE_ROW_MERGES = {
+    # The PAL copy of func_L03_003A40A0: levels 3, 4, 7, 9, 13, 20 and 30, and
+    # levels 8, 11, 16, 17 and 18. USA and v2.00 have one row in all 12.
+    "func_PAL_L03_003A7720": ("func_PAL_L08_003B1594",),
+    # The PAL copy of func_L00_00408E58: 24 levels, and levels 16, 23 and 30.
+    # USA and v2.00 have one row in all 27.
+    "func_PAL_L00_0040D990": ("func_PAL_L16_0040C384",),
 }
 
 

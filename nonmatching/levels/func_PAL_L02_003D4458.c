@@ -1,3 +1,9 @@
+/* 7 November 2026: exact in PAL (every place of func_PAL_L02_003D4458 matches, as below, compiled as a
+ * -g8.c unit with `-O2 -G8 -ffunction-sections -frac2-hazard-labels`), but only with the qualifier `volatile` on the field animation_flags, which matched C may not contain
+ * (AGENTS.md, "No `volatile` in matched C"). Without it the function is shorter than retail by the
+ * rereads or the store sequence the qualifier forces. Reopen with a non-volatile form that keeps retail's
+ * reads and stores.
+ */
 #include "common.h"
 /* The animation flag byte belongs to the incoming actor. All six measured
  * reads use this one field view, including the two snapshots taken before the
