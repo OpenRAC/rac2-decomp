@@ -20,6 +20,6 @@ void func_PAL_0034A808(char *a0, int a1, int *a2)
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0034A870);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034ABB0);
+
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0034B088);

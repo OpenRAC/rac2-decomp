@@ -3475,6 +3475,7 @@ src/pal/game/002C8BD0-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy
 src/pal/levels/shared/L00_002B6488-cc.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
 src/pal/game/00270FC0-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/0030E0E0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-hazard-labels
+src/pal/levels/01_oozla/L01_003C4530-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002C0078-rc2.c	-O2 -G8 -mastra-r5900-extern-buffer -ffunction-sections -fno-builtin
 src/pal/game/002D5C20-g8.c	-fno-builtin -O2 -G8 -ffunction-sections
 src/pal/game/002D5CD8-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
@@ -3486,19 +3487,30 @@ src/pal/game/00343690-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002CECF8-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
 src/pal/game/002C7080-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/003292E8-cc-g8.c	-O2 -G8 -ffunction-sections -ffast-math -g
+src/pal/levels/02_maktar_nebula/L02_003CEF50-cc.c	-O2 -G0 -ffunction-sections -mno-split-addresses
+src/pal/levels/01_oozla/L01_003B8F28-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/01_oozla/L01_003C05E8-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/game/002C7D8C-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002B1A50-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/003122D0-cc.c	-O2 -G0 -ffunction-sections
+src/pal/game/0034ABB0-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels -frac2-gcse-unsplit-edges -fmove-all-movables
 src/pal/game/0032A898-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/00304D90-cc-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/00_aranos_tutorial/L00_002FE768-state-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/game/0030B4E0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/002EF2D8-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/pal/game/00331948-rc2.c	-O2 -G4 -ffunction-sections -fno-builtin
 src/pal/game/00317768-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/02_maktar_nebula/L02_003FF858-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/02_maktar_nebula/L02_003D4458-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/01_oozla/L01_003DF4D8.c	-O2 -G0 -ffunction-sections -fno-expensive-optimizations
 src/pal/game/0030F2B0-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/pal/game/0032C620-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/0028C7C8-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/02_maktar_nebula/L02_003ED0D8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
+src/pal/game/00348DF8-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00314678-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
+src/pal/levels/01_oozla/L01_003C3C80-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002ABCB8-flags.c	-O2 -G0 -ffunction-sections -g -ffast-math
 src/pal/game/00302018-g8.c	-O2 -G8 -ffunction-sections -g -frac2-keep-block-order
 src/pal/game/00287018-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
@@ -3506,6 +3518,9 @@ src/pal/game/00330020-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/0032F3B8-g8.c	-O2 -G8 -ffunction-sections -fstrict-aliasing -g
 src/pal/game/0033E160.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/pal/game/002C5C18.c	-O2 -G0 -ffunction-sections -g
+src/pal/game/00349600-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/02_maktar_nebula/L02_003D9808-g8-dbg.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/02_maktar_nebula/L02_003DFD18-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_002A4788.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00376A18-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
