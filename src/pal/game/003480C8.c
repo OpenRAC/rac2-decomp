@@ -68,8 +68,6 @@ void *func_PAL_003487C8(char *p)
 
 INCLUDE_ASM("asm/pal/game", func_PAL_00348868);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00348DF8);
-
 extern float *func_00335E10(char *);
 typedef unsigned char u8;
 extern void func_00335E38(char *, float, float, float, float);
@@ -113,6 +111,5 @@ void func_PAL_00349450(char *obj)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00349600);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_00349AB8);

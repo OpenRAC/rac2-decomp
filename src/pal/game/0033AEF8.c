@@ -20,7 +20,56 @@ void *func_PAL_0033AEF8(char *a0)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033B218);
+typedef struct { float x, y; } Float2_0033B218;
+
+typedef struct {
+    char pad[0x1C8];
+    unsigned short count;
+    unsigned short unused;
+    unsigned int maximum;
+    unsigned int levels;
+} Statistics_0033B218;
+
+extern void func_00335E38(void *, float, float, float, float);
+extern int func_002DF1F8(void *, int);
+
+extern Float2_0033B218 ref_L00_0042EC50_00;
+extern Float2_0033B218 ref_L00_0042EC50_01;
+extern Float2_0033B218 ref_L00_0042EC50_02;
+
+extern int D_001B1688 __attribute__((sda));
+extern int D_001C51D0;
+extern unsigned int D_001A7390 __attribute__((sda));
+extern int D_001A79F0 __attribute__((sda));
+extern Statistics_0033B218 D_0018C750;
+
+/* func_PAL_0033B218, the PAL copy of func_00339320: the same C, where the widgets from +0x180 sit 0x10 and 0x20 further on,
+   the object at +0x258 is at +0x298, and the highest level time is scaled to 50 Hz before it is compared and kept. */
+int func_PAL_0033B218(char *a0)
+{
+    Float2_0033B218 z0 = {0.0f, 0.0f};
+    Float2_0033B218 z1 = {0.0f, 0.0f};
+    Float2_0033B218 z2 = {0.0f, 0.0f};
+    Float2_0033B218 z3 = {0.0f, 0.0f};
+    Float2_0033B218 g0 = ref_L00_0042EC50_00;
+    Float2_0033B218 g1 = ref_L00_0042EC50_01;
+    Float2_0033B218 g2 = ref_L00_0042EC50_02;
+
+    func_00335E38(a0 + 8, z0.x + (*(float **)(a0 + 4))[0], z0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    func_00335E38(a0 + 0x54, z3.x + (*(float **)(a0 + 4))[0], z3.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    func_00335E38(a0 + 0xA0, z1.x + (*(float **)(a0 + 4))[0], z1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    func_00335E38(a0 + 0xEC, z2.x + (*(float **)(a0 + 4))[0], z2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    func_00335E38(a0 + 0x138, g0.x + (*(float **)(a0 + 4))[0], g0.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    func_00335E38(a0 + 0x190, g1.x + (*(float **)(a0 + 4))[0], g1.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    func_00335E38(a0 + 0x1E8, g2.x + (*(float **)(a0 + 4))[0], g2.y + (*(float **)(a0 + 4))[1], 0.0f, 0.0f);
+    func_002DF1F8(a0 + 0x298, D_001C51D0);
+    if (D_001B1688 >= 11) {
+        if (D_0018C750.count < 0xffff) D_0018C750.count++;
+    }
+    if (((int)D_001A7390 * 5 + 2) / 6 > D_0018C750.maximum) D_0018C750.maximum = ((int)D_001A7390 * 5 + 2) / 6;
+    D_0018C750.levels = (D_0018C750.levels | (1u << D_001A79F0)) | 0x80000000u;
+    return 0;
+}
 
 extern void func_00336320(char *a);
 extern void func_PAL_00338770(char *a);
@@ -95,7 +144,81 @@ char *func_PAL_0033B960(char *object)
     return object;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033BE50);
+typedef struct {
+    float x, y;
+} Point2_0033BE50;
+
+extern void *func_00115484(void *, int, int);
+extern void func_00335F88(void *, float, float, float, float);
+extern int func_00288FB8(int);
+extern void func_00336A38(void *, int);
+extern Point2_0033BE50 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8;
+extern Point2_0033BE50 D_001ADD00 __attribute__((sda));
+extern Point2_0033BE50 D_001ADD00_gp __asm__("D_001ADD00__gp") __attribute__((section(".sdata")));
+extern char D_001C4FA0[];
+extern int D_00258D70[];
+extern char D_001ADC88[];
+
+/* func_PAL_0033BE50, the PAL copy of func_00339F28: the same C, where the six list widgets from
+   +0x190 sit 0x58 apart instead of 0x48, and the scale pair is read directly at each call instead
+   of through a stack copy. Retail reads its x through $gp and its y absolute, so x uses the
+   measured GP view of the same address. */
+int func_PAL_0033BE50(char *obj, int unused)
+{
+    Point2_0033BE50 z0, z1, z2, z3;
+    Point2_0033BE50 title, list, prev, next;
+    char *base;
+    int index;
+
+    func_00115484(&z0, 0, 8);
+    func_00115484(&z1, 0, 8);
+    func_00115484(&z2, 0, 8);
+    func_00115484(&z3, 0, 8);
+    title = D_001ADCE0;
+    list = D_001ADCE8;
+    prev = D_001ADCF0;
+    next = D_001ADCF8;
+    func_00335F88(obj + 0x190, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    func_00335F88(obj + 0x1E8, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    func_00335F88(obj + 0x240, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    func_00335F88(obj + 0x298, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    func_00335F88(obj + 0x2F0, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    func_00335F88(obj + 0x348, D_001ADD00_gp.x, D_001ADD00.y, 0.0f, 0.0f);
+    func_00335E38(obj + 0x8, z0.x + (*(float **)(obj + 4))[0],
+                  z0.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    func_00335E38(obj + 0x54, z3.x + (*(float **)(obj + 4))[0],
+                  z3.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    func_00335E38(obj + 0xA0, z1.x + (*(float **)(obj + 4))[0],
+                  z1.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    func_00335E38(obj + 0xEC, z2.x + (*(float **)(obj + 4))[0],
+                  z2.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    func_00335E38(obj + 0x138, title.x + (*(float **)(obj + 4))[0],
+                  title.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    func_00335E38(obj + 0x190, list.x + (*(float **)(obj + 4))[0],
+                  list.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    func_00335E38(obj + 0x1E8, list.x + (*(float **)(obj + 4))[0],
+                  list.y + (*(float **)(obj + 4))[1] + 18.0f, 0.0f, 0.0f);
+    func_00335E38(obj + 0x240, list.x + (*(float **)(obj + 4))[0],
+                  list.y + (*(float **)(obj + 4))[1] + 36.0f, 0.0f, 0.0f);
+    func_00335E38(obj + 0x298, list.x + (*(float **)(obj + 4))[0],
+                  list.y + (*(float **)(obj + 4))[1] + 54.0f, 0.0f, 0.0f);
+    func_00335E38(obj + 0x2F0, list.x + (*(float **)(obj + 4))[0],
+                  list.y + (*(float **)(obj + 4))[1] + 72.0f, 0.0f, 0.0f);
+    func_00335E38(obj + 0x348, list.x + 8.0f + (*(float **)(obj + 4))[0],
+                  list.y + (*(float **)(obj + 4))[1] + 90.0f, 0.0f, 0.0f);
+    func_00335E38(obj + 0x3A0, prev.x + (*(float **)(obj + 4))[0],
+                  prev.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    func_00335E38(obj + 0x3F8, next.x + (*(float **)(obj + 4))[0],
+                  next.y + (*(float **)(obj + 4))[1], 0.0f, 0.0f);
+    base = D_001C4FA0;
+    func_002DF1F8(obj + 0x450, *(int *)(base + 0x230));
+    index = D_00258D70[*(int *)(base + 0x230) * 2 + 1];
+    if (index >= 0)
+        func_00336A38(obj + 0x3F8, func_00288FB8(index));
+    else
+        func_00336A38(obj + 0x3F8, (int)D_001ADC88);
+    return 0;
+}
 
 extern void F8ad956d6_FUN_00336320(char *target);
 extern void F8ad956d6_FUN_002FC560(int marker, int code);
