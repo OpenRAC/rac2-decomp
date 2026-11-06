@@ -16,10 +16,8 @@ extern int D_L02_001B30C8;
 
 /* The distance bound is read absolutely in state 3 and through GP in state 4.
  * Both symbols resolve to the same word in each of the three programs. */
-extern float D_L02_001B00F8 __attribute__((sda));
+extern float D_L02_001B00F8[] __attribute__((sda));
 extern float D_L02_001B00F8_abs MACRO_ADDR;
-/* State 4 snapshots the upper bound before reading the lower bound. */
-extern volatile float D_L02_001B00FC MACRO_ADDR;
 
 extern void func_PAL_L02_003D24B8(void *);
 extern void func_PAL_L02_003D2A10(void *);
@@ -209,8 +207,8 @@ void func_PAL_L02_003D18D8(char *o)
             if (U8(o, 0x43) != 6)
                 func_PAL_002A7E68(o, 6, 0, 8);
             {
-                float upper = D_L02_001B00FC;
-                F(p, 0x334) = func_002A7878(D_L02_001B00F8, upper) + 0.5f;
+                float upper = D_L02_001B00F8[1];
+                F(p, 0x334) = func_002A7878(D_L02_001B00F8[0], upper) + 0.5f;
             }
         }
         if ((func_PAL_L02_003D2898(o, p + 0x2E0, 0) & 0x80) ||

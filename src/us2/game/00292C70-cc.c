@@ -132,13 +132,14 @@ extern void func_00292328(void *);
 extern u8 *D_L03_001DAB80[];
 extern void func_002934B8(u8 *, u8 *);
 extern unsigned char *D_001BAF38;
+extern int D_001A7290[] __attribute__((sda));
 
 void func_US2_00292C70(void *param)
 {
     func_US2_00292928(param);
     func_00292328(param);
     func_002934B8((u8 *)D_L03_001DAB80[0], D_001BAF38);
-    *(int *)0x001A7290 = (int)param;
+    D_001A7290[0] = (int)param;
 }
 
 /* func_00292408 is in 00292408.c. */

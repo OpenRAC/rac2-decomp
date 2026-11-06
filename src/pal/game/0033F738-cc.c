@@ -9,8 +9,7 @@
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
-extern volatile unsigned char D_PAL_001A7C3A __attribute__((sda));
-extern volatile unsigned char D_PAL_001A7C3B __attribute__((sda));
+extern unsigned char D_PAL_001A7C38[] __attribute__((sda));
 
 int func_PAL_0033F738(char *a0, int a1)
 {
@@ -33,10 +32,10 @@ int func_PAL_0033F738(char *a0, int a1)
         Fc558ca70_FUN_002E5E58(4, 0, 0);
         switch (*(int *)(a0 + 728)) {
         case 0:
-            D_PAL_001A7C3A = D_PAL_001A7C3A == 0;
+            D_PAL_001A7C38[2] = D_PAL_001A7C38[2] == 0;
             break;
         case 1:
-            D_PAL_001A7C3B = D_PAL_001A7C3B == 0;
+            D_PAL_001A7C38[3] = D_PAL_001A7C38[3] == 0;
             break;
         }
     }

@@ -27,7 +27,7 @@ typedef struct {
     u8 tail[0x5C];
 } VendorOffer;
 extern VendorOffer D_L11_00279BA0[];
-extern volatile int D_L11_001B32E8[] MACRO_ADDR;
+extern int D_L11_001B32E0[] __attribute__((sda));
 extern int D_L11_001A8F00[] MACRO_ADDR;
 extern void func_L04_00434AD0(u8 *);
 extern void func_002A7750(u8 *, int, int);
@@ -87,14 +87,14 @@ void func_PAL_L11_004676D0(u8 *object) {
         }
         break;
     case 2:
-        D_L11_001B32E8[0] = 1;
+        D_L11_001B32E0[2] = 1;
         if (D_L11_001A8F00[0] == 2) {
             object[0x31] = 0;
             *(u16 *)(object + 0x34) |= 1;
         }
         if (!func_002F5D10()) {
             VendorRecord *record;
-            D_L11_001B32E8[0] = 0;
+            D_L11_001B32E0[2] = 0;
             record = (VendorRecord *)((u32)D_L11_001B368C[0] + *(int *)(vars + 0x120) * sizeof(VendorRecord));
             func_PAL_L00_002B9CD8(record->position, record->rotation, 0, 1);
             object[0x31] = 1;
@@ -127,13 +127,13 @@ void func_PAL_L11_004676D0(u8 *object) {
         }
         break;
     case 5:
-        D_L11_001B32E8[0] = 1;
+        D_L11_001B32E0[2] = 1;
         if (D_L11_001A8F00[0] == 2) {
             object[0x31] = 0;
             *(u16 *)(object + 0x34) |= 1;
         }
         if (!func_002F5D10()) {
-            D_L11_001B32E8[0] = 0;
+            D_L11_001B32E0[2] = 0;
             object[0x31] = 1;
             *(u16 *)(object + 0x34) &= 0xFFFE;
             if (object[0x21] != 0xFF) func_002A8598(object[0x21], 1);

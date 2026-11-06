@@ -37,8 +37,8 @@ extern unsigned char D_001A7B2E, D_001A7A40;
 extern int D_001397D8 NOT_SDA;
 extern unsigned char D_0013960F NOT_SDA;
 extern int D_L11_001A8F00;
-/* Both dialogue states set this gate before polling and clear it on exit. */
-extern volatile int D_L11_001B32E8[] MACRO_ADDR;
+/* Both dialogue states set the gate D_L11_001B32E0[2] before polling and clear it on exit. */
+extern int D_L11_001B32E0[] __attribute__((sda));
 extern int D_001A79F0 __attribute__((sda));
 extern unsigned char D_0019B2E8[][16];
 extern unsigned char D_L11_001C0AC0[];
@@ -88,13 +88,13 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
         }
         break;
     case 2:
-        D_L11_001B32E8[0] = 1;
+        D_L11_001B32E0[2] = 1;
         if (D_L11_001A8F00 == 2) {
             moby[0x31] = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }
         if (!func_002F5D10()) {
-            D_L11_001B32E8[0] = 0;
+            D_L11_001B32E0[2] = 0;
             moby[0x31] = 1;
             *(u16 *)(moby + 0x34) &= 0xFFFE;
             func_002A7750(moby, 3, -1);
@@ -112,13 +112,13 @@ void func_PAL_L11_003FCA30(unsigned char *moby) {
         }
         break;
     case 4:
-        D_L11_001B32E8[0] = 1;
+        D_L11_001B32E0[2] = 1;
         if (D_L11_001A8F00 == 2) {
             moby[0x31] = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }
         if (!func_002F5D10()) {
-            D_L11_001B32E8[0] = 0;
+            D_L11_001B32E0[2] = 0;
             moby[0x31] = 1;
             *(u16 *)(moby + 0x34) &= 0xFFFE;
             if (!D_001A7B2E) {
