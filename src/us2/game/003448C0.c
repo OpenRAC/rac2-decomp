@@ -271,4 +271,52 @@ void func_US2_003451B8(char *object, unsigned int buttons)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_00345298);
+/* func_US2_00345298, the v2.00 copy of func_00344378: the same lookup, where mode 2 has its own
+   case: at index 7, with flag 0x31 set and flag 7 clear, it reads entry 0x31. The shared body is
+   reached by goto, and the one `return 0` follows that case, because retail keeps both there. */
+extern unsigned char D_00139568[];
+extern unsigned char D_001A7AF8[] __attribute__((sda));
+extern unsigned char D_00239BA0[];
+typedef struct { unsigned char pad[0x42]; short field42; unsigned char rest[0xE0 - 0x44]; } Entry224;
+typedef struct { int v[4]; } Ids_00344378;
+extern Ids_00344378 D_001AE260;
+
+int func_US2_00345298(DobboGridState312 *state)
+{
+    Ids_00344378 table = D_001AE260;
+    int value;
+    int index;
+
+    switch (state->mode) {
+    case 0:
+        index = state->index;
+common:
+        if (D_001A7AF8[index] != 0) {
+            value = ((Entry224 *)D_00239BA0)[D_00139568[index]].field42;
+            break;
+        }
+        goto none;
+    case 1:
+        if (D_001A7AF8[6] != 0) {
+            value = ((Entry224 *)D_00239BA0)[D_00139568[6]].field42;
+            break;
+        }
+        goto none;
+    case 2:
+        index = state->index;
+        if (index == 7 && D_001A7AF8[0x31] != 0 && D_001A7AF8[7] == 0) {
+            value = ((Entry224 *)D_00239BA0)[D_00139568[0x31]].field42;
+            break;
+        }
+        goto common;
+none:
+        return 0;
+    case 3:
+        value = table.v[state->index];
+        break;
+    default:
+        value = 0;
+        break;
+    }
+    return value;
+}
