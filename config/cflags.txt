@@ -3054,6 +3054,7 @@ src/levels/shared/L18_002C4000-quad.c	-O2 -G0 -ffunction-sections -frac2-qcopy -
 src/levels/shared/L09_003AE8C8-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_0037DD80-nsr.c	-O2 -G0 -ffunction-sections -fno-strength-reduce -fno-gcse -fno-sched-interblock
 src/levels/shared/L00_002D7940-fade.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L00_002D7940-wipe.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order
 src/levels/shared/L02_00389F70.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/levels/shared/L02_00333480.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/levels/shared/L22_002A8B98-switch.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order
