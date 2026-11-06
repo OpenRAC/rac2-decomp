@@ -113,7 +113,4 @@ char *func_PAL_L16_0040AC00(float size, char *position, int trigger, int kind, i
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L16_0040B0C8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L16_0040C384);
-
 INCLUDE_ASM("asm/pal/levels", func_PAL_L16_00410D14);
-

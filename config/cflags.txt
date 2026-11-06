@@ -3757,6 +3757,17 @@ src/pal/levels/shared/L08_003B1594-switch-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/0034D238-rc2.c	-O2 -G0 -mno-split-addresses -ffunction-sections -fno-builtin
 src/pal/levels/shared/L03_0038E5C8-g8q.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L00_003EBF24-cc.c	-O2 -G64 -Wa,-G64 -ffunction-sections -fno-rerun-loop-opt
+src/pal/levels/shared/L22_00402258-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L09_0041FC4C-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L22_00401788-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L02_003EFD50-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/20_yeedil/L20_0039FEA0-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/shared/L00_003CC93C-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-zero-ti-por -frac2-hazard-labels
+src/pal/levels/shared/L02_0044B234-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L16_0040C384-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/19_grelbin/L19_00416A3C-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/game/002D5A04-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
+src/pal/levels/01_oozla/L01_002C1C58-action-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_002A4788.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00376A18-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections

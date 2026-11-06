@@ -22,5 +22,3 @@ void func_PAL_L00_003CC908(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
         func_002FDBD8_3(1.0f, context, context->vector_10, 0);
     }
 }
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003CC93C);
