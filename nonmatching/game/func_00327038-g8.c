@@ -28,6 +28,11 @@
  * object and the loop counter in the order retail allocates them is the next
  * experiment.
  */
+/* 6 November 2026, round 12 placement sweep: declaring D_001B27B0 sda (as
+ * 00327038-ground-g8.c does) gives retail's $gp access; 840/840, 0/28 places,
+ * 44 real differing words (was 57) in its own -O2 -G8 -ffunction-sections unit.
+ * In place in 00327038.c and in each sibling unit it gives the same 44.
+ */
 
 #include "common.h"
 
@@ -63,7 +68,7 @@ extern int func_00278870(void *, float);
 extern int func_002761F8(void *, void *, int, void *, int);
 
 /* The unit direction and the level's own target flag. */
-extern float D_001B27B0[4];
+extern float D_001B27B0[4] __attribute__((sda));
 extern int D_001B27C8;
 /* The block of per-object vectors: the target pointers at +0x18, the hit point
  * at +0x20, the other vector at +0x30 and the normal at +0x40. */

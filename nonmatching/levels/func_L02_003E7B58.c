@@ -1,3 +1,22 @@
+/* 6 November 2026 (round 11c, prototype audit): every callee prototype agrees with its matched C in src or the established asm prototype; void helpers never write $v0; every int/float/pointer result is read. No correction to test. */
+/* 6 November 2026, Codex round 11: retained C unchanged, 972/972 bytes,
+ * USA v1.01 0/1 places, 11 real instruction differences; final baseline diff
+ * is identical to the initial baseline. 46 candidate checks tested whole-file
+ * scheduling/CSE options and distinct real initialization forms, without
+ * instruction patches or artificial accesses. Counted differences exclude
+ * symbol relocations; rows from unequal-size bodies are not improvement scores.
+ * Three four-color fill loops emit 1012 bytes normally, 980 with unrolling.
+ * Duplicating selected constant packet assignments in both arms of the existing
+ * flip branch (15 subsets) emits 980-1028 bytes. A genuine four-member color
+ * struct ties at 11 rows; a compound-literal assignment emits 988 bytes and
+ * assignment from an initialized local color struct emits 1020. No source
+ * form improves the retained 11-row result. -fno-sched-spec, -fno-cse-follow-jumps,
+ * -fno-cse-skip-blocks, -fno-strength-reduce and -fno-thread-jumps also tie;
+ * -fno-force-mem, -fno-gcse and -fno-rerun-cse-after-loop enlarge the body.
+ * Remaining blocker: color/primitive local-allocation priority and packet-store
+ * scheduling. Reopen on independently evidenced packet initialization/lifetimes,
+ * rather than more permutations of the same scalar assignments.
+ */
 /* 6 November 2026, round 10: unchanged, 11 real rows. -fno-sched-interblock ties (11) on this
  * and all five earlier forms; -fno-schedule-insns (alone or with it) gives 92. Local-alloc ranks
  * primitive (2 refs, 4-insn span after sched1) just above colour (7 refs, 30-insn span). Order

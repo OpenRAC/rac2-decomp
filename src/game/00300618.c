@@ -332,7 +332,7 @@ void func_00300A00(char *object, int flags, float a, float b, float c, float d, 
 /* func_00300F58 is defined in 00300F58-g8.c. */
 
 
-INCLUDE_ASM("asm/game", func_00301F18);
+/* func_00301F18 is defined in 00301F18-qcopy.c. */
 
 int func_003022A0(char *obj, char *obj2, float x, float y)
 {

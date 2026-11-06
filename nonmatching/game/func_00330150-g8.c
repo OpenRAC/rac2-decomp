@@ -24,6 +24,11 @@
  * leaves the row in a register and frees the frame's ninth word. The same
  * source shape as func_00327038's near miss moves the counter in the same way.
  */
+/* 6 November 2026, round 12 placement sweep: declaring D_001B2830 sda (as
+ * 0032EB28-corners-g8.c does) gives retail's $gp access; 904/904, 0/28 places,
+ * 118 real differing words (was 126) in its own -O2 -G8 -ffunction-sections unit.
+ * In place in 0032EB28.c and in the sibling units it is no better.
+ */
 
 #include "common.h"
 
@@ -64,7 +69,7 @@ extern int func_002761F8(void *, void *, int, void *, int);
 
 /* The game's probe order and the unit direction. */
 extern ProbeOrder D_001B09B0;
-extern float D_001B2830[4];
+extern float D_001B2830[4] __attribute__((sda));
 extern int D_001B2848;
 /* The block of per-object vectors: the target pointers at +0x18, the hit point
  * at +0x20, the other vector at +0x30 and the normal at +0x40. */

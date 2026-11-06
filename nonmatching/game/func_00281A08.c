@@ -1,3 +1,20 @@
+/* 7 November 2026, decomp-permuter: not usable here: with -g the permuter's reprinted C changes line notes (base 296 rows off, score 5520), so no result. Setup: /tmp/claude-1000/-home-lynder063-rac2-decomp/lead/work/perm. */
+/* 6 November 2026 (round 11): gcse expr-table size is not the fix. Upstream 2.95.3
+ * alloc_expr_hash_table (max_cuid/2 |1) equals this tree. Forcing the size to every odd
+ * 11..301 matches here only at 23 or 47 (7/7; = max_cuid/8 or /4), but max_cuid/4 forced
+ * on changes 203 of 8597 units (/8: 242), and sampled matched ones break (00119BF8 1->0/1,
+ * func_002B88F0 28->0/28). Falsified as a compiler difference.
+/* 6 November 2026 (round 12): fuller-source probes do not improve five words.
+ * USA v1.01, v2.00 and PAL each replay at 980/980 bytes, 0/7 places, with
+ * the profile below. Whole-union/struct translation copies, vector-by-value
+ * or return helpers, complete frame helpers and indexed packet initialization
+ * change allocation/size; a direct TI-pointer copy helper ties the baseline.
+ * Measured fuller forms have 184..195 real pre-gcse insns (93..97 buckets),
+ * not the roughly 230 needed by the earlier bucket model. No new donor C was
+ * identified in the current RAC1/RAC4 sources. Retain this source unchanged;
+ * reopen on a genuinely different operation or PRE expression/lifetime.
+ * No linked build was run (worker checks only).
+ */
 /* 6 November 2026 (round 10): still five words. Measured: the PRE table size
  * stayed 89..97 buckets over ~7,000 generated equivalent forms (pointer/index
  * packet and uv forms, struct or .bits translation copy, ring/cur/clamp forms,

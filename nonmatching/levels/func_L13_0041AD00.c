@@ -1,3 +1,12 @@
+/* 6 November 2026, round 12: 1376/1376 bytes, 0/2, 79 differing words excluding relocation
+ * fields (was 101). Changes: index test `index>-1` gives retail's slti/beqz/slti/bnel;
+ * branch row b = branch*16 + (k*64 + s) with no group gives retail's operand order and
+ * drops the two extra nops; one do-while group around the setup n-loop body keeps s in
+ * $s7 (without it s and &previous swap: 82 words). -g has no effect; the j-loop region is
+ * 8 blocks / ~40 insns, under the 10/100 limits, so no block split explains
+ * -fno-sched-interblock (without it: 202). Remaining: branch row b (16 refs) outranks k
+ * and side, so k is $s4 not $s3 and side $s5 not $s4; i-loop copy gets $s4 not $s0;
+ * spill-slot order; the setup n-loop increments move after the group barrier. */
 /* 6 November 2026, round 10b: no gain (101 words, ~45 runs). Branch row b keeps 16-17 refs and outranks side; the i-loop copy takes $s0 only inside a group, which splits row and quotient; six index-test spellings and five flags give no slti/bnel; spill slots follow pseudo number and the uv base comes first here. */
 /* 6 November 2026, round 10: 1376/1376 bytes, 0/2, 101 differing words excluding
  * relocation fields (was 279), first +0xa0. Profile adds -fno-sched-interblock
@@ -83,8 +92,10 @@ void func_L13_0041AD00(char *obj) {
     q[0].primitive=q[1].primitive=q[2].primitive=0;
     q[0].flags=q[1].flags=q[2].flags=flags;
     for (n=0;n<4;n++) {
-        q[0].uv[n][1]=q[1].uv[n][1]=q[2].uv[n][1]=D_L13_001B1660_abs[n][1];
-        q[0].color[n]=q[1].color[n]=q[2].color[n]=*(int *)(s+0x14);
+        do {
+            q[0].uv[n][1]=q[1].uv[n][1]=q[2].uv[n][1]=D_L13_001B1660_abs[n][1];
+            q[0].color[n]=q[1].color[n]=q[2].color[n]=*(int *)(s+0x14);
+        } while (0);
     }
     func_00282C88(&side);
     for (i=0;i<31;i++) {
@@ -125,7 +136,7 @@ void func_L13_0041AD00(char *obj) {
         unsigned char *idx = (unsigned char *)s + 0x18;
         index = idx[branch];
         }
-        if (index<31) if (index>=0) {
+        if (index<31) if (index>-1) {
             for (k=0;k<3;k++) {
                 previous.q = side.q;
                 if (k<2) {
@@ -137,7 +148,7 @@ void func_L13_0041AD00(char *obj) {
                 if (!k) previous.q = side.q;
                 {
                 char *a, *b;
-                do { b = (char *)(((ADVector (*)[4])s)[k]+branch); } while (0);
+                b = (char *)(branch*16 + (k*64 + (int)s));
                 a = b;
                 b += 0x460;
                 a += 0x420;

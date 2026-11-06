@@ -1,3 +1,27 @@
+/* 7 November 2026, decomp-permuter: best score 135 (base 225) only by giving 0x106 and 0 one variable (changes meaning); no rule-compliant gain. Setup: /tmp/claude-1000/-home-lynder063-rac2-decomp/lead/work/perm. */
+/* 6 November 2026 (round 11c, prototype audit): func_00282A88() given its established (void *, int) prototype: same 6 rows. func_00125F20 really returns int (src/core/00125E58.c:63), so its unused result stays int. Other callees agree. */
+/* 6 November 2026, round 11b: unchanged best, 680/680, 0/28, 6 rows. No matched sibling uses
+ * func_00125F20 or 0x4410/0x30003; func_00285548 (00284FC0-g8.c, 0x106 packet) style with an
+ * int * cursor gives 43. sched1 -dS: in block 3 0x8000 issues at cycle 6 with t[1]'s store
+ * (one free slot); 0x106 in block fills it but ranks above the la (all packet constants share
+ * one priority, store weight/luid break ties), so it is born before t[0]'s store (t2). Tied:
+ * three separate 0x8000 locals (cse merges), x *= 8 coordinates, t[1]/t[2] swap. Worse:
+ * t[1] before t[0] (14), one store after the if/else (49), 0x4410+0x106 literal (19), 0x106
+ * literal (9), rotated/reversed store runs (11-26), x = 0x8000; x -= ... (688 bytes, 51).
+ */
+/* 6 November 2026, Codex packet-layout pass: unchanged retained C, game -O2 -G8
+ * -ffunction-sections, 680/680 bytes, 0/28 USA places, six real instruction rows.
+ * New controls: a ten-field packet and a tag plus three value/selector pairs both
+ * tie at six (seven with 0x106 in the final block); scalar versus array DrawState
+ * declarations and a two-element dimensions array also tie. Short/unsigned selector
+ * locals tie; signed 32-bit selectors give 7-17 rows. A shared inline emitter for
+ * real value/selector pairs gives 6-33 rows. The 42 adjacent middle-store groups
+ * t[first..last], 1 <= first < last <= 7, with early or in-block 0x106, give
+ * 24-138 rows and sometimes 688 bytes: loop-note barriers disturb the header/base
+ * schedule instead of fixing 0x8000's allocation. No new form improves the retained
+ * six-row source. Remaining: 0xE/0x30003 allocation and 0x8000's early issue.
+ * No linked build or secondary-release check was run; source marker restored.
+ */
 /* 6 November 2026, round 10c: unchanged best, 680/680, 0/28, 6 rows. Unit flags change nothing
  * on the retained or the t[2]-before-t[1] form: -fno-sched-interblock, -fno-sched-spec,
  * -fno-expensive-optimizations, -frac2-keep-block-order, -frac2-qcopy (6 each); -fno-schedule-insns

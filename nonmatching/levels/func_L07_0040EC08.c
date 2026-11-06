@@ -12,6 +12,32 @@
  * 560 at 20; sampled matched functions regress (4/4, e.g. func_L00_00308538 27 -> 0 places).
  * B, flow.c mark_set_1 kills $fp after reload when !frame_pointer_needed (also with $fp not
  * live at function end): target still 1 diff; 0 units change. Both hypotheses falsified.
+ * 6 November 2026, round 11: 11 more shapes, all still the one bnel at +0x328: separate ifs,
+ * `if(mode!=0) continue;`, nested `if(mode==0) if(health<1)`, `{ f(); continue; }`, a
+ * continue inside the relative test, and do/while/for(;;) loop forms. Why no C shape helps:
+ * the pre-reorg tail RTL is the same for all of them (all three branches target the latch
+ * label, no BARRIER before it, so mark_target_live_regs starts at block 0 and fp is never
+ * REG_DEAD). fp leaves opposite_needed only if branch 2 is already a SEQUENCE with its
+ * non-annulled `lw fp` when branch 1 is filled (mark_set_resources then sees the slot set
+ * before the budget ends). fill_eager walks branches in insn order and branch 1 always fills
+ * in pass 1 from the latch thread, so retail needs branch 1 unfilled in pass 1 (for example a
+ * pre-reorg jump-to-jump target that relax_delay_slots threads). -fno-thread-jumps keeps
+ * bnez but takes `lui a0` from the unthreaded target (1 diff at +0x32c).
+ */
+/* 6 November 2026: current game compiler, isolated -O2 -G8 -ffunction-sections
+ * unit: 952/952 bytes, 0/1 in each USA release; no canonical PAL identity.
+ * Tested 23 candidate compiler flags and 12 syntactic groupings around mode/health
+ * checks: all retain the single bnel/bnez difference at +0x328.
+ * Root cause verified in GCC 2.95 source (resource.c:find_dead_or_set_registers):
+ * on Branch 1's fallthrough path, conditional Branch 2 (+5) and Branch 3 (+5)
+ * hit jump_count >= 10, aborting before reaching the latch lw fp (insn 573).
+ * Because flow.c:mark_set_1 never kills HARD_FRAME_POINTER ($fp), fp remains live
+ * in opposite_needed, forcing must_annul=1 (bnel). Retained C below is unchanged.
+ * 6 November 2026, round 9: env-gated probes, forced on in all 8511 game units.
+ * A, resource.c jump limit 10 -> 11/15/16/20: target matches (1/1); 367 units change at 11,
+ * 560 at 20; sampled matched functions regress (4/4, e.g. func_L00_00308538 27 -> 0 places).
+ * B, flow.c mark_set_1 kills $fp after reload when !frame_pointer_needed (also with $fp not
+ * live at function end): target still 1 diff; 0 units change. Both hypotheses falsified.
  */
 /*
  * Tier: opus-2 (v2175; first reached by opus b1065). Recompiled in v2/c04 as an "-g8.c" unit

@@ -271,7 +271,7 @@ void func_L00_002EC248(char *object, void *positionOffset, void *velocityOffset,
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_002EC608);
+/* func_L00_002EC608 is defined in L00_002EC608-glow.c. */
 
 INCLUDE_ASM("asm/levels", func_L00_002EC970);
 

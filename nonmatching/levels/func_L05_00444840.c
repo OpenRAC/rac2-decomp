@@ -1,3 +1,28 @@
+/* 6 November 2026, decomp-permuter (40 min, 3 threads, --stack-diffs, retail-byte scorer): no candidate beat the base score 20 (2 rows); best rule-compliant result is the retained C. Setup: /tmp/claude-1000/-home-lynder063-rac2-decomp/lead/work/perm. */
+/* 6 November 2026 (round 11c, prototype audit): every declared callee agrees with its matched C or the established asm prototype (func_L05_00444D60 is void in src/levels/shared/L05_00428350.c:327; func_002AB1F0, func_00282C30, func_00283CE0, func_00282E48, func_002761F8 results are all read). No void/int correction exists for the a1/a2 tie; not rerun. */
+/* 6 November 2026, lead (round 11b): loop-structure probes all stay a1-then-a2 in cc1 -S: exclusion scan as an inline helper, the whole candidate filter as an inline helper, a next-candidate helper returning the cursor, a pointer-walk exclusion, break/goto-next exclusion forms, for/for(;;) outer loops, pos = object + 0x10 at the loop top, and all 12 -frac2-* switches plus 12 scheduler/cse flags. -dL shows loop.c (scan_loop, loop_has_call) substitutes both &target temporaries into the a1/a2 moves in every form. With -fno-schedule-insns and -fno-schedule-insns2 the order is still a1, a2, so both schedulers tie (same priority, weight, class and 7 dependents) and keep the expand order. A pseudo a2 = P that dies there would win sched1 on weight, but local-alloc only replaces P by sp+12 when REG_N_REFS is 2, and flow weights refs by loop depth (P counts 4 inside the loop), so P keeps a register. */
+/* 6 November 2026, lead (round 11): target-before-source and target_y-before-target_x declarations and a (u8 *) object cast tie at 2 rows; `i = 0` folded into the call's last argument gives 142. */
+/* 6 November 2026 (round 11, Codex): baseline reconfirmed with check.py:
+ * 736/736 bytes, USA v1.01 0/4 places, exactly two non-relocation instruction
+ * differences at +0x124/+0x128. No source/profile improvement retained.
+ * New lifetime/API probes: inline screen_delta(const int *, const int *) for
+ * either/both axes stays at two rows. Reusing an int pointer for the parameter
+ * read, excluded-entry read, projected coordinate and subsequent rule/class
+ * reads never fixes the argument order (2-153 rows, 728-744 bytes); reading y
+ * through that pointer also changes the two coordinate-load scheduling rows.
+ * Assigning the actual zero call argument to the scan index changes allocation
+ * throughout the body; assigning it to range or the exclusion index stays at
+ * two rows. Storing real coordinate differences back into the output locals
+ * adds one store per axis (744/752 bytes), so it is not an improvement.
+ * Unsigned coordinate storage with explicit signed subtraction stays at two
+ * rows. Aggregate projection helpers and named union views do not fix the
+ * order; returning y by value from an inline projection wrapper also changes
+ * allocation substantially. All underlying projection calls keep the matched
+ * definition's (position, int *x, int *y, int offset) interface: reversing its
+ * pointer arguments would change behavior and is not a scheduling remedy.
+ * Seventy source variants checked, no hill climb or forbidden steering forms.
+ * Best C below is unchanged; no linked build run (lead owns builds).
+ */
 /* 6 November 2026 (round 10, Antigravity worker): USA v1.01, check.py only: 736/736 bytes, 0/4 places,
  * exactly 2 differing rows (+0x124 and +0x128). Profile: -O2 -G8 -ffunction-sections -freduce-all-givs.
  * Haifa scheduler ready-list trace confirms the root mechanism:

@@ -1,28 +1,12 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
-/* 31 October 2026: decomp-permuter (asm passes off) matches 28/28 with one change, the else
-   branch's first copy written through the address of `state`:
-       char **slot = &state; qcopy(&position, *slot);
-   Retail keeps `state` in $s2 throughout, so this models no real memory traffic; it is an
-   artefact, not used. Natural spellings measured 0/28: `state + 0`, ParticleVector casts and
-   indexing, a `src` local for both copies, re-reading object + 0x68. The real source must
-   reorder the same allocation; this branch is where to look. */
-/* Retained near miss (M4, 26 October 2026); not linked.
- * Unit: src/game/00301F18-qcopy.c, profile -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * 900/900 bytes, 0/28 places: only the &position/&angles address pseudos take $s7/$fp the other way
- * round (8 words). Closed here: the parent-state test as an if/else-if chain (the `||` form folds into a
- * range check) and the found-parent arm first. Declaring angles before position gives retail's
- * registers but swaps the two stack slots (4 words). Queued for the permuter.
- */
 #include "common.h"
+
+/* -frac2-qcopy -frac2-qcopy-barrier: the grouped lq/sq copies with their barrier.
+   `slot` holds the parent link address, then the final add's origin. */
 
 typedef int ParticleWord __attribute__((mode(TI)));
 typedef union { ParticleWord word; float f[4]; } ParticleVector;
-typedef struct { int a,b,c,d; } __attribute__((aligned(16))) Quad16;
-extern void func_00282CF0(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 extern int func_00277258(void *, int, void *, float);
-extern char ref_00305798_00[];
-
 extern int func_002AD470(void *, void *, void *, void *, void *, void *);
 extern s32 func_002AD0B0(u8 *);
 extern void func_00282C88(ParticleWord *);
@@ -41,12 +25,15 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     char *parent;
     float step, tilt, radius, lift;
     int detach;
+    u8 *origin; char *slot;
     if (*(char **)(state+0x5c)) {
         func_002AD470(object,*(char **)(state+0x5c),state,state+0x10,&position,&angles);
     } else {
         qcopy(&position, state);
         qcopy(&angles, state+0x10);
     }
+    origin = object+0x10;
+    do {
     if (object[0x20]==3 && *(char **)(state+0x5c)) {
         parent=*(char **)(state+0x5c);
         detach=0;
@@ -58,12 +45,13 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
             func_00282C88((ParticleWord *)(state+0x30));
             *(float *)(state+0x3c)=1.0f;
             parent=(char *)func_002AD0B0((u8 *)*(char **)(state+0x5c));
+            slot = state+0x5c;
             if (parent) {
                 qcopy(state+0x20, parent+0x10);
-                *(char **)(state+0x5c)=0;
+                *(char **)slot=0;
             } else {
                 func_00282C88((ParticleWord *)(state+0x20));
-                *(char **)(state+0x5c)=0;
+                *(char **)slot=0;
             }
         }
     }
@@ -85,10 +73,11 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     func_002833F0(spinMatrix,&rotation);
     func_002833F0(anchorMatrix,&angles);
     func_00283738(object+0xc0,anchorMatrix,spinMatrix);
-    func_00282D30(object+0x10,&anchorMatrix[2],radius);
+    func_00282D30(origin,&anchorMatrix[2],radius);
     func_00282D30(&offset,object+0xc0,lift);
-    func_00282CC0(object+0x10,object+0x10,&offset);
-    func_00282CC0(object+0x10,object+0x10,&position);
+    func_00282CC0(origin,origin,&offset);
+    } while (0);
+    slot = (char *)origin; func_00282CC0(slot,slot,&position);
     if (outPosition) qcopy(outPosition, &position);
     if (outAngles) qcopy(outAngles, &angles);
 }

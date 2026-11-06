@@ -12,6 +12,17 @@
  * ternary colour, 110-step statement-order hill-climb. Only a block split between the label
  * call and the draw call keeps the copy; no real source construct for it is known.
  *
+ * 6 November 2026 (round 11, 9 runs): no admissible block-boundary shape found. Lesson-35 and
+ * UYA (func_003DBEC8/func_003A5DF0/func_003AE8A8) forms in scaled_coord, all dead tests and so
+ * NOT admissible (COMPILER-NOTES "false tests", blocker 26): `scaled = mode == active ? z0 : z1`
+ * with local zeros 976 bytes; identical arms `if (result) coord = (float)result; else ...` 980,
+ * same on the mode global 1016; identical zero-variable arms on result merge early (952);
+ * `if (result != 0) scaled = 1.0f;` without the mode load 964/964 but more rows than the mode
+ * form. `goto` to the next statement (with or without a test) 952: the jump goes before combine.
+ * Retail has no extra load or branch here, so the boundary needs a test that survives combine
+ * and vanishes later; with gcc 2.95 that happens only when both outcomes compute the same value,
+ * i.e. a test dead under C semantics. Next: evidence of the original helper, not more spellings.
+ *
  * Prologue and epilogue are byte-for-byte identical to retail (frame 0x60, saving
  * $s0..$s6 and $f20..$f22). All callee-saved registers match retail assignments:
  * $s0 (object), $s1 (0x8710 / 0xE0), $s2 (state / &D_L02_00264A70), $s3 (enabled / &D_00139568),

@@ -1,3 +1,44 @@
+/* 6 November 2026, Codex round-11 follow-up: 117 check.py runs including
+ * baseline/final confirmation; retained C unchanged, 644/644 bytes, 0/28 USA,
+ * eight real instruction rows (relocation immediates excluded, register bits checked).
+ * New controls against round 11: screen width/height record with the reused spacing
+ * lifetime ties at eight; refreshed count gives 11 rows; reusing count as the indirect
+ * call target puts the initial count in a1 but moves spacing to v1 and changes the
+ * indirect-call registers (11 rows total). Slot/row-offset lifetimes do not improve it.
+ * Eighteen third-group placements and 50 dependency-checked, four-group FP layouts
+ * (explicit scale, bias and half-count operations) give no gain. Scheduler dumps show
+ * the first multiply and bias load co-issued, emitted bias first; the retained group
+ * also orders half-count multiplication before rounding addition. No donor found in
+ * current local RAC1/RAC4 by the distinctive colour constants. Keep the marker; need
+ * an independently grounded lifetime/scheduling hypothesis for count and FP setup.
+ */
+/* 7 November 2026, decomp-permuter: best score 110 (base 135) moved the rounding into the previous group and left an empty do/while (8 -> 15 rows); no rule-compliant gain. Setup: /tmp/claude-1000/-home-lynder063-rac2-decomp/lead/work/perm. */
+/* 6 November 2026 (round 11c, prototype audit): func_00335E10/func_00335E20 given their established pointer returns (float *, int *) without casts: same 14 rows. Other callees agree with src. */
+/* 6 November 2026, round 11b: no gain. Product forms `half = 0.5f; half *= (float)n;`, `half = (float)n; half *= 0.5f;`, `0.5f * n`, `t *= 23A4`, `t += 0.5f`, separate 0.5f variables with up to two groups: li.s 0.5 never moves after the first mul.s. Inline (count, spacing) helpers put count in a0 or v1 (19-22 rows); count stays block-local and lands in v1 because the height holds v0. */
+/* 6 November 2026, round 11: new best C below (644/644, 0/28 USA, 8 real rows, was 14), 22 check.py runs.
+ * Changes: D_001A7344 MACRO_ADDR; sp reused for the vtable offset in the loop (sp = v->offset),
+ * which makes it global, so the loop's v0/v1 conflicts give it retail's a0 and height gets v0;
+ * a float t = 5F0 * 23A4 split, one group {t, n = count, half} and one group {sp = (int)(t + 0.5f)}
+ * give retail's FPRs (23A4 f2, 0.5 f1, half f3) and load order. Left: count v1 (retail a1, 3 rows)
+ * and li.s scheduled before the first mul.s (5 rows). Model: count is a block-local qty, and
+ * fake lifetimes (local-alloc INSN_SCHEDULING) only block v0 (height) for it; retail needs v1
+ * busy too. Making count global (enabled/flag reuse) still picks v1. A 34k-variant cc1 sweep of
+ * statement order, t/cf splits and up to two groups gave nothing better.
+ */
+/* 6 November 2026, Codex follow-up: retained best C unchanged after 79 check.py
+ * runs, including baseline/final confirmations: 644/644 bytes, 0/28 USA,
+ * 14 real instruction rows (relocation fields excluded, register/opcode bits checked).
+ * New controls: widened signed coordinate/index locals add instructions (652/680);
+ * the existing width/height screen-record view gives 19-22 rows; reusing the enabled
+ * value as count/spacing/start/index shrinks to 636 bytes; reusing count/spacing/height
+ * as the later selection, special-row flag or vtable offset gives 16-22 rows.
+ * A count-guarded do loop ties at 14; early count returns and one-pass groups spanning
+ * centring plus drawing, or the enclosing enabled branch, do not improve it. Tested
+ * those controls with plain/MACRO_ADDR height and the retained/half-first/ungrouped
+ * centring forms. All candidate uses were checked for initialization; no forbidden
+ * steering constructs used. Still need a source witness explaining height=v0 and
+ * both v0/v1 unavailable when spacing is allocated, plus the FP setup scheduling.
+ */
 /* 6 November 2026, round 10: best C below unchanged (14 real rows), about 105 check.py runs.
  * MACRO_ADDR on D_001A7344 gives retail's height v0 (lw v0 macro, no %hi pseudo), but then
  * sp takes v1 and count a0 (16-26 over 54 group/order variants, h and spf locals included).
@@ -95,7 +136,7 @@ extern int func_00335E10(char *);
 extern int func_00335E20(char *);
 extern float D_001AE5F0 __attribute__((sda));
 extern float D_001B23A4[] MACRO_ADDR;
-extern int D_001A7344[];
+extern int D_001A7344[] MACRO_ADDR;
 extern float D_001AE5D0 __attribute__((sda));
 extern float D_001AE5D4[] MACRO_ADDR;
 extern float D_001AE5D8 __attribute__((sda));
@@ -131,8 +172,8 @@ typedef struct {
 void func_00348EC0(char *o)
 {
     int color = func_002A9588(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
-    int start, i, n, sp;
-    float half, spf;
+    int start, i, sp, h, n;
+    float half, spf, t;
     ListMenu *menu = (ListMenu *)o;
 
     if (menu->enabled) {
@@ -142,10 +183,16 @@ void func_00348EC0(char *o)
         func_00336320(o + 0x98);
         func_00336320(o + 0xE4);
         do {
-            sp = (int)(D_001AE5F0 * D_001B23A4[0] + 0.5f);
-            half = (float)menu->count * 0.5f;
+            t = D_001AE5F0 * D_001B23A4[0];
+            n = menu->count;
+            half = (float)n * 0.5f;
         } while (0);
-        start = (int)((float)(D_001A7344[0] >> 1) - (float)sp * half);
+        do {
+            sp = (int)(t + 0.5f);
+        } while (0);
+        spf = (float)sp;
+        h = D_001A7344[0] >> 1;
+        start = (int)((float)h - spf * half);
         for (i = 0; i < menu->count; i++) {
             ListRect *p;
             char *slot;
@@ -169,7 +216,8 @@ void func_00348EC0(char *o)
             p->x = D_001AE5E0 + menu->origin->x;
             p->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)start;
             v = *(ListVtable **)(o + i * 72 + 0x248);
-            v->call(slot + v->offset);
+            sp = v->offset;
+            v->call(slot + sp);
         }
     }
 }

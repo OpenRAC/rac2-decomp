@@ -1,3 +1,10 @@
+/* 6 November 2026, round 12 placement sweep: unit order matters here. Placed
+ * after func_L08_003D8348 (the retained source appended to L08_003D8348-init.c's
+ * text, unit compiled with -O2 -G8 -ffunction-sections -g) it gives 3308/3308
+ * bytes, 0/1 places, 211 real differing words; alone or in place in
+ * L08_003D8348.c it stays 3312/3308, 222. Removing func_L08_003D8348's body
+ * from that unit restores 3312. Not a match; source below unchanged.
+ */
 /* 2 November 2026: retained nonmatching C; no linked matching credit.
  * Profile: -O2 -G8 -ffunction-sections -g.
  * USA v1.01 check: 3312/3308 bytes, 0/1 placements.

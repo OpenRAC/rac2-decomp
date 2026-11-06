@@ -1,3 +1,12 @@
+/* 6 November 2026, round 12: unchanged, 3 real words. sched1 ready lists show t25 is
+ * issue-bound (2 issues: sq clear + mul), not memory-bound, so retail needs one more
+ * pre-reload issue before t28 (e.g. a copy reload deletes, or a register zero with
+ * memory-typed sq). A TI zero variable, chained or looped clears are all folded back to
+ * const 0 by cse. No temp-slot shape found for the 48 bytes: designated/compound-literal
+ * corners store in place but clear with memset (BLKmode); an inline MakeCorner returning
+ * the union adds temps plus ld/sd copies (frame 0x240); an inline SetCorner(ptr) costs
+ * callee-saved regs (frame 0x1F0). Also no gain: pointer/early out init loops, h = -h
+ * in place (ties h and -h to one register), cast TI clears on a float[4][4]. */
 /* 6 November 2026, round 10: frame now 0x1D0 like retail; 3 real words left (c2.y/c2.z/c3.z
  * store order at +0x224/+0x230/+0x238). The offset vector is the first member of the same
  * 64-byte scratch type func_L30_0041B848 uses ({angles; rotation[3]}, angles reused as the
