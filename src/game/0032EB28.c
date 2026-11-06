@@ -185,7 +185,6 @@ extern char D_001ADA38[] __attribute__((sda));
 
 /* func_0032EB28 uses small data in 0032EB28-update-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0032F3D0);
 
 
 INCLUDE_ASM("asm/game", func_0032F598);

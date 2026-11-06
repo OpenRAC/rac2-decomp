@@ -3741,3 +3741,6 @@ src/levels/shared/L00_00358B30-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-bloc
 src/levels/shared/L08_002F2D10-g.c	-O2 -G0 -ffunction-sections -g
 src/levels/shared/L08_002F2D10-emit-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-gcse -g
 src/game/00326A10-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
+src/game/0032F3D0-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
+src/levels/shared/L00_003DDEC8-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
+src/levels/shared/L00_004003F0-g8.c	-O2 -G8 -ffunction-sections -fno-gcse

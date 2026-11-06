@@ -1,5 +1,12 @@
-/* 6 November 2026: a u64 colour local and a copied obj pointer do not produce retail's saved,
- * unused $s1 (744 B both). */
+/* 6 November 2026: the ghost-save idiom that matched func_00326A10 and its three siblings
+ * (an inline rounding helper with a dead display-mode test, `if (result != 0 &&
+ * D_L02_001B3E00 == active) scaled = 1.0f;`, active an int local = 1; -fno-gcse; the
+ * 0x8710 offset and the 203.0f factor as named locals) gives the ghost save and retail's
+ * post-rounding constant order here too: 744/752 with the note's profile plus -fno-gcse.
+ * Left: the ghost takes $s0 and 0x8710 $s1 (retail the reverse), FP roles f21/f23 swapped,
+ * and the `id` copy to $a0 placed late. Next: the 326A10 source shape (early return, one
+ * call per statement, ox/sc set after the rounding).
+ */
 /* Near miss (opus-1, v1659): 744/752 bytes, 0/8 USA v1.01 places.
  * Profile: its own unit (e.g. L02_003C43F0-menu-g8.c) with
  *   -O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin,
