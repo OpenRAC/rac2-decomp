@@ -100,8 +100,6 @@ char *func_PAL_L00_00438798(char *object)
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_004388F8);
-
 
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */

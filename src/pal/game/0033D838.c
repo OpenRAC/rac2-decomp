@@ -220,7 +220,6 @@ char *func_PAL_0033F5D8(char *object)
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033F738);
 
 
 
@@ -277,7 +276,6 @@ int func_PAL_003402B8(int owner)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_003402F0);
 
 
 INCLUDE_ASM("asm/pal/game", func_PAL_00340348);
@@ -320,6 +318,5 @@ char *func_PAL_00340630(char *object)
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00341090);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_00341208);

@@ -49,11 +49,11 @@ Decompilation progress is tracked live on **[openrac.dev](https://openrac.dev)**
 <!-- progress -->
 | | Functions | Code |
 | --- | ---: | ---: |
-| Boot executable | 2,940 of 3,125 | 936,960 of 1,044,692 bytes |
-| Levels | 5,233 of 5,459 | 4,137,332 of 4,482,864 bytes |
-| **Total** | 8,173 of 8,584 | 5,074,292 of 5,527,556 bytes (91.80%) |
+| Boot executable | 2,952 of 3,126 | 946,432 of 1,044,692 bytes |
+| Levels | 5,281 of 5,461 | 4,203,216 of 4,482,864 bytes |
+| **Total** | 8,233 of 8,587 | 5,149,648 of 5,527,556 bytes (93.16%) |
 
-The 27 levels hold 100,921 function placements; C covers 91,378 of them.
+The 27 levels hold 100,975 function placements; C covers 91,933 of them.
 376 of the matched functions are the original's own assembly (`ASM_FUNC`), kept as assembly.
 <!-- /progress -->
 

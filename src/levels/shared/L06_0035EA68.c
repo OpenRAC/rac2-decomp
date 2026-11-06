@@ -275,7 +275,7 @@ void func_L06_00475C10(float a0) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L06_0047A408);
+/* func_L06_0047A408 is defined in L06_0047A408.c. */
 
 /* func_L06_0047AC68 is defined in L06_0047AC68-g8.c. */
 

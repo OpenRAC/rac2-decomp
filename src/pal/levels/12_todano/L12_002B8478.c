@@ -181,7 +181,6 @@ s32 func_PAL_L12_002B8478(s32 arg0) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L12_002BFF00);
 
 
 

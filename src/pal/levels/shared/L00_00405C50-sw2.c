@@ -27,5 +27,4 @@ extern float func_00283198(float), func_00283180(float);
 extern void func_00283958(void *, void *);
 extern void func_00283738(void *, void *, void *);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00405F98);
 

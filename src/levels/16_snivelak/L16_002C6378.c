@@ -38,7 +38,7 @@ void func_L16_003AA0C8(u8 *arg0) {
 }
 
 
-INCLUDE_ASM("asm/levels", func_L16_003AA3F0);
+/* func_L16_003AA3F0 is in L16_003AA3F0-g8.c. */
 
 /* func_L16_003D6D00: 368 bytes against retail's 364; the prologue, the frame layout
    and every branch target from +0x44 on are retail's, but the byte test comes out

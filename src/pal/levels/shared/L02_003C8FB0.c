@@ -58,5 +58,4 @@ void func_PAL_L02_003C8FB0(char *obj, u32 color1, u32 color2) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_003C91F0);
 

@@ -272,7 +272,6 @@ void func_L13_003FE970(u8 *a0) {
 
 /* func_L13_004067F8 is in L13_004067F8-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L13_0041A550);
 
 void func_L13_0041B260(u8 *a0) {
     s32 *ptr = *(s32 **)(a0 + 0x68);

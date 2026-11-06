@@ -481,8 +481,6 @@ void func_L04_0040C0C0(L04Quad *position, L04Quad *direction, int count, int mod
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L04_0040C368);
-
 INCLUDE_ASM("asm/levels", func_L04_0040C880);
 
 extern void func_L04_0040D148();
@@ -583,11 +581,8 @@ void func_L04_0040CE30(char *a0)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L04_0040D148);
-
 INCLUDE_ASM("asm/levels", func_L04_0040DCA8);
 
-INCLUDE_ASM("asm/levels", func_L04_0040DF90);
 
 extern BatchA_A04_u8 D_00188660[];
 

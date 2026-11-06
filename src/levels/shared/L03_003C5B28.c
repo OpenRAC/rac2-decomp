@@ -133,7 +133,6 @@ void func_L03_003CA220(u8 *a0, f32 a1) {
 int func_L03_003CA280(unsigned char *p) { return p[0x20] == 1; }
 
 
-INCLUDE_ASM("asm/levels", func_L03_003CA4B0);
 
 void func_L03_003CA9F8(u8 *entity) {
     switch (entity[0x20]) {

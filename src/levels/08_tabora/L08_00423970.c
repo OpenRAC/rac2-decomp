@@ -37,7 +37,7 @@ void func_L08_00424ED0(char *a0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L08_00424FF8);
+/* func_L08_00424FF8 is isolated in L08_00423970-spawn.c. */
 
 /* Not C: the success arm is the single word 0x4600A028 (COP1 fmt=S funct=0x28,
    fd=$f0 fs=$f0 ft=$f20). See nonmatching/levels/func_L08_00425328.c - this cc1 has no
@@ -258,7 +258,7 @@ extern void func_00291450(s32 a0);
 
 /* func_L08_004294A0 is isolated in L08_004294A0.c. */
 
-INCLUDE_ASM("asm/levels", func_L08_00429560);
+/* func_L08_00429560 is isolated in L08_00429560-g8.c. */
 
 /* func_L08_00429EE8 is isolated in L08_00429EE8.c. */
 

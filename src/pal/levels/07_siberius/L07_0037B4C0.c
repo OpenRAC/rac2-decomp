@@ -1,7 +1,6 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L07_0037B708);
 
 #include "common.h"
 extern char D_L07_001B9200[];
