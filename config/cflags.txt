@@ -3745,3 +3745,5 @@ src/game/0032F3D0-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/shared/L00_003DDEC8-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/shared/L00_004003F0-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/game/002D2188-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
+src/game/0027BA68-g16-qcopy.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/03_endako/L03_003F09C0-6BA8.c	-O2 -G0 -ffunction-sections -g -fmove-all-movables

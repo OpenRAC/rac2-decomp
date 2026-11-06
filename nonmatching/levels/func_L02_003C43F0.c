@@ -1,13 +1,13 @@
-/* 6 November 2026, round 3: best body below (752/752, 0/8 USA, about 21 words).
- * Profile: own unit L02_003C43F0-menu-g8.c, -O2 -G8 -fno-expensive-optimizations
- * -ffunction-sections -fno-builtin -fno-gcse. The func_00326A10 idiom (inline rounding
- * helper with the dead `result != 0 && D_L02_001B3E00 == active` test) gives the ghost
- * $s1, s0 = 0x8710, retail's FP roles and post-rounding constant order. Measured levers:
- * the helper for all seven coordinates (the 23.0f ones add `half`, the 373.0f one a
- * literal 0.5f), `on` only in the four draws (literal 1 in the text calls swaps s0/s1
- * into retail order), the u64 colour argument of func_002FC560 (its a0 then goes in the
- * jal slot). Left: the fourth draw's f14/f15 moves (retail `mov.s f15, f14`) and
- * local-alloc FP choices in the 23.0f/373.0f roundings (f0/f1/f2 rotated).
+/* 6 November 2026, round 4: best body below (752/752, 0/8 USA, ~19 words, was ~22).
+ * Same profile as round 3. New: the helper takes the scale as its first parameter
+ * (menu_coord(D_L02_001B3E04, value, half, active)); this fixes the 373.0f rounding's
+ * FP registers. Left: the 23.0f roundings (retail 23 in f0, scale and product in f1),
+ * and the fourth draw's f14/f15 (sched1 puts f15 = one first because `one` dies there;
+ * retail keeps f14 first and reload makes f15 = f14). No change from: a second helper
+ * for the 23.0f calls, `k = 23.0f` locals (worse), one/zero order, split mul/add,
+ * expensive optimizations on (frame 0x50).
+ * Also no gain: a separate `sy` local for f15 (copy or 1.0f, both worse), and a 150-run
+ * hill-climb over the constant-assignment order.
  */
 /* Near miss (opus-1, v1659): 744/752 bytes, 0/8 USA v1.01 places.
  * Profile: its own unit (e.g. L02_003C43F0-menu-g8.c) with
@@ -44,9 +44,9 @@ extern float D_L02_001B3E04;
 
 extern int D_L02_001B3E00;
 
-static __inline__ int menu_coord(float value, float half, int active)
+static __inline__ int menu_coord(float scale, float value, float half, int active)
 {
-    float scaled = D_L02_001B3E04 * value + half;
+    float scaled = scale * value + half;
     int result = (int)scaled;
 
     if (result != 0 && D_L02_001B3E00 == active)
@@ -66,25 +66,25 @@ void func_L02_003C43F0(char *obj) {
     half = 0.5f;
     on = 1;
     id = func_00336D50(D_L02_001A904C + entry, 0x70);
-    y = menu_coord(k, half, on);
+    y = menu_coord(D_L02_001B3E04, k, half, on);
     one = 1.0f;
     zero = 0.0f;
     func_00300A00(id, 0x60442D00, 258.0f, (float)y, one, one, zero);
     func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x6F), 0x60442D00, 258.0f,
-                  (float)menu_coord(k, half, on), one, one, zero);
+                  (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
     func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x71), 0x55F0C070, 258.0f,
-                  (float)menu_coord(k, half, on), one, one, zero);
+                  (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
     func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x72), 0x55F0C070, 258.0f,
-                  (float)menu_coord(k, half, on), one, one, zero);
+                  (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
     func_002FC560(0x47, 0x5360BUL);
     state = *(unsigned char *)(obj + 0x20);
     if (state == 7) {
         text = func_00288FB8(0x2F5C);
-        func_0027FBD8(254, menu_coord(23.0f, half, 1), 0x88FFFFFF, text, -1);
+        func_0027FBD8(254, menu_coord(D_L02_001B3E04, 23.0f, half, 1), 0x88FFFFFF, text, -1);
     } else if (state != 8 && state != 5) {
         text = func_00288FB8(0x2F5B);
-        func_0027FBD8(262, menu_coord(23.0f, half, 1), 0x88FFFFFF, text, -1);
+        func_0027FBD8(262, menu_coord(D_L02_001B3E04, 23.0f, half, 1), 0x88FFFFFF, text, -1);
     }
     text = func_00288FB8(0x2F5A);
-    func_0027FBD8(254, menu_coord(373.0f, 0.5f, 1), 0x88FFFFFF, text, -1);
+    func_0027FBD8(254, menu_coord(D_L02_001B3E04, 373.0f, 0.5f, 1), 0x88FFFFFF, text, -1);
 }

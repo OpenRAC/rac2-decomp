@@ -1,3 +1,15 @@
+/* 6 November 2026, round 4: no change (820/820, 0/27 USA, 10 words). Cause of the first
+ * pair found: after the call sched1 must pick the samples lw or x&31 (equal priority); the
+ * lw kills the struct base pseudo (REG_DEAD), so its smaller register weight wins, the
+ * pointer qty grows long and local-alloc gives x&31 v0. Only a loop-note barrier (group
+ * on `sampleRow *= 16`) flips it, and that barrier blocks sched2 (12 words). Measured,
+ * all 10 unless noted: statement order/temps for the first sample (5 forms), sampleRow
+ * before the call or after regionRow, unsigned int/short sample, `>> 1`, branch forms
+ * (`!(c & 1)` 11, first sample 13, `% 2`, `!= 0`, continue), address operand orders
+ * (10-15), cell/mask/bit spellings (10-116), declaration-order hill-climb (150 runs,
+ * 10), groups at every prologue/inner statement range (12-152), flags -g, -fno-regmove,
+ * -fforce-addr, -frac2-* (10) and -fno-gcse/-fno-caller-saves etc. (87-218).
+ */
 /* 6 November 2026, round 2: no change (820/820, 0/27 USA, 10 words). The RAC1 donor
  * (rac1-decomp level_runtime_and_menus.c, `ensure_menu_cache_entry` loop) uses
  * `((col & 31) >> 1)`, separate packed/selected bytes, a ternary and `continue` tests;

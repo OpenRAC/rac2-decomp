@@ -1,13 +1,16 @@
-/* 6 November 2026, round 4: best body below (764/768, 0/5 USA). Own unit
- * src/levels/shared/L01_002F1588.c, -O2 -G0 -ffunction-sections -fno-gcse. The
- * func_00326A10 dead-test rounding helper (`result != 0 && D_L01_001B2DC0[0] == active`,
- * active an int local = 1) with 0x8710 as a local gives retail's ghost $s0, s1 = 0x8710,
- * the 0x70 frame and f20..f24 roles; a `camera` local gives $s2. Left: retail keeps only
- * %hi(D_1BD9C0) in $s2 (daddu, then addiu %lo at the start and at the end), here the full
- * address; that one-word shift is most of the rest. With gcse on, %hi stays in $s2 and
- * the ghost too, but gcse propagates 1.0f/0.0f into the f14..f16 moves (744). A start-only
- * camera local (760), helper only in the three draws (736), single-condition test
- * (752/756) and -frac2-gcse-unsplit-edges (744) are worse.
+/* 6 November 2026, round 5: best body below (764/768, 0/5 USA, ~25 words off after
+ * alignment, was ~44). Own unit src/levels/shared/L01_002F1588.c, -O2 -G0
+ * -ffunction-sections -fno-gcse. New: the top/bottom (and icon) roundings share one
+ * `height = D_L01_001B2DC4[0]` load (retail lwc1 f1 once, mul f1*k, cvt into f2).
+ * Left: %hi(D_1BD9C0) in $s2 (one word), the f21 = 0.5 placement, and the icon block's
+ * a0/a1 delay-slot order (local `entry` for the count is worse). Finding: with gcse on,
+ * `camera = D_L01_001BD9C0;` again before the final store gives retail's exact camera
+ * code (daddu s2 = %hi, addiu %lo at both ends, ghost s0, s1 = 0x8710), but gcse
+ * const-prop (gcse.c cprop_insn) still turns unit/zero into per-draw constants (frame
+ * 0x60). Copy chains (`h = 1.0f; unit = h;`) do not stop it; fewer helper branches
+ * under -fno-gcse do not let cse share the %hi.
+ * Also no gain: a do/while(0) group around unit/zero with gcse on (still propagated),
+ * and a 250-run hill-climb over the constant-assignment order (stays at ~25 words).
  */
 /* Nonmatching interface overlay reconstruction, 2026-10-28. No C credit.
  * Four US checks, 0/5. Retained 736/768B, frame0x70 exact, with -O2 -G0
@@ -97,13 +100,15 @@ int func_L01_002F1588(void)
     source.second = func_00283D38(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
     colors = source;
     x2 = func_00283CF0(190.0f + func_00283CE0(198) * D_L01_001A90C4[0]);
-    top = hud_coord(374.0f, D_L01_001B2DC4[0], rounding, one);
-    bottom = hud_coord(388.0f, D_L01_001B2DC4[0], rounding, one);
+    height = D_L01_001B2DC4[0];
+    top = hud_coord(374.0f, height, rounding, one);
+    bottom = hud_coord(388.0f, height, rounding, one);
     func_0027EAE8(190, top, x2, bottom, 0, &colors);
     if (D_L01_001A90CC[0]) {
         int icon = func_0028E588(0xEAA7, D_L01_001A90CC[0] - 1);
-        top = hud_coord(352.0f, D_L01_001B2DC4[0], rounding, one);
-        bottom = hud_coord(43.0f, D_L01_001B2DC4[0], rounding, one);
+        height = D_L01_001B2DC4[0];
+        top = hud_coord(352.0f, height, rounding, one);
+        bottom = hud_coord(43.0f, height, rounding, one);
         func_0028E868(icon, 139, top, 43, bottom, 128);
     }
     *(float *)(camera + 0xB0) = oldProjection;

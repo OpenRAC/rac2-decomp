@@ -2861,7 +2861,14 @@ recovers retail's repeated held-bit test, state-base copy and volatile mode relo
 the older nested guard was 16 bytes short. A separate activation pointer and
 one consistent state alias recover both final tails. Animation and item-lookup
 register choices remain. This is a source remedy for the guard, not a full match.
-The retained C and bounded rejected groups are in `nonmatching/game/func_002F93B0.c`.
+The measurements above are kept as history.
+
+**Update, 6 November 2026 (pending review):** now matched, 28/28 US places, in
+`src/game/002F5220.c`. The `volatile` on `mode` was not needed: it blocked reorg
+(a volatile reference stops `fill_slots_from_thread`), so the animation choice
+written inside its branch could not reach the delay slot. Reading each kind
+without an `item` pointer and loading `D_00139688[id]` before the record fixed
+the remaining allocation.
 
 `func_L06_00382608` reaches 588/584 bytes, 0/2 placements, with an explicit outer
 back edge under the default game G0 profile. It restores the 0xA0 frame and
@@ -3584,7 +3591,9 @@ For #267, a same-source comparison of 781 configured units changed code only in 
 
 **6 November 2026, retained scheduling follow-up (USA v1.01 only):**
 
-- [`func_0027BA68`](../nonmatching/game/func_0027BA68.c): 772/772 bytes,
+- `func_0027BA68` (matched 6 November 2026, round 3: `src/game/0027BA68-g16-qcopy.c`,
+  28/28 in USA, US2 and PAL; `view_matrix` assigned after `func_002A0300` and an
+  int-typed `func_002A0468` prototype as in its matched callers). Earlier: 772/772 bytes,
   0/28 places with `-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy
   -frac2-qcopy-barrier`. The permitted one-pass view-position assignment fixes
   the saved-register roles. Eight instruction positions remain in the flag/copy

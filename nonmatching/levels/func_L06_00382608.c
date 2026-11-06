@@ -1,3 +1,24 @@
+/* 6 November 2026, round 5: 584/584 bytes, 0/2 USA v1.01 placements, default
+ * flags; 68 compared rows differ (was 101) and the prologue now matches up to
+ * +0x9C. Two source changes: `n /= 10` after func_00282CC0 gives retail's
+ * mfhi/mflo $s0 digit sequence (no quotient copy), and a do-while(0) group
+ * from the first call through qcopy(previous) gives stride $s5/polygon $s6.
+ * Left: index lives in $s1 (retail $s0), sp+0x20 is linked by gcse PRE into a
+ * saved register, the 10 constant is in $s1 (retail $s2), timer << 16 is not
+ * hoisted to 0x38 and the case-1 constant 1 is in $v0 (retail $s1).
+ * Diagnosis (dumps): retail's loop.c saw maybe_never at the top of the outer
+ * body, so only single-block invariants (timer << 16) left the loop. A
+ * rotated for-loop with the non-landable `if (stride == 77777)` guard plus the
+ * digit change is 608 bytes = 584 + the guard's 6 insns. An unrotated loop
+ * (exit test with a call) also gives maybe_never but gcse PRE then fills its
+ * entry block. Tried this round, no gain: all loop forms (for, while,
+ * do-while, for(;;)+break, top break, do-while(0) around body/label),
+ * struct/bitfield flags, block-scope vectors, next = index + stride, index as
+ * digit counter (564), declaration orders, -g, -fno-gcse, -fno-rerun-loop-opt,
+ * -fno-strength-reduce. Reopen on a real construct that leaves a label or
+ * jump at the body top until after loop (threaded only by the post-loop
+ * thread_jumps pass).
+ */
 /* 6 November 2026: 588/584 bytes, 0/2 USA v1.01 placements, default game
  * -O2 -G0 -ffunction-sections. An explicit outer back edge removes the loop
  * notes responsible for hoisting flags & 7, 1.2f and vector addresses: the
@@ -65,6 +86,7 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
     index = 0;
     if (index < *(int *)polygon) {
 route_point:
+        do {
         func_00282F20(advance, D_L06_001B9A90, scale * 1.2f);
         qcopy(point, polygon + (index * 16 + 0x10));
         switch (flags & 7) {
@@ -80,13 +102,14 @@ route_point:
                 int n = index;
                 do {
                     func_L03_00339128(point, data, n % 10 + 2, owner, 0x7F, timer, 0xFF, scale);
-                    n /= 10;
                     func_00282CC0(point, point, advance);
+                    n /= 10;
                 } while (n != 0);
             }
             break;
         }
         qcopy(previous, polygon + (index * 16 + 0x10));
+        } while (0);
         index += stride;
         if (index < *(int *)polygon) goto route_point;
     }

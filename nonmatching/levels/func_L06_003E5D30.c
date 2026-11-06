@@ -1,3 +1,17 @@
+/* 6 November 2026, round 6: 976/976 bytes, 0/3 USA v1.01 places, same -O2 -G8 unit.
+ * Changes from the retained draft: the smoothing loop counts j = 0..17 over
+ * vel[j + 1], buf[j], buf[j + 1], buf[j + 2] (retail's buf cursors start at
+ * k * 16 + sp, with no hoisted sp + 0xA0); the f[1] store and the timer
+ * write are each a one-pass group. The state pointer is now spilled to 0xC80
+ * and reloaded as in retail, with pos in $fp and vel in $s7.
+ * Left: the strand offset r * 0x2580 is a copy spilled to 0xC9C, not $s6.
+ * Cause: the reset store's mult is hoisted in the second loop pass, and
+ * cse2 turns it into a copy of the r-body mult. The f[1] group also stops
+ * j-loop strength reduction of the buf cursor, which retail has.
+ * Tried without gain: no pos/vel pointers (976, state in $s7), pos/vel at k
+ * top or per branch, a walking store pointer, grouped pos/vel set-up,
+ * groups on the loops, the C88 call, the buffer call or the else loop.
+ */
 /* 6 November 2026 recheck: retained source is 968/976 bytes, 0/3 USA v1.01
  * places, -O2 -G8 -ffunction-sections. The RAC1 donor jitter_strand_grid_update
  * (src/overlays/l10_orxon/platforms_doors_and_bombthrower.c) confirms the grid
@@ -92,15 +106,19 @@ void func_L06_003E5D30(u8 *obj)
                     for (j = 0; j < 20; j++) {
                         func_00282C88(&pos[j][k]);
                         st->pos[r][j][k].f[3] = 1.0f;
-                        st->pos[r][j][k].f[1] = (float)j * 0.05f * D_L06_001AF714 - D_L06_001AF714 * 0.5f;
+                        do {
+                            st->pos[r][j][k].f[1] = (float)j * 0.05f * D_L06_001AF714 - D_L06_001AF714 * 0.5f;
+                        } while (0);
                         func_002A7A00(&buf[j][k], 0.0f, D_L06_001AF710 * (1.0f / 60.0f));
                     }
-                    for (j = 1; j < 19; j++) {
-                        func_00282CC0(&vel[j][k], &buf[j - 1][k], &buf[j][k]);
-                        func_00282CC0(&vel[j][k], &vel[j][k], &buf[j + 1][k]);
-                        func_00282D30(&vel[j][k], &vel[j][k], 0.333f);
+                    for (j = 0; j < 18; j++) {
+                        func_00282CC0(&vel[j + 1][k], &buf[j][k], &buf[j + 1][k]);
+                        func_00282CC0(&vel[j + 1][k], &vel[j + 1][k], &buf[j + 2][k]);
+                        func_00282D30(&vel[j + 1][k], &vel[j + 1][k], 0.333f);
                     }
-                    st->timer[r][k] = D_L06_001B31B0;
+                    do {
+                        st->timer[r][k] = D_L06_001B31B0;
+                    } while (0);
                 } else {
                     for (j = 1; j < 19; j++)
                         func_00282CC0(&pos[j][k], &pos[j][k], &vel[j][k]);

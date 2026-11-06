@@ -1,3 +1,9 @@
+/* 6 November 2026, round 3: unchanged, 460/460, 0/2, 4 rows (preheader copy).
+ * New, all tie: a static inline row helper taking (p, p), (row) or (p+0x460, p+0x560);
+ * the copy is always propagated. Flags: -fno-expensive-optimizations ties;
+ * -fno-rerun-cse-after-loop 10 rows, -fno-schedule-insns 16, -fno-rerun-loop-opt 77,
+ * -fno-gcse 91. Original best C retained.
+ */
 /* 6 November 2026: additional USA v1.01 trials, game -O2 -G8
  * -ffunction-sections -g: best remains 460/460, 0/2, four preheader rows,
  * first +0x84. New: sign/zero-extending the source row pointer to long before

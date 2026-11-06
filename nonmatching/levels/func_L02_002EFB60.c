@@ -1,3 +1,10 @@
+/* 6 November 2026, round 3: unchanged, 540/540, 0/8, 2 rows (decrement slot).
+ * New: reading both bounds into locals before qcopy ties (2 rows); only the upper
+ * bound first gives 4. Explicit counters all worse: for (i = count; i > 0; i--) 27,
+ * i != 0 26, while (count-- > 0) 103, guarded do/while (--i) 94. Without
+ * -mno-split-addresses the decrement lands right after the copy (50 rows).
+ * Original best C retained.
+ */
 /* 6 November 2026: USA v1.01, -O2 -G8 -ffunction-sections
  * -mno-split-addresses: 540/540 bytes, 0/8 placements, first +0x9C; the same
  * decrement differs at +0x9C/+0x118. Nonempty groups are now permitted source forms;

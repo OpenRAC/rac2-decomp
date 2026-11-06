@@ -1,3 +1,11 @@
+/* 6 November 2026, round 3: unchanged, 488/488 bytes, 0/3 places, 5 rows.
+ * All 120 orders of the three header stores, the state load and the 0x20 store,
+ * with and without -frac2-qcopy, give 5 rows or more. sched1 issues two ALU
+ * insns per cycle; the three constants tie on priority, so luid order decides,
+ * and stores follow the same order. Retail needs the byte constant first but
+ * the 0x34 store first: that needs a priority difference no plain store gives.
+ * A byte local set before the stores merges with the halfword 255 (484 bytes).
+ */
 /* 6 November 2026: current game compiler, -O2 -G0 -ffunction-sections -g:
  * 488/488 bytes, 0/3 places in each release; five flag setup words remain.
  * New one-pass groups around individual/adjacent header writes either tie

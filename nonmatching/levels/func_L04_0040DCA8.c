@@ -1,3 +1,11 @@
+/* 6 November 2026, round 5: corner-store order 3 words off (was 5);
+ * USA v1.01 default -O2 -G0 -ffunction-sections, 740/740, 0/6 places.
+ * A hill-climb over the corner field stores (same values, clears first)
+ * found the order below. Retail stores c2.z, c3.z, c2.y at +0x224/+0x230/
+ * +0x238; this C stores c2.y, c2.z, c3.z there. Frame 0x1A0 vs 0x1D0 is
+ * unchanged (48-byte gap before the corners in retail). No further gain
+ * from: a named h or h/-h pair, 1-3 move climbs, moving the four clears.
+ */
 /* 6 November 2026: defined UV cursor storage recovers 740/740 bytes;
  * USA v1.01 default -O2 -G0 -ffunction-sections, 0/6 places. Retained, not linked.
  * Walk both UV components through the complete packet's unsigned-byte object
@@ -101,12 +109,18 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     func_00282D30(offset, transform[0], size);
     func_00282CC0(transform[3], transform[3], offset);
     corners[0].bits = 0; corners[1].bits = 0; corners[2].bits = 0; corners[3].bits = 0;
-    corners[0].f[1] = -1; corners[1].f[1] = -1;
+    corners[0].f[1] = -1;
+    corners[3].f[2] = -(1 - skew * 0.3f);
     corners[0].f[3] = 1;
-    corners[2].f[2] = 1 - skew * 0.3f; corners[0].f[2] = 1 - skew * 0.3f;
+    corners[2].f[1] = 1;
     corners[1].f[3] = 1;
-    corners[3].f[2] = -(1 - skew * 0.3f); corners[1].f[2] = -(1 - skew * 0.3f);
-    corners[2].f[1] = 1; corners[2].f[3] = 1; corners[3].f[1] = 1; corners[3].f[3] = 1;
+    corners[2].f[2] = 1 - skew * 0.3f;
+    corners[2].f[3] = 1;
+    corners[0].f[2] = 1 - skew * 0.3f;
+    corners[1].f[2] = -(1 - skew * 0.3f);
+    corners[1].f[1] = -1;
+    corners[3].f[1] = 1;
+    corners[3].f[3] = 1;
     for (i = 0; i < 4; i++) {
         out = packet.vertices[i];
         func_00282D30(out, corners[i].f, scale);

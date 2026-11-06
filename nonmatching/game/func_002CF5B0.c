@@ -1,3 +1,12 @@
+/* 6 November 2026, round 3: new best below, 576/576, 0/28, 7 rows by the round-3 counter
+ * (the older C gave 17 by the same counter). Two changes: the cleanup argument is read as
+ * D_001A79F8.level (Settings_002F9198 view), and the flags-0x10 path returns its own rc local
+ * instead of sharing status. Status/cost now gets retail's v1 in both places. Left: the table
+ * base takes v1 (retail a0) and 0x5A a0 (retail a1); the s0 base copy is scheduled before the
+ * addu, so the cost beq is not threaded past the 0x5A retest. Tied or worse on this source: no
+ * group or a group around the cost read (8-9), shop_cost for the first read (8), an item local
+ * (10), status for the retest (39), table_base for the item read (107).
+ */
 /* 6 November 2026: USA v1.01, game -O2 -G32 -Wa,-G32 -ffunction-sections:
  * 576/576 bytes, 0/28 placements, first +0x60. The current retained input gave
  * 23 differing instruction rows (ignoring relocation immediates), rather than the
@@ -61,7 +70,8 @@ extern int D_001AB9EC __attribute__((sda));
 extern ShopEntry D_001ABCD0[] MACRO_ADDR;
 extern unsigned char D_001A7A60[] MACRO_ADDR;
 extern unsigned char D_001A7A40[] MACRO_ADDR;
-extern short D_001A7A10[];
+typedef struct { char pad0[0x20]; short level; char pad22[0x1E]; } Settings_002F9198;
+extern Settings_002F9198 D_001A79F8 MACRO_ADDR;
 extern int func_002B0E90(void);
 extern int func_002E5E58(int, unsigned int, void *);
 extern void func_002923C0(void *);
@@ -90,18 +100,18 @@ int func_002CF5B0(void)
     int flags = D_00138180.flags;
 
     if (flags & 0x10) {
-        int value;
+        int value, rc;
         D_001AB9EC = 0;
         value = *(int *)(D_001F2840.source + 0xE0);
         if (value != 0)
             D_001F2840.value = value;
         else if (D_001F2840.fallback == 0) {
-            status = -1;
+            rc = -1;
             goto finish;
         }
-        status = 0;
+        rc = 0;
 finish:
-        return status;
+        return rc;
     }
     if (flags & 0x900) {
         D_001AB9EC = 0;
@@ -146,7 +156,7 @@ finish:
                 {
                     flags = shop_item(D_001AB9EC);
                     if (flags == 9 || flags == 10 || (unsigned char)flags == 2 || (unsigned char)flags == 11)
-                        func_002923C0((void *)(s32)D_001A7A10[4]);
+                        func_002923C0((void *)(s32)D_001A79F8.level);
                 }
             } else
                 func_002E5E58(5, 0, 0);

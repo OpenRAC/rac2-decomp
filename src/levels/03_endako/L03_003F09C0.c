@@ -219,7 +219,6 @@ void func_L03_003F6918(u8 *entity, s32 index) {
 
 /* func_L03_003F6948 is defined in L03_003F6948-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_003F6BA8);
 
 /* func_L03_003F6E88 is defined in L03_003F6E88-g8.c. */
 

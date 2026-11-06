@@ -1,3 +1,8 @@
+/* 6 November 2026, round 3: unchanged, 972/972, 0/1, 22 rows. Slot order here is
+ * phase 0x160, stride 0x164, band 0x168; retail is stride, band, phase. Writing phase[band]
+ * inline from state (four forms, no phase local) gives 61 rows. A hill-climb over the
+ * declaration order (60 orders) stays at 22. Original best C retained.
+ */
 /* 6 November 2026: 972/972, 0/1 USA, 22 rows (was first diff +0x7C). `state = ...; flip = 0.0f;`
  * (flip set after the state load) fixes the lhu/andi/mtc1 order. This source order gives retail's
  * colour register ($v1) and its whole packet store order. Left: mode $a0/primitive $a1/band $a0

@@ -1,3 +1,9 @@
+/* 6 November 2026, round 3: unchanged, 680/680, 0/28, 6 rows (0x106 before the
+ * D_001A6480 la). Automatic hill-climb over the order of the final packet block
+ * (s2 assignment, cursor store, t[0..9]; ~550 compiles, two seeds, also with t[8]
+ * through a local) never went below 6 rows. Moving w = 0x4410 to four earlier
+ * places ties; reusing s for s2 gives 132 rows. Original best C retained.
+ */
 /* 6 November 2026: USA v1.01 recheck, game -O2 -G8 -ffunction-sections:
  * 680/680 bytes, 0/28 placements, first +0x1F4; seven instruction rows differ
  * after ignoring relocation immediates. The older five-row measurement is historical.

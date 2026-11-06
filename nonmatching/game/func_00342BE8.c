@@ -1,10 +1,20 @@
 /* 6 November 2026: current game compiler, -O2 -G8 -ffunction-sections:
  * 900/900 bytes, 0/28 places in each release; only the +0x230/+0x234 stores
- * differ. New one-pass groups around individual/adjacent initialization
- * statements, grouped flag/bounds constants and a group enclosing the guard
- * plus clipping call all grow to 904 bytes and disturb the schedule. The
- * groups introduce a label-alignment nop; they do not close the two-word tie.
- * Retained C is unchanged. No linked build run by this worker.
+ * differ (sw $a0, 0x2C($sp) vs retail sw $v0, 0x24($sp)).
+ * Detailed scheduler analysis shows:
+ * - All 120 permutations of the 5 statements in `if (D_001B23C0 == 0)` tie at 2 or 5 diffs.
+ *   Haifa sched1 schedules independent statements by critical-path priority:
+ *   screenWidthGP load (257, latency 2) delays `screenWidth - 1` (259) to clock 3, so `clip.x1` (261)
+ *   is not ready until clock 4. Meanwhile, 340 (264) issues at clock 2, so `clip.y1` (266, prio 4,
+ *   weight -1) issues at clock 3 ahead of 261.
+ * - In sched2, ready list at t=4 contains both 261 and 266; tie-breaker INSN_LUID preserves
+ *   sched1 order.
+ * - Grouping menuClipGP and D_001B23C0 into a unified struct MenuClipState increases flag priority
+ *   from 3 to 4, but cannot beat 264's priority of 5 (cost to 277 struct copy).
+ * - Hoisting width load outside the block moves the load before bnez and yields 6 diffs.
+ * - Permuting all 24 colour word store orders ties at 2 diffs or degrades up to 10 diffs.
+ * - Nonempty do-while(0) groups introduce a .p2align 3 nop before unaligned .L00342E4C (904 bytes).
+ * Retained C is unchanged.
  */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain func_0028EA58 as void with its real colour pointer and unsigned alpha packing.
