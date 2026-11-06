@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L13_0040F08C);
-
 #include "common.h"
 typedef struct L13C3Flags { char pad[0x88]; volatile int flags; } L13C3Flags;
 #define I(p,o) (*(int *)((p)+(o)))
