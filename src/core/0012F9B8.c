@@ -120,8 +120,6 @@ void func_0012FAE8(int arg0) {
     func_0012FA98(arg0, local);
 }
 
-INCLUDE_ASM("asm/core", func_0012FB10);
-
 /* rac1-decomp src/core/0012AC80.c: func_0012BD28 */
 void func_0012FB48(void *arg0, int arg1, int arg2) {
     int *p = (int *)arg0;

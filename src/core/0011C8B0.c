@@ -55,8 +55,6 @@ int func_0011C8B0(int arg0) {
     return r1_D_00155080[arg0];
 }
 
-INCLUDE_ASM("asm/core", func_0011C8C8);
-
 extern int r1_D_00155080[];
 extern int r1_D_0012FD04;
 extern int r1_D_00154F54;

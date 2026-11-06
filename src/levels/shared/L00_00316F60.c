@@ -195,8 +195,6 @@ f32 func_L00_0031A6C8(f32 value, s32 count) {
     return 1.0f - product;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_0031A710);
-
 /* func_L00_0031AA28 is defined in L00_0031AA28-curve.c. */
 
 /* Blends a value toward a target: helper(second,first) halved, scaled by (1 - helper(third*pi)); the first argument and that product go to a two-float helper whose float result is returned. */

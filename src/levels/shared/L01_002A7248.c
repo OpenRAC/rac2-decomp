@@ -874,7 +874,8 @@ INCLUDE_ASM("asm/levels", func_L01_002F1588);
 
 
 
-INCLUDE_ASM("asm/levels", func_L01_00304270);
+/* Original assembly: level copy of func_0029D7C0 (RAC1 miscproc func_0020C758): live-in $v1 and unconditional `teq` traps. */
+ASM_FUNC("asm/levels", func_L01_00304270);
 
 /* Defined in L01_00310BC0.c. */
 
@@ -1115,7 +1116,44 @@ void func_L01_0031AB20(char *m, MotionState *state, int path, float height, floa
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_0031B300);
+typedef int TI128 __attribute__((mode(TI)));
+typedef union { TI128 q; float f[4]; } Vector;
+extern float func_00282C48(float f12);
+
+int func_L01_0031B300(void *a0, void *a1, void *a2, void *a3) {
+    Vector v, w;
+    float f20;
+    float f2;
+    char *g;
+    char *h;
+    char *p;
+    int v1;
+
+    if (func_002761F8(a2, a3, 0x10, a0, 0) == 0)
+        goto fail;
+    g = (char *)&D_L01_001BF900;
+    p = *(char **)(g + 0x18);
+    if (p != 0) {
+        v1 = *(short *)(p + 0xAA);
+        if (v1 == 0x881 || v1 == 0)
+            return 0;
+        f20 = *(float *)(a0 + 0x18);
+    } else {
+        f20 = *(float *)(a0 + 0x18);
+    }
+    qcopy(&w, g + 0x40);
+    h = g + 0x40;
+    func_00282F20(w.f, w.f, 1.0f);
+    func_00282CF0(&v, a3, g + 0x20);
+    f2 = func_00282C48(func_00282DB0(v.f, w.f));
+    func_00282F20(w.f, (float *)h, f2);
+    func_00282CC0(a0 + 0x10, a0 + 0x10, &w);
+    *(float *)(a0 + 0x18) = f20;
+    return 1;
+fail:
+    return 0;
+}
+
 
 int func_L01_0031BC68(int a0, int a1, float phase) {
     float v = func_00283198(phase);
@@ -1299,7 +1337,7 @@ void func_L01_00324410(char *out, char *src, int *nums)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L01_00324550);
+/* func_L01_00324550 is in L01_00324550-narrowsave.c. */
 
 /* func_L01_003245E0 is defined in L01_002A7248-g8.c (this unit has no $gp access for it). */
 

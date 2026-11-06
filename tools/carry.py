@@ -479,6 +479,9 @@ def correct_level_entries(rows: list[tuple]) -> list[tuple]:
             if lv not in texts:
                 texts[lv] = levels.level_text(levels.DUMP / levels.level_dir(lv))
             base, data = texts[lv]
+            if name in levels.FUNCTION_DELAY_SLOTS and \
+                    levels.words(data[a - base + n - 8:a - base + n - 4]) != (JR_RA,):
+                raise ValueError(f"{name}: level {lv} has no return before its delay slot")
             keys.add((levels.fingerprint(data[a - base:a - base + n], a), n))
         if len(keys) != 1:
             raise ValueError(f"{name}: corrected level copies differ")
@@ -572,7 +575,7 @@ def refresh_entries() -> None:
         if not levels.function_residue(name, n):
             a, n = levels.function_extent(name, a, n)
             boot.append((name, a, n))
-    rows = correct_level_entries(levels.split_level_rows(levels.read_catalogue()))
+    rows = levels.split_identities(correct_level_entries(levels.split_level_rows(levels.read_catalogue())))
     # Validate both catalogues completely before writing either output.
     write_catalogues(boot, rows)
     print(f"entry repairs: {len(boot)} boot functions, {len(rows)} level rows; identities retained")

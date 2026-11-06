@@ -215,8 +215,6 @@ void func_L05_0037BB28(char *object)
     p->f10 = 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L05_0037BB78);
-
 int func_L05_0037BB90(char *obj)
 {
     int *p = (int *)func_002ED688(obj);

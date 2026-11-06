@@ -517,8 +517,6 @@ INCLUDE_ASM("asm/game", func_003136D0);
 
 /* func_003146C0 is in 0030F7B0-ball-g8.c. */
 
-INCLUDE_ASM("asm/game", func_00314CF8);
-
 
 /* func_00314FD0 is in 0030F7B0-throw.c. */
 
@@ -693,6 +691,3 @@ void func_00316DA0(Vec16_Fc936841d *object, int index)
     Fc936841d_FUN_00282CF0(local, (char *)&object[index - 2], (char *)&object[index - 3]);
     Fc936841d_FUN_00282CC0((char *)&object[index - 1], (char *)&object[index - 2], local);
 }
-
-
-INCLUDE_ASM("asm/game", func_003172D0);

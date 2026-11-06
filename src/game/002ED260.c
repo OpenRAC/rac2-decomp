@@ -119,5 +119,3 @@ void func_002ED4B8(void)
         offset += 80;
     }
 }
-
-INCLUDE_ASM("asm/game", func_002ED570);

@@ -1,3 +1,4 @@
+/* 6 November 2026, round 6: marked ASM_FUNC in src/ (original assembly, pending maintainer review); see the src comment for the evidence. */
 #include "include_asm.h"
 
 /* func_002B9390: measured plain-C near miss, not linked.

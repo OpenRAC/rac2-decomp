@@ -291,16 +291,12 @@ void func_002B8048(int value, long address)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002B80B8);
-
 /* func_002B8108 is in 002B7E28-g8.c. */
 
 void func_002B8518(void) {
     D_00138180.active = 0;
     D_00138180.value = 0;
 }
-
-INCLUDE_ASM("asm/game", func_002B8530);
 
 /* func_002B85F8 is in 002B7E28-g8.c. */
 
@@ -321,22 +317,27 @@ void func_002B9000(void) {
     func_002B85F8(&D_00138500);
 }
 
-INCLUDE_ASM("asm/game", func_002B9030);
+/* Original assembly: a `j` with a trapping `addi $a1,$zero,0` in its delay slot; the compiler emits only addiu. */
+ASM_FUNC("asm/game", func_002B9030);
 
 ASM_FUNC("asm/game", func_002B9038);
 
 /* Original assembly: RAC1 overlays/shared/particle_create_kill.c, func_L00_002688A8. */
 ASM_FUNC("asm/game", func_002B9180);
 
-INCLUDE_ASM("asm/game", func_002B9288);
+/* Original assembly: lqc2/qmtc2/vitof VU0 ops and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002B9288);
 
-INCLUDE_ASM("asm/game", func_002B9380);
+/* Original assembly: `lw; nop; jr $v0` keeps a load-delay nop before an indirect tail jump; cc1 never emits the nop and has no indirect sibling call (MATCHING-BLOCKERS 4). */
+ASM_FUNC("asm/game", func_002B9380);
 
-INCLUDE_ASM("asm/game", func_002B9390);
+/* Original assembly: RAC1 game/render/partproc.c, func_00218A80; $ra saved at $gp+0x2DB8, $at as a working register and trapping add/addi. */
+ASM_FUNC("asm/game", func_002B9390);
 
 ASM_FUNC("asm/game", func_002B9420);
 
-INCLUDE_ASM("asm/game", func_002BA048);
+/* Original assembly: qmfc2 VU0 op and trapping add/addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002BA048);
 
 INCLUDE_ASM("asm/game", func_002BA0E0);
 

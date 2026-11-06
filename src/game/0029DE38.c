@@ -289,9 +289,6 @@ void func_0029F6A0(
     *(float *)(dest + 12) = Ff2d8e5ad_FUN_00282E48(dest, m0);
 }
 
-INCLUDE_ASM("asm/game", func_0029F840);
-
-
 void func_0029F978(u8 *a0,u32 a1,u8 *a2) {
  u8 *p;
  if(a2[1]!=0) return;

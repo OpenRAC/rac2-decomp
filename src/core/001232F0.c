@@ -427,8 +427,6 @@ func_00123400  (FLO_union_type * src, fp_number_type * dst)
     }
 }
 
-INCLUDE_ASM("asm/core", func_00123490);
-
 extern FLO_type func_001232F0(fp_number_type *);
 
 FLO_type func_001234C0(fp_class_type classification, unsigned int sign, int exponent, fractype fraction) {

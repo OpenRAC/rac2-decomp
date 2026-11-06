@@ -107,6 +107,7 @@ src/game/0029DC58-rc2.c	-O2 -G8 -ffunction-sections -fno-builtin
 src/game/002A7398-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
 src/game/002A90C8-rc2.c	-O2 -G0 -mno-split-addresses -ffunction-sections -fno-builtin
 src/game/002A9640-rc2.c	-O2 -fno-gcse -G0 -ffunction-sections -fno-builtin
+src/game/0029F840-nogcse.c	-O2 -G0 -ffunction-sections -fno-gcse
 src/game/002B3670-rc2.c	-O2 -G8 -ffunction-sections -fno-builtin
 src/game/002B7CE0-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
 src/game/002C1EF0-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
@@ -3480,3 +3481,10 @@ src/pal/levels/shared/L01_0039C970-weather-g8.c	-O2 -G8 -ffunction-sections -ffa
 src/pal/levels/01_oozla/L01_003C00F0-debris-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L02_00415BD0-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
 src/pal/levels/03_endako/L03_00421E20-g8.c	-O2 -G8 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
+src/levels/shared/L00_00423290-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L01_00324550-narrowsave.c	-O2 -G0 -ffunction-sections -mastra-quad-saves -frac2-narrow-saves-below
+src/levels/shared/L08_00389B68-narrowsave.c	-O2 -G0 -ffunction-sections -mastra-quad-saves -frac2-narrow-saves-below
+src/levels/shared/L00_002FC7A0-00303990-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
+src/levels/shared/L00_003AE900-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/levels/shared/L03_002AB5C8-state-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels -malign-loops=2
+src/game/002F5220-7320.c	-O2 -G8 -ffunction-sections -frac2-keep-block-zero-copy

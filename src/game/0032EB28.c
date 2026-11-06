@@ -190,8 +190,6 @@ INCLUDE_ASM("asm/game", func_0032F3D0);
 
 INCLUDE_ASM("asm/game", func_0032F598);
 
-INCLUDE_ASM("asm/game", func_0032FDC0);
-
 
 /* func_0032FEA8 uses small data in 0032EB28-g8.c. */
 
@@ -464,8 +462,6 @@ done:
     return ret;
 }
 
-INCLUDE_ASM("asm/game", func_00335270);
-
 /* func_00335370 is defined in 00335370-copy.c. */
 
 /* func_003353C8 uses the quadword-copy profile in 0032EB28-qcopy.c. */
@@ -505,8 +501,6 @@ void func_003355A8(int mode)
         *(float *)(state + 0x2A8) = 0.018f;
     }
 }
-
-INCLUDE_ASM("asm/game", func_003356E8);
 
 void func_00335840(void) {
     func_002704D0();

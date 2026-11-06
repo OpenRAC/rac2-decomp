@@ -134,5 +134,3 @@ void func_L09_004051F8(NativeAngleOwner *owner) {
 /* func_L09_00410BC8 lives in L09_00410BC8-sprites.c. */
 
 /* func_L09_0041A700 lives in the sibling small-data unit (L09_003F9468-g8.c). */
-
-INCLUDE_ASM("asm/levels", func_L09_003FB780);

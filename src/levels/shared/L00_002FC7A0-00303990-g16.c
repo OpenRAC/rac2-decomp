@@ -1,58 +1,6 @@
-/* functional: high. Unchecked: a loader; retail never returns within the gate's 40M instructions (NOTHING COMPARED). Read against all 851 retail instructions of level 00's copy (0x303990-0x3046C8): every callee is level 00's place of the named function, every data name sits on the address retail forms (lui/addiu or $gp), the GS words (0x1DB08000/0x5C0000000, 0x19B04000/0x580000000, 0xFFA0000000E0, 0x40000400004000) sign-extend as retail's sra/dsll32 do, and the branch senses and loop bounds agree. Fixed: func_0029D4D0 is declared as the port's host routine defines it, int (int, int); func_L00_00300610 is an empty routine (jr ra), declared (void) as src/ defines it and called without the unused (table, count) retail leaves in a0/a1. The rest is the matching draft (3392/3388 bytes: register choice for one GS word, one swapped independent load/copy, one nop). */
-/*
- * func_L00_00303990 (3388 bytes): the level loader's driver. With `load`, it
- * unpacks the level archive (D_001A7280) into the header and data heap,
- * builds the GS texture tables and GIF words, loads the moby and tie
- * classes (func_00293890 / func_L00_002FF6A8 / func_L00_002FFAB8), places the
- * hero's class bank, relocates spans; then always runs the level-data loader
- * func_L00_00300618(load) into LD+0x68, the camera setup, and either
- * func_L00_00358B30 (resume) or func_L00_003588A8. Returns 0.
- */
-/* Current retained result, 1 November 2026: 3392/3388 bytes. Preserve the level loader's heap-pointer
- * return contract. An explicit goto form of the final loop measured 3380 bytes and lost required control-
- * flow/alignment; keep the structured loop. GS-word allocation and macro-load loop padding remain
- * unresolved.
- * Not a functional-port qualification or a complete matching-build result.
- * Profile: -O2 -G16 -Wa,-G16 -ffunction-sections.
- * Earlier measurements below remain historical where superseded by this note.
- */
-/* Retained nonmatching C, Claude Opus 5.5 xhigh, 31 October 2026 (task v1860).
- * USA v1.01: 3392/3388 bytes, 0/27 places. Five rows differ, plus one extra nop.
- * Unit: src/levels/shared/L00_00303990-g16.c, flags -O2 -G16 -Wa,-G16 -ffunction-sections.
- * Declarations are below; the INCLUDE_ASM marker goes away when this unit is added.
- * No PAL, v2.00 or linked check was run because USA does not match.
- *
- * Remaining differences:
- * 1. 0x00303AF4: retail ors the first GS word into the low half (or v1,v1,v0; or v1,v1,t4;
- *    sd v1); here it lands in the high half's register (or v0,v1,v0). In mips.md the first
- *    operand of (ior:DI (sign_extend:DI ...) ...) is not a register, so local-alloc can only
- *    tie the result to the second operand. Retail's second word does tie that way (or a0,a1,a0).
- *    Tried without effect: lo |= hi, hi | lo, an int lo, RAC1's t/u form (transition.c), hi
- *    shared across blocks. A 64-bit lo with the constant in a variable made it much worse.
- * 2. 0x00304350: retail has lw v0,0x30(s2) then daddu a0,s5,zero; here they are swapped.
- *    The copy is ready in the store's clock, so it issues with the sw and ahead of the load.
- *    Loading before the store gives lw/daddu/sw, so retail acts as if a scheduling boundary
- *    follows the sw, but no branch in retail targets 0x00304350. A do/while(0) around the copy
- *    (61 rows differ) is not that boundary. Reordering statements, base = dst + size,
- *    -fno-sched-interblock, -frac2-keep-block-order and -frac2-gcse-unsplit-edges all tie.
- * 3. 0x00304674: one extra nop before the last loop's bne. Everything else in that loop is
- *    retail's. Retail's loop is seven words with lui/lw inside. mips_r5900_pad_loops counts
- *    the macro lw as one insn, so it sees six and pads. Likely a toolchain limit, because
- *    the pass counts insns and retail's assembler counted words; a word-counting fix is
- *    untested. Splitting the address does not help: a plain array gets its %hi shared by
- *    PRE into s1, and a macro entry test through a _1 alias with a split loop test
- *    (3388 bytes) gets its %hi hoisted into s1 (3 rows). A goto loop was not tried: with no
- *    loop note it should also lose the alignment nop retail has at 0x0030465C.
- *
- * Wordings that closed other differences; keep them:
- * - (D_00139568[0xA] + D_L00_00262570)->b4 gives retail's add operand order.
- * - func_L00_002FE268 takes the class value in a0 (other callers pass an argument too).
- * - In loops 2-4 the value goes in a local before the store, so LD's %hi precedes the table's.
- * - The slot stores run D_L00_001DD180, D_L00_001DA680, D_L00_001D9F00, which gives retail's
- *   sll order and registers.
- * - D_L00_001B1EA0 is an incomplete MACRO_ADDR array, reloaded with lui/lw at both tests.
- * -fno-gcse is far off (808 rows); -g and -frac2-qcopy do not change any differing row.
- */
+/* Level loader: unpacks the level archive, uploads textures, builds the GS template words and
+ * the class/texture tables, and returns the next free heap pointer. The LD store goes before the
+ * fx/fy loads so combine keeps the first GS word's low half a DI register (retail's or tie). */
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -152,7 +100,7 @@ extern void func_00282B50(void *, void *, int);
 extern void func_00282AB0(void *, void *, int);
 extern void func_00293000(void *, int, int, void *);
 extern void func_0011AEA0(int);
-extern int func_0029D4D0(int, int); /* the port's host routine (host/wad.c) takes game addresses as int */
+extern int func_0029D4D0(void *, char *);
 extern int func_00282A18(int);
 extern void func_L00_00300090(char *, void *);
 extern void func_00291EC0(char *);
@@ -164,13 +112,13 @@ extern void func_002934B8(Bank *, int);
 extern void func_L00_002FE268(int);
 extern void func_00293260(Bank *, int);
 extern void func_L00_002FF6A8(char *, void *, void *, int);
-extern void func_L00_00300610(void); /* retail's body is jr ra; nop: the table and count it is handed are unused */
+extern void ref_L00_00303990_00();
 extern void func_L00_002FFAB8(char *, void *, void *, void *, int);
 extern void func_00291DE0(void *, int);
 extern void func_L00_002FD480(char *);
 extern void func_00291CA8(void *, char *, void *, int);
 extern void func_0026FEB8(const char *, ...);
-extern char *func_L00_00300618(int);
+extern int func_L00_00300618(int);
 extern void func_L00_003032F0(void);
 extern void func_L00_00303418(int);
 extern void func_L00_00358B30(void);
@@ -210,22 +158,16 @@ int func_L00_00303990(int load, int resume)
         func_00282AB0(D_L00_001B1CE0, D_0019B2E8 + D_001A79F0 * 16, 16);
         func_00293000((char *)(f[4] + (int)f), h->i[0], h->i[0x84 / 4], (char *)h + h->i[1]);
         func_0011AEA0(0);
-        used = func_0029D4D0(f[0x12] + (int)f, (int)base);
+        used = func_0029D4D0((char *)(f[0x12] + (int)f), base);
+        LD->p[0x2C / 4] = base + h->i[0x60 / 4];
         fx = D_001A72F4;
         fy = D_001A7304;
-        LD->p[0x2C / 4] = base + h->i[0x60 / 4];
-        {
-            unsigned long long lo = (unsigned long long)((fy + h->i[0x90 / 4] * 4) >> 8 | 0x1DB08000);
-            unsigned long long hi = (unsigned long long)((fx + h->i[0x94 / 4]) >> 8) << 37 | 0x5C0000000ULL;
-            D_L00_001B1CF0[0] = (lo | hi) | 0x8000000000000000ULL;
-        }
+        D_L00_001B1CF0[0] = (int)((fy + h->i[0x90 / 4] * 4) >> 8) | 0x1DB08000 | ((long long)0xB800 << 19) |
+            ((long long)((fx + h->i[0x94 / 4]) >> 8) << 37) | 0x8000000000000000LL;
         D_L00_001B1CF0[1] = 0xFFA0000000E0ULL;
         D_L00_001B1CF0[2] = 0x40000400004000ULL;
-        {
-            unsigned long long lo = (unsigned long long)((fy + h->i[0x98 / 4] * 4) >> 8 | 0x19B04000);
-            unsigned long long hi = (unsigned long long)((fx + h->i[0x9C / 4]) >> 8) << 37 | 0x580000000ULL;
-            D_L00_001B1D08[0] = (lo | hi) | 0x8000000000000000ULL;
-        }
+        D_L00_001B1D08[0] = (int)((fy + h->i[0x98 / 4] * 4) >> 8) | 0x19B04000 | ((long long)0xB000 << 19) |
+            ((long long)((fx + h->i[0x9C / 4]) >> 8) << 37) | 0x8000000000000000LL;
         D_L00_001B1D08[1] = 0xFFA0000000E0ULL;
         D_L00_001B1D08[2] = 0x40000400004000ULL;
 
@@ -347,7 +289,7 @@ int func_L00_00303990(int load, int resume)
             func_L00_002FF6A8(base + *(int *)q2, (char *)h + h->i[0x44 / 4], q2 + 0x10, *(int *)(q2 + 4));
         if (D_L00_00226700[0] != 0)
             LD->i[0x3C / 4] = D_L00_00226700[0];
-        func_L00_00300610();
+        ref_L00_00303990_00((char *)h + h->i[0x24 / 4], h->i[0x20 / 4]);
         for (i = 0, q2 = (char *)h + h->i[0x2C / 4]; i < h->i[0x28 / 4]; i++, q2 += 0x30)
             func_L00_002FFAB8(base + *(int *)q2, (char *)h + h->i[0x4C / 4], q2 + 0x10, q2 + 0x20, *(int *)(q2 + 4));
         if (D_L00_0021EA20[0] != 0)
@@ -386,9 +328,12 @@ int func_L00_00303990(int load, int resume)
         if (D_L00_001B24D4 != TEXBASE->i[0x18 / 4]) {
             char *dst;
             int size;
-            TEXBASE->p[0x10 / 4] = base;
-            size = h->i[0x30 / 4] * 16;
+            do {
+                TEXBASE->p[0x10 / 4] = base;
+                size = h->i[0x30 / 4];
+            } while (0);
             dst = base;
+            size *= 16;
             base += size;
             func_00282B50(dst, (char *)h + h->i[0x34 / 4], size);
             TEXBASE->p[0x14 / 4] = base;
@@ -436,7 +381,7 @@ int func_L00_00303990(int load, int resume)
         base = (char *)((unsigned int)end & ~0x3F);
         LD->p[0x48 / 4] = base;
     }
-    LD->p[0x68 / 4] = func_L00_00300618(load);
+    LD->i[0x68 / 4] = func_L00_00300618(load);
     if (load)
         D_00152CE4[0] = -1;
     if (TEXBASE->i[0xC / 4] != 0) {

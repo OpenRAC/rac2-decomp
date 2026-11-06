@@ -1,34 +1,3 @@
-/* Near miss (opus-2, Claude Opus 5.5 xhigh, task v2098, 3 November 2026;
- * earlier opus-1 v2078): 380/380 bytes, 0 of 28 places.  Only the
- * entry-relinking loop's registers differ (about 13 words); the call
- * sequence, the stores before func_002B9000/func_0027BD70/func_002EBAA8,
- * the base copy `daddu a2,a0,zero` and the tail (int func_001261F0) match.
- *
- * Build: its own unit with -O2 -G8 -ffunction-sections (for example
- * src/game/002EBC70-g8.c), replacing the INCLUDE_ASM in src/game/002E7018.c.
- * Compare: python3 /workspace/rac2-orch/v2/cdiff.py <checkout> func_002EBC70
- *
- * Names are now right: retail's absolute words are lui 0x1B + 0x8BB0/0x8BB8
- * = D_001A8BB0/D_001A8BB8, and the final `sw zero` is the same D_001A8BB0
- * through $gp (D_001A8BB0_GP SDATA view).
- *
- * Remaining: retail previous=$v1, base/cursor=$a0, i=$a1; this build gives
- * previous=$a0, base/cursor=$a1, i=$v1.  Global queue here: i (pseudo 87,
- * 7 refs / 15 insns) > previous (85, 7/17) > cursor (125, 7/22).  The
- * cursor's 22 is 11 doubled by update_equiv_regs: cse2 gives the giv init
- * `cursor = base_copy + 396` a REG_EQUAL (const (plus D_001B8840 396)).
- * Retail needs previous first and the cursor (or base 89) ahead of i.
- * With 7 refs each that needs i live > 22 insns (impossible: the only
- * earlier code is the func_002EB7E8 call), so retail's flow-time ref counts
- * must differ (e.g. i 5 refs and born one insn earlier, or previous and the
- * cursor both above 7).  Tried without effect: i = 0 before the previous
- * load, nested ifs, `continue` form; a SceneFrame *frame local drops the
- * base copy; a `list = entries` local adds an addiu; repeated
- * D_001B8840.entries[i] accesses raise the cursor to 9 refs (it then wins
- * $v1) but leave a reload after the store.  Pass-1 preferences
- * (regs_someone_prefers) cannot help: every local pseudo near the loop
- * is in $v0.
- */
 #include "common.h"
 
 /* One frame of the level transition loop: it re-links the queued entries to
@@ -82,11 +51,13 @@ int func_002EBC70(int unused)
     i = 0;
     if (i < D_001B8840.count) {
         do {
-            entry = D_001B8840.entries[i];
-            if (entry != 0 && prev != entry) {
-                entry->previous = prev;
-                prev = entry;
-            }
+            do {
+                entry = D_001B8840.entries[i];
+                if (entry != 0 && prev != entry) {
+                    entry->previous = prev;
+                    prev = entry;
+                }
+            } while (0);
             i++;
         } while (i < D_001B8840.count);
     }

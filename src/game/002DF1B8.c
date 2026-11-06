@@ -18,8 +18,6 @@ int func_002DF1D0(void) {
 
 /* func_002DF3F8 is in 002DF1B8-capture.c. */
 
-INCLUDE_ASM("asm/game", func_002DF630);
-
 
 /* func_002DF7A8 is matched in 002DF1B8-g8.c (-G8 small data). */
 
@@ -37,7 +35,8 @@ ASM_FUNC("asm/game", func_002E0408);
 
 ASM_FUNC("asm/game", func_002E0558);
 
-INCLUDE_ASM("asm/game", func_002E0BA8);
+/* Original assembly: lqc2/sqc2/vdiv VU0 ops and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002E0BA8);
 
 ASM_FUNC("asm/game", func_002E0C40);
 

@@ -2,14 +2,12 @@
 # Each does what the retail function does without matching its bytes; the matching build never reads it.
 # Files under nonmatching/functional/ are C written for the port only (no matching attempt behind them).
 # name	file
-func_001325E0	nonmatching/functional/func_001325E0.c
 func_00280710	nonmatching/functional/func_00280710.c
 func_00283CB8	nonmatching/functional/func_00283CB8.c
 func_00283CF0	nonmatching/functional/func_00283CF0.c
 func_00284088	nonmatching/functional/func_00284088.c
 func_00284268	nonmatching/functional/func_00284268.c
 func_002859C8	nonmatching/functional/func_002859C8.c
-func_0028B160	nonmatching/functional/func_0028B160.c
 func_002933D0	nonmatching/functional/func_002933D0.c
 func_00294F10	nonmatching/functional/func_00294F10.c
 func_002B6828	nonmatching/functional/func_002B6828.c
@@ -67,7 +65,6 @@ func_00285030	nonmatching/functional/func_00285030.c
 func_0028A670	nonmatching/functional/func_0028A670.c
 func_0029CF58	nonmatching/functional/func_0029CF58.c
 func_0029CF78	nonmatching/functional/func_0029CF78.c
-func_0029F840	nonmatching/functional/func_0029F840.c
 func_002A0488	nonmatching/functional/func_002A0488.c
 func_002A04B8	nonmatching/functional/func_002A04B8.c
 func_002B44C0	nonmatching/functional/func_002B44C0.c
@@ -78,7 +75,6 @@ func_002CC6B0	nonmatching/functional/func_002CC6B0.c
 func_002F3CF8	nonmatching/functional/func_002F3CF8.c
 func_00301F18	nonmatching/functional/func_00301F18.c
 func_003136D0	nonmatching/functional/func_003136D0.c
-func_0033A520	nonmatching/functional/func_0033A520.c
 func_00340638	nonmatching/functional/func_00340638.c
 func_00348EC0	nonmatching/functional/func_00348EC0.c
 func_00349D58	nonmatching/functional/func_00349D58.c
@@ -103,7 +99,6 @@ func_L00_00426C78	nonmatching/functional/func_L00_00426C78.c
 func_L02_0032E508	nonmatching/functional/func_L02_0032E508.c
 func_L02_003E7B58	nonmatching/functional/func_L02_003E7B58.c
 func_L02_00412D50	nonmatching/functional/func_L02_00412D50.c
-func_L03_003C1BF0	nonmatching/functional/func_L03_003C1BF0.c
 func_L03_0041DAD0	nonmatching/functional/func_L03_0041DAD0.c
 func_L04_0040DCA8	nonmatching/functional/func_L04_0040DCA8.c
 func_L05_0041DF58	nonmatching/functional/func_L05_0041DF58.c
@@ -171,7 +166,6 @@ func_L00_002CA4E0	nonmatching/functional/func_L00_002CA4E0.c
 func_L00_002E2048	nonmatching/functional/func_L00_002E2048.c
 func_L00_002EC248	nonmatching/functional/func_L00_002EC248.c
 func_L00_002EC608	nonmatching/functional/func_L00_002EC608.c
-func_L00_00308700	nonmatching/functional/func_L00_00308700.c
 func_L00_0038B208	nonmatching/functional/func_L00_0038B208.c
 func_L05_0037A5F8	nonmatching/functional/func_L05_0037A5F8.c
 func_L06_0041EF08	nonmatching/functional/func_L06_0041EF08.c
@@ -181,7 +175,6 @@ func_L06_00443A38	nonmatching/functional/func_L06_00443A38.c
 func_L06_003E5D30	nonmatching/functional/func_L06_003E5D30.c
 func_L15_00431590	nonmatching/functional/func_L15_00431590.c
 func_L25_0040DE40	nonmatching/functional/func_L25_0040DE40.c
-func_002F7320	nonmatching/functional/func_002F7320.c
 func_00282C90	nonmatching/functional/func_00282C90.c
 func_00283360	nonmatching/functional/func_00283360.c
 func_002836E8	nonmatching/functional/func_002836E8.c
@@ -248,7 +241,6 @@ func_L00_00316F60	nonmatching/functional/func_L00_00316F60.c
 func_L00_002E0200	nonmatching/functional/func_L00_002E0200.c
 func_002A3110	nonmatching/functional/func_002A3110.c
 func_002CF5B0	nonmatching/functional/func_002CF5B0.c
-func_L00_00423290	nonmatching/functional/func_L00_00423290.c
 func_L01_003BCEC8	nonmatching/functional/func_L01_003BCEC8.c
 func_L02_003C43F0	nonmatching/functional/func_L02_003C43F0.c
 func_L00_00395428	nonmatching/functional/func_L00_00395428.c
@@ -290,5 +282,4 @@ func_002EAB18	nonmatching/functional/func_002EAB18.c
 func_002F5FB8	nonmatching/functional/func_002F5FB8.c
 func_002CA070	nonmatching/functional/func_002CA070.c
 func_L00_002A3B88	nonmatching/functional/func_L00_002A3B88.c
-func_L00_00303990	nonmatching/functional/func_L00_00303990.c
 func_L11_004465F8	nonmatching/functional/func_L11_004465F8.c

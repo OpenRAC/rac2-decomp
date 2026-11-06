@@ -444,7 +444,46 @@ void func_0028ACB0(int mode)
 
 
 
-INCLUDE_ASM("asm/game", func_0028B160);
+extern int D_001A7308 __attribute__((section(".sdata")));
+extern void func_0028F948(unsigned int, int, int, int, int, int);
+
+void func_0028B160(int bank, int base, int immediate)
+{
+    struct HudTexCounts *counts;
+    int address;
+    int bank_offset;
+    int first;
+    int end;
+    int i;
+    int page;
+    int width_log2;
+    int height_log2;
+    int size;
+
+    if (D_001B1870.header.counts->loaded[bank] == 0) {
+        func_0028AE88(0, base);
+        address = D_001A7308;
+    } else {
+        address = D_001A7308;
+    }
+    counts = D_001B1870.header.counts;
+    bank_offset = bank << 2;
+    first = bank == 0 ? 0 : counts->ends[bank - 1];
+    i = first;
+    end = *(int *)((unsigned char *)D_001B1870.header.counts + bank_offset + 0x34); /* ends[bank] */
+    do {
+        for (; i < end; i++) {
+            page = address >> 8;
+            width_log2 = D_001B1870.image_pages[i].width_log2;
+            height_log2 = D_001B1870.image_pages[i].height_log2;
+            size = 1 << (width_log2 + height_log2);
+            func_0028F948(D_001B1870.image_pages[i].source_address, page, 0x1B, width_log2,
+                          height_log2, immediate);
+            address += size * 4;
+            D_001B1870.image_pages[i].gs_block_offset = page;
+        }
+    } while (0);
+}
 
 extern char *D_001BAF3C;
 extern char * volatile D_001B1880 __attribute__((sda));

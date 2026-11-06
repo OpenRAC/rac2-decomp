@@ -334,7 +334,6 @@ int func_L00_003AE550(char *motion, char *object, int mode)
     return 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003AE900);
 
 /* func_L00_003B0A28 is defined in L00_003B0A28-g8.c. */
 

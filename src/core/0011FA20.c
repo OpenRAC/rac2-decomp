@@ -15,5 +15,3 @@ void func_0011FA20(int status) {
     func_0011FA18();
     r1_func_00118A60(status);
 }
-
-INCLUDE_ASM("asm/core", func_0011FA48);

@@ -1,3 +1,4 @@
+/* 6 November 2026, round 6: marked ASM_FUNC in src/ (original assembly, pending maintainer review); see the src comment for the evidence. */
 /* func_0029D7C0 - near miss (worker 3, wave 3).
  *
  * The retail body is a spin wait: it reads a word, tests bit 0x100 and loops

@@ -570,7 +570,9 @@ s32 func_L03_00419C58(u32 a0, f32 *a1) {
     return out;
 }
 
-INCLUDE_ASM("asm/levels", func_L03_0041B848);
+void func_L03_0041B848(void)
+{
+}
 
 /* func_L03_00424C40 is in L03_00424C40-g8.c (-G8, -fno-gcse). */
 

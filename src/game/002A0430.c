@@ -52,9 +52,11 @@ ASM_FUNC("asm/game", func_002A0558);
    words in an encoding the compiler never emits. */
 ASM_FUNC("asm/game", func_002A05A8);
 
-INCLUDE_ASM("asm/game", func_002A08A0);
+/* Original assembly: VU0 lqc2 ops, scratchpad base in $t7 and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002A08A0);
 
-INCLUDE_ASM("asm/game", func_002A0A28);
+/* Original assembly: $at as a working register and trapping add/addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002A0A28);
 
 ASM_FUNC("asm/game", func_002A0B88);
 
@@ -66,11 +68,13 @@ ASM_FUNC("asm/game", func_002A0C68);
    trapping addi/add and $at as a working register. */
 ASM_FUNC("asm/game", func_002A0F48);
 
-INCLUDE_ASM("asm/game", func_002A10E8);
+/* Original assembly: lqc2/vmove VU0 ops and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002A10E8);
 
 INCLUDE_ASM("asm/game", func_002A1130);
 
-INCLUDE_ASM("asm/game", func_002A1378);
+/* Original assembly: VU0 lqc2/sqc2 ops and trapping addi/add with $at as a working register; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002A1378);
 
 /* Original assembly: 32 trapping add/addi/sub, $at as a working register, and no return:
    it leaves by jumps, like func_002A1130. */
@@ -96,7 +100,8 @@ ASM_FUNC("asm/game", func_002A4E68);
 
 ASM_FUNC("asm/game", func_002A6640);
 
-INCLUDE_ASM("asm/game", func_002A677C);
+/* Original assembly: $ra kept in $t9 and trapping addi; the compiler cannot emit them. */
+ASM_FUNC("asm/game", func_002A677C);
 
 
 

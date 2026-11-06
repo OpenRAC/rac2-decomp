@@ -1,3 +1,4 @@
+/* 6 November 2026, round 6: marked ASM_FUNC in src/ (original assembly, pending maintainer review); see the src comment for the evidence. */
 /* func_00282848, 72-byte original extent, 28 placements.
    A measured tools/levels.py entry correction skips the 56-byte prefix and
    retains the final 16-byte function. In level 00 the original row starts at

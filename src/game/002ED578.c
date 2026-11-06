@@ -47,20 +47,12 @@ s32 func_002ED688(u8 *a0) {
 
 /* func_002ED6B0 is in 002ED6B0.c: its call to func_002ED870 has to be an external one. */
 
-INCLUDE_ASM("asm/game", func_002ED848);
-
 unsigned int func_002ED870(void)
 {
     return D_00214FCC;
 }
 
-INCLUDE_ASM("asm/game", func_002ED880);
 
-
-INCLUDE_ASM("asm/game", func_002ED8F0);
-
-
-INCLUDE_ASM("asm/game", func_002ED9A8);
 
 extern int D_00214F90[];
 

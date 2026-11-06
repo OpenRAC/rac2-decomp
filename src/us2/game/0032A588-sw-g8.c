@@ -139,6 +139,5 @@ void func_US2_0032A588(char *self)
         }
         break;
     }
-    /* The catalogue extent includes eight bytes before this return callback. */
-    func_0027CFD0((char *)func_0032A130 + 8, self);
+    func_0027CFD0(func_0032A130, self);
 }
