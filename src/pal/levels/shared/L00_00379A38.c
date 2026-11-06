@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00379A38);
-
 extern char D_L00_0022F7C0[];
 extern float D_L00_001B25E0 __attribute__((sda));
 extern int D_001A79F8 __attribute__((sda));
