@@ -12,10 +12,6 @@ int func_PAL_002D60F0(void) {
     return 0;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002D6A98);
-
-INCLUDE_ASM("asm/pal/game", func_PAL_002D74D8);
-
 #include "common.h"
 extern void func_PAL_0029D870(void);
 

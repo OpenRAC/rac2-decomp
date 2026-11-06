@@ -111,7 +111,5 @@ void func_PAL_0030A078(X *x) {
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0030A9D8);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0030B4E0);
-
 
 
