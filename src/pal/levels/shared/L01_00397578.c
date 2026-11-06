@@ -44,7 +44,6 @@ void func_PAL_L01_0039A174(void *actor) {
             y = func_00283CF0(pos[1] - phase);
             func_0027E018(x, y, 32, 32, u, v, 32, 32, color, texture);
         }
-INCLUDE_ASM("asm/pal/levels", func_PAL_L01_0039A7B0);
     }
 }
 

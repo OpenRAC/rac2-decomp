@@ -44,7 +44,6 @@ void func_PAL_L04_00408578(unsigned char *m, unsigned char *p)
         if (angle < -1.0f) angle = -1.0f;
         angle *= -0.52359885f;
     }
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_00408A58);
     func_002AA898(m + 0xf0, p + 0x128, angle, factor * 0.050400004f, 0.648f, factor * 0.03316126f, 0);
     if (*(unsigned char **)(p + 0x8c)) {
         unsigned char *child = *(unsigned char **)(p + 0x8c);

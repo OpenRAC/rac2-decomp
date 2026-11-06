@@ -48,7 +48,6 @@ void func_PAL_L00_002B1200(int a0)
     } else {
         goto ret;
     }
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002B1248);
 arm:
     D_00189E20.b = 3;
     D_00189E20.a = 0x3A;

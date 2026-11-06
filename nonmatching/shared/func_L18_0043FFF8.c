@@ -1,3 +1,7 @@
+/* 6 November 2026: on the current compiler, still 5 rows. Retail makes the byte 255, then 0x100,
+ * then the halfword 255, but stores +0x34, +0x30, +0x32. Signed short stores in that store order
+ * (as matched spawners write them) give 5 rows; the +0x30/+0x34/+0x32 order gives retail's
+ * constant order but 6 rows; a struct view of the header ties; without -g about 43 rows differ. */
 /* 5 November 2026: Scoped byte/word flag locals merge constants and give 484/488 bytes. Grouping the real header writes keeps 488 bytes but the same five flag constant/store words still differ. No variant is promoted.
  */
 /* Retained nonmatching reconstruction, 27 October 2026.

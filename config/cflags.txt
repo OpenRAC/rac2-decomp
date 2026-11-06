@@ -3473,6 +3473,14 @@ src/pal/levels/03_endako/L03_003D5360-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00387C58-cc.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/pal/game/002C8BD0-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L00_002B6488-cc.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/shared/L00_002A4788.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_00376A18-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
+src/pal/levels/shared/L01_0039A7B0-collect-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/pal/levels/shared/L01_0039C970-weather-g8.c	-O2 -G8 -ffunction-sections -ffast-math -g -frac2-hazard-labels
+src/pal/levels/01_oozla/L01_003C00F0-debris-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/shared/L02_00415BD0-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
+src/pal/levels/03_endako/L03_00421E20-g8.c	-O2 -G8 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
 src/levels/shared/L00_00423290-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L01_00324550-narrowsave.c	-O2 -G0 -ffunction-sections -mastra-quad-saves -frac2-narrow-saves-below
 src/levels/shared/L08_00389B68-narrowsave.c	-O2 -G0 -ffunction-sections -mastra-quad-saves -frac2-narrow-saves-below
