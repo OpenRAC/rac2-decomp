@@ -28,7 +28,25 @@ void func_PAL_00280218(int x, int y, u64 color, u8 *text, int length, float scal
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00280358);
+/* Scale that fits text into maxWidth, never below minScale and never above 1. */
+float func_PAL_00280358(u8 *text, int length, int maxWidth, float minScale) {
+    int width;
+    float scale;
+
+    scale = 1.0f;
+    if (text != 0) {
+        width = func_0027F288(text, length, scale);
+    } else {
+        width = 0;
+    }
+    if (maxWidth < width) {
+        scale = (float)maxWidth / (float)width;
+        if (scale < minScale) {
+            scale = minScale;
+        }
+    }
+    return scale;
+}
 
 extern int func_PAL_0027F790(u8 *, int, float);
 extern u8 D_PAL_00263C70[];
@@ -47,8 +65,6 @@ void func_PAL_002803E8(int x, int y, u64 color, u8 *text, int length, float scal
     func_PAL_0027FB48(fx, fy, color, text, length, scale, texture, D_PAL_00263C70);
 }
 
-
-INCLUDE_ASM("asm/pal/game", func_PAL_002804A8);
 
 extern void func_PAL_002804A8(float);
 
