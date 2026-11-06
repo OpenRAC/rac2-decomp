@@ -650,6 +650,46 @@ def split_release_places(rows: list[tuple]) -> list[tuple]:
     return out
 
 
+def merge_release_rows(rows: list[tuple]) -> list[tuple]:
+    """Apply levels.RELEASE_ROW_MERGES: the kept row takes the places of rows that are the same function.
+
+    Every merged place must hold the kept row's size, fingerprint and constants
+    (levels.cross_identity), and no level may hold two copies. A merge already
+    applied passes; anything else fails before a catalogue is written."""
+    by_name = {r[0]: r for r in rows}
+    merged, retired = {}, set()
+
+    def body(lv, a, size):
+        base, data = levels.level_text(levels.DUMP / levels.level_dir(lv))
+        return data[a - base:a - base + size]
+
+    for kept, others in levels.RELEASE_ROW_MERGES.items():
+        present = [other for other in others if other in by_name]
+        if not present:
+            continue
+        if kept not in by_name:
+            raise ValueError(f"{kept}: rows to merge but no kept row")
+        name, kind, size, fp, places = by_name[kept]
+        constants = levels.cross_identity(body(*places[0], size))
+        places = list(places)
+        for other in present:
+            _, _, other_size, other_fp, other_places = by_name[other]
+            if (other_size, other_fp) != (size, fp):
+                raise ValueError(f"{other}: not the size and fingerprint of {kept}")
+            for lv, a in other_places:
+                copy = body(lv, a, size)
+                if levels.fingerprint(copy, a) != fp or levels.cross_identity(copy) != constants:
+                    raise ValueError(f"{other}: level {lv} is not the body of {kept}")
+            places += other_places
+        if len({lv for lv, _ in places}) != len(places):
+            raise ValueError(f"{kept}: two merged copies in one level")
+        if kind != "boot":
+            kind = "level" if len(places) == 1 else "shared"
+        merged[kept] = (name, kind, size, fp, sorted(places))
+        retired.update(present)
+    return [merged.get(r[0], r) for r in rows if r[0] not in retired]
+
+
 def refresh_entries() -> None:
     """Repair measured extents in an existing release catalogue, retaining identities.
 
@@ -664,6 +704,7 @@ def refresh_entries() -> None:
     rows = levels.split_identities(correct_level_entries(levels.split_level_rows(levels.read_catalogue())))
     boot, rows = split_release_rows(boot, rows)
     rows = split_release_places(rows)
+    rows = merge_release_rows(rows)
     # Validate both catalogues completely before writing either output.
     write_catalogues(boot, rows)
     print(f"entry repairs: {len(boot)} boot functions, {len(rows)} level rows; identities retained")

@@ -1379,6 +1379,20 @@ RELEASE_PLACE_SPLITS = {
 }
 
 
+# A release's rows that are one function in different levels: the row that stays,
+# then the rows whose places it takes. Each merged row was carried with an entry
+# 4 bytes early (FUNCTION_ENTRY_OFFSETS), so its fingerprint only joined the kept
+# row's after that repair. tools/carry.py --entries checks every merged place.
+RELEASE_ROW_MERGES = {
+    # The PAL copy of func_L03_003A40A0: levels 3, 4, 7, 9, 13, 20 and 30, and
+    # levels 8, 11, 16, 17 and 18. USA and v2.00 have one row in all 12.
+    "func_PAL_L03_003A7720": ("func_PAL_L08_003B1594",),
+    # The PAL copy of func_L00_00408E58: 24 levels, and levels 16, 23 and 30.
+    # USA and v2.00 have one row in all 27.
+    "func_PAL_L00_0040D990": ("func_PAL_L16_0040C384",),
+}
+
+
 def split_identities(rows: list[tuple]) -> list[tuple]:
     """Regroup the places of an audited colliding fingerprint by their unmasked words.
 

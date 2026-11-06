@@ -326,6 +326,35 @@ class Carry(unittest.TestCase):
             with self.subTest(words=words), self.assertRaises(ValueError):
                 self.place_split(words)
 
+    def row_merge(self, rows, texts, spec=("kept", ("copy",))):
+        with patch.dict(levels.RELEASE_ROW_MERGES, dict([spec]), clear=True), \
+             patch.object(levels,"level_text",side_effect=lambda path: texts[int(path.name[:2])]):
+            return carry.merge_release_rows(rows)
+
+    def test_release_row_merge_gives_the_kept_row_every_place(self):
+        body = code(addiu(29,29,-16), lui(2,0x30), lw(2,2,8), lw(3,4,0x2000), JR_RA, addiu(29,29,16))
+        moved = code(addiu(29,29,-16), lui(2,0x31), lw(2,2,12), lw(3,4,0x2000), JR_RA, addiu(29,29,16))
+        fp = levels.fingerprint(body, 0x1000)
+        self.assertEqual(levels.fingerprint(moved, 0x1000), fp)
+        texts = {0:(0x1000,body), 1:(0x1000,moved), 2:(0x1000,body)}
+        rows = [("kept","shared",24,fp,[(0,0x1000),(2,0x1000)]), ("other","level",4,"x",[(0,0x2000)]),
+                ("copy","level",24,fp,[(1,0x1000)])]
+        out = self.row_merge(rows, texts)
+        self.assertEqual(out, [("kept","shared",24,fp,[(0,0x1000),(1,0x1000),(2,0x1000)]), rows[1]])
+        self.assertEqual(self.row_merge(out, texts), out)
+        # A constant the fingerprint masks, another fingerprint, a level twice, or no kept row: all fail.
+        other = code(addiu(29,29,-16), lui(2,0x30), lw(2,2,8), lw(3,4,0x3000), JR_RA, addiu(29,29,16))
+        self.assertEqual(levels.fingerprint(other, 0x1000), fp)
+        for why, change, message in (
+                ("constant", lambda t, r: t.update({1:(0x1000,other)}), "not the body"),
+                ("fingerprint", lambda t, r: r.__setitem__(2, ("copy","level",24,"x",[(1,0x1000)])), "fingerprint"),
+                ("level twice", lambda t, r: r.__setitem__(2, ("copy","level",24,fp,[(2,0x1000)])), "one level"),
+                ("no kept row", lambda t, r: r.__delitem__(0), "no kept row")):
+            with self.subTest(why=why), self.assertRaisesRegex(ValueError, message):
+                t, r = dict(texts), list(rows)
+                change(t, r)
+                self.row_merge(r, t)
+
     def test_branch_target(self):
         self.assertEqual(carry.branch_target(0x10400003, 0x1000), 0x1010)   # beqz v0,+3
         self.assertEqual(carry.branch_target(0x1000FFFF, 0x1000), 0x1000)   # b .

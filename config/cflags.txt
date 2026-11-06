@@ -3858,7 +3858,6 @@ src/pal/levels/shared/L00_00402D4C-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -
 src/pal/levels/06_notak/L06_004695FC-cc-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/pal/levels/shared/L09_003C4454-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/pal/game/002804A8-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32 -mno-split-addresses
-src/pal/levels/shared/L08_003B1594-switch-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/0034D238-rc2.c	-O2 -G0 -mno-split-addresses -ffunction-sections -fno-builtin
 src/pal/levels/shared/L03_0038E5C8-g8q.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/us2/game/0034BDB0-rc2.c	-O2 -G0 -mno-split-addresses -ffunction-sections -fno-builtin
@@ -3874,7 +3873,6 @@ src/pal/levels/shared/L00_003CC93C-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2
 src/us2/levels/shared/L00_003C3BE8-g16-qcopy.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/us2/levels/03_endako/L03_0041E914-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
 src/pal/levels/shared/L02_0044B234-cc-g8.c	-O2 -G8 -ffunction-sections
-src/pal/levels/shared/L16_0040C384-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/19_grelbin/L19_00416A3C-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/us2/levels/11_joba/L11_0044709C-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/14_aranos_prison/L14_004284F4-g8.c	-O2 -G8 -ffunction-sections
