@@ -89,7 +89,6 @@ int func_PAL_L00_003D5AB8(L00PickupObject *object)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003D5C90);
 
 
 
