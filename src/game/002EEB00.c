@@ -256,7 +256,8 @@ ASM_FUNC("asm/game", func_002F1E88);
 
 ASM_FUNC("asm/game", func_002F2610);
 
-INCLUDE_ASM("asm/game", func_002F2758);
+/* Original assembly: lqc2/qmtc2/qmfc2 VU0 macro ops, $at as a working register and trapping addi. */
+ASM_FUNC("asm/game", func_002F2758);
 
 ASM_FUNC("asm/game", func_002F29E4);
 

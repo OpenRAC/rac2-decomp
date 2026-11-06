@@ -2874,7 +2874,7 @@ Words **and operands** matter: qualifying sp-by-sp adjustments, zero moves and n
 
 The four-byte residue rule also needs its measured position after a completed return and delay slot. PR #253 now handles five additional specifically audited mixed-instruction residues (section 50), not an opcode-only generalization.
 
-An extent beginning inside a prior epilogue but containing a later real function needs an entry correction, not deletion. Positive stack adjustment is only a clue. Verify call/data/vtable entries, preserve ends and raw bytes, and preserve boot/level identity when regenerating fingerprints. Other mixed boundaries remain open. **5 November 2026:** 59 more named residues and four 16-to-8 entry corrections are applied; see section 50. **6 November 2026:** one more residue, one fill-skipping entry correction and one PAL delay slot returned to its function (section 50).
+An extent beginning inside a prior epilogue but containing a later real function needs an entry correction, not deletion. Positive stack adjustment is only a clue. Verify call/data/vtable entries, preserve ends and raw bytes, and preserve boot/level identity when regenerating fingerprints. Other mixed boundaries remain open. **5 November 2026:** 59 more named residues and four 16-to-8 entry corrections are applied; see section 50. **6 November 2026:** one more residue, one fill-skipping entry correction and one PAL delay slot returned to its function (section 50); later that day a second residue, a second fill skip and one end correction (section 50).
 
 One boot example remains open: USA v1.01 callers `func_0027B440` and
 `func_00291850` enter `0x00126288`, four bytes after the catalogued
@@ -2985,6 +2985,13 @@ PR #253 is merged. Generator, catalogue, markers and tests account for these spe
 - `func_L00_00309DB0` is a residue (`FUNCTION_RESIDUES`, 28 bytes). US and US2: all 27 copies follow `jr $ra`, its delay slot and a `nop`. PAL: `func_PAL_L00_0030BA80` (frame `-0x20`) ends on `jr $ra` at all 27 places and the row's first word, `addiu $sp,$sp,0x20`, is that return's delay slot. The new named `FUNCTION_DELAY_SLOTS` table gives the slot back (336 to 340 bytes; `carry.py --entries` checks the `jr $ra`); the other 24 PAL bytes are the same residue. No direct target, aligned loaded word or address pair from the level's own sections enters any placement (boot `.text` hits at those addresses are boot code; the PAL level-20 word is the halfword data above).
 - `func_0011A7F8` gets an entry correction (`FUNCTION_ENTRY_OFFSETS`, 24 to 16 bytes). In all three boots 0x11A7F8/0x11A7FC are `0xCDCDCDCD` fill after `jr $ra; addiu $sp,$sp,0x140`; 0x11A800 is `addiu $v1,$zero,0; syscall; jr $ra; nop`. Nothing in the boots or levels enters 0x11A7F8..0x11A800. Like its syscall-stub neighbours (commit eb2811fe) it is `ASM_FUNC`: no C emits `syscall`.
 
+
+**6 November 2026, round eleven (verified in US, PAL and US2):**
+
+- `func_00334550` is a boot-only residue (`FUNCTION_RESIDUES`; US 444 bytes, US2 444 at 0x335348, PAL `func_PAL_003361E8` 432). It follows `jr $ra; addiu $sp,$sp,0x90` and holds only `addiu $sp,$sp,N; nop` pairs, nops and one `sw $zero,0x14($a2)`. No branch, jump, aligned word or address pair in any boot enters it; the memory is above the level base, so level code does not reach it. The old "8 bytes too long at the front" note was wrong.
+- `func_0011F364` gets an entry correction (`FUNCTION_ENTRY_OFFSETS`, 636 to 608 bytes, entry 0x11F380) in all three boots: seven `0xCDCDCDCD` words follow `jr $ra; addiu $sp,$sp,0x40`. The handler (k0 frame, CP0, `mfsa`/`mthi1`, `sync.p`, `eret`, `$at` as a working register) is `ASM_FUNC`. Its end still holds one fill word after a `break`.
+- `func_002F2758` (USA v1.01 boot and 27 levels) ends at its `jr $ra` and delay slot: 652 to 404 bytes (`FUNCTION_END_EXTRA`, now also applied to US level rows). The 248 bytes after it are out-of-line blocks of `func_002F1E88`: only its branches (0x2F1EE8, 0x2F1FB8, 0x2F20C0/C8, 0x2F2588) enter them, they jump back into it, and the last restores the registers it saved at 0x70003FA8. They stay uncatalogued retail assembly. The VU0 routine (jal from 0x2F25C8 and 0x2F318C) is `ASM_FUNC`. PAL and US2 still hold this whole area as one 2908-byte release row (`func_PAL_002F2DD8`, `func_US2_002F2CE0`); unchanged.
+- `func_002DC3C8` is kept. It starts `sw $zero,0x50($a0); nop` in all three releases and nothing enters +0, +4 or +8; a store at the start is not an entry witness (see "Entry still unproved" below).
 
 <a id="blocker-51"></a>
 
@@ -3381,6 +3388,7 @@ there is no independent entry witness at +0, +4 or +8. The twenty words at
 `0026CDF0` are internal switch-case targets, not callbacks. Closed predecessor
 flow and a suspicious state store alone do not settle that ambiguity. Keep the
 complete draft and reopen on a traced entry or object-origin evidence.
+**6 November 2026:** rechecked in US, PAL and US2; still no witness, row kept.
 
 **Measured generator corrections:** `func_002C38A0` now starts eight bytes later
 and spans 56 bytes; `func_00335918` starts 32 bytes later and spans 36 bytes.
@@ -3450,6 +3458,7 @@ resolve the earlier conflicting prefix counts: seven fill words, or 28 bytes, pr
 real code. The following exception/context code uses CP0, the saved arithmetic banks and
 privileged return operations, with additional entries/fragments. This fixes the prefix
 description, not the full entry map; no generator or assembly-classification change is made.
+**6 November 2026:** the fill is skipped (entry 0x11F380, 608 bytes) and the handler is `ASM_FUNC`; see section 50.
 
 **28 October 2026 follow-up for `func_0011A7F8`:** USA v1.01's 24-byte extent has two
 fill-like words before a syscall/return body. It follows the preceding completed return and

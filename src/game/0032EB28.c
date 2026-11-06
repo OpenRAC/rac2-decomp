@@ -368,8 +368,6 @@ s32 func_00334100(s32 a0)
 }
 
 
-INCLUDE_ASM("asm/game", func_00334550);
-
 /* func_00334710 is matched in 00334710-rc2.c. */
 
 
