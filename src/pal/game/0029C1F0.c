@@ -23,5 +23,3 @@ void func_PAL_0029C220(int a0, int a1, int a2, int a3, int a4, int a5, int a6, i
 INCLUDE_ASM("asm/pal/game", func_PAL_0029C7F0);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0029C820);
-
-INCLUDE_ASM("asm/pal/game", func_PAL_0029C8A0);

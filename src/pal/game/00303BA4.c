@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00303BA4);
-
 typedef int s32;
 typedef unsigned char u8;
 typedef struct { float x, y, z, w; } V4_F213135aa;
