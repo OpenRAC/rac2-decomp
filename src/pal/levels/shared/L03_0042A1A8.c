@@ -1,8 +1,40 @@
 #include "include_asm.h"
+#include "common.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L03_0042A1A8);
+extern int func_002A77E0(int x);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L03_0042A5C8);
+/* func_PAL_L03_0042A5C8, the PAL copy of func_L03_00425030: four random floats, four fixed ones,
+   then the fade table at +0x20 scaled to 50 Hz, which turns its loop into a count-up one. */
+void func_PAL_L03_0042A5C8(char *self)
+{
+    float *p = *(float **)(self + 104);
+    float *q = p + 4;
+    int *w;
+    int i;
+    int j;
+
+    for (i = 3; i >= 0; i--)
+    {
+        *q = (float)func_002A77E0(255);
+        q++;
+    }
+
+    p[8] = -1.0f;
+    p[9] = -2.25f;
+    p[10] = 1.25f;
+    p[11] = 2.5f;
+
+    w = (int *)(p + 12);
+    for (j = 0; j < 4; j++)
+    {
+        w[j] = ((s32)(j * 64 + 63) * 5 + 2) / 6;
+    }
+
+    p[16] = 2.0f;
+    p[17] = 2.46f;
+    p[19] = 2.0f;
+    p[18] = 2.46f;
+}
 
 typedef int V4_L03_00425108 __attribute__((mode(TI)));
 extern unsigned char ref_L03_00425108_00[];

@@ -1,7 +1,32 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L05_003D1160);
+extern int func_002A77E0(int);
+
+/* func_PAL_L05_003D1160, the PAL copy of func_L05_003CD4C0: the same C, where the alpha steps take PAL's 50 Hz scale. */
+void func_PAL_L05_003D1160(char *object)
+{
+    char *state = *(char **)(object + 0x68);
+    float *f = (float *)state;
+    int *w;
+    int i;
+    int j;
+
+    for (i = 3; i >= 0; i--)
+        *f++ = (float)func_002A77E0(0xFF);
+    *(float *)(state + 0x10) = -1.0f;
+    *(float *)(state + 0x14) = -2.25f;
+    *(float *)(state + 0x18) = 1.25f;
+    *(float *)(state + 0x1C) = 2.5f;
+    w = (int *)(state + 0x20);
+    for (j = 0; j < 4; j++) {
+        w[j] = ((0x3F + j * 0x40) * 5 + 2) / 6;
+    }
+    *(float *)(state + 0x30) = 2.8f;
+    *(float *)(state + 0x34) = 3.5f;
+    *(float *)(state + 0x3C) = 2.8f;
+    *(float *)(state + 0x38) = 3.5f;
+}
 
 typedef int V4_L05_003CD598 __attribute__((mode(TI)));
 extern unsigned char ref_L05_003CD598_00[];
