@@ -25,7 +25,10 @@ extern float D_001A9688[8] __attribute__((sda));
 extern float D_001A968C[] __attribute__((section(".sdata")));
 extern int func_003005A0(void);
 extern void func_00297FE8(float, float, float *, float *, int);
-int func_00297218(float *x, float *y)
+/* Callers pass (x, y, &u, &v, level): the player's coordinates in $f12/$f13, the two result
+ * pointers in $a2/$a3 and the level number on the stack. This body keys on the global level
+ * and the player view, so the coordinates and the level are unused. */
+int func_00297218(float unused_x, float unused_y, float *x, float *y, int unused_level)
 {
     int found = 0;
     if (D_001A8CC0) {
