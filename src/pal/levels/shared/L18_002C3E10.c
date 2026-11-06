@@ -42,6 +42,3 @@ void func_PAL_L18_002C3E10(void)
         }
     }
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_002C4000);
