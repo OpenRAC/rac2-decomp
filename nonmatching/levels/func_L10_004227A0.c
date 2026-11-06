@@ -1,77 +1,34 @@
-/* Contract follow-up, 4 November 2026; retained, not linked.
- * The matched func_L05_00303000 definition in L05_003008C0.c is void
- * with seven signed32 EE arguments: x, y, width, height, packed color,
- * text-address word and length. All eight calls now keep that physical
- * interface; color is not widened and the text pointer is explicitly cast
- * to its real address word. The earlier s32/u64 declaration was false.
- * D_L10_001B1394/98/9C are ordinary words: there is no measured reload
- * witness supporting the inherited volatile diagnostic declarations.
- * Current -O2 -G8 -ffunction-sections check: 3260/3420 bytes, 0/1 USA.
- * This canonical name is absent from the current US2/PAL catalogues.
- * Real source/helper lifetimes and rounding/scheduling remain unresolved.
- * Earlier sizes and the inherited diagnostic choices below are historical
- * where superseded; no dummy controls, accesses or fields were introduced.
- */
-/* Faithful-source review, 4 November 2026; retained, not linked.
- * 3312/3420 bytes, 0/1 USA placement.
- * Remove MENU_ROW's conditional scaled+1 assignment, which was overwritten without a read and existed only to leave a compiler block boundary. Keep the direct rounded row and the separate consumed display-mode coordinate helper. Actual HUD helper/control-flow evidence is needed before another scheduling experiment.
- * Measured in the assigned production unit with the profile recorded below.
- * Other-release checks were not rerun for this nonmatching source.
- * Earlier diagnostic measurements below are historical where superseded.
- */
-/*
- * Claude Opus 5.5 (xhigh), task v1820, USA v1.01. Replaces the 3300-byte draft from v1754.
- * Game -O2 -G8 -ffunction-sections, in its own -g8.c unit (for example
- * src/levels/10_hrugis_cloud/L10_003170D0-menu-g8.c; no cflags line needed):
- * 3440/3420 bytes, 0/1 places. Relocation-masked sequence alignment: 802 of retail's 855
- * instructions (the v1754 draft scores 517 on the same script). No linked build was run.
- * No exact-bytes form was found with any wording, admissible or not.
+/* 7 November 2026, USA v1.01; retained, not linked.
+ * Profile: own -g8 unit (e.g. src/levels/10_hrugis_cloud/L10_003170D0-menu-g8.c) with
+ * `-O2 -G8 -ffunction-sections -ffast-math` in config/cflags.txt.
+ * tools/check.py: 3440/3420 bytes, 0/1. Relocation-masked alignment: 795 of retail's 855
+ * instructions (the 4 November 3260-byte source scores 602 on the same script).
+ * The same body is func_L05_0041EF00 and func_L15_0042EFE0.
  *
- * Main finding: the "block boundary with no instruction" in MenuRow is a vanished no-else test,
- * `row = (s32)scaled; if (D_L10_001B2D80 == 1) <body that flow1 deletes>`. The flow1, sched1 and
- * flow2 points were read in the gcse, sched and sched2 dumps; the cse points are inferred from bytes:
- * - The body has to be a set that cse cannot delete: `scaled` qualifies because it was already
- *   used by the conversion. Testing before the conversion loses the row: a `y` or unused-local
- *   body dies in cse, so jump removes the test before flow.
- * - The test is single-use and has no label in its body, so cse skips it and 200.0f, 0.5f, 1.0f,
- *   0.0f and 0x8710 stay shared. An `a && b` test gives the label two uses and loses the sharing.
- * - Flow1 deletes the body; sched1 and local-alloc still see the jump, the mode load and the 1.
- *   That alone gives retail's $v1 row, $f20-$f24, $s1, chain registers and the $s3 = 1 hoist.
- * - Flow2 then deletes the jump (tidy_fallthru_edge), merges the blocks and deletes the mode and
- *   1 loads, so this test can read a global and leave no word. This refines the rule in
- *   WORKER2.md, which covers tests that survive until jump2.
+ * Lawful causes found (no volatile, no dead store, no barrier):
+ * - D_L10_001B1390..139C are one per-race array. Retail reads [0] through $gp and [1]..[3]
+ *   as unsplit sym+offset macro loads (lui/lw with empty branch slots), which is what the
+ *   earlier volatile scalars imitated. [0] uses a D_L10_001B1390_gp SDATA view, as
+ *   D_L22_001B0A20_gp does. D_L10_001B1448/1454/1460/146C are rows of one [4][3] reward table.
+ * - func_L05_00303000 forwards its colour and text to the matched func_L05_00302CE8
+ *   (u64 color, u8 *text); retail builds 0x80F0F0F0 as a 64-bit constant
+ *   (ori/dsll/ori), so the caller's prototype has u64 color, as the other text helpers.
+ * - Every row goes through one MenuY(y, adjustment) helper; rows with no adjustment pass
+ *   0.0f. Under -ffast-math `scaled + 0.0f` folds, the two arms become equal and the
+ *   test vanishes after the register allocators, giving retail's $f20-$f24, $s1 for
+ *   0x8710, $s3 = 1 and row registers without a dead body. The ternary and an if/else
+ *   assigning one row compile the same; `if (...) return ...; return ...;` loses 120 words.
  *
- * What still differs, nearly all from one cause: retail keeps a block boundary at this test
- * through sched2, and this draft does not, because flow2 merged the blocks. So sched2 interleaves
- * the row with later arguments, which changes argument order and breaks tail merges such as case
- * 1's locked label into case 2's (20 extra bytes overall, net of 5 words).
- * Diagnostic, not admissible and not kept: the empty `do { } while (0);` after the test in
- * MENU_ROW adds loop notes, a sched2 barrier. It scores 833/855 at 3444 bytes. It has 7 more nops
- * than retail (48 against 41) at labels aligned by `.p2align 3`, for a net 6 surplus words; retail
- * has no such nops, so loop notes are probably not what retail had. `while (0) ;` and
- * `for (;0;) ;` score the same. What else differs: the order of 0.0f, %lo($a1) and $f12 in the
- * 200.0f rows, and a final row's argument order. With the test inside the do-while it scores 773.
- * Next: find what keeps that boundary through flow2 with no word left. It cannot be a jump
- * reading the mode load, since that load would then stay. flow.c merges unless the label has a
- * second predecessor or cannot be deleted.
- *
- * Unproven choices, for review:
- * - The body's `scaled + 1.0f` leaves no trace in retail: the test is measured, its body is a
- *   guess. A test whose body is dead may not be admissible; maintainers have not ruled on it.
- * - D_L10_001B1394/98/9C are volatile. Retail reads them with a lui/lw pair and leaves the branch
- *   slots empty, and volatile reproduces both. Plain, NOT_SDA, nosda and array forms fill the slot
- *   or split the load. Retail never rereads one on a path, so the guide's volatile test is not
- *   shown to be met. D_L10_001B1390 cannot be volatile: retail loads it in a delay slot.
- * - func_L05_00303000 returns s32 here. This gives retail's $v1 index and $v0 slti, because the
- *   call's value makes $v0 unavailable. Its epilogue leaves $v0 from its last call, which fits
- *   but does not prove a return value.
- * - MENU_ROW is a macro because an inline adds a copy of the row (`mfc1 $a1; daddu $s0, $a1`),
- *   7 extra words. Its local `y` gives retail's $f0 constant and $f1 chain.
- *
- * Ruled out (measured): -mno-split-addresses, -fno-schedule-insns2, -g,
- * -frac2-keep-block-order, -frac2-gcse-unsplit-edges, -frac2-no-null-pointer-checks, a -G0 unit;
- * an inline reward helper and ternary index forms (movn, not retail's movz).
- * All required declarations follow.
+ * Still different: sched2 order. Retail keeps a block boundary after each vanished
+ * test, so the 200.0f rows load 1.0f/0.0f and the arguments after cvt.s.w, and the
+ * text calls keep the order a3, a1, a0, a2, t0. Here the arguments interleave with the
+ * row, which breaks the cross-jump of the three "locked" 0x2F73 tails (20 bytes over).
+ * The index register is $v0 here and $v1 in retail. No effect from -fno-sched-interblock,
+ * -fno-sched-spec, -malign-loops=2, -frac2-keep-block-order, -frac2-gcse-unsplit-edges,
+ * -fno-gcse (782), clamp spellings, or passing func_001157AC(text) as the argument.
+ * Worse: a do { } while (0) statement macro (non-empty) on any subset of rows (545-742),
+ * a comma-expression macro (fold drops the test at tree level: 616), and a float-returning
+ * helper for the image rows (746-760).
  */
 #include "common.h"
 
@@ -88,8 +45,9 @@ extern s32 func_0027FBD8(s32, s32, u64, char *, s32);
 extern s32 func_0027FB40(s32, s32, u64, char *, s32);
 extern s32 func_0027FAA8(s32, s32, u64, char *, s32);
 extern void func_0027F5B8(s32, s32, u64, char *, s32);
-/* The matched wrapper consumes seven signed EE words; argument six is a text address. */
-extern void func_L05_00303000(s32, s32, s32, s32, s32, s32, s32);
+/* Forwards to func_L05_00302CE8 (u64 color, u8 *text); retail builds the colour as a 64-bit
+   constant (ori/dsll/ori), as for the other text helpers. */
+extern void func_L05_00303000(s32, s32, s32, s32, u64, u8 *, s32);
 extern s32 D_001A7340;
 typedef struct { u8 pad[0x1A0]; s32 buttons; } MenuInput;
 extern MenuInput D_00138180;
@@ -99,26 +57,19 @@ extern u8 *D_L10_001A904C;
 extern f32 D_L10_001B2D84;
 extern s32 D_L10_001B2D80;
 extern s32 D_L10_001B2048;
-extern s32 D_L10_001B1394, D_L10_001B1398, D_L10_001B139C;
-extern s32 D_L10_001B1454[] __attribute__((sda)), D_L10_001B1460[] __attribute__((sda)), D_L10_001B146C[] __attribute__((sda));
 extern s32 D_L10_001B1F64 __attribute__((sda));
 extern s32 D_L10_001B143C __attribute__((sda));
-extern s32 D_L10_001B1390 __attribute__((sda));
-extern s32 D_L10_001B1448[] SDATA(D_L10_001B1448);
+/* One record per race: [0] is read through $gp (its SDATA view), [1]..[3] at offsets, which
+   cc1 leaves as unsplit macro loads (lui/lw, empty branch slots), as retail. */
+extern s32 D_L10_001B1390[] __attribute__((sda));
+extern s32 D_L10_001B1390_gp[] SDATA(D_L10_001B1390);
+/* Reward table, three tiers per race (rows 0x1448, 0x1454, 0x1460, 0x146C). */
+extern s32 D_L10_001B1448[][3] __attribute__((sda));
+extern s32 D_L10_001B1448_gp[][3] SDATA(D_L10_001B1448);
 
 static __inline__ s32 MenuY(f32 y, f32 adjustment) {
-    f32 scaled = y * D_L10_001B2D84 + 0.5f;
-    if (D_L10_001B2D80 == 1)
-        return (s32)(scaled + adjustment);
-    return (s32)scaled;
+f32 scaled = y * D_L10_001B2D84 + 0.5f; return D_L10_001B2D80 == 1 ? (s32)(scaled + adjustment) : (s32)scaled;
 }
-
-#define MENU_ROW(dst, y0)                              \
-    {                                                  \
-        f32 y = (y0);                                  \
-        f32 scaled = y * D_L10_001B2D84 + 0.5f;        \
-        dst = (s32)scaled;                             \
-    }
 
 s32 func_L10_004227A0(void) {
     char buf[128];
@@ -130,10 +81,10 @@ s32 func_L10_004227A0(void) {
     if (D_L10_001A8F00 || !D_L10_001A904C) return 1;
     D_L10_001B1F64 = 0;
     r = func_00336D50(D_L10_001A904C + 0x8710, 0x45);
-    { s32 row; MENU_ROW(row, 200.0f); imageY = (f32)row; }
+    { s32 row; row = MenuY(200.0f, 0.0f); imageY = (f32)row; }
     func_00300968((char *)r, 0x60442D00, center, imageY, 1.0f, 0.0f);
     r = func_00336D50(D_L10_001A904C + 0x8710, 0x44);
-    { s32 row; MENU_ROW(row, 200.0f); imageY = (f32)row; }
+    { s32 row; row = MenuY(200.0f, 0.0f); imageY = (f32)row; }
     func_00300968((char *)r, 0x55F0C070, center, imageY, 1.0f, 0.0f);
     remainder = D_L10_001B2048 % 50;
     if (remainder >= 25) pulse = 1.0f - (remainder - 25) * 0.04f;
@@ -166,14 +117,14 @@ s32 func_L10_004227A0(void) {
         {
             s32 len;
             s32 row;
-            MENU_ROW(row, 131.0f);
+            row = MenuY(131.0f, 0.0f);
             len = func_001157AC(text);
-            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
+            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len);
         }
         {
-            s32 index = D_L10_001B1390;
+            s32 index = D_L10_001B1390_gp[0];
             if (index >= 3) index = 2;
-            reward = D_L10_001B1448[index];
+            reward = D_L10_001B1448_gp[0][index];
         }
         if (D_001A7A0A) reward *= 10;
         if (reward) {
@@ -181,15 +132,15 @@ s32 func_L10_004227A0(void) {
         {
             s32 len;
             s32 row;
-            MENU_ROW(row, 242.0f);
+            row = MenuY(242.0f, 0.0f);
             len = func_001157AC(buf);
-            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
+            func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
         }
         }
         func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
         break;
     case 1:
-        if (D_L10_001B1390) {
+        if (D_L10_001B1390_gp[0]) {
             text = func_00288FB8(0x2FE3);
             {
                 s32 len;
@@ -201,23 +152,23 @@ s32 func_L10_004227A0(void) {
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 131.0f);
+                row = MenuY(131.0f, 0.0f);
                 len = func_001157AC(text);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len);
             }
             {
-                s32 index = D_L10_001B1394;
+                s32 index = D_L10_001B1390[1];
                 if (index >= 3) index = 2;
-                reward = D_L10_001B1454[index];
+                reward = D_L10_001B1448[1][index];
             }
             if (D_001A7A0A) reward *= 10;
             func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 242.0f);
+                row = MenuY(242.0f, 0.0f);
                 len = func_001157AC(buf);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
             func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
         } else {
@@ -225,14 +176,14 @@ s32 func_L10_004227A0(void) {
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 170.0f);
+                row = MenuY(170.0f, 0.0f);
                 len = func_001157AC(text);
                 func_0027FBD8(x, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;
     case 2:
-        if (D_L10_001B1390 && D_L10_001B1394) {
+        if (D_L10_001B1390_gp[0] && D_L10_001B1390[1]) {
             text = func_00288FB8(0x2FE5);
             {
                 s32 len;
@@ -244,23 +195,23 @@ s32 func_L10_004227A0(void) {
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 131.0f);
+                row = MenuY(131.0f, 0.0f);
                 len = func_001157AC(text);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len);
             }
             {
-                s32 index = D_L10_001B1398;
+                s32 index = D_L10_001B1390[2];
                 if (index >= 3) index = 2;
-                reward = D_L10_001B1460[index];
+                reward = D_L10_001B1448[2][index];
             }
             if (D_001A7A0A) reward *= 10;
             func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 242.0f);
+                row = MenuY(242.0f, 0.0f);
                 len = func_001157AC(buf);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
             func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
         } else {
@@ -268,14 +219,14 @@ s32 func_L10_004227A0(void) {
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 170.0f);
+                row = MenuY(170.0f, 0.0f);
                 len = func_001157AC(text);
                 func_0027FBD8(x, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;
     case 3:
-        if (D_L10_001B1390 && D_L10_001B1394 && D_L10_001B1398) {
+        if (D_L10_001B1390_gp[0] && D_L10_001B1390[1] && D_L10_001B1390[2]) {
             text = func_00288FB8(0x2FE6);
             {
                 s32 len;
@@ -287,23 +238,23 @@ s32 func_L10_004227A0(void) {
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 131.0f);
+                row = MenuY(131.0f, 0.0f);
                 len = func_001157AC(text);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)text, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)text, len);
             }
             {
-                s32 index = D_L10_001B139C;
+                s32 index = D_L10_001B1390[3];
                 if (index >= 3) index = 2;
-                reward = D_L10_001B146C[index];
+                reward = D_L10_001B1448[3][index];
             }
             if (D_001A7A0A) reward *= 10;
             func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 242.0f);
+                row = MenuY(242.0f, 0.0f);
                 len = func_001157AC(buf);
-                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0, (s32)buf, len);
+                func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
             func_0027F5B8(181, MenuY(294.0f, 3.0f), 0x80F0F0F0ULL, func_00288FB8(0x2F3F), -1);
         } else {
@@ -311,7 +262,7 @@ s32 func_L10_004227A0(void) {
             {
                 s32 len;
                 s32 row;
-                MENU_ROW(row, 170.0f);
+                row = MenuY(170.0f, 0.0f);
                 len = func_001157AC(text);
                 func_0027FBD8(x, row, 0x80F0F0F0ULL, text, len);
             }

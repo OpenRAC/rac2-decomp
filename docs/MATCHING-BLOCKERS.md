@@ -2715,6 +2715,17 @@ particular label spelling does not unblock the loop layout.
   three unwitnessed volatile globals gives 3,260/3,420 bytes, 0/1 USA v1.01;
   USA v2.00 and PAL have no canonical row. The older 3,312-byte cleanup still
   contained those diagnostics and is historical, not an admissible baseline.
+  7 November 2026 correction: that wrapper forwards its colour and text to the
+  matched `func_L05_00302CE8(..., u64 color, u8 *text, ...)`, and retail builds the
+  caller's `0x80F0F0F0` as a 64-bit constant (`ori`/`dsll`/`ori`), so `u64 color` and
+  `u8 *text` are the measured caller interface; the 32-bit spelling only fits the
+  forwarder's own bytes. The three volatile words are `D_L10_001B1390[1..3]`: retail
+  reads `[0]` through `$gp` and the others as unsplit sym+offset macro loads, and the
+  `0x1454`/`0x1460`/`0x146C` tables are rows of one `[4][3]` table at `0x1448`. With
+  one `MenuY(y, adjustment)` helper for every row (0.0f where there is none, so
+  `-ffast-math` folds the arms equal) the lawful draft reaches 3,440/3,420 bytes,
+  795 of 855 aligned instructions; only sched2 order after the vanished tests and one
+  missed tail merge remain (`nonmatching/levels/func_L10_004227A0.c`).
 - **A measured field model must cover the actual accesses.** The Maktar actor
   routine `func_L02_003D0408` uses a single volatile byte view at actor `+0x60`
   for all six retail reads, including the two snapshots before distance tests.
