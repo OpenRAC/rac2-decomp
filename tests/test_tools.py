@@ -1055,6 +1055,17 @@ class ProgressChecks(unittest.TestCase):
         self.release([{"name":"kept","fuzzy_match_percent":0.0},
                       {"name":"retired","fuzzy_match_percent":0.0}])
 
+    def test_realigned_stretch_retires_only_its_unmatched_miscut_rows(self):
+        spec = {"kept": ({5: 0x1000}, (("kept", 0, 8),), ("miscut",))}
+        with patch.object(levels, "RELEASE_PLACE_RUNS", spec):
+            self.release([{"name":"kept","fuzzy_match_percent":0.0},
+                          {"name":"miscut","fuzzy_match_percent":0.0}])
+            for change in ("matched", "unnamed"):
+                with self.subTest(change=change), self.assertRaises(SystemExit):
+                    name = "other" if change == "unnamed" else "miscut"
+                    self.release([{"name":"kept","fuzzy_match_percent":0.0},
+                                  {"name":name,"fuzzy_match_percent":100.0 if change == "matched" else 0.0}])
+
     def split_fixture(self, address=0x00131DF8):
         main, sound = "func_00131D98", "func_00131DE8"
         functions = [{"name":main, "size":"656", "fuzzy_match_percent":0.0,

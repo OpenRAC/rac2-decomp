@@ -1040,7 +1040,6 @@ FUNCTION_DELAY_SLOTS = {
 FUNCTION_END_EXTRA = {
     "func_PAL_L00_003FB330": (832, -4),
     "func_PAL_L00_00418F28": (816, -4),
-    "func_PAL_L05_00327418": (48, -4),
     "func_PAL_L17_00388C38": (1088, -4),
     "func_PAL_L18_00438248": (608, -4),
     "func_PAL_L00_002A7D48": (5628, 4),
@@ -1391,6 +1390,43 @@ RELEASE_ROW_MERGES = {
     # The PAL copy of func_L00_00408E58: 24 levels, and levels 16, 23 and 30.
     # USA and v2.00 have one row in all 27.
     "func_PAL_L00_0040D990": ("func_PAL_L16_0040C384",),
+}
+
+
+# A release's stretch whose places the carry gave to the wrong copies (OpenRAC/rac2-decomp#421).
+# In PAL's starship levels 05, 10, 15 and 25, carry.align() anchored the 48-byte menu
+# accessors one body early and pasted v1.01's cuts over boundaries that moved, so from
+# func_PAL_0029C7F0's body on, rows took the next body of the same shape (the fingerprint
+# hides the accessors' offsets), func_PAL_0029C820 and func_PAL_0029C8A0 sat inside one
+# 592-byte row, and the first 60-byte accessor was cut across two rows. The other 23
+# levels have every body in level 00's order. Each entry: the stretch's address in each
+# level, every function whose place there changes as (name, offset, size), and the rows
+# that held the stretch's miscut bodies. The empty function at +0x278 is the copy those
+# levels have one more of: it goes to the row USA v1.01 and v2.00 give that level's copy.
+# tools/carry.py --entries checks every new place against the row's copies elsewhere
+# (constants and callees compared) before writing; a stretch already in place passes.
+RELEASE_PLACE_RUNS = {
+    "func_PAL_0029C7F0": (
+        {5: 0x003270F8, 10: 0x00329800, 15: 0x00327950, 25: 0x00321450},
+        (("func_PAL_0029C7F0", 0x0, 48), ("func_PAL_0029C820", 0x30, 92),
+         ("func_PAL_0029C8A0", 0x90, 488),
+         ({5: "func_L03_00456E58", 10: "func_L04_0047A7C8", 15: "func_L03_004586F0",
+           25: "func_L03_00456E58"}, 0x278, 8),
+         ("func_PAL_L00_0030F000", 0x280, 48), ("func_PAL_L00_0030F030", 0x2B0, 48),
+         ("func_PAL_L00_0030F060", 0x2E0, 48), ("func_PAL_L00_0030F090", 0x310, 60),
+         ("func_PAL_L00_0030F130", 0x3B0, 60), ("func_PAL_L00_0030F1B8", 0x438, 60),
+         ("func_PAL_L00_0030F228", 0x4A8, 60), ("func_PAL_L00_0030F2C8", 0x548, 60),
+         ("func_PAL_L00_0030F338", 0x5B8, 60), ("func_PAL_L00_0030F3A8", 0x628, 60),
+         ("func_PAL_L00_0030F418", 0x698, 60), ("func_PAL_L00_0030F488", 0x708, 60),
+         ("func_PAL_L00_0030F4F8", 0x778, 60), ("func_PAL_L00_0030F568", 0x7E8, 60),
+         ("func_PAL_L00_0030F5D8", 0x858, 60), ("func_PAL_L00_0030F618", 0x898, 60),
+         ("func_PAL_L00_0030F688", 0x908, 60), ("func_PAL_L00_0030F6F8", 0x978, 60),
+         ("func_PAL_L00_0030F768", 0x9E8, 60), ("func_PAL_L00_0030F7D8", 0xA58, 60),
+         ("func_PAL_L00_0030F848", 0xAC8, 60), ("func_PAL_L00_0030F8B8", 0xB38, 60),
+         ("func_PAL_L00_0030F928", 0xBA8, 60), ("func_PAL_L00_0030F998", 0xC18, 60),
+         ("func_PAL_L00_0030FA08", 0xC88, 60), ("func_PAL_L00_0030FB08", 0xD88, 60),
+         ("func_PAL_L00_0030FE60", 0x1118, 60)),
+        ("func_PAL_L05_00327128", "func_PAL_L05_003273D8", "func_PAL_L05_00327418")),
 }
 
 

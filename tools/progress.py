@@ -396,10 +396,12 @@ def release_check(version: str, report_path: Path) -> None:
         # explains exactly one missing release-named row at the same address.
         demoted = demoted_renames(version, functions, retired, missing, where)
         explained |= set(demoted.values())
-        # Measured residues may retire in the same tree as exactly explained splits.
+        # Measured residues may retire in the same tree as exactly explained splits, and so
+        # may the miscut rows a realigned stretch replaces (levels.RELEASE_PLACE_RUNS).
+        realigned = {n for spec in levels.RELEASE_PLACE_RUNS.values() for n in spec[2]}
         known_split = bool(missing) and missing == explained
         known_boundary = ((retired or known_split)
-                          and retired <= set(levels.FUNCTION_RESIDUES) | renamed | set(demoted)
+                          and retired <= set(levels.FUNCTION_RESIDUES) | renamed | set(demoted) | realigned
                           and (not missing or known_split)
                           and total == len(where) + len(retired) - len(missing)
                           and all(f["fuzzy_match_percent"] == 0.0 for f in functions
