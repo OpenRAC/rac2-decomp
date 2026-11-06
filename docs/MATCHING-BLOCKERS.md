@@ -4777,3 +4777,17 @@ single flags, all 15,120 store orders with the addresses in locals, and 100,000 
 forms. None got more than 3 of the 5 registers. Next useful experiment: a case-8 shape that gives
 the init or upd value one more reference without extra code, for example a different call or
 struct form. Statement order is exhausted.
+
+### F35 HUD icon body (func_L05_00421B98 and its three copies), 7 November 2026
+
+USA v1.01, `-O2 -G8 -ffunction-sections`, one body at L05/L10/L15/L25 (1,852 bytes each). The
+unused saved `$s2` is reproduced by the `scaled_coord` helper merged in `func_L11_004456A0` and
+`func_L02_003FF6E8` (commits 4bdf489e and dfdec300), but only with a single-test dead compare
+(`if (mode == active)`): L02's `result != 0 && mode == active` adds a second branch per draw,
+which ends cse's path and rematerialises every constant (1836 bytes). Best: 1848/1852, 0/1,
+prologue and frame exact. Remaining constraint, measured with `cc1 -dl -dg`: the dead mode
+load is block-local, so local-alloc gives it `$v0` before global-alloc places the sprite
+pseudo; retail's `mfc1 $a0` fix results and late `daddu $a0,$v0` need the sprite in `$v0` and
+the mode load out of it. Next experiment: a source shape where the sprite pseudo stays within
+one basic block or `$v0` is live at the mode load. Draft: `nonmatching/levels/func_L05_00421B98.c`.
+

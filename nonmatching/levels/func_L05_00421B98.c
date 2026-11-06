@@ -1,4 +1,28 @@
-/* func_L05_00421B98 (1852 B): draw two HUD icon pairs, the countdown icon and its box.
+/* 7 November 2026 (USA v1.01, -O2 -G8 -ffunction-sections as L05_00421B98-g8.c): 1848/1852
+ * bytes, 0/1, not a match. This body replaces the M25/M34 one below. New in it: the y coordinate
+ * goes through the same inline helper as the merged func_L11_004456A0 / func_L02_003FF6E8, with
+ * per-block `half` and `one` locals and a single-test dead mode compare (`if (mode == active)`).
+ * That reproduces retail's whole prologue: frame 0xF0, the four saved FPRs and the unused saved
+ * $s2 (it is `one`, allocated across the calls; its only use, the dead compare, goes at flow2).
+ * Constants and 0x8710 stay CSE'd within each block, as in retail.
+ * Measured and rejected (each one compile):
+ *   - L02's `result != 0 && mode == active`: the two branches end cse's path, so -1/1/0, 0.5 and
+ *     0x8710 are rematerialised at every draw (1836 bytes); block-local float variables for them
+ *     are constant-propagated the same way. `mode == active && result != 0`: 1932-1948 bytes.
+ *   - y in its own statement before the draw: same allocation, worse schedule.
+ *   - mode loaded before the func_00336D50 call (passed to the helper): 1860 bytes.
+ *   - -fno-schedule-insns2 gives 1852 bytes but leaves the prologue unscheduled (retail's is
+ *     scheduled), so it is not the profile. -fno-schedule-insns: 1804; -g: 1848, no better.
+ * Left, and why (cc1 -dl -dg on this body): retail converts each y with `mfc1 $a0` and keeps the
+ * sprite in $v0 until after the chain (`daddu $a0,$v0` late). Here the dead mode load is a
+ * block-local pseudo (load and branch in the chunk after the call), so local-alloc gives it $v0
+ * before global-alloc sees the sprite pseudo; the sprite then takes $a0, the fix result $v1, and
+ * sched2 fills the y chain with the constant loads. Retail's roles need the mode load kept out of
+ * $v0 (sprite allocated first, or $v0 still live at the load), which no wording here reached.
+ * The else arm also still swaps 0x8710 and the constant 1 ($s0/$s1).
+ *
+ * Earlier notes:
+ * func_L05_00421B98 (1852 B): draw two HUD icon pairs, the countdown icon and its box.
  * M25 2026-10-26 near miss. Profile -O2 -G8 -ffunction-sections (a -g8.c unit): 1848/1852 bytes.
  * Byte-identical modulo addresses to func_L10_00424CD0, func_L15_00431590 and func_L25_0040DE40
  * (family F35): one match ports to all four.
@@ -25,6 +49,7 @@
  *     reproduces it (all worse or unchanged); the helper loads x/y before the call.
  *   - The unused saved $s2 is still unexplained (no spill slot in retail's frame).
  */
+
 #include "common.h"
 
 extern char *D_L05_001B13B0 __attribute__((sda));
@@ -51,6 +76,24 @@ extern int func_0028EA58(int, int, int, int, int, unsigned int *);
 extern int func_00115DA8(char *, const char *, ...);
 extern void func_0027F5B8(int, int, unsigned long long, unsigned char *, int);
 
+/* A coordinate scaled for the display and rounded to a whole pixel. The display-mode test has no
+   effect on the result, but it is real: its load and compare go at flow2, after allocation
+   (as in func_L11_004456A0 and func_L02_003FF6E8). */
+static __inline__ int scaled_coord(int value, float scale, float half, int active)
+{
+    int mode = D_L05_001B2D80;
+    float scaled = (float)value * scale + half;
+    int result = (int)scaled;
+
+    if (mode == active)
+        scaled = 1.0f;
+    return result;
+}
+
+#define ICON(id, color, x, y, a, b, c)                                                       \
+    func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, id), color, (float)(x),            \
+                  (float)scaled_coord(y, D_L05_001B2D84, half, one), a, b, c)
+
 void func_L05_00421B98(int first, int second, int third, int fourth)
 {
     char text[0x80];
@@ -65,46 +108,50 @@ void func_L05_00421B98(int first, int second, int third, int fourth)
     if (D_L05_001A904C == 0)
         return;
     if (first) {
-        func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xBD), 0x60442D00, (float)D_L05_001B1428,
-                      (float)(int)((float)D_L05_001B142C * D_L05_001B2D84 + 0.5f), -1.0f, 1.0f, 0.0f);
-        func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xBE), 0x55F0C070, (float)D_L05_001B1428,
-                      (float)(int)((float)D_L05_001B142C * D_L05_001B2D84 + 0.5f), -1.0f, 1.0f, 0.0f);
+        float half = 0.5f;
+        int one = 1;
+
+        ICON(0xBD, 0x60442D00, D_L05_001B1428, D_L05_001B142C, -1.0f, 1.0f, 0.0f);
+        ICON(0xBE, 0x55F0C070, D_L05_001B1428, D_L05_001B142C, -1.0f, 1.0f, 0.0f);
     }
     if (second && D_L05_001B3548 < D_001A79FC) {
         if (func_00282948(state + 0x50) == 0) {
             time = *(int *)(state + 0x50);
             if (time >= 0x123) {
+                float half = 0.5f;
+                int one = 1;
+
                 scale = func_00283CE0(300 - time) * 0.1f;
                 if (scale > 1.0f)
                     scale = 1.0f;
                 else if (scale < 0.0f)
                     scale = 0.0f;
-                func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xBF), 0x60442D00, (float)D_L05_001B1430,
-                              (float)(int)((float)D_L05_001B1434 * D_L05_001B2D84 + 0.5f), scale, scale, 0.0f);
-                func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xC0), 0x55F0C070, (float)D_L05_001B1430,
-                              (float)(int)((float)D_L05_001B1434 * D_L05_001B2D84 + 0.5f), scale, scale, 0.0f);
+                ICON(0xBF, 0x60442D00, D_L05_001B1430, D_L05_001B1434, scale, scale, 0.0f);
+                ICON(0xC0, 0x55F0C070, D_L05_001B1430, D_L05_001B1434, scale, scale, 0.0f);
             } else if (time < 10) {
+                float half = 0.5f;
+                int one = 1;
+
                 scale = func_00283CE0(time) * 0.1f;
                 if (scale > 1.0f)
                     scale = 1.0f;
                 else if (scale < 0.0f)
                     scale = 0.0f;
-                func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xBF), 0x60442D00, (float)D_L05_001B1430,
-                              (float)(int)((float)D_L05_001B1434 * D_L05_001B2D84 + 0.5f), scale, scale, 0.0f);
-                func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xC0), 0x55F0C070, (float)D_L05_001B1430,
-                              (float)(int)((float)D_L05_001B1434 * D_L05_001B2D84 + 0.5f), scale, scale, 0.0f);
+                ICON(0xBF, 0x60442D00, D_L05_001B1430, D_L05_001B1434, scale, scale, 0.0f);
+                ICON(0xC0, 0x55F0C070, D_L05_001B1430, D_L05_001B1434, scale, scale, 0.0f);
             } else {
-                func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xBF), 0x60442D00, (float)D_L05_001B1430,
-                              (float)(int)((float)D_L05_001B1434 * D_L05_001B2D84 + 0.5f), 1.0f, 1.0f, 0.0f);
-                func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xC0), 0x55F0C070, (float)D_L05_001B1430,
-                              (float)(int)((float)D_L05_001B1434 * D_L05_001B2D84 + 0.5f), 1.0f, 1.0f, 0.0f);
+                float half = 0.5f;
+                int one = 1;
+
+                ICON(0xBF, 0x60442D00, D_L05_001B1430, D_L05_001B1434, 1.0f, 1.0f, 0.0f);
+                ICON(0xC0, 0x55F0C070, D_L05_001B1430, D_L05_001B1434, 1.0f, 1.0f, 0.0f);
                 {
                     unsigned int colors[4] = { 0x8080F0F0, 0x8080F0F0, 0x8080F0F0, 0x8080F0F0 };
                     {
                         int id = func_0028E588(0xEAA2, 3);
                         int x = D_L05_001B1430 - 0x33;
-                        float y = (float)(D_L05_001B1434 - 13) * D_L05_001B2D84 + 0.5f;
-                        if (D_L05_001B2D80 == 1)
+                        float y = (float)(D_L05_001B1434 - 13) * D_L05_001B2D84 + half;
+                        if (D_L05_001B2D80 == one)
                             y += 1.0f;
                         func_0028EA58(id, x, (int)y, 0x1C, 0x1C, colors);
                     }
@@ -119,15 +166,17 @@ void func_L05_00421B98(int first, int second, int third, int fourth)
         }
     }
     if (third) {
-        func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xC1), 0x60442D00, (float)D_L05_001B1438,
-                      (float)(int)((float)D_L05_001B143C * D_L05_001B2D84 + 0.5f), 1.1f, 1.0f, 0.0f);
-        func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xC2), 0x55F0C070, (float)D_L05_001B1438,
-                      (float)(int)((float)D_L05_001B143C * D_L05_001B2D84 + 0.5f), 1.1f, 1.0f, 0.0f);
+        float half = 0.5f;
+        int one = 1;
+
+        ICON(0xC1, 0x60442D00, D_L05_001B1438, D_L05_001B143C, 1.1f, 1.0f, 0.0f);
+        ICON(0xC2, 0x55F0C070, D_L05_001B1438, D_L05_001B143C, 1.1f, 1.0f, 0.0f);
     }
     if (fourth) {
-        func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xC1), 0x60442D00, (float)D_L05_001B1440,
-                      (float)(int)((float)D_L05_001B1444 * D_L05_001B2D84 + 0.5f), 1.1f, 1.0f, 0.0f);
-        func_00300A00(func_00336D50(D_L05_001A904C + 0x8710, 0xC2), 0x55F0C070, (float)D_L05_001B1440,
-                      (float)(int)((float)D_L05_001B1444 * D_L05_001B2D84 + 0.5f), 1.1f, 1.0f, 0.0f);
+        float half = 0.5f;
+        int one = 1;
+
+        ICON(0xC1, 0x60442D00, D_L05_001B1440, D_L05_001B1444, 1.1f, 1.0f, 0.0f);
+        ICON(0xC2, 0x55F0C070, D_L05_001B1440, D_L05_001B1444, 1.1f, 1.0f, 0.0f);
     }
 }
