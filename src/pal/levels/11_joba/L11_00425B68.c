@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L11_00425B68);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L11_00429B30);
 
 typedef unsigned char u8;
 typedef float f32;
