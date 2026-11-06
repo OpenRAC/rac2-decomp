@@ -47,9 +47,31 @@ void func_PAL_L01_0039A174(void *actor) {
     }
 }
 
+/* func_PAL_L01_0039AD60, the PAL copy of func_L01_00397950: the same stores, where the second loop
+ * scales each value to 50 Hz and counts up. */
+void func_PAL_L01_0039AD60(void *arg0) {
+    s32 *base = *(s32 **)((u8 *)arg0 + 0x68);
+    f32 *values = (f32 *)((u8 *)base + 0x20);
+    s32 *slot;
+    s32 i;
 
+    for (i = 0; i < 4; i++) {
+        *values = (f32)func_002A77E0(0xFF);
+        values++;
+    }
 
+    *(f32 *)((u8 *)base + 0x30) = -1.0f;
+    *(f32 *)((u8 *)base + 0x34) = -2.25f;
+    slot = (s32 *)((u8 *)base + 0x40);
+    *(f32 *)((u8 *)base + 0x38) = 1.25f;
+    *(f32 *)((u8 *)base + 0x3C) = 2.5f;
 
+    for (i = 0; i < 4; i++) {
+        slot[i] = ((i * 0x40 + 0x3F) * 5 + 2) / 6;
+    }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L01_0039AD60);
-
+    *(f32 *)((u8 *)base + 0x50) = 2.5f;
+    *(f32 *)((u8 *)base + 0x54) = 3.0f;
+    *(f32 *)((u8 *)base + 0x5C) = 2.5f;
+    *(f32 *)((u8 *)base + 0x58) = 3.0f;
+}

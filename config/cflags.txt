@@ -3721,6 +3721,12 @@ src/pal/levels/02_maktar_nebula/L02_003D9808-g8-dbg.c	-O2 -G8 -ffunction-section
 src/pal/levels/02_maktar_nebula/L02_003DFD18-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/12_todano/L12_00418E80-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
 src/pal/levels/shared/L09_003FD248-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/shared/L05_00326B88-g32.c	-O2 -G32 -ffunction-sections -Wa,-G32
+src/pal/levels/09_dobbo/L09_0040F3A0-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_00423418-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/pal/levels/shared/L00_0040BA28-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/06_notak/L06_004238A0.c	-O2 -G0 -ffunction-sections -fno-expensive-optimizations
+src/pal/levels/01_oozla/L01_003DCCC8-burst.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsplit-edges
 src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_002A4788.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00376A18-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
