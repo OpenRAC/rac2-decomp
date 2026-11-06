@@ -44,6 +44,7 @@ INCLUDE_ASM("asm/pal/levels", func_PAL_L03_003F8E58);
 
 
 
+
 typedef unsigned int u32;
 extern void func_320318(void *entity, void *target);
 extern u32 func_31CFF8(void *a, void *b, u32 c);
@@ -81,4 +82,3 @@ void func_PAL_L03_003FA8D8(u8 *entity) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L03_003FAB20);
