@@ -88,5 +88,4 @@ void func_PAL_L02_00433808(u8 *a0) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_00433B90);
 

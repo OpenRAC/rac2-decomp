@@ -94,5 +94,3 @@ void func_PAL_L14_003E8FB8(unsigned char *self)
     }
     func_PAL_L14_003E9570((char *)self);
 }
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_003E92D8);

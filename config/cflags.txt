@@ -3792,6 +3792,12 @@ src/pal/levels/shared/L00_002A7D48-por.c	-O2 -G0 -ffunction-sections -frac2-zero
 src/pal/levels/30_insomniac_museum/L30_004180E8-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/19_grelbin/L19_00423BC8-lift-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/12_todano/L12_004294CC-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/14_aranos_prison/L14_003E92D8-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/shared/L09_003FCF28-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/03_endako/L03_00422624-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections
+src/pal/levels/07_siberius/L07_003F85AC-trail-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/game/002E7270-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
+src/pal/levels/shared/L00_004276D8-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_002A4788.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00376A18-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
@@ -3800,6 +3806,12 @@ src/pal/levels/shared/L01_0039C970-weather-g8.c	-O2 -G8 -ffunction-sections -ffa
 src/pal/levels/01_oozla/L01_003C00F0-debris-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L02_00415BD0-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
 src/pal/levels/03_endako/L03_00421E20-g8.c	-O2 -G8 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
+src/pal/levels/09_dobbo/L09_0040A580-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/18_damosel/L18_00435E70.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order -frac2-hazard-labels
+src/pal/levels/11_joba/L11_003F8E90-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/02_maktar_nebula/L02_00433B90-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/shared/L00_004098C0-g.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L14_0042C988-g32.c	-O2 -G32 -ffunction-sections -Wa,-G32 -g
 src/levels/shared/L00_00423290-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L01_00324550-narrowsave.c	-O2 -G0 -ffunction-sections -mastra-quad-saves -frac2-narrow-saves-below
 src/levels/shared/L08_00389B68-narrowsave.c	-O2 -G0 -ffunction-sections -mastra-quad-saves -frac2-narrow-saves-below
