@@ -477,6 +477,7 @@ src/levels/shared/L00_0038F020.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2
 src/levels/shared/L00_002C3BB0.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L00_002C3E18.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L00_002CA898.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order
+src/levels/shared/L00_002CA4E0.c	-O2 -G0 -ffunction-sections -fno-rerun-loop-opt
 src/game/00270D50.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/16_snivelak/L16_00404F50.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L00_003F4B68-g8-qcopy.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -4053,6 +4054,8 @@ src/pal/levels/18_damosel/L18_0043A56C-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/04_barlow/L04_00426EF0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/pal/levels/shared/L03_003C70B8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/11_joba/L11_00434418-hz-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L13_0041AB30-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L00_003080D0.c	-O2 -G0 -ffunction-sections
 src/pal/levels/17_smolg/L17_003EB968-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -fmove-all-movables
 src/pal/game/0032F7C8-g8.c	-O2 -G8 -g -ffunction-sections
 src/pal/levels/01_oozla/L01_003C2688-g8.c	-O2 -G8 -ffunction-sections

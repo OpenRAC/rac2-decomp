@@ -1,25 +1,111 @@
-/* 6 November 2026, round 2: C below unchanged. Measured in a -G8 unit: default 936/964,
- * with -frac2-qcopy 944/964 (lq/sq copy as retail). Retail keeps 15.0f in saved $f20 and
- * copies it to $f12, though no call follows its only use: the pseudo must cross a call in
- * the original RTL; no source form found. Retail loads every constant and D_L17_001B0E40
- * once ($f9) before the stores, then stores in source order. Per-offset struct field
- * accesses (anonymous struct per macro) free those loads but reorder the byte stores (each
- * struct its own alias set), 944/964 and no closer. One real struct type for `state`
- * is the next thing to try.
- */
-/* 30 October 2026 retained ordinary C; no linked match or semantic proof.
- * Profile: -O2 -G8 -ffunction-sections.
- * us: 17_smolg: 936 bytes, expected 964.
- * us2: 17_smolg: 936 bytes, expected 964.
- * pal: func_L17_003E8A58 is in neither catalogue of pal.
- * Complete fighter initialization groups, proximity, impact filtering and damage update.
- * Actual entry consumes object pointer a0; an existing caller in L17_003E7068-g8.c still
- * declares this helper void(void), a separate native-interface issue not changed
- * here.936/964 bytes; frame0x20 instead of0x30 and initialization allocation differ.
+/* 6 November 2026, Codex own-unit replay: retained C, not a linked match.
+ * Profile: game -O2 -G8 -ffunction-sections -frac2-qcopy.
+ * USA v1.01 and v2.00: 944/964 bytes, 0/1 places each; PAL absent.
+ * The complete state layout (including the overlapping 0x6C0 vector / 0x6CC float)
+ * and snapshots of the initialization inputs reduce allocation/scheduling differences
+ * against the old raw-offset draft. Independent store swaps improve the initialization
+ * further. All cached inputs are assigned before use; stores touch disjoint fields.
+ * Still missing: retail's saved $f20 containing 15.0f (frame 0x30 versus our 0x20),
+ * plus its defensive hit-candidate recheck. Initialization GPR/FPR choices, load/store
+ * scheduling and copy placement also differ. No redundant candidate test is retained.
+ * New negative results: one real state struct alone is insufficient; cached inputs
+ * help, but single-operation/suffix one-pass groups regress. Moving/reusing a real
+ * float rate across the initialization and final damage arguments, including with
+ * -fno-gcse, does not recover $f20. qcopy-barrier and no interblock scheduling tie.
+ * Reopen with evidence for the original float lifetime or parameter-group layout;
+ * another constant spelling or one-pass store group is unlikely to help.
+ * No linked build run (worker restriction). The existing zero-argument declaration in
+ * L17_003E7068-g8.c remains a separate native-interface issue.
+ * Historical measurements: ordinary raw-offset C was 936/964 without the copy
+ * profile and 944/964 with it. Neither the old nor this draft has the retail frame.
  */
 #include "common.h"
 typedef int Q __attribute__((mode(TI)));
 typedef union { Q q; float f[4]; } Vec;
+typedef struct FighterState {
+    u8 pad0[0x26];
+    u16 f26;
+    u8 f28;
+    u8 f29;
+    u8 pad2A[0x6];
+    float f30;
+    u8 f34;
+    u8 pad35[0x13];
+    u8 f48;
+    u8 pad49[0x1];
+    u8 f4A;
+    u8 pad4B[0x25];
+    u8 f70;
+    u8 f71;
+    u8 pad72[0x3];
+    u8 f75;
+    u8 f76;
+    u8 f77;
+    u8 pad78[0x4];
+    float f7C;
+    float f80;
+    float f84;
+    float f88;
+    float f8C;
+    float f90;
+    float f94;
+    short f98;
+    u8 pad9A[0x2];
+    float f9C;
+    float fA0;
+    u8 padA4[0x4];
+    int fA8;
+    u8 padAC[0xC];
+    float fB8;
+    u8 padBC[0x10];
+    u8 fCC;
+    u8 fCD;
+    u8 fCE;
+    u8 fCF;
+    u8 padD0[0x2];
+    u8 fD2;
+    u8 fD3;
+    u8 padD4[0x1];
+    u8 fD5;
+    u8 padD6[0x3A];
+    float f110;
+    u8 pad114[0x4];
+    float f118;
+    float f11C;
+    float f120;
+    u8 pad124[0x18];
+    float f13C;
+    u8 pad140[0x8];
+    int f148;
+    int f14C;
+    u8 pad150[0x100];
+    int f250;
+    u8 pad254[0x42C];
+    int f680;
+    int f684;
+    u8 pad688[0x16];
+    short f69E;
+    u8 pad6A0[0x4];
+    int f6A4;
+    u8 pad6A8[0x10];
+    int f6B8;
+    u8 pad6BC[0x4];
+    Vec f6C0;
+    u8 pad6D0[0x18];
+    int f6E8;
+    int f6EC;
+    u8 pad6F0[0x10];
+    float f700;
+    u8 pad704[0x1C];
+    char * f720;
+    u8 pad724[0xC];
+    int f730;
+    u8 pad734[0x10];
+    char * f744;
+    u8 pad748[0x8];
+    int f750;
+
+} FighterState;
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define P(p,o) (*(char **)((char *)(p)+(o)))
@@ -40,35 +126,95 @@ extern int func_002B3BA8(void *,int,void *,int,float,float);
 /* Initializes the fighter's complete parameter groups, then handles proximity and damage. */
 void func_L17_003E8A58(char *object)
 {
-    char *state=P(object,0x68),*hit;
+    FighterState *state=(FighterState *)P(object,0x68);
+    char *hit;
     int index;
+    float vf80;
+    float vf84;
+    float vf94;
+    float vf7C;
+    float vf88;
+    float vf8C;
+    float vf9C;
+    float vf700;
+    float vfB8;
+    float vf90;
+    int vf14C;
+    float vfA0;
+    float vf11C;
+    float vf120;
+    float vf13C;
+    float vf30;
+    float vf118;
     if(!U(object,0x20)) {
         F(object,0x2c)=F(P(object,0x24),0x24)*0.85f;
-        index=I(state,0x6b8);
+        index=state->f6B8;
         if((unsigned)(index+1)>=2) F(object,0x18)=F(D_L17_001B2C1C+index*256,0x18)+1.4f;
-        *(Q *)(state+0x6c0)=*(Q *)(object+0x10);
-        F(state,0x110)=D_L17_001B0E40;
-        I(state,0x6e8)=0;I(state,0x6ec)=0;F(state,0x6cc)=F(object,0xf8);
-        U(state,0x48)=func_00283CF0(15.0f);U(state,0x4a)=func_00283CF0(12.8f);
-        U(state,0x70)=14;U(state,0x71)=13;U(state,0x76)=8;U(state,0x29)=1;U(state,0x75)=7;U(state,0x77)=9;
-        U(state,0xd3)=12;F(state,0x80)=D_L17_001B0F38*0.016666668f;F(state,0x84)=0.00416666688f;
-        F(state,0x94)=D_L17_001B0E40+0.1f;
-        U(state,0xcc)=7;U(state,0xcd)=20;U(state,0xce)=4;U(state,0xcf)=9;U(state,0xd2)=6;U(state,0xd5)=1;
-        I(state,0xa8)=3;F(state,0x7c)=0.333333343f;F(state,0x88)=0.00833333377f;F(state,0x8c)=0.00138888892f;
-        F(state,0x9c)=0.4f;F(state,0x700)=(float)U(state,0x34);*(u16 *)(state+0x26)=60;
-        F(state,0xb8)=0.01f;F(state,0x90)=D_L17_001B0E40;I(state,0x14c)=I(state,0x684);F(state,0xa0)=40.0f;
-        F(state,0x11c)=D_L17_001B0E48;F(state,0x120)=1.308997035f;F(state,0x13c)=0.01111111138f;
-        I(state,0x148)|=16;U(state,0x28)=3;F(state,0x30)=1.0f;F(state,0x118)=D_L17_001B0E48;H(state,0x98)=0;
-        if(I(state,0x680)==-1 || I(state,0x684)==-1) {func_0029F338(object);return;}
-        if((unsigned)(I(state,0x6b8)+1)<2) func_002A7750(object,3,0);else func_002A7750(object,1,5);
-        I(state,0x730)=1;P(state,0x720)=P(state,0x744);
-        if(P(state,0x744)) I(P(state,0x744),0)=-1;
-        I(state,0x750)=func_L02_0032E508(object,I(state,0x684),state+0x280,32);
+        state->f6C0.q=*(Q *)(object+0x10);
+        state->f110=D_L17_001B0E40;
+        state->f6E8=0;state->f6EC=0;state->f6C0.f[3]=F(object,0xf8);
+        state->f48=func_00283CF0(15.0f);state->f4A=func_00283CF0(12.8f);
+        state->f70=14;state->f71=13;state->f76=8;state->f29=1;state->f75=7;state->f77=9;
+        vf80=D_L17_001B0F38*0.016666668f;
+        vf84=0.00416666688f;
+        vf94=D_L17_001B0E40+0.1f;
+        vf7C=0.333333343f;
+        vf88=0.00833333377f;
+        vf8C=0.00138888892f;
+        vf9C=0.4f;
+        vf700=(float)state->f34;
+        vfB8=0.01f;
+        vf90=D_L17_001B0E40;
+        vf14C=state->f684;
+        vfA0=40.0f;
+        vf11C=D_L17_001B0E48;
+        vf120=1.308997035f;
+        vf13C=0.01111111138f;
+        vf30=1.0f;
+        vf118=D_L17_001B0E48;
+        state->fD3=12;
+        state->f80=vf80;
+        state->f84=vf84;
+        state->f94=vf94;
+        state->fCC=7;
+        state->fCE=4;
+        state->fCD=20;
+        state->fCF=9;
+        state->fD2=6;
+        state->fD5=1;
+        state->fA8=3;
+        state->f7C=vf7C;
+        state->f8C=vf8C;
+        state->f88=vf88;
+        state->f9C=vf9C;
+        state->f700=vf700;
+        state->f26=60;
+        state->fB8=vfB8;
+        state->f90=vf90;
+        state->f14C=vf14C;
+        state->fA0=vfA0;
+        state->f11C=vf11C;
+        state->f13C=vf13C;
+        state->f120=vf120;
+        state->f148|=16;
+        state->f28=3;
+        state->f30=vf30;
+        state->f118=vf118;
+        state->f98=0;
+        if(state->f680==-1 || state->f684==-1) {func_0029F338(object);return;}
+        if((unsigned)(state->f6B8+1)<2) func_002A7750(object,3,0);else func_002A7750(object,1,5);
+        state->f730=1;state->f720=state->f744;
+        if(state->f744) I(state->f744,0)=-1;
+        state->f750=func_L02_0032E508(object,state->f684,(char *)state+0x280,32);
     }
     if(U(object,0x31) && func_00282E48(object+16,D_L17_001B9BC0)<24.0f) {func_002A93B0(object);U(object,0x6f)=22;}
     hit=func_002A9640(object,0x10000,1);
-    if(hit && P(hit,0x20) && (H(P(hit,0x20),0xaa)==0x31a || H(P(hit,0x20),0xaa)==0x1256 || H(P(hit,0x20),0xaa)==0x1305)) U(object,0xa8)=255;
-    else if(U(object,0x20)!=1) func_002B0ED8(object,state+0x60,0);
-    H(state,0x69e)=func_002B3BA8(object,I(state,0x680),0,0,0.0f,0.0f);
-    I(state,0x6a4)=I(state,0x250);
+    if(hit && P(hit,0x20) && (H(P(hit,0x20),0xaa)==0x31a || H(P(hit,0x20),0xaa)==0x1256 || H(P(hit,0x20),0xaa)==0x1305)) goto impact;
+    if(U(object,0x20)!=1) func_002B0ED8(object,(char *)state+0x60,0);
+    goto damage;
+impact:
+    U(object,0xa8)=255;
+damage:;
+    state->f69E=func_002B3BA8(object,state->f680,0,0,0.0f,0.0f);
+    state->f6A4=state->f250;
 }

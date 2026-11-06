@@ -1,3 +1,28 @@
+/* 6 November 2026, Codex worker: best C below retained unchanged after 137 check.py
+ * runs (including baseline and final confirmation): 644/644 bytes, 0/28 USA,
+ * 14 real instruction rows. No improvement from new lifetime pipelines: reusing a
+ * scale/product/bias float as half-count or converted spacing, with one-pass groups
+ * around their real operations (88 candidates); reusing the loop index/count for
+ * spacing or height (24); scalar declarations for the height/tuning globals and
+ * explicit conversion/height groups (16); explicit refreshed loop bounds (2);
+ * five initial integer/float lifetime variants. No donor found by distinctive
+ * colour constants in current local RAC1/RAC4 sources. Allocator dumps confirm
+ * count=a1 and spacing=a0 already; split height address=v0, load/shift=v1.
+ * Still needed: retail's tuning=f2, bias=f1, height=v0, and spacing conversion
+ * before the height load. Keep the marker; reopen on a source/control-flow
+ * witness for these lifetimes rather than further equivalent reorderings.
+ */
+/* 6 November 2026, round 9: new best C below (644/644, 0/28 USA, 14 real rows, was 19).
+ * The 18-row source of the next note read n before setting it (the hill-climb moved n = menu->count
+ * below its use); that order is not valid C and is dropped. Changes: a for loop on
+ * menu->count (no n), the group holds only sp and half, and D_001A7344 is a plain extern
+ * (split %hi). Count a1, sp a0 and (float)count f3 now match retail. Left: 23A4 f1 / 0.5 f2
+ * (retail f2/f1), height v1 (retail v0, same as %hi), and the (float)sp convert scheduled
+ * after the height load. Half first in the group gives retail's FPRs but loads the count
+ * first (19). No change from: declaration order (30-run hill-climb), early h = D_001A7344 >> 1
+ * (14-28), MACRO_ADDR with this shape (19), group start before any of the five calls (16),
+ * nested groups (19-25), float temp reuse (14-19), single flags incl. -frac2-* (14+).
+ */
 /* 6 November 2026, lead: 24-run hill-climb over the four group statements gives 18 real rows (from 19); source below is that order. Reusing sp or n for start (19, 118), the loop bound as n (68) and a block-local h = D_001A7344 >> 1 (18) do not help. */
 /* 6 November 2026, round 2: new best C below (644/644, 0/28 USA, 19 words, was 25).
  * One group holding sp, n, half = (float)n * 0.5f and spf = (float)sp puts its loop-end
@@ -62,7 +87,7 @@ extern int func_00335E10(char *);
 extern int func_00335E20(char *);
 extern float D_001AE5F0 __attribute__((sda));
 extern float D_001B23A4[] MACRO_ADDR;
-extern int D_001A7344[] MACRO_ADDR;
+extern int D_001A7344[];
 extern float D_001AE5D0 __attribute__((sda));
 extern float D_001AE5D4[] MACRO_ADDR;
 extern float D_001AE5D8 __attribute__((sda));
@@ -110,14 +135,10 @@ void func_00348EC0(char *o)
         func_00336320(o + 0xE4);
         do {
             sp = (int)(D_001AE5F0 * D_001B23A4[0] + 0.5f);
-            half = (float)n * 0.5f;
-            spf = (float)sp;
-            n = menu->count;
+            half = (float)menu->count * 0.5f;
         } while (0);
-        start = (int)((float)(D_001A7344[0] >> 1) - spf * half);
-        if (n > 0) {
-        i = 0;
-        do {
+        start = (int)((float)(D_001A7344[0] >> 1) - (float)sp * half);
+        for (i = 0; i < menu->count; i++) {
             ListRect *p;
             char *slot;
             ListVtable *v;
@@ -141,7 +162,6 @@ void func_00348EC0(char *o)
             p->y = (D_001AE5E4[0] + (float)i * D_001AE5E8) + (float)start;
             v = *(ListVtable **)(o + i * 72 + 0x248);
             v->call(slot + v->offset);
-        } while (++i < menu->count);
         }
     }
 }

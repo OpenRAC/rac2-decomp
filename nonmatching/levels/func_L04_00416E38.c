@@ -1,3 +1,35 @@
+/* 6 November 2026, Codex follow-up (USA v1.01, check.py only): the retained
+ * -O2 -G0 -ffunction-sections -fno-gcse diagnostic rechecks at 492/492 bytes,
+ * 0/2 places, five actual instruction differences (+0x180, +0x184, +0x18c,
+ * +0x190, +0x198); relocation immediate differences are excluded.
+ * IMPORTANT: menu_coord's unused `scaled = 1.0f` store exists only to affect
+ * allocation/block boundaries. This diagnostic is inadmissible under the
+ * current no-dead-store rule, even if the remaining five words are solved.
+ * New controls removed the mode read, active test and dead assignment, then
+ * grouped the actual conversion alone, add+conversion, or whole rounding;
+ * a nested conversion group was also tested. Four inline-helper forms give
+ * 484 bytes. Twelve caller-expanded forms crossed those three group placements
+ * with shared/separate product temporaries and fresh/reused coordinate locals:
+ * 484-496 bytes, all 0/2. Whole-rounding groups with fresh coordinates give
+ * 488 bytes. These clean forms lose the ghost s2 save/restore and retain FP
+ * allocation/scheduling differences; equal-size reused-coordinate forms add
+ * real saved-register moves instead. No clean form improves the diagnostic.
+ * RAC1/RAC4 source searches found no donor for the constants/string IDs.
+ * Next useful evidence: an admissible rounding/block-boundary source shape
+ * that explains the ghost s2, before another x4-only allocation search.
+ * Temporary source/profile restored; no linked build or alternate release run.
+ */
+/* 6 November 2026, round 9: best body below (492/492, 0/2 places, 5 words: lui/lw/srl/addu/sra
+ * of x4). Same unit and flags. Loading the mode first in the helper (`int mode =
+ * D_L04_001B2D40;` before the rounding) fixes the second draw's v0 (was v1); `x4 = D; x4 =
+ * x4 / 2;` puts x4 in s0 and y4 in s1, but the load goes into s0 (retail: v1, tied to the sum).
+ * With the plain `x4 = D / 2;` (8 words) the regalloc dump shows x4 2 refs vs y4 3 refs (live 7
+ * each): x4 needs a third ref. Probes: x4 as the last helper's `active` gives s0/s1 but loses the
+ * $s2 ghost (`on` must stay live across x4); a mode-only last test fixes all registers but loses
+ * the block boundary (19 rows). Int dead-test helpers for x4 vanish before allocation. y4 before
+ * x4, x3/y3/x1/y1 reuse, long/short/unsigned types, groups around x4 or y4, array or non-sda
+ * D_001A7340, swapped test operands: no better (~75 compiles, scratch m1/r9c).
+ */
 /* 6 November 2026, round 4: best body below (492/492, 0/2 places, 10 words). Own unit
  * (src/levels/shared/L04_00416E38.c), -O2 -G0 -ffunction-sections -fno-gcse. The
  * func_00326A10 dead-test rounding helper gives the ghost $s2 and the block boundaries;
@@ -117,10 +149,11 @@ extern int func_0027FB40(int, int, unsigned long long, char *, int);
 
 static __inline__ int menu_coord(float value, float scale, float half, int active)
 {
+    int mode = D_L04_001B2D40;
     float scaled = scale * value + half;
     int result = (int)scaled;
 
-    if (result != 0 && D_L04_001B2D40 == active)
+    if (result != 0 && mode == active)
         scaled = 1.0f;
     return result;
 }
@@ -146,7 +179,8 @@ void func_L04_00416E38(void) {
     y3 = menu_coord(479.0f, s, half, on);
     func_002802E0(box, x3, y3, 44, 468, 256, 299, 16, 3);
     func_00280200(box, (int)0x80F0F0F0, func_00288FB8(0xA41), -1);
-    x4 = D_001A7340 / 2;
+    x4 = D_001A7340;
+    x4 = x4 / 2;
     y4 = menu_coord(349.0f, D_L04_001B2D44, half, on);
     func_0027FB40(x4, y4, (int)0x80F0F0F0, func_00288FB8(0x2F2C), -1);
 }

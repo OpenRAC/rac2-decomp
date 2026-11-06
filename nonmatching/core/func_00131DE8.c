@@ -1,4 +1,31 @@
-/* 6 November 2026, hill-climb: ~380 runs over independent store orders and server/delay
+/* 6 November 2026, plain-C follow-up (supersedes the qualified source below).
+ * Game -O2 -G0 -ffunction-sections, separate unit; USA boot check.py only:
+ * removing all volatile qualifiers from the previous best gives 552/576 bytes,
+ * 0/1 places, 70 differing instruction positions after resolving relocations.
+ * Retained below: 572/576 bytes, 0/1 places, 32 differing instruction positions.
+ * The complete first block and both 9999 bgez delay slots now match. A one-pass
+ * group around each real server snapshot plus a decrement-first do/while delay
+ * prevents speculative slot filling without an extra loop guard. Both snapshots
+ * still precede their busy delays. Reordering the independent initialization
+ * stores and grouping the two read-state clears improves the tail further.
+ * Remaining: server v1 / loop limit a0 instead of retail a0 / v1 (five words
+ * per bind loop), and final store/argument scheduling with a filled jal slot
+ * instead of retail's nop; the epilogue is four bytes early.
+ * New controls: separate per-loop locals, nested decrement groups, reusing the
+ * bind result for the delay, explicit loop-limit locals, scalar/read-state
+ * owner views, sda client fields and bounded final-store permutations. None
+ * resolves the remaining allocation/tail scheduling. Non-sda globals worsen
+ * address forms; unsigned limit comparisons materialize 0xFFFFFFFF in two
+ * instructions and are not a remedy. About 200 check.py calls, no linked build.
+ * No volatile qualifiers, inline instruction asm, macro symbol aliases,
+ * hardcoded addresses, padding locals, dead stores or use-before-set remain.
+ * Existing file-scope symbol names for the real two-pointer buffer pairs are
+ * retained; they are declarations, not inline instruction sequences.
+ * Next: explain the server/limit allocation and final-store scheduling from
+ * compiler dumps with this plain-C input. Old volatile-specific measurements
+ * below are historical, not evidence that the new rule permits that method.
+ */
+/* Superseded history, 6 November 2026, hill-climb: ~380 runs over independent store orders and server/delay
  * order give the C below, 80 -> 78 rows (volatile read_active/read_error order kept). No
  * order puts 9999 ahead of the volatile server load, so the bgez slot still differs.
  */
@@ -40,21 +67,6 @@
  * originally from Lombyte; declarations and the eight-byte init payload
  * follow the RAC2 retail caller and RPC consumers.
  */
-typedef struct {
-    u8 reserved[0x24];
-    void *volatile server;
-} SoundRpcClient;
-
-typedef struct {
-    volatile int read_active;
-    u8 reserved[12];
-    volatile int read_error;
-} SoundReadState;
-
-typedef struct {
-    u8 *first, *second;
-} SoundBufferPair;
-
 extern u8 D_00146CC0[], D_00147CC0[];
 extern u8 D_00148CC0[], D_00149CC0[], D_0014ACC0[], D_0014B100[];
 extern u8 *D_001A74A0[] SDATA(D_001A74A0) __attribute__((sda));
@@ -68,14 +80,14 @@ extern int D_001A74C8[] SDATA(D_001A74C8) __attribute__((sda));
 extern int D_001A74D0[] SDATA(D_001A74D0) __attribute__((sda));
 extern int D_001A74A8[] SDATA(D_001A74A8) __attribute__((sda));
 extern int D_001A74AC[] __attribute__((sda));
-extern volatile long D_001A74D8[] __attribute__((sda));
+extern long D_001A74D8[] __attribute__((sda));
 extern int D_001A7180[] __attribute__((sda));
 extern u8 D_001A7040[] __attribute__((sda));
 extern u8 D_001A7140[] __attribute__((sda));
-extern volatile int D_001A7100[] __attribute__((sda));
-extern volatile int D_001A7110[] __attribute__((sda));
-extern void *volatile D_001A7064[] __attribute__((sda));
-extern void *volatile D_001A7164[] __attribute__((sda));
+extern int D_001A7100[] __attribute__((sda));
+extern int D_001A7110[] __attribute__((sda));
+extern void *D_001A7064[] __attribute__((sda));
+extern void *D_001A7164[] __attribute__((sda));
 extern char D_001A7500[], D_001A7528[];
 
 extern void func_0011CF78(int);
@@ -89,7 +101,7 @@ int func_00131DE8(int options)
     int delay;
     void *server;
     struct {
-        volatile int *read_active;
+        int *read_active;
         int options;
     } init;
     u8 *const command_buffer1 = D_00147CC0;
@@ -113,17 +125,21 @@ int func_00131DE8(int options)
             func_00115D48(D_001A7500, D_001A7528, 0xB1);
             for (;;) {}
         }
-        delay = 10000;
-        server = D_001A7064[0];
-        for (delay--; delay != -1; delay--) {}
+        delay = 9999;
+        do {
+            server = D_001A7064[0];
+        } while (0);
+        do {
+            delay--;
+        } while (delay != -1);
         if (server != 0)
             break;
     }
 
     D_001A74C8[0] = 0;
     D_001A74D0[0] = 0;
-    D_001A7180[0] = 0;
     D_001A74D8[0] = 0;
+    D_001A7180[0] = 0;
 
     do {
         bind_result = func_0011D450(D_001A7140, 0x123457, 0);
@@ -131,18 +147,26 @@ int func_00131DE8(int options)
             func_00115D48(D_001A7500, D_001A7528, 0xC6);
             for (;;) {}
         }
-        delay = 10000;
-        server = D_001A7164[0];
-        for (delay--; delay != -1; delay--) {}
+        delay = 9999;
+        do {
+            server = D_001A7164[0];
+        } while (0);
+        do {
+            delay--;
+        } while (delay != -1);
     } while (server == 0);
 
+    *(int *)D_00146CC0 = 0;
+    do {
+        D_001A7100[0] = 0;
+    } while (0);
+    *(int *)D_00147CC0 = 0;
+    do {
+        D_001A7110[0] = 0;
+    } while (0);
     D_001A74A8[0] = 0xFFC;
-    D_001A7100[0] = 0;
+    D_001A74AC[0] = 0xFFC;
     init.read_active = D_001A7100;
     init.options = options;
-    D_001A7110[0] = 0;
-    D_001A74AC[0] = 0xFFC;
-    *(int *)D_00146CC0 = 0;
-    *(int *)D_00147CC0 = 0;
     return func_00132C48(0, 8, &init);
 }

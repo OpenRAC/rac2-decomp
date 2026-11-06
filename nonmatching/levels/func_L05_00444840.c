@@ -1,3 +1,18 @@
+/* 6 November 2026 (round 10, Antigravity worker): USA v1.01, check.py only: 736/736 bytes, 0/4 places,
+ * exactly 2 differing rows (+0x124 and +0x128). Profile: -O2 -G8 -ffunction-sections -freduce-all-givs.
+ * Haifa scheduler ready-list trace confirms the root mechanism:
+ * In calls.c:expand_call, arguments are emitted in order (a0, a1, a2, a3). In sched1, insn 180 (a1)
+ * and insn 182 (a2) both have latency 1, weight 1, and 1 dependent (call_insn 186).
+ * In sched2, ready list tie-break uses INSN_LUID(tmp) - INSN_LUID(tmp2), preserving a1 before a2.
+ * When `i = 0;` is outside the phony do { ... } while(0) group (Case 2), hard register $a2 is set in block 18,
+ * giving insn 182 an output dependence that boosts a2 over a1 (matching retail lines 74-75: addiu a2,sp,12;
+ * addiu a1,sp,8; daddu a3,zero,zero 100% byte-for-byte). But because NOTE_INSN_LOOP_BEG acts as a sched2
+ * barrier, i = 0 is emitted at clock 19 and range = 40 at clock 20, swapping retail lines 93-94 (a2 before a3).
+ * When both range = 40 and i = 0 are outside the group, loop.c classifies the group as a real loop and
+ * strength-reduces D_L05_002B87F0[i] (114 diffs).
+ * Baseline C below retains retail lines 93-94 (addiu a3,zero,0x28; daddu a2,zero,zero); remaining diff is
+ * solely +0x124 (mine a1, retail a2) and +0x128 (mine a2, retail a1).
+ */
 /* 6 November 2026, lead: with -freduce-all-givs (2 rows: a1/a2 setup order before the second func_L05_00444D60 call; retail's first call keeps a1-then-a2): no change from int[2]/struct/shared int[4] target locals, pointer temporaries for either argument, a 150-step hill-climb over the 16 local declarations. */
 /* 6 November 2026 (round 6), USA v1.01, check.py only: 736/736 bytes, 0/4
  * places, 7 differing rows. Profile: -O2 -G8 -ffunction-sections (the
@@ -37,6 +52,22 @@
  * check or kind: 6-110 rows). Also no help: -fmove-all-movables,
  * -malign-loops=2, -fno-strength-reduce, for(;;) scans, label-first groups
  * (rotated or multiple entry), table pointer local, int target[2], px/py.
+ * 6 November 2026 (round 9), still 2 rows with -freduce-all-givs. Why the
+ * tie: loop.c (scan_loop, loop_has_call) substitutes both single-use
+ * &target_x/&target_y temporaries into the a1/a2 loads. Both loads then
+ * have equal priority, weight 1 and one dependent, so sched1 keeps the
+ * source order (a1 first) and sched2 copies it. Retail's addiu (not the ori
+ * that combine makes, as in the first call) means a2 was also a frame-address
+ * equivalent. To put a2 first, its load must be "a2 = P" with P dying there
+ * (sched1 weight 0) and P later replaced by sp+12 (update_equiv_regs or
+ * reload). That needs a REG_EQUAL note on P's set, and cse only adds one
+ * when the address was already seen in the same extended block. Tried
+ * (about 55 compiles): py = &target_y at 7 places in the loop, with and
+ * without -fmove-all-movables (4-149 rows; py gets a register and its addiu
+ * moves early). Also tried: a py reused for both calls (combine makes
+ * ori, 7 rows), py - 1 for a1 (hoisted, 69 rows), py read again after the
+ * call (cse folds it, 2-4 rows), an inline grid_position wrapper (2), and
+ * 11 single -f flags (2-114).
  */
 #include "common.h"
 extern void func_L05_00444D60(void *, int *, int *, int);

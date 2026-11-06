@@ -1,35 +1,27 @@
-/* 6 November 2026, hill-climb: ~380 runs over independent statement orders (pre-loop
- * calls/pointers, loop stores, t computation, uv stores) give the C below, 39 -> 36 rows;
- * the $f0/$f1 swap, n in s7 and the spill order remain.
- */
-/* 6 November 2026: new best C below (692/692, 0/1 USA, 39 differing rows after relocation
- * noise, was 42). Writing each arm as `t=(float)n; t=t/D` lets jump cross-jump the two
- * div.s into retail's shared one. Left: the arms and join use $f1/$f0 where retail has $f0/$f1
- * (each arm's D load is a local-alloc quantity and takes $f0 before global t). Loading D into
- * a shared variable fixes the FPRs but merges more (688). Also left: n s7 (retail s6), the
- * preheader spill order, the U store placement. No change: ternary numerator (45), divide at
- * the join (688), arms swapped (45), u+t operand order.
- */
-/*
- * func_L14_003DFA60 (692 bytes) -- tier opus-2, NOT MATCHING.
- * Best check.py: "14_aranos_prison: instruction at +0x10 differs", 0 of 1 places;
- * size 692/692 bytes; cdiff: 64 of 174 rows differ (several are relocation-only).
- * Profile: a unit of its own, e.g. src/levels/14_aranos_prison/L14_003DFA60-g32.c with
- *   config/cflags.txt line "<unit>\t-O2 -G32 -Wa,-G32 -ffunction-sections"
- *   (D_L14_001B0394..03B8 gp-relative, D_03BC absolute; declarations below).
- * Established: TI-mode Vec union + qzero_nc keep the Y store address unfolded
- *   (addiu sp,0x40; addu; swc1 4); the ternary gives the bnez sense; quotient t in
- *   the arms + "uv[0]=u+t" in the join removes the extra lw 0xD0 reload (reload's
- *   find_equiv_reg gives up on any MEM store between the V-table load and src+=2;
- *   the earlier "t=uv[0]+q per arm; uv[0]=t" form kept retail arm registers but was 696 B).
- * Still differs:
- *   1. n is in s7 (retail s6); the packet pointer starts in fp with the qzero giv
- *      in s0 (retail: v in s0, copy in s7, i*16 giv in fp); the preheader stores the
- *      0xD4 spill before 0xD0 (retail 0xD0 first).
- *   2. arm 1 (i<2) allocates cvt->f1, D_039C->f0, so its div.s does not cross-jump
- *      with arm 2 and the 0xD0 load fills arm 1's b delay slot.
- *   3. the sum u+t lands in f0 (retail f1) and the U store is scheduled late.
- * No declaration initializers; "u" is a local holding *src2 before its uses.
+/* 6 November 2026: new best C below (692/692, 0/1 USA v1.01, 17 diff rows, reduced from 36).
+ * Solved:
+ *   1. FPR Allocation ($f0 vs $f1): loading `den = D_L14_001B039C` in both if (i < 2) and else
+ *      arms turns `den` into a global pseudo across basic blocks, forcing both `t` and `den` into
+ *      global-alloc. Lines 003DFC40..003DFC78 match retail 100% byte-for-byte.
+ *   2. Tail Destination FPR: `den = u + t; uv[0] = den;` forces `add.s` destination into $f1 and
+ *      the load of `*src` into $f0.
+ *   3. Preheader Spills: `src = D_L14_001B03BC; src2 = D_L14_001B03B8;` placed immediately after
+ *      `func_00281DE8` places 0xD0($sp) first and 0xD4($sp) second, matching retail 100%.
+ *   4. GPR $s6: `n` is allocated $s6, matching retail 100%.
+ *
+ * Remaining differences (17 rows: 5 GPR + 12 scheduling rows):
+ *   - Loop giv register tie ($fp vs $s7):
+ *     Retail: $s0 is `v`, $s7 is `qzero_nc(&p.pos[i])`, $fp is byte offset 0, 16, 32, 48.
+ *     Compiled: $s0 is `v`, $fp is `qzero_nc`, $s7 is byte offset.
+ *     Both pseudos have 7 refs. In retail, `offset` was initialized at 003DFB48 (daddu $fp, 0)
+ *     before `pointer` at 003DFB4C (daddu $s7, $s0), giving `offset` live_length 160 vs 156,
+ *     which lowered its priority (875 vs 897) so `pointer` got $s7 and `offset` got $fp.
+ *     In our code, `pointer` is initialized at 003DFB2C (addiu $fp, $sp, 0x40), so `offset`
+ *     has shorter live_length and gets $s7.
+ *   - Loop latch scheduling: the swap of $fp and $s7 shifts the Giv increments (003DFCA4 vs 003DFC98),
+ *     which cascades into minor instruction reorderings with swc1 in the loop tail.
+ * Profile: src/levels/14_aranos_prison/L14_003DFA60-g32.c with flags
+ *   -O2 -G32 -Wa,-G32 -ffunction-sections -mno-split-addresses
  */
 #include "common.h"
 typedef int Quad128 __attribute__((mode(TI)));
@@ -59,16 +51,16 @@ void func_L14_003DFA60(char *self) {
  float mtx[16] __attribute__((aligned(16)));
  DrawPacket p __attribute__((aligned(16)));
  int n,i;
- float angle,t,u;
+ float angle,t,u,num,den;
  float *v,*uv,*src,*src2;
  n=func_L03_004197A8(D_L14_001B259C_base[0]+(*(int *)(*(char **)(self+0x68)+4)<<8));
  func_00283658(mtx,self+0xC0);
  func_L03_002EFB60(mtx,mtx,*(float *)(self+0x2C)/ *(float *)(*(char **)(self+0x24)+0x24));
  qcopy(mtx+12,self+0x10);
  mtx[15]=1.0f;
- src2=D_L14_001B03B8;
  func_00281DE8(p.pos,D_L14_001B0394,0,0x80);
  src=D_L14_001B03BC;
+ src2=D_L14_001B03B8;
  for(i=0;i<4;i++) {
   v=p.pos[i].f;
   angle=func_00283B98(D_L14_001B03A0*0.01745329424738884f,(float)i*1.5707964f);
@@ -85,9 +77,11 @@ void func_L14_003DFA60(char *self) {
   v[2]+=D_L14_001B03B0;
   p.color[i]=D_L14_001B03AC;
   uv=p.uv[i]; u=*src2; uv[0]=u;
-  if(i<2){t=(float)n;t=t/D_L14_001B039C;} else{t=(float)(n+1);t=t/D_L14_001B039C;}
-  p.uv[i][1]=*src; src+=2;
-  uv[0]=u+t;
+  if(i<2){den=D_L14_001B039C;t=(float)n;t=t/den;} else{den=D_L14_001B039C;t=(float)(n+1);t=t/den;}
+  den=u+t;
+  p.uv[i][1]=*src;
+  uv[0]=den;
+  src+=2;
   src2+=2;
  }
  func_00280B90(&p,mtx,0);

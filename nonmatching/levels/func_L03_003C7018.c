@@ -1,4 +1,30 @@
-/* 6 November 2026, round 2: new best C below; default -G0 profile, 656/656 bytes, 0/1 USA,
+/* 6 November 2026, Codex follow-up: retained best C, USA v1.01 656/656 bytes,
+ * 0/1 places; -O2 -G0 -ffunction-sections. check.py: "03_endako: instruction at
+ * +0x58 differs". There are 49 differing instruction positions after masking
+ * only relocation fields, versus 60 for the previous retained C (the earlier
+ * 92/102 line counts included unresolved relocation display differences).
+ * Grouping the real title lookup and argument reads restores half in $f20 and
+ * zero in $f21. An outer group around the second draw prevents part of the
+ * loop preheader from crossing that draw. Remaining: zero is materialized too
+ * early, title/coordinate argument moves and loads interleave differently,
+ * key-array initialization and coordinate-pointer setup differ, and loop
+ * increments occur between mfc1 and mtc1 rather than after cvt.s.w.
+ * New measured controls: all 21 integer/FP-bank interleavings preserve the
+ * physical call contract but tie or worsen; explicit rounded-int/float locals,
+ * groups around lookup/conversion/argument-read intervals and nested groups
+ * bottom out at this form. Adjacent independent x/c/d/zero assignment swaps
+ * tie. Moving the actual loop increment between rounding/helper/draw steps
+ * ties; grouping that increment adds four bytes. An explicit four-key memcpy
+ * ties; initializing i before it gives 53 differences. A direct y-array view
+ * fixes the base+4 expression but worsens scheduling by one position.
+ * With this source, -frac2-sticky-volatile-refs, -fno-regmove and -g tie;
+ * -fno-schedule-insns, -fno-schedule-insns2, -fno-gcse,
+ * -fno-rerun-cse-after-loop and -fno-rerun-loop-opt worsen size or instructions.
+ * No donor found by key/color constants in local RAC1/RAC4 sources. Next useful
+ * evidence is the original text-argument conversion/call grouping or a compiler
+ * scheduling witness; do not repeat the tied order/flag probes. No linked build.
+ */
+/* Superseded 6 November 2026, round 2: default -G0 profile, 656/656 bytes, 0/1 USA,
  * 92 diff lines (the previous form gave 102). Plain call arguments with literal 0.5f/0.0f
  * put half in $f20 before the first call as retail does; a group around the second text
  * call keeps the loop set-up (i, the constant 1, the coordinate pointers) after that call;
@@ -51,11 +77,33 @@ extern int func_L00_00443E18(char *);
 int func_L03_003C7018(void)
 {
     if (D_L03_001A904C) {
-        func_00300A00((char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc6), 0x60442d00, D_L03_001B014C,
-            (float)(int)(D_L03_001B0150 * D_L03_001B3284 + 0.5f), D_L03_001B0154, D_L03_001B0158, 0.0f);
+        {
+            char *title;
+            float row, x, c, d, z;
+
+            do {
+                title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc6);
+                row = (float)(int)(D_L03_001B0150 * D_L03_001B3284 + 0.5f);
+                x = D_L03_001B014C;
+                c = D_L03_001B0154;
+                d = D_L03_001B0158;
+                z = 0.0f;
+            } while (0);
+            func_00300A00(title, 0x60442d00, x, row, c, d, z);
+        }
         do {
-            func_00300A00((char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7), 0x55f0c070, D_L03_001B014C,
-                (float)(int)(D_L03_001B0150 * D_L03_001B3284 + 0.5f), D_L03_001B0154, D_L03_001B0158, 0.0f);
+            char *title;
+            float row, x, c, d, z;
+
+            do {
+                title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
+                row = (float)(int)(D_L03_001B0150 * D_L03_001B3284 + 0.5f);
+                x = D_L03_001B014C;
+                c = D_L03_001B0154;
+                d = D_L03_001B0158;
+                z = 0.0f;
+            } while (0);
+            func_00300A00(title, 0x55f0c070, x, row, c, d, z);
         } while (0);
         {
             int keys[4] = {11599,12116,12769,12770};

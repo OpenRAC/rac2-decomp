@@ -1,3 +1,21 @@
+/* 6 November 2026 (round 9): still 416/412 bytes, 0/1 USA. The extra word is
+ * case 0's first `lh a1, 0x36(p)`: retail fills the beql slot with it (s0 = obj is
+ * live there), ours fills it with `ld s0` because local-alloc gives the table base
+ * s0. Base and stride are single-block, single-death pseudos (local-alloc.c:359),
+ * so they are allocated before obj. Note: the base length 42 is REG_LIVE_LENGTH
+ * doubled for its REG_EQUIV note, so even as globals the order would be obj
+ * (39/71) > p (14/34) > base (10/42) > stride (10/50), not retail's base/stride
+ * before p. Proof: one `tbl`/`n` variable set in all three cases makes them
+ * global: obj s0 and case 0's beql/lh layout match retail, but p s1, base s2,
+ * stride s3, and cases 1/2 use s2/s3 (408/412). No change (416) from
+ * -fno-rerun-loop-opt, -fno-regmove, -fno-rerun-cse-after-loop, -fno-gcse,
+ * -fno-strength-reduce, -fno-schedule-insns(2), -fno-caller-saves, -fexceptions,
+ * -g, -O3, -ffast-math, -fmove-all-movables, -frac2-sticky-volatile-refs,
+ * -frac2-keep-block-order/-zero-copy, -frac2-gcse-unsplit-edges, -frac2-qcopy.
+ * Per-call groups (with/without -fno-rerun-loop-opt, -fno-gcse) 416-428; table
+ * hoisted to the top 400; if-chain 384; case reorders 404-416; a 3-step loop
+ * with -funroll-loops 408. Needs base/stride global AND above p.
+ */
 /* 6 November 2026: default game G0, best C remains 416/412 bytes, 0/1 USA.
  * New bounded trials: group the initializer call, group its record-address
  * calculation, group the middle append call, or group the complete four-call

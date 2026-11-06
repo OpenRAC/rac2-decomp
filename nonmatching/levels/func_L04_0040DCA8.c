@@ -1,3 +1,4 @@
+/* 6 November 2026, round 9: unchanged, 3 real words (c2.y/c2.z/c3.z store order). sched1 has h ready only at t31 and four early stores to fill t26-t30, so one 1.0 store is forced at t30; retail needs one more memory op before reload. 170-step climb with a corrected metric (frame offset +0x30 masked), chained clears, corner copies and -fno-regmove/-fno-caller-saves stay at 3. The 0x1A0/0x1D0 frame gap closes only with an unused 48-byte local (rejected as padding). */
 /* 6 November 2026, round 5: corner-store order 3 words off (was 5);
  * USA v1.01 default -O2 -G0 -ffunction-sections, 740/740, 0/6 places.
  * A hill-climb over the corner field stores (same values, clears first)

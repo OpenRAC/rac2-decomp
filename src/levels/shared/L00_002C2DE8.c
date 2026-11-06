@@ -339,7 +339,7 @@ void func_L00_002CA478(void)
         q->flags &= ~0x41;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_002CA4E0);
+/* func_L00_002CA4E0 is built in its dedicated no-rerun-loop-opt unit. */
 
 /* func_L00_002CA898 is built in its dedicated block-order-profile unit. */
 

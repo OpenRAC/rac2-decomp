@@ -1,3 +1,20 @@
+/* 6 November 2026 (Codex follow-up), USA v1.01, check.py only:
+ * Retained round-7 C unchanged: 924/924 bytes, 0/1 places. The baseline has
+ * 25 instruction-word differences when relocation immediate bits are excluded
+ * (the older 43-row count uses a different normalization). No improvement.
+ * The helper's dead display-mode test/assignment is not eligible under the
+ * current prohibition on constructs used only to steer the compiler; retain
+ * it here as historical evidence, not as an approved source method.
+ * New experiment: remove that dead test, then group only real operations.
+ * Plain removal gives 904 bytes. Tested all 10 contiguous groups over the
+ * helper's half/add/round/float-conversion statements, 8 draw-setup group
+ * ranges, and 48 combinations of those groups (67 new candidates total).
+ * Bodies range from 904 to 928 bytes; none matches or improves the retained
+ * baseline. Every group preserves statement order and initialized uses.
+ * No donor found in current RAC1/RAC4 searches. Next useful input: an evidenced
+ * rounding-helper source/control-flow shape that retains the label copies
+ * without a dead test. Source marker and flags restored; no linked build run.
+ */
 /* 6 November 2026 (round 7), USA v1.01, check.py only: best C below unchanged
  * (924/924, 0/1, 43 rows). Global-alloc dump: label (pseudo set 4 times, 10
  * refs, life 47) is allocated before the dead mode/active pseudos, so it takes

@@ -1,4 +1,22 @@
-/* 6 November 2026, round 4: best body below (752/752, 0/8 USA, ~19 words, was ~22).
+/* 6 November 2026, Codex (stopped at its usage limit): without the inadmissible dead-test helpers the best compliant form is 744/752 bytes, 0/8; it lacks retail's unused $s1 save/restore, and rounding and argument scheduling differ. Typed argument interleavings and constant-initialisation orders did not help. */
+/* 6 November 2026, round 9: best body below (752/752, 0/8 USA, ~9 words, was ~19).
+ * Same profile, plus -fno-gcse (as round 4 used):
+ *   -O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin -fno-gcse
+ * New: the two 23.0f roundings use menu_coord2, whose dead test reads `scaled` in its
+ * second block. That makes the scale/product chain a global pseudo, so local-alloc gives
+ * 23.0 $f0 first and the chain $f1, as retail. Both 23.0f roundings now match.
+ * Left:
+ *  - fourth draw: retail has mov.s $f14,$f20 first and mov.s $f15,$f14 in the delay
+ *    slot. reload_cse makes f15 = f14 only for a constant 1.0 source when it knows
+ *    f20 = 1.0, but the helper labels clear its table. A copy `s = one` is folded by
+ *    cse/cse2 (a do/while(0) group around it does not survive cse2 and adds a nop);
+ *    `s = one` before the helper gives s = $f14 but the copy lands in the first block.
+ *  - 373.0f rounding: retail loads 373 before the scale (sched2 tie on insn order).
+ *    Scale not as the first helper parameter gives that order but swaps $f0/$f2.
+ * No gain: no-helper draws with do/while(0) groups (~100 words), 16 parameter orders
+ * for the 373.0f helper, a 60-run hill-climb over declarations and setup order.
+ */
+/* 6 November 2026, round 4: (752/752, 0/8 USA, ~19 words, was ~22).
  * Same profile as round 3. New: the helper takes the scale as its first parameter
  * (menu_coord(D_L02_001B3E04, value, half, active)); this fixes the 373.0f rounding's
  * FP registers. Left: the 23.0f roundings (retail 23 in f0, scale and product in f1),
@@ -54,6 +72,16 @@ static __inline__ int menu_coord(float scale, float value, float half, int activ
     return result;
 }
 
+static __inline__ int menu_coord2(float scale, float value, float half)
+{
+    float scaled = scale * value + half;
+    int result = (int)scaled;
+
+    if (result != 0 && scaled != 0.0f)
+        scaled = 1.0f;
+    return result;
+}
+
 void func_L02_003C43F0(char *obj) {
     char *text;
     int state;
@@ -80,10 +108,10 @@ void func_L02_003C43F0(char *obj) {
     state = *(unsigned char *)(obj + 0x20);
     if (state == 7) {
         text = func_00288FB8(0x2F5C);
-        func_0027FBD8(254, menu_coord(D_L02_001B3E04, 23.0f, half, 1), 0x88FFFFFF, text, -1);
+        func_0027FBD8(254, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     } else if (state != 8 && state != 5) {
         text = func_00288FB8(0x2F5B);
-        func_0027FBD8(262, menu_coord(D_L02_001B3E04, 23.0f, half, 1), 0x88FFFFFF, text, -1);
+        func_0027FBD8(262, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     }
     text = func_00288FB8(0x2F5A);
     func_0027FBD8(254, menu_coord(D_L02_001B3E04, 373.0f, 0.5f, 1), 0x88FFFFFF, text, -1);
