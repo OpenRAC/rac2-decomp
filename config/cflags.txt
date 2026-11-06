@@ -3472,3 +3472,4 @@ src/pal/levels/03_endako/L03_003D5360-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00387C58-cc.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/pal/game/002C8BD0-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L00_002B6488-cc.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g

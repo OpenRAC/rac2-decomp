@@ -1,26 +1,3 @@
-/* opus-1 tier (Claude Opus 5.5, xhigh), USA v1.01, pinned worker toolchain, 31 October 2026.
- * Best: 1600/1600 bytes, 0/1 places; first mismatch at +0x2E0; the first UV loop is the only
- * real difference left (the other differing rows are that loop's shift and unlinked relocations).
- * Profile: -O2 -G8 -ffunction-sections, sibling 00308768-g8.c. All declarations are below.
- * Improved here: the third loop needs its own counter (j), which gives retail's $s2 countdown.
- * Approved SDATA aliases on the corner arrays and the U view keep retail's GP addresses; the V
- * base is absolute (001AED74), the U base GP-relative (001AED70), over the same storage.
- * Remaining: retail advances V straight after loading it (00308A58); this C reloads the spilled
- * V pointer first (00308A6C), which adds one loop instruction and consumes the next loop's nop.
- * Cause, read from the x.i.sched trace and x.i.greg: sched1 issues 452 U load + 483 i++ at t=1,
- * 475 V load + 1383 U advance at t=2, then 454 U store before 1359 V advance at t=3. 454 ranks
- * higher, apparently from its anti-dependent $s2 increment (priority inferred from ready lists).
- * Reload emits a load before each advance. Reload_cse appears to delete U's and keep V's, as
- * the U store between V's load and advance invalidates the remembered slot value.
- * So retail needs 1359 before 454 in sched1, or some other way to keep the slot value valid.
- * Tied (same pattern): locals for U/V in either load order, explicit advancing U/V pointers,
- * source element pointers, assignment chains, comma store, swapped stores, -g and 8 more flags.
- * Worse: one destination pointer (offset store, 1584 bytes), -fno-schedule-insns (1572 bytes),
- * -fno-gcse, -mno-split-addresses, -fno-expensive-optimizations.
- * Next useful idea: a natural form that delays the U store one cycle or raises V's advance.
- * A float copy later coalesced should delay the store (untested); no natural source was found.
- * Not linked; original marker restored.
- */
 #include "common.h"
 /* Adapted from RAC1 visibomb_and_pyrocitor.c (OpenRAC, GPL-3.0). */
 typedef struct { float x,y,z,w; } __attribute__((aligned(16))) BeamVec;

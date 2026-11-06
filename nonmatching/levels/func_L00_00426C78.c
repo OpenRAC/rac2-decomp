@@ -1,3 +1,8 @@
+/* 6 November 2026: on the current compiler the draft is unchanged (908/908, 0/27). Writing
+ * `1.5707964f - func_002831B0(x)` as a static inline acos helper ties: the inlined return copy is
+ * folded before allocation, so the counts stay 151/31. Both suspicious interfaces were checked
+ * against retail and are right ($f13 = temp[2] at both func_L00_00424F00 calls; 0 is returned
+ * after func_L00_002D9D98). */
 /* opus-1 tier (v0916); USA v1.01. Unit profile: own -g8 file, default
  * "-O2 -G8 -ffunction-sections" (the $gp flag word D_L00_001B15DC needs -G8).
  * Counterpart: RAC1 camera_transition_update (rac1-decomp

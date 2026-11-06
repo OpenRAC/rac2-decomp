@@ -201,10 +201,6 @@ void func_002E3940(int index)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002E3998);
-
-INCLUDE_ASM("asm/game", func_002E3BD8);
-
 ASM_FUNC("asm/game", func_002E3E54);
 
 ASM_FUNC("asm/game", func_002E3FA0);
