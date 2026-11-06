@@ -761,7 +761,7 @@ int func_L00_00303388(unsigned char *object)
 
 /* func_L00_00303530 is defined in its own unit. */
 
-INCLUDE_ASM("asm/levels", func_L00_00303990);
+/* func_L00_00303990 is defined in its own unit. */
 
 /* Reads a record count from a per-level data root, indexes a fixed 332-byte-stride table with it, and when the int after position index is greater than the one at position index calls two helpers with the entry value added to a per-level base; returns 1. */
 int func_L00_003046D0(int index)
