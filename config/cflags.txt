@@ -3592,6 +3592,7 @@ src/pal/levels/shared/L00_003B7608-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-ze
 src/pal/game/002C7D8C-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/11_joba/L11_0044D030-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/16_snivelak/L16_0041E3D8-cc-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
+src/pal/levels/shared/L22_00401BA0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/23_damosel_orbit/L23_00428A98-cc-g8.c	-O2 -G8 -ffunction-sections -ffast-math
 src/pal/levels/shared/L00_0038ACC8-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/11_joba/L11_00450AA8-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
