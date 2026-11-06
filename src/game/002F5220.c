@@ -386,7 +386,6 @@ int func_002F6510(void)
     return result;
 }
 
-INCLUDE_ASM("asm/game", func_002F7320);
 
 extern unsigned char D_001A7AB8[] MACRO_ADDR;
 extern unsigned char D_001A7AF8[] MACRO_ADDR;

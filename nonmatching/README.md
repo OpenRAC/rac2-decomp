@@ -288,7 +288,6 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 
 
 | `func_0028A180` | 240 | One 228-byte plain-C draft matched 0/28 in US, PAL, and US2. It used guessed fixed data addresses; no safe shared-source data symbols were established, so the draft was discarded. Reopen with verified data-symbol mapping and retail loop/layout evidence. |
-| [`func_002F7320`](game/func_002F7320.c) | 132 | 2 November 2026: 2 November 2026: the signed 32-bit index/result form remains 132/132 bytes, 0/28 US placements. An unsigned index changes the retail signed bound test; a 64-bit result expands to 140 bytes without preserving the required zero copy. Neither is retained. The entry zero-copy/CSE constraint remains; do not repeat width probes without new compiler evidence. Not linked or counted. |
 | [`func_002F3CF8`](game/func_002F3CF8.c) | 40 | Four checker invocations across USA v1.01, PAL and USA v2.00. Best plain-C form is 44 bytes and matches 0/28 placements in each release. C computes the address in an extra instruction and uses `$v0`; retail uses `$at` as a value register and has three nops between the load and mask, evidence for review under the handwritten-code rule; no ASM_FUNC classification is made. Marker restored; no strict build was run. |
 
 | [`func_L00_002CA4E0`](levels/func_L00_002CA4E0.c) | 948 | 3 November 2026: Real captures preserve two complete vectors, their copy ordering and the evidenced choices array. 944/948 bytes, 0/27 USA. Origin/constant hoisting and the sampling numerator remain; no new scalar or flag sweep. |
