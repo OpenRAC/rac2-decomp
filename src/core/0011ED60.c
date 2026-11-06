@@ -240,4 +240,6 @@ int func_0011F130(void) {
 
 ASM_FUNC("asm/core", func_0011F170);
 
-INCLUDE_ASM("asm/core", func_0011F364);
+/* Original assembly: privileged exception handler (k0 frame, CP0 Status/Cause/EPC,
+ * HI1/LO1 and SA saves, sync.p, eret) with $at as a working register. */
+ASM_FUNC("asm/core", func_0011F364);

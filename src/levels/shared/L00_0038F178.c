@@ -455,7 +455,6 @@ void func_L00_00398118(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_00398810);
 
 
 /* func_L00_0039B288 is defined in L00_0039B288-g8.c. */

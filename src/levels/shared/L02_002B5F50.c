@@ -19,7 +19,7 @@ extern float func_L02_0032EC98(void *, void *, void *, float, float);
 
 /* func_L02_002EF968 is defined in L02_002EF968-helpers.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_002EFB60);
+/* func_L02_002EFB60 is defined in L02_002EFB60-g8.c. */
 
 
 ASM_FUNC("asm/levels", func_L02_002F1FB8);

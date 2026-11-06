@@ -1,3 +1,8 @@
+/* 6 November 2026: C below unchanged, nothing compiled. Retail frame: sums[47] at 0,
+ * picks[7] at 0xC0, the 16-byte vector at 0xE0, then 0x20 bytes no instruction touches,
+ * saves at 0x110. The callee chain (func_L23_0041C7D8 -> func_L23_0041C8C0) reads only
+ * the first 16 bytes of the vector, so it does not show a larger callee-filled object.
+ */
 /* 4 November 2026: faithful retained C; no linked match.
  * Remove the unused eight-float local that existed solely to reproduce the stack frame.
  * us: 564/564 bytes, 0/1 places; us2: 564/564 bytes, 0/1 places; pal: 564/564 bytes, 0/1 places.

@@ -219,7 +219,6 @@ void func_L03_003F6918(u8 *entity, s32 index) {
 
 /* func_L03_003F6948 is defined in L03_003F6948-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_003F6BA8);
 
 /* func_L03_003F6E88 is defined in L03_003F6E88-g8.c. */
 
@@ -320,7 +319,6 @@ u32 func_L03_0041D1D8(u8 *entity) {
 
 /* func_L03_0041D258 is in L03_0041D258-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_0041DAD0);
 
 /* Projects the state position onto its path, clamps lateral displacement,
  * advances the path blend nearby, and maintains its movement sound. */

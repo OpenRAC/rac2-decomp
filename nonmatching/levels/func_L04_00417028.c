@@ -1,3 +1,9 @@
+/* 6 November 2026, round 3: the func_00326A10 dead-test rounding helper does not carry over
+ * (732/736, own -O2 -G0 -fno-gcse unit). Retail has no unused save here (s1 = 60 divisor,
+ * s2 = prefix, s0 = format), so `active` must not be a call-crossing local; with literal 1
+ * or a per-pair `on = 1`, cse folds the test and no boundary is left after the roundings
+ * (112.0f/142.0f constants hoisted before the first chain, f21/f22 swapped).
+ */
 /* 4 November 2026: faithful retained C; no linked match.
  * Replace the per-function cvt.w.s/mfc1 inline assembly with an ordinary C cast.
  * us: 732/736 bytes, 0/2 places; us2: absent; pal: absent.

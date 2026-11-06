@@ -1,3 +1,10 @@
+/* 6 November 2026: retained source unchanged (944/948). Literal `1.0f` in both the call and the
+ * sampling loop (no `one`) gives retail's two `mov.s $f13,$f21` (call delay slot and loop numerator):
+ * loop.c hoists the constant and cse2 turns it into a copy of the call's 1.0. But the copy lands
+ * after the duplicated first iteration, so cross-jumping fails (1016 bytes). Retail sets it before
+ * the blez, so the numerator is a pseudo set before the loop that gcse does not propagate.
+ * `one` set after the call, inside the if, or next to rate: all tie the base.
+ */
 /* 3 November 2026; retained C, no linked match.
  * Real operand captures and a choice write cursor, following current RAC1
  * pick_idle_fidget, remain 944/948 bytes and 0/27 US places (frame 0xD0).

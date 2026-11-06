@@ -82,20 +82,22 @@ python3 $T/count_asm_words.py gcc/config/mips/mips.c
 python3 $T/no_recombine_givs.py gcc/loop.c
 python3 $T/narrow_saves_below.py gcc
 python3 $T/keep_block_zero_copy.py gcc
+python3 $T/sticky_volatile_refs.py gcc
 sha256sum --check --quiet <<'SUMS'
 91ac97768f907db2c50b5e04c150b7c7d72c2da3f15d21f0a7f4e802ba8378fb  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-9cc8cc607cdd8a315b67ef3d342ff4779aef414c0ae954743e1b74534aeaf4b7  gcc/toplev.c
+02327fa692839411d825948959ddfc2d2fa96bf0840acffe6b277bb21f650d2d  gcc/toplev.c
 3098888cc26ac83c936a8d505662b6ba1aa9039811e89c534f4ea8f1a851e7d6  gcc/haifa-sched.c
 656c2b9546b5c38d96cfe25b02620cce02b625f5637ecad6386f0a4d89f3e0fe  gcc/reorg.c
-692efc7f9e569ed16a1a132c835f478fd47be251ae19e4b3cc2e23e8318ac936  gcc/flags.h
+99e6bdd7649c0f9af0e2e5c02518eb65001d34bda4b7c7430e3b101857db54da  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 ba947e44256e3d5144e353a4976aac931a4941acc8dcb1dc0fda99fa8b7b504a  gcc/flow.c
 d4031dbfc5e08005b6bdfd23685e02bdde46bf711236c419ebca655ba2f542a9  gas/config/tc-mips.c
 6d4c688bdf8517a1da1b35a04bb1e3b6137093a6224b3ed52666581e3a7bd557  gcc/reload1.c
 2f6ffa23d379d620ec38db4e527b2cbd5583865195cd8b364aa2c1ce07433faf  gcc/loop.c
 a2dd997196a573b94aef15338115cfdb1c2a7e29f3dc1857597695f1a0bf9b20  gcc/cse.c
+8e2768736759358567dc26fe0379d8fbe8b6f5bc3d9dc35adeb573cb99eac63f  gcc/resource.c
 SUMS
 
 # bison 1.28: the 1999 grammars need its skeleton.
@@ -147,6 +149,7 @@ RAC2_GCC_SOURCE="$W/src/gcc/reload1.c" RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_null_pointer_checks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_narrow_saves_below.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_keep_block_zero_copy.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sticky_volatile_refs.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

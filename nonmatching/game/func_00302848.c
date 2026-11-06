@@ -1,3 +1,29 @@
+/* 6 November 2026, lead: block-local a/b (and t for D_001A8BD0) in either assignment order and *&D_001AE92C all tie at 5 words. */
+/* 6 November 2026, round 8: closer (468/468, 0/28 USA, 5 words). The absolute settings
+ * words are offset reads of the $gp words before them (doc rule: symbol+offset has length
+ * 2, never fills a slot, assembler expands lui/lw): D_001AE900 block [1],[2],[3],[5],[6]
+ * for 904/908/90C/914/918, D_001AE920 [1], D_001AE8E8 [1], D_001AE8F0 [2]; the $gp reads
+ * use SDATA(...) aliases so the canonical names stay absolute. This fixes the 002A7878
+ * f12/f13 and 00283D38 a0/a1 setups. Left: func_002C2210 setup is a1, t1, a2 (retail a2,
+ * t1, a1): sched1/sched2 tie on luid in argument order. Same 5: all 84 float positions in
+ * the prototype, locals for either value (any order), D_001AE92C as SDATA D_001AE928[1],
+ * ternary k, local for D_001A8BD0 or the life float. Worse: a2 read in both arms (98),
+ * do/while(0) around either load or the call (86-92, +nop), split (plain) a2 base (10, lui
+ * hoisted to v0 but a2/t1/a1 order right).
+ */
+/* 6 November 2026, round 2: no change (468/468, 0/28 USA, 12 words; checked in
+ * src/game/00300618-g8.c). sched1 dump: the call block's arg moves are in argument
+ * order and tie, so a1 (D_001AE92C) goes before a2 (D_001AE904); retail has a2 first.
+ * Same result: a block local for D_001AE92C, the -g (00300618-draw-g8) and -g8-qcopy
+ * units. Worse: local before the branch (114), D_001AE92C as an incomplete
+ * MACRO_ADDR or sda view (472, absolute), D_001AE8EC[4] sda (13, macro in jal slot),
+ * D_001AE8EC[] sda (464), -mno-split-addresses with or without plain arrays (472,
+ * bnel head, a1/a2 still swapped), plain arrays with split addresses (46).
+ */
+/* 6 November 2026: retained source below unchanged (468/468, 0/28 USA, 12 words).
+ * -mno-split-addresses with the 16-byte arrays and D_001A8BD0 as plain (non-sda) externs
+ * gives 472 bytes and about 80 differing words (puff store block and branch-likely tail).
+ */
 /* 3 November 2026, second pass, current qualified compiler, default G8:
  * Fresh baseline: 468/468 bytes, 0/28 USA places, first mismatch +0x174.
  * The only remaining region is 00283D38's colour-load / f12 call setup.
@@ -48,23 +74,19 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } V4_F302848;
 
 extern s32 D_001AE930 __attribute__((sda));
-extern s32 D_001AE900 __attribute__((sda));
+extern s32 D_001AE900 SDATA(D_001AE900);
 extern s32 D_001AE928 __attribute__((sda));
-extern float D_001AE920 __attribute__((sda));
+extern float D_001AE920 SDATA(D_001AE920);
 extern s32 D_001AE92C __attribute__((sda));
-extern float D_001AE8F0 __attribute__((sda));
-extern float D_001AE8E8 __attribute__((sda));
-extern s32 D_001AE904[4] __attribute__((sda));
-extern float D_001AE924[4] __attribute__((sda));
+extern float D_001AE8F0 SDATA(D_001AE8F0);
+extern float D_001AE8E8 SDATA(D_001AE8E8);
+extern s32 D_001AE900_blk[] __asm__("D_001AE900") MACRO_ADDR;
+extern float D_001AE920_blk[] __asm__("D_001AE920") MACRO_ADDR;
+extern float D_001AE8E8_blk[] __asm__("D_001AE8E8") MACRO_ADDR;
+extern float D_001AE8F0_blk[] __asm__("D_001AE8F0") MACRO_ADDR;
 extern char D_001A8BD0[16] __attribute__((sda));
 extern u8 *D_001F0000[];
 extern s32 D_001B1688[4] __attribute__((sda));
-extern float D_001AE8EC[];
-extern s32 D_001AE914[4] __attribute__((sda));
-extern s32 D_001AE918[4] __attribute__((sda));
-extern s32 D_001AE908[4] __attribute__((sda));
-extern s32 D_001AE90C[4] __attribute__((sda));
-extern float D_001AE8F8[4] __attribute__((sda));
 
 extern s32 func_002A77E0(s32);
 extern void *func_002C2210(char *, float, float, s32, s32, float, s32, s32, char *, s32);
@@ -93,7 +115,7 @@ void func_00302848(char *obj, s32 quiet)
             k = -D_001AE928;
         else
             k = D_001AE928;
-        func_002C2210(first, D_001AE920, D_001AE924[0], D_001AE92C, D_001AE904[0], 0.0f, 2, k, D_001A8BD0, 0);
+        func_002C2210(first, D_001AE920, D_001AE920_blk[1], D_001AE92C, D_001AE900_blk[1], 0.0f, 2, k, D_001A8BD0, 0);
     }
     pos = obj + 0x10;
     puff = func_002C2FD8(pos, D_001AE900, *(u8 *)(rec + 0x41), 0, 0, 2, 0, D_001AE8F0);
@@ -102,9 +124,9 @@ void func_00302848(char *obj, s32 quiet)
     if (quiet == 0 && (D_001B1688[0] & 1)) {
         func_002A7A00(&vec, 0.0f, 0.05f);
         func_00282CC0(&vec, &vec, pos);
-        zero.f[2] = -(func_002A7878(D_001AE8E8, D_001AE8EC[0]) * 0.016666668f);
-        tint = func_002A7820(D_001AE914[0], D_001AE918[0]);
-        color = func_00283D38(D_001AE908[0], D_001AE90C[0], func_002A7878(0.0f, 1.0f));
-        func_002C3150(&vec, &zero, color, tint, func_002A77E0(0xFF), 0, D_001AE8F8[0]);
+        zero.f[2] = -(func_002A7878(D_001AE8E8, D_001AE8E8_blk[1]) * 0.016666668f);
+        tint = func_002A7820(D_001AE900_blk[5], D_001AE900_blk[6]);
+        color = func_00283D38(D_001AE900_blk[2], D_001AE900_blk[3], func_002A7878(0.0f, 1.0f));
+        func_002C3150(&vec, &zero, color, tint, func_002A77E0(0xFF), 0, D_001AE8F0_blk[2]);
     }
 }

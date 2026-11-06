@@ -1,14 +1,4 @@
-/* Opus G2, 1 November 2026: with -fmove-all-movables the only cause left is `mov.s $f20,$f21`, which
- * lands in the call delay slot at +0x448 where retail has a nop and keeps it at +0x544. Moving the
- * statement inside the loop tail ties. A probe of single flag and MACRO_ADDR toggles found nothing.
- * Sol-low v0327, 2026-10-28: upstream toolchain, 1480/1484 bytes, 0/27 places.
- * Carried orch/main unit with -O2 -G0 -ffunction-sections -frac2-hazard-labels
- * -fmove-all-movables. Adding qcopy/qcopy-barrier and using qcopy_nc on the final
- * independent radial copy both tie at 1480 bytes. Retail keeps the f20=f21 move
- * after the final copy; upstream moves it into the earlier call delay slot and
- * removes a nop. Old sticky-volatile-refs flag is unavailable here. Needs an
- * evidenced source lifetime that retains retail scheduling, not a volatile cast.
- */
+/* func_L00_003C5310: needs -frac2-sticky-volatile-refs (keeps the f20=f21 move after the final copy); see docs/COMPILER-NOTES.md. */
 #include "common.h"
 
 /* Own unit: -fmove-all-movables lets loop.c hoist the second strip loop's

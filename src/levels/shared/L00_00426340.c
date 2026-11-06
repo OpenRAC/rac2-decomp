@@ -217,7 +217,6 @@ void func_L00_00426680(char *self)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_00426C78);
 
 void func_L00_00427008(char *self)
 {

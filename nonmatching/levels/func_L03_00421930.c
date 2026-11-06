@@ -1,3 +1,13 @@
+/* 6 November 2026: default game G0, best C remains 416/412 bytes, 0/1 USA.
+ * New bounded trials: group the initializer call, group its record-address
+ * calculation, group the middle append call, or group the complete four-call
+ * initialization sequence. Each gives 420/412, with obj in s3, p in s2,
+ * table in s0 and stride in s1: none promotes the table/stride as required.
+ * -fno-expensive-optimizations gives 404/412, drops the saved FP zero and
+ * retains the wrong integer allocation. -fno-local-alloc is unsupported.
+ * Read-only RAC1/RAC4 searches found no corresponding initialization donor.
+ * Stop the tied grouping approach; retain the older best body below.
+ */
 /* 4 November 2026 current-RAC1 source-method trial; retained, not linked.
  * Two new real-operation group trials (the first append call and the state-pointer read) each
  * produce 420/412 bytes, 0/1 USA placements. Neither promotes table/stride allocation as

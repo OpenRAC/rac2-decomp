@@ -185,7 +185,6 @@ extern char D_001ADA38[] __attribute__((sda));
 
 /* func_0032EB28 uses small data in 0032EB28-update-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0032F3D0);
 
 
 INCLUDE_ASM("asm/game", func_0032F598);
@@ -368,8 +367,6 @@ s32 func_00334100(s32 a0)
     return r;
 }
 
-
-INCLUDE_ASM("asm/game", func_00334550);
 
 /* func_00334710 is matched in 00334710-rc2.c. */
 

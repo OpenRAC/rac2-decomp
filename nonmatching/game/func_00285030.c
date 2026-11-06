@@ -1,3 +1,28 @@
+/* 6 November 2026, round 7: unchanged best, 680/680, 0/28, 6 rows. Setting 0x106 in a local
+ * next to w (both moved by update_equiv_regs after sched1) gives retail's la/0x4410/0x106 order
+ * and v1, but 0x8000 is then issued in the same sched1 cycle as t[1]'s store, so 0xE loses a2
+ * (0xE t0, 0x30003 t2; 6 rows). Tied or worse: s2 as a top-level local (6), p or q reused for
+ * the final packet (25-30), w reused for 0x106 (107), 0xE as an early local (72), t[1] moved
+ * before t[0] or the cursor store (12-17), 0x4410 literal with 0x106 local (15; hill-climb 13).
+ */
+/* 6 November 2026, round 3: unchanged, 680/680, 0/28, 6 rows (0x106 before the
+ * D_001A6480 la). Automatic hill-climb over the order of the final packet block
+ * (s2 assignment, cursor store, t[0..9]; ~550 compiles, two seeds, also with t[8]
+ * through a local) never went below 6 rows. Moving w = 0x4410 to four earlier
+ * places ties; reusing s for s2 gives 132 rows. Original best C retained.
+ */
+/* 6 November 2026: USA v1.01 recheck, game -O2 -G8 -ffunction-sections:
+ * 680/680 bytes, 0/28 placements, first +0x1F4; seven instruction rows differ
+ * after ignoring relocation immediates. The older five-row measurement is historical.
+ * New: grouping the final packet or its 0x4410 store grows to 688 bytes; grouping
+ * its first store, 0x106 store, coordinates or state-base assignment worsens allocation.
+ * Moving the actual 0x106 store before 0x4410, before the header or after coordinates
+ * gives 15, 22 or 44 differing rows. RAC1's active setup_render_target donor in
+ * src/game/render/framebuf.c confirms the packet structure; its literal 0x4410 and
+ * unsigned draw-environment view give 17 rows here. Original best C retained.
+ * Reopen with a source-supported reason for the state address to precede 0x106
+ * while preserving the packet constants' allocation; no linked build was run.
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the actual int return and pointer/signed-short inputs of func_00125F20.
  * The measured 680-byte USA near miss still differs in packet constant/address scheduling; no false call contract is used to close it.

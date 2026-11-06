@@ -1007,6 +1007,9 @@ FUNCTION_ENTRY_OFFSETS = {
     # Two 0xCDCDCDCD fill words after the previous return, then a syscall-0
     # stub; nothing enters the fill in US/PAL/US2; 6 November 2026.
     "func_0011A7F8": (24, 8),
+    # Seven 0xCDCDCDCD fill words after the previous return, then the privileged
+    # exception handler (k0, CP0, eret); nothing enters the fill in US/PAL/US2.
+    "func_0011F364": (636, 28),
 }
 
 
@@ -1019,7 +1022,8 @@ FUNCTION_DELAY_SLOTS = {
 }
 
 
-# Rows that end on `jr ra`: the delay slot belongs to them.
+# Rows with a measured wrong end, corrected once from that size. Most end on
+# `jr ra` and the delay slot belongs to them.
 FUNCTION_END_EXTRA = {
     "func_PAL_L00_003FB330": (832, -4),
     "func_PAL_L00_00418F28": (816, -4),
@@ -1038,6 +1042,11 @@ FUNCTION_END_EXTRA = {
     "func_US2_002AF9C8": (140, 4),
     "func_US2_002ECC48": (972, 4),
     "func_US2_L00_003C3BE8": (1604, 4),
+    # USA v1.01 boot and 27 levels: the VU0 routine ends at its `jr $ra` and delay
+    # slot (404 bytes). The 248 bytes after it are out-of-line blocks of
+    # func_002F1E88: only its branches enter them, they jump back into it and the
+    # last one restores the registers it saved. 6 November 2026.
+    "func_002F2758": (652, -248),
 }
 
 
@@ -1159,6 +1168,10 @@ FUNCTION_RESIDUES = {
     # return at all 27 placements of each release (in PAL the first word is the
     # predecessor's delay slot, see FUNCTION_DELAY_SLOTS); no reference enters it.
     "func_L00_00309DB0": 28,
+    # 6 November 2026: stack restores, nops and one orphan store after a completed
+    # return, boot only (US/US2 444 bytes, PAL 432); no reference enters them.
+    "func_00334550": 444,
+    "func_PAL_003361E8": 432,
 }
 
 
@@ -1583,6 +1596,8 @@ def catalogue() -> None:
     # Read named residues from the immutable input, including after their rows
     # have disappeared. Otherwise a second run can rename a surviving copy.
     for name, n in FUNCTION_RESIDUES.items():
+        if name.startswith(("func_PAL_", "func_US2_")):
+            continue                    # another release's address
         a = int(name.rsplit("_", 1)[1], 16)
         if name.startswith("func_L"):
             number = int(name.split("_")[1][1:])
@@ -1660,6 +1675,8 @@ def catalogue() -> None:
             if function_residue(original_name, n):
                 continue
             a, n = level_extent(number, a, n)
+            if original_name in FUNCTION_END_EXTRA:
+                a, n = function_extent(original_name, a, n)
             body = data[a - base:a - base + n]
             candidates = entry_keys.get((fingerprint(body, a), n), set())
             entry_name = (original_name if original_name in candidates else

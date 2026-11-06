@@ -72,7 +72,6 @@ typedef struct {
 
 
 
-INCLUDE_ASM("asm/levels", func_L05_0042AFE0);
 
 INCLUDE_ASM("asm/levels", func_L05_0042B2C0);
 

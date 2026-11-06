@@ -276,7 +276,7 @@ void func_L00_002A7A10(void)
 
 /* func_L00_002A7A50 is defined in L00_002A7A50-glow.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002A9460);
+/* func_L00_002A9460 is defined in L00_002A9460.c. */
 
 /* func_L00_002A9600 uses the quadword-copy profile in L00_002A9600-qcopy.c. */
 

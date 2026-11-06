@@ -103,8 +103,6 @@ void func_0027BA48(void)
   return;
 }
 
-INCLUDE_ASM("asm/game", func_0027BA68);
-
 /* Defined in 0027BD70-g8.c. */
 
 

@@ -1,3 +1,28 @@
+/* 6 November 2026, lead: the 2 real rows are sched1's register-weight tie-break: the store where `color` dies is issued first (writing color[1] last moves 0x44 first instead; color[0] last moves 0x40 first). Retail issues the uv[0] zero stores first, i.e. in retail `color` is still live after these stores or the zero stores outrank them; nothing in the current body keeps color live (it is reassigned before the second draw). */
+/* 6 November 2026: retained near miss, not linked or counted.
+ * USA v1.01: 868/868 bytes, 0/27 places, first mismatch +0x108.
+ * Reproduction unit: src/levels/shared/L00_002EC608-glow.c, default
+ * -O2 -G0 -ffunction-sections. Three instruction positions remain:
+ * +0x108/+0x10c/+0x110 emit color[0], uv[0][0], uv[0][1]; retail emits
+ * uv[0][0], uv[0][1], color[0]. All other non-relocation instructions agree.
+ * Rotate the initial vertex stores and color broadcasts as below to account
+ * for sched1 selecting the last use first. Updating tint at the second random
+ * alpha fixes its s3/matrix-s4 roles. A separate final white color fixes the
+ * first/final color registers and packing. Put the last two zero UV stores
+ * after colors.
+ * New negative results: integer-bit union UV zeros and an inline color-broadcast
+ * helper tie at three; reading the first color for the other colors changes
+ * which store moves early; one-pass groups around the real zero stores or first
+ * color store disrupt scheduling/allocation; measured volatile UV/color views
+ * worsen the result; a real descending broadcast loop with -funroll-loops is
+ * 912 bytes. No flags from these trials are retained. Private sched1/sched2
+ * dumps locate the early color store in sched1, before the UV stores.
+ * Reopen on a real lifetime/dependency that puts the two zero UV stores first.
+ * No alternate-release checks or linked builds were run for this attempt.
+ */
+/* Historical reconstruction notes below; the current source fixes the
+ * saved-register and packing differences described there.
+ */
 /* Nonmatching reconstruction, 2 November 2026. Replaces the old opcode screen.
  * Default -O2 -G0 -ffunction-sections: 868/868 bytes, 0/27 USA places,
  * first mismatch +0x1C. The real 0x130 frame and complete call sequence agree;
@@ -40,17 +65,17 @@ void func_L00_002EC608(float *position, int tint)
     GlowTransform transform;
     float rotation[4];
     float offset[4];
-    u32 color;
+    u32 color, white;
     float scale;
 
-    quad.point[1][1] = -2.0f;
-    quad.point[3][1] = 2.0f;
     quad.point[0][2] = -2.0f;
     quad.point[1][2] = 2.0f;
     quad.point[2][2] = -2.0f;
     quad.point[3][2] = 2.0f;
     quad.point[0][1] = -2.0f;
     quad.point[2][1] = 2.0f;
+    quad.point[1][1] = -2.0f;
+    quad.point[3][1] = 2.0f;
     quad.point[0][3] = 1.0f;
     quad.point[1][3] = 1.0f;
     quad.point[2][3] = 1.0f;
@@ -64,12 +89,12 @@ void func_L00_002EC608(float *position, int tint)
     color |= (u32)(tint >> 17) << 16;
     color |= (tint >> 9) & 0xFF00;
     color |= (tint >> 1) & 0xFF;
-    quad.uv[0][0] = 0; quad.uv[0][1] = 0;
-    quad.uv[1][0] = 0; quad.uv[1][1] = 1;
-    quad.uv[2][0] = 1; quad.uv[2][1] = 0;
+    quad.uv[1][1] = 1; quad.uv[2][0] = 1;
     quad.uv[3][0] = 1; quad.uv[3][1] = 1;
-    quad.color[0] = color; quad.color[3] = color;
-    quad.color[2] = color; quad.color[1] = color;
+    quad.uv[0][0] = 0; quad.uv[0][1] = 0;
+    quad.color[3] = color; quad.color[2] = color;
+    quad.color[1] = color; quad.color[0] = color;
+    quad.uv[1][0] = 0; quad.uv[2][1] = 0;
     rotation[3] = 0;
     rotation[2] = func_00283248(D_L00_001B8C80[0].position[0] - position[0],
                                D_L00_001B8C80[0].position[1] - position[1]);
@@ -93,16 +118,17 @@ void func_L00_002EC608(float *position, int tint)
     func_00282D30(quad.point[1], quad.point[1], 0.5f);
     func_00282D30(quad.point[2], quad.point[2], 0.5f);
     func_00282D30(quad.point[3], quad.point[3], 0.5f);
-    color = (u32)tint + ((u32)func_002A7820(64, 127) << 24);
-    quad.color[0] = color; quad.color[3] = color;
-    quad.color[2] = color; quad.color[1] = color;
+    tint += (u32)func_002A7820(64, 127) << 24;
+    color = tint;
+    quad.color[3] = color; quad.color[2] = color;
+    quad.color[1] = color; quad.color[0] = color;
     func_00280B90(&quad, &transform, 0);
     func_00282D30(quad.point[0], quad.point[0], 0.5f);
     func_00282D30(quad.point[1], quad.point[1], 0.5f);
     func_00282D30(quad.point[2], quad.point[2], 0.5f);
     func_00282D30(quad.point[3], quad.point[3], 0.5f);
-    color = ((u32)func_002A7820(64, 127) << 24) + 0x7F7F7F;
-    quad.color[0] = color; quad.color[3] = color;
-    quad.color[2] = color; quad.color[1] = color;
+    white = ((u32)func_002A7820(64, 127) << 24) + 0x7F7F7F;
+    quad.color[3] = white; quad.color[2] = white;
+    quad.color[1] = white; quad.color[0] = white;
     func_00280B90(&quad, &transform, 0);
 }

@@ -375,6 +375,31 @@ class DelaySlotBoundary(unittest.TestCase):
             self.fixture(Path(d), 0)
 
 
+class RoundElevenBoundaries(unittest.TestCase):
+    """6 November 2026: a fill-prefixed handler, a VU0 routine with foreign blocks after it, a residue."""
+
+    def test_handler_skips_its_fill(self):
+        self.assertEqual(levels.function_extent("func_0011F364", 0x11F364, 636), (0x11F380, 608))
+        self.assertEqual(levels.function_extent("func_0011F364", 0x11F380, 608), (0x11F380, 608))
+        with self.assertRaises(ValueError):
+            levels.function_extent("func_0011F364", 0x11F364, 640)
+
+    def test_vu0_routine_ends_at_its_delay_slot(self):
+        self.assertEqual(levels.function_extent("func_002F2758", 0x2F2758, 652), (0x2F2758, 404))
+        self.assertEqual(levels.function_extent("func_002F2758", 0x2F2758, 404), (0x2F2758, 404))
+
+    def test_boot_residue_in_each_release(self):
+        self.assertTrue(levels.function_residue("func_00334550", 444))
+        self.assertTrue(levels.function_residue("func_PAL_003361E8", 432))
+        with self.assertRaises(ValueError):
+            levels.function_residue("func_00334550", 432)
+
+    def test_unproved_entry_is_kept(self):
+        # A store at the start is not an entry witness (section 50).
+        self.assertNotIn("func_002DC3C8", levels.FUNCTION_RESIDUES)
+        self.assertNotIn("func_002DC3C8", levels.FUNCTION_ENTRY_OFFSETS)
+
+
 class AuditedIdentitySplit(unittest.TestCase):
     """Section 34: a fingerprint shared by two bodies is regrouped only by audited digests."""
 

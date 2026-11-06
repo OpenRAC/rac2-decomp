@@ -1,3 +1,10 @@
+/* 6 November 2026, round 3: the func_L11_004456A0 / func_00326A10 helper form (rounding first,
+ * then the dead `result != 0 && D_L02_001B3E00 == active` test) does not reach this one.
+ * Own -G8 unit: with an int `one` local as active, 936 (default) and 956 (-fno-gcse, with
+ * 0x8710/1.0f/0.0f as locals) bytes, `one` kept in $fp (retail has no unused save here);
+ * with a literal 1 the test folds early: 932 (-fno-gcse) / 944 (default). The earlier
+ * probe (dead store before the chain) still gives 964 bytes, 92 differing lines.
+ */
 /*
  * Opus 5.5 (xhigh), task v2169, 2026-11-03: body below unchanged (944/964 bytes
  * recompiled in its own -G8 unit here). Measured probe (NOT acceptable

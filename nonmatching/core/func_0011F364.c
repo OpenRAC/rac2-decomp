@@ -1,3 +1,4 @@
+/* 6 November 2026: entry corrected to 0x0011F380 (608 bytes, fill skipped) and marked ASM_FUNC in src/ (original assembly: CP0, eret, $at working register). */
 /* Retail classification, 2 November 2026; no C candidate or match.
  *
  * USA v1.01's 636-byte catalogue extent begins with seven 0xCDCDCDCD

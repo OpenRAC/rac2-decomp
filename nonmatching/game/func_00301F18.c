@@ -1,3 +1,31 @@
+/* 6 November 2026, lead: last call func_00282CC0(origin, origin, &position): retail a0, a2, then a1 (= copy of a0) in the jal slot; ours a0, a1, a2-in-slot. The previous call already gets retail's a2-first order (a2 = s0). Spelling the second or first argument as object+0x10 grows to 904 B; a block-local dst copy ties. */
+/* 6 November 2026, Codex follow-up: retained best source still 900/900 bytes,
+ * 0/28 USA places, only +0x31c/+0x324 differ (last add's a1/a2 setup).
+ * New pointer aliases for the position/origin at the group boundary and an
+ * actual inline add helper reproduce those two differences. Computing the
+ * origin again after the first add adds four bytes. Extending the large group
+ * through the last add while grouping either the real angle-basis call or the
+ * fallback angle copy disturbs allocation/scheduling. Grouping both optional
+ * output copies adds four alignment bytes. A separate group around the last
+ * add restores the old s7/fp swap. None improves the retained source below.
+ * Reopen on the real last-call dependency, not another folded pointer alias.
+ * No alternate-release checks or linked builds were run in this follow-up.
+ */
+/* 6 November 2026: one-pass group (docs/COMPILER-NOTES.md:54) from the parent-state test
+ * through the first func_00282CC0, with an `origin = object + 0x10` local for the three
+ * tail calls. Same profile and unit; 900/900 bytes, 0/28 USA places, 2 words left (was 8):
+ * the group weights &angles above &position, so retail's s7/fp roles come out, and
+ * `origin` keeps the address in s4 after the group. Left: the last func_00282CC0 sets
+ * a1 (copy of a0) before a2 = &position; retail sets a2 first and puts the a1 copy in
+ * the jal slot. The group's end splits that block. Measured worse: groups only around
+ * the anchor func_002833F0 (7: first jal slot, object+0xC0 placement), only around the
+ * tail copies (+4 nop, s5/s6 swap), the end after the last call (s7/fp back), a `frame`
+ * local for object+0xC0 (3-6). Next: a form where the last call's a1 is not a copy of
+ * a0 at sched1 while the group still ends before it.
+ * Second pass, same day, no change: a pointer local for &position (set before or inside
+ * the group), mixed object+0x10/origin arguments (904 bytes), casts, a group around the
+ * tail copies or the last call.
+ */
 /* 4 November 2026: a genuine two-vector anchor aggregate was tested with
  * the existing qcopy/qcopy-barrier profile in the assigned production unit.
  * It remains 900/900 bytes, 0/28 USA placements, first mismatch +0x60:
@@ -48,12 +76,15 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     char *parent;
     float step, tilt, radius, lift;
     int detach;
+    u8 *origin;
     if (*(char **)(state+0x5c)) {
         func_002AD470(object,*(char **)(state+0x5c),state,state+0x10,&position,&angles);
     } else {
         qcopy(&position, state);
         qcopy(&angles, state+0x10);
     }
+    origin = object+0x10;
+    do {
     if (object[0x20]==3 && *(char **)(state+0x5c)) {
         parent=*(char **)(state+0x5c);
         detach=0;
@@ -92,10 +123,11 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     func_002833F0(spinMatrix,&rotation);
     func_002833F0(anchorMatrix,&angles);
     func_00283738(object+0xc0,anchorMatrix,spinMatrix);
-    func_00282D30(object+0x10,&anchorMatrix[2],radius);
+    func_00282D30(origin,&anchorMatrix[2],radius);
     func_00282D30(&offset,object+0xc0,lift);
-    func_00282CC0(object+0x10,object+0x10,&offset);
-    func_00282CC0(object+0x10,object+0x10,&position);
+    func_00282CC0(origin,origin,&offset);
+    } while (0);
+    func_00282CC0(origin,origin,&position);
     if (outPosition) qcopy(outPosition, &position);
     if (outAngles) qcopy(outAngles, &angles);
 }

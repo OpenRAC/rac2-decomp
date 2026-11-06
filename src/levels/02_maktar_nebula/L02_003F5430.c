@@ -969,7 +969,6 @@ INCLUDE_ASM("asm/levels", func_L02_003FE250);
 
 INCLUDE_ASM("asm/levels", func_L02_003FE8B8);
 
-INCLUDE_ASM("asm/levels", func_L02_003FF6E8);
 
 /* func_L02_003FF9A0 is defined in L02_003F5430-g8.c ($gp accesses). */
 

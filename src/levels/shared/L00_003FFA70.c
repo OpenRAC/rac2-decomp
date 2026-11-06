@@ -64,7 +64,6 @@ void func_L00_003FFA70(char *arg)
 
 /* func_L00_003FFBA0 is defined in L00_003FFBA0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_004003F0);
 
 /* func_L00_004005B0 is matched in L00_004005B0-g8.c (a -G8 unit built with -frac2-qcopy
    -frac2-qcopy-barrier). */

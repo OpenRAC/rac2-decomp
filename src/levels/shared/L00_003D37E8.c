@@ -553,7 +553,6 @@ void func_L00_003DD680(char *p)
 
 /* func_L00_003DD6A8 lives in L00_003DD6A8-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003DDEC8);
 
 /* func_L00_003DE088 lives in L00_003DE088-g8.c. */
 

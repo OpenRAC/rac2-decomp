@@ -1,3 +1,16 @@
+/* 6 November 2026, round 4: best body below (492/492, 0/2 places, 10 words). Own unit
+ * (src/levels/shared/L04_00416E38.c), -O2 -G0 -ffunction-sections -fno-gcse. The
+ * func_00326A10 dead-test rounding helper gives the ghost $s2 and the block boundaries;
+ * `ky = 371.0f` after the first rounding gives retail's f22/f21 roles, and the floats-first
+ * prototype of func_0029B658 (as func_L04_00417028's note) gives the second draw's argument
+ * order. Left: the second draw's two rounding results in v1 (retail v0; the regalloc dump
+ * shows each result conflicting with the dead mode load, local-allocated to v0, and with
+ * hard v0 from the fix scratch), x4's load/temporary v0/v1 swapped and x4/y4 in s1/s0
+ * (x4 has 2 refs, y4 3). Hill-climb over declaration and top-assignment order (350 runs,
+ * scratchpad m5g/hc.py) found nothing better. `x4 = D; x4 /= 2;` puts x4 in s0 but loads
+ * into it (14 rows); nested y4, a width temporary, swapped test operands: no change;
+ * a group around x4 (26), the dead-store-before helper (476 bytes), y4 first (size change).
+ */
 /* func_L04_00416E38 - 492 bytes, places 04:00416E38 and 11:00406938.
  * Retained C below: tier opus-1 (v1645), rechecked by opus-2 (v1724), 31 October 2026.
  * Tier opus-2 (v1823), 31 October 2026: C below retained, recompiled here: 488/492, 0/2 places, 95 cdiff
@@ -90,36 +103,50 @@
  * Next: find the original construct that ends a block after each rounding but leaves no
  * branch (compare func_0033C028's identical-arm if, already in src/), and the $s2 pseudo.
  */
-#include "include_asm.h"
+#include "common.h"
 
 extern float D_L04_001B2D44 __attribute__((sda));
+extern int D_L04_001B2D40 __attribute__((sda));
 extern int D_001A7340 __attribute__((sda));
 extern void func_0027EB88(int, int, int, int, int, int);
-extern void func_0029B658(int, int, float, float, float, float);
+extern void func_0029B658(float, float, float, float, int, int);
 extern void func_002802E0(void *, int, int, int, int, int, int, int, int);
 extern char *func_00288FB8(int);
 extern void func_00280200(void *, unsigned long long, char *, int);
 extern int func_0027FB40(int, int, unsigned long long, char *, int);
 
-#define SCALE(v, k) do { s = D_L04_001B2D44; f = s * (k); f += 0.5f; v = f; } while (0)
+static __inline__ int menu_coord(float value, float scale, float half, int active)
+{
+    float scaled = scale * value + half;
+    int result = (int)scaled;
+
+    if (result != 0 && D_L04_001B2D40 == active)
+        scaled = 1.0f;
+    return result;
+}
 
 void func_L04_00416E38(void) {
     char box[32];
-    float s, f;
-    int x1, y1, x2, y2, x3, y3, x4, y4;
-    int color;
-    SCALE(x1, 263.0f);
-    SCALE(y1, 371.0f);
+    float s, half, ky, kx;
+    int x1, y1, x3, y3, x4, y4, on;
+
+    half = 0.5f;
+    on = 1;
+    kx = 263.0f;
+    s = D_L04_001B2D44;
+    x1 = menu_coord(kx, s, half, on);
+    ky = 371.0f;
+    y1 = menu_coord(ky, s, half, on);
     func_0027EB88(x1, y1, 130, 384, 96, 0x60442D00);
-    SCALE(x2, 263.0f);
-    SCALE(y2, 371.0f);
-    func_0029B658(96, 0x55F0C070, (float)x2, (float)y2, 130.0f, 384.0f);
-    SCALE(x3, 222.0f);
-    SCALE(y3, 479.0f);
+    s = D_L04_001B2D44;
+    func_0029B658((float)menu_coord(kx, s, half, on), (float)menu_coord(ky, s, half, on),
+                  130.0f, 384.0f, 96, 0x55F0C070);
+    s = D_L04_001B2D44;
+    x3 = menu_coord(222.0f, s, half, on);
+    y3 = menu_coord(479.0f, s, half, on);
     func_002802E0(box, x3, y3, 44, 468, 256, 299, 16, 3);
-    color = 0x80F0F0F0;
-    func_00280200(box, color, func_00288FB8(0xA41), -1);
+    func_00280200(box, (int)0x80F0F0F0, func_00288FB8(0xA41), -1);
     x4 = D_001A7340 / 2;
-    SCALE(y4, 349.0f);
-    func_0027FB40(x4, y4, color, func_00288FB8(0x2F2C), -1);
+    y4 = menu_coord(349.0f, D_L04_001B2D44, half, on);
+    func_0027FB40(x4, y4, (int)0x80F0F0F0, func_00288FB8(0x2F2C), -1);
 }

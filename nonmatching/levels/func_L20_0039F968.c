@@ -1,3 +1,34 @@
+/* 6 November 2026, round 7: body unchanged (996/996, 0/1, 9 rows). Cause found: retail's
+ * src base needs cse1 NOT to relate D-16 to the dst's D (then loop keeps (i*400 + reg[D-16]) and
+ * cse2 later turns it into D - 16), while cse2 must. Only a LOOP_END between them does that
+ * inside the body (cse.c stops there before loop), so every in-body group adds the exit-label
+ * alignment nop. A dst base pseudo `tab = D` before the loop (`&tab[i][h]`, bare D for src) gives
+ * retail's exact copy-loop registers and sum; with the `history` local removed too it is 9 rows,
+ * but D's lui/addiu land before the blez (source order). Behind `if (last > 0)` loop pass 2
+ * hoists tab out of the outer loop (same block as its uses), 980-988 bytes. Row = D[i] forms:
+ * 17 rows (hoisted high(D) takes $s1). ~135 compiles; dead ends: outer-loop row (44), index
+ * forms, src-first, `history` for either side, -fno-rerun-loop-opt, -fmove-all-movables.
+ */
+/* 6 November 2026, round 4 (second pass): best body below, 996/996, 0/1, 9 rows (was ~33).
+ * Profile -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier (rerun-loop-opt ON).
+ * The copy loop as `qcopy_nc(&D[i][h], &D[i][h - 1])` fixes the prologue s1/s2, keeps state in
+ * fp, and the point-loop preheader now matches. Only the copy-loop setup is left (+0xAC..+0x10C).
+ * This is the func_L00_003C4F78 problem: the start is (last*16 + i*400) + (D-16), but retail has
+ * last*16 + (i*400 + (D-16)). That match's fix (two-step dst in a do/while(0) group in the loop)
+ * gets the right shape here too, but the group's LOOP_BEG aligns the loop's exit label (0x0039FA74,
+ * unaligned in retail): +1 nop, 1004 bytes. `&D[i][-1] + h` gets the shape (the 0xFFFFFFF0 offset
+ * stops cse1 relating it), but then D-16 is its own lui/addiu (24 rows). Block locals row/prev
+ * inside `if (h > 0)`: rerun moves the table address into fp (988); before the guard: 17 rows.
+ * Group form + -malign-loops=2 (with or without -frac2-hazard-labels): 984-988 bytes, because
+ * retail's nops at +0x6C and +0xEC are real loop-head alignment. Hill-climb over declaration and
+ * last/speed order (40 tries): no change from 9 rows.
+ */
+/* 6 November 2026: retained source unchanged (996/996, 0/1). Copy-loop source as
+ * `(&D_L20_00234880[0][-1] + i * 25)[h]` (or a cast to Vector (*)[25]) gives retail's grouping
+ * last*16 + (i*400 + (base-16)), but base-16 is then its own lui/addiu and comes before base;
+ * retail derives it from base (addiu a1,v0,-0x10), so base must be live first. Pointer-pair and
+ * `prev = &D[i][-1]` forms are worse (68-192 rows).
+ */
 /* Claude Opus 5.5 (opus-1, xhigh) worker, task v2165, 2026-11-03.
  * USA v1.01: 996/996 bytes, 0/1 places; first difference +0xB0. About 36 of
  * 249 rows differ once relocations are ignored, all in two places:
@@ -73,7 +104,8 @@ void func_L20_0039F968(unsigned char *object) {
             if (counts[i] > 24) counts[i] = 25;
             last = counts[i] - 1;
             speed = D_L20_001AED58;
-            for (historyIndex = last; historyIndex > 0; --historyIndex) D_L20_00234880[i][historyIndex].q = D_L20_00234880[i][historyIndex - 1].q;
+            for (historyIndex = last; historyIndex > 0; --historyIndex)
+                qcopy_nc(&D_L20_00234880[i][historyIndex], &D_L20_00234880[i][historyIndex - 1]);
             head = history[i];
             func_002AB668(&rotation, (int)&D_L20_00235500[i], speed * 0.017453294f);
             func_002ACDE8(head, head, &rotation);

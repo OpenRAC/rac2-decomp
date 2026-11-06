@@ -545,7 +545,123 @@ void func_002F9198(void)
 }
 
 
-INCLUDE_ASM("asm/game", func_002F93B0);
+extern int D_001B2240, D_001B223C;
+extern int D_001B2244 __attribute__((sda));
+extern int D_00139688[];
+extern void func_0028B6C8(int, unsigned int);
+extern int func_002F6510(void);
+extern void func_002F9198(void);
+
+typedef struct { int id, kind; int fields[4]; } ShopRow_93;
+typedef struct {
+    char pad0[0x28]; char *moby; char pad2C[0x24];
+    int mode; char pad54[0x18]; int scroll;
+    char pad70[8]; int handle; char pad7C[4]; int selected;
+    int busy; int animated; char pad8C[4]; int animation;
+    char pad94[0xAC]; ShopRow_93 rows[64]; int count;
+} ShopInput_93;
+extern ShopInput_93 F93State __asm__("D_0021F240");
+typedef struct { char pad[0x1C4]; int buttons; } Input_93;
+void func_002F93B0(void)
+{
+    ShopInput_93 *state = &F93State;
+    int cost;
+    char *record;
+    if (state->busy) return;
+    {
+        Input_93 *input = (Input_93 *)D_00138180;
+        if ((input->buttons & 0x2000) ||
+                (D_001B2240 >= 16 && D_001B2240 % 10 == 1)) {
+            if (state->scroll < 57) {
+                int moved = 0;
+                if (state->selected < state->count - 1) {
+                    ++state->selected;
+                    moved = 1;
+                }
+                if (moved) {
+                    if (state->animated) {
+                        int animation = 3;
+                        if (state->mode != 2) animation = 1;
+                        state->animation = animation;
+                    }
+                    state->scroll += 56;
+                    func_002E5CF8(1, 17, state->moby);
+                    if (state->handle != -1) {
+                        if (state->mode == 0)
+                            func_0028B6C8(state->handle, 0);
+                    }
+                    F93State.handle = -1;
+                }
+            }
+        }
+    }
+    {
+        Input_93 *input = (Input_93 *)D_00138180;
+        ShopInput_93 *state;
+        if ((input->buttons & 0x8000) ||
+                (D_001B223C >= 16 && D_001B223C % 10 == 1)) {
+            state = &F93State;
+            if (state->scroll >= -56) {
+                int moved = 0;
+                if (state->selected > 0) {
+                    --state->selected;
+                    moved = 1;
+                }
+                if (moved) {
+                    if (state->animated) {
+                        int animation = 3;
+                        if (state->mode != 2) animation = 1;
+                        state->animation = animation;
+                    }
+                    state->scroll -= 56;
+                    func_002E5CF8(1, 17, state->moby);
+                    if (state->handle != -1) {
+                        if (state->mode == 0)
+                            func_0028B6C8(state->handle, 0);
+                    }
+                    F93State.handle = -1;
+                }
+            }
+        }
+    }
+    {
+        Input_93 *input = (Input_93 *)D_00138180;
+        ShopInput_93 *state;
+        if (((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode != 3) ||
+            ((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode == 3 &&
+             *(int *)((char *)&F93State + 0x144 + F93State.selected * 12) != 0)) {
+                state = &F93State;
+                if (state->mode == 0) {
+                    int stride = sizeof(ShopRow_93);
+                    int *kinds = &state->rows[0].kind;
+                    if (*(int *)((char *)kinds + state->selected * stride) == 0) {
+                        cost = func_002F6510();
+                        if ((*(int *)&D_001A79F8) >= cost) goto activate;
+                    }
+                    if (*(int *)((char *)kinds + state->selected * stride) != 1) goto rejected;
+                    {
+                        int id = state->rows[state->selected].id;
+                        int owned = D_00139688[id];
+                        record = (char *)D_00239BA0 + D_00139568[id] * 224;
+                        if (owned >= *(unsigned short *)(record + 0x8E)) goto rejected;
+                    }
+                    if ((*(int *)&D_001A79F8) < *(unsigned short *)(record + 0x88)) goto rejected;
+                }
+activate:
+                {
+                    ShopInput_93 *active = &F93State;
+                    if (active->animated) active->animation = 1;
+                    active->busy = 1;
+                    func_002E5CF8(0, 17, active->moby);
+                    goto finish;
+                }
+rejected:
+                func_002E5CF8(2, 17, F93State.moby);
+        }
+    }
+finish:
+    if (((Input_93 *)D_00138180)->buttons & 0x10) func_002F9198();
+}
 
 extern void func_002F93B0(void);
 

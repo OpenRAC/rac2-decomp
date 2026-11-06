@@ -1,3 +1,22 @@
+/* 6 November 2026, lead: 24-run hill-climb over the four group statements gives 18 real rows (from 19); source below is that order. Reusing sp or n for start (19, 118), the loop bound as n (68) and a block-local h = D_001A7344 >> 1 (18) do not help. */
+/* 6 November 2026, round 2: new best C below (644/644, 0/28 USA, 19 words, was 25).
+ * One group holding sp, n, half = (float)n * 0.5f and spf = (float)sp puts its loop-end
+ * note between the (float)sp conversion and the D_001A7344 load: the whole centring block
+ * now has retail's instruction order. Only registers differ: count a0/v0/v1 for retail's
+ * a1/a0/v0 (count/sp/height), and 23A4 f1, 0.5 f2, half f1 for retail's f2/f1/f3.
+ * Swapping the group to n, half, sp, spf gives retail's FPRs but loads the count first.
+ * A plain `extern int D_001A7344[];` (split %hi pseudo) gives 18 words: height v0 but %hi
+ * in v1 and sp still v0. -dg dump: sp is a local-alloc quantity, and v0/v1 are free during
+ * its life, so retail needs a GPR quantity live across the fix that this form lacks.
+ * No change from: n before sp, half = 0.5f * n, 0.5f + product, h = D_001A7344 >> 1 in or
+ * before the group (22-25 words).
+ */
+/* 6 November 2026: retained source below unchanged (644/644, 0/28 USA, 25 words).
+ * Retail loads D_001AE5F0 ($gp), D_001B23A4 and the count, then D_001A7344 last; this
+ * source loads D_001B23A4 first and D_001A7344 before the count. No change from: count
+ * read before sp, a `half` or `scale` local, menu->count in place of n, swapped product
+ * operands; a one-pass group around sp or start gives 23-26 words.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 644/644 bytes, 0/28 placements; first difference 0x98.
  * Profile: -O2 -G8 -ffunction-sections.
@@ -80,6 +99,7 @@ void func_00348EC0(char *o)
 {
     int color = func_002A9588(0x20FFFEED, 0x70FFFEED, 20, 0, 0);
     int start, i, n, sp;
+    float half, spf;
     ListMenu *menu = (ListMenu *)o;
 
     if (menu->enabled) {
@@ -88,9 +108,13 @@ void func_00348EC0(char *o)
         func_00336320(o + 0x4C);
         func_00336320(o + 0x98);
         func_00336320(o + 0xE4);
-        sp = (int)(D_001AE5F0 * D_001B23A4[0] + 0.5f);
-        n = menu->count;
-        start = (int)((float)(D_001A7344[0] >> 1) - (float)sp * ((float)n * 0.5f));
+        do {
+            sp = (int)(D_001AE5F0 * D_001B23A4[0] + 0.5f);
+            half = (float)n * 0.5f;
+            spf = (float)sp;
+            n = menu->count;
+        } while (0);
+        start = (int)((float)(D_001A7344[0] >> 1) - spf * half);
         if (n > 0) {
         i = 0;
         do {
@@ -121,3 +145,4 @@ void func_00348EC0(char *o)
         }
     }
 }
+

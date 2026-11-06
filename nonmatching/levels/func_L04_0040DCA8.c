@@ -1,4 +1,28 @@
-/* 3 November 2026: owning vector/UV storage; still not matching.
+/* 6 November 2026, round 5: corner-store order 3 words off (was 5);
+ * USA v1.01 default -O2 -G0 -ffunction-sections, 740/740, 0/6 places.
+ * A hill-climb over the corner field stores (same values, clears first)
+ * found the order below. Retail stores c2.z, c3.z, c2.y at +0x224/+0x230/
+ * +0x238; this C stores c2.y, c2.z, c3.z there. Frame 0x1A0 vs 0x1D0 is
+ * unchanged (48-byte gap before the corners in retail). No further gain
+ * from: a named h or h/-h pair, 1-3 move climbs, moving the four clears.
+ */
+/* 6 November 2026: defined UV cursor storage recovers 740/740 bytes;
+ * USA v1.01 default -O2 -G0 -ffunction-sections, 0/6 places. Retained, not linked.
+ * Walk both UV components through the complete packet's unsigned-byte object
+ * representation. Both cursors remain inside that object, including the final
+ * v cursor at packet+0x74; no float-array pointer advances beyond its bound.
+ * A separate UV counter and block-local v cursor recover retail's entire UV
+ * loop, allocation and delay slots. The union-owned corners remain defined.
+ * Remaining: frame 0x1A0 versus 0x1D0, corner/save offsets lower by 0x30, and
+ * five corner-store words at +0x224..+0x238. No unused rotation array or
+ * artificial stack padding was introduced to fill that independently open gap.
+ * New negative trials: same-scope byte cursors 744/740; separate counter but
+ * same-scope cursors 740/740 with u/v registers swapped; one union containing
+ * both complete corner views ties the latter. Grouping both positive-height
+ * stores gives 748/740; grouping only the first gives 748/740 and disrupts
+ * preceding scheduling. Reopen on evidenced stack storage and the store DAG.
+ */
+/* Historical, 3 November 2026: owning vector/UV storage; still not matching.
  * Default game -O2 -G0 -ffunction-sections. US, PAL and US2 each:
  * 728/740 bytes, 0/6 places. This supersedes the historical 740-byte draft.
  * Corners use complete quadword/float unions, with each input and output
@@ -55,7 +79,7 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     Corner corners[4];
     float c, sn;
     float *out;
-    UVPair *uv;
+    u8 *u;
     int i;
     func_00281DE8(&packet, texture, flags, 128);
     packet.state[0] = 5;
@@ -64,13 +88,17 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     packet.uv[2].u = 1; packet.uv[2].v = 0; packet.uv[3].u = 1; packet.uv[3].v = 1;
     c = func_00283180(angle);
     sn = func_00283198(angle);
-    for (i = 3, uv = packet.uv; i >= 0; i--, uv++) {
-        tmp[0] = uv->u - 0.5f;
-        tmp[1] = uv->v - 0.5f;
-        uv->u = tmp[0] * c - tmp[1] * sn;
-        uv->v = tmp[0] * sn + tmp[1] * c;
-        uv->u += 0.5f;
-        uv->v += 0.5f;
+    {
+        int k;
+        u8 *v = (u8 *)&packet + 0x54;
+        for (u = (u8 *)&packet + 0x50, k = 3; k >= 0; k--, u += 8, v += 8) {
+            tmp[0] = *(float *)u - 0.5f;
+            tmp[1] = *(float *)v - 0.5f;
+            *(float *)u = tmp[0] * c - tmp[1] * sn;
+            *(float *)v = tmp[0] * sn + tmp[1] * c;
+            *(float *)u += 0.5f;
+            *(float *)v += 0.5f;
+        }
     }
     qcopy(transform[3], position);
     func_00282CF0(transform[0], D_L04_001B9680, transform[3]);
@@ -81,12 +109,18 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     func_00282D30(offset, transform[0], size);
     func_00282CC0(transform[3], transform[3], offset);
     corners[0].bits = 0; corners[1].bits = 0; corners[2].bits = 0; corners[3].bits = 0;
-    corners[0].f[1] = -1; corners[1].f[1] = -1;
+    corners[0].f[1] = -1;
+    corners[3].f[2] = -(1 - skew * 0.3f);
     corners[0].f[3] = 1;
-    corners[2].f[2] = 1 - skew * 0.3f; corners[0].f[2] = 1 - skew * 0.3f;
+    corners[2].f[1] = 1;
     corners[1].f[3] = 1;
-    corners[3].f[2] = -(1 - skew * 0.3f); corners[1].f[2] = -(1 - skew * 0.3f);
-    corners[2].f[1] = 1; corners[2].f[3] = 1; corners[3].f[1] = 1; corners[3].f[3] = 1;
+    corners[2].f[2] = 1 - skew * 0.3f;
+    corners[2].f[3] = 1;
+    corners[0].f[2] = 1 - skew * 0.3f;
+    corners[1].f[2] = -(1 - skew * 0.3f);
+    corners[1].f[1] = -1;
+    corners[3].f[1] = 1;
+    corners[3].f[3] = 1;
     for (i = 0; i < 4; i++) {
         out = packet.vertices[i];
         func_00282D30(out, corners[i].f, scale);
