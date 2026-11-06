@@ -1,3 +1,39 @@
+/* 6 November 2026, Codex follow-up: best retained C below is 736/736 bytes,
+ * 0/2 USA v1.01 places (04:00417028, 11:00406B28), seven instruction words off
+ * at each place, excluding relocation values. US2/PAL identity remains absent.
+ * Trial unit: src/levels/shared/L04_00417028.c, own profile
+ * -O2 -G0 -ffunction-sections -fno-gcse. No linked build run (lead's task).
+ * This supersedes the earlier claim that the shared rounding helper cannot carry over:
+ * initialize active = 1 AFTER the formatter branches, convert each second-box result
+ * immediately to its float local, and use a plain final conversion in a nonempty group.
+ * The active lifetime then fits the existing saved registers; no extra save is needed.
+ * Reusing s for the final 118.0f factor gives retail's final FP load/multiply order.
+ * Both 64-byte buffers and the real four-FP rectangle interface are preserved.
+ *
+ * Remaining differences, relative to the function entry:
+ * +0x204/+0x20C: second-box x rounding goes through v1 instead of retail's v0.
+ * +0x270/+0x274/+0x27C/+0x280/+0x288: final width/divide temporaries are tied
+ * to s0, whereas retail loads/adds in v1 and only the final sra writes s0.
+ * All other instruction words agree after relocation masks; check.py reports
+ * "instruction at +0x204 differs" in each place, not a match.
+ *
+ * New measured attempts (~200 checks): conversion-only groups initially gave
+ * 736/736 and 46 words off. Immediate FP conversion plus last-factor reuse gave
+ * 42; additional real nested groups reached 40. The helper with active after
+ * formatting and immediate FP conversions reached 14, direct final scale 10,
+ * then the plain grouped final cast reached seven. Reusing necessary integer
+ * roles, splitting/reordering the final divide, explicit signed-half arithmetic,
+ * nested groups on actual operations and helper result/return groups did not
+ * improve seven. A float-returning rounding helper fixes the x result register
+ * but pins its FP conversion ahead of y's multiply (nine words total).
+ * Using a source divisor local for /60 changes the formatter's trap/divide body;
+ * keeping active across the formatter adds saved-register/formatting differences.
+ * All retained locals are initialized before use; no instruction primitives,
+ * register pins, synthetic volatile accesses or dummy operations are retained.
+ * Next useful experiment: establish the original rounding-result lifetime that
+ * avoids the dead mode-load/fix scratch v0 conflict, and a genuine cross-block
+ * lifetime for the final width numerator. Avoid repeating pure reorder/group trials.
+ */
 /* 6 November 2026, round 3: the func_00326A10 dead-test rounding helper does not carry over
  * (732/736, own -O2 -G0 -fno-gcse unit). Retail has no unused save here (s1 = 60 divisor,
  * s2 = prefix, s0 = format), so `active` must not be a call-crossing local; with literal 1
@@ -72,22 +108,45 @@ extern char D_L04_001B0B38[];
 extern float D_L04_001B2D44 __attribute__((sda));
 extern int D_001A7340 __attribute__((sda));
 
-static __inline__ int ftoi(float f) {
-    return (int)f;
+extern int D_L04_001B2D40 __attribute__((sda));
+/* The shared HUD rounding helper; the dead mode arm leaves a scheduling boundary. */
+static __inline__ int menu_coord(float value, float scale, float half, int active)
+{
+    float scaled = scale * value + half;
+    int result = (int)scaled;
+
+    if (result != 0 && D_L04_001B2D40 == active)
+        scaled = 1.0f;
+    return result;
 }
 
 void func_L04_00417028(void) {
+    float s, t, half, kx, ky;
+    int x1, y1, x4, y4, active;
+    float fx, fy;
     char text[64], prefix[64];
     func_00115DA8(prefix, func_00288FB8(0x2F82), D_L04_001A8FE4);
     if (D_L04_001B0920_gp / 60 % 60 < 10)
         func_00115DA8(text, D_L04_001B0B20, prefix, func_00288FB8(0x2F83), D_L04_001B0920_gp / 216000, D_L04_001B0920_gp / 3600 % 60, D_L04_001B0920_gp / 60 % 60, D_L04_001B0920_gp / 6 % 10);
     else
         func_00115DA8(text, D_L04_001B0B38, prefix, func_00288FB8(0x2F83), D_L04_001B0920_gp / 216000, D_L04_001B0920_gp / 3600 % 60, D_L04_001B0920_gp / 60 % 60, D_L04_001B0920_gp / 6 % 10);
-    func_0027EB88(ftoi(D_L04_001B2D44 * 112.0f + 0.5f), ftoi(D_L04_001B2D44 * 142.0f + 0.5f), 50, D_001A7340 - 50, 96, 0x60442D00);
-    func_0029B658((float)ftoi(D_L04_001B2D44 * 112.0f + 0.5f), (float)ftoi(D_L04_001B2D44 * 142.0f + 0.5f), 50.0f, (float)(D_001A7340 - 50), 96, 0x55F0C070);
-    {
-        int x = D_001A7340 / 2;
-        int y = ftoi(D_L04_001B2D44 * 118.0f + 0.5f);
-        func_0027FBD8(x, y, 0x80F0F0F0ULL, text, func_001157AC(text));
-    }
+    active = 1;
+    half = 0.5f;
+    kx = 112.0f;
+    s = D_L04_001B2D44;
+    x1 = menu_coord(kx, s, half, active);
+    ky = 142.0f;
+    y1 = menu_coord(ky, s, half, active);
+    func_0027EB88(x1, y1, 50, D_001A7340 - 50, 96, 0x60442D00);
+    s = D_L04_001B2D44;
+    fx = (float)menu_coord(kx, s, half, active);
+    fy = (float)menu_coord(ky, s, half, active);
+    func_0029B658(fx, fy, 50.0f, (float)(D_001A7340 - 50), 96, 0x55F0C070);
+    x4 = D_001A7340 / 2;
+    s = 118.0f;
+    t = D_L04_001B2D44 * s + half;
+    do {
+        y4 = (int)t;
+    } while (0);
+    func_0027FBD8(x4, y4, 0x80F0F0F0ULL, text, func_001157AC(text));
 }

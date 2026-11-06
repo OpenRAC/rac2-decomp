@@ -712,6 +712,5 @@ char *func_L13_00412748(float size, char *position, int trigger, int kind, int r
 
 /* func_L13_00412C18 is matched in L13_00412C18-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L13_0041AB30);
 
 INCLUDE_ASM("asm/levels", func_L13_0041AD00);

@@ -1,3 +1,16 @@
+/* 6 November 2026, Codex follow-up: best C unchanged, 900/900 bytes,
+ * 0/28 places in USA v1.01, PAL and USA v2.00 after check.py --diff rechecks.
+ * Byte-addressed clip-field writes, paired-axis/nested-axis rectangle layouts,
+ * switch/goto guards and second/texture scalar reuse still tie at two words.
+ * An inline rectangle-return constructor gives 940 bytes for all 24 argument
+ * orders. Groups spanning colour writes/initialization give 904 bytes; grouping
+ * only the clipping call gives 900 bytes but eight real instruction differences.
+ * -malign-loops=2 removes the required nop at +0xB4: control and all 21 contiguous
+ * initialization groups are 896 bytes, so it cannot fix the group's extra nop.
+ * Reusing first for nonzero bounds changes 37-42 real instructions. No source
+ * improved the +0x230/+0x234 store swap; no linked build was run.
+ */
+/* 6 November 2026, round 9: still 2 words. sched1 dumps: the x0 store (p4, weight 0) is ready at t1, so retail's order needs a fifth weight -1 store in the t3 memory slot (the flag store, which only reaches p3). Tied: all 120 orders with the flag as a field of a 20-byte state at D_001B23B0 (also with the copy before the flag store), flag `++`/`+= 1`, `y1 = y0 + 277`, inner-scope clip, inline field/copy helpers (use a $s address register), volatile width (no new deps), and -frac2-qcopy(-barrier), -g, -fno-expensive-optimizations, -fstrict-aliasing, -fno-gcse, -fno-sched-interblock. */
 /* 6 November 2026, lead: the only real difference is the order of two stack stores into clip: retail y0, x1, y1, x0; ours y0, y1, x1, x0. Direct stores to menuClipGP (864 B), loading screenWidthGP (or width-1) into a local before the if (7-12 rows), x1 written last, and struct initializers / compound literal (932-964 B) all fail. */
 /* 6 November 2026: current game compiler, -O2 -G8 -ffunction-sections:
  * 900/900 bytes, 0/28 places in each release; only the +0x230/+0x234 stores

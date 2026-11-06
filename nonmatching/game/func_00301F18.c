@@ -1,3 +1,13 @@
+/* 6 November 2026, round 9: no change (2 words). -frac2-sticky-volatile-refs: same 2 words.
+ * Cause (sched dumps): the group's LOOP_END note makes the first insn after it (a0 = origin)
+ * a barrier, so a1 and a2 tie and luid puts a1 first. With no barrier in that block the order
+ * is retail's. Measured all group spans (start x end, 59 runs): ends before the last two calls
+ * fix the last call but flip the func_00283738 or 2nd-last func_00282CC0 arg order (4-6 words);
+ * end after the 2nd func_002833F0 needs object+0xc0 early (a `frame` local) and then leaves
+ * func_00283738's a0/a1/a2 order (3 words). Defining origin only after the group (group uses
+ * object+0x10) gives the last call retail's order (sched1 puts a2 before a1) but rebuilds a0 from
+ * s3 and flips the 2nd-last call (4 words); recomputing origin with a live origin is 904-908 B.
+ */
 /* 6 November 2026, lead: last call func_00282CC0(origin, origin, &position): retail a0, a2, then a1 (= copy of a0) in the jal slot; ours a0, a1, a2-in-slot. The previous call already gets retail's a2-first order (a2 = s0). Spelling the second or first argument as object+0x10 grows to 904 B; a block-local dst copy ties. */
 /* 6 November 2026, Codex follow-up: retained best source still 900/900 bytes,
  * 0/28 USA places, only +0x31c/+0x324 differ (last add's a1/a2 setup).

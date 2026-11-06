@@ -1,3 +1,8 @@
+/* 6 November 2026, round 9: unchanged best, 680/680, 0/28, 6 rows. With 0x4410 and 0x106 both in
+ * early locals (retail la/0x4410/0x106 order), a 150-step hill-climb over the final packet order
+ * stayed at 6. Also tied or worse: no s2 (6), s2 declared before t (6), 0xE as an early local (73,
+ * 684 bytes), 0x8000L (39), one shared t for both packets (27-28), w/w2 set after the if (20).
+ */
 /* 6 November 2026, round 7: unchanged best, 680/680, 0/28, 6 rows. Setting 0x106 in a local
  * next to w (both moved by update_equiv_regs after sched1) gives retail's la/0x4410/0x106 order
  * and v1, but 0x8000 is then issued in the same sched1 cycle as t[1]'s store, so 0xE loses a2

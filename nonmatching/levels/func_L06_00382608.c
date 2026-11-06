@@ -1,3 +1,17 @@
+/* 6 November 2026, follow-up: retained source rechecked at 584/584 bytes,
+ * 0/2 USA v1.01 placements; first difference +0x9C. Counting unequal
+ * instruction words while masking only relocation bits gives 75 differences
+ * (the earlier 68-row score used a different comparison). No source gain.
+ * New controls: contiguous one-pass groups spanning the scale call, point
+ * copy, switch and final copy; index-as-digit-counter with saved point offset
+ * and next index, across those group boundaries (564-604 bytes); combinations
+ * of -fno-gcse with scheduling/loop options; and the sticky-reference profile.
+ * An aligned TImode point copy with -frac2-qcopy -frac2-qcopy-barrier ties
+ * this draft; without the barrier it changes scheduling/size but does not
+ * restore retail's timer-only hoist. qcopy_nc on that copy also ties.
+ * None explains the required loop-entry control flow. The C below and the
+ * INCLUDE_ASM marker remain unchanged; no linked build was run by this worker.
+ */
 /* 6 November 2026, round 5: 584/584 bytes, 0/2 USA v1.01 placements, default
  * flags; 68 compared rows differ (was 101) and the prologue now matches up to
  * +0x9C. Two source changes: `n /= 10` after func_00282CC0 gives retail's

@@ -108,6 +108,17 @@ or the guard plus clipping call grow to 904 bytes with a label-alignment nop
 and altered scheduling. None closes the two-store difference. The retained
 source is unchanged; these are local checks, with no linked build.
 
+**6 November 2026, source-shape follow-up:** byte-addressed clip-field stores,
+paired-axis layouts and switch/goto guards retain the same two-word difference.
+An inline rectangle-return constructor is 940 bytes for all 24 argument orders.
+Reducing loop alignment to `-malign-loops=2` removes the required main-loop nop
+at `+0xB4`: the control and all 21 contiguous initialization groups become
+896 bytes. Groups spanning colour writes/initialization remain 904 bytes with
+default alignment; grouping just the clipping call is 900 bytes but changes
+eight real instructions. The unchanged best source was rechecked with
+`tools/check.py func_00342BE8 --diff` in USA, PAL and USA v2.00: 0/28 in each.
+No linked build was run. These results do not establish a new remedy.
+
 The spawn routine `func_L18_0043FFF8` likewise stays 488/488 bytes and 0/3
 in each release under game `-O2 -G0 -ffunction-sections -g`. Grouped header
 writes or grouped byte-constant locals before/inside the null guard do not
@@ -570,6 +581,31 @@ The numbered history below is retained, with obsolete conclusions and incorrect 
 <a id="blocker-01"></a>
 
 ## 1. Register allocation on long bodies (the dominant wall)
+
+**6 November 2026, Joba contextual help:** `func_L11_00443940` remains a
+historical 924/924-byte near miss, 0/1 USA v1.01 places, with game `-O2 -G8
+-ffunction-sections -fno-rerun-loop-opt -fno-gcse`. Excluding relocation
+immediate bits leaves 25 differing instruction words. Its retained rounding
+helper's dead display-mode test is ineligible under the current source rules.
+Removing it gives 904 bytes; 67 new candidates using only real-operation
+one-pass groups in the helper and draw setup give 904–928 bytes without
+improvement. Reopen with an evidenced rounding-helper/control-flow shape that
+retains the label copies without a dead test. The retained source and trial
+history are in `nonmatching/levels/func_L11_00443940.c`; no linked build ran.
+
+**6 November 2026, Smolg fighter initializer (retained):**
+`func_L17_003E8A58` is 944/964 bytes, USA v1.01 0/1 and v2.00 0/1;
+PAL absent, game `-O2 -G8 -ffunction-sections -frac2-qcopy` in its own unit.
+A complete state type with the overlapping vector/float at 0x6C0/0x6CC,
+cached initialization inputs and independent store reordering improve the
+initialization allocation/scheduling over the raw-offset draft. The saved
+15.0f in `$f20` and retail 0x30 frame remain absent (C frame 0x20).
+One-pass store groups regress; early/reused real float rates and `-fno-gcse`
+do not recover the saved float. Copy-barrier and no-interblock controls tie.
+Retail's defensive candidate recheck is also absent; no redundant source
+test is retained. Reopen on the original float lifetime/parameter layout,
+not another tied constant spelling. Retained C is in
+`nonmatching/levels/func_L17_003E8A58.c`; no linked build was run.
 
 **6 November 2026, ribbon PRE replay:** `func_00281A08` remains 980/980
 bytes, 0/7 in each release with game `-O2 -G8 -ffunction-sections -g
@@ -2342,6 +2378,23 @@ field view shortens the body to 984 bytes; disabling GCSE or sched1 gives 996.
 Independent alias/lifetime evidence is the next useful input, not more identical
 loop spellings.
 
+**6 November 2026, `func_L23_0041CA58`:** a separate unit with
+`-O2 -G0 -ffunction-sections -frac2-qcopy` and direct typed accesses to the
+47 state counts recovers the state/counts saved-register roles and a missing
+counts-pointer copy in the inherited 564-byte diagnostic. It still differs
+in 66 instruction words after relocation fields are masked (76 initially),
+and fails its one placement in each release. That diagnostic retains a dead
+remainder assignment solely to preserve the otherwise unused divide guard;
+it is not eligible under the worker's explicit no-dead-store constraint.
+Removing the assignment gives the retained 540/564-byte C, 0/1 in USA v1.01,
+v2.00 and PAL. The source's 0x140 frame also lacks retail's unexplained 0x20
+bytes. Meaningful one-pass groups, helper transfers, natural vector views,
+loop/counter lifetimes and bounded standard optimization controls do not
+close these differences. Recover the guard's real source/control flow and
+scratch ownership before adding artificial uses or padding; see the
+[retained source](../nonmatching/levels/func_L23_0041CA58.c). No linked build
+was run for this worker attempt.
+
 The way out that closed two of these: jump2 cross-jumps two arms that end the same, the branch
 goes, and the load that fed it stays dead, because flow ran before jump2. `func_L18_00432630`
 keeps two equal arms on `0x7FC`. `func_L18_002CA350` (1 November 2026, local match) keeps
@@ -2722,6 +2775,27 @@ pointer across navigation arms adds a saved register. The original two drafts
 and improved menu draft stay in `nonmatching/`; their notes give measured
 limits and reopening conditions. No linked or secondary-release check was run.
 
+**6 November 2026, round 9: `func_L13_0041AB30` matches** (check.py 2/2 in US,
+PAL and US2; not yet linked). The preheader copy survives when (1) the row pointer is
+modified after the copy (`p = q; do { q += 0x460; } while (0);`), so gcse does not
+record the copy and the one-pass group blocks regmove's optimize_reg_copy_1; (2) the copy's
+later use precedes the row's in the loop body, so cse does not swap the copy;
+(3) the row pointer is reused in the last loop, so it is a global pseudo ($v1) that
+local-alloc cannot tie to the shift; (4) `j = 2;` stands before the copy so sched1 can
+hoist it. The same copy pattern is noted for `func_L13_0041AD00`.
+
+**6 November 2026, `func_L04_00416E38`, USA v1.01:** the retained
+`-O2 -G0 -ffunction-sections -fno-gcse` diagnostic rechecks at 492/492 bytes,
+0/2 placements, five actual x4 load/divide word differences. Its rounding
+helper contains an unused assignment used to preserve allocation/block
+boundaries: this source is inadmissible under the current no-dead-store rule.
+Sixteen mode-free controls grouping real conversion/add/rounding operations,
+with shared/separate products and fresh/reused coordinates, give 484–496
+bytes and 0/2 placements. They lose the ghost s2 save/restore and retain FP
+allocation/scheduling differences. Solve the admissible rounding shape before
+reopening only the five-word allocation residue; details remain in the
+existing nonmatching source. No linked or secondary-release check was run.
+
 **Signature:** two values compete and the tested source forms did not change their allocation. The
 `.lreg` dump (`cc1 -dl`; each pseudo carries `refs`, `live_length`, `crosses N calls`) shows the
 tie: two pseudos with *identical* statistics, and `local-alloc` breaks it by pseudo number.
@@ -2796,6 +2870,21 @@ The displayed object column is unrelocated, so zero call/address addends can loo
 
 ## 45. Source shapes that move a body
 
+**6 November 2026, packed-map sampling (`func_L00_003080D0`): local checks exact,
+linked verification pending.** With the existing game compiler and default
+`-O2 -G0 -ffunction-sections`, the 820-byte retained draft had four real instruction
+differences in all 27 USA v1.01 places. Keep the unsigned `sample` reused for the
+initial masked coordinate and the inner-loop index/value, but assign the first
+shift to a block-local `int index`: `sample = x & 31; index = (int)sample >> 1;`.
+Use `index` in the first packed-byte address. This removes all four differences
+(the `x & 1` register and the shift/add scheduling) without extra accesses or
+compiler barriers. `tools/check.py func_L00_003080D0 --diff`, and the same check
+with `--version pal` and `--version us2`, each report 27 of 27 places matching.
+The source now lives in `src/levels/shared/L00_003080D0.c` with the actual data
+symbol declared directly; the superseded near-miss copies are removed. These
+are local checks only; the lead still needs strict linked builds and placement
+verification before claiming a completed match.
+
 Measured on `func_L00_004096B0` (1 November 2026, 94 to 28 words, retained near miss):
 
 - A spilled slot plus a callee-saved register holding the same address over a few calls is one spilled PRE copy, with
@@ -2822,6 +2911,8 @@ Historical examples, to requalify in the final unit:
 - Before tuning a near miss, compare it with its matched relatives by masked opcodes. func_L02_00421DA0 needed func_L15_00438B00's `for` loop and `angle` local, func_L07_002B3580 the `scale` local of the ground probes (a constant set before an `if`, used after it), and func_L13_0040DFC0 is func_L16_003E7248 with other data. Copy the relative's flags too: func_L10_0039DA48 went from 131 to 26 words on func_L00_0040D058's.
 - A rule table loop with an unreduced `mult` at an aligned label is a loop that loop.c skipped (func_L05_00444840): `for` with a `break` gets the same tail, but jump1 copies the test and the found arm ahead of the loop, which gives "multiple entry points". **6 November 2026, USA v1.01, check.py only:** grouping the real class read inside an infinite indexed scan stops that peeling (retained 732/736 bytes, 0/4 places, `-O2 -G8 -ffunction-sections -fno-rerun-loop-opt`). The first scan still hoists its table base/base+4 and the second becomes a pointer walk; allocation also differs. A macro-address table gives 740/712-byte alternatives with worse loop shapes, and a volatile indexed read gives 836. The next experiment needs both indexed scans and base rematerialization while preserving outer-loop invariant motion; the retained C is in `nonmatching/levels/func_L05_00444840.c`.
 - **UI lifetime constraints, 6 November 2026 (USA v1.01, check.py only): matched.** `func_L08_003DB518` matched 2/2 (src/levels/shared/L08_003DB518-g8.c). The 0x80 frame came from the dead-test helper (as func_L11_004456A0) on the height rounding, which makes `one2` global (s5) and needs `half2` for f20. Reusing `fade` for the 1.0 constant, and `t` for the product and a scale, makes them global: no local tie, so the temporaries take f1 like retail. A one-pass group ends the rounding block. `-malign-loops=2` stops the pad of the label after it.
+- **Timer rounding lifetime, 6 November 2026 (USA v1.01, retained near miss):** `func_L04_00417028` improves from 732/736 bytes to 736/736 with seven instruction words off in both Barlow and Joba. The shared HUD rounding helper works when its active local starts after formatting and each second-box result is immediately converted to float; a plain final cast in a nonempty group and reuse of the scale local for 118.0f preserve the remaining FP order. Own `-O2 -G0 -ffunction-sections -fno-gcse` unit, check.py only; alternate-release identities are absent. Remaining: second-box x uses v1 rather than v0 (two words), and the final width numerator ties to s0 rather than v1 (five words). A float-returning helper fixes the first register but moves its conversion ahead of y's multiply (nine words). Reusing necessary integer roles and grouping/reordering the actual divide did not improve seven; see the [retained source](../nonmatching/levels/func_L04_00417028.c). No linked match or build is claimed.
+
 - A float kept off a free register: a pseudo set by local-alloc in a hard register gives its operands a preference that keeps other pseudos off that register (global.c regs_someone_prefers). In func_L12_0041BF88 a scratch float shared with a later loop made the pseudo global and freed $f1.
 - **A variable reused across blocks is a global pseudo (1 November 2026).** Local-alloc only takes pseudos of one block. A function-scope `f`, `n`, `id` or `history` reused for an unrelated later job goes to global-alloc after the block-local temporaries, which swaps whole register groups around it. A fresh block-local closed func_L22_003FC870 (f0/f1 group), func_L18_00428AE8 (a0/a2), and the history pointers of func_L08_003D4190. Check this before reading allocator dumps.
 - **Byte-pointer stores pin later loads.** `*(float *)(m + 0xF8) = x` is not in a struct, so a following scalar global load cannot pass it; a store through a struct view can (`MEM_IN_STRUCT_P`). Where retail reads a global ahead of an object field just after a store, view the store's object as a struct: func_L08_003E5BB8, func_L05_004170C8.
@@ -2839,6 +2930,7 @@ Historical examples, to requalify in the final unit:
 - **The address of a member can leave a base pseudo.** With one union for a frame area, `scratch.fx.a` sets a pseudo for `&scratch` first. Cse folds the member but keeps that pseudo for the base member, so its `addiu` appears too early (func_L18_004401E0). Retail's overlap of four vectors and a request block is block-scoped storage: declare the vectors in a block nested one level inside the `if`, with nothing after them, as the slots are then freed for the request block's own nested scope.
 - **A catalogue row's name is not always its address.** func_L05_0033D3A0 sits at 0x33D3A8 and func_L16_003A8D58 at 0x3A8D60; the eight bytes before each are the previous function's end. Read the address from the row before generating assembly. Fuzzy twin screens should use it too: func_L05_0033D3A0 turned out to be func_002B1350 with a data name changed.
 - **An `sda` read at a nonzero offset stays out of delay slots (1 November 2026).** func_L01_003980D0 read a byte at 0x001A7A0A. As a plain global it splits into `lui` + `lbu` with two registers, and the `lui` fills the branch slot. As an `sda` scalar it is a one-word load that reorg moves into the slot, where it becomes a $gp load. Declared as `D_001A7A00[]` under `sda` and read at `[0xA]`, it is a length-2 macro load: tied `lui v0 / lbu v0`, not eligible for the slot, so reorg takes retail's `beql` from the target. The offset's value is real: 0x001A7A00 is a known object elsewhere in `src/`. Try this where retail has a tied load after a branch-likely.
+- **Plain server snapshots and delay-slot filling (6 November 2026, retained near miss).** `func_00131DE8`, USA v1.01 boot, game `-O2 -G0 -ffunction-sections`: removing volatile from the earlier retained C gives 552/576 bytes, 0/1 places, 70 differing instruction positions after resolving relocations. Grouping each necessary server snapshot in a one-pass loop and using a decrement-first delay recovers retail's two `9999` bgez slots. Independent initialization-store ordering and groups around read-state clears reach 572/576, 32 positions (retained in `nonmatching/core/func_00131DE8.c`). Server/limit registers remain swapped and the final store/argument schedule leaves the epilogue four bytes early. Scalar/owner declarations, distinct loop locals, bind-result reuse, explicit limits and nested decrement groups do not resolve it; unsigned comparisons add a two-instruction limit. SDA client fields also keep the load out of the slot but do not fix allocation. Next useful input is allocator/scheduler dumps of this plain-C source. Approximately 200 check.py calls; no linked build or matching credit. Older volatile-based notes are superseded history.
 - **A table field through a struct orders the `addu` (1 November 2026).** func_L00_0039E7A8 indexed two level tables at +0x464 through local byte pointers, which put the index first. `struct { char pad[0x464]; u8 disabled[1]; }` read as `table.disabled[i]` puts the base first at all three sites and closed the function; func_L01_003980D0 already read its table that way. It did not move func_L00_003D3388, whose retail order is the other way round (index first after a `mult`).
 - **Encoding correction:**0x700014A9 is por v0,zero,zero, not pcpyld. TI zero materialisation is reachable in appropriate cases; retention/folding depends on current source/profile(section 17). The word alone neither proves handwritten assembly nor proves a complete C match.
 - **A register copy retail keeps means its source was overwritten.** gcse's cprop removes `b = a` whenever `a` is untouched between the copy and b's uses, so a surviving `daddu` in front of a long stretch says `a` is set again later: one scratch variable doing two jobs. func_0028C6D0 (37 words to 0): `scratch` holds the colour, is copied into `color`, then takes the string length. func_L00_003ED198 (57 words to 0, size 1712 to 1720): an int holds &delta, is copied into the loop's pointer, then takes the random phase in the loop; a block-local `float *t` used only up to the call gives retail's `$v0`-then-`$s5` pair. Measured with cprop switched off in a research cc1: most near misses get worse, so cprop itself runs in retail.
@@ -2868,15 +2960,36 @@ written inside its branch could not reach the delay slot. Reading each kind
 without an `item` pointer and loading `D_00139688[id]` before the record fixed
 the remaining allocation.
 
-`func_L06_00382608` reaches 588/584 bytes, 0/2 placements, with an explicit outer
-back edge under the default game G0 profile. It restores the 0xA0 frame and
-in-loop flags/constant setup, but also loses the timer-only invariant that retail
-hoists. Reusing the digit counter gives 564 bytes through an explicit back edge
-and 600 through a structured loop. No synthetic guard is needed for these
-measurements; neither form matches. The source retains the earlier negative
-controls as history. For the related grid `func_L06_003E5D30`, a smoothing-call
+`func_L06_00382608`'s 6 November follow-up rechecks the retained grouped
+explicit-back-edge source at 584/584 bytes, 0/2 USA v1.01 placements under the
+default game G0 profile; 75 instruction words differ when only relocation bits
+are masked. This supersedes the older 588-byte measurement below. The frame
+and in-loop flags setup agree, but gcse caches the advance-vector address and
+the timer-only hoist is absent. Contiguous one-pass groups, grouped index reuse
+with saved offset/next index (564-604 bytes), and combined scheduling/loop
+profiles give no improvement. The sticky-reference profile ties. Replacing the
+point copy with an aligned TImode assignment under qcopy plus qcopy-barrier
+also ties; removing that barrier changes size/scheduling without restoring the
+selective hoist. qcopy_nc ties. No linked build was run for this follow-up.
+The earlier 588-byte explicit-loop and 564/600-byte index-reuse results remain
+historical constraints; no synthetic guard is needed for them. For the related grid `func_L06_003E5D30`, a smoothing-call
 group reaches 976/976 bytes, still 0/3: allocator diagnostics retain state in fp
 and spill the strand offset. Equal size alone has not closed either blocker.
+
+**6 November 2026 follow-up, retained near miss:** the grid's own game
+`-O2 -G8 -ffunction-sections` unit remains 976/976 bytes, 0/3 USA placements.
+Separate traversal counters, fade-before-lifetime initialization, a complete
+reset-iteration group and a smoothing-scale group reduce differing instruction
+words from 137 to 112 (relocation fields excluded). The first difference is
++0x170; the preceding 368 bytes also pass symbol/address derivation. State now
+spills at 0xC80, but the strand offset still spills at 0xC9C instead of using
+s6, with reset buffer strength reduction and smoothing allocation unresolved.
+Explicit grouped offsets, three independent row cursors, grouped partial y
+calculations and float/vector representation controls did not improve it.
+The functional draft with its unused padding removed measures 928/976 bytes.
+Retained C and details are in `nonmatching/levels/func_L06_003E5D30.c`; no linked
+build was run. A useful next experiment must preserve both the strand-offset
+lifetime and reset buffer strength reduction.
 
 <a id="blocker-46"></a>
 
@@ -3621,6 +3734,18 @@ For #267, a same-source comparison of 781 configured units changed code only in 
   sched1/sched2 dumps place the early color store in sched1. Integer-bit UV and
   inline-broadcast views tie; one-pass store groups, volatile views and real-loop
   unrolling worsen the result. Reopen on this store lifetime/dependency.
+- `func_L03_003C5668` (matched 6 November 2026, now in
+  `src/levels/shared/L03_002AB5C8.c`, 2/2 USA places): indexing `D_L03_001FB5A0`
+  directly (no table local) fixed the loop spill order, and `best = 0` as the
+  `else` arm of the first accept test put the a1 spill at +0x4. History:
+
+  unrolling worsen the result. A 6 November follow-up checked 190 valid source
+  variants: multi-field vector/UV/color layouts and a dependency-checked search
+  including packing and camera delta operands tie at three positions. Groups
+  spanning packing and stores change allocation (at least 68 positions differ),
+  including when paired with a second tint-update group (at least 75).
+  Two-component UV aggregate assignments grow to 884-932 bytes. The retained C
+  is unchanged; reopen on this store lifetime/dependency.
 - [`func_L03_003C5668`](../nonmatching/levels/func_L03_003C5668.c):
   644/644 bytes, 0/2 places with default game flags. Current reproduction corrects
   the older one-displaced-instruction claim: 12 prologue positions and 10 loop
@@ -3810,6 +3935,7 @@ attributed for provenance, not exclusive ownership.
 | **Clear through a register address at a nonzero offset:** `func_002B5678` | Open | Retail has `addiu $v0,$s1,0x60 ; sq $zero,0($v0)`, the clear macro's register operand. After #258, C gives `por` + `sq $v0,0x60($s1)`. **Next:** a profile that materializes the address of a displaced const-0 TImode store. |
 | **A `por` clear at a zero displacement:** `func_L02_003DB200`, `func_L02_00423520`, `func_L23_00422798`, and with the copy barrier `func_L02_003DBA70`, `func_L23_00429DC8` | Proposed: PR #281 | These functions clear a stack vector with `por $v0,$zero,$zero` + `sq $v0,0($sp)`. Since #258, the fold still makes that `sq $zero,0($sp)`, because the address is register-only.<br><br>A finer retail count (one place per catalogue row, boot game code from 0x26EA00, a store counted when every path into it starts from the `por`) finds 183 `por`-fed stores at a zero displacement, in 153 functions. Every one of them is to `0($sp)`; none goes through another register. Against that, 396 `sq $zero,0(reg)` stores in 263 functions, of which 82 (58 functions) are also to `0($sp)`.<br><br>PR #281 adds the opt-in `-frac2-zero-ti-por`: with it, the fold leaves a store to `0($sp)` alone, and stores through any other register still fold. It is neutral by default (806 of 806 units). Forced on everywhere, it changes exactly the 4 units whose matched functions clear `0($sp)` with `sq $zero`. The five functions above are exact with it. `func_L23_003C16D8` stays out: three of its clears go through a computed stack address. |
 | **A cse block boundary that leaves no instruction:** `func_L02_003D26B0`; the five 632-byte twins `func_L11_00436D08`, `func_L11_00449C70`, `func_L11_0044C850`, `func_L11_004530E0`, `func_L11_004566C0`; `func_L02_003F1BA8`, `func_L02_0040BBD8`; `func_L07_00378898` | Open | Retail keeps a gcse (PRE) copy, for example `daddu $s5,$s4,$zero` of `e + 0x10`, that this cc1 makes only when cse1 and cse2 both see a label at that spot. Adding `\|\| x == 7 \|\| y == 9` to the test reproduces it, with extra code. An empty `do { } while (0)` reproduces it exactly but is rejected (#257, fc4a6c6). For `func_L07_00378898`, `-fno-cse-follow-jumps -fno-cse-skip-blocks` reproduces the block, as a probe only. **Next:** the original's construct at that spot, or a measured cse rule. |
+| **History-copy address association:** `func_L20_0039F968` | Retained near miss | **6 November 2026, USA v1.01:** current compiler with `-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier` reproduces the incoming retained body at 996/996 bytes, 0/1 places, 14 real instruction differences; the historical nine-row result is not reproduced. Removing its history-pointer local gives 13 differences, all in copy-loop setup (+0xAC..+0xF8), retained in [the source note](../nonmatching/levels/func_L20_0039F968.c). Preheader pointer-update boundaries, mixed cursor/index loops and contiguous groups of real count/clamp/copy operations do not close the gap. CSE traversal controls add code; disabling strength reduction or scheduling diverges more widely. **Next:** independent source evidence for the boundary that preserves retail's `last*16 + (i*400 + (D-16))`, or a qualified pass-level explanation. No linked build or alternate-release check in this follow-up. |
 | **Meaningful nonempty one-pass groups:** `func_L02_003FB000`, `func_002CDA20`, `func_002CF2B8`, `func_002D53F0` | Strict linked matches; pending PR review | **4 November 2026:** current active RAC1 game C supplies the missing source-method precedent; see [source methods](COMPILER-NOTES.md#source-methods-shared-with-rac1). The actual last store gives Maktar 288 bytes, 1/1 places in each USA release (PAL identity absent). Actual formatter-call groups give the three text draws 140/136/140 bytes and 28/28 USA v1.01 places each; their canonical identities are absent in the other releases. The formatter style remains 64 bits; its return and the signed32 address getter follow their real definitions. Old narrower-style trials remain invalid. All 84 strict programs pass with zero C fallbacks, and all 92 placements of the five added functions are present in their carrying programs. This supersedes the earlier blanket hold on nonempty groups, not the ban on empty loops or fake dependencies. `func_0033A520` is still unresolved: its historical exact probe also assumes an unevidenced const global and fails both alternate releases.<br><br>**5 November 2026:** `func_L02_003FE768` (shared boss bar) matches the same way, with each real conversion of its rounded edge in a group (`t = v * scale + 0.5f; do { top = t; } while (0);`): 2 of 2 USA places, 0 of 2 without the groups. A scratch cc1 that made every float-to-int conversion a sched2 barrier broke 95 of 228 matched functions, so the barrier belongs to these sources. In `func_L11_00444400` the same groups give retail's boundary before each box call (4692/4684 bytes); its register allocation is still open. |
 | **Jump tables the build cannot place:** `func_L06_003FDA08`, `func_L13_00422CB8`, `func_L03_003C4578`, `func_L02_003F9AF0`, `func_L02_003F9B70`, `func_L02_003FE1B0` | Solved, PR pending | A computed goto through retail's own table, in the form of `func_00310A40`, matches all six. The three level 2 records' in-order switches were wrong: retail's tables map the values to the bodies in another order. Decode the table before trusting a record's `switch`. |
 | **Labels behind hazard nops:** `func_L18_004308F0`, `func_L02_00411530` | Merged, #264 | Opt-in `-frac2-hazard-labels`. 198 retail branch targets after a compare or `mtc1` sit on the nop, and SN's `Ps2EeAs` agrees. Forced on everywhere it is neutral (778 of 779, one `.mdebug`). |
@@ -4159,6 +4285,19 @@ helper return type is not an acceptable match.
 **Update, 29 October 2026 (pending review):** matched by the tiered-wave series; `func_L11_00456938` is C in `src/levels/11_joba/L11_00453358-retreat-g8.c` (`-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g`), placed at 1 US, 1 PAL, 1 US2 places; `func_L18_00428138` is C in `src/levels/shared/L18_00428138-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 3 US, 3 US2 places (PAL catalogue has no function of this name). The measurements above are kept as history.
 
 ### Scalar-SDA table walks and packet construction
+
+**6 November 2026, Endako menu (`func_L03_003C7018`):** the retained
+ordinary C is 656/656 bytes, 0/1 USA v1.01 places under the default game
+`-O2 -G0 -ffunction-sections` profile. Grouping the real title lookup and
+argument reads restores the persistent half/zero FP-register roles; grouping
+the second draw also bounds loop-preheader motion. This reduces differing
+instruction positions from 60 to 49, excluding relocation fields. Text-argument
+conversion scheduling, key-copy/pointer setup and loop-increment placement
+remain; first difference is +0x58. Typed bank-preserving argument interleavings,
+independent argument-read permutations, explicit four-key copying and the
+sticky-volatile profile do not improve it. The retained source records the
+other negative controls. A new conversion/call scheduling witness is needed;
+this is not a linked match.
 
 PR #357 review also withdraws `func_L01_003EC0C0` and `func_L01_00405300`
 from matching C. Removing the volatile table/index accesses preserves their
@@ -4568,6 +4707,14 @@ open, so the row stays. Direct or nearby address-pair absence alone is not proof
   reproduces the retail copy loop and prologue: 972/972 bytes, still 0/1 USA.
   Flag/zero setup and later lifetimes remain different; this is a new useful
   constraint, not a reason to repeat every unchanged near miss.
+  **6 November 2026, worker follow-up:** the retained USA `-O2 -G0
+  -ffunction-sections` source remains 972/972 bytes, 0/1 places, with 11 real
+  instruction differences in colour/primitive allocation and packet-store order.
+  All 78 contiguous one-pass packet-setup groups worsen it (best 43 rows);
+  70 additional real-value lifetime and logical initializer-helper variants tie
+  or worsen. Allocator diagnostics reproduce the baseline object and classify
+  colour/primitive as local allocations; band/stride/phase spill slots agree.
+  Retained C and detailed negative results are in its existing near-miss note.
 - `func_00131D98`'s former secondary-release boundary blocker is resolved by
   the guarded main/sound split in `tools/carry.py --entries` (see
   [LEVELS.md](LEVELS.md)). Both complete bodies, their named callees and their

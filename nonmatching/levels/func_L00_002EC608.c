@@ -1,3 +1,17 @@
+/* 6 November 2026, Codex follow-up: 190 valid source variants, no improvement
+ * over the retained 868-byte / 3-position / USA 0-of-27 result. Fifteen genuine
+ * multi-field position/camera/UV/color layout combinations tie exactly. A
+ * dependency-checked 56-check hill-climb extending the previous store-only
+ * search to the color packing and first atan's two delta operands also ties.
+ * Fifty-two packing-to-store one-pass groups yield at least 68 differing
+ * positions; grouping the second tint update/broadcast as well gives at least
+ * 75, rather than restoring the changed allocation. Fifteen two-component UV
+ * aggregate-assignment combinations grow to 884-932 bytes. No candidate uses
+ * volatile, inline asm, dummy operations or one-field allocation wrappers.
+ * Final check.py --diff reproduces only +0x108/+0x10c/+0x110; original C and
+ * source marker restored. No alternate-release check or linked build run.
+ */
+/* 6 November 2026, round 9: sched1 trace (-fsched-verbose-5): all stores have priority 77, the colour ops 78+; the 18 load/colour/address insns fill both issue slots from the rand call to t=31, so no store issues before the color[0] store is ready at t=32, where its REG_DEAD weight -1 wins; sched2 then keeps that order (equal priority and depend count, luid). 120-step hill-climb over the 13 uv/color/rotation[3] stores: no better than 3 positions. Hoisting the camera pointer to the top frees a slot (zeros follow color[0] directly) but sched2 moves its lui before the calls (55 rows); a target float pointer is 864 bytes; four colour-packing forms give 3-21 rows. Reopen only on a form that delays color[0]'s readiness by two issue slots or gives the zero stores a real later dependent. */
 /* 6 November 2026, lead: the 2 real rows are sched1's register-weight tie-break: the store where `color` dies is issued first (writing color[1] last moves 0x44 first instead; color[0] last moves 0x40 first). Retail issues the uv[0] zero stores first, i.e. in retail `color` is still live after these stores or the zero stores outrank them; nothing in the current body keeps color live (it is reassigned before the second draw). */
 /* 6 November 2026: retained near miss, not linked or counted.
  * USA v1.01: 868/868 bytes, 0/27 places, first mismatch +0x108.

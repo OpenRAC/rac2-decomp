@@ -1,3 +1,30 @@
+/* 6 November 2026, round 10: 768/768 bytes, 0/5 USA, still 2 words off. The round-9
+ * second `camera = D_L01_001BD9C0;` was a redundant reload (the address is a link-time
+ * constant; nothing in between can change it). Now an inline accessor `hud_camera()`
+ * is used at all three sites, no camera local: same code (s2 = %hi, %lo again at the
+ * end). Writing the global directly, or a local set once, gives 760 bytes (full
+ * address kept in s2). Icon block: confirmed in the sched dump that sched1 picks
+ * `a1 = count - 1` first only because the count dies there (INSN_REG_WEIGHT 0 vs 1 for
+ * a0 = 0xEAA7); with the count kept live the order flips (diagnostic, extra code).
+ * No gain: count in y/entry/x2/top/bottom, count reused as the call result, nested
+ * call, 0xEAA7 in a variable before the if (cprop folds it back, also with
+ * -fno-gcse), and flags -fno-sched-interblock, -fno-sched-spec, -fno-cse-follow-jumps,
+ * -fno-thread-jumps, -frac2-keep-block-order, -frac2-hazard-labels, -frac2-zero-ti-por,
+ * -frac2-gcse-unsplit-edges, -frac2-keep-block-zero-copy, -g (all 2 words or worse).
+ */
+/* 6 November 2026, round 9: 768/768 bytes, 0/5 USA, 2 words off (was ~25). Own unit
+ * src/levels/shared/L01_002F1588.c, -O2 -G0 -ffunction-sections (gcse ON, no -fno-gcse).
+ * Missing word was retail's second `addiu v0,s2,%lo(D_1BD9C0)`: s2 holds only the %hi,
+ * shared by gcse across the draw blocks, so `camera = D_L01_001BD9C0;` again before the
+ * restore. gcse cprop of unit/zero is stopped by copying them from `height` and
+ * reassigning height in the same block (the copies are then not available at block end).
+ * Rect/icon roundings use a check without a load (`result == active`), so the call
+ * results (x2, icon) get $v0 and are copied late, as in retail.
+ * Left: icon block only, beqz/jal delay slots swapped (retail ori a0,0xEAA7 in beqz slot,
+ * addiu a1,a1,-1 in jal slot). Cause: sched1 picks `a1 = count - 1` first because it
+ * kills the count pseudo (lower INSN_REG_WEIGHT). No gain: local count, --count, inline
+ * wrapper, `+ -1`, int temp for 0xEAA7 or for count - 1, -frac2-sticky-volatile-refs.
+ */
 /* 6 November 2026, round 5: best body below (764/768, 0/5 USA, ~25 words off after
  * alignment, was ~44). Own unit src/levels/shared/L01_002F1588.c, -O2 -G0
  * -ffunction-sections -fno-gcse. New: the top/bottom (and icon) roundings share one
@@ -67,6 +94,21 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
+static __inline__ int hud_round(float value, float scale, float half, int active)
+{
+    float scaled = scale * value + half;
+    int result = (int)scaled;
+
+    if (result != 0 && result == active)
+        scaled = 1.0f;
+    return result;
+}
+
+static __inline__ unsigned char *hud_camera(void)
+{
+    return D_L01_001BD9C0;
+}
+
 int func_L01_002F1588(void)
 {
     OverlayColorPair colors, source;
@@ -74,12 +116,10 @@ int func_L01_002F1588(void)
     int top, bottom;
     unsigned char *node;
     int x2, y, one, entry;
-    unsigned char *camera;
     if (!D_L01_001A908C || *(int *)D_L01_0027EAC8 || *(int *)(D_L01_0027EAC8 + 0x24) != -1)
         return D_L01_001A90D0[0];
-    camera = D_L01_001BD9C0;
-    oldProjection = *(float *)(camera + 0xB0);
-    *(float *)(camera + 0xB0) = 0.6200000047683716f;
+    oldProjection = *(float *)(hud_camera() + 0xB0);
+    *(float *)(hud_camera() + 0xB0) = 0.6200000047683716f;
     span = 375.0f;
     func_0027AB40();
     rounding = 0.5f;
@@ -87,31 +127,36 @@ int func_L01_002F1588(void)
     entry = 0x8710;
     node = (unsigned char *)func_00336D50(D_L01_001A908C + entry, 142);
     y = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
-    unit = 1.0f;
-    zero = 0.0f;
-    func_00300A00(node, 0x60442D00, 250.0f, (float)y, unit, unit, zero);
+    height = 1.0f;
+    unit = height;
+    height = 0.0f;
+    zero = height;
+    height = (float)y;
+    func_00300A00(node, 0x60442D00, 250.0f, height, unit, unit, zero);
     node = (unsigned char *)func_00336D50(D_L01_001A908C + entry, 143);
     y = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
-    func_00300A00(node, 0x60241700, 250.0f, (float)y, unit, unit, zero);
+    height = (float)y;
+    func_00300A00(node, 0x60241700, 250.0f, height, unit, unit, zero);
     node = (unsigned char *)func_00336D50(D_L01_001A908C + entry, 144);
     y = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
-    func_00300A00(node, 0x55F0C070, 250.0f, (float)y, unit, unit, zero);
+    height = (float)y;
+    func_00300A00(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
     source.first = (int)0x800050C0;
     source.second = func_00283D38(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
     colors = source;
     x2 = func_00283CF0(190.0f + func_00283CE0(198) * D_L01_001A90C4[0]);
     height = D_L01_001B2DC4[0];
-    top = hud_coord(374.0f, height, rounding, one);
-    bottom = hud_coord(388.0f, height, rounding, one);
+    top = hud_round(374.0f, height, rounding, one);
+    bottom = hud_round(388.0f, height, rounding, one);
     func_0027EAE8(190, top, x2, bottom, 0, &colors);
     if (D_L01_001A90CC[0]) {
         int icon = func_0028E588(0xEAA7, D_L01_001A90CC[0] - 1);
         height = D_L01_001B2DC4[0];
-        top = hud_coord(352.0f, height, rounding, one);
-        bottom = hud_coord(43.0f, height, rounding, one);
+        top = hud_round(352.0f, height, rounding, one);
+        bottom = hud_round(43.0f, height, rounding, one);
         func_0028E868(icon, 139, top, 43, bottom, 128);
     }
-    *(float *)(camera + 0xB0) = oldProjection;
+    *(float *)(hud_camera() + 0xB0) = oldProjection;
     func_0027AB40();
     return D_L01_001A90D0[0];
 }

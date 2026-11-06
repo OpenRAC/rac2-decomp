@@ -1,3 +1,22 @@
+/* 6 November 2026, round 9: retained C below, own unit with
+ * -O2 -G0 -ffunction-sections -fno-sched-interblock -fno-gcse: 684/708 bytes,
+ * 0/27 USA places, but 71 real instruction differences (aligned diff, relocs
+ * masked) against 84 for the previous 700-byte form.
+ * Gains: the second loop takes a `strand` pointer (`strand += 10, k++`), so
+ * pass 1 reduces every k giv and pass 2 reverses the loop (count 4..0, bgez,
+ * beql, increments strand/values/count/timer as retail); -fno-sched-interblock
+ * keeps those increments at the loop bottom. An in-body `u32 values` holding
+ * D_1B29A0 gives retail's fp at the if-start and `addu vX, s5, fp` in each arm;
+ * with gcse on, PRE hoists the arm sum instead.
+ * Still different: the pass-2 hoisted D_240080 (refs 8, live 152) wins a saved
+ * register (s6) over the delta base sp+0x10; with `Vector *d = delta` or with
+ * gcse on (which hoists sp+0x10 itself) values or next loses instead. Second
+ * loop allocates s0/s1/s2 as 7F7F7F/count/timer, retail timer/7F7F7F/count.
+ * Tried, not kept: goto outer loop (next spilled), s16 *values (708 bytes,
+ * 92 diffs), values+timer_offset with gcse (PRE merges arms), do/while(0)
+ * groups around the tail, next or i = next (one of next/values always spills),
+ * timer pointer in loop 2, grey local for 0x7F7F7F, -fno-rerun-loop-opt.
+ */
 /* 6 November 2026: retained best is now 700/708 bytes, 0/27 USA v1.01
  * places, default -O2 -G0 -ffunction-sections (no extra per-file flags).
  * Indexed points plus next=i+1 and an explicit halfword-table byte offset
@@ -76,14 +95,16 @@ extern float D_L00_001B29D4 __attribute__((sda));
 void func_L00_003C48D0(u8 *object)
 {
     Vector anchor, delta[10];
-    int i, j, color, alternate, next;
+    int i, j, k, color, alternate, next;
     u32 alpha;
+    Vector *strand;
     float numerator, ratio;
     qcopy(anchor, *(u8 **)(object + 0x68) + 0x30);
     for (i = 0; i < 5; i = next) {
         int timer_offset = i * 2;
         next = i + 1;
         if (*(s16 *)((u8 *)D_L00_001B2990 + timer_offset)) {
+            u32 values = (u32)D_L00_001B29A0;
             for (j = 1; j < 10; j++)
                 func_00282CF0(delta[j], D_L00_00240080[i][j], D_L00_00240080[i][j - 1]);
             qcopy(D_L00_00240080[i][0], anchor);
@@ -95,19 +116,20 @@ void func_L00_003C48D0(u8 *object)
             if (*(s16 *)((u8 *)D_L00_001B2990 + timer_offset) > 0) {
                 numerator = func_00283CE0(*(s16 *)((u8 *)D_L00_001B2990 + timer_offset));
                 ratio = numerator / func_00283CE0(*(s16 *)((u8 *)D_L00_001B29B0 + timer_offset));
-                *(s16 *)((u8 *)D_L00_001B29A0 + timer_offset) = func_00283CF0(D_L00_001AFF8C_gp * ratio);
+                *(s16 *)(timer_offset + values) = func_00283CF0(D_L00_001AFF8C_gp * ratio);
             } else
-                *(s16 *)((u8 *)D_L00_001B29A0 + timer_offset) = 0;
+                *(s16 *)(timer_offset + values) = 0;
         }
     }
-    for (i = 0; i < 5; i++) {
-        if (D_L00_001B2990[i]) {
-            alpha = (u32)func_00283CF0(func_00283CE0(D_L00_001B29A0[i]) * D_L00_001B29D4) << 24;
+    strand = D_L00_00240080[0];
+    for (k = 0; k < 5; strand += 10, k++) {
+        if (D_L00_001B2990[k]) {
+            alpha = (u32)func_00283CF0(func_00283CE0(D_L00_001B29A0[k]) * D_L00_001B29D4) << 24;
             alternate = D_L00_001AFF24_gp;
             color = D_L00_001AFF20_gp;
             if (*(s16 *)(object + 0xAA) == 0x1192)
                 color = alternate;
-            func_L00_002EBE88(D_L00_00240080[i], 23, 14, 10, alpha | 0x7F7F7F, alpha | color, 0.0f, 4.0f, 0.0f);
+            func_L00_002EBE88(strand, 23, 14, 10, alpha | 0x7F7F7F, alpha | color, 0.0f, 4.0f, 0.0f);
         }
     }
 }

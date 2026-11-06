@@ -1,3 +1,9 @@
+/* 6 November 2026, round 9: the func_L13_0041AB30 idiom (p = s + i*16; r = p;
+ * do { r += 0x20; } while (0); p += 0x30; same for the 0x420/0x460 branch rows)
+ * stays at 1420/1376 bytes, 0/2, 281 rows (279 before); -g and
+ * -frac2-sticky-volatile-refs tie. The blocker is still allocation: the state pointer
+ * spills to 0x280 and (i/4)*4 holds $fp, while retail keeps s in $s7, &previous in
+ * $fp and spills the quotient (so one subu, not one per tail). Original C retained. */
 /* Nonmatching C reconstruction (opus-1, v2196, USA v1.01, 2026-11-03).
  * Tier: far. Profile: -O2 -G8 -ffunction-sections -frac2-qcopy
  * -frac2-qcopy-barrier. Best cdiff: 1420 compiled bytes / 1376 retail,

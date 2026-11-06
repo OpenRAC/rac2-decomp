@@ -901,7 +901,72 @@ unsigned char *func_L03_003C5488(unsigned char *a0) {
     return best;
 }
 
-INCLUDE_ASM("asm/levels", func_L03_003C5668);
+extern int func_00277258(void *, int, void *, float);
+
+extern float func_002A89A8(void *, int, float);
+
+extern float func_00282E48(void *, void *);
+
+typedef struct {
+    unsigned char pad0[0x200];
+    int ids[8];
+    unsigned int ref220;
+    unsigned char pad1[0x354 - 0x224];
+    unsigned char *target;
+} L03SeekState;
+
+/* Picks the object's target or a nearer reachable entity (type 0x972) from its eight groups,
+   then copies that entity's position to a1 (height set by func_002A89A8) and its 0xF0 vector
+   to a2. */
+void func_L03_003C5668(unsigned char *a0, float *a1, float *a2) {
+    L03SeekState *o = *(L03SeekState **)(a0 + 0x68);
+    unsigned char *cand;
+    unsigned char *best;
+    unsigned char *e;
+    unsigned short *q;
+    float bestd;
+    float d;
+    float vec[4] __attribute__((aligned(16)));
+    int r;
+    int i;
+
+    bestd = func_00282E48(a0 + 0x10, o->target + 0x10);
+    cand = o->target;
+    if (func_L03_00419BD8(o->ref220, a0 + 0x10, cand + 0x10))
+        best = o->target;
+    else
+        best = 0;
+    for (i = 0; i < 8; i++) {
+        for (q = D_L03_001FB5A0[o->ids[i]];
+             (o->ids[i] & 0xFF) != 0xFF && o->ids[i] <= D_L03_001B2A38[0] && q != 0 &&
+             ((short)q[-1] >= 0 || q == D_L03_001FB5A0[o->ids[i]]);
+             q++) {
+            e = D_L03_001B2A1C + ((*q & 0x7FFF) << 8);
+            if (e == 0)
+                break;
+            if (*(short *)(e + 0xAA) == 0x972) {
+                d = func_00282E80(a0 + 0x10, e + 0x10);
+                if (d < bestd) {
+                    qcopy(vec, e + 0x10);
+                    vec[2] += 1.0f;
+                    if (func_00277258(vec, 0, a0, 0.5f) == 0) {
+                        cand = e;
+                        r = func_L03_00419BD8(o->ref220, a0 + 0x10, e + 0x10);
+                        bestd = d;
+                        if (r)
+                            best = cand;
+                    }
+                }
+            }
+        }
+    }
+    if (best)
+        cand = best;
+    qcopy(a2, cand + 0xF0);
+    qcopy_nc(a1, cand + 0x10);
+    a1[2] = func_002A89A8(a1, 0, 0.5f);
+}
+
 
 /* func_L03_003C58F0 is defined in L03_002AB5C8-g8.c (it reads the group count through $gp). */
 

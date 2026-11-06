@@ -1,3 +1,22 @@
+/* 6 November 2026, Codex follow-up: current compiler reproduces the incoming
+ * retained body at 996/996 bytes, 0/1 USA v1.01 places, 14 real instruction
+ * differences (not the historical nine). Removing the history table-pointer local
+ * gives the body below: 996/996, 0/1, 13 real differences, all +0xAC..+0xF8;
+ * check.py reports "20_yeedil: instruction at +0xb0 differs". Profile remains
+ * -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
+ * New probes: real pointer-update/one-pass boundaries before the copy loop,
+ * mixed indexed/cursor loops, reuse of the count/head locals, and contiguous
+ * groups of the actual count/clamp/last/speed/copy operations. None closes the
+ * address-association/scheduling gap. Integer/byte-pointer source views either
+ * canonicalize back or change the loop more widely. -fno-cse-follow-jumps and
+ * -fno-cse-skip-blocks produce 1004/1012 bytes; disabling strength reduction,
+ * gcse or either scheduling pass diverges more widely. -g, -fno-force-mem,
+ * -fno-sched-spec, -fno-sched-interblock and -fno-thread-jumps are unchanged.
+ * No forbidden qualifiers, artificial operations or compiler changes used.
+ * Next: source evidence for the CSE boundary or a qualified compiler-pass
+ * explanation; further equivalent arithmetic/group spellings are tied.
+ * No linked build run (lead owns builds); other releases not checked.
+ */
 /* 6 November 2026, round 7: body unchanged (996/996, 0/1, 9 rows). Cause found: retail's
  * src base needs cse1 NOT to relate D-16 to the dst's D (then loop keeps (i*400 + reg[D-16]) and
  * cse2 later turns it into D - 16), while cse2 must. Only a LOOP_END between them does that
@@ -87,7 +106,6 @@ void func_L20_0039F968(unsigned char *object) {
     Vector origin, offset, rotation;
     int i = 0;
     int *counts = D_L20_001B3870;
-    Vector (*history)[25] = D_L20_00234880;
     unsigned char *level = D_L20_001FFB40;
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *particle;
@@ -106,7 +124,7 @@ void func_L20_0039F968(unsigned char *object) {
             speed = D_L20_001AED58;
             for (historyIndex = last; historyIndex > 0; --historyIndex)
                 qcopy_nc(&D_L20_00234880[i][historyIndex], &D_L20_00234880[i][historyIndex - 1]);
-            head = history[i];
+            head = D_L20_00234880[i];
             func_002AB668(&rotation, (int)&D_L20_00235500[i], speed * 0.017453294f);
             func_002ACDE8(head, head, &rotation);
             func_002ACB48(head->f, 0.125f);
@@ -123,12 +141,12 @@ void func_L20_0039F968(unsigned char *object) {
         {
             int n = 0;
             for (j = last; j > 0; --j) {
-                func_00282CC0(&points[n], &origin, &history[i][j]);
+                func_00282CC0(&points[n], &origin, &D_L20_00234880[i][j]);
                 points[n].f[3] = 0.5f;
                 ++n;
             }
         }
-        func_00282CC0(&points[last], &origin, history[i]);
+        func_00282CC0(&points[last], &origin, D_L20_00234880[i]);
         points[last].f[3] = 0.05f;
         if (func_L02_002F1658()) {
             int top = counts[i] - 1;

@@ -1,3 +1,15 @@
+/* 6 November 2026, Codex worker: best unchanged, 972/972, 0/1 USA, 11 real
+ * instruction differences, excluding relocations. 148 new variants: all 78
+ * contiguous one-pass groups of the 12 packet-setup statements (best 43 rows),
+ * 24 colour/primitive local initializations with and without one-pass groups,
+ * 16 logical packet-initializer helper variants, six shared complemented-U
+ * lifetime forms, and 24 reuses of band/piece/tile for the earlier real colour
+ * or primitive value. None improves the retained source. Allocator diagnostics
+ * reproduce the baseline object and identify colour/primitive as local allocations
+ * (SI pseudo 104 in a0, DI pseudo 101 in v1); the loop spills already agree.
+ * No donor with the distinctive strip-width/scaling constants was found in the
+ * current RAC1/RAC4 sources. Final baseline check reproduces all 11 differences.
+ */
 /* 6 November 2026, round 9: 972/972, 0/1, 11 real rows (18 before, counting stack-offset
  * rows that the earlier "11" ignored). Writing phase inside the band loop
  * (`float *phase = (float *)(state + 0x60)`) lets gcse hoist it into a late pseudo, so
