@@ -1,3 +1,20 @@
+/* 7 November 2026 (opus, DrLegitamate): the spill slots are fully explained.
+ * The eight spilled loop invariants are sp+16, sp+48, sp+64, sp+80, sp+84, sp+208, object+192
+ * and index+1. Their slots follow gcse's expression-table bucket order, with bucket =
+ * (14001 + regno + constant) % n and n = max_cuid / 2 | 1 (this draft: max_cuid 242, n = 121).
+ * Retail's order is object+192, sp+80, sp+84, sp+208, index+1, sp+16, sp+48, sp+64. Among
+ * the stack addresses, near this size only n = 111 gives that order (the next counts are
+ * 217, 235, 239). A scratch cc1 forcing 111 buckets on this draft, with `object` read through
+ * a local copy (`char *object = object_;`, any position among the locals after q) and 15 or
+ * more extra function-scope pseudos before `index`, gives every stack offset of retail. The
+ * rest of the output is identical to this draft, so that is a full match.
+ * Natural source therefore has about 20 fewer insns at gcse (max_cuid 220..223) and still
+ * the same final code. Not found: an exhaustive search of 65,536 combinations of 16
+ * equivalent spellings (row, entry, vertex and uv pointers, ternary colour, colour and alpha
+ * temporaries, loop forms, hoisted object+192, typed object copy, late declarations) keeps
+ * the code only at 121 buckets; every spelling that changes max_cuid changes the code.
+ * Every single flag and every pair of the project's flags: no change.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 1108/1108 bytes, 0/27 placements; first difference 0x4c.
  * Profile: -O2 -G8 -ffunction-sections -ffast-math.
