@@ -169,6 +169,3 @@ char *func_PAL_L30_0041A748(void *pos, float scale, int shake, int a2, int a3, i
     }
     return obj;
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L30_0041AC18);

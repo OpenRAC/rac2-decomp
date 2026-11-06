@@ -89,4 +89,3 @@ Moby_L08_003B2DB0 *func_PAL_L08_003B6448(int owner, float *pos, float *dir, int 
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L08_003C9330);
