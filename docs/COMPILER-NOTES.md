@@ -193,6 +193,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | libgcc `_eh.o` (L_eh): preserve the frame at final calls and place the exception-return stub correctly | sdk profile with -fexceptions, as GCC's libgcc Makefile builds _eh.o (rac3-decomp builds its copy the same way) | func_00120A30, func_001208E8; paired throw/rethrow func_00120F00 and func_001210E0 |
 | Whole GPR save area uses sq/lq | -mastra-quad-saves | func_00119BC8, func_00115F28, func_00115C90 |
 | Quad slots: `sd $ra` below `sq $s0` | -mastra-quad-saves -frac2-narrow-saves-below, `register_precision(ra, 64)` | func_L01_00324550, func_L08_00389B68 |
+| Copy of a zero set in the same block stays a register copy | -frac2-keep-block-zero-copy | func_002F7320 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
 | Arguments spilled and branch to common epilogue | Measured -O0 unit, not an invented varargs helper | func_001175F0 |
@@ -373,6 +374,18 @@ without `-mastra-quad-saves` the option has no effect. Forced on in every game u
 none of 7,572 (144 SDK units use another compiler). `register_precision` sets the mode for the
 rest of the unit, so each function has a file of its own. The attribute is an inference from
 the save widths, not a recovered source line.
+
+func_002F7320 (132 bytes, 28 places) starts `daddu $t1,$zero,$zero ... daddu $a3,$t1,$zero`
+for `int result = 0; int i = result;`. Stock cse folds that copy to `move $a3,$0`: CONST_INT
+costs 0 and a pseudo 1. With the copy alive, result=0 has a dependent, sched1 moves it ahead
+of the argument copies and allocation becomes retail's (a0 value, a3 i, t1 result).
+[keep_block_zero_copy.py](../tools/compiler/transformers/keep_block_zero_copy.py) adds
+`-frac2-keep-block-zero-copy`: cse keeps a copy from one pseudo to another whose value is known
+to be 0 when its source is set earlier in the same basic block; the REG_EQUAL note still gives
+loop.c the zero start. Without the same-block limit, forced on, it changes one matched body,
+func_00349680, where jump1's duplicated loop-exit copy `lo = hi` sees a zero from an earlier
+block and retail keeps `move $18,$0`. With the limit, forced on in every game unit, it changes
+none of 7,577 others (144 SDK units use another compiler).
 
 Patch 0057 enables `-mastra-split-trunc-slot`: split `truncdisi2` after reload and
 before scheduling so its second shift can fill the return slot. `func_0012E8C8`

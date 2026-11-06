@@ -220,7 +220,15 @@ saves at the slot's full width take the upper slots and the saves narrowed by th
 `tests/test_narrow_saves_below.py` covers the anchors, the default/disabled equality, a
 mixed-width frame and a one-width control.
 
+`keep_block_zero_copy.py` adds `-frac2-keep-block-zero-copy`: cse keeps a copy from one
+pseudo to another whose value is known to be 0 when the source is set earlier in the same
+basic block, instead of folding it to `move $rd,$0` (func_002F7320: `daddu $a3,$t1,$zero`).
+A zero learnt in an earlier block is folded as before. It is off by default, enabled per unit
+in `config/cflags.txt`, and `-fno-rac2-keep-block-zero-copy` disables it;
+`tests/test_keep_block_zero_copy.py` covers the anchors, the default/disabled equality, the
+kept copy and a control across a call.
+
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
-`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c` and `tc-mips.c` hash as it
+`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c` and `tc-mips.c` hash as it
 lists. The binaries' own hashes depend on the build host and path, so check a compiler by its
 output: `tools/build.py` compiles every matched function to the retail bytes.
