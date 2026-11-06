@@ -26,8 +26,6 @@ void func_PAL_002B14F8(void *a0, float *a1, float f12, int a2, int a3)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002B1570);
-
 void func_PAL_002B1588(int first, int second)
 {
     extern int func_00288FB8(int);

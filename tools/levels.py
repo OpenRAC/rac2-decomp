@@ -845,7 +845,6 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_00314B5C": (4204, 4),
     "func_PAL_003161FC": (284, 4),
     "func_PAL_003198A4": (5296, 92),
-    "func_PAL_0031E96C": (140, 4),
     "func_PAL_0033423C": (2672, 28),
     "func_PAL_003373BC": (188, 4),
     "func_PAL_L00_00349574": (96, 4),
@@ -879,7 +878,6 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_L04_003E61CC": (10400, 4),
     "func_PAL_L04_0040F2AC": (3444, 4),
     "func_PAL_L04_0041E49C": (5132, 4),
-    "func_PAL_L05_0033ED34": (44, 4),
     "func_PAL_L05_004259FC": (1456, 4),
     "func_PAL_L06_00422184": (4300, 4),
     "func_PAL_L06_004347BC": (2540, 4),
@@ -954,7 +952,6 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_US2_002FAB0C": (1532, 4),
     "func_US2_002FBCEC": (748, 4),
     "func_US2_00315AEC": (316, 4),
-    "func_US2_0031E14C": (140, 4),
     "func_US2_003364DC": (196, 4),
     "func_US2_L00_00348244": (96, 4),
     "func_US2_L00_00349AAC": (96, 4),
@@ -989,7 +986,6 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_US2_L14_004284F4": (760, 4),
     "func_US2_L16_003C404C": (1792, 4),
     "func_US2_L19_0042BE14": (1504, 4),
-    "func_US2_L20_0036F994": (12, 4),
     "func_US2_L30_003B4E94": (2736, 4),
     "func_US2_L02_00400E04": (728, 12),
     "func_US2_L11_0044709C": (784, 12),
@@ -1207,6 +1203,25 @@ FUNCTION_RESIDUES = {
     "func_US2_003420C0": 12,
     "func_US2_0034BDA8": 8,
     "func_US2_L00_00402420": 8,
+    # 7 November 2026, second pass: the same audit for 14 more release rows. Each
+    # follows a completed return and its delay slot (with a padding nop in some),
+    # holds no return, branch or stack-frame prologue, and runs into the next body;
+    # no reference enters it at any placement of its release. Sizes are the rows'
+    # current extents, after the filler-nop skip some of them had.
+    "func_PAL_002B1570": 24,
+    "func_PAL_002EE8B8": 16,
+    "func_PAL_0031E96C": 136,
+    "func_PAL_00331938": 16,
+    "func_PAL_00339E30": 8,
+    "func_PAL_0034F050": 16,
+    "func_PAL_L00_00369C48": 8,
+    "func_PAL_L05_0033ED34": 40,
+    "func_PAL_L05_0037FF68": 8,
+    "func_US2_0031E14C": 136,
+    "func_US2_00330BD8": 16,
+    "func_US2_00338F80": 8,
+    "func_US2_0034DBC8": 16,
+    "func_US2_L20_0036F994": 8,
 }
 
 

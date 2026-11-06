@@ -35,8 +35,6 @@ void func_PAL_00339DC8(int object, int value, int count)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00339E30);
-
 
 
 

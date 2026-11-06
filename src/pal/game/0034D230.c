@@ -120,8 +120,6 @@ void func_PAL_0034EFF0(int *self, int value)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034F050);
-
 INCLUDE_ASM("asm/pal/game", func_PAL_0034F060);
 
 
