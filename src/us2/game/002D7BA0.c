@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_002D7BA0);
-
 extern void func_0029D830(int *);
 extern int func_0029DB28(unsigned int, unsigned int, unsigned int, int);
 extern int D_001C51D0;

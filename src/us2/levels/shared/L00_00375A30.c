@@ -26,5 +26,3 @@ void func_US2_L00_00375EC0(void)
         break;
     }
 }
-
-INCLUDE_ASM("asm/us2/levels", func_US2_L00_00375F40);
