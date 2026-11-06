@@ -23,4 +23,53 @@ extern int D_0025E0B0;
 extern StreamReads2DAD18 D_0014B540;
 extern int func_002B7B18(int, int, int);
 
-INCLUDE_ASM("asm/us2/game", func_US2_002DBA70);
+int func_US2_002DBA70(Handles_2DCB28 *object)
+{
+    switch (object->state) {
+    case 0:
+        if (object->first != 0) {
+            if (D_001A63AC != 0)
+                break;
+            {
+                StreamReads2DAD18 *reads = &D_0014B540;
+                int offset = reads->offset;
+
+                if (func_002B7B18(object->first,
+                                  reads->first[D_0025E0B0].start + offset,
+                                  reads->first[D_0025E0B0].length) != 0)
+                    object->state++;
+                else
+                    object->state = -1;
+            }
+        }
+        break;
+    case 1:
+        if (D_001A63AC != 0)
+            break;
+        object->state = 2;
+        break;
+    case 2:
+        if (object->second != 0) {
+            if (D_001A63AC != 0)
+                break;
+            {
+                StreamReads2DAD18 *reads = &D_0014B540;
+                int offset = reads->offset;
+
+                if (func_002B7B18(object->second,
+                                  reads->second[D_0025E0B0].start + offset,
+                                  reads->second[D_0025E0B0].length) != 0)
+                    object->state++;
+                else
+                    object->state = -1;
+            }
+        }
+        break;
+    case 3:
+        if (D_001A63AC != 0)
+            break;
+        object->state = 4;
+        break;
+    }
+    return 0;
+}

@@ -41,5 +41,3 @@ void func_US2_L01_003C1CA8(char *object)
     *(int *)(hero + 0x1B8) = 0;
     *(int *)(hero + 0x18C0) = 0;
 }
-
-INCLUDE_ASM("asm/us2/levels", func_US2_L01_003C1DB8);

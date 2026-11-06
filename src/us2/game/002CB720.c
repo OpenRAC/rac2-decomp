@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_002CB720);
-
 #include "common.h"
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -47,3 +45,43 @@ extern int func_00132028(void);
 extern void func_002E4AC8(void);
 extern s16 func_002B7CE0(int);
 extern void func_002B8518(void);
+
+void func_US2_002CB720(void)
+{
+    GameState_2CB720 *s = (GameState_2CB720 *)(void *)D_001F2840;
+    TI128 *dst;
+    int mode;
+
+    *(int *)(void *)D_001F2840 = 0;
+    func_002FC138();
+    dst = (TI128 *)D_001B5340;
+    qcopy(dst, &s->field_050);
+    qcopy(dst + 1, &s->field_060);
+    func_00282AB0((char *)dst + 0x230, (char *)s + 0x200, 0x30);
+    *(float *)D_001B90F0 = s->field_0F8;
+    func_0027AB40();
+    func_00279D18();
+    func_0028B338(0);
+    func_00279FF0();
+    mode = s->field_01C;
+    s->field_11C = 0;
+    s->field_114 = 0;
+    s->field_020 = 0;
+    s->field_118 = 0;
+    if (mode == 3 || mode == 4 || mode == 6 || mode == 5) {
+        func_0027D330(0x10);
+    }
+    if (((GameState_2CB720 *)(void *)D_001F2840)->field_1F4 == 0) {
+        func_00132B28(0x5D);
+        if (((GameState_2CB720 *)(void *)D_001F2840)->field_01C != 2 || func_00288D30() == 0)
+            func_002B7320();
+        func_00132028();
+    }
+    func_002E4AC8();
+    if (((GameState_2CB720 *)(void *)D_001F2840)->field_0DB) {
+        func_002B7CE0(1);
+        ((GameState_2CB720 *)(void *)D_001F2840)->field_0DB = 0;
+    }
+    func_002B8518();
+}
+
