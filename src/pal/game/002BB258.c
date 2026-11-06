@@ -81,4 +81,18 @@ void func_PAL_002BB458(void *a0, int a1)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002BB530);
+extern int func_00282978(char *);
+extern unsigned char *D_001F2544;
+
+/* func_PAL_002BB530, the PAL copy of func_002BA978: the same C, with a lifetime of 22 frames for
+ * 27, and the table index scaled to span the same ten entries: (22 - t) * 9 / 22 for (27 - t) / 3. */
+void func_PAL_002BB530(char *self)
+{
+    int alpha = *(short *)(self + 0xA) * *(int *)(self + 0x20) / 22;
+    *(unsigned int *)(self + 4) = (*(unsigned int *)(self + 4) & 0xFFFFFFu) | (alpha << 24);
+    if (func_00282978(self + 0xA)) {
+        func_002B9180(self);
+    } else {
+        self[2] = D_001F2544[(22 - *(short *)(self + 0xA)) * 9 / 22];
+    }
+}

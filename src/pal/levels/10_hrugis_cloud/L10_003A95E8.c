@@ -2,8 +2,6 @@
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L10_003AF110);
-
 
 
 typedef signed int s32;

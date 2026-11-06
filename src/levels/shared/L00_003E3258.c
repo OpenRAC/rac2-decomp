@@ -507,7 +507,7 @@ void func_L00_003E7760(void)
 {
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003E7C88);
+/* func_L00_003E7C88 is in L00_003E3258-fade.c */
 
 /* func_L00_003E7E40 lives in L00_003E7E40-trails.c. */
 

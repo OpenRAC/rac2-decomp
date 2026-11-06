@@ -43,6 +43,5 @@ void func_PAL_L04_00410678(L04Quad *position, L04Quad *direction, int count, int
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_00410920);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L04_00410E40);

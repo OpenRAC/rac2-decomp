@@ -245,6 +245,4 @@ finish:
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_00394290);
-
 INCLUDE_ASM("asm/pal/levels", func_PAL_L09_0039EEE0);

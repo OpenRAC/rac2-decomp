@@ -1,4 +1,11 @@
 #include "common.h"
+typedef struct { float v[4]; } RibbonPoint;
+typedef struct {
+    float vertex[4][4]; unsigned int color[4]; float uv[8]; u64 state[4];
+} RibbonPacket;
+extern void func_00281DE8(void *, int, int, int);
+extern void func_00280B90(void *, int, int);
+extern void func_00282DD8(void *, void *, void *);
 
 extern void func_00282D30(void *, void *, float);
 extern float D_L04_001AD848 MACRO_ADDR, D_L04_001AD84C MACRO_ADDR;
@@ -539,7 +546,68 @@ extern u32 ref_L04_00362940_00;
 
 /* func_L04_0030C4C0 is matched in L04_0030C4C0.c (built with -frac2-qcopy and -g). */
 
-INCLUDE_ASM("asm/levels", func_L04_0030C948);
+/* Draws a camera-facing ribbon along a polyline, one quad per segment; each point's fourth
+   float is its half width.  The first segment uses first_texture, the last one last_texture
+   and the others middle_texture. */
+void func_L04_0030C948(RibbonPoint *line, int first_texture, int middle_texture,
+                     int last_texture, int count, unsigned int color)
+{
+    RibbonPacket q;
+    RibbonPoint *points;
+    float camera[4];
+    float cross[4];
+    float side[4];
+    float camera_delta[4];
+    float segment[4];
+    float width;
+    int i = 0;
+    int changed;
+
+    changed = 0;
+    qcopy(camera, D_L04_001B9680);
+    points = line;
+    line = 0;
+    func_00281DE8(&q, first_texture, 0, 0x80);
+    q.color[3] = color;
+    q.color[2] = color;
+    q.color[1] = color;
+    q.color[0] = color;
+    q.uv[0] = 0.0f;
+    q.uv[1] = 0.0f;
+    q.uv[2] = 1.0f;
+    q.uv[3] = 0.0f;
+    q.uv[4] = 0.0f;
+    q.uv[5] = 1.0f;
+    q.uv[6] = 1.0f;
+    q.uv[7] = 1.0f;
+    func_00282CF0(camera_delta, points[0].v, camera);
+    func_00282CF0(segment, points[1].v, points[0].v);
+    func_00282DD8(cross, segment, camera_delta);
+    width = points[0].v[3];
+    func_00282F20(side, cross, width);
+    func_00282CC0(q.vertex[0], points[0].v, side);
+    func_00282CF0(q.vertex[1], points[0].v, side);
+    for (i = 1; i < count; i++) {
+        func_00282CF0(camera_delta, points[i].v, camera);
+        func_00282CF0(segment, points[i].v, points[i - 1].v);
+        func_00282DD8(cross, segment, camera_delta);
+        width = points[i].v[3];
+        func_00282F20(side, cross, width);
+        func_00282CC0(q.vertex[2], points[i].v, side);
+        func_00282CF0(q.vertex[3], points[i].v, side);
+        func_00280B90(&q, 0, 0);
+        if (!changed) {
+            if (i == count - 2) func_00281DE8(&q, last_texture, 0, 0x80);
+            else func_00281DE8(&q, middle_texture, 0, 0x80);
+            changed = 1;
+        } else if (i == count - 2) {
+            func_00281DE8(&q, last_texture, 0, 0x80);
+        }
+        qcopy(q.vertex[0], q.vertex[2]);
+        qcopy(q.vertex[1], q.vertex[3]);
+    }
+}
+
 
 ASM_FUNC("asm/levels", func_L04_0030EDE0);
 
@@ -636,7 +704,6 @@ s32 func_L04_0033D4B0(u8 *a0) {
     return 0;
 }
 
-INCLUDE_ASM("asm/levels", func_L04_003429F8);
 
 extern void func_00282D60(void *buf, u32 value, float scale);
 extern void func_00283DB8(void *buf, float value);
@@ -1278,7 +1345,7 @@ void func_L04_003A1FA0(u8 *self) {
 
 /* func_L04_003A1FE0 is matched in L04_002CC748-g8.c (built with -G8). */
 
-INCLUDE_ASM("asm/levels", func_L04_003A21F8);
+/* func_L04_003A21F8 is matched in L04_002CC748-water-g8.c (built with -G8). */
 
 typedef struct {
     u32 value;

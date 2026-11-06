@@ -29,7 +29,6 @@ void func_PAL_L20_00448200(char *arg0, char *arg1, float f) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_00448428);
 
 #include "common.h"
 extern void func_002A7750(int, int, int);

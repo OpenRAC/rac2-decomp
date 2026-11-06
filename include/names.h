@@ -196,7 +196,10 @@
 #define InitializeHero                   func_L00_002A4928
 #define floor                            func_00117650
 #define MorphorayUpdate                  func_L00_00405808
+#define volume_camera_swing              func_L06_0047A408
 #define RenderLocalizedUiEntryList       func_002D6230
+#define render_water_grids               func_L04_003A21F8
+#define update_slot_panes_and_effects    func_L08_00429560
 
 /* descriptive */
 #define QueueMobyImpact                  func_002A8E20
@@ -863,6 +866,7 @@
 #define UpdateTriggeredAnchorMover       func_L17_003C3C50
 #define DrawSegmentedBeam                func_L07_003F4CC0
 #define UpdateCollisionRing              func_L07_003F4578
+#define draw_moby_glow_sprites           func_L00_003FA858
 #define UpdateObjectPreviewSequence      func_002FF450
 #define __ieee754_fmod                   func_00117848
 #define InitPathMotion                   func_L00_004291A0
@@ -877,6 +881,7 @@
 #define LaunchSpawnerMobyUpdate          func_L04_003EE090
 #define RefreshMissionMenuItems          func_0029B910
 #define UpdateBankedOrientation          func_002EE000
+#define BeginPreviewTransition           func_002FF0D8
 #define ProbeLedgeGrab                   func_L01_002AE128
 #define UpdateOwnedParticleTrails        func_003054E8
 #define DrawNativeQuads                  func_00300AA8
@@ -887,6 +892,7 @@
 #define UpdateBouncingExplosive          func_L00_003F4210
 #define UpdateShipWeapons                func_L05_00443D08
 #define UpdateLockOnWeapon               func_L00_003C8A90
+#define DrawCameraFacingRibbon           func_L04_0030C948
 #define UpdateRaceSelectionMenu          func_L04_0040BA68
 #define L18_DisableModeGroups            func_L18_003FA180
 #define UpdateBeamLinkStrips             func_L09_003FB9F8
@@ -903,5 +909,15 @@
 #define UpdateWaveLineEffect             func_L00_00413358
 #define DrawShrinkingMobyRings           func_L01_00398B50
 #define DrawAnimatedEffectQuads          func_L02_00410F68
+#define UpdateSpreadWeapon               func_L00_003D1D28
+#define UpdateNearestRoutePoint          func_L04_00410788
+#define UpdateProjectile                 func_L05_00427238
+#define DrawSegmentedBeams               func_L18_003FAE50
+#define DrawPulsingGlowSphere            func_L04_0040D148
+#define UpdateDamoselTimedExplosions     func_L18_003170F8
+#define UpdateEffectSlots                func_003166C8
+#define DrawRotatingObjectGroupEffects   func_L02_003E80F8
+#define FindHeroOrMobyTarget             func_L04_003429F8
+#define UpdateFadingMobyList             func_L00_003E7C88
 
 #endif /* NAMES_H */
