@@ -172,8 +172,6 @@ the placement rules are in `tools/fcheck.py`'s docstring; its tests are
 | [`func_002B44C0`](game/func_002B44C0.c) | 1248 | 1192 bytes: the same folded pointer on the two copies at the top, which changes the saved registers holding `self + 0x10` and `target` and the order of the spills at 0xC8-0xEC |
 | [`func_L22_003D0840`](levels/func_L22_003D0840.c) | 60 | 4; matches size and every other word, but the parameter copy is `daddu $v1,$a0,$zero` against retail's `$a3`. |
 | [`func_00129410`](core/func_00129410.c) | 64 | 2 November 2026: VU0 sqc2 stores plus unmatched +0xA0 sp release and 12-byte CDCD fill. Corrected R5900 decode at +0x30 to ordinary sq; existing no-incoming-reference evidence, no C candidate. |
-| [`func_002E3998`](game/func_002E3998.c) | 572 | 6 November 2026: 572/572, 28/28 in all three releases, but only with the hardcoded scratchpad address 0x70002000; a `D_70002000` symbol swaps $s6/$s7, 0/28. Not allowed in matched C. |
-| [`func_002E3BD8`](game/func_002E3BD8.c) | 628 | 6 November 2026: as func_002E3998: exact only with the hardcoded scratchpad address 0x70002000. |
 | [`func_L00_002EDC90`](levels/func_L00_002EDC90.c) | 40 | G8 candidate is 44 bytes; 0/27 places. Separate multiply/add does not reproduce the retail COP1 accumulation sequence. |
 | [`func_L00_002EDCC8`](levels/func_L00_002EDCC8.c) | 40 | G8 candidate is 44 bytes; 0/27 places. Separate multiply/add does not reproduce the retail COP1 accumulation sequence. |
 | [`func_L00_002EDD00`](levels/func_L00_002EDD00.c) | 40 | G8 candidate is 44 bytes; 0/27 places. Separate multiply/add does not reproduce the retail COP1 accumulation sequence. |
