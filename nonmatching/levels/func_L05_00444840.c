@@ -1,3 +1,4 @@
+/* 6 November 2026: -fno-gcse (with or without -fno-rerun-loop-opt) gives 696/704 bytes, -g ties. Retail hoists 12, -1, 3 and a lui into s4..fp before the object loop; this C does not. */
 /* Retained target selection, 2026-10-28: best736/736B,0/4US.
  * Five bounded trials. Pointer-rule scans G0=748; indexed rules816; G8=744;
  * G8+no-rerun-loop-opt736 (size only); indexed+no-force-mem812, rejected.

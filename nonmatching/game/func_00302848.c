@@ -1,3 +1,12 @@
+/* 6 November 2026, round 2: no change (468/468, 0/28 USA, 12 words; checked in
+ * src/game/00300618-g8.c). sched1 dump: the call block's arg moves are in argument
+ * order and tie, so a1 (D_001AE92C) goes before a2 (D_001AE904); retail has a2 first.
+ * Same result: a block local for D_001AE92C, the -g (00300618-draw-g8) and -g8-qcopy
+ * units. Worse: local before the branch (114), D_001AE92C as an incomplete
+ * MACRO_ADDR or sda view (472, absolute), D_001AE8EC[4] sda (13, macro in jal slot),
+ * D_001AE8EC[] sda (464), -mno-split-addresses with or without plain arrays (472,
+ * bnel head, a1/a2 still swapped), plain arrays with split addresses (46).
+ */
 /* 6 November 2026: retained source below unchanged (468/468, 0/28 USA, 12 words).
  * -mno-split-addresses with the 16-byte arrays and D_001A8BD0 as plain (non-sda) externs
  * gives 472 bytes and about 80 differing words (puff store block and branch-likely tail).

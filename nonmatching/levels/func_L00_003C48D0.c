@@ -1,3 +1,11 @@
+/* 6 November 2026, round 2: no change. Own -O2 -G0 unit, plain indexed body with
+ * `next = i + 1`: 684/708. Outer loop as goto: 656 (gcse hoists D_1B2990 instead,
+ * D-16 built from D); goto with -fno-gcse: 652 (addresses rebuilt as retail, but
+ * D-16 from D and no madd). do-while or while outer loop: 684. sda attributes on the
+ * arrays: 684. -fno-rerun-loop-opt: 692. Loop dump: threshold is about 45-54, so a
+ * savings-2 life-4 address in a 152-insn loop is always desirable; retail's outer
+ * loop is a real loop (aligned top label, nop) that moved nothing.
+ */
 /* 6 November 2026: two new checks, no match; the body below is kept (696/708).
  * Plain indexed C (`func_00282CF0(delta[j], D[i][j], D[i][j - 1])`, j = 1..9, own
  * -O2 -G0 unit) gives retail's D_240070 operand but strength-reduces the outer loop

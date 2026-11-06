@@ -1,8 +1,23 @@
+/* 6 November 2026: additional USA v1.01 trials, game -O2 -G8
+ * -ffunction-sections -g: best remains 460/460, 0/2, four preheader rows,
+ * first +0x84. New: sign/zero-extending the source row pointer to long before
+ * converting it back ties. Keeping the row arithmetic itself in unsigned/signed
+ * long gives 472/464 bytes and changes the frame. Grouping the real row copy
+ * gives five preheader rows. Placing the column offset inside the integer row
+ * expression gives a different four-row miss; advancing unadjusted row pointers
+ * emits per-call offsets (452 bytes). Original best C retained.
+ * No exact RAC1/RAC4 donor found. The next useful evidence remains the separate
+ * reduced row pseudo's lifetime. No linked build was run.
+ */
 /* 6 November 2026: unchanged, 460/460, 0/2, 4 rows (the preheader copy). Tied: a second
  * row pointer copied from the first, two pointer bivs a/b from the row, a separate q row,
  * `p + j * 64 + 0x460`, a per-iteration local for the 0x460 cell, q = p + 0x100. An int
  * offset summed three times is far worse (113 rows). Loop dump: both givs (1120, 1376) come
- * from reg 108 = (i << 4) + s with no copy; retail's copy must come from another pseudo. */
+ * from reg 108 = (i << 4) + s with no copy; retail's copy must come from another pseudo.
+ * Round two (same day, 21 compiles): one-pass groups around the copy, either init or both;
+ * a = row, c = a copy then += 0x460/0x560 (9-10 rows); Cell[3][4] struct/array views of
+ * both grids (4 rows, offsets added before s); mixed `s + i * 16 + 0x460` / `p + 0x560`
+ * (3 rows, s0 = s + (i*16+0x460) instead of row + 0x460). None keeps the copy. */
 /* 4 November 2026 source-layout review, retained near miss.
  * Four new grid/address/group forms with -O2 -G8 -ffunction-sections -g
  * remain 460/460 bytes, 0/2 USA places (first +0x78 or +0x84).

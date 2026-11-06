@@ -3738,3 +3738,6 @@ src/levels/shared/L03_002AB5C8-state-g8.c	-O2 -G8 -ffunction-sections -frac2-haz
 src/game/002F5220-7320.c	-O2 -G8 -ffunction-sections -frac2-keep-block-zero-copy
 src/levels/30_insomniac_museum/L30_0040B6B0-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_00358B30-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/levels/shared/L08_002F2D10-g.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L08_002F2D10-emit-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-gcse -g
+src/game/00326A10-g8.c	-O2 -G8 -ffunction-sections -fno-gcse

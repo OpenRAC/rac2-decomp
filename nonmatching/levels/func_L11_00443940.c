@@ -1,3 +1,4 @@
+/* 6 November 2026: -g with -fno-rerun-loop-opt still 904 bytes; the label copy is still folded into a0. */
 /* Retained manual C reconstruction; not linked and not matching.
  * Profile: -O2 -G8 -ffunction-sections
  * Local tools/check.py measurements: us: 908 compiled bytes, 0/1 placements, exit 1; us2: 908 compiled bytes, 0/1 placements, exit 1; pal: 908 compiled bytes, 0/1 placements, exit 1.

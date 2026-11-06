@@ -1,3 +1,8 @@
+/* 6 November 2026, round 2: C below unchanged (416/412, 0/1 USA). A do/while(0) group around
+ * the last two, the last three or one AC0 call, or around func_002A7750, gives 420/412 each;
+ * base and stride stay local-alloc quantities in s0/s1 (lui into s0), since loop notes do
+ * not split the block. Retail needs them global (obj s0, base s1, stride s2, p s3).
+ */
 /* 4 November 2026 current-RAC1 source-method trial; retained, not linked.
  * Two new real-operation group trials (the first append call and the state-pointer read) each
  * produce 420/412 bytes, 0/1 USA placements. Neither promotes table/stride allocation as

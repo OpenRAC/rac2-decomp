@@ -1,3 +1,15 @@
+/* 6 November 2026, round 2: new best C below; default -G0 profile, 656/656 bytes, 0/1 USA,
+ * 92 diff lines (the previous form gave 102). Plain call arguments with literal 0.5f/0.0f
+ * put half in $f20 before the first call as retail does; a group around the second text
+ * call keeps the loop set-up (i, the constant 1, the coordinate pointers) after that call;
+ * an unconditional (float)shift fixes the loop registers (i s3, shift s1, keys s2, buffer s4).
+ * Left: half/zero swapped ($f21/$f20) once the group is in; in both text calls retail does
+ * the whole row conversion before loading any other argument, here sched interleaves them;
+ * retail's .y pointer is %hi/%lo(D_001B0164) where this forms base+4; loop increments sit
+ * between mfc1 and mtc1. Measured, none closer: group around both calls or the first only
+ * (668 bytes, extra $f22), group around the loop's row block (660), a `half` variable,
+ * -ffast-math, -fno-schedule-insns, -fno-schedule-insns2 (652).
+ */
 /* Retained bounded near miss, 2026-10-28: default profile656/656 bytes.
  * Five forms: named half constant removes duplicated FPR and restores0xf0
  * frame; explicit row/zero/adjustment lifetimes and -fno-regmove tie the
@@ -36,44 +48,38 @@ extern int func_0027FB40(int, int, unsigned long, unsigned char *, int);
 extern int func_L00_00443DF8(char *);
 extern int func_L00_00443E18(char *);
 
-/* Four genuine text identifiers, one128-byte formatting buffer and four
- * coordinate pairs. The text formatter writes through its ordinary char
- * interface; no shortened object or scheduling-only volatile is used. */
 int func_L03_003C7018(void)
 {
     if (D_L03_001A904C) {
-        int text;
-        float half = 0.5f, row, zero;
-        text = func_00336D50(D_L03_001A904C + 0x8710, 0xc6);
-        row = (float)(int)(D_L03_001B0150 * D_L03_001B3284 + half);
-        zero = 0.0f;
-        func_00300A00((char *)text, 0x60442d00, D_L03_001B014C, row,
-            D_L03_001B0154, D_L03_001B0158, zero);
-        text = func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
-        row = (float)(int)(D_L03_001B0150 * D_L03_001B3284 + half);
-        func_00300A00((char *)text, 0x55f0c070, D_L03_001B014C, row,
-            D_L03_001B0154, D_L03_001B0158, zero);
+        func_00300A00((char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc6), 0x60442d00, D_L03_001B014C,
+            (float)(int)(D_L03_001B0150 * D_L03_001B3284 + 0.5f), D_L03_001B0154, D_L03_001B0158, 0.0f);
+        do {
+            func_00300A00((char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7), 0x55f0c070, D_L03_001B014C,
+                (float)(int)(D_L03_001B0150 * D_L03_001B3284 + 0.5f), D_L03_001B0154, D_L03_001B0158, 0.0f);
+        } while (0);
         {
             int keys[4] = {11599,12116,12769,12770};
             unsigned char buffer[128];
             int i;
-            for (i = 0; i < 4; ++i) {
-                int shift = 5, x, y;
+            for (i = 0; i < 4; i++) {
+                int shift = 5;
+                int x;
+                float y;
                 unsigned char *label = func_00288FB8(keys[i]);
                 if (i == 1) {
-                    func_00115DA8((char *)buffer, D_L03_001B0190, label, D_L03_001B0140+1);
+                    func_00115DA8((char *)buffer, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
-                } else func_00115DA8((char *)buffer, D_L03_001B0198, label);
+                } else {
+                    func_00115DA8((char *)buffer, D_L03_001B0198, label);
+                }
                 x = func_00283CF0(D_L03_001B0160_gp[i].x);
                 {
-                    row = D_L03_001B0160[i].y * D_L03_001B3284 + half;
-                    {
-                        float adjustment = (float)shift;
-                        if (D_L03_001B3280 == 1) row += adjustment;
-                    }
-                    y = func_00283CF0((float)(int)row);
+                    float adjustment = (float)shift;
+                    y = D_L03_001B0160[i].y * D_L03_001B3284 + 0.5f;
+                    if (D_L03_001B3280 == 1)
+                        y += adjustment;
                 }
-                func_0027FB40(x, y, 0x80808080UL, buffer, 0x80);
+                func_0027FB40(x, func_00283CF0((float)(int)y), 0x80808080UL, buffer, 0x80);
             }
         }
         if (D_001A7A7C[0]) {
@@ -83,3 +89,4 @@ int func_L03_003C7018(void)
     }
     return 1;
 }
+

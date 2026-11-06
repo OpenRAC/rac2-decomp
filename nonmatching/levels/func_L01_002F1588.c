@@ -1,3 +1,4 @@
+/* 6 November 2026: -g, -fno-gcse and both stay 736/768, 173 rows. Retail keeps the projection block's high half in s2 and loads 1.0f/0.0f after the first conversion. */
 /* Nonmatching interface overlay reconstruction, 2026-10-28. No C credit.
  * Four US checks, 0/5. Retained 736/768B, frame0x70 exact, with -O2 -G0
  * -ffunction-sections. First diagnostic728B had rectangle-top375 rather

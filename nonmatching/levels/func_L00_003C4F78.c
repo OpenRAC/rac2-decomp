@@ -1,3 +1,14 @@
+/* 6 November 2026, round 2: best body below (916/916, 0/27 USA, 9 words; was 11).
+ * A one-pass group around the copy only, `do { qcopy(dst, src); } while (0);`,
+ * fixes the s1/s2 roles (source pointer s1, vertices s2). Left: a0/a1 for D-16 vs
+ * last*16, the source start still summed (last*16 + i*320) + (D-16), and the group's
+ * loop note moves `addiu a1, sp, 0x160` into the jal slot. The loop dump shows the
+ * source giv add as ((i*320) + -16) + D_reg; retail needs i*320 + X, X opaque.
+ * Tied (9): &D[i][j] - 1, D[0] - 1 cast to a row array, (D[0] - 1)[i*20 + j], group
+ * around `index = ...; qcopy`, the -g8-qcopy unit. Worse: group around the call or
+ * the 0.05f store (15-213), a source local before qcopy (952/956), struct assign
+ * in the -g8-qcopy unit (932), group around last= (16) or the counter clamp (11).
+ */
 /* Complete-owner follow-up, 2026-11-03; no linked match.
  * One new check under -O2 -G8 -ffunction-sections: int32 byte-offset cursors
  * over the actual four 20-point rows stay 916/916 bytes, 0/27 US placements.
@@ -85,7 +96,7 @@ void func_L00_003C4F78(char *owner)
         last = D_L00_001B2940[i] - 1;
         for (j = last; j > 0; j--) {
             int index = last - j;
-            qcopy(&D_L00_0023FB80[i][j], &D_L00_0023FB80[i][j - 1]);
+            do { qcopy(&D_L00_0023FB80[i][j], &D_L00_0023FB80[i][j - 1]); } while (0);
             func_00282CC0(&vertices[index], &origin, &D_L00_0023FB80[i][j]);
             vertices[index].f[3] = 0.05f;
         }

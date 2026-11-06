@@ -1,3 +1,15 @@
+/* 6 November 2026: USA v1.01 recheck, game -O2 -G8 -ffunction-sections:
+ * 680/680 bytes, 0/28 placements, first +0x1F4; seven instruction rows differ
+ * after ignoring relocation immediates. The older five-row measurement is historical.
+ * New: grouping the final packet or its 0x4410 store grows to 688 bytes; grouping
+ * its first store, 0x106 store, coordinates or state-base assignment worsens allocation.
+ * Moving the actual 0x106 store before 0x4410, before the header or after coordinates
+ * gives 15, 22 or 44 differing rows. RAC1's active setup_render_target donor in
+ * src/game/render/framebuf.c confirms the packet structure; its literal 0x4410 and
+ * unsigned draw-environment view give 17 rows here. Original best C retained.
+ * Reopen with a source-supported reason for the state address to precede 0x106
+ * while preserving the packet constants' allocation; no linked build was run.
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the actual int return and pointer/signed-short inputs of func_00125F20.
  * The measured 680-byte USA near miss still differs in packet constant/address scheduling; no false call contract is used to close it.

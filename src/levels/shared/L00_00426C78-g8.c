@@ -12,7 +12,7 @@ extern void func_L00_002D9D98(void);
 extern void func_00282978(char *);
 typedef struct { char *table; } Table_b0898;
 extern Table_b0898 D_L00_001B1844[] __attribute__((section(".sdata")));
-extern int D_L00_001B15DC __attribute__((sda));
+extern int ref_L00_00426C78_00 __attribute__((sda));
 extern char *D_L00_001B8E10 __attribute__((section(".data")));
 extern char D_00189EA0[];
 extern unsigned int D_001A7390[] __attribute__((section(".sdata")));
@@ -41,10 +41,10 @@ int func_L00_00426C78(char *a, char *b)
     int type;
     int otherType, ownerType;
     float len, dot;
-    if (D_L00_001B15DC) { D_L00_001B15DC = 0; return 0; }
+    if (ref_L00_00426C78_00) { ref_L00_00426C78_00 = 0; return 0; }
     type = D_00189E20_6C78.identity;
     { int identity = *(short *)(a + 0x86);
-    D_L00_001B15DC = 0;
+    ref_L00_00426C78_00 = 0;
     if (type == identity || type == 0x51) {
         owner = D_L00_001B8E10;
         otherType = *(short *)(b + 0x86);

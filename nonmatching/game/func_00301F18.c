@@ -1,3 +1,15 @@
+/* 6 November 2026, Codex follow-up: retained best source still 900/900 bytes,
+ * 0/28 USA places, only +0x31c/+0x324 differ (last add's a1/a2 setup).
+ * New pointer aliases for the position/origin at the group boundary and an
+ * actual inline add helper reproduce those two differences. Computing the
+ * origin again after the first add adds four bytes. Extending the large group
+ * through the last add while grouping either the real angle-basis call or the
+ * fallback angle copy disturbs allocation/scheduling. Grouping both optional
+ * output copies adds four alignment bytes. A separate group around the last
+ * add restores the old s7/fp swap. None improves the retained source below.
+ * Reopen on the real last-call dependency, not another folded pointer alias.
+ * No alternate-release checks or linked builds were run in this follow-up.
+ */
 /* 6 November 2026: one-pass group (docs/COMPILER-NOTES.md:54) from the parent-state test
  * through the first func_00282CC0, with an `origin = object + 0x10` local for the three
  * tail calls. Same profile and unit; 900/900 bytes, 0/28 USA places, 2 words left (was 8):
@@ -9,6 +21,9 @@
  * tail copies (+4 nop, s5/s6 swap), the end after the last call (s7/fp back), a `frame`
  * local for object+0xC0 (3-6). Next: a form where the last call's a1 is not a copy of
  * a0 at sched1 while the group still ends before it.
+ * Second pass, same day, no change: a pointer local for &position (set before or inside
+ * the group), mixed object+0x10/origin arguments (904 bytes), casts, a group around the
+ * tail copies or the last call.
  */
 /* 4 November 2026: a genuine two-vector anchor aggregate was tested with
  * the existing qcopy/qcopy-barrier profile in the assigned production unit.

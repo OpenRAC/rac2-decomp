@@ -1,3 +1,11 @@
+/* 6 November 2026: current game compiler, -O2 -G8 -ffunction-sections:
+ * 900/900 bytes, 0/28 places in each release; only the +0x230/+0x234 stores
+ * differ. New one-pass groups around individual/adjacent initialization
+ * statements, grouped flag/bounds constants and a group enclosing the guard
+ * plus clipping call all grow to 904 bytes and disturb the schedule. The
+ * groups introduce a label-alignment nop; they do not close the two-word tie.
+ * Retained C is unchanged. No linked build run by this worker.
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain func_0028EA58 as void with its real colour pointer and unsigned alpha packing.
  * The last bounded checks remain 900/900 bytes, 0/28 USA places: only clip.x1 and clip.y1 stores swap.

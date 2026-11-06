@@ -1,3 +1,27 @@
+/* 6 November 2026: retained near miss, not linked or counted.
+ * USA v1.01: 772/772 bytes, 0/28 places, first mismatch +0x78.
+ * Unit/profile for reproduction: src/game/0027BA68-qcopy.c,
+ * -O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
+ * A permitted one-pass group around view_position = view_matrix - 0x230
+ * fixes the eight view-pointer register differences. The complete camera owner
+ * still contains both addresses; no pointer subtraction before an object.
+ * Eight instruction positions remain: +0x78/+0x7c/+0x80/+0x88 schedule
+ * the flag mask/store and first copy arguments; +0x118 through +0x124 schedule
+ * the command-color lui before/after a0/a3/t0. Keep the four real 64-bit command
+ * fields and the observed f12=1.0 input to func_0027B9C0.
+ * New trials: grouping an actual matrix-source alias places the mask/store too
+ * early; reusing the scene variable for the saved-matrix destination ties;
+ * grouping the restore and source alias worsens allocation; naming the 64-bit
+ * command color before the preceding call ties. No flags retained beyond the
+ * stated profile. Previously tied: short/int/pointer/one-bit flag views and
+ * destination/source/count locals. Previous groups around the restore, copy,
+ * or both tied at four scheduling differences or worsened to 8-18 rows.
+ * Reopen with a real dependency explaining the two argument-setup windows.
+ * No alternate-release checks or linked builds were run in this attempt.
+ */
+/* Historical notes below: the current measurements above supersede the old
+ * residuals and any statement that meaningful one-pass groups are forbidden.
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the four 64-bit fields of func_002A0468 and a complete camera owner at D_001B5200: position +0x140, matrix +0x370.
  * Do not subtract before a separately declared D_001B5570 array.
@@ -122,11 +146,8 @@ void func_0027BA68(void)
         func_002A0300(scene, -1);
         moby->flags &= ~1;
         func_00282B50(saved_matrix, view_matrix, 0x40);
-        {
-            char *first = (char *)&D_001B5200 + 0x140;
-            qcopy(&saved_position, first);
-            view_position = first;
-        }
+        do { view_position = view_matrix - 0x230; } while (0);
+        qcopy(&saved_position, view_position);
         saved_scale = D_001B9040.scale;
         func_0027B9C0(8, 8, 1.0f);
         func_00129178(matrix);

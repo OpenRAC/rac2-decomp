@@ -1,3 +1,16 @@
+/* 6 November 2026: USA v1.01, -O2 -G8 -ffunction-sections
+ * -mno-split-addresses: 540/540 bytes, 0/8 placements, first +0x9C; the same
+ * decrement differs at +0x9C/+0x118. Nonempty groups are now permitted source forms;
+ * the old open-policy question below is superseded by docs/COMPILER-NOTES.md.
+ * New: grouping the bound read gives 552 bytes; grouping copy plus bound read
+ * or copy plus W call gives 544. Explicit common 0/1 locals around the copy group
+ * shrink to 528 with different saved-register allocation. Grouping the actual
+ * induction update in the for increment gives 544 (an extra end-of-loop nop),
+ * with the same wrong decrement slot. qcopy_nc and nonvolatile scalar/one-element
+ * nosda views of the minimum bound tie the best two-row miss. Original C retained.
+ * No exact RAC1/RAC4 donor found. Reopen with an independently justified memory
+ * dependency or loop-note placement that preserves constant sharing. No linked build.
+ */
 /* 6 November 2026: on the current compiler the draft is unchanged (2 rows). A plain TI union
  * assignment in place of qcopy gives 528 bytes and 122 rows, so the qcopy barrier stays. */
 /* 5 November 2026: retained reconstruction, not linked or counted.

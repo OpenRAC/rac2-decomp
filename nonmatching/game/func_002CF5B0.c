@@ -1,3 +1,17 @@
+/* 6 November 2026: USA v1.01, game -O2 -G32 -Wa,-G32 -ffunction-sections:
+ * 576/576 bytes, 0/28 placements, first +0x60. The current retained input gave
+ * 23 differing instruction rows (ignoring relocation immediates), rather than the
+ * older ten-word result. Reusing the actual input-mask working variable for the
+ * later item read recovers retail's a0 item allocation and reduces this to 21 rows;
+ * that source is retained below. Base/status allocation and cleanup-call setup remain.
+ * New: a shared table pointer across navigation arms adds a saved register (588
+ * bytes); keeping another real table-base reference for the cost retest gives 592.
+ * Reusing the callback's real source/owner pointer for the later table base does
+ * not close the allocation difference. A scalar nosda binding for the cleanup
+ * halfword ties, as does grouping the item read; grouping cost moves the constant.
+ * No exact RAC1/RAC4 donor found. Reopen with lifetime evidence that keeps the
+ * table base out of local allocation without another saved register. No linked build.
+ */
 /* 4 November 2026 source-contract/lifetime trials; retained, not linked.
  * Real cost-read and table-base groups both give 576/576 bytes, 0/28 USA placements, first +0x60.
  * The borrowed short table is incomplete rather than incorrectly bounded to four elements while
@@ -130,8 +144,8 @@ finish:
                 else
                     *slot = 1;
                 {
-                    int item = shop_item(D_001AB9EC);
-                    if (item == 9 || item == 10 || (unsigned char)item == 2 || (unsigned char)item == 11)
+                    flags = shop_item(D_001AB9EC);
+                    if (flags == 9 || flags == 10 || (unsigned char)flags == 2 || (unsigned char)flags == 11)
                         func_002923C0((void *)(s32)D_001A7A10[4]);
                 }
             } else

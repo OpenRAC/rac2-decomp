@@ -1,3 +1,17 @@
+/* 6 November 2026, Codex follow-up: current-toolchain reproduction of the
+ * retained source in src/levels/shared/L03_002AB5C8.c is 644/644 bytes, 0/2 USA
+ * places. The old claim of only one displaced instruction is incomplete for
+ * this source/profile: 12 positions at +0x4 through +0x30 differ in prologue
+ * ordering, and 10 later positions exchange the +0x1c/+0x20 spill slots.
+ * Default -O2 -G0 -ffunction-sections. A separate unit reproduces the same
+ * differences. Grouping the first real distance call gives 652 bytes; grouping
+ * the output copy/height update gives 640. An output alias scoped to the tail,
+ * a concrete 16-byte output-struct view, and a separate height local tie.
+ * An entry output alias consistently used by the tail still costs a second
+ * spill and eight bytes (652), as in the earlier note. The best C is unchanged.
+ * Reopen on the incoming output pointer's spill dependency and loop spill order.
+ * No alternate-release checks or linked builds were run in this follow-up.
+ */
 /* 6 November 2026: one check, no change. A `float *` return of a1 (the caller in
  * L03_003C3220-g8.c declares `float *`; retail leaves a1 in v0) compiles the same:
  * `sw a1,0x10(sp)` still sits at +0x20 instead of +0x4. 644/644 bytes, 0/2.

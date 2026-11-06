@@ -1,3 +1,13 @@
+/* 6 November 2026: closer, still 944/948 bytes, 0/27 USA places (same profile). Below:
+ * a one-pass group around `origin_source = D_00189E20.origin`, written first before
+ * `records`. Retail's origin $fp and the in-loop -1 now come out; retail's preheader
+ * order (0.0f, fp, records, index, startp, endp, next) is nearly right. Left: retail
+ * copies `area` to a0 and puts -1 in v0 (`beq`, not `beql`); here area stays in v0 and
+ * -1 goes in a0; the second loop's `mov.s $f13,$f21` copy of `one` is still missing (4
+ * bytes). A group around the `draw` call brings the copy back but gives 952 bytes and
+ * swaps sum/one (f20/f21). No change: compare spellings, a `sel` local, group around
+ * `area`, `one` assigned after the declarations.
+ */
 /* 3 November 2026; retained C, no linked match.
  * Real operand captures and a choice write cursor, following current RAC1
  * pick_idle_fidget, remain 944/948 bytes and 0/27 US places (frame 0xD0).
@@ -77,17 +87,17 @@ int func_L00_002CA4E0(int *selected)
         if ((D_00189E20.flags & 2) == 0) return 0;
         return func_002A7878(0.0f, 1.0f) < 0.33f;
     }
+    do { origin_source = D_00189E20.origin; } while (0);
     records = D_L00_0025BC00;
     startp = &origin;
     endp = &raised;
-    origin_source = D_00189E20.origin;
     next = choices;
     for (index = 0; index < 4; index++) {
         float zero = 0.0f;
         int area;
         entry = &records[index];
         if (entry->inactive != 0 || entry->weight == zero) continue;
-        area = func_L00_002ADEA0(0);
+        do { area = func_L00_002ADEA0(0); } while (0);
         if (entry->selector != -1 && entry->selector != area) continue;
         if (index == 2) {
             if (D_001A79F0 != 7 && D_001A79F0 != 0x13) continue;

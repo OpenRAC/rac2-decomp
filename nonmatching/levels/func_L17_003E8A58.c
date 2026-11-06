@@ -1,3 +1,12 @@
+/* 6 November 2026, round 2: C below unchanged. Measured in a -G8 unit: default 936/964,
+ * with -frac2-qcopy 944/964 (lq/sq copy as retail). Retail keeps 15.0f in saved $f20 and
+ * copies it to $f12, though no call follows its only use: the pseudo must cross a call in
+ * the original RTL; no source form found. Retail loads every constant and D_L17_001B0E40
+ * once ($f9) before the stores, then stores in source order. Per-offset struct field
+ * accesses (anonymous struct per macro) free those loads but reorder the byte stores (each
+ * struct its own alias set), 944/964 and no closer. One real struct type for `state`
+ * is the next thing to try.
+ */
 /* 30 October 2026 retained ordinary C; no linked match or semantic proof.
  * Profile: -O2 -G8 -ffunction-sections.
  * us: 17_smolg: 936 bytes, expected 964.

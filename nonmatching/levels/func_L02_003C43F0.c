@@ -1,3 +1,5 @@
+/* 6 November 2026: a u64 colour local and a copied obj pointer do not produce retail's saved,
+ * unused $s1 (744 B both). */
 /* Near miss (opus-1, v1659): 744/752 bytes, 0/8 USA v1.01 places.
  * Profile: its own unit (e.g. L02_003C43F0-menu-g8.c) with
  *   -O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin,

@@ -1,3 +1,5 @@
+/* 6 November 2026: copy-loop source cursor as (D[i] - 1)[h], (&D[i][-1])[h] and a char-minus-16
+ * view: unchanged (+0xB0). A row pointer local (row[h] = row[h-1], prev = row - 1): 988 B. */
 /* Claude Opus 5.5 (opus-1, xhigh) worker, task v2165, 2026-11-03.
  * USA v1.01: 996/996 bytes, 0/1 places; first difference +0xB0. About 36 of
  * 249 rows differ once relocations are ignored, all in two places:

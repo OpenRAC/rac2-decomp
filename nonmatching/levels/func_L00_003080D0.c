@@ -1,3 +1,12 @@
+/* 6 November 2026, round 2: no change (820/820, 0/27 USA, 10 words). The RAC1 donor
+ * (rac1-decomp level_runtime_and_menus.c, `ensure_menu_cache_entry` loop) uses
+ * `((col & 31) >> 1)`, separate packed/selected bytes, a ternary and `continue` tests;
+ * each, and `sample == colour`, `unsigned char colour`, `int packed`, all keep the same
+ * 10 words. Inline ternary in the compare: 52; ternary for the first sample: 172; one-
+ * pass groups around `sampleRow` (24) or the inner sample load (22). Allocator dump:
+ * sample (pseudo 98, 18 refs) is first in the global queue and nothing it conflicts
+ * with holds v0, so retail's v1 needs a conflict or preference this source lacks.
+ */
 /* 6 November 2026: retained source below unchanged (820/820, 0/27 USA, 10 words).
  * One-pass groups measured: around `sampleRow *= 16` gives retail's v1/v0 for the first
  * sample but pins y&31 first (12 words); around the inner sample statements gives sample v1

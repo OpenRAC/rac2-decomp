@@ -588,7 +588,6 @@ void func_00325B70(char *self, char **children, int first, int second)
 
 /* func_00326198 is in 0031F210-state-g8.c. */
 
-INCLUDE_ASM("asm/game", func_00326A10);
 
 
 

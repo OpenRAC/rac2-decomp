@@ -1,3 +1,10 @@
+/* 6 November 2026: current game compiler, isolated -O2 -G8 -ffunction-sections
+ * unit: 952/952 bytes, 0/1 in each USA release; no canonical PAL identity.
+ * Seven new one-pass grouping / early-continue forms around the two mode tests
+ * retain the single bnel/bnez difference at +0x328. A shared health-label form
+ * grows to 956 bytes. No improvement; retained C below is unchanged.
+ * Reopen with evidence that changes reorg's first mode-branch slot selection.
+ */
 /*
  * Tier: opus-2 (v2175; first reached by opus b1065). Recompiled in v2/c04 as an "-g8.c" unit
  * with -O2 -G8 -ffunction-sections: 952/952 bytes, 0/1 places; exactly one instruction

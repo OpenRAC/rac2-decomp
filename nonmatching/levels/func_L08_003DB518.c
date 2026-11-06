@@ -1,3 +1,4 @@
+/* 6 November 2026: -g, -fno-gcse and both give 964/968 bytes, 217 rows. Retail frame is 0x80 with s0..s5 and f20..f23 (32.0f kept in f23, 1.0f in f21), reads D_L08_001A904C absolute and fills the menu test with a beql that loads state+4. */
 /* func_L08_003DB518: retained near miss, 30 October 2026.
    Profile: -O2 -G8 -ffunction-sections.
    Complete UI reconstruction with 16-byte packed style and 64-bit text-style argument. The 16-byte text slot is sufficient: the current retail format is %d and the input is s32 (at most 12 bytes including termination). Frame, rounding/allocation and scheduling remain.

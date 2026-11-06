@@ -1,3 +1,10 @@
+/* 6 November 2026: current game compiler, -O2 -G0 -ffunction-sections -g:
+ * 488/488 bytes, 0/3 places in each release; five flag setup words remain.
+ * New one-pass groups around individual/adjacent header writes either tie
+ * or worsen the constant/store order. Grouped byte-constant initialization,
+ * before or inside the null guard with char/int locals, also does not improve.
+ * Retain the existing C; reopen with a measured constant lifetime explanation.
+ */
 /* 6 November 2026: on the current compiler, still 5 rows. Retail makes the byte 255, then 0x100,
  * then the halfword 255, but stores +0x34, +0x30, +0x32. Signed short stores in that store order
  * (as matched spawners write them) give 5 rows; the +0x30/+0x34/+0x32 order gives retail's

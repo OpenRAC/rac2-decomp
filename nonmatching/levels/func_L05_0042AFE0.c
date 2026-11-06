@@ -1,3 +1,4 @@
+/* 6 November 2026: still 724/724, 47 rows (default, -g, -fno-gcse, -fno-gcse -g, and a phase local per wrap all tie). The bc1f slot takes daddu s1 instead of the phase store, and the -7 test is bc1f+nop where retail steals the next phase load into a bc1fl slot. */
 /* Complete C near miss; not linked and no matching credit.
  * 2026-10-30: game -O2 -G8 -ffunction-sections -g.
  * us: 0/4; us2: 0/4; pal: 0/4.

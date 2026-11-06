@@ -101,6 +101,20 @@ builtin/byte-view copies, complete-owner stores and equivalent initialization
 state transitions all tie. Reopen with independent scheduling or source-boundary
 evidence, not another store permutation or invented volatile stack access.
 
+**6 November 2026, bounded replay:** the isolated game `-O2 -G8
+-ffunction-sections` source still gives 900/900 bytes, 0/28 in each release.
+One-pass groups around the initialization stores, flag/bounds constant setup,
+or the guard plus clipping call grow to 904 bytes with a label-alignment nop
+and altered scheduling. None closes the two-store difference. The retained
+source is unchanged; these are local checks, with no linked build.
+
+The spawn routine `func_L18_0043FFF8` likewise stays 488/488 bytes and 0/3
+in each release under game `-O2 -G0 -ffunction-sections -g`. Grouped header
+writes or grouped byte-constant locals before/inside the null guard do not
+improve its five flag constant/store differences. Reopen with a measured
+constant lifetime explanation, rather than another equivalent store order.
+
+
 ### Floating formatter lifetimes and inherited limits
 
 `func_001185E8` is 1,496 bytes in each release and passes all three strict boot
@@ -552,6 +566,16 @@ The numbered history below is retained, with obsolete conclusions and incorrect 
 <a id="blocker-01"></a>
 
 ## 1. Register allocation on long bodies (the dominant wall)
+
+**6 November 2026, ribbon PRE replay:** `func_00281A08` remains 980/980
+bytes, 0/7 in each release with game `-O2 -G8 -ffunction-sections -g
+-frac2-qcopy -frac2-qcopy-barrier`. Eight non-relocated spill-offset words
+differ in the retained source, superseding its older ten-row count. Explicit
+`qcopy` for either/both matrix translations ties. Scoped loop counters, an
+explicit pair count, a zero-based step and one-pass groups around the setup,
+outer loop or translation copy do not improve; groups give 976-1004 bytes or
+earlier allocation differences. Reopen with a measured PRE expression or
+lifetime change that fixes the slot order. No linked build was run.
 
 **Ties and spill slots, 1 November 2026:**
 global allocation orders pseudos by `floor_log2(refs) * refs / live length`. With equal refs, the
@@ -1173,6 +1197,14 @@ pools, `.sdata` and unsupported assembly data directives remain rejected.
 
 ## 7. Annulled integer branch delay slots
 
+**6 November 2026, retained near miss:** `func_L07_0040EC08` is 952/952
+bytes, 0/1 in both USA releases under game `-O2 -G8 -ffunction-sections`;
+PAL has no canonical identity. Only `bnel` versus retail's `bnez` at +0x328
+remains. One-pass groups around the mode tests/calls and early-continue
+forms retain it; a shared health-label form grows to 956 bytes. The retained
+source explains the reorg jump-budget hypothesis. New evidence must change
+the first mode-branch slot selection; no linked match is claimed.
+
 Historical mismatches involved bnel/beql with a taken-path slot where retail used a normal branch and fall-through work, often one word different. The wave 9 correction counted 342 then-matched functions containing a likely branch: the compiler does emit them from ordinary C. That count is historical, not today's corpus size.
 
 Hoisting genuinely shared work before the condition changed slot selection in some bodies. It is a measured source lever, not a guarantee that every likely branch can be rewritten to a normal one. Five workers had previously discarded 9, 10, 11, 14 and 15 targets using that signature alone; those exclusions were not justified without exact decoding/profile checks.
@@ -1778,6 +1810,16 @@ its draft declared `func_002FC560(int, int)`. The callee stores its second input
 as a 64-bit packet value. Its real unsigned 64-bit declaration and literal recover
 27/27 checks in both USA releases; the name is absent from PAL's catalogue.
 No flag or artificial scheduling dependency is needed beyond the existing G8 unit.
+
+**6 November 2026, retained USA v1.01 miss:** `func_L02_002EFB60`
+remains 540/540 bytes, 0/8 places with game `-O2 -G8 -ffunction-sections
+-mno-split-addresses`. Its decrement occupies the first random call's slot
+instead of the post-copy call's slot (+0x9C/+0x118). Grouping bound/copy work
+adds constant reloads (544/552 bytes); grouping the induction update in the
+for increment adds a loop-end nop (544). Nonvolatile scalar/one-element bound
+views and `qcopy_nc` tie. The retained source has the detailed constraints;
+reopen with a justified memory dependency or loop-note placement that retains
+constant sharing. No linked or secondary-release check was run.
 
 **Named examples now resolved:** func_L18_0042FAA8, func_L02_003D69F0 and func_L23_003C0E98 each pass1/1. Their older measurements below are retained as history, not current blockers.
 
@@ -2629,6 +2671,21 @@ Use measured siblings, final unit/profile checks and a bounded budget. Reopen a 
 
 **Current counterexample:** func_L22_00328220 passes 2/2. The other named attempts remain open. Eight identical variants establish a stopping point for those variants, not the absence of every source/profile lever.
 
+**6 November 2026, retained USA v1.01 misses:** `func_00285030` remains
+680/680 bytes, 0/28 places with game `-O2 -G8 -ffunction-sections` (first
++0x1F4). Real packet-store reordering and statement groups do not recover the
+state-address/0x106 ordering; the current RAC1 `setup_render_target` donor
+confirms the structure but does not match this four-argument variant.
+`func_L13_0041AB30` remains 460/460, 0/2 with the same profile plus `-g`;
+wide pointer views tie or change the frame, and grouping the row copy worsens
+its four preheader rows. `func_002CF5B0` is 576/576, 0/28 with `-G32
+-Wa,-G32`: reusing the actual mask working variable for the later item read
+recovers the item's `$a0` allocation (23 to 21 differing instruction rows),
+but base/status allocation and cleanup-call setup remain. Sharing the table
+pointer across navigation arms adds a saved register. The original two drafts
+and improved menu draft stay in `nonmatching/`; their notes give measured
+limits and reopening conditions. No linked or secondary-release check was run.
+
 **Signature:** two values compete and the tested source forms did not change their allocation. The
 `.lreg` dump (`cc1 -dl`; each pseudo carries `refs`, `live_length`, `crosses N calls`) shows the
 tie: two pseudos with *identical* statistics, and `local-alloc` breaks it by pseudo number.
@@ -3456,6 +3513,39 @@ reopen with a measured scheduler/allocator input beyond these tied forms.
 **Update, 3 November 2026 (pending review):** now matched. `func_002FDBD8` is C in `src/game/002FC8D0-billboard-g8.c` (`-O2 -G8 -ffunction-sections`), placed at 28 US, 28 US2 places (PAL catalogue has no function of this name). The measurements above are kept as history.
 
 For #267, a same-source comparison of 781 configured units changed code only in the new multiplier; eleven differences were debug-only. The shared union changed no object section in the four existing users. Source, flags and durable explanations are in the merged repository; partial C remains in `nonmatching/`. No progress report was regenerated.
+
+**6 November 2026, retained scheduling follow-up (USA v1.01 only):**
+
+- [`func_0027BA68`](../nonmatching/game/func_0027BA68.c): 772/772 bytes,
+  0/28 places with `-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy
+  -frac2-qcopy-barrier`. The permitted one-pass view-position assignment fixes
+  the saved-register roles. Eight instruction positions remain in the flag/copy
+  setup (+0x78) and 64-bit command argument setup (+0x118). Matrix-source grouping
+  moves the mask/store too early; destination rebinding and a named command color
+  tie. The four command fields retain their measured 64-bit contract.
+- [`func_00301F18`](../nonmatching/game/func_00301F18.c): 900/900 bytes,
+  0/28 places with `-O2 -G0 -ffunction-sections -frac2-qcopy
+  -frac2-qcopy-barrier`. The existing group leaves two positions, +0x31c/+0x324,
+  setting the last add's a1/a2 in opposite order. Boundary aliases and an inline
+  add helper tie; extending/grouping the real angle/output operations changes
+  allocation or padding. Retained source unchanged.
+- [`func_L00_002EC608`](../nonmatching/levels/func_L00_002EC608.c):
+  868/868 bytes, 0/27 places with default game flags. Reordering the real vertex
+  and color stores, updating tint for the second alpha, and separating the final
+  white color fix the former saved-register and packing differences. Only
+  +0x108/+0x10c/+0x110 differ: color[0] precedes two zero UV stores. Private
+  sched1/sched2 dumps place the early color store in sched1. Integer-bit UV and
+  inline-broadcast views tie; one-pass store groups, volatile views and real-loop
+  unrolling worsen the result. Reopen on this store lifetime/dependency.
+- [`func_L03_003C5668`](../nonmatching/levels/func_L03_003C5668.c):
+  644/644 bytes, 0/2 places with default game flags. Current reproduction corrects
+  the older one-displaced-instruction claim: 12 prologue positions and 10 loop
+  spill offsets differ. Tail alias, concrete output view and height local tie;
+  the entry output alias still adds eight bytes. First-call/output groups yield
+  652/640 bytes. Reopen on the output spill dependency and loop spill order.
+
+These are near misses, without alternate-release or linked-build qualification.
+The assembly markers and production flags are restored; no function is counted.
 
 ### Camera and effect-record follow-up (23 October 2026)
 

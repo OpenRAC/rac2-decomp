@@ -1,3 +1,8 @@
+/* 6 November 2026: the inline draw helper of nonmatching/game/func_0032F3D0.c (454.0f literal in
+ * the helper body; -0.5f, 1.0f, 0.0f as outer locals) gives 436/444 bytes here too: retail's
+ * f20-f24 saves and li.s 454 at each call, but no unused saved s0 and early argument setup.
+ * The 444-byte C below is kept.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 444/444 bytes, 0/27 placements; first difference 0x0.
  * Profile: -O2 -G8 -ffunction-sections -mno-split-addresses.

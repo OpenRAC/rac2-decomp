@@ -1,3 +1,4 @@
+/* 6 November 2026: -g ties at 556; -fno-gcse 540; sdk 572. Swapping the delay set before the server read ties. Retail sched2 puts 9999 before the volatile server load, so dbr steals it into the bgez slot and the loop label needs one more alignment nop. */
 /* Newly reconstructed sound initializer near miss, 2 November 2026.
  * Profile: game -O2 -G0 -ffunction-sections, separate unit.
  * Retained source:556/576 bytes,0/1 USA boot; frame0x40 and five saved GPRs.
