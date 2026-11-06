@@ -110,7 +110,55 @@ void func_US2_L00_00378C38(void) {
 
 
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L00_00379928);
+/* Selected-item prompt and panel; the model has 28-byte trailing records. */
+typedef struct {
+    char pad00[0x80];
+    int index;
+    int state;
+    char pad88[0xBC];
+    struct { int price; int rest[6]; } cells[0]; /* Variable-length trailing table. */
+} UpgradeModel;
+extern int func_US2_00280440(int, int, unsigned long long, unsigned char *, int, int, float);
+extern void func_0028E868(int, int, int, int, int, int);
+
+/* func_US2_L00_00379928, the v2.00 copy of func_L00_00378578: the same panel, with its prompts drawn
+ * through func_US2_00280440 at scale 0.7 and moved up when D_001A7B90 is set. */
+void func_US2_L00_00379928(void) {
+    UpgradeModel *model = (UpgradeModel *)&D_L00_0022F7C0;
+    int index = model->index;
+    int mode;
+    int y;
+    if (model->state != 0) {
+        if (model->cells[index].price <= D_001A79FC) {
+            func_US2_00280440(444, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
+                              (unsigned char *)func_00288FB8(0x31C7), -1, 82, 0.7f);
+            func_US2_00280440(444, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
+                              (unsigned char *)func_00288FB8(0x31C4), -1, 82, 0.7f);
+        } else {
+            int top;
+            mode = D_001A7B90;
+            y = (int)(D_L00_001B25E0 * 214.0f + 0.5f);
+            top = mode ? y - 11 : y;
+            func_US2_00280440(444, top, 0x80F0F0F0ULL,
+                              (unsigned char *)func_00288FB8(0x31B0), -1, 82, 0.7f);
+        }
+    } else {
+        func_US2_00280440(444, (int)(D_L00_001B25E0 * 190.0f + 0.5f), 0x80F0F0F0ULL,
+                          (unsigned char *)func_00288FB8(0x31B1), -1, 82, 0.7f);
+        func_US2_00280440(444, (int)(D_L00_001B25E0 * 214.0f + 0.5f), 0x80F0F0F0ULL,
+                          (unsigned char *)func_00288FB8(0x2BE5), -1, 82, 0.7f);
+    }
+    {
+        int icon = func_0028E588(0xEAA8, 1);
+        mode = D_001A7B90;
+        y = (int)(D_L00_001B25E0 * 64.0f + 0.5f);
+        func_0028E868(icon, 402, mode ? y - 3 : y, 89, (int)(D_L00_001B25E0 * 115.0f + 0.5f), 64);
+    }
+    func_0027FB40(445, (int)(D_L00_001B25E0 * 130.0f + 0.5f), 0x80F0F0F0ULL,
+                  (unsigned char *)func_00288FB8(0x30A8), -1);
+    func_0027FB40(445, (int)(D_L00_001B25E0 * 148.0f + 0.5f), 0x80F0F0F0ULL,
+                  (unsigned char *)func_00288FB8(0x30A9), -1);
+}
 
 /* func_L00_00377C50 is defined in L00_00377C50-g8.c. */
 
