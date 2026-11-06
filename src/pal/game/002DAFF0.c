@@ -21,6 +21,5 @@ int func_PAL_002DAFF0(Handles_2DCB28 *object) {
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002DB6C8);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002DBA38);

@@ -3222,8 +3222,11 @@ src/levels/shared/L00_003E3258-fade.c	-O2 -G64 -Wa,-G64 -ffunction-sections -fno
 src/levels/02_maktar_nebula/L02_003EB258-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -mno-split-addresses -g
 src/levels/08_tabora/L08_00429560-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-hazard-labels
 src/levels/shared/L00_003F8E08-glow-g8.c	-O2 -G8 -ffunction-sections -ffast-math -g
+src/pal/game/002F96D8-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/pal/game/002AF6C0-flags.c	-O2 -G0 -ffunction-sections -g -ffast-math
+src/pal/game/002E91B0-port.c	-O2 -G8 -ffunction-sections
 src/pal/game/002CC7B8-flags.c	-O2 -G8 -mastra-r5900-extern-buffer -ffunction-sections -fno-builtin
+src/pal/game/002D1EB0-menu-g8.c	-O2 -G8 -ffunction-sections
 src/levels/11_joba/L11_00451178-gu-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/game/002E7338-g8.c	-O2 -G8 -ffunction-sections
 src/game/00337210.c	-O2 -G0 -ffunction-sections
@@ -3235,15 +3238,27 @@ src/levels/shared/L00_00424F98-g8.c	-O2 -G8 -ffunction-sections -g
 src/game/002EEBC8.c	-O2 -G0 -ffunction-sections
 src/game/002F0FA0-g8.c	-O2 -G8 -ffunction-sections
 src/core/001185E8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
+src/pal/game/00300130-start.c	-O2 -G0 -ffunction-sections -g
 src/pal/game/002BE9A8-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/0027FB48-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32
 src/pal/game/002B5570-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/00295DD0-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/002948A8-cc.c	-O2 -G0 -ffunction-sections
+src/pal/game/002CC950-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/00303548-cc.c	-O2 -G0 -ffunction-sections
+src/pal/game/002D82D8-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/002DB6C8-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/002CB710-cc.c	-O2 -G0 -ffunction-sections
+src/pal/game/00303578-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/0028D738-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/game/002A7650-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/002D6E30-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/game/002ED320-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00274928-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/game/002FEC30-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/002FACD0-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/002C7598-cc.c	-O2 -G0 -ffunction-sections -g
+src/pal/game/002E7B78-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/002EE490-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/002BEB88-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/game/002C8BD0-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
