@@ -1020,7 +1020,7 @@ class ProgressChecks(unittest.TestCase):
                              "source_path":"src/game/open.c","categories":["executable","game"]},
                 "Shared level code":{"rows":[row("e",8,0x300,False)],
                                      "source_path":"src/levels/shared","categories":["level_code","common"]}}
-        report=progress.build_report(groups,lambda n:f"Level {n:02d}",{})
+        report=progress.build_report(groups,lambda n:f"Level {n:02d}")
         total=report["measures"]
         self.assertEqual((total["complete_code"],total["complete_units"],total["total_code"]),("12",1,"40"))
         self.assertAlmostEqual(total["complete_code_percent"],30.0)
