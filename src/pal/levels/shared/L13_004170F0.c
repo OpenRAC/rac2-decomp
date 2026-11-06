@@ -110,5 +110,3 @@ char *func_PAL_L13_004170F0(float size, char *position, int trigger, int kind, i
     return object;
 }
 
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L13_004175B8);

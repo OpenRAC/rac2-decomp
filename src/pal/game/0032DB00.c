@@ -106,5 +106,3 @@ char *func_PAL_0032DF28(EffectVector *position, int flash, int n0, int n1,
     return object;
 }
 
-
-INCLUDE_ASM("asm/pal/game", func_PAL_0032E268);
