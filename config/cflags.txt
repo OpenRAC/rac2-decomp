@@ -3961,3 +3961,14 @@ src/pal/levels/01_oozla/L01_003ED6B0-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/13_boldan/L13_0041F2B8-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_003B4AD8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00320D00-sparks-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_004177A8-sparks-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/0031C1B8-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/16_snivelak/L16_003ADB58-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/shared/L09_003FC118-por.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por -mno-split-addresses
+src/pal/levels/shared/L02_00426DF8-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/0030A9D8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/shared/L00_003BCEB8-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/17_smolg/L17_003CBDF4-tilt-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/17_smolg/L17_003C7F18-motion-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/game/003469E8-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/07_siberius/L07_003FCC48-g8.c	-O2 -G8 -ffunction-sections
