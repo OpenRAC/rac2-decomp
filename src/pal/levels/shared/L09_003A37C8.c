@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_003A37C8);
 
 #include "common.h"
 extern void *func_0029EFD0(int id);
@@ -41,7 +40,6 @@ char *func_PAL_L09_003A3CA0(char *object, char *a1, char *a2, float f12)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_003B20E8);
 
 extern void func_002AFFD8(void *pos, void *out, int mode);
 extern void func_00282CC0(void *dst, void *a, void *b);

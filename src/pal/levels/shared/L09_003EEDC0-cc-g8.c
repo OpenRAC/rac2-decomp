@@ -1,0 +1,139 @@
+/* func_PAL_L09_003EEDC0, the PAL copy of func_L09_003EA798: the same C. */
+#include "common.h"
+
+/* Its caller func_L09_003EAA18 is in L09_002B7238-g8.c; this unit of its own keeps that
+   call external, since PAL has func_L09_003EAA18 in C but not this function. */
+extern void func_002A7750(char *object, int a1, int a2);
+
+/* func_PAL_L09_003EEDC0: the four scaled inputs differ per level (ref_). */
+extern int func_00283CF0(float);
+extern void func_002B60B0(char *, float, float, float, float);
+extern float func_L09_0033E7A0(int);
+extern int func_L09_003EA2D0(char *, int, int);
+extern unsigned int D_L09_001FE6C0[];
+extern float ref_L09_003EA798_00 __attribute__((sda));
+extern float ref_L09_003EA798_01 __attribute__((sda));
+extern float ref_L09_003EA798_02 __attribute__((sda));
+extern float ref_L09_003EA798_03 __attribute__((sda));
+
+typedef struct {
+    char pad0[0x28];
+    unsigned char f28;
+    char pad29[0x6];
+    unsigned char f2F;
+    float f30;
+    char pad34[0x14];
+    unsigned char f48;
+    char pad49[0x1];
+    unsigned char f4A;
+    char pad4B[0x5];
+    float f50;
+    int f54;
+    int f58;
+    int f5C;
+    float f60;
+    char pad64[0x18];
+    int f7C;
+    float f80;
+    char pad84[0x10C];
+    unsigned char f190;
+    unsigned char f191;
+    unsigned char f192;
+    char pad193[0x3];
+    unsigned char f196;
+    unsigned char f197;
+    char pad198[0x4];
+    int f19C;
+    int f1A0;
+    float f1A4;
+    float f1A8;
+    float f1AC;
+    float f1B0;
+    int f1B4;
+    short f1B8;
+    char pad1BA[0x2];
+    float f1BC;
+    char pad1C0[0x8];
+    int f1C8;
+    char pad1CC[0x20];
+    unsigned char f1EC;
+    unsigned char f1ED;
+    unsigned char f1EE;
+    unsigned char f1EF;
+    char pad1F0[0x2];
+    unsigned char f1F2;
+    unsigned char f1F3;
+    char pad1F4[0x2];
+    unsigned char f1F6;
+    char pad1F7[0x159];
+    int f350;
+    int f354;
+    char pad358[0x14];
+    int f36C;
+    char pad370[0x4];
+    int f374;
+    char pad378[0x8];
+    int f380;
+} DobboMoverState;
+
+/* Initialises a new object's state block: copies its position and the vector at 0xF0,
+   sets the tuning constants and, when it has a table entry, moves it there.
+   The store order is the one sched1 (stores ending a constant's life first) and sched2
+   (stores with more dependants first, 0x50 being the 34th memory reference) turn into
+   retail's sequence. */
+void func_PAL_L09_003EEDC0(char *object) {
+    DobboMoverState *state = *(DobboMoverState **)(object + 0x68);
+    char *pos = object + 0x10;
+    int entry;
+
+    qcopy((char *)state + 0x330, pos);
+    qcopy((char *)state + 0x340, object + 0xF0);
+    state->f48 = func_00283CF0(25.0f);
+    state->f4A = func_00283CF0(19.2f);
+    state->f1EC = 4;
+    state->f1EE = 4;
+    state->f191 = 2;
+    state->f192 = 2;
+    state->f196 = 2;
+    state->f197 = 2;
+    state->f1ED = 8;
+    state->f1EF = 8;
+    state->f190 = 5;
+    state->f1F2 = 4;
+    state->f1F3 = 8;
+    state->f1F6 = 1;
+    state->f28 = 3;
+    state->f2F = 2;
+    state->f1C8 = 5;
+    state->f1AC = 0.002f;
+    state->f1A4 = 0.0036000002f;
+    state->f1A8 = 0.0036000002f;
+    state->f1B0 = 1.5f;
+    state->f1BC = 0.4f;
+    state->f30 = 1.0f;
+    state->f19C = 0;
+    state->f1A0 = 0;
+    state->f1B4 = 0;
+    state->f1B8 = 0;
+    state->f54 = 0;
+    state->f58 = 0;
+    state->f5C = 0;
+    state->f7C = 0;
+    state->f50 = 3.5f;
+    state->f60 = 3.141593f;
+    state->f80 = 0.52359885f;
+    func_002B60B0(object, ref_L09_003EA798_00 * 0.00040000002f, ref_L09_003EA798_01 * 0.020000001f,
+                  ref_L09_003EA798_02 * 6.981318e-06f, ref_L09_003EA798_03 * 0.0003490659f);
+    state->f354 = state->f374;
+    func_L09_0033E7A0(state->f36C);
+    func_L09_0033E7A0(state->f350);
+    entry = state->f36C;
+    if (entry != -1) {
+        qcopy(pos, (char *)D_L09_001FE6C0[entry] + 0x10);
+        func_L09_003EA2D0(object, entry, -1);
+        state->f380 = 0;
+    } else {
+        state->f380 = 1;
+    }
+    func_002A7750(object, 1, 1);
+}
