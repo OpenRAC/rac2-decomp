@@ -3647,6 +3647,18 @@ src/us2/game/0027FCB0-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32
 src/us2/game/002D5C58-g8.c	-fno-builtin -O2 -G8 -ffunction-sections
 src/us2/game/002D5D10-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
 src/us2/levels/11_joba/L11_00433090-g8.c	-O2 -G8 -ffunction-sections
+src/us2/game/002CBED0-g8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_00345740-g8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L04_0040CF60-g8.c	-O2 -G8 -ffunction-sections
+src/us2/game/0029CA88-cc-g8.c	-O2 -G8 -ffunction-sections
+src/us2/game/00292C70-cc.c	-O2 -G0 -ffunction-sections
+src/us2/game/002ED260-cc-g8.c	-O2 -G8 -ffunction-sections
+src/us2/game/002E91C0-cc-g8.c	-O2 -G8 -ffunction-sections
+src/us2/game/002DB700-cc.c	-O2 -G0 -ffunction-sections
+src/us2/game/002D6E98-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/us2/game/003002E0-cc.c	-O2 -G0 -ffunction-sections -g
+src/us2/game/002CB860-cc.c	-O2 -G0 -ffunction-sections
+src/us2/game/002CCAA0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L05_0039A808-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_003A6238-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_003EE450-cc-g8.c	-O2 -G8 -ffunction-sections
