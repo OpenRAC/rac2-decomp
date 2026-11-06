@@ -3778,6 +3778,20 @@ src/pal/levels/shared/L00_003CA0B4-gun-g8.c	-O2 -G8 -ffunction-sections -frac2-z
 src/pal/levels/01_oozla/L01_003B93DC-g8.c	-O2 -G8 -ffunction-sections -fno-expensive-optimizations
 src/pal/levels/11_joba/L11_00439AE0-g-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/08_tabora/L08_0042BE14-flags.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L02_003C6394-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
+src/pal/levels/11_joba/L11_004439E4-main-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/game/002FBEB4-g8.c	-O2 -G8 -ffunction-sections -fno-builtin
+src/pal/levels/01_oozla/L01_00432064-campath-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/pal/levels/02_maktar_nebula/L02_00410A1C-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/12_todano/L12_003E4E5C-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
+src/pal/levels/shared/L16_00410D14-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/14_aranos_prison/L14_0042B28C-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/pal/game/003188D8-cc.c	-O2 -G0 -ffunction-sections
+src/pal/levels/shared/L04_00407940-flags.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L00_002A7D48-por.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por
+src/pal/levels/30_insomniac_museum/L30_004180E8-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/19_grelbin/L19_00423BC8-lift-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
+src/pal/levels/12_todano/L12_004294CC-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_002A4788.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00376A18-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
