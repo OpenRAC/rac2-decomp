@@ -954,6 +954,11 @@ FUNCTION_ENTRY_OFFSETS = {
 
 # Rows that end on `jr ra`: the delay slot belongs to them.
 FUNCTION_END_EXTRA = {
+    "func_PAL_L00_003FB330": (832, -4),
+    "func_PAL_L00_00418F28": (816, -4),
+    "func_PAL_L05_00327418": (48, -4),
+    "func_PAL_L17_00388C38": (1088, -4),
+    "func_PAL_L18_00438248": (608, -4),
     "func_PAL_L00_002A7D48": (5628, 4),
     "func_PAL_L00_0030BA80": (336, 4),
     "func_PAL_L00_0039BE70": (424, 4),
