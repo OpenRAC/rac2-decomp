@@ -3652,32 +3652,52 @@ src/us2/levels/shared/L00_00345740-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L04_0040CF60-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/0029CA88-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/00349E88-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L00_0042DA48-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L00_0043FEA0-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/00292C70-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L02_0038B3C0-cc.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/us2/game/00352868-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/01_oozla/L01_003A6FB8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L00_002A4928-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/00350D08-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L05_0042DB38-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/00338F88-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/00316C20-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/us2/levels/03_endako/L03_0041E138-cc-g8.c	-O2 -G8 -ffunction-sections -Wa,--r5900-unsigned32-mask=sn
+src/us2/levels/03_endako/L03_004201B8-cc-g8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L01_00398790-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/us2/game/002ED260-cc-g8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_003C76E0-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/us2/levels/shared/L00_00406CF8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-zero-ti-por -frac2-hazard-labels
 src/us2/game/002E91C0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/00348E20-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L00_0042EF90-cc-g8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_0043A498-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L00_00443BF0-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L00_00443BF8-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/0033F398-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/00344458-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/00344480-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/06_notak/L06_004571C8-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/shared/L00_0043A4B8-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/003444A0-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/shared/L00_0043A470-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/002DB700-cc.c	-O2 -G0 -ffunction-sections
 src/us2/levels/shared/L00_00361628-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/002D6E98-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/us2/game/003002E0-cc.c	-O2 -G0 -ffunction-sections -g
+src/us2/levels/shared/L03_003E5C90-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/us2/game/003413A8-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/002CB860-cc.c	-O2 -G0 -ffunction-sections
 src/us2/levels/shared/L00_00375270-cc.c	-O2 -G64 -Wa,-G64 -ffunction-sections
+src/us2/levels/03_endako/L03_003C8030-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/002CCAA0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/0033BC20-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/003395F0-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/0033FF68-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/0033E8B0-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/0034EDB8-cc.c	-O2 -G0 -ffunction-sections
+src/us2/levels/02_maktar_nebula/L02_003FF768-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/00349728-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels -frac2-gcse-unsplit-edges -fmove-all-movables
 src/pal/levels/shared/L05_0039A808-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_003A6238-cc-g8.c	-O2 -G8 -ffunction-sections
