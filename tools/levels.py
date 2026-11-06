@@ -841,13 +841,12 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_002D022C": (96, 4),
     "func_PAL_002D5A04": (452, 4),
     "func_PAL_002FBEB4": (748, 4),
-    "func_PAL_00300104": (44, 4),
-    "func_PAL_00303BA4": (916, 4),
+    "func_PAL_00303BA4": (916, 76),
     "func_PAL_00314B5C": (4204, 4),
     "func_PAL_003161FC": (284, 4),
-    "func_PAL_003198A4": (5296, 4),
+    "func_PAL_003198A4": (5296, 92),
     "func_PAL_0031E96C": (140, 4),
-    "func_PAL_0033423C": (2672, 4),
+    "func_PAL_0033423C": (2672, 28),
     "func_PAL_003373BC": (188, 4),
     "func_PAL_L00_00349574": (96, 4),
     "func_PAL_L00_0034ADE4": (96, 4),
@@ -907,7 +906,7 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_L11_00456D04": (4892, 4),
     "func_PAL_L12_003A44BC": (2188, 4),
     "func_PAL_L12_003E4E5C": (2696, 4),
-    "func_PAL_L12_0041D6B4": (2148, 4),
+    "func_PAL_L12_0041D6B4": (2148, 12),
     "func_PAL_L12_004294CC": (824, 4),
     "func_PAL_L13_0040B7AC": (8648, 4),
     "func_PAL_L13_0040F08C": (7176, 4),
@@ -924,7 +923,7 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_L17_003CBDF4": (1672, 4),
     "func_PAL_L18_0043A56C": (1404, 4),
     "func_PAL_L18_0043C3F4": (2448, 4),
-    "func_PAL_L19_003E0F5C": (2612, 4),
+    "func_PAL_L19_003E0F5C": (2612, 20),
     "func_PAL_L19_00416A3C": (1672, 4),
     "func_PAL_L19_0041A8A4": (2972, 4),
     "func_PAL_L19_0043054C": (1600, 4),
@@ -942,7 +941,7 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_0032B930": (2104, 512),
     "func_PAL_00333360": (2420, 8),
     "func_PAL_00336710": (1924, 8),
-    "func_PAL_L00_0039C018": (1052, 8),
+    "func_PAL_L00_0039C018": (1064, 8),
     "func_PAL_L19_003E4048": (5012, 8),
     "func_PAL_L24_003FED38": (2052, 8),
     "func_US2_0028DC24": (2588, 4),
@@ -951,7 +950,6 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_US2_002D0D04": (1100, 4),
     "func_US2_002D5A44": (452, 4),
     "func_US2_002D6024": (192, 4),
-    "func_US2_002DFFFC": (20, 4),
     "func_US2_002FAB0C": (1532, 4),
     "func_US2_002FBCEC": (748, 4),
     "func_US2_00315AEC": (316, 4),
@@ -1010,6 +1008,20 @@ FUNCTION_ENTRY_OFFSETS = {
     # Seven 0xCDCDCDCD fill words after the previous return, then the privileged
     # exception handler (k0, CP0, eret); nothing enters the fill in US/PAL/US2.
     "func_0011F364": (636, 28),
+    # 7 November 2026: filler, stack restores or an orphan instruction ahead of a
+    # stack-frame prologue at every place; no jump, branch, aligned word or lui/addiu
+    # pair enters the prefix in any of the release's programs.
+    "func_0032A140": (2104, 512),
+    "func_PAL_00321BC0": (4576, 80),
+    "func_PAL_00335118": (1596, 56),
+    "func_PAL_L00_0039C438": (1856, 8),
+    "func_PAL_L04_003FE9E8": (4524, 8),
+    "func_PAL_L17_003A7DB0": (528, 8),
+    "func_PAL_L23_003C1280": (4068, 8),
+    "func_US2_003342A8": (1604, 64),
+    # A row that starts inside its function: the prologue is 32 bytes earlier, in
+    # the row before it (see FUNCTION_END_EXTRA), and the end does not move.
+    "func_PAL_0029C8A0": (456, -32),
 }
 
 
@@ -1047,6 +1059,12 @@ FUNCTION_END_EXTRA = {
     # func_002F1E88: only its branches enter them, they jump back into it and the
     # last one restores the registers it saved. 6 November 2026.
     "func_002F2758": (652, -248),
+    # Past the end or short of it, 7 November 2026: the first two stop just before the
+    # epilogue's last load, so the load, the return and its slot belong to them; the
+    # third runs past its return into the next function's prologue.
+    "func_PAL_002FB8D0": (1196, 12),
+    "func_PAL_L00_0039C018": (1044, 12),
+    "func_PAL_0029C820": (128, -36),
 }
 
 
@@ -1172,6 +1190,23 @@ FUNCTION_RESIDUES = {
     # return, boot only (US/US2 444 bytes, PAL 432); no reference enters them.
     "func_00334550": 444,
     "func_PAL_003361E8": 432,
+    # 7 November 2026: the same audit, release rows only: stack restores, moves and
+    # orphan stores with their nops, from a completed return to the next body. Nine
+    # are word for word what USA v1.01 leaves in a gap; func_PAL_00343230,
+    # func_PAL_L00_003281B0, func_US2_002DFFFC and func_US2_003420C0 have no exact copy.
+    "func_PAL_00300104": 40,
+    "func_PAL_00343230": 12,
+    "func_PAL_0034D230": 8,
+    "func_PAL_L00_003281B0": 16,
+    "func_PAL_L00_003D5AB0": 8,
+    "func_PAL_L00_00405878": 8,
+    "func_PAL_L22_004024D0": 8,
+    "func_PAL_L23_003ADFC8": 8,
+    "func_PAL_L23_00409528": 8,
+    "func_US2_002DFFFC": 16,
+    "func_US2_003420C0": 12,
+    "func_US2_0034BDA8": 8,
+    "func_US2_L00_00402420": 8,
 }
 
 

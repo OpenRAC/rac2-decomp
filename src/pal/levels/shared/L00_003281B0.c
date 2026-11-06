@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003281B0);
-
 #include "common.h"
 extern u8 D_00189EA0[];
 extern u32 D_001A79F0 MACRO_ADDR;

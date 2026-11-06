@@ -78,8 +78,6 @@ int func_PAL_003430B0(char *self, unsigned int buttons, MenuEntry *table)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00343230);
-
 extern void func_L00_0042BAD0_6(u8 *);
 extern void func_L00_0042BFF8_5(u8 *);
 extern void func_L00_0042C290_6(u8 *);

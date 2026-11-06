@@ -692,7 +692,7 @@ class Catalogue(unittest.TestCase):
             with patch.multiple(levels, BOOT_FUNCTIONS=boot, CATALOGUE=catalogue, LEVELS=root,
                                 BOOT_PAIRS=root / "absent.tsv", DUMP=dump, NAMES={0:"test"},
                                 BOOT_RESIDUES={}, FUNCTION_ENTRY_OFFSETS={},
-                                FUNCTION_RESIDUES={"func_00001000": 4}), \
+                                FUNCTION_RESIDUES={"func_00001000": 4, "func_PAL_L00_00900000": 8}), \
                  patch.object(levels, "boot_image", return_value=(raw, [(0x1000,0,len(raw))])), \
                  patch.object(sys, "argv", ["levels.py", "catalogue"]):
                 levels.catalogue()

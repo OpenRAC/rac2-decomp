@@ -1,8 +1,6 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003D5AB0);
-
 typedef struct {
     char pad_00[0x38];
     short multiple_sound;

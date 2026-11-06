@@ -78,8 +78,6 @@ int func_US2_00341F40(char *self, unsigned int buttons, MenuEntry *table)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_003420C0);
-
 extern void func_L00_0042BAD0_6(u8 *);
 extern void func_L00_0042BFF8_5(u8 *);
 extern void func_L00_0042C290_6(u8 *);

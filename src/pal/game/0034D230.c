@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034D230);
-
 INCLUDE_ASM("asm/pal/game", func_PAL_0034D490);
 
 extern int func_00335E20(unsigned char *field);
