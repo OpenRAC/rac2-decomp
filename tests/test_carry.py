@@ -267,6 +267,65 @@ class Carry(unittest.TestCase):
              self.assertRaisesRegex(ValueError,"corrected level copies differ"):
             carry.correct_level_entries(rows)
 
+    def split_fixture(self, *tail):
+        """A boot with two closed functions at 0x2000, a gap word between them, and one level copy."""
+        body = code(addiu(2,0,1),JR_RA,NOP,NOP,addiu(2,0,2),JR_RA,NOP)
+        spec = {"whole": (28, (("whole",0,12), ("part",16,12)))}
+        boot = [("before",0x1FF8,8), ("whole",0x2000,28), ("after",0x2020,8)]
+        rows = [("whole","boot",28,"old",[(0,0x3000),(1,0x4000)])]
+        read = lambda p, n: (body + b"".join(tail))[p - 0x2000:p - 0x2000 + n]
+        return spec, boot, rows, read, body
+
+    def split_release(self, spec, boot, rows, read, level_text):
+        with patch.dict(levels.RELEASE_FUNCTION_SPLITS, spec, clear=True), \
+             patch.object(levels,"boot_bytes",side_effect=read), \
+             patch.object(levels,"level_text",side_effect=level_text):
+            return carry.split_release_rows(boot, rows)
+
+    def test_release_split_gives_each_function_a_row_at_every_place(self):
+        spec, boot, rows, read, body = self.split_fixture()
+        new_boot, new_rows = self.split_release(spec, boot, rows, read, [(0x3000,body),(0x4000,body)])
+        self.assertEqual(new_boot, [("before",0x1FF8,8), ("whole",0x2000,12), ("part",0x2010,12), ("after",0x2020,8)])
+        self.assertEqual([(r[0],r[1],r[2],r[4]) for r in new_rows],
+                         [("whole","boot",12,[(0,0x3000),(1,0x4000)]), ("part","boot",12,[(0,0x3010),(1,0x4010)])])
+        again = self.split_release(spec, new_boot, new_rows, read, [])
+        self.assertEqual(again, (new_boot, new_rows))
+
+    def test_release_split_rejects_what_was_not_measured(self):
+        spec, boot, rows, read, body = self.split_fixture()
+        other = code(addiu(2,0,1),JR_RA,NOP,NOP,lui(2,3),JR_RA,NOP)
+        for why, changed, message in (
+                ("no return", {"whole": (28, (("whole",0,8), ("part",16,12)))}, "does not close"),
+                ("short", {"whole": (28, (("whole",0,4), ("part",16,12)))}, "does not close")):
+            with self.subTest(why=why), self.assertRaisesRegex(ValueError, message):
+                self.split_release(changed, boot, rows, read, [(0x3000,body),(0x4000,body)])
+        gap = code(addiu(2,0,1),JR_RA,NOP,addiu(2,0,9),addiu(2,0,2),JR_RA,NOP)
+        with self.assertRaisesRegex(ValueError, "non-zero"):
+            self.split_release(spec, boot, rows, read, [(0x3000,gap),(0x4000,gap)])
+        with self.assertRaisesRegex(ValueError, "split copies differ"):
+            self.split_release(spec, boot, rows, read, [(0x3000,body),(0x4000,other)])
+        with self.assertRaisesRegex(ValueError, "child identity"):
+            self.split_release(spec, boot + [("part",0x2010,12)], [], read, [])
+        with self.assertRaisesRegex(ValueError, "20 bytes, expected 28 or 12"):
+            self.split_release(spec, [("whole",0x2000,20)], [], read, [])
+        with self.assertRaisesRegex(ValueError, "20 bytes, expected 28 or 12"):
+            self.split_release(spec, [], [("whole","boot",20,"old",[(0,0x3000)])], read, [])
+
+    def place_split(self, words, spec=("old", (8, 0xAA, "new", 0xBB))):
+        rows = [("old","shared",12,"fp",[(n,0x1000) for n in range(len(words))])]
+        texts = [(0x1000,code(0,0,w)) for w in words]
+        with patch.dict(levels.RELEASE_PLACE_SPLITS, dict([spec]), clear=True), \
+             patch.object(levels,"level_text",side_effect=texts):
+            return carry.split_release_places(rows)
+
+    def test_release_place_split_regroups_by_the_measured_word(self):
+        self.assertEqual(self.place_split((0xAA,0xAA,0xBB)),
+                         [("old","shared",12,"fp",[(0,0x1000),(1,0x1000)]), ("new","level",12,"fp",[(2,0x1000)])])
+        self.assertEqual(self.place_split((0xAA,0xAA)), [("old","shared",12,"fp",[(0,0x1000),(1,0x1000)])])
+        for words in ((0xAA,0xCC), (0xBB,0xBB)):
+            with self.subTest(words=words), self.assertRaises(ValueError):
+                self.place_split(words)
+
     def test_branch_target(self):
         self.assertEqual(carry.branch_target(0x10400003, 0x1000), 0x1010)   # beqz v0,+3
         self.assertEqual(carry.branch_target(0x1000FFFF, 0x1000), 0x1000)   # b .

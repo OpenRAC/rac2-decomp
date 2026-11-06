@@ -1351,6 +1351,34 @@ IDENTITY_SPLITS = {
 }
 
 
+# A release's rows that hold several closed functions: the row's size, then each
+# function's (name, offset, size). The row keeps its name for the first. Every part
+# ends on `jr $ra` and its slot, and any gap between parts is zeros. tools/carry.py
+# --entries applies these to the boot and the level copies alike.
+RELEASE_FUNCTION_SPLITS = {
+    # A jal reaches each of the six in every one of the 24 places. They are the
+    # release's counterparts of six USA rows, func_0029B910 to func_0029BE88; the
+    # first is 280 bytes here against 328 there, the other five keep their sizes.
+    "func_PAL_0029C2A8": (1400, (("func_PAL_0029C2A8", 0, 280), ("func_PAL_0029C3C0", 280, 216),
+                                 ("func_PAL_0029C498", 496, 408), ("func_PAL_0029C630", 904, 12),
+                                 ("func_PAL_0029C640", 920, 432), ("func_PAL_0029C7F0", 1352, 48))),
+    # A pointer table holds each of the three in every one of the 28 places. USA's
+    # boot rows are func_002D53F0 (140 bytes against 104), func_002D5480 and func_002D54F0.
+    "func_PAL_002D5FF0": (256, (("func_PAL_002D5FF0", 0, 104), ("func_PAL_002D6058", 104, 112),
+                                ("func_PAL_002D60C8", 216, 40))),
+}
+
+
+# A release's rows that group copies differing in a constant the fingerprint masks:
+# the offset of a word that tells them apart, its value in the places the row
+# keeps, the new row's name, and its value there. USA keeps these two apart as
+# func_L12_00429ED8 (0x202020, levels 12 and 17) and func_L30_00417120 (0x801010).
+RELEASE_PLACE_SPLITS = {
+    "func_PAL_L12_0042F4F0": (0x260, 0x3C030020, "func_PAL_L30_0041C5B0", 0x3C030080),
+    "func_US2_L12_0042B340": (0x260, 0x3C030020, "func_US2_L30_004177A0", 0x3C030080),
+}
+
+
 def split_identities(rows: list[tuple]) -> list[tuple]:
     """Regroup the places of an audited colliding fingerprint by their unmasked words.
 

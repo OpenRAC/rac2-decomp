@@ -1114,6 +1114,36 @@ class ProgressChecks(unittest.TestCase):
                         where["other"] = (0x2000,8,"boot",None)
                 self.release(functions, where=where)
 
+    def release_split_fixture(self):
+        functions = [{"name":"whole", "size":"28", "fuzzy_match_percent":0.0}]
+        where = {"whole":(0x1000,12,"boot",None), "part":(0x1010,12,"boot",None)}
+        return functions, where
+
+    def test_release_split_can_wait_for_a_report_refresh(self):
+        spec = {"whole": (28, (("whole",0,12), ("part",16,12)))}
+        with patch.object(levels, "RELEASE_FUNCTION_SPLITS", spec):
+            functions, where = self.release_split_fixture()
+            self.release(functions, where=where)
+            for change in ("matched", "moved", "reported", "other"):
+                with self.subTest(change=change), self.assertRaises(SystemExit):
+                    functions, where = self.release_split_fixture()
+                    if change == "matched": functions[0]["fuzzy_match_percent"] = 100.0
+                    elif change == "moved": where["part"] = (0x1014,12,"boot",None)
+                    elif change == "reported": functions.append({"name":"part","fuzzy_match_percent":0.0})
+                    else: where["other"] = (0x2000,8,"boot",None)
+                    self.release(functions, where=where)
+
+    def test_release_place_split_can_wait_for_a_report_refresh(self):
+        spec = {"kept": (8, 1, "copy", 2)}
+        functions = [{"name":"kept", "size":"16", "fuzzy_match_percent":0.0}]
+        where = {"kept":(0x1000,16,"shared",12), "copy":(0x2000,16,"level",30)}
+        with patch.object(levels, "RELEASE_PLACE_SPLITS", spec):
+            self.release(functions, where=where)
+            with self.assertRaises(SystemExit):
+                self.release([dict(functions[0], fuzzy_match_percent=100.0)], where=where)
+            with self.assertRaises(SystemExit):
+                self.release(functions, where=dict(where, copy=(0x2000,20,"level",30)))
+
     def test_identity_split_retires_its_matched_name_only_with_its_parts(self):
         spec = {("fp", 8): (0, (("kept", "a"), ("part", "b")), ("old",))}
         with patch.object(levels, "IDENTITY_SPLITS", spec):

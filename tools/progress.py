@@ -293,6 +293,36 @@ def pending_level_splits(functions: list[dict], where: dict) -> set[str] | None:
     return missing
 
 
+def pending_release_splits(functions: list[dict], where: dict) -> set[str] | None:
+    """Missing names explained by the exact old, wholly unmatched rows of a release's splits
+    (levels.RELEASE_FUNCTION_SPLITS, levels.RELEASE_PLACE_SPLITS). None denotes an invalid
+    old row, or a split whose new rows are not where the catalogues should have them."""
+    reported = {f["name"]:f for f in functions}
+    missing = set()
+    for name, (size, parts) in levels.RELEASE_FUNCTION_SPLITS.items():
+        old = reported.get(name)
+        if not old or name not in where or old.get("size") != str(size):
+            continue
+        address, _, kind, level = where[name]
+        if old["fuzzy_match_percent"] != 0.0:
+            return None
+        for part, offset, length in parts:
+            if where.get(part) != (address + offset, length, kind, level):
+                return None
+            if part != name:
+                if part in reported:
+                    return None
+                missing.add(part)
+    for name, (_, _, child, _) in levels.RELEASE_PLACE_SPLITS.items():
+        old = reported.get(name)
+        if not old or name not in where or child not in where or child in reported:
+            continue
+        if old["fuzzy_match_percent"] != 0.0 or where[child][1] != where[name][1]:
+            return None
+        missing.add(child)
+    return missing
+
+
 def demoted_renames(version: str, functions: list, retired: set, missing: set, where: dict) -> dict:
     """Retired report rows that tools/carry.py --demote renamed for the release: each is
     listed in config/<version>/not_carried.tsv, is unmatched in the report, and has exactly
@@ -344,6 +374,9 @@ def release_check(version: str, report_path: Path) -> None:
     level_splits = pending_level_splits(functions, where)
     if level_splits is None:
         sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged level row")
+    release_splits = pending_release_splits(functions, where)
+    if release_splits is None:
+        sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged release row")
     if "func_00131DE8" in where and not split and any(
             f["name"] == "func_00131D98" and f.get("size") == "656" for f in functions):
         sys.exit(f"{report_path.relative_to(ROOT)} has an invalid merged main/sound row")
@@ -354,7 +387,7 @@ def release_check(version: str, report_path: Path) -> None:
         # Boundary-only PRs leave the reports for a maintainer's later refresh.
         # Only measured unmatched remnants or the named unmatched merged rows
         # are tolerated. Unknown missing entries and duplicate compensation fail.
-        explained = (level_splits | ({"func_00131DE8"} if split else set())
+        explained = (level_splits | release_splits | ({"func_00131DE8"} if split else set())
                      | ({"func_00115E38"} if assertion_split else set()))
         # A name retired by an audited identity split explains its unreported parts.
         explained |= {n for spec in levels.IDENTITY_SPLITS.values() if set(spec[2]) & retired

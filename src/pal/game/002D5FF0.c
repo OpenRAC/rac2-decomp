@@ -2,6 +2,10 @@
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002D5FF0);
 
+INCLUDE_ASM("asm/pal/game", func_PAL_002D6058);
+
+INCLUDE_ASM("asm/pal/game", func_PAL_002D60C8);
+
 extern int D_00138344;
 extern void func_0029CF08(int);
 extern int D_00138344;

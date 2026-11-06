@@ -564,6 +564,92 @@ def correct_boot_splits(boot: list[tuple]) -> list[tuple]:
     return out
 
 
+def split_release_rows(boot: list[tuple], rows: list[tuple]) -> tuple[list[tuple], list[tuple]]:
+    """Apply levels.RELEASE_FUNCTION_SPLITS to the boot's rows and their level copies.
+
+    A row of the old size becomes its parts, each checked at every place: it closes on
+    `jr $ra`, what lies between two parts is zeros, and the level copies of a part share
+    one fingerprint. A row already split passes. Anything else fails before writing."""
+    names = {r[0] for r in boot} | {r[0] for r in rows}
+
+    def parts_of(name, size):
+        spec = levels.RELEASE_FUNCTION_SPLITS.get(name)
+        if not spec or size == spec[1][0][2]:
+            return None
+        if size != spec[0]:
+            raise ValueError(f"{name}: {size} bytes, expected {spec[0]} or {spec[1][0][2]}")
+        if names & {part for part, _, _ in spec[1][1:]}:
+            raise ValueError(f"{name}: merged row already has a child identity")
+        return spec[1]
+
+    def closed(name, parts, address, read):
+        end = address
+        for _, offset, length in parts:
+            if any(read(end, address + offset - end)):
+                raise ValueError(f"{name}: non-zero bytes between two parts")
+            if levels.words(read(address + offset + length - 8, 4)) != (JR_RA,):
+                raise ValueError(f"{name}: part at +{offset:#x} does not close on a return")
+            end = address + offset + length
+
+    new_boot = []
+    for name, a, n in boot:
+        parts = parts_of(name, n)
+        if parts is None:
+            new_boot.append((name, a, n))
+            continue
+        closed(name, parts, a, levels.boot_bytes)
+        new_boot.extend((part, a + offset, length) for part, offset, length in parts)
+    new_rows = []
+    for row in rows:
+        name, kind, size, _, places = row
+        parts = parts_of(name, size)
+        if parts is None:
+            new_rows.append(row)
+            continue
+        keys = [set() for _ in parts]
+        for lv, a in places:
+            base, data = levels.level_text(levels.DUMP / levels.level_dir(lv))
+            read = lambda p, n: data[p - base:p - base + n]
+            closed(name, parts, a, read)
+            for key, (_, offset, length) in zip(keys, parts):
+                key.add(levels.fingerprint(read(a + offset, length), a + offset))
+        if any(len(key) != 1 for key in keys):
+            raise ValueError(f"{name}: split copies differ")
+        for key, (part, offset, length) in zip(keys, parts):
+            new_rows.append((part, kind, length, next(iter(key)), [(lv, a + offset) for lv, a in places]))
+    return new_boot, new_rows
+
+
+def split_release_places(rows: list[tuple]) -> list[tuple]:
+    """Apply levels.RELEASE_PLACE_SPLITS: regroup a row's places by the word that differs.
+
+    A place holding neither measured word fails; a row already split passes."""
+    names, out = {r[0] for r in rows}, []
+    kind_of = lambda places: "level" if len({lv for lv, _ in places}) == 1 else "shared"
+    for row in rows:
+        name, _, size, fp, places = row
+        if name not in levels.RELEASE_PLACE_SPLITS:
+            out.append(row)
+            continue
+        offset, kept_word, child, child_word = levels.RELEASE_PLACE_SPLITS[name]
+        groups = {kept_word: [], child_word: []}
+        for lv, a in places:
+            base, data = levels.level_text(levels.DUMP / levels.level_dir(lv))
+            word = levels.words(data[a - base + offset:a - base + offset + 4])[0]
+            if word not in groups:
+                raise ValueError(f"{name}: level {lv} holds neither measured word")
+            groups[word].append((lv, a))
+        kept, moved = groups[kept_word], groups[child_word]
+        if not moved:
+            out.append(row)
+            continue
+        if not kept or child in names:
+            raise ValueError(f"{name}: unexpected place split")
+        out.append((name, kind_of(kept), size, fp, kept))
+        out.append((child, kind_of(moved), size, fp, moved))
+    return out
+
+
 def refresh_entries() -> None:
     """Repair measured extents in an existing release catalogue, retaining identities.
 
@@ -576,6 +662,8 @@ def refresh_entries() -> None:
             a, n = levels.function_extent(name, a, n)
             boot.append((name, a, n))
     rows = levels.split_identities(correct_level_entries(levels.split_level_rows(levels.read_catalogue())))
+    boot, rows = split_release_rows(boot, rows)
+    rows = split_release_places(rows)
     # Validate both catalogues completely before writing either output.
     write_catalogues(boot, rows)
     print(f"entry repairs: {len(boot)} boot functions, {len(rows)} level rows; identities retained")
