@@ -11,6 +11,7 @@ extern int func_001244B8(int, int);
 /* The catalogue retains the legacy name; its measured entry is 00127220. */
 extern void func_00127218(int *, int) __asm__("func_00127218");
 extern int func_00351F38(volatile int *);
+/* Movie-frame state: written by the movie decoder's interrupt-time callback while this runs. */
 extern volatile int D_001AE7D0[] __attribute__((sda));
 extern volatile int D_001AE7D4[] __attribute__((sda));
 extern volatile int D_001AE7D8[] __attribute__((sda));

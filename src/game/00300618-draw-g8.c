@@ -57,7 +57,8 @@ extern float ref_00300AA8_02[16] __attribute__((sda));
 typedef struct { char pad[0xB0]; float size[2]; char padB8[0x148]; float scale[2]; } NativeDrawView;
 extern NativeDrawView ref_00300AA8_03;
 extern ParticleWord ref_00300AA8_06 SDATA(ref_00300AA8_06);
-/* The queue retains the qualifiers of its existing renderer declaration. */
+/* The DMA packet cursor: the DMA controller reads the packets the cursor advances over,
+   so the queue is volatile. */
 extern volatile unsigned int * volatile D_001B22A8;
 extern volatile unsigned int *nativeQueue SDATA(D_001B22A8);
 extern void func_00300910(void);
@@ -75,6 +76,7 @@ void func_00300AA8(char *object, float x, float y, int flags, float frame, float
     TextureUpload *upload;
     ScratchVertex *scratch;
     u8 *quad;
+    /* Packet words the DMA controller reads once the chain is kicked. */
     volatile u32 *packet, *tagPacket;
     volatile NativeCompactU64 *payload;
     NativeCompactU64 *source;
