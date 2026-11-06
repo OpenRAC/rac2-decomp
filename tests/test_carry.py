@@ -329,7 +329,7 @@ class Carry(unittest.TestCase):
     def row_merge(self, rows, texts, spec=("kept", ("copy",))):
         with patch.dict(levels.RELEASE_ROW_MERGES, dict([spec]), clear=True), \
              patch.object(levels,"level_text",side_effect=lambda path: texts[int(path.name[:2])]):
-            return carry.merge_release_rows(rows)
+            return carry.merge_release_rows([], rows)[1]
 
     def test_release_row_merge_gives_the_kept_row_every_place(self):
         body = code(addiu(29,29,-16), lui(2,0x30), lw(2,2,8), lw(3,4,0x2000), JR_RA, addiu(29,29,16))
@@ -354,6 +354,32 @@ class Carry(unittest.TestCase):
                 t, r = dict(texts), list(rows)
                 change(t, r)
                 self.row_merge(r, t)
+
+    def test_release_row_merge_gives_a_merged_boot_entry_the_kept_name(self):
+        body = code(addiu(29,29,-16), lui(2,0x30), lw(2,2,8), lw(3,4,0x2000), JR_RA, addiu(29,29,16))
+        fp = levels.fingerprint(body, 0x1000)
+        texts = {0:(0x1000,body), 1:(0x1000,body)}
+        boot = [("before",0x5000,8), ("copy",0x5008,24), ("after",0x5020,8)]
+        rows = [("kept","shared",24,fp,[(0,0x1000)]), ("copy","boot",24,fp,[(1,0x1000)])]
+        boot_image = bytes(8) + body + bytes(8)
+
+        def merge(boot, rows, image=boot_image):
+            with patch.dict(levels.RELEASE_ROW_MERGES, {"kept": ("copy",)}, clear=True), \
+                 patch.object(levels,"boot_bytes",side_effect=lambda a, n: image[a - 0x5000:a - 0x5000 + n]), \
+                 patch.object(levels,"level_text",side_effect=lambda path: texts[int(path.name[:2])]):
+                return carry.merge_release_rows(boot, rows)
+
+        new_boot, new_rows = merge(boot, rows)
+        self.assertEqual(new_boot, [("before",0x5000,8), ("kept",0x5008,24), ("after",0x5020,8)])
+        self.assertEqual(new_rows, [("kept","boot",24,fp,[(0,0x1000),(1,0x1000)])])
+        self.assertEqual(merge(new_boot, new_rows), (new_boot, new_rows))
+        other = code(addiu(29,29,-16), lui(2,0x30), lw(2,2,8), lw(3,4,0x3000), JR_RA, addiu(29,29,16))
+        with self.assertRaisesRegex(ValueError, "the boot's copy is not the body of kept"):
+            merge(boot, rows, bytes(8) + other + bytes(8))
+        with self.assertRaisesRegex(ValueError, "kept is a boot function already"):
+            merge(boot + [("kept",0x6000,24)], rows)
+        with self.assertRaisesRegex(ValueError, "boot entry is left without its row"):
+            merge(boot, rows[:1])
 
     def realign(self, images, rows, spec, boot=()):
         """realign_release_places() over level texts IMAGES {level: (base, bytes)}."""

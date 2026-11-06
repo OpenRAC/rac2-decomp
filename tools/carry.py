@@ -650,14 +650,17 @@ def split_release_places(rows: list[tuple]) -> list[tuple]:
     return out
 
 
-def merge_release_rows(rows: list[tuple]) -> list[tuple]:
+def merge_release_rows(boot: list[tuple], rows: list[tuple]) -> tuple[list[tuple], list[tuple]]:
     """Apply levels.RELEASE_ROW_MERGES: the kept row takes the places of rows that are the same function.
 
     Every merged place must hold the kept row's size, fingerprint and constants
-    (levels.cross_identity), and no level may hold two copies. A merge already
+    (levels.cross_identity), and no level may hold two copies. A merged row that is a
+    boot function gives its boot entry to the kept name, after the same checks of the
+    boot's copy; the kept name may not be a boot function already. A merge already
     applied passes; anything else fails before a catalogue is written."""
     by_name = {r[0]: r for r in rows}
-    merged, retired = {}, set()
+    in_boot = {n: (a, s) for n, a, s in boot}
+    merged, retired, renamed = {}, set(), {}
 
     def body(lv, a, size):
         base, data = levels.level_text(levels.DUMP / levels.level_dir(lv))
@@ -666,6 +669,8 @@ def merge_release_rows(rows: list[tuple]) -> list[tuple]:
     for kept, others in levels.RELEASE_ROW_MERGES.items():
         present = [other for other in others if other in by_name]
         if not present:
+            if any(other in in_boot for other in others):
+                raise ValueError(f"{kept}: a merged row's boot entry is left without its row")
             continue
         if kept not in by_name:
             raise ValueError(f"{kept}: rows to merge but no kept row")
@@ -680,6 +685,15 @@ def merge_release_rows(rows: list[tuple]) -> list[tuple]:
                 copy = body(lv, a, size)
                 if levels.fingerprint(copy, a) != fp or levels.cross_identity(copy) != constants:
                     raise ValueError(f"{other}: level {lv} is not the body of {kept}")
+            if other in in_boot:
+                if kept in in_boot or kept in renamed.values():
+                    raise ValueError(f"{other}: {kept} is a boot function already")
+                a, n = in_boot[other]
+                copy = levels.boot_bytes(a, size)
+                if n != size or levels.fingerprint(copy, a) != fp or levels.cross_identity(copy) != constants:
+                    raise ValueError(f"{other}: the boot's copy is not the body of {kept}")
+                renamed[other] = kept
+                kind = "boot"
             places += other_places
         if len({lv for lv, _ in places}) != len(places):
             raise ValueError(f"{kept}: two merged copies in one level")
@@ -687,7 +701,8 @@ def merge_release_rows(rows: list[tuple]) -> list[tuple]:
             kind = "level" if len(places) == 1 else "shared"
         merged[kept] = (name, kind, size, fp, sorted(places))
         retired.update(present)
-    return [merged.get(r[0], r) for r in rows if r[0] not in retired]
+    return ([(renamed.get(n, n), a, s) for n, a, s in boot],
+            [merged.get(r[0], r) for r in rows if r[0] not in retired])
 
 
 def realign_release_places(boot: list[tuple], rows: list[tuple]) -> list[tuple]:
@@ -803,8 +818,9 @@ def refresh_entries() -> None:
     """Repair measured extents in an existing release catalogue, retaining identities.
 
     This does not realign releases, revisit callee correspondences or promote C: the only
-    places it moves are the measured stretches of levels.RELEASE_PLACE_RUNS. The normal carry
-    remains the full cross-release alignment operation.
+    places it moves are the measured stretches of levels.RELEASE_PLACE_RUNS, and the only rows
+    it folds together are those of levels.RELEASE_ROW_MERGES. The normal carry remains the
+    full cross-release alignment operation.
     """
     boot = []
     for name, a, n in levels.split_boot_rows(correct_boot_splits(levels.read_boot_functions())):
@@ -815,7 +831,7 @@ def refresh_entries() -> None:
     boot, rows = split_release_rows(boot, rows)
     rows = split_release_places(rows)
     rows = realign_release_places(boot, rows)
-    rows = merge_release_rows(rows)
+    boot, rows = merge_release_rows(boot, rows)
     # Validate both catalogues completely before writing either output.
     write_catalogues(boot, rows)
     print(f"entry repairs: {len(boot)} boot functions, {len(rows)} level rows; identities retained")

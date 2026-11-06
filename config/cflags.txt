@@ -1619,7 +1619,7 @@ src/pal/levels/shared/L04_0041A660-g82.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L04_0041E49C-sw.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L04_00456C90-flags.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L04_00473240-g82.c	-O2 -G8 -ffunction-sections -g
-src/pal/levels/shared/L05_00326B88-menu-g8.c	-O2 -G32 -ffunction-sections -Wa,-G32
+src/pal/game/0029C498-menu-g8.c	-O2 -G32 -ffunction-sections -Wa,-G32
 src/pal/levels/shared/L05_0039AE90-flags.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L05_0039BD90-flags.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order -frac2-gcse-unsplit-edges
 src/pal/levels/shared/L05_003D4068-qcopy.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-zero-ti-por
@@ -3822,7 +3822,7 @@ src/pal/levels/02_maktar_nebula/L02_003D9808-g8-dbg.c	-O2 -G8 -ffunction-section
 src/pal/levels/02_maktar_nebula/L02_003DFD18-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/12_todano/L12_00418E80-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
 src/pal/levels/shared/L09_003FD248-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
-src/pal/levels/shared/L05_00326B88-g32.c	-O2 -G32 -ffunction-sections -Wa,-G32
+src/pal/game/0029C2A8-g32.c	-O2 -G32 -ffunction-sections -Wa,-G32
 src/pal/levels/09_dobbo/L09_0040F3A0-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00423418-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/pal/levels/shared/L00_0040BA28-g8.c	-O2 -G8 -ffunction-sections

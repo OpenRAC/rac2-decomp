@@ -1,7 +1,7 @@
 #include "common.h"
 
-/* func_PAL_L05_00326B88, the PAL copy of func_0029B910: the same C, where the
- * menu offset 0x3F138 becomes 0x3F860 and the store of the item id is gone. */
+/* func_PAL_0029C2A8, PAL's func_0029B910: the same C, where the menu offset
+ * 0x3F138 becomes 0x3F860 and the store of the item id is gone. */
 extern int D_001A9AC8[4] __attribute__((sda));
 extern char *D_001A8CFC MACRO_ADDR;
 extern int func_002ED8A0(int);
@@ -34,7 +34,7 @@ typedef struct {
 extern MissionRecord D_00262940[];
 extern MissionMenuItem D_00256418[];
 
-void func_PAL_L05_00326B88(void) {
+void func_PAL_0029C2A8(void) {
     int i;
     int *ids;
     if (D_001A8CFC != 0) {

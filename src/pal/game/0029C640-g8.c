@@ -3,7 +3,7 @@
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
 extern int D_001A8BB0[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_PAL_L05_00326D78(void);
+extern void func_PAL_0029C498(void);
 extern unsigned int func_L00_002F0E38(void);
 extern void func_PAL_L00_0030E780(void);
 typedef int (*Fn)(void);
@@ -18,7 +18,7 @@ typedef struct {
     Slot slot2[2];
 } Sub;
 
-void func_PAL_L05_00326F48(void)
+void func_PAL_0029C640(void)
 {
     int i;
     int result;
@@ -31,7 +31,7 @@ void func_PAL_L05_00326F48(void)
 
     if (D_001A8CFC[0] == 0)
         goto states;
-    func_PAL_L05_00326D78();
+    func_PAL_0029C498();
     fn = (Fn)((Sub *)(D_001A8CFC[0] + 0x38000))->cb2;
     if (fn != 0) {
         if (fn() != 0)

@@ -1380,16 +1380,28 @@ RELEASE_PLACE_SPLITS = {
 
 
 # A release's rows that are one function in different levels: the row that stays,
-# then the rows whose places it takes. Each merged row was carried with an entry
-# 4 bytes early (FUNCTION_ENTRY_OFFSETS), so its fingerprint only joined the kept
-# row's after that repair. tools/carry.py --entries checks every merged place.
+# then the rows whose places it takes. A merged row that is a boot function also gives
+# the kept row its boot entry, under the kept name. tools/carry.py --entries checks
+# every merged place, the boot's included.
 RELEASE_ROW_MERGES = {
+    # Each of these two merged rows was carried with an entry 4 bytes early
+    # (FUNCTION_ENTRY_OFFSETS), so its fingerprint only joined the kept row's after that repair.
     # The PAL copy of func_L03_003A40A0: levels 3, 4, 7, 9, 13, 20 and 30, and
     # levels 8, 11, 16, 17 and 18. USA and v2.00 have one row in all 12.
     "func_PAL_L03_003A7720": ("func_PAL_L08_003B1594",),
     # The PAL copy of func_L00_00408E58: 24 levels, and levels 16, 23 and 30.
     # USA and v2.00 have one row in all 27.
     "func_PAL_L00_0040D990": ("func_PAL_L16_0040C384",),
+    # The split of func_PAL_0029C2A8 (RELEASE_FUNCTION_SPLITS) gave the boot and 23 levels
+    # rows for five functions that levels 05, 10, 15 and 25 already held under rows of
+    # their own, since carry.align() had cut that stretch correctly only there. The boot's
+    # name stays, except for the 12-byte function: the carry found it as v1.01's
+    # func_0029BCC8, so the boot entry takes that name.
+    "func_PAL_0029C2A8": ("func_PAL_L05_00326B88",),
+    "func_PAL_0029C3C0": ("func_PAL_L05_00326CA0",),
+    "func_PAL_0029C498": ("func_PAL_L05_00326D78",),
+    "func_0029BCC8": ("func_PAL_0029C630",),
+    "func_PAL_0029C640": ("func_PAL_L05_00326F48",),
 }
 
 

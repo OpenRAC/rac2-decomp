@@ -9,24 +9,24 @@ extern char *D_001A8CFC MACRO_ADDR;
 extern char *D_001A8CFC_gp SDATA(D_001A8CFC);
 typedef struct { char pad[0x1C0]; int flags; int pad2[2]; int state; } MenuInput;
 extern MenuInput D_00138180;
-extern void func_PAL_L05_00326CA0(void), func_PAL_L05_00326B88(void);
+extern void func_PAL_0029C3C0(void), func_PAL_0029C2A8(void);
 extern void func_PAL_0033C5B0(void *), func_PAL_0033C920(void *, int), func_PAL_0033C908(void *, int);
 extern int func_PAL_0034B358(void *, void *), func_002ED8A0(int);
 extern void func_00349488(void *);
 
-int func_PAL_L05_00326D78(void) {
+int func_PAL_0029C498(void) {
  int result, changed;
  if (D_001A9A50 == 0) return -1;
  if (D_001A8C64 != 0) return -1;
  if (D_001A8CFC_gp != 0) {
-  func_PAL_L05_00326CA0();
+  func_PAL_0029C3C0();
   {
    int enabled = 0;
    switch (D_001A9A54) {
     case 0: return -1;
     case 1:
      changed = 0;
-     func_PAL_L05_00326B88();
+     func_PAL_0029C2A8();
      if (D_00138180.flags & 0x10) {
       D_001A9AD8 = 1;
       D_00138180.state = 2;
