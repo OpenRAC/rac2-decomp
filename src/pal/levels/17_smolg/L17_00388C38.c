@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L17_00388C38);
-
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union {
@@ -41,6 +39,120 @@ extern void func_002FEE50(int);
 extern void func_PAL_L00_00390F48(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
+
+/* func_PAL_L17_00388C38, the PAL copy of func_L17_00385DE8: the same C, where the sparks' life of
+   16 frames becomes 13 and the second spark's spin stays a literal 16. */
+/* Read once as a GP macro load in a delay slot and otherwise as lui/lw, as at -G0 in retail. */
+extern int D_L17_001A8F00 __attribute__((sda));
+typedef struct { char pad[0x30]; int phase, frame; char gap[0x15C]; char *actor; } CutsceneState;
+extern CutsceneState D_L17_001BD8C0;
+typedef struct EffectMoby {
+    char pad0[0x28]; struct EffectMoby *next; char pad1[8]; unsigned short flags;
+    char pad2[0x62]; int unknown; char pad3[0xE]; short classId;
+} EffectMoby;
+extern EffectMoby *D_L17_001B2C28 __attribute__((sda));
+extern void func_0029FCC0(void *, int, void *);
+typedef struct { char pad0[4]; int state; char pad1[2]; unsigned char opacity, age; } EffectTail;
+typedef struct { char pad0[8]; unsigned char color, size; short life; char pad1[0x14]; EffectTail tail; } CutsceneParticle;
+/* Each register bank keeps the callee's order (a0-t0: position, spin, axis, colour, count;
+   f12-f15: jitter, lo, hi, size); the interleaving gives retail's argument setup order. */
+extern CutsceneParticle *func_PAL_002BE9A8(void *, int, float, float, void *, float, unsigned int, float, int);
+extern int func_00283CF0(float);
+
+/* Activates the scene's effect mobys during phase 6 and emits paired sparks from the
+   scene actor during two frame windows of phases 4 and 5. */
+void func_PAL_L17_00388C38(unsigned char *self) {
+    Vec velocity, point;
+    char *obj;
+    CutsceneParticle *first, *second;
+    EffectTail *detail;
+    int amount, state;
+
+    switch (self[0x20]) {
+    case 0:
+        self[0x30] = 255;
+        self[0x20] = 1;
+        break;
+    case 1:
+        if (D_L17_001A8F00 != 2)
+            break;
+        if (D_L17_001BD8C0.phase == 6) {
+            EffectMoby *m;
+            for (m = D_L17_001B2C28; m; m = m->next) {
+                if (m->classId == 0xB88 || m->classId == 0x1249) {
+                    m->unknown = 0;
+                    m->flags = (m->flags | 0x43) & 0xEFFF;
+                }
+            }
+        }
+        state = D_L17_001A8F00;
+        if (state != 2)
+            break;
+        if (D_L17_001BD8C0.phase == 4 && (unsigned)(D_L17_001BD8C0.frame - 301) < 59) {
+            obj = D_L17_001BD8C0.actor;
+            if (*(short *)(obj + 0xAA) == 0x125E) {
+                func_0029FCC0(obj, 0, &point);
+                func_00282F20(&velocity, obj + 0xE0, -0.05f);
+                amount = func_002A77E0(16);
+                if (func_002A77E0(2))
+                    amount = -amount;
+                first = func_PAL_002BE9A8(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
+                if (first) {
+                    first->life = 13;
+                    first->size = func_00283CF0(4.0f) + 64;
+                    detail = &first->tail;
+                    detail->opacity = 127;
+                    detail->state = state;
+                    detail->age = (unsigned char)first->life;
+                }
+                second = func_PAL_002BE9A8(&point, 16, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
+                /* Retail tests the first spark again before writing the second. */
+                if (first) {
+                    detail = &second->tail;
+                    second->size = func_00283CF0(4.0f) + 64;
+                    second->life = 13;
+                    second->color = func_002A77E0(255);
+                    detail->state = state;
+                    detail->opacity = 127;
+                    detail->age = (unsigned char)first->life;
+                }
+                state = D_L17_001A8F00;
+            }
+        }
+        if (state != 2)
+            break;
+        if (D_L17_001BD8C0.phase == 5 && D_L17_001BD8C0.frame >= 531) {
+            obj = D_L17_001BD8C0.actor;
+            if (*(short *)(obj + 0xAA) == 0x125E) {
+                func_0029FCC0(obj, 0, &point);
+                func_00282F20(&velocity, obj + 0xE0, -0.05f);
+                amount = func_002A77E0(16);
+                if (func_002A77E0(2))
+                    amount = -amount;
+                first = func_PAL_002BE9A8(&point, amount, 0.1f, 1.0f, &velocity, 0.9f, 0x7F204080, 100000.0f, 0);
+                if (first) {
+                    first->life = 13;
+                    first->size = func_00283CF0(4.0f) + 64;
+                    detail = &first->tail;
+                    detail->opacity = 127;
+                    detail->state = state;
+                    detail->age = (unsigned char)first->life;
+                }
+                second = func_PAL_002BE9A8(&point, 16, 0.05f, 1.0f, &velocity, 0.97f, 0x7FFFFFFF, 60000.0f, 0);
+                if (first) {
+                    detail = &second->tail;
+                    second->size = func_00283CF0(4.0f) + 64;
+                    second->life = 13;
+                    second->color = func_002A77E0(255);
+                    detail->state = state;
+                    detail->opacity = 127;
+                    detail->age = (unsigned char)first->life;
+                }
+            }
+        }
+        break;
+    }
+}
 
 void func_PAL_L17_00393E08(unsigned char *obj) {
     struct {

@@ -190,6 +190,3 @@ void func_PAL_L14_004356C0(PrisonEntity *self)
             func_PAL_002A7E68(self, 0, 0, 0);
     }
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_00435D28);
