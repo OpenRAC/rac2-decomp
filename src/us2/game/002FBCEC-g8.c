@@ -27,7 +27,7 @@ extern int func_00288FB8(int);
  * prompts are looked up in the text table. */
 void func_US2_002FBCEC(void) {
     {
-    static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
+    static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
     unsigned int rc2_selector = (unsigned int)(D_0021F240.st);
     if (rc2_selector > 6U) goto rc2_default;
 goto *D_0026DBE0[rc2_selector];

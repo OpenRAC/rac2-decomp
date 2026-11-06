@@ -7,7 +7,7 @@ extern int D_001A8CFC;
 extern int ref_002D08C8_01 __attribute__((sda));
 extern int D_001F2848[];
 extern int D_001ABA0C[4] __attribute__((sda));
-extern volatile unsigned char D_001A7A0A;
+extern unsigned char D_001A7A0A;
 
 int func_PAL_002D17F0(void)
 {

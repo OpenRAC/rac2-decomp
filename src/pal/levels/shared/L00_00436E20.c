@@ -117,7 +117,7 @@ extern void func_PAL_0033CF78(void *, int, int, int);
 extern void func_PAL_0033CD50(void *);
 extern void func_L00_00430948(void *, float, float);
 extern int func_002E5E58(int a, int b, int c);
-extern volatile unsigned char D_001A7BB2 __attribute__((sda));
+extern unsigned char D_001A7BB2 __attribute__((sda));
 
 /* func_PAL_L00_00438CC0, the PAL copy of func_L00_00433560: the same C, with the child's three
    text ids set up first and the two object fields 0x30 further on. */

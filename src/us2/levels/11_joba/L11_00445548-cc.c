@@ -100,7 +100,7 @@ extern JobaFlagBlockView D_L11_001BA780;
 extern void *jtbl_002BB0E0[13];
 
 s32 func_US2_L11_00445548(s32 a) {
-    static void * volatile tab[] = {
+    static void * tab[] = {
         &&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7,
         &&c8, &&c9, &&c10, &&c11, &&c12
     };

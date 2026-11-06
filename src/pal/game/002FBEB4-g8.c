@@ -53,7 +53,7 @@ extern s32 D_001A7A20;
 
 void func_PAL_002FBEB4(void) {
     {
-    static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
+    static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
     u32 rc2_selector = (u32)(D_0021F240.st);
     if (rc2_selector > 6U) goto rc2_default;
 goto *D_0026DBE0[rc2_selector];

@@ -5,7 +5,7 @@ extern void func_PAL_0033CF78(void *, char *, char *, char *);
 extern void func_PAL_0033CD50(void *);
 extern void func_0033B018(void *, float, float);
 extern int func_002E5E58(int, int, int);
-extern volatile unsigned char D_001A7BB2 __attribute__((sda));
+extern unsigned char D_001A7BB2 __attribute__((sda));
 extern char *func_00288FB8(int);
 extern void func_PAL_0033CE70(void *);
 extern void func_00284E40(void);

@@ -50,7 +50,7 @@ s32 func_US2_002CC908(s32 arg0) {
 
     r = 0;
     {
-    static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4};
+    static void *rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4};
     u32 rc2_selector = (u32)(arg0);
     if (rc2_selector > 4U) goto rc2_switch_end;
 goto *D_0026CCE0[rc2_selector];
