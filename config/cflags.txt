@@ -3727,6 +3727,16 @@ src/pal/levels/shared/L00_00423418-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qc
 src/pal/levels/shared/L00_0040BA28-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/06_notak/L06_004238A0.c	-O2 -G0 -ffunction-sections -fno-expensive-optimizations
 src/pal/levels/01_oozla/L01_003DCCC8-burst.c	-O2 -G0 -ffunction-sections -g -frac2-gcse-unsplit-edges
+src/pal/levels/08_tabora/L08_00427A58-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/shared/L22_003CD550-flags.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L18_003F96E8-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
+src/pal/levels/shared/L04_002DCE68-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/11_joba/L11_004676D0-g8.c	-O2 -G8 -ffunction-sections -funroll-loops -malign-loops=2
+src/pal/levels/shared/L00_002B6B38-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/03_endako/L03_00387350-g8.c	-O2 -G8 -mno-split-addresses -ffunction-sections
+src/pal/game/002A9FA0-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/02_maktar_nebula/L02_0040F0C0-gu.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/game/002D1120-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/levels/shared/L08_0041E790-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_002A4788.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_00376A18-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections
