@@ -53,4 +53,3 @@ u8 *func_PAL_L03_003E5DE8(char *owner, void *position, void *first, void *second
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L03_003E61B0);
