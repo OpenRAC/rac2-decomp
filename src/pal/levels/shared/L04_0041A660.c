@@ -95,10 +95,8 @@ void func_PAL_L04_0041A660(u8 *owner, f32 *pos, f32 *to, f32 *from)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0041A790);
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0041AF28);
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0041B5C0);
 
@@ -108,3 +106,5 @@ INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0041BC68);
 
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0041D788);
+
+INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0041AF28);
