@@ -936,6 +936,15 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_L26_003D881C": (960, 4),
     "func_PAL_L26_003DFB1C": (1612, 4),
     "func_PAL_L30_0041DB3C": (1228, 4),
+    "func_PAL_0030A9D8": (2820, 24),
+    "func_PAL_0030F460": (1740, 8),
+    "func_PAL_003188D8": (2564, 56),
+    "func_PAL_0032B930": (2104, 512),
+    "func_PAL_00333360": (2420, 8),
+    "func_PAL_00336710": (1924, 8),
+    "func_PAL_L00_0039C018": (1052, 8),
+    "func_PAL_L19_003E4048": (5012, 8),
+    "func_PAL_L24_003FED38": (2052, 8),
     "func_US2_L16_0034DE08": (288, 16),
     "func_US2_L19_00353D38": (288, 16),
     "func_US2_L19_003DEC48": (3336, 8),
@@ -943,8 +952,24 @@ FUNCTION_ENTRY_OFFSETS = {
 }
 
 
+# Rows that end on `jr ra`: the delay slot belongs to them.
+FUNCTION_END_EXTRA = {
+    "func_PAL_L00_002A7D48": (5628, 4),
+    "func_PAL_L00_0030BA80": (336, 4),
+    "func_PAL_L00_0039BE70": (424, 4),
+    "func_PAL_L00_003C64E8": (1604, 4),
+    "func_PAL_L00_003E1488": (964, 4),
+    "func_PAL_L00_003EED30": (556, 4),
+    "func_PAL_L01_002C1C58": (2476, 4),
+    "func_PAL_L02_003EFD50": (1204, 4),
+    "func_PAL_L20_0039FEA0": (996, 4),
+}
+
+
 def function_extent(name: str, address: int, size: int) -> tuple[int, int]:
     """Apply a named, measured entry correction once; reject unexpected extents."""
+    if name in FUNCTION_END_EXTRA and size == FUNCTION_END_EXTRA[name][0]:
+        size += FUNCTION_END_EXTRA[name][1]
     if name not in FUNCTION_ENTRY_OFFSETS:
         return address, size
     original, skip = FUNCTION_ENTRY_OFFSETS[name]
