@@ -3335,7 +3335,6 @@ src/pal/game/00353D08-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/00295DD0-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L08_003D7A28-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002948A8-cc.c	-O2 -G0 -ffunction-sections
-src/pal/game/002CC950-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00303548-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/002D82D8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00339E38-cc.c	-O2 -G0 -ffunction-sections
@@ -3707,7 +3706,6 @@ src/us2/game/003413A8-cc.c	-O2 -G0 -ffunction-sections
 src/us2/game/002CB860-cc.c	-O2 -G0 -ffunction-sections
 src/us2/levels/shared/L00_00375270-cc.c	-O2 -G64 -Wa,-G64 -ffunction-sections
 src/us2/levels/03_endako/L03_003C8030-cc-g8.c	-O2 -G8 -ffunction-sections
-src/us2/game/002CCAA0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L09_004116E0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/0033BC20-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/003395F0-cc.c	-O2 -G0 -ffunction-sections
@@ -3747,7 +3745,6 @@ src/us2/game/002D7BA0-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L04_00417CB0-g8.c	-O2 -G8 -g -ffunction-sections -frac2-hazard-labels
 src/pal/levels/shared/L00_003CD388-burst-g8.c	-O2 -G8 -ffunction-sections -fno-sched-interblock
 src/pal/levels/shared/L13_00420460-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
-src/pal/levels/02_maktar_nebula/L02_003D4458-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/pal/levels/01_oozla/L01_003DF4D8.c	-O2 -G0 -ffunction-sections -fno-expensive-optimizations
 src/pal/levels/shared/L04_003F2BD0-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g
 src/pal/levels/shared/L00_003B0230-particles-g.c	-O2 -G0 -g -ffunction-sections
