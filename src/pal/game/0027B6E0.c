@@ -28,6 +28,10 @@ typedef struct {
 } ScreenExtent;
 extern ScreenExtent D_001A7340 __attribute__((sda));
 
+typedef struct { char pad[0x150]; short width, height; } ScreenDimensions;
+extern ScreenDimensions D_001A6480;
+extern void func_00279FF0(void);
+
 void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, float c, float d)
 {
     ScreenState *context = &D_001B9040;
@@ -55,4 +59,32 @@ void func_PAL_0027B6E0(int width, int height, float scale, float a, float b, flo
     func_0027AB40();
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0027B810);
+/* func_PAL_0027B810, the PAL copy of func_0027A9F0: the same C, without the stores to fA0, fA4,
+   f218, f21C, f228 and f22C, and with a call of func_00279FF0 at the end. */
+void func_PAL_0027B810(void)
+{
+    ScreenDimensions *dimensions = &D_001A6480;
+    ScreenState *view = &D_001B9040;
+    short width = dimensions->width;
+    short height = dimensions->height;
+    int half_width = width >> 1;
+    int half_height = height >> 1;
+    float half_height_f;
+
+    D_001A7340.width = width;
+    D_001A7340.height = height;
+    D_001A7340.half_width = half_width;
+    D_001A7340.half_height = half_height;
+    D_001A7340.left = (2048 - half_width) << 4;
+    D_001A7340.top = (2048 - half_height) << 4;
+    D_001A7340.right = (half_width + 2048) << 4;
+    D_001A7340.bottom = (half_height + 2048) << 4;
+
+    view->fB0 = 0.62f;
+    view->f200 = func_00283CE0(width) * 0.5f;
+    half_height_f = func_00283CE0(dimensions->height) * 0.5f;
+    view->f204 = half_height_f;
+    view->f208 = view->f200 * 4.0f;
+    view->f20C = half_height_f * 4.0f;
+    func_00279FF0();
+}

@@ -1,13 +1,41 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0026E780);
+#include "common.h"
+
+extern unsigned char *D_001B22A8 __attribute__((sda));
+extern unsigned char D_PAL_001AC950[];
+
+/* func_PAL_0026E780, PAL's own function, built like func_002FC518: appends a packet header for
+   three quadwords to the buffer at D_001B22A8, the quadword at D_PAL_001AC950, and four doublewords.
+   D_PAL_001AC950 is PAL's own name: v1.01's D_001AC950 is another object, which func_002FC748
+   reads from elsewhere in PAL.
+   -G0 as func_002FC468: D_001B22A8 is loaded absolutely, and the store in the return's delay
+   slot takes the assembler's $gp form. */
+void func_PAL_0026E780(void)
+{
+    unsigned char *p;
+
+    *(unsigned int *)(D_001B22A8 + 0) = 0x10000003u;
+    *(unsigned int *)(D_001B22A8 + 4) = 0;
+    *(unsigned int *)(D_001B22A8 + 8) = 0;
+    *(unsigned int *)(D_001B22A8 + 12) = 0x50000003u;
+    D_001B22A8 += 16;
+    p = D_001B22A8;
+    qcopy(p, D_PAL_001AC950);
+    p += 16;
+    D_001B22A8 = p;
+    *(unsigned long long *)(p + 0) = 0x101;
+    *(unsigned long long *)(p + 8) = 0x80000000u;
+    *(unsigned long long *)(p + 16) = 0x8FE86FF8u;
+    *(unsigned long long *)(p + 24) = 0x8FE88FF8u;
+    D_001B22A8 += 32;
+}
 
 typedef struct { char prefix[20]; int *data; } SplashState;
 extern char D_001BAEC0[];
 extern int D_001A72DC[] __attribute__((sda));
 extern void func_PAL_0029DE68(int, void *);
 extern int func_0011AEA0(int);
-extern void func_PAL_0026E780(void);
 extern void func_002FC1D8(void);
 extern void func_002FCB00(void *, int, int, int);
 extern void func_0027B858(void);

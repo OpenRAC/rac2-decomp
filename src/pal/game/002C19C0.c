@@ -65,4 +65,3 @@ void func_PAL_002C21D8(SmokeParticle *p)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002C23B8);

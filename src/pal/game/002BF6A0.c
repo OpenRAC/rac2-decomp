@@ -40,7 +40,6 @@ void func_PAL_002BF6A0(char *p)
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002C0078);
 
 extern int func_00283CF0(float);
 extern int func_002AAE98(float, float, float, float);
