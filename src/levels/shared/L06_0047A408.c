@@ -1,32 +1,5 @@
-/*
- * Tier: GPT-6.1 Sol (high effort), task v1356; supersedes v1017's profile.
- * USA v1.01, game -O2 -G0 -ffunction-sections -g -frac2-hazard-labels.
- * Best check.py: 2144/2144 bytes, 0 of 3 places match (06, 12, 13).
- * Requalified on the current pinned compiler in an isolated source unit.
- * The hazard-label option fixes the branch at +0x580 (0047A988 in level 06):
- * its displacement now equals retail's 0x1D instead of the old draft's 0x1E.
- * No other instruction changes against the original draft's current check.
- * First mismatch remains +0x8: retail loads the descriptor table before
- * spilling a0. Rig/follow/snap and focus-copy allocation still differ;
- * follow spills while retail keeps it in s4. Saved one/at_end/ten allocation
- * also differs (retail s0/s1/s2, candidate lacks the separate saved one).
- * Fourteen successful checker compiles plus one allocator diagnostic pair.
- * Typed scalar descriptor indexing and a local table pointer tie the original
- * array/explicit-index expression exactly. A byte-sized at_end and a float-first
- * interleaving of the first vector-scale call also tie the original bytes.
- * -mno-split-addresses fixes the initial load sequence but grows to 2160 bytes
- * and changes other global accesses. Independent hero symbols with reordered
- * rig aliases reach 2160; explicit follow-member accesses and G8/NOT_SDA tie it.
- * On that independent-symbol form, -fno-gcse gives 2152 bytes and
- * -fno-force-mem gives 2136; neither resolves the follow spill. Mixed hero
- * base/subobject addressing gives 2156 bytes. None improves the retained body.
- * All declarations are below. External refs remain unqualified because
- * instruction comparison fails before relocation qualification. No link check
- * was run; the src marker and temporary per-file profile were restored.
- * Next: recover the original camera-object/pointer lifetime model to keep
- * follow resident without retaining a separate hero-focus address. Do not
- * repeat the tied descriptor, boolean or call-interleaving wordings.
- */
+/* Follow camera swing volume update, shared by levels 06, 12 and 13.
+ * A unit of its own because it needs -g and hazard labels, and flags are per file. */
 #include "common.h"
 typedef struct {
     f32 swing; u8 pad04[4]; s32 volume_25faf0; s32 clip_volume; s32 volume_25fa38; s32 path; u8 pad18[8];
@@ -37,7 +10,11 @@ typedef struct {
 typedef struct { u8 pad0[0x18]; f32 yaw; SwingCameraParams *params; } CamDesc;
 typedef struct { u8 pad0[0x100]; f32 analog[4]; } PadSt;
 
-/* Adapted from OpenRAC/rac1-decomp camera_modes_and_scripts.c (GPL-3.0), volume_camera_swing. */
+/* Adapted from OpenRAC/rac1-decomp camera_modes_and_scripts.c (GPL-3.0), volume_camera_swing.
+ * hero_pos holds a constant across calls, so it gets no register and every use rebuilds it.
+ * The copies escape cse through qcopy's asm inputs: state must stay separate from rig, and
+ * follow_copy gives follow its two extra references.
+ */
 typedef float CameraVec[4];
 typedef struct { float f[4]; } Vec4f;
 typedef struct {
@@ -50,11 +27,12 @@ typedef struct { u8 pad[4]; float look_height, distance, unk2C, unk30, unk34, un
 typedef struct { float position[4]; u8 pad10[0x10]; FollowCamReset reset; u8 pad40[0x20]; FollowCamBlock follow; FollowCamTail tail; } FollowCamState;
 struct UpdateCam { u8 pad0[0x30]; Vec4f pos; u8 pad40[0x30]; void *saved_state; u8 pad74[0x10]; s16 descriptor_index; };
 #define FOLLOW_CAM_STATE(cam) ((FollowCamState *)(cam)->saved_state)
-extern char *ref_L06_0047A408_00[];
+extern char *ref_L06_0047A408_00 MACRO_ADDR;
 extern char *ref_L06_0047A408_01;
 extern char ref_L06_0047A408_02[];
 extern float ref_L06_0047A408_03, ref_L06_0047A408_04;
-extern char D_00189E20[];
+extern char D_00189EA0[];
+extern char D_0018A0E0[];
 extern s32 D_00138320[];
 extern PadSt D_00138180;
 #define pad_held_r D_00138320
@@ -83,7 +61,6 @@ extern void func_L00_00424B70(f32, f32);
 extern void func_L00_00424BB8(f32, f32);
 
 extern int func_L06_0047A268(void *);
-extern void func_L00_00424B70(f32, f32);
 void func_L06_0047A408(char *arg) {
     struct UpdateCam *cam = (struct UpdateCam *)arg;
     CameraVec dir;
@@ -96,12 +73,15 @@ void func_L06_0047A408(char *arg) {
     FollowCamTail *tail;
     FollowCamSnap *snap;
     FollowCamReset *reset;
+    FollowCamBlock *follow_copy;
+    char *hero_pos;
+    f32 zero;
     s32 at_end;
     f32 total;
     f32 swing;
     f32 t;
 
-    params = ((CamDesc *)((cam->descriptor_index << 5) + (s32)ref_L06_0047A408_00[0]))->params;
+    params = ((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].params;
     if (params->type == 8 && FOLLOW_CAM_STATE(((struct UpdateCam *)ref_L06_0047A408_01))->tail.mode == 0) {
         return;
     }
@@ -119,7 +99,7 @@ void func_L06_0047A408(char *arg) {
         return;
     }
     if (params->check_yaw != 0
-        && func_00283C80(((CamDesc *)ref_L06_0047A408_00[0])[cam->descriptor_index].yaw, ref_L06_0047A408_03) >= 1.396263599395752f) {
+        && func_00283C80(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw, ref_L06_0047A408_03) >= 1.396263599395752f) {
         goto stop;
     }
     if (params->l_buttons_end != 0 && params->type == 5 && (pad_held_r[0] & 4)) {
@@ -138,38 +118,37 @@ stop:
     }
     if (*(s32 *)&params->type == 5) {
         *(s32 *)&params->swing = 0;
+        hero_pos = D_00189EA0;
         rec = ((struct UpdateCam *)ref_L06_0047A408_01);
         rig = FOLLOW_CAM_STATE(rec);
-        tail = &rig->tail;
-        state = rig;
-        snap = &rig->tail.snap;
         follow = &rig->follow;
+        tail = &rig->tail;
+        snap = &rig->tail.snap;
+        state = rig;
         reset = &state->reset;
         func_00282F20(tail->unk130, tail->unk130, params->distance);
+        follow_copy = follow;
         tail->unk15C = params->distance;
         tail->distance = params->height;
-        follow->look_height = params->offset_scale;
+        follow_copy->look_height = params->offset_scale;
         qcopy(state->tail.unk140, tail->unk130);
-        func_00282D30(dir, D_00189E20 + 0x2C0, -tail->distance);
+        func_00282D30(dir, D_0018A0E0, -tail->distance);
         pos = &rec->pos;
-        func_00282CC0(state->follow.eye, D_00189E20 + 0x80, dir);
+        func_00282CC0(state->follow.eye, hero_pos, dir);
         func_00282CC0(pos, state->follow.eye, tail->unk130);
-        func_00282D30(dir, D_00189E20 + 0x2C0, -follow->look_height);
-        func_00282CC0(state->follow.look_target, D_00189E20 + 0x80, dir);
+        func_00282D30(dir, D_0018A0E0, -follow_copy->look_height);
+        func_00282CC0(state->follow.look_target, hero_pos, dir);
         qcopy(state->follow.unkD0, state->follow.look_target);
-        qcopy(follow->focus, D_00189E20 + 0x80);
-        qcopy(state->follow.offset, follow->focus);
+        qcopy(follow_copy->focus, hero_pos);
+        qcopy(state->follow.offset, follow_copy->focus);
         qcopy(state->position, pos);
         qcopy(state->tail.snap.unk1F0, pos);
         snap->unk200 = tail->unk15C - func_00282DF0(tail->unk130);
         *(s32 *)&reset->unk34 = 0;
-        reset->look_height = follow->look_height;
-        { f32 zero = reset->unk34;
-        f32 distance = tail->distance;
-        reset->distance = distance;
-        reset->unk38 = zero;
-        reset->unk30 = zero;
-        reset->unk2C = zero; }
+        reset->look_height = follow_copy->look_height;
+        reset->distance = tail->distance;
+        zero = reset->unk34;
+        reset->unk2C = reset->unk30 = reset->unk38 = reset->unk34 = zero;
     }
     at_end = 0;
     total = func_00283CE0(200);
@@ -207,8 +186,8 @@ stop:
     } else if (params->type == 3) {
         total = func_00283CE0(1);
         if (params->timer > 1) {
-            at_end = 1;
             params->timer = 1;
+            at_end = 1;
         }
     } else {
         if (params->timer > 200) {
@@ -216,8 +195,8 @@ stop:
             params->timer = 200;
         }
     }
-    dir[0] = func_00283180(((CamDesc *)ref_L06_0047A408_00[0])[cam->descriptor_index].yaw);
-    dir[1] = func_00283198(((CamDesc *)ref_L06_0047A408_00[0])[cam->descriptor_index].yaw);
+    dir[0] = func_00283180(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw);
+    dir[1] = func_00283198(((CamDesc *)ref_L06_0047A408_00)[cam->descriptor_index].yaw);
     *(s32 *)&dir[2] = 0;
     swing = params->swing * ((params->timer / total) * 0.01745329424738884f);
     if ((params->type != 1 && params->type != 7 && params->type != 9) || at_end == 0) {

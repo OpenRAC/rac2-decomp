@@ -1,23 +1,5 @@
-/* Tier: Claude Opus 5.5 (opus-1, xhigh effort), v2145, 3 November 2026.
- * Best check.py: 1156/1156 bytes, 0/2 USA v1.01 places; cdiff 67 of 289 rows differ, all of them
- * register names (every instruction corresponds after relocation).
- * Profile: -O2 -G8 -ffunction-sections -g, dedicated unit src/levels/shared/L03_003CA4B0-g8.c.
- * RAC1 counterpart: draw_gadgebot_spawn_container (overlays/shared/gadgebot_containers_and_frog.c).
- * Fixed since v1009: the face loop now uses RAC1's static inline TransformPoint wrapper, a do/while
- * and a `center` pointer, so no sp+0x90 copy is hoisted into s4 (the face-table base is back in s4).
- * The far loop is RAC1's indexed for (i < 57) over the two tables, which fixes its preheader order.
- * An index form of the near loop is far worse (138 rows), so the near loop keeps its pointers.
- * Remaining: reload register choice. The spilled `near` (sp+0x110, pseudo 85) reloads into v1 where
- * retail uses v0. The .greg dump says "Spilling reg 2" for its test (insn 118), but choose_reload_regs
- * gives v1. The rematerialised in-loop HIGH parts alternate v1/v0 where retail uses v0 throughout
- * (a0 for the D_L03_00240CF0 high in both preheaders). The last one makes retail's loop-end branch a
- * bnel, because its slot sets the tested v0; ours is a bnez.
- * Next: trace reload's per-insn used_spill_regs and its last_spill_reg round-robin in the .greg dump.
- * Find what makes retail's first reload after the near=1 store (insn 1052, v0) land on v0 again.
- */
 #include "common.h"
 #define F(p,o) (*(float *)((char *)(p)+(o)))
-#define I(p,o) (*(int *)((char *)(p)+(o)))
 extern void func_00282F20(void *,void *,float),func_002830C0(void *,void *,void *),func_00282CF0(void *,void *,void *),func_00282D30(void *,void *,float),func_00283098(void *,void *,void *);
 extern float func_00282C48(float),func_00282DB0(void *,void *),func_00282C10(float);
 extern u64 func_0027C878(int);
@@ -40,8 +22,12 @@ typedef struct {char pad[0x140];float pos[4];} ReflectCamera;
 extern ReflectCamera D_L03_001B9840;
 
 /* Transform src by the matrix into dst (RAC1 TransformPoint). */
-static inline void TransformPoint(float *dst,void *src,void *m){func_002830C0(dst,src,m);}
+static inline void TransformPoint(float *dst,void *src,void *m)
+{
+    func_002830C0(dst,src,m);
+}
 
+/* Draws the reflective container moby: 57 vertices, 42 faces (RAC1 draw_gadgebot_spawn_container). */
 void func_L03_003CA4B0(char *m){
  ReflectPacket packet __attribute__((aligned(16)));
  typedef unsigned int ReflectQ __attribute__((mode(TI)));
@@ -49,7 +35,7 @@ void func_L03_003CA4B0(char *m){
  typedef struct {ReflectVec row[4];} ReflectMatrix;
  ReflectMatrix transform;
  ReflectVec dir,normal,reflected,temp;
-#define matrix ((float *)&transform)
+ float (*verts)[4];
  int near=0,i,j,index;float scale,denom;u64 flags;
  scale=F(m,0x2c)/F(*(char **)(m+0x24),0x24);
  func_00282F20(transform.row[0].f,m+0xc0,scale);func_00282F20(transform.row[1].f,m+0xd0,scale);func_00282F20(transform.row[2].f,m+0xe0,scale);
@@ -57,10 +43,10 @@ void func_L03_003CA4B0(char *m){
  if(func_00282C48(D_L03_001B9840.pos[0]-F(m,0x10))<16&&func_00282C48(D_L03_001B9840.pos[1]-F(m,0x14))<16)near=1;
  if(near!=0){
  ReflectUV *uv=D_L03_00240B20;
- float (*pos)[4]=D_L03_00240CF0;
- for(i=0;i<57;i++,uv++,pos++){
- func_002830C0(pos,D_L03_0029A920[i],&transform);
- func_00282CF0(dir.f,pos,D_L03_001B9980);func_00282F20(dir.f,dir.f,1);
+ for(i=0;i<57;i++,uv++){
+ verts=D_L03_00240CF0;
+ func_002830C0(verts[i],D_L03_0029A920[i],&transform);
+ func_00282CF0(dir.f,verts[i],D_L03_001B9980);func_00282F20(dir.f,dir.f,1);
  func_002830C0(reflected.f,D_L03_0029B3C0[i],&transform);
  func_00282F20(reflected.f,reflected.f,D_L03_001B0338);
  denom=func_00282DB0(reflected.f,dir.f);func_00282D30(temp.f,reflected.f,denom+denom);
@@ -73,8 +59,11 @@ void func_L03_003CA4B0(char *m){
  (*uv)[1]=v+0.5f;(*uv)[0]=u+0.5f;}
  }
  }else{
- for(i=0;i<57;i++){float *world=D_L03_00240CF0[i];func_002830C0(world,D_L03_0029A920[i],&transform);}
+ for(i=0;i<57;i++){func_002830C0(D_L03_00240CF0[i],D_L03_0029A920[i],&transform);}
  }
+  /* Dead store: keeps gcse's reaching register for the table's high half alive until cse2,
+    so both preheaders share it (flow then deletes this statement). */
+ verts=D_L03_00240CF0;
  {u64 texture=func_0027C878(D_L03_001B0330);
  flags=(u64)D_L03_001B031C;
  flags|=(u64)D_L03_001B0320<<2;

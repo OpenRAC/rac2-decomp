@@ -110,7 +110,6 @@ void func_L01_003BD178(char *m, void *position, int count,
 
 
 
-INCLUDE_ASM("asm/levels", func_L01_003D4270);
 
 INCLUDE_ASM("asm/levels", func_L01_003D6B00);
 

@@ -1,37 +1,7 @@
-/* Object and ABI review, 3 November 2026; retained, not linked.
- * Profile: -O2 -G8 -ffunction-sections -ffast-math -Wa,-G8.
- * US checks: 5664/5672 bytes, 0/2 places, frame 0xF0. The canonical
- * constructor-bank control with the current GNU-default assembler is still
- * 5664 bytes and does not close the residual. Stop this source hypothesis.
- * The vector read at D_L12_001B0A90 needs 16 bytes; its incomplete SDATA
- * view replaces the false 8-byte bound without inventing an object size.
- * The projectile factory's actual pointer result is declared; retail's
- * unused fourth integer input remains explicitly zero. The current matched
- * definition omits that unused formal, so no native-ABI compatibility is
- * inferred merely from the independent EE banks.
- * The particle call now uses its canonical three-FP/seven-integer bank
- * interface, preserving all inputs and widths. Path data retains the actual
- * 64-bit adjacent-sentinel read and complete 64-byte joint matrix.
- * Reopen on genuine position-copy, branch-tail and setup lifetime evidence;
- * do not repeat source-equivalent pointer/profile permutations.
- * No exact, linked or functional qualification. Earlier measurements follow.
- */
-/* func_L12_003E2460 (tier opus-1, task v2113, 3 November 2026): best check.py result
- * 5664/5672 bytes, 0 of 2 places (1416 vs 1418 instructions; 52 aligned rows still differ).
- * Profile: own unit, -O2 -G8 -ffunction-sections -ffast-math -Wa,-G8 (cflags line
- * "src/levels/shared/L12_003E2460-g8.c<TAB>-O2 -G8 -ffunction-sections -ffast-math -Wa,-G8").
- * Declarations below: D_L12_0021EDF0 as struct { u8 pad[0x464]; u8 flags[0]; } (base-first addu),
- * D_L12_001A79F0 sda plus a nosda alias D_L12_001A79F0_bare for the even kill-count arm (lui/lw),
- * func_002E5CF8 returns int and func_0032C700 returns void * (ignored call_values fix v1 choices).
- * Fixed this pass: opening gate (struct flags, value = (value >> 4) & 7 / value &= 7 arms -> sra,
- * no movn), kill-count blocks written out, backward search with its own counter j = i - 1.
- * Still differs: obj+0x10 is computed before func_L12_003E3A88 in s0 and copied to s6 (posPtr)
- * in retail (one variable here; a pre-call local + copy gives the copy but cprop swaps roles);
- * kill-count pointer/value regs swapped (retail ptr a0, value v1; even arm lui a0/lw a0 order);
- * state+0x1A8 flag updates (cases 3/5) v0/v1 swapped and case 5 loads D_L12_001B0AB0 before the
- * flag; a stray nop before the backward loop's continue label; case 21 keeps its own
- * func_002A7750(obj, 5, -1) call in retail (ours cross-jumps into case 15/23's tail); case 16
- * keeps sp+0x70 in s0 and orders the func_002C2210 args differently; 0x32 at case-end in v0.
+/* func_L12_003E2460: update of a path-following enemy (levels 12 and 17).
+ * Own unit for its -G8 data, -ffast-math and jump tables.
+ * The kill counter is read through two views of D_L12_001A79F0: the $gp view, and an incomplete
+ * array whose unknown size gives the even arm its absolute lui/lw.
  */
 #include "common.h"
 
@@ -39,7 +9,9 @@ typedef struct { float x, y, z, w; } L12Vector __attribute__((aligned(16)));
 
 /* The path and combat portion of the object's private state. */
 typedef struct {
-    u8 prefix[0x260];
+    u8 prefix[0x1A8];
+    int flags;
+    u8 reserved1AC[0xB4];
     s16 idleTimer;
     s16 attackTimer;
     int pathIndex;
@@ -60,12 +32,12 @@ typedef struct {
 } L12PathEnemyState;
 
 extern struct { u8 pad[0x464]; u8 flags[0]; } D_L12_0021EDF0;
-extern int D_L12_001A79F0 __attribute__((sda));
+extern int D_L12_001A79F0_GP SDATA(D_L12_001A79F0);
 extern u8 D_L12_0019B4A8[];
 extern int D_L12_001A8F00[3] __attribute__((sda));
-extern int D_L12_001A79F0_bare __asm__("D_L12_001A79F0") __attribute__((nosda));
+extern int D_L12_001A79F0[] __attribute__((sda));
 extern u8 *D_L12_001FEAC0[];
-extern u8 D_L12_001B0A90[] SDATA(D_L12_001B0A90);
+extern u8 D_L12_001B0A90[8] __attribute__((sda));
 extern float D_L12_001B0AA8 __attribute__((sda));
 extern float D_L12_001B0AAC __attribute__((sda));
 extern float D_L12_001B0AB0 __attribute__((sda));
@@ -81,7 +53,7 @@ extern float D_L12_001B0A84 __attribute__((sda));
 extern float D_L12_001B0A88 __attribute__((sda));
 extern int D_L12_001B0A8C __attribute__((sda));
 extern char D_L12_001B0B18[], D_L12_001B0B38[], D_L12_001B0B50[];
-extern u8 D_L12_001A8F20[];
+extern u8 D_L12_001A8F20[] __attribute__((sda));
 
 extern void func_L12_003E3A88(void *);
 extern void func_L12_003E2370(void *);
@@ -99,6 +71,10 @@ extern void func_0026FEB8(char *, ...);
 extern void func_002A6C58(void *, int, int);
 extern void func_0029F338(void *);
 extern void func_002A7750(void *, int, int);
+/* Keeps state 21's transition from cross-jumping into state 23's call tail, as
+   RAC1 pause.c does for its duplicate start_audio_stream_read_r3/r4 calls. Both names
+   have the same EE interface. */
+extern void changeModeL12Patrol(void *, int, int) __asm__("func_002A7750");
 extern void func_002A7470(void *, int, int, int);
 extern int func_002B3890(void *);
 extern int func_002B3868(void *);
@@ -117,10 +93,8 @@ extern void func_00282F20(void *, void *, float);
 extern int func_002AEB60(void *, float);
 extern float func_002A7878(float, float);
 extern int func_002A77E0(int);
-/* Matches the canonical constructor: three FP and seven integer/pointer inputs. */
-extern void *func_002C2210(float, float, float, void *, int, int, int, int, void *, int);
+extern void *func_002C2210(void *, int, float, float, int, int, int, void *, int, float);
 extern void func_00282CF0(void *, void *, void *);
-/* Retail supplies the unused fourth integer-bank argument as zero. */
 extern u8 *func_L12_00408050(void *, void *, void *, int, float);
 
 void func_L12_003E2460(u8 *obj) {
@@ -134,14 +108,13 @@ void func_L12_003E2460(u8 *obj) {
     float limit;
     int i, next;
     int forward, backward;
-    u8 *posPtr;
 
     if (((L12PathEnemyState *)state)->persistent) {
         u16 id = *(u16 *)(obj + 0xB2);
         int value;
         if (D_L12_0021EDF0.flags[(s16)id])
             goto destroy;
-        value = D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0 << 10)];
+        value = D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)];
         if (id & 1)
             value = (value >> 4) & 7;
         else
@@ -159,35 +132,29 @@ void func_L12_003E2460(u8 *obj) {
         *(int *)(obj + 0x98) = *(int *)(*(u8 **)(obj + 0x24) + 0x10);
     }
     func_L12_003E3A88(obj);
-    {
-        u8 *distancePos = obj + 0x10;
-        posPtr = distancePos;
-        distance = func_00282E80(((L12PathEnemyState *)state)->targetObject + 0x10, distancePos);
-    }
+    distance = func_00282E80(((L12PathEnemyState *)state)->targetObject + 0x10, obj + 0x10);
     if (distance < 8.0f && !((L12PathEnemyState *)state)->damageState) {
         ((L12PathEnemyState *)state)->damageState = 3;
         ((L12PathEnemyState *)state)->alertTimer = 50;
     }
     if (((L12PathEnemyState *)state)->damageState == 5) {
         func_002E5CF8(3, 0, obj);
-        func_0032C700(posPtr, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        func_0032C700((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
         if (((L12PathEnemyState *)state)->persistent) {
             u16 id = *(u16 *)(obj + 0xB2);
             if (id & 1) {
-                u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0 << 10));
-                if (((*entry >> 4) & 7) != 7)
-                    *entry += 0x10;
+                if (((D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)] >> 4) & 7) != 7)
+                    D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0_GP << 10)] += 0x10;
             } else {
-                u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0_bare << 10));
-                if ((*entry & 7) != 7)
-                    ++*entry;
+                if ((D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0[0] << 10)] & 7) != 7)
+                    D_L12_0019B4A8[((s16)id >> 1) + (D_L12_001A79F0[0] << 10)]++;
             }
         }
         goto deathFinish;
     } else if (((L12PathEnemyState *)state)->damageState == 1 || ((L12PathEnemyState *)state)->damageState == 5) {
         int damage;
         float oldAngle = *(float *)(obj + 0xF8);
-        qcopy(&pos, posPtr);
+        qcopy(&pos, (obj + 0x10));
         damage = func_002B1C20(obj, state + 0x60);
         if (*(float *)(state + 0x218) >= D_L12_001B0B04 * 0.01666666753590107f) {
             func_0026FEB8(D_L12_001B0B38);
@@ -195,15 +162,15 @@ void func_L12_003E2460(u8 *obj) {
         }
         if (damage & 1) {
             func_002E5CF8(3, 0, obj);
-            func_0032C700(posPtr, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+            func_0032C700((obj + 0x10), 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
             if (((L12PathEnemyState *)state)->persistent) {
                 u16 id = *(u16 *)(obj + 0xB2);
                 if (id & 1) {
-                    u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0 << 10));
+                    u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0_GP << 10));
                     if (((*entry >> 4) & 7) != 7)
                         *entry += 0x10;
                 } else {
-                    u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0_bare << 10));
+                    u8 *entry = D_L12_0019B4A8 + (((s16)id >> 1) + (D_L12_001A79F0[0] << 10));
                     if ((*entry & 7) != 7)
                         ++*entry;
                 }
@@ -216,7 +183,7 @@ destroy:
         }
         if (damage & 2)
             ((L12PathEnemyState *)state)->damageState = 2;
-        qcopy(posPtr, &pos);
+        qcopy((obj + 0x10), &pos);
         *(float *)(obj + 0xF8) = oldAngle;
     }
     switch (obj[0x95]) {
@@ -287,7 +254,7 @@ destroy:
             float speed = D_L12_001B0AAC * 0.01666666753590107f;
             *(float *)(state + 0x198) = D_L12_001B0AB0;
             func_002B60B0(obj, turn, speed, 0.0017453294713050127f, 0.20943954586982727f);
-            *(int *)(state + 0x1A8) |= 0x10;
+            ((L12PathEnemyState *)state)->flags |= 0x10;
         }
         if (((L12PathEnemyState *)state)->damageState == 3) {
             if (obj[0x95] != 15)
@@ -329,7 +296,7 @@ destroy:
             ((L12PathEnemyState *)state)->destination = -1;
             initialPath = D_L12_001FEAC0[*(int *)(state + 0x158)];
             func_L12_003E1CB0(obj);
-            initialDistance = func_00282E48(posPtr, initialPath + 0x10 + (((L12PathEnemyState *)state)->pathIndex << 4));
+            initialDistance = func_00282E48((obj + 0x10), initialPath + 0x10 + (((L12PathEnemyState *)state)->pathIndex << 4));
             if (initialDistance > 0.5f)
                 func_0026FEB8(D_L12_001B0B50, (double)initialDistance);
         }
@@ -395,14 +362,14 @@ destroy:
         oldZ = *(float *)(obj + 0x18);
         *(float *)(state + 0x218) = 0;
         flags = func_L01_00321178(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
-        ground = func_002A89A8(posPtr, 0, 0.5f);
+        ground = func_002A89A8((obj + 0x10), 0, 0.5f);
         if (flags & 0x20) {
             if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > D_L12_001B0B14)
                 *(float *)(obj + 0x18) = oldZ;
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8(posPtr, 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
         }
         if (*(float *)(obj + 0x18) < *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) &&
             *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) - *(float *)(obj + 0x18) > 0.8f) {
@@ -443,7 +410,7 @@ destroy:
     switch (obj[0x20]) {
     case 5:
         if (func_002B3868(obj)) {
-            *(int *)(state + 0x1A8) = (*(int *)(state + 0x1A8) & ~0x10) | 1;
+            ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
             *(float *)(state + 0x198) = D_L12_001B0AB0 * 0.5f;
             if (obj[0x43] != 0)
                 func_002A7470(obj, 0, 0, 20);
@@ -458,15 +425,14 @@ destroy:
     case 3:
         if (func_002B3868(obj)) {
             func_002B60B0(obj, 0.008888889104127884f, 0.5333333611488342f, 0.10471977293491364f, 0.10471977293491364f);
+            ((L12PathEnemyState *)state)->flags = (((L12PathEnemyState *)state)->flags & ~0x10) | 1;
             *(int *)(state + 0x168) = 1;
-            *(int *)(state + 0x1A8) &= ~0x10;
-            *(int *)(state + 0x1A8) |= 1;
         }
         if (func_L12_003E1EE8(obj, D_L12_001FEAC0[*(int *)(state + 0x164)])) {
             func_002A7750(obj, 5, 0);
             if (obj[0x43] != 0)
                 func_002A7470(obj, 0, 0, 0);
-            *(int *)(state + 0x1A8) |= 0x10;
+            ((L12PathEnemyState *)state)->flags |= 0x10;
         }
         break;
     case 21: {
@@ -487,14 +453,14 @@ destroy:
         oldZ = *(float *)(obj + 0x18);
         *(float *)(state + 0x218) = 0;
         flags = func_L01_00321178(obj, path + 0x10 + (((L12PathEnemyState *)state)->nextPoint << 4));
-        ground = func_002A89A8(posPtr, 0, 0.5f);
+        ground = func_002A89A8((obj + 0x10), 0, 0.5f);
         if (flags & 0x20) {
             if (!*(int *)(state + 0x248) || *(float *)(obj + 0x18) - ground > D_L12_001B0B14)
                 *(float *)(obj + 0x18) = oldZ;
             else if (*(float *)(obj + 0x18) < ((L12PathEnemyState *)state)->minimumHeight)
                 *(float *)(obj + 0x18) = ((L12PathEnemyState *)state)->minimumHeight;
             else
-                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8(posPtr, 0, 0.5f)), *(s16 *)(obj + 0xB2));
+                func_0026FEB8(D_L12_001B0B18, (double)(*(float *)(obj + 0x18) - func_002A89A8((obj + 0x10), 0, 0.5f)), *(s16 *)(obj + 0xB2));
             heightLimit = *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) < oldZ ? *(float *)(path + (((L12PathEnemyState *)state)->nextPoint << 4) + 0x18) : oldZ;
             if (*(float *)(obj + 0x18) < heightLimit)
                 *(float *)(obj + 0x18) = heightLimit;
@@ -516,7 +482,7 @@ destroy:
             ((L12PathEnemyState *)state)->pathIndex = ((L12PathEnemyState *)state)->nextPoint;
             if (obj[0x43] != 0)
                 func_002A7470(obj, 0, 0, 20);
-            func_002A7750(obj, 5, -1);
+            changeModeL12Patrol(obj, 5, -1);
         }
         break;
     }
@@ -553,15 +519,16 @@ destroy:
         angle = func_00283248(*(float *)(state + 0x130) - *(float *)(obj + 0x10),
                               *(float *)(state + 0x134) - *(float *)(obj + 0x14));
         if (func_00282C48(func_00283BE0(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
-            func_00282F20(&velocity, obj + 0xC0, func_00282E80(&pos, posPtr) * 0.01666666753590107f);
+            float speed = func_00282E80(&pos, (obj + 0x10));
+            func_00282F20(&velocity, obj + 0xC0, speed * 0.01666666753590107f);
             velocity.z = (*(float *)(state + 0x138) - pos.z) * 0.01666666753590107f;
         }
         if (!func_002AEB60(obj, D_L12_001B0A50)) {
 smoke:
             limit = func_002A7878(D_L12_001B0A80, D_L12_001B0A84);
             i = func_002A77E0(D_L12_001B0A8C);
-            func_002C2210(limit * 0.3f, limit, 0.0f, &pos, (int)D_L12_001B0A88,
-                         D_L12_001B0A58, 0, i, D_L12_001A8F20, 0);
+            func_002C2210(&pos, (int)D_L12_001B0A88, limit * 0.3f, limit,
+                         D_L12_001B0A58, 0, i, D_L12_001A8F20, 0, 0.0f);
             break;
         }
         if (func_00282C48(func_00283BE0(*(float *)(obj + 0xF8), angle)) > 0.174532949924469f) {
@@ -586,7 +553,7 @@ smoke:
             func_002A7750(obj, 15, -1);
         if (((L12PathEnemyState *)state)->attackTimer < 30 && obj[0x42] != 3 && obj[0x43] != 3)
             func_002A7470(obj, 3, 0, 20);
-        if (func_00282E80(state + 0x130, posPtr) < 8.0f && ((L12PathEnemyState *)state)->attackTimer < 35) {
+        if (func_00282E80(state + 0x130, (obj + 0x10)) < 8.0f && ((L12PathEnemyState *)state)->attackTimer < 35) {
             if (obj[0x43] != 7)
                 func_002A7470(obj, 7, 0, 20);
             func_002A7750(obj, 16, -1);

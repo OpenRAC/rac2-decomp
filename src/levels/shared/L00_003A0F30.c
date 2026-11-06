@@ -68,7 +68,7 @@ typedef struct { float vertices[4][4]; unsigned int colors[4]; float uv[4][2]; u
 extern void func_L00_003A2B28(char *);
 
 
-INCLUDE_ASM("asm/levels", func_L00_003A1580);
+/* func_L00_003A1580 is defined in L00_003A1580-g8.c. */
 
 
 

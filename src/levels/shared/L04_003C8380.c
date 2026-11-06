@@ -596,7 +596,99 @@ unsigned char *func_L04_003FA5A8(unsigned char *owner, float *pos,
 
 /* func_L04_003FA7E0 is defined in L04_003FA7E0.c. */
 
-INCLUDE_ASM("asm/levels", func_L04_003FB990);
+
+extern int func_002E5CF8(int, int, char *);
+
+extern unsigned char *D_L04_001C3B40[];
+extern float func_00283C80(float, float);
+extern float func_00282E80(void *, void *);
+extern float func_00282E48(char *, char *);
+extern float func_00283180(float);
+extern float func_00283198(float);
+extern float func_00283C28(float);
+extern float func_00283B98(float, float);
+extern void func_002A8E20(void *, void *);
+extern void func_002AF000(void *, float, float, float);
+
+/* The impact record func_002A8E20 queues: the layout of Rac2Impact32 in engine.h,
+   rounded up to whole quadwords as its stack slot is. */
+typedef struct {
+    float vector[4];
+    void *source;
+    int flags;
+    unsigned char unk18, unk19;
+    unsigned short objectClass;
+    float strength;
+    int unk20;
+    int unk24;
+    int pad[2];
+} B990Impact;
+
+/* Hits the mobys around m inside its firing cone, then traces the cone's edge rays and
+   leaves an effect where one is blocked. gcse numbers the two spilled pointers in hash-bucket
+   order, and retail's stack slots need at least 228 insns there: the argument locals, range
+   and the initial values of angle, angle0, angle1, sign and i supply them, and leave no code. */
+void func_L04_003FB990(unsigned char *m, void *vars)
+{
+    unsigned char *v = vars;
+    float radius = *(float *)(v + 0x70) * *(float *)(v + 0x7C);
+    float angle = 0.0f, angle0 = 0.0f, angle1 = 0.0f, sign = 0.0f;
+    int count, n, side, i = 0;
+    int soundId = 10, soundArg = 0;
+    int rayMask = 18;
+    void *rayResult = 0;
+    int sparkKind = 8, sparkArg = 0;
+    if (radius < 0.75f) radius = 0.75f;
+    n = func_00277F48(radius, m + 0x10, 16, *(void **)(v + 0x74), 0);
+    for (count = 0; count < n; count++) {
+        if (D_L04_001C3B40[count] == *(unsigned char **)(v + 0x74)) continue;
+        if (*(float *)(v + 0x7C) > 0) {
+            angle = func_00283248(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
+                                  *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
+            if (func_00283C80(angle, *(float *)(m + 0xF8)) > 0.741765022277832f) continue;
+            angle = func_00283248(func_00282E80(m + 0x10, D_L04_001C3B40[count] + 0x10),
+                                  *(float *)(D_L04_001C3B40[count] + 0x18) - *(float *)(m + 0x18));
+            if (func_00283C80(angle, -*(float *)(m + 0xF4)) > 0.523598849773407f) continue;
+        }
+        if (func_00282E48((char *)m + 0x10, (char *)D_L04_001C3B40[count] + 0x10) > radius * 0.75f) {
+            B990Impact impact;
+            impact.source = *(void **)(v + 0x74);
+            impact.flags = 0x230000;
+            impact.unk18 = 2;
+            impact.unk19 = 3;
+            impact.objectClass = *(unsigned short *)(m + 0xAA);
+            impact.strength = 1.0f;
+            impact.unk20 = 0x230000;
+            angle = func_00283248(*(float *)(D_L04_001C3B40[count] + 0x10) - *(float *)(m + 0x10),
+                                  *(float *)(D_L04_001C3B40[count] + 0x14) - *(float *)(m + 0x14));
+            impact.vector[0] = func_00283180(angle);
+            impact.vector[1] = func_00283198(angle);
+            impact.vector[2] = 1.0f;
+            impact.vector[3] = 5627.9248046875f;
+            func_002A8E20(D_L04_001C3B40[count], &impact);
+            func_002E5CF8(soundId, soundArg, *(void **)(v + 0x74));
+        }
+    }
+    {
+    float ray[3][4];
+    float range = radius;
+    for (side = 0; side < 2; side++) {
+        sign = (side & 1) ? 1.0f : -1.0f;
+        for (i = 0; i < 5; i++) {
+            angle0 = func_00283C28(func_00283CE0(i) * sign * 0.1396263688802719f);
+            angle1 = func_00283C28(func_00283CE0(i + 1) * sign * 0.1396263688802719f);
+            func_002AF000(ray[0], range, func_00283B98(angle0, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            func_002AF000(ray[1], range, func_00283B98(angle1, *(float *)(m + 0xF8)), -*(float *)(m + 0xF4));
+            func_00282CD8(ray[2], ray[0], m + 0x10);
+            func_00282CD8(ray[2], ray[1], m + 0x10);
+            if (func_002761F8(ray[0], ray[1], rayMask, *(void **)(v + 0x74), rayResult)) {
+                func_002AF000(ray[2], 0.33333334326744f, *(float *)(m + 0xF8), -*(float *)(m + 0xF4));
+                func_L04_0040C0C0(&D_L04_001BFAE0, ray[2], sparkKind, sparkArg);
+            }
+        }
+    }
+    }
+}
 
 /* func_L04_003FBD80 is in the sibling file L04_003C8380-g8.c (it stores through $gp). */
 
@@ -623,7 +715,7 @@ extern void func_0029F338(void *);
 extern float func_002AA800(void *, int, float, float);
 extern void func_002E59F8(int);
 extern void func_L00_002E6DB8(void *, void *);
-extern void func_L04_003FB990(unsigned char *, L04_C678Vars *);
+extern void func_L04_003FB990(unsigned char *, void *);
 extern void func_L04_003FBEF8(void);
 extern unsigned char D_00188660[];
 extern int D_L04_001B0488 __attribute__((sda));

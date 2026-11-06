@@ -148,7 +148,7 @@ void func_L12_003E2418(s32 a0) {
         *slot = -1;
 }
 
-INCLUDE_ASM("asm/levels", func_L12_003E2460);
+/* func_L12_003E2460 is defined in L12_003E2460-g8.c. */
 
 /* func_L12_003E3A88 is defined in L12_003E3A88-g8.c. */
 

@@ -35,6 +35,8 @@ typedef struct {
     u8 pad000[0x1A8];
     s32 route;
     s32 links[4];
+    s32 nextLinks[4];
+    s32 prevLinks[4];
 } L04_RouteState;
 
 extern L04_Route *D_L04_001FE340[];
@@ -91,7 +93,205 @@ void func_L04_00410518(L04_RouteObject *object, L04_RouteState *state, int *link
     *result = func_L04_0040F8F0(object, state, *link, *point, mode, object->modelId == 0xBBC);
 }
 
-INCLUDE_ASM("asm/levels", func_L04_00410788);
+extern s32 func_00283CF0(f32);
+
+/* Finds the nearest point around the last known position: on the current link and its
+   neighbours, or on the base route and the links that leave it near that position. */
+float func_L04_00410788(L04_RouteObject *object, L04_RouteState *state, s32 *link, s32 *point,
+                        s32 wrap, s32 mode)
+{
+    f32 delta[4] __attribute__((aligned(16)));
+    f32 best = 9999.0f, dist;
+    s32 oldLink = *link;
+    L04_Route *path;
+    L04_Route *base = D_L04_001FE340[state->route];
+    L04_Route *other;
+    s32 start, boundary;
+    s32 i, j, k, index, n;
+    s32 end;
+
+    if (oldLink == -1) {
+        start = *point - 5;
+        if (start < 0)
+            start += base->count - 1;
+
+        for (i = 0; i < 4; i++) {
+            s32 *links = state->links, *nextLinks, *entry, *nextEntry;
+
+            entry = links + i;
+            if (*entry == -1)
+                continue;
+            path = D_L04_001FE340[*entry];
+
+            end = start + 10;
+            boundary = func_00283CF0(path->points[1][3]);
+            {
+                s32 count = base->count;
+
+                if (end >= count)
+                    end -= count;
+            }
+            if ((state->prevLinks[i] == -1 && start < end && boundary >= start && boundary < end) ||
+                (end < start && (boundary >= start || boundary < end))) {
+                for (j = 0; j < 5; j++) {
+                    func_00282CF0(delta, object->pos, path->points[j]);
+                    dist = func_L00_002EE290(delta);
+                    if (dist < best) {
+                        best = dist;
+                        *link = i;
+                        *point = j;
+                    }
+                }
+            }
+
+            boundary = func_00283CF0(path->points[2][3]);
+            nextLinks = state->nextLinks;
+            nextEntry = nextLinks + i;
+            if ((*nextEntry == -1 && start < end && boundary >= start && boundary < end) ||
+                (end < start && (boundary >= start || boundary < end))) {
+                for (j = 0; j < 5; j++) {
+                    s32 last = path->count - 1;
+
+                    index = last - j;
+                    func_00282CF0(delta, object->pos, path->points[index]);
+                    dist = func_L00_002EE290(delta);
+                    if (dist < best) {
+                        best = dist;
+                        *link = i;
+                        *point = index;
+                    }
+                }
+            }
+        }
+
+        for (n = 0; n < 10; n++) {
+            index = start + n;
+            {
+                s32 count = base->count;
+
+                if (index >= count)
+                    index -= count;
+            }
+            func_00282CF0(delta, object->pos, base->points[index]);
+            dist = func_L00_002EE290(delta);
+            if (dist < best) {
+                best = dist;
+                *link = -1;
+                *point = index;
+            }
+        }
+    } else {
+        s32 offset = oldLink * 4;
+        s32 *links = state->links, *entry, *oldEntry = (s32 *)((u8 *)links + offset);
+
+        path = D_L04_001FE340[*oldEntry];
+        start = *point - 5;
+        if (start < 0) {
+            start = 0;
+            n = func_00283CF0(path->points[1][3]);
+            n -= 5;
+            if (n < 0) {
+                if (!wrap)
+                    n = 0;
+                else
+                    n += base->count - 1;
+            }
+            for (i = 0; i < 10; i++) {
+                s32 l;
+
+                j = n + i;
+                {
+                    s32 count = base->count;
+
+                    if (j >= count)
+                        j -= count;
+                }
+                func_00282CF0(delta, object->pos, base->points[j]);
+                dist = func_L00_002EE290(delta);
+                if (dist < best) {
+                    best = dist;
+                    *link = -1;
+                    *point = j;
+                }
+                for (l = 0; l < 4; l++) {
+                    s32 *branches = state->links;
+
+                    entry = branches + l;
+                    if (*entry == -1 || l == oldLink)
+                        continue;
+                    other = D_L04_001FE340[*entry];
+                    if (func_00283CF0(other->points[1][3]) != j)
+                        continue;
+                    for (k = 0; k < 5; k++) {
+                        func_00282CF0(delta, object->pos, other->points[k]);
+                        dist = func_L00_002EE290(delta);
+                        if (dist < best) {
+                            best = dist;
+                            *link = l;
+                            *point = k;
+                        }
+                    }
+                }
+            }
+        } else if (*point > path->count - 4) {
+            s32 l;
+            s32 *nextLinks;
+
+            n = func_00283CF0(path->points[2][3]) - 5;
+            nextLinks = state->nextLinks;
+            entry = nextLinks + oldLink;
+            l = *entry;
+            if (l != -1) {
+                s32 *nextEntry = links + l;
+
+                other = D_L04_001FE340[*nextEntry];
+            } else {
+                other = base;
+            }
+            if (n < 0) {
+                if (!wrap)
+                    n = 0;
+                else
+                    n += other->count - 1;
+            }
+            for (i = 0; i < 10; i++) {
+                j = n + i;
+                {
+                    s32 count = other->count;
+
+                    if (j >= count)
+                        j -= count;
+                }
+                func_00282CF0(delta, object->pos, other->points[j]);
+                dist = func_L00_002EE290(delta);
+                if (dist < best) {
+                    best = dist;
+                    {
+                        s32 *nextTable = state->nextLinks, *oldNext = nextTable + oldLink;
+
+                        *link = *oldNext;
+                    }
+                    *point = j;
+                }
+            }
+        }
+
+        for (n = 0; n < 10; n++) {
+            index = start + n;
+            if (index >= base->count)
+                break;
+            func_00282CF0(delta, object->pos, path->points[index]);
+            dist = func_L00_002EE290(delta);
+            if (dist < best) {
+                best = dist;
+                *point = index;
+                *link = oldLink;
+            }
+        }
+    }
+
+    return func_L04_0040F8F0(object, state, *link, *point, wrap, object->modelId == 0xBBC);
+}
 
 /* Scans the 0x20 slots at +0x110 of the state block for the first whose stored id the
    matcher accepts, and records its index in +0x270. */
@@ -135,7 +335,6 @@ typedef struct RankObject {
     u8 pad6c[0x100 - 0x6c];
 } RankObject;
 extern RankObject *D_L04_001B24DC __attribute__((sda));
-extern f32 func_L04_00410788(RankObject *, RankState *, s32 *, s32 *, s32, s32);
 
 /* Restarts EE timer 0 (T0_MODE = 0x81, T0_COUNT = 0), recomputes the route progress of every
    racer listed in the 21 slots at +0x1E4 of the object's state, bubble-sorts the active ones

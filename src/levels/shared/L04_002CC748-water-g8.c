@@ -1,25 +1,5 @@
-/* Tier: sol-high (task v1231), USA v1.01 game profile -O2 -G8 -ffunction-sections.
- * Retained check.py result: 1708 bytes versus 1700; 0 of 5 places match.
- * A scalar/untyped variant reached 1700 bytes but had worse packet allocation.
- * Compared with the earlier 1772-byte draft, this retains measured 0x1190-byte
- * grid records and two contiguous five-word GS alpha-state views. Explicit
- * small-data views preserve their full 20-byte extents. Splitting the two
- * packed-alpha accumulators restores the retail v0/v1/a0/a1 packet sequence.
- * Calling FloatToInt inside the branches restores the retail shared-call tail.
- * Still different: 1024.0f is hoisted before the blend call; early UV products,
- * the s5/s6 corner-loop allocation and its delay slot differ. The alpha add
- * sinks into a branch slot, leaving a two-instruction cursor store where
- * retail has a GP store, and the tile loop gains one alignment nop.
- * Countdown/index/pointer corner loops tie; separate alpha-result locals and
- * cursor byte/word increments tie. -fno-strict-aliasing did not fix the packet.
- * Next useful experiment: establish the original packet-cursor/GS field views
- * and UV update grouping. No linked build was run; placement symbols remain
- * unvalidated. All required declarations are below.
- *
- * closer D, 1 November 2026: all 240 orders of the uv statements stay at 74-78. 1024.0f (insn 1227) is ready at
- * t=1 of the block and, at priority 2, passes the blend call in sched1; retail issues it first after
- * func_00283D38. A do/while(0) barrier is worse (114), so this is not a block or loop-note boundary.
- */
+/* The -G8 sibling of L04_002CC748.c for the water grid renderer: its globals are read through $gp
+   and the packet cursor through a macro address. */
 #include "common.h"
 /* Adapted from RAC1 render_water_grids, GPL-3.0, with RAC2 blend/GS setup. */
 extern void func_L04_003A0FC8(void);
@@ -64,19 +44,24 @@ typedef struct {
 typedef struct { s32 a,b,c,d,alpha; } WaterAlphaState;
 extern WaterAlphaState ref_L04_003A21F8_00 SDATA(ref_L04_003A21F8_00);
 extern WaterAlphaState ref_L04_003A21F8_01 SDATA(ref_L04_003A21F8_01);
+/* Both arms end in the same call, so jump2 merges them, and the test on the value already in a
+   register leaves no instruction. Until then it ends a block right after the call. */
+static inline float water_ease(float t, s32 reverse, float scale) {
+    if (reverse) return scale * func_002A7798(t);
+    return func_002A7798(t);
+}
 void func_L04_003A21F8(WaterGrid *pos, s32 count) {
     f32 corners[4][4];
     f32 near_clip[4];
     f32 far_clip[4];
     f32 x_offset, y_offset, x_end, y_end, z;
     float blend, twice, alpha, v, upper, lower, interpolated_alpha;
-    float fade, scroll0, scroll1, uv;
-    f32 (*corner)[4];
+    float fade, scroll0, scroll1, uv, uv2, uv3;
     u64 state0, state1;
     u32 near_bits, far_bits;
     s32 mask;
-    s32 i, j, mode;
-    s32 height_index, index, alpha_index;
+    s32 i, j, mode, reverse;
+    s32 n, index, alpha_index;
     f32 *height;
     u64 *data;
 
@@ -87,19 +72,22 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
     if (count > 0) do {
         u16 active = pos->active;
         if (active == 0) goto next_entity;
-        if (pos->reverse) blend=pos->blend;
+        reverse = pos->reverse;
+        if (reverse) blend=pos->blend;
         else blend=1.0f-pos->blend;
-        blend=func_002A7798(blend);
+        blend=water_ease(blend,reverse,1.0f);
         fade = 1.0f-blend;
         scroll0 = pos->scroll0 * fade;
         scroll1 = pos->scroll1 * fade;
         uv = fade * -0.0016f;
+        uv2 = fade * 0.02f;
+        uv3 = fade * -0.031f;
+        pos->uv0 = uv;
+        pos->uv1 = uv;
         pos->scroll0 = scroll0;
         pos->scroll1 = scroll1;
-        pos->uv0 = uv;
-        pos->uv3 = fade * -0.031f;
-        pos->uv2 = fade * 0.02f;
-        pos->uv1 = uv;
+        pos->uv2 = uv2;
+        pos->uv3 = uv3;
         D_L04_001AD820=func_00283D38(D_L04_001ADA30,D_L04_001ADA34,blend);
         x_offset = pos->position[0] + D_L04_001AD848;
         x_end = pos->position[0] - D_L04_001AD848;
@@ -124,8 +112,8 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         corners[3][3] = 1.0f;
         near_bits = 0;
         far_bits = 0;
-        for (j = 0, corner = corners; j < 4; j++, corner++) {
-            func_00282CF0(near_clip, *corner, D_L04_001B9680);
+        for (j = 0; j < 4; j++) {
+            func_00282CF0(near_clip, corners[j], D_L04_001B9680);
             func_00282D30(far_clip, near_clip, 1024.0f);
             func_00282D30(near_clip, near_clip, 1024.0f);
             func_002830C0(far_clip, far_clip, D_L04_001B9680 - 0x80);
@@ -146,19 +134,19 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         func_L04_003A00E8(pos);
         if (pos->edges & 1) {
             height = (f32 *)0x70002008;
-            for (height_index = 0x10; height_index >= 0; height_index--, height += 3) *height = pos->position[2];
+            for (n = 0x10; n >= 0; n--, height += 3) *height = pos->position[2];
         }
         if (pos->edges & 2) {
             height = (f32 *)0x700020c8;
-            for (height_index = 0x10; height_index >= 0; height_index--, height += 0x33) *height = pos->position[2];
+            for (n = 0x10; n >= 0; n--, height += 0x33) *height = pos->position[2];
         }
         if (pos->edges & 4) {
             height = (f32 *)0x70002cc8;
-            for (height_index = 0x10; height_index >= 0; height_index--, height += 3) *height = pos->position[2];
+            for (n = 0x10; n >= 0; n--, height += 3) *height = pos->position[2];
         }
         if (pos->edges & 8) {
             height = (f32 *)0x70002008;
-            for (height_index = 0x10; height_index >= 0; height_index--, height += 0x33) *height = pos->position[2];
+            for (n = 0x10; n >= 0; n--, height += 0x33) *height = pos->position[2];
         }
         mode = (far_bits & 0x2f2f2f2f) != 0;
         if (!mode) {
@@ -175,11 +163,12 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         D_L04_001B2C48.words[1] = 0;
         D_L04_001B2C48.words[2] = 0x11000000;
         D_L04_001B2C48.words[3] = 0x50000005;
+        reverse = pos->reverse;
         D_L04_001B2C48.bytes += 16;
-        if (pos->reverse) {
+        if (reverse) {
             if (twice<=1.0f) { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=func_00283CF0(lower*70.0f); }
             else { ref_L04_003A21F8_01.b=2; ref_L04_003A21F8_01.alpha=func_00283CF0(upper*170.5f); }
-        } else if (twice>=1.0f) { ref_L04_003A21F8_01.b=2; ref_L04_003A21F8_01.alpha=func_00283CF0(upper*170.0f); }
+        } else if (twice>=1.0f) { n=2; ref_L04_003A21F8_01.b=n; ref_L04_003A21F8_01.alpha=func_00283CF0(upper*170.0f); }
         else { ref_L04_003A21F8_01.b=1; ref_L04_003A21F8_01.alpha=func_00283CF0(lower*70.0f); }
         alpha_index=func_00283CF0(interpolated_alpha);
         data = (u64 *)D_L04_001B2C48.words;
@@ -203,10 +192,10 @@ void func_L04_003A21F8(WaterGrid *pos, s32 count) {
         data[7] = 6;
         data[8] = func_0027C878(pos->texture0);
         data[9] = 7;
-        D_L04_001B2C48.words = (u32 *)(data + 10);
         {
             u32 texture_id = pos->texture0;
             u32 second_texture_id = pos->texture1;
+            D_L04_001B2C48.words = (u32 *)(data + 10);
             (*(u32 *)&D_L04_001AD884) = texture_id;
             (*(u32 *)&D_L04_001AD888) = second_texture_id;
         }
