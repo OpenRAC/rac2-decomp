@@ -888,6 +888,7 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_L07_003EA44C": (2040, 4),
     "func_PAL_L07_003EEC8C": (2532, 4),
     "func_PAL_L07_003F85AC": (1388, 4),
+    # Retired by RELEASE_ROW_MERGES, but the entry repair must run first so their bodies fingerprint alike: keep.
     "func_PAL_L08_003B1594": (796, 4),
     "func_PAL_L08_003DF82C": (992, 4),
     "func_PAL_L08_003FB594": (2372, 4),
