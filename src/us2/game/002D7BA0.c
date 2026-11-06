@@ -24,5 +24,3 @@ int func_US2_002D8270(int *arg0)
     *(int *)((char *)arg0 + 0xA4) = 0;
     return 0;
 }
-
-INCLUDE_ASM("asm/us2/game", func_US2_002D8320);

@@ -1,0 +1,116 @@
+#include "common.h"
+
+extern unsigned int D_00139768[];
+extern char D_001339B0[];
+extern char D_0014B540[];
+typedef struct { char pad[0x6B]; unsigned char flags; } Player;
+extern Player D_00188660;
+typedef struct { char pad[0x34]; int frame; char pad38[0x14]; int buffer; } Scene;
+extern Scene D_001B8840;
+typedef struct { unsigned long long texture; unsigned short image, palette; unsigned char width,height; short format; } Texture;
+typedef struct { char pad[0x20]; Texture desc; } Graphics;
+extern Graphics D_001B9740;
+extern int D_001A8BB0 MACRO_ADDR, D_001B1598 MACRO_ADDR, D_001A72D4 MACRO_ADDR;
+extern char *D_001B1604;
+typedef struct { char pad[0x6C]; int arena; } Runtime;
+extern Runtime D_001BAEC0;
+extern unsigned char D_001A7BB4;
+extern int func_002EF010(int);
+extern void func_00133710(int,int,int,int,int);
+extern void func_002FC3C0(unsigned long long);
+extern void func_002FC280(void);
+extern void func_002FC220(void);
+extern void func_0011AEA0(int);
+extern void func_002E5FE0(void);
+extern void func_002B7170(void);
+extern void func_0027D330(int);
+extern int func_00133580(int);
+extern int func_00126288(void *,short,short,short,short,short,short,short);
+extern void func_00126DC0(void *);
+extern void func_002FC1D8(void);
+extern int func_001244B8(int,int);
+extern int func_001261F0(int);
+extern int func_002B7C80(void *,int,int);
+extern int func_001265B0(void *,void *);
+extern int func_0034EF58(int,int,void *,void *,int,int);
+#define W(p,o) (*(int *)((p)+(o)))
+
+/* func_US2_002ECC48, the USA v2.00 copy of func_002EBDF0: the same C, where the texture
+   descriptor's width and height become bytes and a format field at 0xE replaces the constant 0x13.
+   Loads the movie and its texture, plays it from aligned workspace, then restores the GS. */
+int func_US2_002ECC48(unsigned int id) {
+    typedef struct {
+        long q[12];
+    } LoadImage __attribute__((aligned(16)));
+    LoadImage image;
+    char *table;
+    int *sectors, *sizes;
+    int index, data, size, bytes;
+    char *arena, *work, *buffer;
+    Texture *desc;
+    Graphics *graphics;
+    int result = 1;
+    long low, high;
+    unsigned long long texture;
+    D_001A8BB0 = result;
+    if (id<0xB1) *(unsigned int *)((id >> 2) * 4 + (int)D_00139768)|=result<<(id&31);
+    index = func_002EF010(id);
+    table = D_0014B540;
+    sectors = (int *)(table+8);
+    sizes = (int *)(table+12);
+    data = *(int *)((((index*2)|1)*8)+(int)sectors)+W(table, 4);
+    size = *(int *)((((index*2)|1)*8)+(int)sizes);
+    D_00188660.flags|=8;
+    D_001B8840.buffer = 0;
+    D_001B8840.frame = 0;
+    func_00133710(2, 0, 0, 0, 0);
+    func_002FC3C0(1);
+    func_001261F0(0);
+    D_001B1598 = 1+D_001B1598;
+    func_002FC280();
+    func_002FC220();
+    func_0011AEA0(0);
+    func_002E5FE0();
+    func_002B7170();
+    func_0027D330(4);
+    func_0011AEA0(0);
+    func_002E5FE0();
+    func_002B7170();
+    func_00133580(0);
+    arena = (char *)(D_001BAEC0.arena-0x2C0000);
+    work = arena-0xE0000;
+    buffer = work-0x4000;
+    bytes = *(int *)((index<<4)+(int)sizes);
+    func_002B7C80(buffer, *(int *)((index<<4)+(int)sectors)+W(table, 4), (bytes+0x7FF)/0x800);
+    graphics = &D_001B9740;
+    desc = &graphics->desc;
+    D_001B8840.buffer = (int)buffer;
+    D_001B8840.frame = 0;
+    func_00126288(&image, ((D_001A72D4+0x400)<<8)>>16, (short)((result<<desc->width)>>6), desc->format, 0, 0, result<<desc->width, result<<desc->height);
+    func_0011AEA0(0);
+    func_001265B0(&image, D_001B1604+(desc->image<<4));
+    func_001244B8(0, 0);
+    func_00126288(&image, (D_001A72D4<<8)>>16, 1, 0, 0, 0, 16, 16);
+    func_0011AEA0(0);
+    func_001265B0(&image, D_001B1604+(desc->palette<<4));
+    func_001244B8(0, 0);
+    low = ((long)((result<<desc->width)>>6)<<14) | (long)((D_001A72D4+0x400)>>8);
+    low = low | ((long)desc->format<<20);
+    low = low | ((long)desc->width<<26);
+    low = low | ((long)desc->height<<30);
+    high = ((long)(D_001A72D4>>8)<<37) | 0x400000000L;
+    texture = (low | high) | 0x4000000000000000ULL;
+    graphics->desc.texture = texture;
+    result = func_0034EF58(data, size, (void *)(((int)arena+63)&-64), (void *)(((int)work+63)&-64), D_001A7BB4, 0)!=0;
+    func_001261F0(0);
+    func_001244B8(0, 0);
+    func_00126DC0(D_001339B0);
+    func_001265B0(&image, D_001B1604+(graphics->desc.palette<<4));
+    func_001244B8(0, 0);
+    graphics->desc.texture = 0;
+    func_002FC1D8();
+    func_0027D330(4);
+    D_001A8BB0 = 6;
+    D_00188660.flags|=16;
+    return result;
+}
