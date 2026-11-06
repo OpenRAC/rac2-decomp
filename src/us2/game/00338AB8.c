@@ -128,5 +128,3 @@ void func_US2_00339678(int object, int value, int count)
     func_US2_00338D48((void *)inner, 2, limit, 255.0f, 123.0f);
 }
 
-
-INCLUDE_ASM("asm/us2/game", func_US2_00339398);

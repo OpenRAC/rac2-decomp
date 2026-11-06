@@ -56,5 +56,10 @@ int func_US2_002B1C90(int index)
 }
 
 /* Entry of a 21-entry table, 0 past its end. */
-
-INCLUDE_ASM("asm/us2/game", func_US2_002B1D18);
+int func_US2_002B1D18(unsigned int index)
+{
+    if (index < 21) {
+        return D_US2_00258CF0[index];
+    }
+    return 0;
+}

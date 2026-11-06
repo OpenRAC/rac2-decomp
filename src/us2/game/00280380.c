@@ -26,11 +26,29 @@ void func_US2_00280380(int x, int y, u64 color, u8 *text, int length, float scal
     texture = func_US2_0027CED8(1);
     func_US2_0027FCB0(fx, fy, color, text, length, scale, texture, D_L08_00296CD0);
 }
+
+
+float func_US2_002804C0(u8 *text, int length, int limit, float minimum) {
+    float scale = 1.0f;
+    int width;
+
+    if (text != 0) {
+        width = func_0027F288(text, length, scale);
+    } else {
+        width = 0;
+    }
+    if (limit < width) {
+        scale = (float)limit / (float)width;
+        if (scale < minimum) {
+            scale = minimum;
+        }
+    }
+    return scale;
+}
+
 extern void func_US2_00280550(float);
 
 void func_US2_00280B20(void) {
     func_US2_00280550(1.0f);
 }
 
-
-INCLUDE_ASM("asm/us2/game", func_US2_002804C0);

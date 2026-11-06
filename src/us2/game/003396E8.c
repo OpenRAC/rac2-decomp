@@ -1,6 +1,16 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_003396E8);
+float func_US2_003396E8(void *object, int index)
+{
+    switch (index) {
+    case 0:
+        return 0.7f;
+    case 1:
+        return 0.8f;
+    case 2:
+    default:
+        return 1.0f;
+    }
+}
 
-INCLUDE_ASM("asm/us2/game", func_US2_00339740);
 
