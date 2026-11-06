@@ -40,7 +40,6 @@ int func_PAL_0033CA78(int a0)
 	return a0;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033CB00);
 
 extern void func_0033AE18(unsigned char *owner, int value);
 

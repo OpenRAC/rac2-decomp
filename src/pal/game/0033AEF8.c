@@ -20,8 +20,6 @@ void *func_PAL_0033AEF8(char *a0)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0033AF68);
-
 INCLUDE_ASM("asm/pal/game", func_PAL_0033B218);
 
 extern void func_00336320(char *a);

@@ -2,7 +2,6 @@
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0031C1B8);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0031D2E8);
 
 #include "common.h"
 extern float func_00283B98(float, float);
