@@ -147,4 +147,3 @@ void func_PAL_L08_00428DD8(Ent *a0)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L08_00428EA8);

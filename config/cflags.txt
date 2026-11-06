@@ -4032,3 +4032,19 @@ src/pal/levels/12_todano/L12_0041A100-g8.c	-O2 -G8 -ffunction-sections -frac2-qc
 src/pal/levels/shared/L00_00371E28-tick-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/pal/levels/shared/L00_003D5C90-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/14_aranos_prison/L14_003E3E84-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/pal/game/002EA0B0-flags.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L00_003CA9E0-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g
+src/pal/levels/17_smolg/L17_003C8520-carrier-g8.c	-O2 -G8 -ffunction-sections -g -ffast-math
+src/pal/levels/shared/L08_00423EA0-g8.c	-O2 -G8 -ffunction-sections -ffast-math -g -frac2-keep-block-order
+src/pal/levels/shared/L00_0040AB80-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g
+src/pal/levels/shared/L00_003A89F0-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
+src/pal/levels/shared/L00_00405C50-probe-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/00331CF0-probe-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/20_yeedil/L20_00312A28-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L13_0040F08C-ai.c	-O2 -G0 -ffunction-sections
+src/pal/levels/08_tabora/L08_00428EA8-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/03_endako/L03_003F5090-help-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/pal/levels/18_damosel/L18_0043A56C-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/04_barlow/L04_00426EF0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/shared/L03_003C70B8-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/11_joba/L11_00434418-hz-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels

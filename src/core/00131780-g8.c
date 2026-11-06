@@ -41,7 +41,7 @@ extern int D_001A7488 __attribute__((sda));
 extern int D_001A74D0 __attribute__((sda));
 extern int D_001A71C0 MACRO_ADDR;
 extern unsigned int D_001A7180 MACRO_ADDR;
-extern volatile long D_001A74D8 MACRO_ADDR;
+extern long D_001A74D8 MACRO_ADDR;
 extern int D_001A7140 MACRO_ADDR;
 extern char D_001A76F8[];
 void func_001325E0(int a, int c, long d) {

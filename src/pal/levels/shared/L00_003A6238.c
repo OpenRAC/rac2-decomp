@@ -101,7 +101,6 @@ void func_PAL_L00_003A8978(int a0)
     }
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003A89F0);
 
 typedef struct {
     unsigned char pad_000[0x18];
