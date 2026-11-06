@@ -47,7 +47,7 @@ extern u8 *D_L18_001FF4D4;
 
 /* func_L18_002E68B0 is in the sibling file L18_002E68B0-decider.c (its own profile). */
 
-INCLUDE_ASM("asm/levels", func_L18_003170F8);
+/* func_L18_003170F8 is in the sibling file L18_002E68B0-movables.c (its own profile). */
 
 
 /* Fills the record with the requested fields and derived coordinates. */

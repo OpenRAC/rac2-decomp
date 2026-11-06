@@ -671,7 +671,8 @@ void func_L05_00426D98(char *object)
 
 
 
-INCLUDE_ASM("asm/levels", func_L05_00427238);
+
+/* func_L05_00427238 lives in L05_003D33E8-g8.c. */
 
 /* func_L05_004276E8 is defined in L05_004276E8-g8.c. */
 

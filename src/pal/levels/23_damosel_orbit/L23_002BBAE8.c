@@ -208,4 +208,3 @@ s32 func_PAL_L23_002BBAE8(s32 arg0) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L23_002C37A8);

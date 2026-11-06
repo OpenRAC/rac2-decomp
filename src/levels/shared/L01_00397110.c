@@ -110,7 +110,6 @@ void func_L01_003BD178(char *m, void *position, int count,
 
 
 
-INCLUDE_ASM("asm/levels", func_L01_003D4270);
 
 typedef union { int whole __attribute__((mode(TI))); float f[4]; } EffectVector;
 extern void func_L00_003263D0(void *, void *, float, int, int, void *, float, float, unsigned int, void *, float);

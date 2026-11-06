@@ -315,7 +315,7 @@ char *func_00332440(void *a0, void *a1, void *a2)
 
 
 
-INCLUDE_ASM("asm/game", func_003334B0);
+/* func_003334B0 is in 0032EB28-trigger-g8.c. */
 
 /* func_00333AF8 is in 0032EB28-beam.c. */
 

@@ -1,7 +1,6 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002E7B78);
 
 extern char D_00189E20_9[];
 extern char D_001A63A8_3[];

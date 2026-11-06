@@ -48,6 +48,7 @@ void func_PAL_L00_002B1200(int a0)
     } else {
         goto ret;
     }
+INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002B1248);
 arm:
     D_00189E20.b = 3;
     D_00189E20.a = 0x3A;
@@ -55,8 +56,9 @@ ret:
     return;
 }
 
+INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002B20F8);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002B1248);
+
 
 extern void func_L00_002B1F90(void);
 extern void func_PAL_002A7E68(void *, int, int, int);
@@ -115,7 +117,6 @@ void func_PAL_L00_002B1E88(void)
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002B20F8);
 
 extern void func_PAL_L00_002AF6C0(void);
 extern void func_PAL_L00_002B1E88(void);

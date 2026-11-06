@@ -11,5 +11,4 @@ extern void func_0029F338(void *);
 extern int D_L05_001B1500 __attribute__((sda));
 extern void func_PAL_L05_0042C2E8(char *);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L05_0042C044);
 

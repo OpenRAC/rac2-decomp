@@ -20,19 +20,33 @@ u8 *func_PAL_00345268(u8 *a0) {
     return a0;
 }
 
+INCLUDE_ASM("asm/pal/game", func_PAL_003456B0);
 
 INCLUDE_ASM("asm/pal/game", func_PAL_003452C8);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_003455B0);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_003455D8);
+extern int func_00336E40(void *);
+extern int *func_00336DA8(int, int);
+extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC30[], D_001ADC88[], D_001AE0C0[];
+/* sda in this -G0 unit gives the one-instruction (macro) load of D_001A8CFC that retail has */
+extern char *D_001A8CFC[] __attribute__((sda));
+extern void func_003361E0(void *, void *, void *);
+extern void func_PAL_00338688(void *, void *, void *);
+extern void func_00336710(void *, void *, void *);
+extern int *func_00335E20(void *);
+extern void func_00336390(void *, void *, int);
+extern void func_00336A38(void *, void *);
+extern void func_00336A30(void *, int);
+extern const char *func_00288FB8(int);
+extern void func_00335F88(void *, float, float, float, float);
+extern void func_003428E0(void *, void *);
+extern void func_00343028(void *, float, float);
+extern void func_00343038(void *, float);
+extern void func_PAL_003457F0(void *, int);
+extern void func_PAL_00345628(u8 *, unsigned int);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_003455F8);
-
-INCLUDE_ASM("asm/pal/game", func_PAL_00345618);
-
-INCLUDE_ASM("asm/pal/game", func_PAL_00345620);
-
+/* func_PAL_003452C8, the PAL copy of func_00343260: the same C, where the sub-objects past +0x1F8 move,
+   the text id becomes 0xB60 and func_00336A30 is called after the third func_00336A38. */
 typedef int s32;
 typedef unsigned int u32;
 extern void func_003435B0(u8 *, u32);
@@ -44,5 +58,9 @@ void func_PAL_00345628(u8 *a0, u32 a1) {
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_003456B0);
 
+
+
+INCLUDE_ASM("asm/pal/game", func_PAL_00345618);
+
+INCLUDE_ASM("asm/pal/game", func_PAL_00345620);

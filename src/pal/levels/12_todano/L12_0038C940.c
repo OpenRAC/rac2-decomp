@@ -3,6 +3,7 @@
 INCLUDE_ASM("asm/pal/levels", func_PAL_L12_0038C940);
 
 
+
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
 typedef union {
@@ -247,8 +248,6 @@ finish:
     }
 }
 
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L12_0039BF28);
 
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L12_003A44BC);

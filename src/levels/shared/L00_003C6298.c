@@ -332,7 +332,6 @@ int func_L00_003D1B50(L00PickupObject *object)
     return result;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003D1D28);
 
 
 /* func_L00_003D2C00 is defined in L00_003C6298-strip.c. */

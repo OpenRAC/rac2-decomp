@@ -588,7 +588,68 @@ void func_00316400(void *owner, char *object, int duration)
     }
 }
 
-INCLUDE_ASM("asm/game", func_003166C8);
+extern float func_00283B98(float, float);
+extern float func_00283180(float);
+extern float func_00283198(float);
+extern void func_00282D08(void *, void *, void *, float);
+extern float func_00283CE0(int);
+extern int func_00282948(void *);
+
+/* Advances the owner's effect slots. p is set only after the owner test, in the block of the
+ * origin copy: there p + 0x20 is not anticipatable, so gcse leaves the last call's own address
+ * instead of keeping it in a saved register. */
+void func_003166C8(void *owner)
+{
+    int i;
+    PoolEffect *p, *slot;
+    char *info;
+    char local[16] __attribute__((aligned(16)));
+    float ratio;
+    for (i = 0; i < 3; i++) {
+        slot = &D_0022AA10[i];
+        if (slot->owner != owner) continue;
+        p = slot;
+        qcopy(p->origin, D_001B2520);
+        if (p->timer) {
+            p->angle[0] = func_00283B98(p->angle[0], p->speed[0] * 100.0f);
+            p->angle[1] = func_00283B98(p->angle[1], p->speed[1] * 100.0f);
+            p->angle[2] = func_00283B98(p->angle[2], p->speed[2] * 100.0f);
+            p->angle2[0] = func_00283B98(p->angle2[0], p->speed2[0] * 100.0f);
+            p->angle2[1] = func_00283B98(p->angle2[1], p->speed2[1] * 100.0f);
+            p->angle2[2] = func_00283B98(p->angle2[2], p->speed2[2] * 100.0f);
+        } else {
+            p->angle[0] = func_00283B98(p->angle[0], p->speed[0] * 50.0f);
+            p->angle[1] = func_00283B98(p->angle[1], p->speed[1] * 50.0f);
+            p->angle[2] = func_00283B98(p->angle[2], p->speed[2] * 50.0f);
+            p->angle2[0] = func_00283B98(p->angle2[0], p->speed2[0] * 50.0f);
+            p->angle2[1] = func_00283B98(p->angle2[1], p->speed2[1] * 50.0f);
+            p->angle2[2] = func_00283B98(p->angle2[2], p->speed2[2] * 50.0f);
+        }
+        p->offset[0] = func_00283180(p->angle[0]) * p->amplitude[0];
+        p->offset[1] = func_00283198(p->angle[1]) * p->amplitude[1];
+        p->offset[2] = -func_00283198(p->angle[2]) * p->amplitude[2];
+        p->rotation[0] = func_00283180(p->angle2[0]) * p->amplitude2[0];
+        p->rotation[1] = func_00283198(p->angle2[1]) * p->amplitude2[1];
+        p->rotation[2] = -func_00283198(p->angle2[2]) * p->amplitude2[2];
+        if (p->object) {
+            info = func_002AB1F0(p->object);
+            if (info) {
+                func_002B00B0(p->object, local, 1);
+                func_00282D30(local, local, *(float *)(info + 16));
+                func_00282CC0(p->position, local, p->object + 16);
+            } else {
+                qcopy(p->position, p->object + 16);
+            }
+            ratio = func_00283CE0(p->timer);
+            ratio /= func_00283CE0(p->duration);
+            func_00282D08(p->position, p->origin, p->position, 1.0f - ratio);
+        }
+        if (func_00282948(&p->timer)) {
+            if (!p->expired) p->expired = 1;
+            if (func_00282948(&p->fade)) p->owner = 0;
+        }
+    }
+}
 
 
 void func_00316B40(char *p)
