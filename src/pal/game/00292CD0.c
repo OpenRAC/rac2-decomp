@@ -7,7 +7,15 @@ extern u8 *D_L03_001DAB80[];
 extern void func_002934B8(u8 *, u8 *);
 extern unsigned char *D_001BAF38;
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00292CD0);
+/* func_PAL_00292CD0, the PAL copy of func_002923C0: the same C, where func_00292078
+   becomes func_PAL_00292988 and 0x001A7290 becomes 0x001A7310. */
+void func_PAL_00292CD0(void *param)
+{
+    func_PAL_00292988(param);
+    func_00292328(param);
+    func_002934B8((u8 *)D_L03_001DAB80[0], D_001BAF38);
+    *(int *)0x001A7310 = (int)param;
+}
 
 
 
