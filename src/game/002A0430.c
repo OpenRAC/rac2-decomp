@@ -48,7 +48,9 @@ ASM_FUNC("asm/game", func_002A04E8);
 /* Original assembly: RAC1 overlays/shared/moby_frame_packet.c, func_L00_00251468. */
 ASM_FUNC("asm/game", func_002A0558);
 
-INCLUDE_ASM("asm/game", func_002A05A8);
+/* Original assembly: 29 trapping add/addi/sub/dsub, $at as a working register, and two cvt.w.s
+   words in an encoding the compiler never emits. */
+ASM_FUNC("asm/game", func_002A05A8);
 
 INCLUDE_ASM("asm/game", func_002A08A0);
 
@@ -60,7 +62,9 @@ ASM_FUNC("asm/game", func_002A0BE8);
 
 ASM_FUNC("asm/game", func_002A0C68);
 
-INCLUDE_ASM("asm/game", func_002A0F48);
+/* Original assembly: VU0 macro instructions (lqc2/sqc2, vmula/vmadd, vcallms, qmtc2/qmfc2),
+   trapping addi/add and $at as a working register. */
+ASM_FUNC("asm/game", func_002A0F48);
 
 INCLUDE_ASM("asm/game", func_002A10E8);
 
@@ -68,7 +72,9 @@ INCLUDE_ASM("asm/game", func_002A1130);
 
 INCLUDE_ASM("asm/game", func_002A1378);
 
-INCLUDE_ASM("asm/game", func_002A1490);
+/* Original assembly: 32 trapping add/addi/sub, $at as a working register, and no return:
+   it leaves by jumps, like func_002A1130. */
+ASM_FUNC("asm/game", func_002A1490);
 
 ASM_FUNC("asm/game", func_002A1738);
 

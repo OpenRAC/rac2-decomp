@@ -1,9 +1,3 @@
-/* Retained exact-C attempt: 752/756 bytes.
- * Profile: -O2 -G8 -ffunction-sections -g.
- * US and US2 0/2; PAL absent. The body agrees until the final rise division needs one incoming nop. Splitting the division gives two nops instead; G8 and hazard labels do not close it. The dependent boost transfer uses clobbering qcopy.
- * Local checks only; no strict linked match. Reopen with independent
- * source, allocation or assembler evidence for the stated difference.
- */
 #include "common.h"
 
 

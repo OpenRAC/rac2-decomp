@@ -1,3 +1,5 @@
+/* 6 November 2026: on the current compiler the draft is unchanged (2 rows). A plain TI union
+ * assignment in place of qcopy gives 528 bytes and 122 rows, so the qcopy barrier stays. */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the constructor pointer return instead of a false void declaration.
  * The 540-byte source remains a near miss; complete-position and W-component grouping do not recover the decrement slot.
