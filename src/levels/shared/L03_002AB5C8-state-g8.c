@@ -13,7 +13,6 @@ typedef struct {
 extern float D_00189EA0[], D_00189F00[];
 extern u8 D_00189E20[];
 typedef union { u8 b[0x2600]; u8 *ptr[0x980]; float f[0x980]; } Hero;
-#define HERO ((Hero *)D_00189E20)
 extern u16 D_0018CB20[], D_0018CB38[], D_0018CDCC[];
 extern u16 D_0018CB2C[], D_0018CF58[], D_0018CDE4[];
 extern int D_0018CB4C[];
@@ -162,8 +161,8 @@ void func_L03_003C1BF0(u8 *object)
             }
             break;
         case 2:
-            if (HERO->ptr[0x270 / 4] == object || HERO->ptr[0x26C / 4] == object)
-                func_L03_003C4368(object, &HERO->b[0x80]);
+            if (((Hero *)D_00189E20)->ptr[0x270 / 4] == object || ((Hero *)D_00189E20)->ptr[0x26C / 4] == object)
+                func_L03_003C4368(object, &((Hero *)D_00189E20)->b[0x80]);
             func_L03_003C4240(object);
             if (object[0x31]) func_L03_003C4BD8(object);
             break;
@@ -172,8 +171,8 @@ void func_L03_003C1BF0(u8 *object)
                 if (object[0x43]) func_002A7470(object, 0, func_002A77E0(ANIM_FRAMES(0x48)), 15);
                 SI(0x380) = 2; qzero(state + 0x1B0);
             }
-            if (HERO->ptr[0x270 / 4] == object || HERO->ptr[0x26C / 4] == object)
-                func_L03_003C4368(object, &HERO->b[0x80]);
+            if (((Hero *)D_00189E20)->ptr[0x270 / 4] == object || ((Hero *)D_00189E20)->ptr[0x26C / 4] == object)
+                func_L03_003C4368(object, &((Hero *)D_00189E20)->b[0x80]);
             func_L03_003C4240(object);
             distance = func_00282E80(object + 0x10, D_00189E20 + 0x80);
             if (D_L03_001AFEE4 < distance && func_L03_00419BD8((u32)SI(0x220), object + 0x10, D_00189E20 + 0x80)) {
@@ -223,7 +222,7 @@ void func_L03_003C1BF0(u8 *object)
                 if (object[0x20] == 8) { if (object[0x43] != 7) func_002A7470(object, 7, 0, 20); }
                 else if (object[0x43] != 3) func_002A7470(object, 3, 0, 20);
             }
-            func_L01_00322288((int)object, func_00283248(HERO->f[0x80 / 4] - OF(0x10), HERO->f[0x84 / 4] - OF(0x14)));
+            func_L01_00322288((int)object, func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - OF(0x10), ((Hero *)D_00189E20)->f[0x84 / 4] - OF(0x14)));
             if (object[0x60] & 2) func_002A7750(object, 4, -1);
             break;
 

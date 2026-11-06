@@ -33,9 +33,10 @@ source method or adding a compiler mechanism. At revision
 
 - [`movie/vobuf.c`](https://github.com/OpenRAC/rac1-decomp/blob/e7e787ed94f0d56c1ab617e7abdb83ac6db787ec/src/game/movie/vobuf.c#L68)
   and [`hud.c`](https://github.com/OpenRAC/rac1-decomp/blob/e7e787ed94f0d56c1ab617e7abdb83ac6db787ec/src/game/hud.c#L469)
-  use volatile memory fields to retain reloads. Such a field need not be MMIO:
-  establish the actual access widths, offsets and ordering from the retail body.
-  A synthetic volatile local or extra access is not equivalent evidence.
+  use volatile memory fields to retain reloads. That route is not available here:
+  the `volatile` qualifier is not allowed in matched C, measured or not, MMIO
+  included (AGENTS.md, Rules). A function that only matches with it stays in
+  `nonmatching/`.
 - [`map.c`](https://github.com/OpenRAC/rac1-decomp/blob/e7e787ed94f0d56c1ab617e7abdb83ac6db787ec/src/game/map.c#L642)
   declares the same target with different integer/FP interleavings. The EE assigns
   the two banks independently. A typed interleaving may change argument setup
@@ -89,11 +90,12 @@ arguments. Ambient register contents are not a C argument-forwarding contract.
 repairs, the regression and the linked-placement checks.
 
 `func_L02_003D0408` uses one borrowed actor-field view for all six measured
-byte reads at offset `0x60`. Its volatile qualifier describes the complete
+byte reads at offset `0x60`. Its volatile qualifier reproduces the complete
 reload sequence, including two snapshots before the distance test on its
 abandon path. The animation writer `func_002A7470` clears the same bit after
-updating the sequence/frame. This is an access model, not proof of the original
-source qualifier. Both local vectors own their full 16 bytes; the xyz-only
+updating the sequence/frame. It landed before `volatile` was ruled out of
+matched C (AGENTS.md, Rules) and needs plain C without it, or a move back to
+`nonmatching/`. Both local vectors own their full 16 bytes; the xyz-only
 random-vector helper does not justify inventing an initialized fourth lane.
 The interleaved particle call preserves four integer and four FP arguments,
 including its actual vector pointer and byte tag. The ignored-pointer hook

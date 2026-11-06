@@ -126,7 +126,6 @@ typedef struct { float v[4]; } RatesAE900;
 /* Camera shake record: +0x160 amount, +0x168 frames, +0x16C counter. */
 typedef struct { char pad000[0x160]; float amount; char pad164[4]; int frames; int counter; } ShakeAE900;
 
-#define WEAPON_AE900 (*(D_00262570 + D_00139568[0x22]))
 
 extern HeroAE900 D_00189E20;
 extern unsigned char D_00139568[];
@@ -355,7 +354,7 @@ void func_L00_003AE900(MobyAE900 *moby)
         hit.owner = moby;
         hit.flags = 0x830000;
         hit.i20 = 1;
-        hit.damage = WEAPON_AE900.rate;
+        hit.damage = (*(D_00262570 + D_00139568[0x22])).rate;
         qcopy(&hit.dir, &vars->vel);
         func_00282F70(&hit.dir, &hit.dir, 1.0f);
         hit.b18 = 2;
@@ -562,7 +561,7 @@ void func_L00_003AE900(MobyAE900 *moby)
                 func_00282CF0(&t120, &vars->target->pos, &moby->pos);
                 func_00282F20(&t120, &t120, vars->pull);
                 func_00282CC0(&moby->pos, &moby->pos, &t120);
-                func_002A8C00(&t140, moby, 0x10000, &t120, WEAPON_AE900.rate);
+                func_002A8C00(&t140, moby, 0x10000, &t120, (*(D_00262570 + D_00139568[0x22])).rate);
                 qcopy(&t170, &moby->pos);
                 t170.f[2] += 0.35f;
                 if (func_00277F48(&t170, 0x10, moby, &t140, 0.35f)) {
@@ -654,11 +653,11 @@ void func_L00_003AE900(MobyAE900 *moby)
                 float radius = 2.0f;
                 int count;
 
-                if (WEAPON_AE900.upgraded)
+                if ((*(D_00262570 + D_00139568[0x22])).upgraded)
                     radius = 3.0f;
                 count = func_00277F48(&moby->pos, 0x10, moby, 0, radius);
                 t120.q = moby->pos.q;
-                func_002A9850(moby, &t120, D_L00_001C3280, count, 0, 0x810000, 4, 1, WEAPON_AE900.rate, 0.25f, 1.5f);
+                func_002A9850(moby, &t120, D_L00_001C3280, count, 0, 0x810000, 4, 1, (*(D_00262570 + D_00139568[0x22])).rate, 0.25f, 1.5f);
             }
             water = func_002A8A20(&moby->pos);
             if (vars->inWater != 0) {
@@ -729,8 +728,8 @@ void func_L00_003AE900(MobyAE900 *moby)
                     t140.f[2] = func_002A7878(3.0f, 6.0f) * FRAME_AE900;
                     t130.q = moby->pos.q;
                     t130.f[2] = surface;
-                    c1 = func_002AAFA0(c1, WEAPON_AE900.upgraded != 0);
-                    c2 = func_002AAFA0(c2, WEAPON_AE900.upgraded != 0);
+                    c1 = func_002AAFA0(c1, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
+                    c2 = func_002AAFA0(c2, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
                     sz = func_002A7878(0.15f * 210000.0f, 0.25f * 210000.0f);
                     life = func_002A7820(90, 150);
                     defs = (char **)D_L00_001FE940;
@@ -740,13 +739,13 @@ void func_L00_003AE900(MobyAE900 *moby)
             } else if (water + 2.0f < moby->pos.f[2]) {
                 func_00282C88(&t120);
                 func_002ABBB8(moby, &t120, 0, 0.0f, 0.0f, 3, 3, 5, 2.0f, 1.0f, 4.0f, 1.0f, 2, 7.0f, 0, 1, -1,
-                              WEAPON_AE900.upgraded != 0, 0x810001);
+                              (*(D_00262570 + D_00139568[0x22])).upgraded != 0, 0x810001);
             } else {
                 float scale = 1.0f;
                 int count;
                 int i;
 
-                if (WEAPON_AE900.upgraded)
+                if ((*(D_00262570 + D_00139568[0x22])).upgraded)
                     scale = 1.5f;
                 count = func_00283CF0(dist * 15.0f);
                 for (i = 0; i < count; i++) {
@@ -771,14 +770,14 @@ void func_L00_003AE900(MobyAE900 *moby)
                     t130.f[2] -= r * (8.0f * FRAME_AE900);
                     switch (kind) {
                     case 0: {
-                        int c = func_002AAFA0(0x1F101820, WEAPON_AE900.upgraded != 0);
+                        int c = func_002AAFA0(0x1F101820, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
                         float f = func_002A7878(200000.0f, 300000.0f) * scale;
                         func_002BCF18(&t140, &t130, c, 0x101010, f, func_002A7820(180, 240), 0);
                         break;
                     }
                     case 1: {
-                        int c1 = func_002AAFA0(0x3F081020, WEAPON_AE900.upgraded != 0);
-                        int c2 = func_002AAFA0(0x0F081020, WEAPON_AE900.upgraded != 0);
+                        int c1 = func_002AAFA0(0x3F081020, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
+                        int c2 = func_002AAFA0(0x0F081020, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
                         func_002BCF18(&t140, &t130, c1, c2, func_002A7878(50000.0f, 100000.0f) * scale, 180, 1);
                         break;
                     }
@@ -792,8 +791,8 @@ void func_L00_003AE900(MobyAE900 *moby)
                         color = 0x2F486078;
                         if (roll <= 39)
                             color = 0x5FF8F8F8;
-                        c1 = func_002AAFA0(color, WEAPON_AE900.upgraded != 0);
-                        c2 = func_002AAFA0(0x0F000020, WEAPON_AE900.upgraded != 0);
+                        c1 = func_002AAFA0(color, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
+                        c2 = func_002AAFA0(0x0F000020, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
                         f = scale * 150000.0f;
                         func_002BCF18(&t140, &t130, c1, c2, f, func_002A7820(30, 45), 2);
                         break;
@@ -803,8 +802,8 @@ void func_L00_003AE900(MobyAE900 *moby)
                         int c2 = func_L00_0031C998(0, 0x5F5F5F, func_002A7878(0.5f, 1.0f));
                         float f;
 
-                        c1 = func_002AAFA0(c1, WEAPON_AE900.upgraded != 0);
-                        c2 = func_002AAFA0(c2, WEAPON_AE900.upgraded != 0);
+                        c1 = func_002AAFA0(c1, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
+                        c2 = func_002AAFA0(c2, (*(D_00262570 + D_00139568[0x22])).upgraded != 0);
                         func_002AF000(&t130, func_002A7878(0.0f, 1.0f) * FRAME_AE900, a, func_002A7940());
                         f = func_002A7878(200000.0f, 300000.0f) * scale;
                         func_002BCF18(&t140, &t130, c1, c2, f, func_002A7820(240, 300), 3);
@@ -814,7 +813,7 @@ void func_L00_003AE900(MobyAE900 *moby)
                 }
             }
             moby->bBC = 0;
-            if (WEAPON_AE900.upgraded)
+            if ((*(D_00262570 + D_00139568[0x22])).upgraded)
                 func_002E5CF8(3, 0, moby);
             else
                 func_002E5CF8(2, 0, moby);
@@ -828,7 +827,7 @@ void func_L00_003AE900(MobyAE900 *moby)
             }
             D_L00_001B8C80.counter = 0;
             D_L00_001B8C80.frames = 25;
-            if (WEAPON_AE900.upgraded)
+            if ((*(D_00262570 + D_00139568[0x22])).upgraded)
                 func_00312B70(&big, &moby->pos, 0, 0);
             else
                 func_00312B70(&small, &moby->pos, 0, 0);

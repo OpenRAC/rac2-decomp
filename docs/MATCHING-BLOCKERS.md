@@ -204,6 +204,10 @@ the fourth. The retail body never reads `$a3`, and its functional C already said
 match 28/28 in `src/game/002E10B8-sky-g8.c`. The `$a3` was only local-alloc giving `h`
 a free call-clobbered register, because `h` dies before the call.
 
+That C passes the scratchpad address 0x70002000 as a literal, which matched C may not
+contain, so both functions are back in `nonmatching/game/` (6 November 2026). A
+`D_70002000` symbol in its place swaps `$s6`/`$s7` from the prologue on.
+
 When a near miss is one argument-register copy away, check the callee's actual
 register use before tuning schedules, especially for an `ASM_FUNC` callee, whose
 interface no C definition constrains. The same applies to return values; see the

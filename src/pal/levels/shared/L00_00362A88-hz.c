@@ -42,10 +42,9 @@ extern float func_002A89A8(void *, int, float);
 extern float func_00283B98(float, float);
 extern int func_L00_003268E8(int);
 
-#define HERO_VEHICLE (*(unsigned char **)(D_00189EA0 + 0x2BC))
 #define HERO_RIDING_D54() \
-    (HERO_VEHICLE && *(short *)(HERO_VEHICLE + 0xAA) == 0xD54 && \
-     (unsigned char)HERO_VEHICLE[0x20] != 254 && (unsigned char)HERO_VEHICLE[0x20] != 253)
+    ((*(unsigned char **)(D_00189EA0 + 0x2BC)) && *(short *)((*(unsigned char **)(D_00189EA0 + 0x2BC)) + 0xAA) == 0xD54 && \
+     (unsigned char)(*(unsigned char **)(D_00189EA0 + 0x2BC))[0x20] != 254 && (unsigned char)(*(unsigned char **)(D_00189EA0 + 0x2BC))[0x20] != 253)
 
 void func_PAL_L00_00362A88(unsigned char *object) {
     Vector position;

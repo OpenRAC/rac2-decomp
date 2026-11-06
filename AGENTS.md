@@ -178,13 +178,21 @@ each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
   primitives (for example GCC's original `longlong.h` multiplication primitive) may be
   retained with their upstream provenance and licence, as in RAC1. Symbol aliases and
   independently evidenced file-scope padding are permitted. No register pins, empty asm
-  barriers, fake dependencies, false prototypes or invented volatile accesses. A helper
+  barriers, fake dependencies or false prototypes. A helper
   or primitive is not a match: validate its actual compiled bytes and every linked place.
+- **No `volatile` in matched C.** The qualifier is not allowed anywhere in C that links
+  into a program: not on a field, pointer, cast, global or local, not for memory-mapped
+  hardware, and not when it reproduces a reload or store sequence measured in retail.
+  The same goes for inline asm beyond the reviewed shared helpers above, `#define`
+  aliases that give a symbol a second name or an offset view in a unit, and hardcoded
+  addresses. A function that matches only with one of these is a near miss: its C goes
+  to `nonmatching/` with a line in `nonmatching/README.md`, and its `INCLUDE_ASM`
+  marker goes back.
 - **Check current RAC1 before rejecting a method.** Inspect its current source and build
   inputs, rather than treating an old experiment or private worker restriction as a ban.
   Methods used there are available here, subject to the same sourcing and strict-build
-  checks. Measured `volatile` fields can describe real reload/store sequences; they are
-  not limited to memory-mapped hardware. Typed integer/FP argument interleavings are
+  checks. The exception is `volatile`: RAC1's volatile fields are not a precedent here
+  (see the rule above). Typed integer/FP argument interleavings are
   permitted when the EE ABI preserves each register bank's argument order, count and
   widths, stack arguments, return contract and side effects. Do not invent accesses or
   change the callee's physical interface to influence allocation. See
