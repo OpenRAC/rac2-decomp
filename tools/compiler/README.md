@@ -228,7 +228,15 @@ in `config/cflags.txt`, and `-fno-rac2-keep-block-zero-copy` disables it;
 `tests/test_keep_block_zero_copy.py` covers the anchors, the default/disabled equality, the
 kept copy and a control across a call.
 
+`sticky_volatile_refs.py` adds `-frac2-sticky-volatile-refs`: mark_referenced_resources
+(resource.c) keeps `volatil` set at later MEMs and asm operands, as GCC 2.95's `|=` does,
+instead of the EE tree's `=`. reorg's forward delay-slot search then stops at a volatile asm
+(func_L00_002A9460: the `%lo(D_00189E20)` addiu fills the second call's slot). It is off by
+default, enabled per unit in `config/cflags.txt`, and `-fno-rac2-sticky-volatile-refs`
+disables it; `tests/test_sticky_volatile_refs.py` covers the anchors, the default/disabled
+equality, the stopped search and a control without the asm.
+
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
-`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c` and `tc-mips.c` hash as it
+`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c` and `tc-mips.c` hash as it
 lists. The binaries' own hashes depend on the build host and path, so check a compiler by its
 output: `tools/build.py` compiles every matched function to the retail bytes.

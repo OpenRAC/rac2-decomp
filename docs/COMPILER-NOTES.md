@@ -194,6 +194,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Whole GPR save area uses sq/lq | -mastra-quad-saves | func_00119BC8, func_00115F28, func_00115C90 |
 | Quad slots: `sd $ra` below `sq $s0` | -mastra-quad-saves -frac2-narrow-saves-below, `register_precision(ra, 64)` | func_L01_00324550, func_L08_00389B68 |
 | Copy of a zero set in the same block stays a register copy | -frac2-keep-block-zero-copy | func_002F7320 |
+| A volatile asm ends the forward delay-slot search past later loads | -frac2-sticky-volatile-refs | func_L00_002A9460 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
 | Arguments spilled and branch to common epilogue | Measured -O0 unit, not an invented varargs helper | func_001175F0 |
@@ -386,6 +387,18 @@ loop.c the zero start. Without the same-block limit, forced on, it changes one m
 func_00349680, where jump1's duplicated loop-exit copy `lo = hi` sees a zero from an earlier
 block and retail keeps `move $18,$0`. With the limit, forced on in every game unit, it changes
 none of 7,577 others (144 SDK units use another compiler).
+
+func_L00_002A9460 (412 bytes, 27 places) differs from stock cc1 in one delay slot: retail puts
+`addiu $s1,$s1,%lo(D_00189E20)` in the slot of its second call, stock in the first. reorg's
+forward search from the first call passes the second qcopy asm (volatile). The EE tree's
+resource.c predates GCC 2.95's 6 May 1999 change (Mark Mitchell: "Make volatil monotonically
+increasing"): mark_referenced_resources assigns `res->volatil = MEM_VOLATILE_P (x)`, so the
+next ordinary load clears the flag and the search goes on to the addiu. Upstream 2.95 and
+2.95.3 use `|=` there. [sticky_volatile_refs.py](../tools/compiler/transformers/sticky_volatile_refs.py)
+adds `-frac2-sticky-volatile-refs`: the MEM and ASM_OPERANDS cases of
+mark_referenced_resources keep the flag set. Forced on in every game unit it changes none of
+8,510 others. The mark_set_resources half of the same upstream change is not applied: forced
+on it also changes matched func_00132498 (0 of 1 places).
 
 Patch 0057 enables `-mastra-split-trunc-slot`: split `truncdisi2` after reload and
 before scheduling so its second shift can fill the return slot. `func_0012E8C8`
