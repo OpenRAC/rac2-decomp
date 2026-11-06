@@ -140,7 +140,6 @@ typedef struct {
     int pad160;
     int err;
 } PauseCardState;
-#define PAUSE ((PauseState *)D_001F2840)
 extern PauseCardState D_001393E0;
 extern int D_001A7424 __attribute__((sda));
 extern int D_001B1684 __attribute__((sda));
@@ -157,16 +156,16 @@ extern void func_US2_002CB560(void);
 
 void func_US2_002CB860(void)
 {
-    PAUSE->update_count = PAUSE->update_count > 31999 ? 32000 : PAUSE->update_count + 1;
-    PAUSE->clear = 0;
-    if (PAUSE->timer) --PAUSE->timer;
-    if (D_001393E0.state < 3 && D_001393E0.err < 0) ++PAUSE->card_error_frames;
-    else PAUSE->card_error_frames = 0;
+    ((PauseState *)D_001F2840)->update_count = ((PauseState *)D_001F2840)->update_count > 31999 ? 32000 : ((PauseState *)D_001F2840)->update_count + 1;
+    ((PauseState *)D_001F2840)->clear = 0;
+    if (((PauseState *)D_001F2840)->timer) --((PauseState *)D_001F2840)->timer;
+    if (D_001393E0.state < 3 && D_001393E0.err < 0) ++((PauseState *)D_001F2840)->card_error_frames;
+    else ((PauseState *)D_001F2840)->card_error_frames = 0;
     func_US2_002DECE0();
-    if ((D_001A7424 & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
-        if (!func_002B49E0(4, 1, 1, PAUSE->arg, 0)) return;
+    if ((D_001A7424 & 1) && ((PauseState *)D_001F2840)->mode == 4 && D_001B1684 >= 8) {
+        if (!func_002B49E0(4, 1, 1, ((PauseState *)D_001F2840)->arg, 0)) return;
     }
-    switch (PAUSE->mode) {
+    switch (((PauseState *)D_001F2840)->mode) {
     case 1: func_002CAA58(); break;
     case 2: func_002CAA88(); break;
     case 3: func_002CAAA0(); break;
@@ -180,9 +179,8 @@ void func_US2_002CB860(void)
     }
     func_002B6658();
     func_002E4AC8();
-    if (PAUSE->pending) func_US2_002CB560();
+    if (((PauseState *)D_001F2840)->pending) func_US2_002CB560();
 }
-#undef PAUSE
 
 void func_002CAA58(void);
 

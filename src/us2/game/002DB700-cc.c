@@ -147,7 +147,6 @@ typedef struct {
     char pad140[0x24];
     int age;
 } Menu2DA9A8;
-#define Menu_2DA9A8 (*(Menu2DA9A8 *)&D_001F2840)
 
 extern unsigned char D_001A7AF8[];
 extern unsigned char D_001395B8[];
@@ -173,10 +172,10 @@ int func_US2_002DB700(MenuPanel2DA9A8 *menu)
     if (menu->mode < 2) {
         if (!(menu->flags & 0x100)) return 1;
         if (D_001393E0.state == 2
-            && !(D_001393E0.stage < 3 && D_001393E0.status < 0 && Menu_2DA9A8.age > 10)) {
+            && !(D_001393E0.stage < 3 && D_001393E0.status < 0 && (*(Menu2DA9A8 *)&D_001F2840).age > 10)) {
             func_0027C540(0);
             message = 0x2c96;
-            if (Menu_2DA9A8.message_override) message = Menu_2DA9A8.message;
+            if ((*(Menu2DA9A8 *)&D_001F2840).message_override) message = (*(Menu2DA9A8 *)&D_001F2840).message;
             text = func_00288FB8(message);
             {
                 TextWindow2DA9A8 window = {1, menu->height + 1, 1, menu->width + 1,
@@ -199,7 +198,7 @@ int func_US2_002DB700(MenuPanel2DA9A8 *menu)
     }
     if (menu->flags & 4) {
         unsigned int selection = (menu->mode < 4) ^ 1;
-        row = &Menu_2DA9A8.owner->rows->rows[menu->choice[selection]];
+        row = &(*(Menu2DA9A8 *)&D_001F2840).owner->rows->rows[menu->choice[selection]];
         if (row->type == 0) {
             short id = row->id;
             if (!D_001A7AF8[id]) return 1;

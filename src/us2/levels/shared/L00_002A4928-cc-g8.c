@@ -67,8 +67,6 @@ extern void func_L00_002D23C0(int, int);
 extern void func_US2_L00_002D6258(void);
 extern int func_002A7820(int, int);
 
-#define HERO ((HeroState *)D_00189E20)
-#define SELECTED (HERO->m[0x2290 / 4])
 
 void func_US2_L00_002A4928(void)
 {
@@ -78,37 +76,37 @@ void func_US2_L00_002A4928(void)
     int i;
 
     for (i = 0; i < 7; i++)
-        saved[i] = HERO->i[0x1248 / 4 + i * 0x14];
+        saved[i] = ((HeroState *)D_00189E20)->i[0x1248 / 4 + i * 0x14];
     func_00282A60(D_00189E20, 0, 0x2540);
     for (i = 0; i < 7; i++)
-        saved[i] = HERO->i[0x1248 / 4 + i * 0x14];
+        saved[i] = ((HeroState *)D_00189E20)->i[0x1248 / 4 + i * 0x14];
 
     for (i = 0; &D_L00_001B1E9C[0][i] < D_L00_001B1EA0[0]; i++) {
         actor = &D_L00_001B1E9C[0][i];
         if (actor->oclass == 0) {
-            SELECTED = actor;
+            (((HeroState *)D_00189E20)->m[0x2290 / 4]) = actor;
             func_002833F0(&actor->basis, &actor->axis);
-            func_00282F20(&far, &SELECTED->fwd, -3.0f);
-            func_00282F20(&near, &SELECTED->fwd, 1.0f);
-            func_00282CC0(&near, &near, &HERO->q[8]);
-            func_00282CC0(&far, &far, &HERO->q[8]);
-            if (func_002761F8(&near, &far, 2, SELECTED, 0) != 0)
-                qcopy(&HERO->q[8], &D_L00_001BF220);
-            SELECTED->flags |= 2;
-            HERO->m[0xC18 / 4] = SELECTED;
-            HERO->f[0x98 / 4] = SELECTED->axis.f[2];
-            qcopy(&HERO->q[8], &SELECTED->pos);
+            func_00282F20(&far, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, -3.0f);
+            func_00282F20(&near, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, 1.0f);
+            func_00282CC0(&near, &near, &((HeroState *)D_00189E20)->q[8]);
+            func_00282CC0(&far, &far, &((HeroState *)D_00189E20)->q[8]);
+            if (func_002761F8(&near, &far, 2, (((HeroState *)D_00189E20)->m[0x2290 / 4]), 0) != 0)
+                qcopy(&((HeroState *)D_00189E20)->q[8], &D_L00_001BF220);
+            (((HeroState *)D_00189E20)->m[0x2290 / 4])->flags |= 2;
+            ((HeroState *)D_00189E20)->m[0xC18 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4]);
+            ((HeroState *)D_00189E20)->f[0x98 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4])->axis.f[2];
+            qcopy(&((HeroState *)D_00189E20)->q[8], &(((HeroState *)D_00189E20)->m[0x2290 / 4])->pos);
             func_L00_002B4900();
             func_L00_002A9460();
             func_L00_002D23C0(0, 0);
-            qcopy(&((Placement *)D_00152C70)->pos, &HERO->q[8]);
-            qcopy(&((Placement *)D_00152C70)->rot, &HERO->q[9]);
+            qcopy(&((Placement *)D_00152C70)->pos, &((HeroState *)D_00189E20)->q[8]);
+            qcopy(&((Placement *)D_00152C70)->rot, &((HeroState *)D_00189E20)->q[9]);
             break;
         }
     }
     if (D_001A79F0_1[0] == 1 || D_001A79F0_1[0] == 8)
-        SELECTED->b7E |= 1;
-    SELECTED->b62 = 0xFF;
+        (((HeroState *)D_00189E20)->m[0x2290 / 4])->b7E |= 1;
+    (((HeroState *)D_00189E20)->m[0x2290 / 4])->b62 = 0xFF;
     if (D_001A7398[0] == 0)
         D_001A7398[0] = 30;
 
@@ -122,23 +120,23 @@ void func_US2_L00_002A4928(void)
         func_00282C88(&D_L00_0025BE10[i].pos_vel);
     }
     for (i = 0; i < 9; i++)
-        HERO->i[0x242C / 4 + i] = -1;
-    HERO->f[0x24A4 / 4] = 2.125f;
-    HERO->f[0x24A8 / 4] = 1.25f;
+        ((HeroState *)D_00189E20)->i[0x242C / 4 + i] = -1;
+    ((HeroState *)D_00189E20)->f[0x24A4 / 4] = 2.125f;
+    ((HeroState *)D_00189E20)->f[0x24A8 / 4] = 1.25f;
     if (D_001A7A00[0] == 0)
         func_US2_L00_002D6258();
-    HERO->i[0x24D0 / 4] = 4;
-    HERO->i[0x24CC / 4] = D_001A7A00[0];
-    HERO->h[0x24D4 / 2] = HERO->h[0x24CC / 2];
-    HERO->i[0x11A0 / 4] = func_002A7820(180, 300);
-    HERO->f[0x11A4 / 4] = 0.007f;
-    HERO->f[0x11A8 / 4] = 0.3f;
-    HERO->f[0xEB0 / 4] = 0.97f;
+    ((HeroState *)D_00189E20)->i[0x24D0 / 4] = 4;
+    ((HeroState *)D_00189E20)->i[0x24CC / 4] = D_001A7A00[0];
+    ((HeroState *)D_00189E20)->h[0x24D4 / 2] = ((HeroState *)D_00189E20)->h[0x24CC / 2];
+    ((HeroState *)D_00189E20)->i[0x11A0 / 4] = func_002A7820(180, 300);
+    ((HeroState *)D_00189E20)->f[0x11A4 / 4] = 0.007f;
+    ((HeroState *)D_00189E20)->f[0x11A8 / 4] = 0.3f;
+    ((HeroState *)D_00189E20)->f[0xEB0 / 4] = 0.97f;
     if (D_L00_001A8FF0[0] != 0)
-        qcopy(&HERO->q[0xB0 / 16], D_L00_001B1B10);
-    HERO->i[0x18D4 / 4] = 0;
+        qcopy(&((HeroState *)D_00189E20)->q[0xB0 / 16], D_L00_001B1B10);
+    ((HeroState *)D_00189E20)->i[0x18D4 / 4] = 0;
     if (D_001A7AFA[0] == 0)
-        HERO->h[0x24FC / 2] = 1;
+        ((HeroState *)D_00189E20)->h[0x24FC / 2] = 1;
 }
 
 extern char D_00189E20[];

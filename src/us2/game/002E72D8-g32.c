@@ -55,7 +55,6 @@ extern char D_001ABF58[16] __attribute__((sda)), D_001ABF68[16] __attribute__((s
 extern char D_001ABF78[16] __attribute__((sda));
 extern HeroGlobals D_00189E20;
 
-#define HERO ((char *)&D_00189E20.hero)
 
 extern void func_002E6178(void *);
 extern float func_002A89A8(void *, int, float);
@@ -98,23 +97,23 @@ void func_US2_002E72D8(Object *object)
             return;
         if (!D_001A8BB0_gp) {
             blocked = 0;
-            if (func_00282E80(object->position, HERO) < 6.0f) {
+            if (func_00282E80(object->position, ((char *)&D_00189E20.hero)) < 6.0f) {
                 if (object->blocked) {
-                    qcopy(p, HERO + 0x60);
+                    qcopy(p, ((char *)&D_00189E20.hero) + 0x60);
                     p[2] += 2.0f;
-                    if (func_002761F8(HERO + 0x60, p, 0, D_00189E20.collision, 0))
+                    if (func_002761F8(((char *)&D_00189E20.hero) + 0x60, p, 0, D_00189E20.collision, 0))
                         blocked = 1;
                     else {
-                        func_00282CF0(old, object->position, HERO);
+                        func_00282CF0(old, object->position, ((char *)&D_00189E20.hero));
                         old[2] = 0;
                         func_00282F20(old, old, 0.4f);
                         func_00282CC0(p, p, old);
-                        blocked = func_002761F8(HERO + 0x60, p, 0, D_00189E20.collision, 0) != 0;
+                        blocked = func_002761F8(((char *)&D_00189E20.hero) + 0x60, p, 0, D_00189E20.collision, 0) != 0;
                     }
                 } else {
-                    qcopy(p, HERO + 0x60);
+                    qcopy(p, ((char *)&D_00189E20.hero) + 0x60);
                     p[2] += 2.0f;
-                    blocked = func_002761F8(HERO + 0x60, p, 0, *(int *)(HERO + 0x2210), 0) != 0;
+                    blocked = func_002761F8(((char *)&D_00189E20.hero) + 0x60, p, 0, *(int *)(((char *)&D_00189E20.hero) + 0x2210), 0) != 0;
                 }
             }
             object->blocked = blocked;
@@ -165,7 +164,7 @@ void func_US2_002E72D8(Object *object)
             func_002AD6F0(state + 0x20, delta, previous, D_00214920[i]->previous);
         }
         if (D_00189E20.count >= 2 && D_00189E20.selected == D_00214920[i])
-            target = HERO;
+            target = ((char *)&D_00189E20.hero);
         if (D_001A8BB0[0]) {
             D_00214920[i]->render = 0;
             object->render = 0;

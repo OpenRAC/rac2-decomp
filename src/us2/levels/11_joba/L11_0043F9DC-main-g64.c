@@ -257,8 +257,6 @@ extern void func_L11_00447018(u8 *, s32);
 extern void func_L11_004471A8(u8 *, void *);
 extern void func_L11_00447360(char *);
 
-#define HERO ((Hero *)D_00189E20)
-#define TABLE D_L11_001B14F8
 #define OBJ ((JobaObj *)obj)
 
 void func_US2_L11_0043F9DC(u8 *obj) {
@@ -343,13 +341,13 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         }
         break;
     case 1:
-        if (func_L00_003206B8(&HERO->f[0x80 / 4], st->zone) != 0) {
+        if (func_L00_003206B8(&((Hero *)D_00189E20)->f[0x80 / 4], st->zone) != 0) {
             func_002A7750(obj, 4, -1);
-        } else if (func_002ACBC8(&HERO->f[0x80 / 4], st->trigger1) != 0) {
+        } else if (func_002ACBC8(&((Hero *)D_00189E20)->f[0x80 / 4], st->trigger1) != 0) {
             func_002B0C28(4, 0x2DD2, 1);
             func_L02_003FF698(obj);
         } else if (D_001395B8[func_L11_0043E108(1)] != 0) {
-            if (func_002ACBC8(&HERO->f[0x80 / 4], st->trigger2) != 0) {
+            if (func_002ACBC8(&((Hero *)D_00189E20)->f[0x80 / 4], st->trigger2) != 0) {
                 func_002B0C28(4, 0x2DD2, 1);
                 func_L02_003FF698(obj);
             }
@@ -390,7 +388,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 }
                 p1 = D_L11_001B368C + (st->camera << 7);
                 func_L00_002B9D60(p1 + 0x30, p1 + 0x70, 0x6F, 1);
-                func_002DF3F8(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
+                func_002DF3F8(&((Hero *)D_00189E20)->f[0x80 / 4], &((Hero *)D_00189E20)->f[0x90 / 4]);
                 func_L01_00323310(st->music, st->volume);
                 *(TI128 *)v = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
                 v[2] += 2.0f;
@@ -406,7 +404,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 func_L00_002D40A0(func_L11_004417E8(obj), 0, 0.0f);
             }
         } else if (OBJ->phase == 3) {
-            if (func_00282E80(&HERO->f[0x80 / 4], func_L11_004417E8(obj)) < 10.0f) {
+            if (func_00282E80(&((Hero *)D_00189E20)->f[0x80 / 4], func_L11_004417E8(obj)) < 10.0f) {
                 if (D_001395B8[0x4A] == 0) {
                     D_001395B8[0x4A] = 1;
                     OBJ->phase = 1;
@@ -440,7 +438,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         if (OBJ->timer < 0xB4) {
             func_L11_00441A58(obj, 0);
             func_L11_00441D08(obj, 0);
-            HERO->f[0x24A4 / 4] = 300.0f;
+            ((Hero *)D_00189E20)->f[0x24A4 / 4] = 300.0f;
             func_L11_00442170(obj);
             break;
         }
@@ -456,7 +454,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             func_L11_00441A58(obj, 0);
             func_L11_00441D08(obj, 0);
             func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0x6F, 1);
-            func_002DF3F8(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
+            func_002DF3F8(&((Hero *)D_00189E20)->f[0x80 / 4], &((Hero *)D_00189E20)->f[0x90 / 4]);
             func_L11_00443380(obj);
             st->mode = 5;
             func_L11_004461E8(obj);
@@ -470,7 +468,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             func_L11_00441A58(obj, 0);
             func_L11_00441D08(obj, 0);
             if (OBJ->timer >= 0xB5) {
-                HERO->f[0x24A4 / 4] = 200.0f;
+                ((Hero *)D_00189E20)->f[0x24A4 / 4] = 200.0f;
             }
             func_L11_00442170(obj);
         } else {
@@ -486,7 +484,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         }
         if (OBJ->phase == 0) {
             if (OBJ->timer < 0xB4) {
-                HERO->f[0x24A4 / 4] = 200.0f;
+                ((Hero *)D_00189E20)->f[0x24A4 / 4] = 200.0f;
                 func_L11_00442170(obj);
                 break;
             }
@@ -497,7 +495,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             }
             OBJ->timer = 0;
             OBJ->phase = 1;
-        } else if (HERO->i[0x24CC / 4] > 0 && D_L11_001A8F00 != 2 && OBJ->timer >= 0xF1) {
+        } else if (((Hero *)D_00189E20)->i[0x24CC / 4] > 0 && D_L11_001A8F00 != 2 && OBJ->timer >= 0xF1) {
             func_L11_004427B8((char *)obj, st->cls);
             OBJ->state = 5;
             D_L11_001B359C[st->door].flags |= 1;
@@ -507,7 +505,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             func_L11_00441A58(obj, 0);
             func_L11_00441D08(obj, 0);
             func_L00_002B9D60(func_L11_004417E8(obj), D_L11_001B1570, 0x6F, 1);
-            func_002DF3F8(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
+            func_002DF3F8(&((Hero *)D_00189E20)->f[0x80 / 4], &((Hero *)D_00189E20)->f[0x90 / 4]);
             func_L11_00443380(obj);
             D_L11_001A8FF4 = 0;
             D_L11_001A8FF0 = 0;
@@ -519,7 +517,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
     case 7:
         if (func_002B3868(obj) != 0) {
             sel = D_001395B8[0x49];
-            if (sel != 0 && (D_001395B8[func_L11_0043E108(TABLE[sel]->id)] == 0 ||
+            if (sel != 0 && (D_001395B8[func_L11_0043E108(D_L11_001B14F8[sel]->id)] == 0 ||
                              (sel >= 11 && func_00288D58() == 0) ||
                              (sel == 8 && D_00139586[0][D_L11_00279BA0].enabled == 0))) {
                 sel = 0;
@@ -540,7 +538,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             func_L11_00442C80(obj);
             func_L11_00440238(obj);
             func_L11_00442E38(obj);
-            rec1 = &TABLE[st->cls]->records[st->wave];
+            rec1 = &D_L11_001B14F8[st->cls]->records[st->wave];
             func_L11_00441A58(obj, rec1->h[7]);
             func_L11_00441D08(obj, rec1->h[6]);
             for (k3 = 0; k3 < 40; k3++) {
@@ -549,22 +547,22 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             for (k3 = 0; k3 < 6; k3++) {
                 st->limits[k3] = D_L11_001B14B0[k3];
             }
-            HERO->i[0x24CC / 4] = D_001A7A00;
+            ((Hero *)D_00189E20)->i[0x24CC / 4] = D_001A7A00;
             func_L11_00447360((char *)obj);
             D_L11_001B359C[st->door].flags |= 1;
             D_L11_001B359C[st->door].hidden = 0;
             if (st->cls == 7) {
-                r1 = HERO->i[0x18D4 / 4];
-                HERO->i[0x18D4 / 4] = 0;
+                r1 = ((Hero *)D_00189E20)->i[0x18D4 / 4];
+                ((Hero *)D_00189E20)->i[0x18D4 / 4] = 0;
                 D_L11_001B1588 = r1;
             } else if (st->cls == 8) {
-                r2 = HERO->i[0x18D4 / 4];
-                HERO->i[0x18D4 / 4] = 0;
+                r2 = ((Hero *)D_00189E20)->i[0x18D4 / 4];
+                ((Hero *)D_00189E20)->i[0x18D4 / 4] = 0;
                 D_00139700[0] = 300;
                 D_L11_001B1588 = r2;
             }
         }
-        rec2 = &TABLE[st->cls]->records[st->wave];
+        rec2 = &D_L11_001B14F8[st->cls]->records[st->wave];
         if (rec2->b[3] != 0) {
             func_002A7750(obj, 9, -1);
             return;
@@ -583,9 +581,9 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             cls3 = (u16)st->cls;
             st->sound = 0;
             st->owner = 0;
-            if (st->wave >= TABLE[cls1]->count) {
+            if (st->wave >= D_L11_001B14F8[cls1]->count) {
                 if (cls3 - 7U < 2) {
-                    HERO->i[0x18D4 / 4] = D_L11_001B1588;
+                    ((Hero *)D_00189E20)->i[0x18D4 / 4] = D_L11_001B1588;
                 }
                 st->result = st->cls;
                 if (st->result == 0 && D_001395B8[func_L11_0043E108(0)] == 0) {
@@ -601,7 +599,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 st->cls = 0;
             }
             func_L11_00442E38(obj);
-            rec3 = &TABLE[st->cls]->records[st->wave];
+            rec3 = &D_L11_001B14F8[st->cls]->records[st->wave];
             func_L11_00441A58(obj, rec3->h[7]);
             func_L11_00441D08(obj, rec3->h[6]);
         }
@@ -648,7 +646,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 return;
             }
         }
-        if ((st->cls == 3 || st->cls == 11) && HERO->i[0x24CC / 4] < D_001A7A00) {
+        if ((st->cls == 3 || st->cls == 11) && ((Hero *)D_00189E20)->i[0x24CC / 4] < D_001A7A00) {
             func_L00_0030DD70(func_00288FB8(0x3100), -1);
             func_002A7750(obj, 11, -1);
             st->sound = 0;
@@ -656,7 +654,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             func_L00_004028C0((char *)1, -1);
             return;
         }
-        rec2 = &TABLE[st->cls]->records[st->wave];
+        rec2 = &D_L11_001B14F8[st->cls]->records[st->wave];
         if (OBJ->timer >= 0x3D || rec2->b[0] != 0) {
             ok1 = 0;
             func_L11_00441108(obj);
@@ -709,7 +707,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         }
         if (st->cls == 7) {
             func_002AD860(10);
-            HERO->b[0x22B7] = 1;
+            ((Hero *)D_00189E20)->b[0x22B7] = 1;
         }
         if (st->cls == 8) {
             func_002AD860(30);
@@ -730,7 +728,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         func_L11_0043E108(1);
         if (func_002B3868(obj) != 0) {
             if (st->counts[7] == 0) {
-                if (TABLE[st->cls]->records[st->wave].b[1] != 0) {
+                if (D_L11_001B14F8[st->cls]->records[st->wave].b[1] != 0) {
                     r4 = func_L11_00440868(obj, 0xB3A, 0);
                     st->sound = r4;
                     st->owner = r4;
@@ -766,20 +764,20 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 lt1->height = f1;
                 *(f32 *)(q1 + 0x18) = f1;
             }
-            if (HERO->ptr[0x33C / 4] == (void *)q1 && HERO->i[0x340 / 4] != 0 &&
-                (HERO->i[0x2294 / 4] == 7 || OBJ->timer >= 0x12D)) {
-                HERO->i[0xF0 / 4] = 0;
+            if (((Hero *)D_00189E20)->ptr[0x33C / 4] == (void *)q1 && ((Hero *)D_00189E20)->i[0x340 / 4] != 0 &&
+                (((Hero *)D_00189E20)->i[0x2294 / 4] == 7 || OBJ->timer >= 0x12D)) {
+                ((Hero *)D_00189E20)->i[0xF0 / 4] = 0;
                 D_L11_001A7CD8 = 80.0f;
-                HERO->i[0xF4 / 4] = 0;
-                if (HERO->i[0x2294 / 4] != 7) {
-                    if (HERO->i[0x2294 / 4] != 0x81) {
+                ((Hero *)D_00189E20)->i[0xF4 / 4] = 0;
+                if (((Hero *)D_00189E20)->i[0x2294 / 4] != 7) {
+                    if (((Hero *)D_00189E20)->i[0x2294 / 4] != 0x81) {
                         func_L11_002D8EF8(7, 1);
                     }
                 } else {
                     func_L11_002D8EF8(0x81, 1);
                 }
-                if (func_00282E80(&HERO->f[0x80 / 4], lt1->pos) < 0.01f) {
-                    HERO->f[0x84 / 4] += 0.01f;
+                if (func_00282E80(&((Hero *)D_00189E20)->f[0x80 / 4], lt1->pos) < 0.01f) {
+                    ((Hero *)D_00189E20)->f[0x84 / 4] += 0.01f;
                 }
             }
             ok2 = 0;
@@ -803,15 +801,15 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 func_L11_00441090(obj);
             }
             if (D_L11_001A8FF4 == 0) {
-                if (HERO->f[0x88 / 4] > 480.0f && HERO->f[0x180 / 4] < 0.033333335f) {
+                if (((Hero *)D_00189E20)->f[0x88 / 4] > 480.0f && ((Hero *)D_00189E20)->f[0x180 / 4] < 0.033333335f) {
                     D_L11_001A8FF4 = 1;
                     D_L11_001A8FF0 = 1;
                     func_L11_00447360((char *)obj);
                     func_L11_00447018(obj, 5);
                 }
                 if (D_L11_001A8FF4 == 0) {
-                    if (HERO->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < HERO->f[0x88 / 4]) {
-                        HERO->h[0x1F0 / 2] = 1;
+                    if (((Hero *)D_00189E20)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)D_00189E20)->f[0x88 / 4]) {
+                        ((Hero *)D_00189E20)->h[0x1F0 / 2] = 1;
                     }
                     if (D_L11_001A8FF4 == 0) {
                         goto tail9;
@@ -822,12 +820,12 @@ void func_US2_L11_0043F9DC(u8 *obj) {
             if (D_L11_001A8FF4 != 0 && st->mode == 3) {
                 OBJ->timer = 0;
                 OBJ->phase = 1;
-                rec6 = &TABLE[st->cls]->records[st->wave];
+                rec6 = &D_L11_001B14F8[st->cls]->records[st->wave];
                 for (c10 = 0; c10 < 6; c10++) {
                     st->counts[c10] = 0;
                 }
-                st->heading = func_00283248(HERO->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
-                                           HERO->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
+                st->heading = func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
+                                           ((Hero *)D_00189E20)->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
                 st->heading = func_00283B98(st->heading, -1.5707965f);
                 for (k10 = st->counts[3]; k10 < rec6->h[3]; k10++) {
                     func_L11_00440790(obj, 0xDF7, 1);
@@ -848,8 +846,8 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         } else if (OBJ->phase == 1) {
             func_L11_00440360(obj);
             func_L11_004461E8(obj);
-            if (TABLE[st->cls]->records[st->wave].b[4] != 0) {
-                func_L11_004471A8(obj, &TABLE[st->cls]->records[st->wave]);
+            if (D_L11_001B14F8[st->cls]->records[st->wave].b[4] != 0) {
+                func_L11_004471A8(obj, &D_L11_001B14F8[st->cls]->records[st->wave]);
             }
             func_L11_00447018(obj, 0);
             if (func_L11_00442710(obj) != 0) {
@@ -857,15 +855,15 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                     st->counts[c11] = 0;
                 }
                 st->lost = 0;
-                cl1 = TABLE[st->cls];
+                cl1 = D_L11_001B14F8[st->cls];
                 w1 = st->wave;
                 next1 = &cl1->records[w1 + 1];
                 if (w1 + 1 < cl1->count && next1->b[3] != 0) {
-                    st->heading = func_00283248(HERO->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
-                                               HERO->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
+                    st->heading = func_00283248(((Hero *)D_00189E20)->f[0x80 / 4] - ((f32 *)func_L11_004417E8(obj))[0],
+                                               ((Hero *)D_00189E20)->f[0x84 / 4] - ((f32 *)func_L11_004417E8(obj))[1]);
                     st->heading = func_00283B98(st->heading, -1.5707965f);
                     st->wave++;
-                    rec8 = &TABLE[st->cls]->records[st->wave];
+                    rec8 = &D_L11_001B14F8[st->cls]->records[st->wave];
                     for (k11 = st->counts[3]; k11 < rec8->h[3]; k11++) {
                         func_L11_00440790(obj, 0xDF7, 1);
                     }
@@ -931,7 +929,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         } else if (OBJ->phase == 2) {
             func_L11_004461E8(obj);
             if (OBJ->timer >= 0xB5) {
-                HERO->h[0x348 / 2] = 0;
+                ((Hero *)D_00189E20)->h[0x348 / 2] = 0;
                 D_L11_001A7CD8 = 5.0f;
                 func_L11_002D8EF8(0x81, 1);
                 OBJ->phase = 3;
@@ -939,8 +937,8 @@ void func_US2_L11_0043F9DC(u8 *obj) {
         } else if (OBJ->phase == 3) {
             D_L11_001A8FF4 = 0;
             D_L11_001A8FF0 = 0;
-            if (HERO->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < HERO->f[0x88 / 4]) {
-                HERO->h[0x1F0 / 2] = 1;
+            if (((Hero *)D_00189E20)->f[0x88 / 4] < D_L11_001B1580 && D_L11_001B1584 < ((Hero *)D_00189E20)->f[0x88 / 4]) {
+                ((Hero *)D_00189E20)->h[0x1F0 / 2] = 1;
             }
             func_L11_004461E8(obj);
             lt2 = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
@@ -962,7 +960,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                 cls2 = st->cls;
                 st->sound = 0;
                 st->owner = 0;
-                if (st->wave >= TABLE[cls2]->count) {
+                if (st->wave >= D_L11_001B14F8[cls2]->count) {
                     if (cls2 == 1 && D_001395B8[func_L11_0043E108(1)] == 0) {
                         func_002A7750(obj, 13, -1);
                         OBJ->timer = 0xB4;
@@ -979,7 +977,7 @@ void func_US2_L11_0043F9DC(u8 *obj) {
                     st->cls = 0;
                 }
                 func_L11_00442E38(obj);
-                rec9 = &TABLE[st->cls]->records[st->wave];
+                rec9 = &D_L11_001B14F8[st->cls]->records[st->wave];
                 func_L11_00441A58(obj, rec9->h[7]);
                 func_L11_00441D08(obj, rec9->h[6]);
                 OBJ->state = 8;

@@ -290,8 +290,6 @@ extern void func_002A93B0(void *);
 extern void func_L08_003391C0(void *, s32, s32, void *, float, float);
 extern void func_L08_00339220(void *, void *, s32, s32, float);
 extern void func_00282948(void *);
-#define PLAYER D_00189E20_14
-#define HIT D_L08_001BFF40
 /* An effect record (0x70 bytes) still owned by this moby and active. */
 #define EFFECT(i) ((EffectSlot *)(D_00188660 + (i) * 0x70))
 #define EFFECT_LIVE(i) (EFFECT(i)->owner == moby && EFFECT(i)->active)
@@ -306,7 +304,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
      * are reused below as the probe point, its offset and the contact normal. */
     float forward[4], thrust[4], nextPos[4], basis[4][4], angles[4], scratch[16];
 
-    if (D_L08_001A8F00 == 2 || PLAYER.animationState == 97) {
+    if (D_L08_001A8F00 == 2 || D_00189E20_14.animationState == 97) {
         moby->drawn = 0;
         moby->modeBits |= 1;
         return;
@@ -328,7 +326,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
                 p->flashRGB[2] = 0xd2;
                 func_002AB800(moby, p->flash);
                 p->health -= *(float *)(hit + 0x2c);
-                PLAYER.health = p->health;
+                D_00189E20_14.health = p->health;
                 if (p->health <= 0.0f)
                     moby->state = 5;
                 p->lastHit = *(u8 **)(hit + 0x20);
@@ -341,10 +339,10 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
     }
     func_002AB8C0(moby, p->flash);
     moby->f2c = *(float *)(moby->pClass + 0x24) * D_L08_001B19B4;
-    if (PLAYER.vehicle == moby && moby->state)
-        PLAYER.healthBar = (s32)(PLAYER.health / PLAYER.maxHealth * 200.0f);
+    if (D_00189E20_14.vehicle == moby && moby->state)
+        D_00189E20_14.healthBar = (s32)(D_00189E20_14.health / D_00189E20_14.maxHealth * 200.0f);
     else
-        PLAYER.healthBar = 200;
+        D_00189E20_14.healthBar = 200;
     fresh = 0;
     if (p->sound != -1)
         func_L08_00328BB0(p->sound, -1, -1, 1);
@@ -363,17 +361,17 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
         qzero(p->vel);
         switch (D_001A79F0) {
         case 8:
-            PLAYER.maxHealth = D_L08_001B19D4;
+            D_00189E20_14.maxHealth = D_L08_001B19D4;
             break;
         case 19:
-            PLAYER.maxHealth = D_L08_001B19D8;
+            D_00189E20_14.maxHealth = D_L08_001B19D8;
             break;
         default:
-            PLAYER.maxHealth = D_L08_001B19D0;
+            D_00189E20_14.maxHealth = D_L08_001B19D0;
             break;
         }
-        p->health = PLAYER.maxHealth;
-        PLAYER.health = p->health;
+        p->health = D_00189E20_14.maxHealth;
+        D_00189E20_14.health = p->health;
         p->f74 = 0;
         moby->state = 1;
         p->fx1a4 = -1;
@@ -382,18 +380,18 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
         p->fx1b0 = 0;
         break;
     case 1:
-        if (PLAYER.animationState != 28 && PLAYER.animationState != 22 &&
-            PLAYER.animationState != 57 && PLAYER.animationState != 111 &&
-            PLAYER.movementState != 2 && PLAYER.movementState != 4 &&
-            PLAYER.movementState != 3 && PLAYER.movementState < 13 &&
-            PLAYER.movementState != 7 && PLAYER.movementState != 10 &&
-            PLAYER.movementState != 16 && PLAYER.movementState != 5 &&
-            PLAYER.animationState != 98 && PLAYER.healthAvailable > 0 &&
-            D_L08_001A8F00 == 0 && PLAYER.available &&
-            (!PLAYER.attachment || (*(s16 *)(PLAYER.attachment + 0xaa) != 0x13e &&
-                                    *(s16 *)(PLAYER.attachment + 0xaa) != 0x46f)) &&
-            func_002A0558(moby, PLAYER.moby) < D_L08_001B18E0 &&
-            PLAYER.animationState != 49) {
+        if (D_00189E20_14.animationState != 28 && D_00189E20_14.animationState != 22 &&
+            D_00189E20_14.animationState != 57 && D_00189E20_14.animationState != 111 &&
+            D_00189E20_14.movementState != 2 && D_00189E20_14.movementState != 4 &&
+            D_00189E20_14.movementState != 3 && D_00189E20_14.movementState < 13 &&
+            D_00189E20_14.movementState != 7 && D_00189E20_14.movementState != 10 &&
+            D_00189E20_14.movementState != 16 && D_00189E20_14.movementState != 5 &&
+            D_00189E20_14.animationState != 98 && D_00189E20_14.healthAvailable > 0 &&
+            D_L08_001A8F00 == 0 && D_00189E20_14.available &&
+            (!D_00189E20_14.attachment || (*(s16 *)(D_00189E20_14.attachment + 0xaa) != 0x13e &&
+                                    *(s16 *)(D_00189E20_14.attachment + 0xaa) != 0x46f)) &&
+            func_002A0558(moby, D_00189E20_14.moby) < D_L08_001B18E0 &&
+            D_00189E20_14.animationState != 49) {
             s32 ready = func_002B0C28(7, 0x12ea, 1) != 0;
             if ((D_00138180[0x69] & 16) && ready) {
                 p->f190 = 0;
@@ -402,15 +400,15 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
                 func_L01_00323310(p->f194, p->f19c);
                 ref_US2_L08_004201E0_01(49, 0);
                 func_L00_002D2168(D_L08_001B1918, 0, 15.0f);
-                qcopy(PLAYER.rotation, moby->rot);
-                qcopy(PLAYER.position, moby->pos);
-                PLAYER.vehicle = moby;
+                qcopy(D_00189E20_14.rotation, moby->rot);
+                qcopy(D_00189E20_14.position, moby->pos);
+                D_00189E20_14.vehicle = moby;
                 moby->state = 3;
                 if (p->fx1b4 != -1 && EFFECT_LIVE(p->fx1b4))
                     func_002E59F8(p->fx1b4);
                 p->fx1b4 = -1;
-                PLAYER.moby->f9c = -1;
-                PLAYER.vehicleControl = 1;
+                D_00189E20_14.moby->f9c = -1;
+                D_00189E20_14.vehicleControl = 1;
             }
         }
         if (!EFFECT_LIVE(p->fx1b4))
@@ -421,7 +419,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
         func_00282978(&p->timer7c);
         inputStrafe = inputBrake = inputPitch = inputThrottle = inputTurn = 0.0f;
         if (moby->state == 3) {
-            PLAYER.vehicleControl = 1;
+            D_00189E20_14.vehicleControl = 1;
             if (D_00138180[0x68] & 0x80) {
                 if ((moby->seqA < 1 || moby->seqA > 3) && moby->seqB != 1 && moby->seqB != 2 &&
                     moby->seqB != 3) {
@@ -550,7 +548,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
             grounded = 1;
             p->vel[2] -= D_L08_001B1920 * 0.00027777778f;
             if (height != 0.0f) {
-                func_00282F20(basis[2], HIT.normal, 1.0f);
+                func_00282F20(basis[2], D_L08_001BFF40.normal, 1.0f);
                 func_00282DD8(basis[1], moby->mtx, basis[2]);
                 func_00282DD8(basis[0], basis[1], basis[2]);
                 qzero_nc(basis[3]);
@@ -606,10 +604,10 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
             collision = func_00278870(basis[0], D_L08_001B1914);
             if (!collision) {
                 if (D_001A79F0 == 19) {
-                    s32 saved = PLAYER.moby->collData;
-                    PLAYER.moby->collData = 0;
+                    s32 saved = D_00189E20_14.moby->collData;
+                    D_00189E20_14.moby->collData = 0;
                     collision = func_00277258(basis[0], 0, moby, D_L08_001B1914);
-                    PLAYER.moby->collData = saved;
+                    D_00189E20_14.moby->collData = saved;
                 } else {
                     collision = func_00277258(basis[0], 2, moby, D_L08_001B1914);
                 }
@@ -618,23 +616,23 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
             if (collision) {
                 if (func_00278E78() == 1 || func_00278E78() == 11)
                     moby->state = 5;
-                if (HIT.moby != PLAYER.moby) {
+                if (D_L08_001BFF40.moby != D_00189E20_14.moby) {
                     float give = 1.0f;
                     if (grounded) {
-                        HIT.point[0] -= basis[0][0];
-                        HIT.point[1] -= basis[0][1];
-                        if (HIT.point[0] < 0.050000004f)
-                            HIT.point[0] *= p->power;
-                        if (HIT.point[1] < 0.050000004f)
-                            HIT.point[1] *= p->power;
-                        HIT.point[0] += basis[0][0];
-                        HIT.point[1] += basis[0][1];
+                        D_L08_001BFF40.point[0] -= basis[0][0];
+                        D_L08_001BFF40.point[1] -= basis[0][1];
+                        if (D_L08_001BFF40.point[0] < 0.050000004f)
+                            D_L08_001BFF40.point[0] *= p->power;
+                        if (D_L08_001BFF40.point[1] < 0.050000004f)
+                            D_L08_001BFF40.point[1] *= p->power;
+                        D_L08_001BFF40.point[0] += basis[0][0];
+                        D_L08_001BFF40.point[1] += basis[0][1];
                     } else {
                         give = p->power;
                     }
-                    func_00282CC0(moby->pos, HIT.point, basis[1]);
-                    func_00282DD8(basis[3], HIT.normal, p);
-                    func_00282DD8(basis[2], basis[3], HIT.normal);
+                    func_00282CC0(moby->pos, D_L08_001BFF40.point, basis[1]);
+                    func_00282DD8(basis[3], D_L08_001BFF40.normal, p);
+                    func_00282DD8(basis[2], basis[3], D_L08_001BFF40.normal);
                     func_00282F20(basis[2], basis[2], 1.0f);
                     func_00282F20(p, basis[2], func_00282DB0(p, basis[2]) * give);
                     func_00282D30(p, p, D_L08_001B1924);
@@ -644,8 +642,8 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
             }
         }
         if (moby->state == 3) {
-            if (moby->pos[2] < HIT.lowest[2])
-                HIT.lowest[2] = moby->pos[2];
+            if (moby->pos[2] < D_L08_001BFF40.lowest[2])
+                D_L08_001BFF40.lowest[2] = moby->pos[2];
             if (p->power < 0.98f && (D_00138180[0x68] & 0x80)) {
                 if (p->fx1a8 == 0) {
                     if (!p->fx1ac)
@@ -661,7 +659,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
                     }
                 }
                 if (p->f68 < D_L08_001B031C[0]) {
-                    func_L08_0041E790(moby, HIT.lowest, D_L08_001B1B40,
+                    func_L08_0041E790(moby, D_L08_001BFF40.lowest, D_L08_001B1B40,
                         D_L08_001B1B38, D_L08_001B1B3C, D_L08_001B1B34,
                         D_L08_001B1B34, D_L08_001B1B44, D_L08_001B1B48);
                     if (!func_002A77E0(11)) {
@@ -670,7 +668,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
                         D_L08_001B99C0.phase = 0;
                     }
                 } else {
-                    func_L08_0041E790(moby, HIT.lowest, D_L08_001B1B58,
+                    func_L08_0041E790(moby, D_L08_001BFF40.lowest, D_L08_001B1B58,
                         D_L08_001B1B50, D_L08_001B1B54, D_L08_001B1B4C,
                         D_L08_001B1B4C, D_L08_001B1B5C, D_L08_001B1B60);
                 }
@@ -688,7 +686,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
             } else if (!EFFECT_LIVE(p->fx1b4)) {
                 p->fx1b4 = func_002E5DA0(9, 4, moby, 0x85c);
             }
-            func_L08_0041E790(moby, HIT.lowest, D_L08_001B1B28,
+            func_L08_0041E790(moby, D_L08_001BFF40.lowest, D_L08_001B1B28,
                 D_L08_001B1B20, D_L08_001B1B24, D_L08_001B1B1C,
                 D_L08_001B1B2C, D_L08_001B1B30, 1.0f);
         }
@@ -711,7 +709,7 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
             func_0029FCC0(moby, 1, scratch);
             func_00277F48(scratch, 0, moby, basis[2], D_L08_001B19C4);
         }
-        if (!fresh && PLAYER.vehicle == moby && (D_00138180[0x69] & 16)) {
+        if (!fresh && D_00189E20_14.vehicle == moby && (D_00138180[0x69] & 16)) {
             func_US2_L08_00420068(moby);
             moby->state = 1;
             if (!EFFECT_LIVE(p->fx1b4))
@@ -798,10 +796,10 @@ void func_US2_L08_004201E0(VehicleMoby *moby)
         if (forward[2] < 0.0f)
             forward[2] = 0.0f;
         forward[2] += 1.5f;
-        func_00282CC0(PLAYER.position, forward, moby->pos);
-        qcopy(PLAYER.cameraPosition, PLAYER.position);
-        PLAYER.cameraPosition[2] = moby->pos[2];
-        qcopy(PLAYER.rotation, moby->rot);
+        func_00282CC0(D_00189E20_14.position, forward, moby->pos);
+        qcopy(D_00189E20_14.cameraPosition, D_00189E20_14.position);
+        D_00189E20_14.cameraPosition[2] = moby->pos[2];
+        qcopy(D_00189E20_14.rotation, moby->rot);
     }
     moby->collData = *(s32 *)(moby->pClass + 0x10);
     if (moby->drawn && func_00282E48(moby->pos, D_L08_001B9B00) < 64.0f) {
