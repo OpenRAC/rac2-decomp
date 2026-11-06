@@ -211,7 +211,7 @@ void func_00280670(u32 *pixels, int index) {
     *(&D_001B8A10[index])->result = (float)(total - count) / (float)total;
 }
 
-INCLUDE_ASM("asm/game", func_00280710);
+/* func_00280710 -- see src/game/0027F128-copy-g8.c (built with -G8). */
 
 ASM_FUNC("asm/game", func_002808F8);
 
@@ -533,8 +533,6 @@ ASM_FUNC("asm/game", func_00283DB8);
 ASM_FUNC("asm/game", func_00283EB0);
 
 ASM_FUNC("asm/game", func_00283EF0);
-
-INCLUDE_ASM("asm/game", func_00284088);
 
 INCLUDE_ASM("asm/game", func_00284268);
 

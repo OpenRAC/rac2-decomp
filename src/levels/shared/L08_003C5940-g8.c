@@ -1,16 +1,5 @@
-/* func_L08_003C5940 (2732 B, levels 08, 19, 30): HUD draw for the Tabora bike. Written fresh from
- * m2c, Opus closer g1, 1 November 2026. Profile -O2 -G8 -ffunction-sections -g. 2732/2732 bytes,
- * 19 rows off, 0/1 places. Left:
- *  - head: the two GS packs (test, alpha) are staged as the front end needs, but sched1's interleave
- *    gives other t-registers (8 rows). 210 interleavings and a hill climb tried.
- *  - clamp: retail is `daddu a2,s1; movz a2,a0,a1`, this form `daddu a2,a0; movn a2,s1,v0` (5 rows).
- *    The cmove's tied operand decides it; about 170 min/max spellings tie.
- *  - segment loop: `or v0,a0,v0` in the slot, index in $v0; here $a0 (6 rows).
- * What closed the rest: `t`, `base`, `a`, `b` as single-set block locals (local-alloc gives f20/f21)
- * with y and x crossing the loop (global-alloc f24/f25); `fade` one function-level int; the divide in
- * its own statement for -g's nops; loop stores through a pointer local so the $gp pointer is not
- * hoisted; MACRO_ADDR on the colour table. */
 #include "common.h"
+
 typedef struct {
     float position[4];
     u8 pad10[0x5C - 0x10];
@@ -48,8 +37,9 @@ extern int D_L08_001AFAF4[] MACRO_ADDR;
 extern float D_L08_001AF9C4 __attribute__((sda)), D_L08_001AFA58 __attribute__((sda)), D_L08_001AFA5C __attribute__((sda));
 extern float D_L08_001AFA60 __attribute__((sda)), D_L08_001AFA64 __attribute__((sda)), D_L08_001AFA68 __attribute__((sda));
 extern float D_L08_001AFB1C __attribute__((sda)), D_L08_001AFB20 __attribute__((sda)), D_L08_001B031C __attribute__((sda));
-extern int *D_L08_001AFAD8 __attribute__((sda));
-extern int D_L08_0023E6A0[];
+/* Palette pointer storage, accessed through its word-pointer view as in RAC1 HUDs. */
+extern unsigned char D_L08_001AFAD8[4] __attribute__((sda));
+extern unsigned D_L08_0023E6A0[];
 extern char D_L08_001AFB28[];
 typedef struct { char pad[0x183C]; float health, maxHealth; } HudHero;
 extern HudHero D_00189E20;
@@ -75,6 +65,12 @@ extern void func_L08_002F5CB8(int, int, u64, u8 *, int, float);
 extern float func_L08_003277C0(int, float);
 extern void func_L08_00389B68(int, int, unsigned long, int, unsigned long);
 
+static __inline__ unsigned long PackGaugeFlag(unsigned long flags, unsigned char value, int shift)
+{
+    return flags | ((unsigned long)value << shift);
+}
+
+/* Draws the status gauge and updates its swizzled palette. */
 void func_L08_003C5940(char *object)
 {
     char text[16];
@@ -83,19 +79,20 @@ void func_L08_003C5940(char *object)
     unsigned long tex;
     float delta, angle;
     int fade;
-    int level, low, high, prev, less;
-    test = D_L08_001AFAE5 | (u64)D_L08_001AFAE6 << 1;
-    test |= (u64)D_L08_001AFAE7 << 4;
-    test |= (u64)D_L08_001AFAE8 << 12;
-    test |= (u64)D_L08_001AFAEB << 16;
-    test |= (u64)D_L08_001AFAEA << 15;
-    alpha = D_L08_001AFAE0 | (u64)D_L08_001AFAE1 << 2;
-    test |= (u64)D_L08_001AFAEC << 17;
-    alpha |= (u64)D_L08_001AFAE2 << 4;
-    alpha |= (u64)D_L08_001AFAE3 << 6;
-    test |= (u64)D_L08_001AFAE9 << 14;
-    alpha |= (u64)D_L08_001AFAE4 << 32;
-    func_L08_00389B68(2, 0x47, test, 0x42, alpha);
+    int level, low, high, i;
+    test = D_L08_001AFAE5;
+    test = PackGaugeFlag(test, D_L08_001AFAE6, 1);
+    test = PackGaugeFlag(test, D_L08_001AFAE7, 4);
+    test = PackGaugeFlag(test, D_L08_001AFAE8, 12);
+    test = PackGaugeFlag(test, D_L08_001AFAE9, 14);
+    test = PackGaugeFlag(test, D_L08_001AFAEA, 15);
+    alpha = D_L08_001AFAE0;
+    alpha = PackGaugeFlag(alpha, D_L08_001AFAE1, 2);
+    test = PackGaugeFlag(test, D_L08_001AFAEB, 16);
+    alpha = PackGaugeFlag(alpha, D_L08_001AFAE2, 4);
+    alpha = PackGaugeFlag(alpha, D_L08_001AFAE3, 6);
+    func_L08_00389B68(2, 0x47, test | ((unsigned long)D_L08_001AFAEC << 17),
+        0x42, alpha | ((unsigned long)D_L08_001AFAE4 << 32));
     func_00282978(&state->message);
     if (D_001A79F0 == 8) {
         if (state->message != 0) {
@@ -188,27 +185,18 @@ void func_L08_003C5940(char *object)
     }
     state->shown += delta;
     level = func_00283CF0(state->shown * 251.0f / D_00189E20.maxHealth) + 2;
-    if (level >= 0xFE)
+    if (level > 0xFD)
         level = 0xFD;
-    if (level <= 1)
+    if (level < 2)
         level = 2;
-    prev = state->segments;
-    low = level;
-    if (level >= prev)
-        low = prev;
-    high = prev;
-    if (high < level)
-        high = level;
-    for (; low <= high; low++) {
-        int index = (low & 0xE7) | ((low & 0x10) >> 1) | ((low & 8) << 1);
-        if (low < level) {
-            int *e;
-            int value = *(index + D_L08_0023E6A0);
-            e = index + D_L08_001AFAD8;
-            *e = value;
+    low = state->segments <= level ? state->segments : level;
+    high = state->segments < level ? level : state->segments;
+    for (i = low; i <= high; i++) {
+        int index = (i & 0xE7) | ((i & 0x10) >> 1) | ((i & 8) << 1);
+        if (i < level) {
+            (*(unsigned **)&D_L08_001AFAD8)[index] = D_L08_0023E6A0[index];
         } else {
-            int *e = index + D_L08_001AFAD8;
-            *e = 0x80000000;
+            (*(unsigned **)&D_L08_001AFAD8)[index] = 0x80000000;
         }
     }
     tex = func_0027C878(state->texture + D_L08_001AFA50);

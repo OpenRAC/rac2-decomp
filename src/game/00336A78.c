@@ -442,7 +442,52 @@ void func_003380B0(void *object, short *box, int style, char *text, int mode,
     box[9] = flags;
 }
 
-INCLUDE_ASM("asm/game", func_003384C0);
+/* Partial view of the shared screen/render state (see src/game/00274128.c). */
+typedef struct {
+    char pad[0xB0];
+    float fB0;
+} ViewState;
+extern ViewState D_001B9040;
+extern void func_0027AB40(void);
+extern int func_00335E08(void);
+extern void func_00300A00(int, float, float, unsigned int, float, float, float);
+
+/* Draws a frame when the level object exists: with the view scale at +0xB0 of D_001B9040
+   set to 0.62 (restored afterwards), the two sprites at +0x220C go at the left and right
+   ends and the four of +0x2210 at the corners, inset by 16; the last argument is computed
+   from the frame's height, then from its width. Colour = alpha << 24 | color. */
+void func_003384C0(char *obj, unsigned int alpha, unsigned int color, float top, float bottom, float left, float right)
+{
+    ViewState *view;
+    float saved, scale, uv, insetRight, insetLeft, border;
+
+    if (D_001A8CFC[0]) {
+        view = &D_001B9040;
+        scale = 1.0f;
+        saved = view->fB0;
+        view->fB0 = 0.62f;
+        func_0027AB40();
+        uv = ((bottom - top) - 26.0f) * 0.008928571827709675f;
+        uv = uv * 0.3110000193119049f + 0.03750000149011612f;
+        if (func_00335E08() == 1)
+            scale = 0.9f;
+        alpha <<= 24;
+        alpha |= color;
+        func_00300A00(*(int *)(obj + 0x220c), left, top, alpha, -1.0f, scale, uv);
+        border = 16.0f;
+        func_00300A00(*(int *)(obj + 0x220c), right, top, alpha, 1.0f, scale, uv);
+        uv = ((right - left) - 150.0f) * 0.003267973894253373f;
+        insetLeft = left + border;
+        insetRight = right - border;
+        uv = uv * 0.43300002813339233f + 0.10199999809265137f;
+        func_00300A00(*(int *)(obj + 0x2210), insetLeft, top, alpha, -1.0f, 1.0f, uv);
+        func_00300A00(*(int *)(obj + 0x2210), insetRight, top, alpha, 1.0f, 1.0f, uv);
+        func_00300A00(*(int *)(obj + 0x2210), insetLeft, bottom, alpha, -1.0f, -1.0f, uv);
+        func_00300A00(*(int *)(obj + 0x2210), insetRight, bottom, alpha, 1.0f, -1.0f, uv);
+        view->fB0 = saved;
+        func_0027AB40();
+    }
+}
 
 extern char *func_00288FB8(int);
 

@@ -675,7 +675,7 @@ destroy:
     func_0029F338(obj);
 }
 
-INCLUDE_ASM("asm/levels", func_L08_003C5940);
+/* Defined in L08_003C5940-g8.c. */
 
 /* Defined in L08_003C63F0-g8.c. */
 
@@ -707,7 +707,8 @@ void func_L08_003C66F0(char *obj) {
 
 /* func_L08_003C67B8 lives in L08_002F2D10-emit-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L08_003C6AB0);
+/* func_L08_003C6AB0 is in L08_003C6AB0-g8.c. */
+
 
 
 /* func_L08_003CD488 lives in the -g8 sibling file (it reads the level's scalars
@@ -721,8 +722,6 @@ extern void func_002A0F48();
 /* Defined in L08_003CD648.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L08_003CD708);
 
-INCLUDE_ASM("asm/levels", func_L08_003CDB78);
 
 INCLUDE_ASM("asm/levels", func_L08_003CDF98);

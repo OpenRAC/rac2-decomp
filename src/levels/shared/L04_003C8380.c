@@ -692,7 +692,7 @@ void func_L04_003FB990(unsigned char *m, void *vars)
 
 /* func_L04_003FBD80 is in the sibling file L04_003C8380-g8.c (it stores through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L04_003FBEF8);
+/* func_L04_003FBEF8 is in L04_003C8380-dome.c (its file has -g). */
 
 typedef struct {
     unsigned char pad0[0x74];

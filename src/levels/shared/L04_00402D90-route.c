@@ -1,17 +1,5 @@
-/* func_L04_00402D90: near miss, 1948/1952 bytes, 0 of 2 places (USA v1.01, 1 November 2026).
-
-   Profile: its own unit, `-O2 -G0 -ffunction-sections`.
-
-   A racer's route choice in Barlow and Joba. Calls, constants, stores and the branch layout
-   agree with retail, including the absolute link symbol compared with 40 (4 in level 04, 11
-   in Joba, as ref_L04_00400AB0_00 in L04_003C8380-path-g8.c). Things that mattered: the three
-   repeated sequences as macros with plain braces (a `do { } while (0)` puts loop notes, and a
-   `.p2align 3` nop, after them); the join taking the route as an argument and its distance in a
-   new variable; `fresh = 0` before the second random call; the inner if in the first branch
-   loop written with the assignment first.
-   What differs: retail keeps self in $s7, the rival record in $s2 and `fresh` in $s3 (here $s4,
-   $s3, $s2; declaration and assignment orders do not move them), and on the !fresh path it
-   reloads +0x54 before the end-of-branch test (4 bytes). */
+/* func_L04_00402D90 in a unit of its own: it needs -frac2-gcse-unsplit-edges (config/cflags.txt),
+   so gcse leaves the reload of the main route index at the label of the rejoin test. */
 
 #include "common.h"
 
@@ -86,12 +74,11 @@ void func_L04_00402D90(u8 *self)
 {
     float delta[4];
     u8 *s;
-    int k;
     u8 *p;
-    int fresh;
+    int i; /* 1 while a branch route may still be picked this frame, then the branch index */
 
     s = P(self, 0x68);
-    fresh = 1;
+    i = 1;
     p = P(P(s, 0x164), 0x68);
 
     if (I(s, 0x54) == -1) {
@@ -112,19 +99,19 @@ void func_L04_00402D90(u8 *self)
                     P(s, 0x110) = route;
                     JOIN_ROUTE(route);
                     SWAY();
-                    fresh = 0;
+                    i = 0;
                     NEXT_SWAY();
                     I(s, 0x240) = 1;
                     s[0xA1] = 180;
                 } else {
-                    fresh = 0;
+                    i = 0;
                 }
             } else {
                 if (func_002A7878(0.0f, 1.0f) < 0.9f) {
                     I(s, 0x240) = 1;
                     s[0xA1] = 180;
                 }
-                fresh = 0;
+                i = 0;
             }
         }
     }
@@ -141,46 +128,45 @@ void func_L04_00402D90(u8 *self)
             JOIN_ROUTE(route);
         }
     }
-    if (func_002829A8(s + 0xA1) != 0 && I(s, 0x240) == 0 && P(s, 0x110) == D_L04_001FE340[I(s, 0x54)]) {
-        if (fresh) {
-            for (k = 0; k < 5; k++) {
-                int id = ((int *)(s + 0x58))[k];
+    if (func_002829A8(s + 0xA1) != 0 && I(s, 0x240) == 0 && P(s, 0x110) == D_L04_001FE340[I(s, 0x54)]
+        && i) {
+        for (i = 0; i < 5; i++) {
+            int id = ((int *)(s + 0x58))[i];
+
+            if (id != -1) {
+                u8 *branch = D_L04_001FE340[id];
+
+                func_00282CF0(delta, branch + 0x10, s + 0xF0);
+                if (func_L00_002EE290(delta) < 25.0f) {
+                    if (func_002A77E0(2) == 0) {
+                        P(s, 0x110) = branch;
+                    } else {
+                        s[0xA1] = 120;
+                    }
+                }
+            }
+        }
+        if (D_L04_002C63C0[D_L04_001B090C].flags & 4) {
+            for (i = 0; i < 4; i++) {
+                int id = ((int *)(s + 0x6C))[i];
 
                 if (id != -1) {
                     u8 *branch = D_L04_001FE340[id];
 
                     func_00282CF0(delta, branch + 0x10, s + 0xF0);
                     if (func_L00_002EE290(delta) < 25.0f) {
-                        if (func_002A77E0(2) != 0) {
-                            s[0xA1] = 120;
-                        } else {
+                        if (func_002A77E0(2) == 0) {
                             P(s, 0x110) = branch;
+                        } else {
+                            s[0xA1] = 120;
                         }
                     }
                 }
             }
-            if (D_L04_002C63C0[D_L04_001B090C].flags & 4) {
-                for (k = 0; k < 4; k++) {
-                    int id = ((int *)(s + 0x6C))[k];
-
-                    if (id != -1) {
-                        u8 *branch = D_L04_001FE340[id];
-
-                        func_00282CF0(delta, branch + 0x10, s + 0xF0);
-                        if (func_L00_002EE290(delta) < 25.0f) {
-                            if (func_002A77E0(2) != 0) {
-                                s[0xA1] = 120;
-                            } else {
-                                P(s, 0x110) = branch;
-                            }
-                        }
-                    }
-                }
-            }
-            if (P(s, 0x110) != D_L04_001FE340[I(s, 0x54)]) {
-                JOIN_ROUTE(P(s, 0x110));
-                WOBBLE();
-            }
+        }
+        if (P(s, 0x110) != D_L04_001FE340[I(s, 0x54)]) {
+            JOIN_ROUTE(P(s, 0x110));
+            WOBBLE();
         }
     } else if (P(s, 0x110) != D_L04_001FE340[I(s, 0x54)] && I(s, 0x114) == I(P(s, 0x110), 0) - 1) {
         u8 *route = D_L04_001FE340[I(s, 0x54)];

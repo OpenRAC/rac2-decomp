@@ -2776,6 +2776,7 @@ src/levels/shared/L00_0037A2E8-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy 
 src/core/00132318-g8.c	-O2 -G8 -ffunction-sections -fno-gcse -fno-cse-follow-jumps
 src/levels/08_tabora/L08_00425AA8.c	-O2 -G0 -ffunction-sections -ffast-math
 src/levels/shared/L05_003979B0-g8.c	-O2 -G8 -ffunction-sections -g
+src/game/0027F128-resample.c	-O2 -G0 -ffunction-sections -fno-sched-interblock
 src/game/0027F128-glow.c	-O2 -G0 -ffunction-sections -fno-rerun-loop-opt
 src/game/0027F128-quad.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/08_tabora/L08_003D8CA8.c	-O2 -G0 -ffunction-sections -g
@@ -2783,6 +2784,7 @@ src/game/0026EA00-target.c	-O2 -G0 -ffunction-sections -g
 src/game/002E35E0-g8.c	-O2 -G8 -ffunction-sections -fmove-all-movables
 src/game/002E64A0.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/game/00345358-wrap.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/game/00345358-children.c	-O2 -G0 -ffunction-sections -fno-expensive-optimizations
 src/levels/shared/L00_00403730.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
 src/core/0011B140.c	sdk -O2 -G2 -ffunction-sections
 src/game/00308600-wavy.c	-O2 -G0 -ffunction-sections -g
@@ -4067,6 +4069,18 @@ src/pal/levels/shared/L00_00410630-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00296870-map-g8.c	-O2 -G8 -Wa,-G64 -ffunction-sections -ffast-math -g
 src/pal/levels/shared/L16_0040B0C8-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/pal/levels/shared/L19_003E4048.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g -ffast-math
+src/levels/shared/L00_0038B208-g8-qcopy.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-gcse-unsplit-edges
+src/levels/11_joba/L11_004465F8-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
+src/levels/shared/L00_003E6030-g8.c	-O2 -G8 -ffunction-sections -ffast-math
+src/levels/shared/L08_003CD708-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L08_003CDB78-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L00_0041ABB8-anim-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L00_0041ABB8-homing.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L08_003C5940-g8.c	-O2 -G8 -ffunction-sections -g
+src/levels/shared/L08_003C6AB0-g8.c	-O2 -G8 -ffunction-sections -g -ffast-math -frac2-qcopy -frac2-qcopy-barrier
+src/levels/shared/L04_00402D90-route.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/levels/shared/L04_003C8380-dome.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L09_0037FCE8-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/game/0033423C-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/pal/levels/12_todano/L12_0041D6B4-g8.c	-O2 -G8 -fno-sched-interblock -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L19_003E0F5C-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges

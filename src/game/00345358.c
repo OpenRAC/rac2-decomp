@@ -951,5 +951,3 @@ void func_0034CE28(int *self, int value)
 
 /* Measured target: byte-identical across all 27 levels. */
 void func_0034CE98(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x2bc) = a1; }
-
-INCLUDE_ASM("asm/game", func_003486A8);

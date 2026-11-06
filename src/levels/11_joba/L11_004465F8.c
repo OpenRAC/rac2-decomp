@@ -43,7 +43,7 @@ extern s32 func_441868(s32 a0, s32 a1);
 extern s32 func_33C800(char *a0, s32 a1, s32 a2, s32 a3, float f12, float f13);
 
 
-INCLUDE_ASM("asm/levels", func_L11_004465F8);
+/* func_L11_004465F8 is defined in L11_004465F8-g32.c. */
 
 /* func_L11_00446C78 is defined in L11_00446C78-g16.c. */
 

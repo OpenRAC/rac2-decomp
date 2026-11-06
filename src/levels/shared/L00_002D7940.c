@@ -191,8 +191,7 @@ INCLUDE_ASM("asm/levels", func_L00_002E2958);
 
 /* func_L00_002E2C30 is in L00_002D7940-fade.c. */
 
-/* func_L00_002E30B8 is a near miss: nonmatching/levels/func_L00_002E30B8.c */
-INCLUDE_ASM("asm/levels", func_L00_002E30B8);
+/* func_L00_002E30B8 is in L00_002D7940-g8.c. */
 
 #ifndef MACRO_ADDR
 #define MACRO_ADDR __attribute__((section(".sdata")))

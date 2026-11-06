@@ -1,4 +1,3 @@
-/* functional: medium. Complete packet owner; qualified C matching remains blocked by copy scheduling. */
 #include "common.h"
 
 typedef float Vec[4] __attribute__((aligned(16)));
@@ -44,6 +43,7 @@ void func_L11_004465F8(char *self) {
     char *state = *(char **)(self + 0x68);
     char *points;
     float height;
+    float depth;
     if (*(float *)(state + 0x1BC) < D_L11_001B18FC) return;
     q.gs[1] = func_0027C878(D_L11_001B18A0);
     pos1 = q.pos[1];
@@ -65,9 +65,10 @@ void func_L11_004465F8(char *self) {
     for (i = 0; i < *(int *)points - 1; i = next_i) {
         mask = 0xFFFFFF;
         qcopy(q.pos[0], points + (i * 16 + 0x20));
-        q.pos[0][2] -= D_L11_001B18E8;
+        depth = D_L11_001B18E8;
+        q.pos[0][2] -= depth;
         qcopy(pos1, points + (i * 16 + 0x10));
-        q.pos[1][2] -= D_L11_001B18E8;
+        q.pos[1][2] -= depth;
         qcopy(pos2, points + (i * 16 + 0x20));
         q.pos[2][2] += height + D_L11_001B18F8 * func_00283180(func_00283C28(q.pos[0][1]));
         qcopy(pos3, points + (i * 16 + 0x10));
@@ -99,9 +100,10 @@ void func_L11_004465F8(char *self) {
         func_00280B90(&q, 0, 0);
     }
     qcopy(q.pos[0], points + 0x10);
-    q.pos[0][2] -= D_L11_001B18E8;
+    depth = D_L11_001B18E8;
+    q.pos[0][2] -= depth;
     qcopy(pos1, points + (*(int *)points * 16));
-    q.pos[1][2] -= D_L11_001B18E8;
+    q.pos[1][2] -= depth;
     qcopy(pos2, points + 0x10);
     q.pos[2][2] += height + D_L11_001B18F8 * func_00283180(func_00283C28(q.pos[0][1]));
     qcopy(pos3, points + (*(int *)points * 16));

@@ -1,15 +1,3 @@
-/* 2 November 2026: retained nonmatching C; no linked matching credit.
- * Profile: -O2 -G8 -ffunction-sections -g.
- * USA v1.01 check: 1072/1068 bytes, 0/3 placements.
- * Full steering-controller C replaces the old screen. Typed measured input and hero prefixes
- * restore the full 0x40 frame and saved s2/high-half lifetime. The mode field has exactly the
- * two reads observed in retail; its volatile qualifier applies to the whole evidenced field.
- * Both integer and FP argument banks and float helper returns are preserved. Progression: 1020,
- * 1048, 1052, then 1072 bytes with the correct saved-register set. A QI-to-SI conversion still
- * emits an extra andi at the second mode read; unsigned widening and separating read lifetimes
- * tie. Remaining FP/control scheduling differs. Reopen on a truthful field type/lowering model
- * eliminating that extra extension. No linked or native-runtime validation.
- */
 #include "common.h"
 typedef struct { unsigned char pad[0x108]; float x,y,z,baseX,baseY,baseZ; unsigned char gap[0x80]; int flags; } SteeringInputs;
 extern SteeringInputs D_00138180;
@@ -49,12 +37,14 @@ extern float func_00283BE0(float,float),func_00283B98(float,float),func_00282C48
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
 
-typedef struct { unsigned char pad[0x20]; volatile unsigned char mode; } SteeringObject;
+typedef struct { unsigned char pad[0x20]; unsigned char mode; } SteeringObject;
 
-/* Smooth the steering and orientation targets from the combined controls. */
+/* Smooth the steering and orientation targets from the combined controls.
+ * mode is 64-bit: its (zero_extend:DI (mem:QI)) differs from the (zero_extend:SI) of the first
+ * test, so gcse keeps the second read of the field that retail has. */
 void func_L08_003CD708(SteeringObject *object,char *state,float inputScale)
 {
-    unsigned int mode;
+    u64 mode;
 
     float gain=D_L08_001B0028;
     float targetX,targetY,bias=0.0f;
