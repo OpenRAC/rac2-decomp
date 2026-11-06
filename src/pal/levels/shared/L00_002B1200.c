@@ -55,10 +55,6 @@ ret:
     return;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_002B20F8);
-
-
-
 extern void func_L00_002B1F90(void);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern int D_L00_001B18D8[] __attribute__((sda)), D_L00_001B19C8[] __attribute__((sda));
@@ -113,9 +109,6 @@ void func_PAL_L00_002B1E88(void)
         }
     }
 }
-
-
-
 
 extern void func_PAL_L00_002AF6C0(void);
 extern void func_PAL_L00_002B1E88(void);
@@ -188,4 +181,3 @@ void func_PAL_L00_002B2958(int mode, int value, char *object)
         }
     }
 }
-
