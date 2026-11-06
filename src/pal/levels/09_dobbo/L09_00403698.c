@@ -50,5 +50,4 @@ void func_PAL_L09_00403900(char *a0) {
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_00403B10);
 

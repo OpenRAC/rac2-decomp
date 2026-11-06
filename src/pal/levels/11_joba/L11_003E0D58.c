@@ -1,7 +1,6 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L11_003E0F10);
 
 #include "common.h"
 extern u8 *func_002A9640(s32 arg0, s32 arg1, s32 arg2);

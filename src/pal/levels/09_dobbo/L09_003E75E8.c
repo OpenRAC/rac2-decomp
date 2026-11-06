@@ -30,6 +30,3 @@ void func_PAL_L09_003E75E8(unsigned char *a0) {
         break;
     }
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_003E76B0);
