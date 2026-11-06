@@ -1243,6 +1243,11 @@ occur within a function and is not a function-boundary detector.
 retain two measured cleared-history exemptions: a0 to f0 before cvt.s.w f0,f0,
 and zero to f0 before c.lt.s f12,f0. Eight first-transfer witnesses split four
 requiring a nop and four not. A distance-two producer rule failed `func_002A7878`.
+Both apply only to an mtc1 appended to an empty history (function or section
+start). The retail survey: no nop only at function entry (`f_002EF240` in 28 level
+programs, boot `0x00283CE0`, handwritten `0x00129218`/`2C0`/`368`); after a branch slot
+gas fills with a nop the a0 pair keeps it (`func_L00_002E2958`, 27 programs), and the
+zero pair keeps it at all 147 label sites. `tests/test_mtc1_exemption.py`.
 
 Ten original no-nop sites in `0x00283C28`, `0x002A677C`, `0x002E0408`,
 `0x002E0558` can also be reproduced with explicit instruction ordering; ISA

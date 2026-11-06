@@ -93,7 +93,7 @@ e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mip
 99e6bdd7649c0f9af0e2e5c02518eb65001d34bda4b7c7430e3b101857db54da  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 ba947e44256e3d5144e353a4976aac931a4941acc8dcb1dc0fda99fa8b7b504a  gcc/flow.c
-d4031dbfc5e08005b6bdfd23685e02bdde46bf711236c419ebca655ba2f542a9  gas/config/tc-mips.c
+17c1a41578b92c102dea8c189e1e7372e637662e690d5226c87a4122a32d1225  gas/config/tc-mips.c
 6d4c688bdf8517a1da1b35a04bb1e3b6137093a6224b3ed52666581e3a7bd557  gcc/reload1.c
 2f6ffa23d379d620ec38db4e527b2cbd5583865195cd8b364aa2c1ce07433faf  gcc/loop.c
 a2dd997196a573b94aef15338115cfdb1c2a7e29f3dc1857597695f1a0bf9b20  gcc/cse.c
@@ -145,6 +145,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_qcopy_barrier.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_annulled_wide_stores.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_zero_ti_por.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_ti_one_gpr.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_mtc1_exemption.py"
 RAC2_GCC_SOURCE="$W/src/gcc/reload1.c" RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_reload_reg_used_guard.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_null_pointer_checks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_narrow_saves_below.py"
