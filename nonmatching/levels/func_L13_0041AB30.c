@@ -1,3 +1,4 @@
+/* 6 November 2026, lead: retail computes the row into v1, copies it to v0 and forms +0x460 from v1 and +0x560 from v0. Two row variables (q = p; separate i*16+s; q = p + 0x100), d/e cursor pointers and a per-j local all tie at 4 rows (cse merges the copy). Unit flags: -fmove-all-movables, -fno-cse-follow-jumps, -fcse-skip-blocks tie; -freduce-all-givs 15, -fno-strength-reduce 80. */
 /* 6 November 2026, round 3: unchanged, 460/460, 0/2, 4 rows (preheader copy).
  * New, all tie: a static inline row helper taking (p, p), (row) or (p+0x460, p+0x560);
  * the copy is always propagated. Flags: -fno-expensive-optimizations ties;

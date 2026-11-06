@@ -1,3 +1,14 @@
+/* 6 November 2026, round 7: body unchanged (996/996, 0/1, 9 rows). Cause found: retail's
+ * src base needs cse1 NOT to relate D-16 to the dst's D (then loop keeps (i*400 + reg[D-16]) and
+ * cse2 later turns it into D - 16), while cse2 must. Only a LOOP_END between them does that
+ * inside the body (cse.c stops there before loop), so every in-body group adds the exit-label
+ * alignment nop. A dst base pseudo `tab = D` before the loop (`&tab[i][h]`, bare D for src) gives
+ * retail's exact copy-loop registers and sum; with the `history` local removed too it is 9 rows,
+ * but D's lui/addiu land before the blez (source order). Behind `if (last > 0)` loop pass 2
+ * hoists tab out of the outer loop (same block as its uses), 980-988 bytes. Row = D[i] forms:
+ * 17 rows (hoisted high(D) takes $s1). ~135 compiles; dead ends: outer-loop row (44), index
+ * forms, src-first, `history` for either side, -fno-rerun-loop-opt, -fmove-all-movables.
+ */
 /* 6 November 2026, round 4 (second pass): best body below, 996/996, 0/1, 9 rows (was ~33).
  * Profile -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier (rerun-loop-opt ON).
  * The copy loop as `qcopy_nc(&D[i][h], &D[i][h - 1])` fixes the prologue s1/s2, keeps state in

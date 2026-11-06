@@ -1,3 +1,4 @@
+/* 6 November 2026, lead: the 2 real rows are sched1's register-weight tie-break: the store where `color` dies is issued first (writing color[1] last moves 0x44 first instead; color[0] last moves 0x40 first). Retail issues the uv[0] zero stores first, i.e. in retail `color` is still live after these stores or the zero stores outrank them; nothing in the current body keeps color live (it is reassigned before the second draw). */
 /* 6 November 2026: retained near miss, not linked or counted.
  * USA v1.01: 868/868 bytes, 0/27 places, first mismatch +0x108.
  * Reproduction unit: src/levels/shared/L00_002EC608-glow.c, default

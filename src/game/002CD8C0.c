@@ -173,7 +173,7 @@ int func_002CF188(char *object) {
 
 /* func_002CF340 is built from 002CF340-g8.c. */
 
-INCLUDE_ASM("asm/game", func_002CF5B0);
+/* func_002CF5B0 is built from 002CF5B0-g32.c. */
 
 /* func_002CF7F0 is built from 002CF7F0-g8.c. */
 

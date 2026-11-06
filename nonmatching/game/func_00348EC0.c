@@ -1,3 +1,4 @@
+/* 6 November 2026, lead: 24-run hill-climb over the four group statements gives 18 real rows (from 19); source below is that order. Reusing sp or n for start (19, 118), the loop bound as n (68) and a block-local h = D_001A7344 >> 1 (18) do not help. */
 /* 6 November 2026, round 2: new best C below (644/644, 0/28 USA, 19 words, was 25).
  * One group holding sp, n, half = (float)n * 0.5f and spf = (float)sp puts its loop-end
  * note between the (float)sp conversion and the D_001A7344 load: the whole centring block
@@ -109,9 +110,9 @@ void func_00348EC0(char *o)
         func_00336320(o + 0xE4);
         do {
             sp = (int)(D_001AE5F0 * D_001B23A4[0] + 0.5f);
-            n = menu->count;
             half = (float)n * 0.5f;
             spf = (float)sp;
+            n = menu->count;
         } while (0);
         start = (int)((float)(D_001A7344[0] >> 1) - spf * half);
         if (n > 0) {
@@ -144,3 +145,4 @@ void func_00348EC0(char *o)
         }
     }
 }
+

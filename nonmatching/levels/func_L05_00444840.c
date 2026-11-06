@@ -1,41 +1,42 @@
-/* 6 November 2026, USA v1.01, check.py only: retained 732/736 bytes,
- * 0/4 placements, frame 0x70. Profile: -O2 -G8 -ffunction-sections
- * -fno-rerun-loop-opt. New hypothesis: group the real table-class read inside
- * each infinite scan, so jump1 cannot duplicate its exit test. This removes
- * the peeled test; both scans retain the object's signed class read. Each
- * scan now has a fresh rule_class local, separate from the object classifier.
- * Remaining: first scan hoists table base/base+4, second scan is still pointer
- * reduced; saved-register allocation, exclusion-loop slots and constant 3
- * hoisting differ. The object/rule tables still have their measured sentinels.
- * No volatile access is retained. Volatile indexed reads gave 836 bytes;
- * grouping the whole scan gave 808; macro-address table declarations gave
- * 740 (load group) / 712 (rule pointer), with worse address/loop shapes.
- * Removing the load group gave 808; continue-form scans gave 740. None match.
- * Next useful experiment: preserve first-scan base rematerialization and the
- * second indexed multiply without disabling outer-loop invariant motion.
- * Historical source/profile measurements follow; their sizes refer to the
- * earlier pointer-scan body, superseded by the indexed draft below.
- */
-/* Retained target selection, 2026-10-28: best736/736B,0/4US.
- * Five bounded trials. Pointer-rule scans G0=748; indexed rules816; G8=744;
- * G8+no-rerun-loop-opt736 (size only); indexed+no-force-mem812, rejected.
- * Retail multiplies each table index by12 and reads signed object class in
- * each iteration. Pointer loops hoist LH/LHU and sign-extension; indexed
- * spelling retains excess arithmetic. Allocation of object/rule/stride differs.
- * Required best profile: -O2 -G8 -ffunction-sections -fno-rerun-loop-opt.
- * Current helper444D60 raw152B writes exactlyone32-bit word to each output,
- * returns no semantic value; AB1F0 actual C returns a32-bit address word.
- * State parameters need4B, object at leastAC, nullable definition at least48.
- * Both object/rule tables have incomplete declared extents and real sentinels.
- * The negated less-than tests retain retail's NaN rejection, unlike >=.
- *
- * closer D, 1 November 2026: 736 bytes with `i = 0; while (T[i].class != -1) { if (T[i].class != K) { i++; continue; }
- * range = T[i].range; break; }`, pos = object + 0x10 as a local, excluded[i] compared as `object != excluded[i]` and
- * D_001A79F0 read into a local before the second loop. Retail's two rule loops are invisible to loop.c: no strength
- * reduction (mult by the outer-hoisted 12 at the aligned label) and no hoist of the %lo. `for (...; i++)` with a break
- * reaches the same tail (`bnel; i++; addu a1,a0; lw 4(v0)`), but jump1's duplicate_loop_exit_test copies the whole
- * test and found arm ahead of the loop ("multiple entry points"). That copy is the only thing left to lose: the exit
- * code would need a CODE_LABEL, or more than LOOP_TEST_THRESHOLD insns. goto-in, inline helpers and do-while forms fail.
+/* 6 November 2026, lead: with -freduce-all-givs (2 rows: a1/a2 setup order before the second func_L05_00444D60 call; retail's first call keeps a1-then-a2): no change from int[2]/struct/shared int[4] target locals, pointer temporaries for either argument, a 150-step hill-climb over the 16 local declarations. */
+/* 6 November 2026 (round 6), USA v1.01, check.py only: 736/736 bytes, 0/4
+ * places, 7 differing rows. Profile: -O2 -G8 -ffunction-sections (the
+ * -fno-rerun-loop-opt switch is no longer needed).
+ * What fixed the loop shapes: each rule scan is a goto loop inside a
+ * do { ... } while (0) group whose first insn is a real assignment
+ * (range = 40 / j = 0). That group is "phony" to loop.c, so there is no
+ * strength reduction and no base hoist; its loop note still aligns the scan
+ * label and weights the scan refs. A separate index per scan (i, j) and a
+ * separate exclusion index n give retail's a0/a1/a2 and v0/v1/a0 choices.
+ * The -1 exit is a goto past the group and the found arm a break, so jump1
+ * keeps the found code as the fall-through and reorg emits bnel. The two
+ * frame-counter reads use sda array aliases (lui/lw on one register).
+ * Remaining: (1) prologue stores s7 early: the cursor init (addiu s7) is in
+ * the prologue block; retail has it after the first null test. Guarded
+ * do-while forms move it but leave an extra copy (v1 -> s7).
+ * (2) second D_L05_00444D60 call sets a1 before a2 (retail a2 first);
+ * `i = 0;` outside the group fixes this but then i = 0 is scheduled before
+ * range = 40. Round 6b: a scalar alias of the list's first word for the
+ * guard read removes the copy and fixes the prologue, but cursor then
+ * outranks the hoisted 12 (s6/s7 swap, 17 rows); pos assigned in the call
+ * arguments swaps s0/s1. Tried and rejected this round: for/while(1) scans (loop.c SR),
+ * label inside a group with outside back-edge, then-first arms (jump1 moves
+ * the found arm), indexed outer loop (giv not reduced), local scope or
+ * declaration order of the grid outputs, sched/gcse flag sweeps.
+ * 6 November 2026 (round 7): this C plus the standard -freduce-all-givs
+ * gives 2 rows (only the a1/a2 order): loop.c then reduces the outer
+ * `*cursor` giv (benefit 0, "not worth while" without the flag) and puts the
+ * cursor init in the preheader after the null test, as retail does. No unit
+ * uses that flag yet. Without it, an index over a local copy of the list
+ * (`cursor = D; while ((object = cursor[k]) != 0) ... k++`) is reduced too,
+ * but leaves a copy (v1 -> s7): 7 rows. a1/a2 in sched2: an arg move wins
+ * the tie when a later insn in the block before the group's loop note sets
+ * its register (i = 0 in a2 -> a2 first; range = 40 in a3 -> a3 first; both
+ * -> a2, a3, a1). Retail needs a2 alone boosted but range = 40 before i = 0,
+ * which no group start tried allows (group at call, dx, dy, pos, exclusion
+ * check or kind: 6-110 rows). Also no help: -fmove-all-movables,
+ * -malign-loops=2, -fno-strength-reduce, for(;;) scans, label-first groups
+ * (rotated or multiple entry), table pointer local, int target[2], px/py.
  */
 #include "common.h"
 extern void func_L05_00444D60(void *, int *, int *, int);
@@ -49,9 +50,9 @@ typedef struct { int object_class, screen_range; float world_range; } TargetRule
 extern TargetRule D_L05_002B87F0[];
 extern float D_L05_001B1B1C_gp SDATA(D_L05_001B1B1C);
 extern float D_L05_001B1B18_gp SDATA(D_L05_001B1B18);
-extern int D_001A79F0 NOT_SDA;
+extern int D_001A79F0[] __attribute__((sda));
 extern float D_L05_001B96C0[];
-extern int D_L05_001B2048 NOT_SDA;
+extern int D_L05_001B2048[] __attribute__((sda));
 
 static __inline__ int target_class(u8 *object)
 {
@@ -69,8 +70,8 @@ u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
     int i, kind, range;
     float dx, dy, distance;
     u8 **cursor, *object, *parameters;
-    u8 *pos;
     int state;
+    int n, j;
     func_L05_00444D60(position, &source_x, &source_y, 0);
     cursor = D_L05_001FB5E0;
     while ((object = *cursor) != 0) {
@@ -83,46 +84,49 @@ u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
         if (kind != 5 && kind != 15)
             goto next;
         if (excluded) {
-            for (i = 0; excluded[i] && object != excluded[i]; i++) {}
-            if (excluded[i])
+            for (n = 0; excluded[n] && object != excluded[n]; n++) {}
+            if (excluded[n])
                 goto next;
         }
-        pos = object + 0x10;
-        func_L05_00444D60(pos, &target_x, &target_y, 0);
+        func_L05_00444D60(object + 0x10, &target_x, &target_y, 0);
         dx = func_00283CE0(func_00282C30(target_x - source_x));
         dy = func_00283CE0(func_00282C30(target_y - source_y));
-        range = 40;
-        i = 0;
-        while (1) {
-            int rule_class;
-            do { rule_class = D_L05_002B87F0[i].object_class; } while (0);
-            if (rule_class == -1) break;
-            if (rule_class == *(s16 *)(object + 0xAA)) {
+        do {
+            range = 40;
+            i = 0;
+scan1:
+            if (D_L05_002B87F0[i].object_class == -1)
+                goto scan1_done;
+            if (*(s16 *)(object + 0xAA) == D_L05_002B87F0[i].object_class) {
                 range = D_L05_002B87F0[i].screen_range;
                 break;
             }
             i++;
-        }
+            goto scan1;
+        } while (0);
+scan1_done:
         if (!(dx < D_L05_001B1B1C_gp + (float)range) || !(dy < D_L05_001B1B1C_gp + (float)range))
             goto next;
         distance = D_L05_001B1B18_gp;
-        state = D_001A79F0;
-        i = 0;
-        while (1) {
-            int rule_class;
-            do { rule_class = D_L05_002B87F0[i].object_class; } while (0);
-            if (rule_class == -1) break;
-            if (rule_class == *(s16 *)(object + 0xAA)) {
-                distance = D_L05_002B87F0[i].world_range;
+        do {
+            j = 0;
+            state = D_001A79F0[0];
+scan2:
+            if (D_L05_002B87F0[j].object_class == -1)
+                goto scan2_done;
+            if (D_L05_002B87F0[j].object_class == *(s16 *)(object + 0xAA)) {
+                distance = D_L05_002B87F0[j].world_range;
                 break;
             }
-            i++;
-        }
-        if (state != 20 && distance < func_00282E48(D_L05_001B96C0, pos))
+            j++;
+            goto scan2;
+        } while (0);
+scan2_done:
+        if (state != 20 && distance < func_00282E48(D_L05_001B96C0, object + 0x10))
             goto next;
-        if (current && current == object && D_L05_001B2048 % 3 != 0)
+        if (current && current == object && D_L05_001B2048[0] % 3 != 0)
             return object;
-        if (!func_002761F8(D_L05_001B96C0, pos, 16, object, 0))
+        if (!func_002761F8(D_L05_001B96C0, object + 0x10, 16, object, 0))
             return object;
 next:
         cursor++;

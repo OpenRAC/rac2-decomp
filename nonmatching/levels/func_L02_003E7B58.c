@@ -1,3 +1,12 @@
+/* 6 November 2026, round 9: 972/972, 0/1, 11 real rows (18 before, counting stack-offset
+ * rows that the earlier "11" ignored). Writing phase inside the band loop
+ * (`float *phase = (float *)(state + 0x60)`) lets gcse hoist it into a late pseudo, so
+ * reload gives stride/band/phase retail's 0x160/0x164/0x168 slots; `off = band * 4`
+ * gives retail's addu operand order. Left: colour $a0/primitive $v1 (retail $v1/$a0) and
+ * the packet store order. Putting colour before primitive (needed for $v1) moves mode,
+ * primitive and band registers (19-33 rows). Hill-climbs over declarations and setup
+ * order (~450 runs, chained or split colour stores) and band types tie or worsen. */
+/* 6 November 2026, lead: hill-climb over the packet setup order (60 runs) cuts real instruction differences from 20 to 11; the band loop registers now match. Left: colour constant in $a0 (retail $v1), primitive in $v1 (retail $a0), band/phase stack slots 0x160 vs 0x168 and their store order. Split colour stores, a grey local, declaration orders and -freduce-all-givs/-fno-rerun-loop-opt/-fexpensive-optimizations tie at 11. Source below is the 11-row form. */
 /* 6 November 2026, round 3: unchanged, 972/972, 0/1, 22 rows. Slot order here is
  * phase 0x160, stride 0x164, band 0x168; retail is stride, band, phase. Writing phase[band]
  * inline from state (four forms, no phase local) gives 61 rows. A hill-climb over the
@@ -49,30 +58,30 @@ extern void func_00280B90(void *, void *, int);
 void func_L02_003E7B58(char *actor) {
     StripGeometry geometry;
     StripPacket packet;
-    float sample[4] __attribute__((aligned(16)));
     char *state;
-    float *phase;
     float flip;
+    float sample[4] __attribute__((aligned(16)));
     int band, piece;
     geometry = D_L02_002A52F0;
     state = *(char **)(actor + 0x68);
     flip = 0.0f;
     if (*(unsigned short *)(actor + 0x34) & 0x8000) flip = 1.0f;
-    packet.mode = 0xFF9000000260ULL;
     packet.tex0[0] = flip;
     packet.tex0[1] = 0.0f;
     packet.tex0[2] = 1.0f - flip;
     packet.tex0[3] = 0.0f;
-    packet.tex1[0] = flip;
     packet.tex1[1] = 1.0f;
-    packet.tex1[2] = 1.0f - flip;
-    packet.tex1[3] = 1.0f;
-    packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = 0x7F7F7F7F;
-    phase = (float *)(state + 0x60);
+    packet.mode = 0xFF9000000260ULL;
     packet.primitive = 5;
+    packet.tex1[2] = 1.0f - flip;
+    packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = 0x7F7F7F7F;
+    packet.tex1[0] = flip;
     packet.flags = 0x8000000000ULL;
+    packet.tex1[3] = 1.0f;
     for (band = 0; band < 3; band++) {
-        float scroll = phase[band] + 0.15f;
+        int off = band * 4;
+        float *phase = (float *)(state + 0x60);
+        float scroll = *(float *)((char *)phase + off) + 0.15f;
         for (piece = 0; piece < 3; piece++) {
             float first = ((float)func_00283CF0(scroll) - scroll) * 0.43094158f;
             int tile;

@@ -1,3 +1,42 @@
+/* 6 November 2026 (round 7), USA v1.01, check.py only: best C below unchanged
+ * (924/924, 0/1, 43 rows). Global-alloc dump: label (pseudo set 4 times, 10
+ * refs, life 47) is allocated before the dead mode/active pseudos, so it takes
+ * any free low register; it gets a2 only when a local field value sits in v1
+ * across its copy. Writing the 0x4a field through c
+ * (`c = field; c = (c & 0x2000) ? D_L11_001B1648 : color;`) does that: label
+ * a2 in all four draws (45 rows; the field then is a1, not v1). Retail's 0x4b
+ * and 0x4a draws (rounded int in v1, field hi a0/field v1) imply sched1 put the
+ * label copy after the fix there, before it in the first two draws. Tried
+ * without gain (~280 runs): field via phase/i/one/entry/label, two-step and if
+ * colour forms, literal 1 for active, separate labels per draw (combine merges
+ * the copy, 62-189 rows), all 36 c/x/fy orders in both late draws, and
+ * 180 hill-climb steps over helper and entry statements.
+ */
+/* 6 November 2026 (round 6), USA v1.01, check.py only: size fixed, 924/924 bytes,
+ * 0/1 placements, 43 normalized rows differ (73 before the half fix), under -O2 -G8 -ffunction-sections
+ * -fno-rerun-loop-opt -fno-gcse (-g makes no difference). Not a match.
+ * Fix for the four label copies (lessons 16/18): the inline helper with a dead
+ * display-mode test (as func_L11_004456A0) splits blocks, so combine keeps the
+ * label copy; converting to float inside the helper keeps the result local in v0;
+ * computing the colour before the rounding in the 0x4b/0x4a draws puts the field
+ * hi part in a0; one shared label variable then conflicts with v0/v1/a0/a1 and
+ * gets a2, as in retail. entry/half/one/sc/z variables with -fno-gcse give the
+ * retail prologue (s1 = 0x8710, f22/f20/f21) and the pulse must use sc.
+ * Loop hoist of the in-loop 0.5f (retail mtc1 into f2, a constant, not a
+ * load): the inline param temp had life 3 (two block notes) and was moved;
+ * copying the param into a local just before the add (`h = half; scaled =
+ * scaled + h;`) makes the constant load adjacent (life 1, not desirable).
+ * Param order, const param, product/sum arguments, `scaled += half` and a
+ * block macro (the test then dies, 904 bytes) did not.
+ * Remaining (43 rows, all register choice): the label now gets v1, not a2,
+ * because it lost its v1 conflict. In the 0x4b draw local-alloc gives the
+ * field hi part v1 and the field a0 (retail hi a0, field v1); in the 0x4a draw
+ * sched1 puts the label copy before the field load (retail after), so the field
+ * takes v0. The dead active/mode pseudos sit in a3/a2 there. Tried: colour as
+ * ternary/if/negated forms, `one` in the enabled calls (196 rows), mode in the
+ * condition, flag probes (-g, -fno-regmove, -frac2-hazard-labels, ...), and
+ * 105 hill-climb steps over statement order: no gain.
+ */
 /* 6 November 2026, USA v1.01, check.py only: retained original best C,
  * 904/924 bytes, 0/1 placements, frame 0x60, under -O2 -G8
  * -ffunction-sections -fno-rerun-loop-opt. No new match.
@@ -99,30 +138,59 @@ extern unsigned int D_L11_001B163C __attribute__((sda));
 extern unsigned int D_L11_001B1644 __attribute__((sda));
 extern unsigned int D_L11_001B1648 __attribute__((sda));
 
+extern int D_L11_001B3E00;
+
+static __inline__ float scaled_coord(int value, float scale, float half, int active)
+{
+    int mode = D_L11_001B3E00;
+    float scaled = (float)value * scale;
+    float h;
+    int result;
+    float coord;
+
+    h = half;
+    scaled = scaled + h;
+    result = (int)scaled;
+    coord = (float)result;
+
+    if (result != 0 && mode == active)
+        scaled = 1.0f;
+    return coord;
+}
+
 void func_L11_00443940(u8 *object, int enabled)
 {
     u8 *state;
-    int label, phase, i;
-    unsigned int color;
-    float pulse;
+    int label, phase, i, one, entry;
+    unsigned int color, c;
+    float x, fy, pulse, half, sc, z;
     if (D_L11_001A904C == 0) return;
     func_L00_0037B7B0();
+    entry = 0x8710;
     state = *(u8 **)(object + 0x68);
-    label = func_00336D50(D_L11_001A904C + 0x8710, 0x49);
-    func_00300A00((char *)label, D_L11_001B163C, (float)D_L11_001B1620,
-        (float)(int)((float)D_L11_001B1624 * D_L11_001B3E04 + 0.5f), D_L11_001B161C, 1.0f, 0.0f);
-    label = func_00336D50(D_L11_001A904C + 0x8710, 0x48);
-    func_00300A00((char *)label, D_L11_001B1638, (float)D_L11_001B1620,
-        (float)(int)((float)D_L11_001B1624 * D_L11_001B3E04 + 0.5f), D_L11_001B161C, 1.0f, 0.0f);
+    half = 0.5f;
+    one = 1;
+    label = func_00336D50(D_L11_001A904C + entry, 0x49);
+    x = (float)D_L11_001B1620;
+    fy = scaled_coord(D_L11_001B1624, D_L11_001B3E04, half, one);
+    sc = 1.0f;
+    z = 0.0f;
+    func_00300A00((char *)label, D_L11_001B163C, x, fy, D_L11_001B161C, sc, z);
+    label = func_00336D50(D_L11_001A904C + entry, 0x48);
+    x = (float)D_L11_001B1620;
+    fy = scaled_coord(D_L11_001B1624, D_L11_001B3E04, half, one);
+    func_00300A00((char *)label, D_L11_001B1638, x, fy, D_L11_001B161C, sc, z);
     phase = D_L11_001B30C8 % 50;
-    if (phase >= 25) pulse = 1.0f - (float)(phase - 25) * 0.04f;
+    if (phase >= 25) pulse = sc - (float)(phase - 25) * 0.04f;
     else pulse = (float)phase * 0.04f;
     color = func_00283D38(D_L11_001B1638, D_L11_001B163C, pulse);
     if (enabled) {
         if (*(short *)(state + 0x1e8) != 0) {
             label = func_00336D50(D_L11_001A904C + 0x8710, 0x4b);
-            func_00300A00((char *)label, (((InputView *)D_00138180)->field1a0 & 0x8000) ? D_L11_001B1644 : color,
-                (float)D_L11_001B1628, (float)(int)((float)D_L11_001B162C * D_L11_001B3E04 + 0.5f), D_L11_001B161C, 1.0f, 0.0f);
+            c = (((InputView *)D_00138180)->field1a0 & 0x8000) ? D_L11_001B1644 : color;
+            x = (float)D_L11_001B1628;
+            fy = scaled_coord(D_L11_001B162C, D_L11_001B3E04, 0.5f, 1);
+            func_00300A00((char *)label, c, x, fy, D_L11_001B161C, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x1e8) + 1; i < 13; i++) {
             if (!D_001395B8[func_L11_0043E108(TABLE[i][2])]) continue;
@@ -132,8 +200,10 @@ void func_L11_00443940(u8 *object, int enabled)
                 if (!choice->enabled) continue;
             }
             label = func_00336D50(D_L11_001A904C + 0x8710, 0x4a);
-            func_00300A00((char *)label, (((InputView *)D_00138180)->field1a0 & 0x2000) ? D_L11_001B1648 : color,
-                (float)D_L11_001B1630, (float)(int)((float)D_L11_001B1634 * D_L11_001B3E04 + 0.5f), D_L11_001B161C, 1.0f, 0.0f);
+            c = (((InputView *)D_00138180)->field1a0 & 0x2000) ? D_L11_001B1648 : color;
+            x = (float)D_L11_001B1630;
+            fy = scaled_coord(D_L11_001B1634, D_L11_001B3E04, 0.5f, 1);
+            func_00300A00((char *)label, c, x, fy, D_L11_001B161C, 1.0f, 0.0f);
             break;
         }
     }

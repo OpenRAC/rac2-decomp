@@ -7,6 +7,11 @@
  * hit jump_count >= 10, aborting before reaching the latch lw fp (insn 573).
  * Because flow.c:mark_set_1 never kills HARD_FRAME_POINTER ($fp), fp remains live
  * in opposite_needed, forcing must_annul=1 (bnel). Retained C below is unchanged.
+ * 6 November 2026, round 9: env-gated probes, forced on in all 8511 game units.
+ * A, resource.c jump limit 10 -> 11/15/16/20: target matches (1/1); 367 units change at 11,
+ * 560 at 20; sampled matched functions regress (4/4, e.g. func_L00_00308538 27 -> 0 places).
+ * B, flow.c mark_set_1 kills $fp after reload when !frame_pointer_needed (also with $fp not
+ * live at function end): target still 1 diff; 0 units change. Both hypotheses falsified.
  */
 /*
  * Tier: opus-2 (v2175; first reached by opus b1065). Recompiled in v2/c04 as an "-g8.c" unit

@@ -1,3 +1,10 @@
+/* 6 November 2026, round 7: unchanged best, 680/680, 0/28, 6 rows. Setting 0x106 in a local
+ * next to w (both moved by update_equiv_regs after sched1) gives retail's la/0x4410/0x106 order
+ * and v1, but 0x8000 is then issued in the same sched1 cycle as t[1]'s store, so 0xE loses a2
+ * (0xE t0, 0x30003 t2; 6 rows). Tied or worse: s2 as a top-level local (6), p or q reused for
+ * the final packet (25-30), w reused for 0x106 (107), 0xE as an early local (72), t[1] moved
+ * before t[0] or the cursor store (12-17), 0x4410 literal with 0x106 local (15; hill-climb 13).
+ */
 /* 6 November 2026, round 3: unchanged, 680/680, 0/28, 6 rows (0x106 before the
  * D_001A6480 la). Automatic hill-climb over the order of the final packet block
  * (s2 assignment, cursor store, t[0..9]; ~550 compiles, two seeds, also with t[8]

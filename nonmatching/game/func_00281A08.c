@@ -1,3 +1,15 @@
+/* 6 November 2026 (round 8): declaring `step` right after `ring` leaves five
+ * words, all one swap: retail step+1 0x964 / &matrix[3] 0x96C, ours reversed.
+ * Slots follow gcse PRE reaching-register order = expression-hash bucket order
+ * (gcse dump): &matrix[3] (plus fp 2352) bucket 14, matrix (plus fp 2304) 59,
+ * step+1 81, half 86 with a 93-bucket table (max_cuid ~186). Retail order
+ * step+1 < matrix < &matrix[3] < half needs matrix before &matrix[3], which no
+ * table of 61..113 buckets gives; 115 or 119 buckets (~230-240 pre-gcse insns,
+ * +45) do. Block-scoped `step` already puts step+1 before matrix. 70-step
+ * declaration hill-climb, step reusing k, unsigned step, matrix pointer locals,
+ * inline transform/packet helpers and -frac2-gcse-unsplit-edges /
+ * keep-block-order / hazard-labels gave nothing better.
+ */
 /* 6 November 2026: current game compiler, isolated unit with the profile below:
  * 980/980 bytes, 0/7 in each of USA v1.01, USA v2.00 and PAL. The current
  * retained draft differs at eight non-relocated words, all PRE spill offsets
@@ -48,7 +60,7 @@ void func_00281A08(UiVector *vertices, int vertex_count, UiVector *positions,
 {
     UiDrawPacket packets[16];
     UiVector matrix[4];
-    int ring, i, j, k, n, v, step, cur;
+    int ring, step, i, j, k, n, v, cur;
     float increment, t;
     unsigned int color;
 

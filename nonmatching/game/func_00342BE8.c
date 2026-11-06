@@ -1,3 +1,4 @@
+/* 6 November 2026, lead: the only real difference is the order of two stack stores into clip: retail y0, x1, y1, x0; ours y0, y1, x1, x0. Direct stores to menuClipGP (864 B), loading screenWidthGP (or width-1) into a local before the if (7-12 rows), x1 written last, and struct initializers / compound literal (932-964 B) all fail. */
 /* 6 November 2026: current game compiler, -O2 -G8 -ffunction-sections:
  * 900/900 bytes, 0/28 places in each release; only the +0x230/+0x234 stores
  * differ (sw $a0, 0x2C($sp) vs retail sw $v0, 0x24($sp)).

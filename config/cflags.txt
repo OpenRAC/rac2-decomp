@@ -1,5 +1,6 @@
 src/levels/shared/L08_00363320-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L03_00424C40-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
+src/levels/shared/L08_003DB518-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/levels/12_todano/L12_00429610.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L04_0043BEE8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/shared/L03_003CC238.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por -g
@@ -4002,3 +4003,6 @@ src/pal/levels/17_smolg/L17_003CBDF4-tilt-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/17_smolg/L17_003C7F18-motion-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/game/003469E8-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/07_siberius/L07_003FCC48-g8.c	-O2 -G8 -ffunction-sections
+src/game/002CF5B0-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
+src/levels/shared/L02_002EFB60-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses -frac2-sticky-volatile-refs
+src/levels/shared/L00_003C5310.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels -fmove-all-movables -frac2-sticky-volatile-refs

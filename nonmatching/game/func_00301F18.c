@@ -1,3 +1,4 @@
+/* 6 November 2026, lead: last call func_00282CC0(origin, origin, &position): retail a0, a2, then a1 (= copy of a0) in the jal slot; ours a0, a1, a2-in-slot. The previous call already gets retail's a2-first order (a2 = s0). Spelling the second or first argument as object+0x10 grows to 904 B; a block-local dst copy ties. */
 /* 6 November 2026, Codex follow-up: retained best source still 900/900 bytes,
  * 0/28 USA places, only +0x31c/+0x324 differ (last add's a1/a2 setup).
  * New pointer aliases for the position/origin at the group boundary and an
