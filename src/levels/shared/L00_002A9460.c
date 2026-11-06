@@ -32,7 +32,6 @@ extern void func_L00_002D3778(void *, void *, float);
 extern void func_L00_00310748(void *, int, void *, float, float);
 extern int func_L00_002ADF80(void);
 
-#define HERO ((HeroView_L00_002A9460 *)D_00189E20)
 
 void func_L00_002A9460(void)
 {
@@ -40,35 +39,35 @@ void func_L00_002A9460(void)
     float t, gap;
     unsigned char *m;
 
-    HERO->moby[0xA8] = 0xFF;
-    qcopy(HERO->moby + 0x10, &HERO->position);
+    ((HeroView_L00_002A9460 *)D_00189E20)->moby[0xA8] = 0xFF;
+    qcopy(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0x10, &((HeroView_L00_002A9460 *)D_00189E20)->position);
     func_L00_002A75D8();
-    qcopy(HERO->moby + 0xF0, &HERO->unk90);
+    qcopy(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0xF0, &((HeroView_L00_002A9460 *)D_00189E20)->unk90);
     func_L00_002A76B8();
-    func_00282AB0(HERO->moby + 0xC0, D_00189E20, 0x30);
-    func_002A0F48(HERO->moby);
-    m = HERO->moby;
+    func_00282AB0(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0xC0, D_00189E20, 0x30);
+    func_002A0F48(((HeroView_L00_002A9460 *)D_00189E20)->moby);
+    m = ((HeroView_L00_002A9460 *)D_00189E20)->moby;
     if ((*(unsigned char **)(m + 0x24))[6] != 0)
         m[0x63] = 0x10;
     else
         m[0x63] = 0x10;
-    if (HERO->unk1F0 != 0 || *(int *)(HERO->moby + 0x98) == 0)
+    if (((HeroView_L00_002A9460 *)D_00189E20)->unk1F0 != 0 || *(int *)(((HeroView_L00_002A9460 *)D_00189E20)->moby + 0x98) == 0)
         return;
-    qcopy(v, &HERO->position);
-    func_L00_002D3778(v, v, HERO->unk254);
-    gap = HERO->unk250 - HERO->unk254;
+    qcopy(v, &((HeroView_L00_002A9460 *)D_00189E20)->position);
+    func_L00_002D3778(v, v, ((HeroView_L00_002A9460 *)D_00189E20)->unk254);
+    gap = ((HeroView_L00_002A9460 *)D_00189E20)->unk250 - ((HeroView_L00_002A9460 *)D_00189E20)->unk254;
     if (gap < 0.05f)
         gap = 0.05f;
-    func_L00_00310748(HERO->moby, 0, v, HERO->unk264, gap);
-    t = HERO->unk264 + 0.05f;
-    if (HERO->unk229C == 4)
+    func_L00_00310748(((HeroView_L00_002A9460 *)D_00189E20)->moby, 0, v, ((HeroView_L00_002A9460 *)D_00189E20)->unk264, gap);
+    t = ((HeroView_L00_002A9460 *)D_00189E20)->unk264 + 0.05f;
+    if (((HeroView_L00_002A9460 *)D_00189E20)->unk229C == 4)
         t += 0.15f;
     if (func_L00_002ADF80() != 0)
-        t = HERO->unk254;
-    qcopy(v, &HERO->position);
+        t = ((HeroView_L00_002A9460 *)D_00189E20)->unk254;
+    qcopy(v, &((HeroView_L00_002A9460 *)D_00189E20)->position);
     func_L00_002D3778(v, v, t);
-    gap = HERO->unk250 - t;
+    gap = ((HeroView_L00_002A9460 *)D_00189E20)->unk250 - t;
     if (gap < 0.05f)
         gap = 0.05f;
-    func_L00_00310748(HERO->moby, 1, v, HERO->unk264, gap);
+    func_L00_00310748(((HeroView_L00_002A9460 *)D_00189E20)->moby, 1, v, ((HeroView_L00_002A9460 *)D_00189E20)->unk264, gap);
 }
