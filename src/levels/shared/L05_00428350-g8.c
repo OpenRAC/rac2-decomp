@@ -407,3 +407,75 @@ void func_L05_00441D40(Object_00441D40 *object)
     D_L05_001B1B78 = 0;
     func_L05_00442720();
 }
+
+extern float D_L05_001B1680 __attribute__((sda));
+extern float D_L05_001B1684 __attribute__((sda));
+extern float D_L05_001B169C __attribute__((sda));
+extern float D_L05_001B16A0 __attribute__((sda));
+extern float D_L05_001B16B4 __attribute__((sda));
+extern float D_L05_001B16B8 __attribute__((sda));
+extern float D_L05_001B16BC __attribute__((sda));
+extern float D_L05_001B16C0 __attribute__((sda));
+extern float D_L05_001B16C4 __attribute__((sda));
+extern float D_L05_001B16C8 __attribute__((sda));
+extern float D_L05_001B16CC __attribute__((sda));
+extern float D_L05_001B16D0 __attribute__((sda));
+extern float D_L05_001B16D4 __attribute__((sda));
+extern float D_L05_001B16D8 __attribute__((sda));
+extern float D_L05_001B16E8 __attribute__((sda));
+extern float D_L05_001B16EC __attribute__((sda));
+extern float D_L05_001B16FC __attribute__((sda));
+extern float D_L05_001B1700 __attribute__((sda));
+extern float D_L05_001B1704 __attribute__((sda));
+extern float D_L05_001B1708 __attribute__((sda));
+extern float D_L05_001B170C __attribute__((sda));
+extern float D_L05_001B1710 __attribute__((sda));
+extern int D_L05_001B16A4 __attribute__((sda));
+extern int D_L05_001B16A8 __attribute__((sda));
+extern int D_L05_001B16AC __attribute__((sda));
+extern int D_L05_001B16B0 __attribute__((sda));
+extern int D_L05_001B1714 __attribute__((sda));
+extern int D_L05_001B1718 __attribute__((sda));
+extern int D_L05_001B171C __attribute__((sda));
+extern int D_L05_001B1720 __attribute__((sda));
+extern float func_00283180(float), func_00283198(float);
+extern void func_L05_0042BB10(void *);
+extern void func_L05_0042B2C0(void *, void *, float, float, int, int,
+                           float, float, float, float);
+
+/* Advances five wrapped phases, then draws four layers along the actor heading. */
+void func_L05_0042AFE0(u8 *actor)
+{
+    float direction[4] __attribute__((aligned(16)));
+    D_L05_001B16D4 += D_L05_001B16D8;
+    if (D_L05_001B16D4 > 7.0f) D_L05_001B16D4 -= 7.0f;
+    else if (D_L05_001B16D4 < -7.0f) D_L05_001B16D4 += 7.0f;
+    D_L05_001B16E8 += D_L05_001B16EC;
+    if (D_L05_001B16E8 > 7.0f) D_L05_001B16E8 -= 7.0f;
+    else if (D_L05_001B16E8 < -7.0f) D_L05_001B16E8 += 7.0f;
+    D_L05_001B16FC += D_L05_001B1700;
+    if (D_L05_001B16FC > 7.0f) D_L05_001B16FC -= 7.0f;
+    else if (D_L05_001B16FC < -7.0f) D_L05_001B16FC += 7.0f;
+    D_L05_001B1704 += D_L05_001B1708;
+    if (D_L05_001B1704 > 7.0f) D_L05_001B1704 -= 7.0f;
+    else if (D_L05_001B1704 < -7.0f) D_L05_001B1704 += 7.0f;
+    D_L05_001B170C += D_L05_001B1710;
+    if (D_L05_001B170C > 7.0f) D_L05_001B170C -= 7.0f;
+    else if (D_L05_001B170C < -7.0f) D_L05_001B170C += 7.0f;
+    direction[0] = func_00283180(*(float *)(actor + 0xF8));
+    direction[1] = func_00283198(*(float *)(actor + 0xF8));
+    direction[2] = 0.0f;
+    func_L05_0042BB10(actor);
+    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B16A0, D_L05_001B1684, D_L05_001B1718, D_L05_001B16A8,
+                     D_L05_001B16D0 * 0.03225806355f,
+                     D_L05_001B16CC * 0.2f, 0.0f, D_L05_001B16D4);
+    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1714, D_L05_001B16A4,
+                     D_L05_001B16B8 * 0.03225806355f,
+                     D_L05_001B16B4 * 0.2f, D_L05_001B16FC, D_L05_001B16D4);
+    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1720, D_L05_001B16B0,
+                     D_L05_001B16C8 * 0.03225806355f,
+                     D_L05_001B16C4 * 0.2f, D_L05_001B1704, D_L05_001B16E8);
+    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B171C, D_L05_001B16AC,
+                     D_L05_001B16C0 * 0.03225806355f,
+                     D_L05_001B16BC * 0.2f, D_L05_001B170C, D_L05_001B16D4);
+}

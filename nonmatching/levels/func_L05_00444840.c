@@ -1,4 +1,21 @@
-/* 6 November 2026: -fno-gcse (with or without -fno-rerun-loop-opt) gives 696/704 bytes, -g ties. Retail hoists 12, -1, 3 and a lui into s4..fp before the object loop; this C does not. */
+/* 6 November 2026, USA v1.01, check.py only: retained 732/736 bytes,
+ * 0/4 placements, frame 0x70. Profile: -O2 -G8 -ffunction-sections
+ * -fno-rerun-loop-opt. New hypothesis: group the real table-class read inside
+ * each infinite scan, so jump1 cannot duplicate its exit test. This removes
+ * the peeled test; both scans retain the object's signed class read. Each
+ * scan now has a fresh rule_class local, separate from the object classifier.
+ * Remaining: first scan hoists table base/base+4, second scan is still pointer
+ * reduced; saved-register allocation, exclusion-loop slots and constant 3
+ * hoisting differ. The object/rule tables still have their measured sentinels.
+ * No volatile access is retained. Volatile indexed reads gave 836 bytes;
+ * grouping the whole scan gave 808; macro-address table declarations gave
+ * 740 (load group) / 712 (rule pointer), with worse address/loop shapes.
+ * Removing the load group gave 808; continue-form scans gave 740. None match.
+ * Next useful experiment: preserve first-scan base rematerialization and the
+ * second indexed multiply without disabling outer-loop invariant motion.
+ * Historical source/profile measurements follow; their sizes refer to the
+ * earlier pointer-scan body, superseded by the indexed draft below.
+ */
 /* Retained target selection, 2026-10-28: best736/736B,0/4US.
  * Five bounded trials. Pointer-rule scans G0=748; indexed rules816; G8=744;
  * G8+no-rerun-loop-opt736 (size only); indexed+no-force-mem812, rejected.
@@ -52,7 +69,8 @@ u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
     int i, kind, range;
     float dx, dy, distance;
     u8 **cursor, *object, *parameters;
-    TargetRule *rule;
+    u8 *pos;
+    int state;
     func_L05_00444D60(position, &source_x, &source_y, 0);
     cursor = D_L05_001FB5E0;
     while ((object = *cursor) != 0) {
@@ -65,34 +83,46 @@ u8 *func_L05_00444840(void *position, u8 **excluded, u8 *current)
         if (kind != 5 && kind != 15)
             goto next;
         if (excluded) {
-            for (i = 0; excluded[i] && excluded[i] != object; i++) {}
+            for (i = 0; excluded[i] && object != excluded[i]; i++) {}
             if (excluded[i])
                 goto next;
         }
-        func_L05_00444D60(object + 0x10, &target_x, &target_y, 0);
+        pos = object + 0x10;
+        func_L05_00444D60(pos, &target_x, &target_y, 0);
         dx = func_00283CE0(func_00282C30(target_x - source_x));
         dy = func_00283CE0(func_00282C30(target_y - source_y));
         range = 40;
-        for (rule = D_L05_002B87F0; rule->object_class != -1; rule++) {
-            if (rule->object_class == *(s16 *)(object + 0xAA)) {
-                range = rule->screen_range;
+        i = 0;
+        while (1) {
+            int rule_class;
+            do { rule_class = D_L05_002B87F0[i].object_class; } while (0);
+            if (rule_class == -1) break;
+            if (rule_class == *(s16 *)(object + 0xAA)) {
+                range = D_L05_002B87F0[i].screen_range;
                 break;
             }
+            i++;
         }
         if (!(dx < D_L05_001B1B1C_gp + (float)range) || !(dy < D_L05_001B1B1C_gp + (float)range))
             goto next;
         distance = D_L05_001B1B18_gp;
-        for (rule = D_L05_002B87F0; rule->object_class != -1; rule++) {
-            if (rule->object_class == *(s16 *)(object + 0xAA)) {
-                distance = rule->world_range;
+        state = D_001A79F0;
+        i = 0;
+        while (1) {
+            int rule_class;
+            do { rule_class = D_L05_002B87F0[i].object_class; } while (0);
+            if (rule_class == -1) break;
+            if (rule_class == *(s16 *)(object + 0xAA)) {
+                distance = D_L05_002B87F0[i].world_range;
                 break;
             }
+            i++;
         }
-        if (D_001A79F0 != 20 && distance < func_00282E48(D_L05_001B96C0, object + 0x10))
+        if (state != 20 && distance < func_00282E48(D_L05_001B96C0, pos))
             goto next;
         if (current && current == object && D_L05_001B2048 % 3 != 0)
             return object;
-        if (!func_002761F8(D_L05_001B96C0, object + 0x10, 16, object, 0))
+        if (!func_002761F8(D_L05_001B96C0, pos, 16, object, 0))
             return object;
 next:
         cursor++;

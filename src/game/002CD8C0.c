@@ -251,7 +251,6 @@ int func_002D2010(void) {
 }
 
 
-INCLUDE_ASM("asm/game", func_002D2188);
 
 int func_002D23D8(void) {
     if (D_001A8CFC[0] != 0) D_0025CADC = -300;

@@ -3744,3 +3744,4 @@ src/game/00326A10-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/game/0032F3D0-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/shared/L00_003DDEC8-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/shared/L00_004003F0-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
+src/game/002D2188-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin

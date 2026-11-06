@@ -1,4 +1,20 @@
-/* Claude Opus 5.5 (xhigh), task v1673. Best: 608/584 bytes default, 596/584 with
+/* 6 November 2026: 588/584 bytes, 0/2 USA v1.01 placements, default game
+ * -O2 -G0 -ffunction-sections. An explicit outer back edge removes the loop
+ * notes responsible for hoisting flags & 7, 1.2f and vector addresses: the
+ * frame is now retail's 0xA0 and flags occupy stack +0x30. This is a real
+ * loop, with no diagnostic guard or invented memory effect. The original
+ * primary draft currently measures 600 bytes with this checkout's compiler.
+ * Remaining: timer sign-extension is no longer hoisted, advance is cached in
+ * a saved register, and route/index/next and digit-loop registers/scheduling
+ * differ. Reusing index as the digit counter with an explicit saved offset
+ * gives 564 bytes via goto and 600 via for, both further from retail's body.
+ * One-pass groups around the call/body/timer and an ABI-preserving FP argument
+ * interleaving do not restore the one invariant retail hoists. An explicit
+ * digit back edge also gives 564. -fno-force-addr has no effect. Reopen on a
+ * real loop form that retains the timer-only invariant without extra effects.
+ */
+/* Historical 3 November 2026 measurements (superseded source; preserve these
+ * rejected experiments as constraints). Claude Opus 5.5 (xhigh), task v1673. Best: 608/584 bytes default, 596/584 with
  * -fno-rerun-loop-opt, 0/2 places. 50 and 57 of 146 retail instructions align; the earlier
  * draft aligned 44 and 49 (it reached 588 bytes with the flag, but with the wrong loop shape).
  *
@@ -46,7 +62,9 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
     polygon = D_L06_001FE500[path];
     timer = (flags & 0x40) ? -1 : 2;
     qcopy(previous, polygon + 0x10);
-    for (index = 0; index < *(int *)polygon; index += stride) {
+    index = 0;
+    if (index < *(int *)polygon) {
+route_point:
         func_00282F20(advance, D_L06_001B9A90, scale * 1.2f);
         qcopy(point, polygon + (index * 16 + 0x10));
         switch (flags & 7) {
@@ -69,5 +87,7 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
             break;
         }
         qcopy(previous, polygon + (index * 16 + 0x10));
+        index += stride;
+        if (index < *(int *)polygon) goto route_point;
     }
 }

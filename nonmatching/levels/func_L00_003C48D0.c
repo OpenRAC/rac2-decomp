@@ -1,12 +1,25 @@
-/* 6 November 2026, round 2: no change. Own -O2 -G0 unit, plain indexed body with
- * `next = i + 1`: 684/708. Outer loop as goto: 656 (gcse hoists D_1B2990 instead,
- * D-16 built from D); goto with -fno-gcse: 652 (addresses rebuilt as retail, but
- * D-16 from D and no madd). do-while or while outer loop: 684. sda attributes on the
- * arrays: 684. -fno-rerun-loop-opt: 692. Loop dump: threshold is about 45-54, so a
- * savings-2 life-4 address in a 152-insn loop is always desirable; retail's outer
- * loop is a real loop (aligned top label, nop) that moved nothing.
+/* 6 November 2026: retained best is now 700/708 bytes, 0/27 USA v1.01
+ * places, default -O2 -G0 -ffunction-sections (no extra per-file flags).
+ * Indexed points plus next=i+1 and an explicit halfword-table byte offset
+ * let the strand index die before the timer tail. This recovers the 0x120
+ * frame, s3 strand index, s5 timer offset and both post-copy madd operations.
+ * The single 800-byte point owner and all previous-point accesses stay bounded.
+ * Still different: the point base occupies s7 rather than being rematerialized,
+ * next occupies fp rather than s7, the alpha-table base is rebuilt after the
+ * inner loops rather than held in fp, and second-loop pointer allocation/order.
+ * Diagnostic baseline/dump objects agree: point-base pseudo 118 has 8 refs
+ * over 152 insns and is allocated s7. Retail rematerialization alone does not
+ * establish that its outer loop skipped loop.c; reload can rebuild hoisted bases.
+ * New trials: goto outer loop 656, goto plus -fno-gcse 652, indexed next with
+ * -Os 656; qcopy_nc ties indexed-next 684. Explicit timer offset yields 700;
+ * an indexed first timer guard, an owning union vector and a grouped complete
+ * alpha tail each tie 700. This body with -fno-rerun-loop-opt gives 688.
+ * Early opacity pointer, grouped opacity base, or separate negative-arm
+ * opacity pointer each give 684. Those variants are not retained.
+ * Next useful experiment: promote the real alpha-table base without extending
+ * the strand index's lifetime, then check rematerialization and loop allocation.
  */
-/* 6 November 2026: two new checks, no match; the body below is kept (696/708).
+/* Historical, earlier 6 November 2026: two checks, no match; then kept 696/708.
  * Plain indexed C (`func_00282CF0(delta[j], D[i][j], D[i][j - 1])`, j = 1..9, own
  * -O2 -G0 unit) gives retail's D_240070 operand but strength-reduces the outer loop
  * (frame 0x140). Writing the outer loop `for (i = 0; i < 5; i = next) { next = i + 1;`
@@ -63,43 +76,28 @@ extern float D_L00_001B29D4 __attribute__((sda));
 void func_L00_003C48D0(u8 *object)
 {
     Vector anchor, delta[10];
-    int i, j, color, alternate;
+    int i, j, color, alternate, next;
     u32 alpha;
     float numerator, ratio;
     qcopy(anchor, *(u8 **)(object + 0x68) + 0x30);
-    for (i = 0; i < 5; i++) {
-        if (D_L00_001B2990[i]) {
-            {
-                int previous_offset = i * (int)sizeof(D_L00_00240080[0]);
-                int current_offset = previous_offset + (int)sizeof(Vector);
-                for (j = 1; j < 10; j++) {
-                    void *current = (u8 *)&D_L00_00240080 + current_offset;
-                    void *previous = (u8 *)&D_L00_00240080 + previous_offset;
-                    func_00282CF0(delta[j], current, previous);
-                    previous_offset = current_offset;
-                    current_offset += (int)sizeof(Vector);
-                }
-            }
+    for (i = 0; i < 5; i = next) {
+        int timer_offset = i * 2;
+        next = i + 1;
+        if (*(s16 *)((u8 *)D_L00_001B2990 + timer_offset)) {
+            for (j = 1; j < 10; j++)
+                func_00282CF0(delta[j], D_L00_00240080[i][j], D_L00_00240080[i][j - 1]);
             qcopy(D_L00_00240080[i][0], anchor);
             D_L00_00240080[i][0][3] = 0.03999999910593033f;
-            {
-                int previous_offset = i * (int)sizeof(D_L00_00240080[0]);
-                int current_offset = previous_offset + (int)sizeof(Vector);
-                for (j = 1; j < 10; j++) {
-                    void *current = (u8 *)&D_L00_00240080 + current_offset;
-                    void *previous = (u8 *)&D_L00_00240080 + previous_offset;
-                    func_00282CC0(current, previous, delta[j]);
-                    ((float *)current)[3] = 0.03999999910593033f;
-                    previous_offset = current_offset;
-                    current_offset += (int)sizeof(Vector);
-                }
+            for (j = 1; j < 10; j++) {
+                func_00282CC0(D_L00_00240080[i][j], D_L00_00240080[i][j - 1], delta[j]);
+                D_L00_00240080[i][j][3] = 0.03999999910593033f;
             }
-            if (D_L00_001B2990[i] > 0) {
-                numerator = func_00283CE0(D_L00_001B2990[i]);
-                ratio = numerator / func_00283CE0(D_L00_001B29B0[i]);
-                D_L00_001B29A0[i] = func_00283CF0(D_L00_001AFF8C_gp * ratio);
+            if (*(s16 *)((u8 *)D_L00_001B2990 + timer_offset) > 0) {
+                numerator = func_00283CE0(*(s16 *)((u8 *)D_L00_001B2990 + timer_offset));
+                ratio = numerator / func_00283CE0(*(s16 *)((u8 *)D_L00_001B29B0 + timer_offset));
+                *(s16 *)((u8 *)D_L00_001B29A0 + timer_offset) = func_00283CF0(D_L00_001AFF8C_gp * ratio);
             } else
-                D_L00_001B29A0[i] = 0;
+                *(s16 *)((u8 *)D_L00_001B29A0 + timer_offset) = 0;
         }
     }
     for (i = 0; i < 5; i++) {

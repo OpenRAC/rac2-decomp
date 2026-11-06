@@ -1,4 +1,18 @@
-/* 6 November 2026: -g ties at 556; -fno-gcse 540; sdk 572. Swapping the delay set before the server read ties. Retail sched2 puts 9999 before the volatile server load, so dbr steals it into the bgez slot and the loop label needs one more alignment nop. */
+/* 6 November 2026, hill-climb: ~380 runs over independent store orders and server/delay
+ * order give the C below, 80 -> 78 rows (volatile read_active/read_error order kept). No
+ * order puts 9999 ahead of the volatile server load, so the bgez slot still differs.
+ */
+/* 6 November 2026: new best C below (556/576, 0/1 USA, 80 differing rows after relocation
+ * noise, was 108). Same game -O2 -G0 separate unit (the SDK profile gives frame 0xB0). Each
+ * buffer pair is one array, [0] through the SDATA gp name and [1] through a plain sda alias of
+ * the same symbol: sym+4 is a two-instruction macro store (`lui $at; sw`), so it stays out of
+ * the beqz delay slot and the whole first block now equals retail. Left: retail sets the 9999
+ * delay count first in the bgez target so reorg pulls it into that slot; here the volatile
+ * server load is scheduled first and the slot takes the error-path argument, which shifts
+ * the rest (server a0/-1 v1 in retail). No change from: delay set before the server read,
+ * delay-- before it, bind_result reused as the counter; delay set before the bind test (584);
+ * -fno-gcse (540); -fno-schedule-insns.
+ */
 /* Newly reconstructed sound initializer near miss, 2 November 2026.
  * Profile: game -O2 -G0 -ffunction-sections, separate unit.
  * Retained source:556/576 bytes,0/1 USA boot; frame0x40 and five saved GPRs.
@@ -44,11 +58,11 @@ typedef struct {
 extern u8 D_00146CC0[], D_00147CC0[];
 extern u8 D_00148CC0[], D_00149CC0[], D_0014ACC0[], D_0014B100[];
 extern u8 *D_001A74A0[] SDATA(D_001A74A0) __attribute__((sda));
+extern u8 *D_001A74A0_pair[] __asm__("D_001A74A0") __attribute__((sda));
 extern u8 *D_001A74B0[] SDATA(D_001A74B0) __attribute__((sda));
+extern u8 *D_001A74B0_pair[] __asm__("D_001A74B0") __attribute__((sda));
 extern u8 *D_001A74B8[] SDATA(D_001A74B8) __attribute__((sda));
-extern u8 *D_001A74A4[] __attribute__((sda));
-extern SoundBufferPair command_pair __asm__("D_001A74B0");
-extern u8 *D_001A74BC[] __attribute__((sda));
+extern u8 *D_001A74B8_pair[] __asm__("D_001A74B8") __attribute__((sda));
 extern int D_001A74F8[] SDATA(D_001A74F8) __attribute__((sda));
 extern int D_001A74C8[] SDATA(D_001A74C8) __attribute__((sda));
 extern int D_001A74D0[] SDATA(D_001A74D0) __attribute__((sda));
@@ -82,11 +96,11 @@ int func_00131DE8(int options)
     u8 *const command_buffer0 = D_00146CC0;
 
     D_001A74A0[0] = command_buffer0;
-    D_001A74A4[0] = command_buffer1;
+    D_001A74A0_pair[1] = command_buffer1;
     D_001A74B8[0] = D_0014ACC0;
-    D_001A74BC[0] = D_0014B100;
+    D_001A74B8_pair[1] = D_0014B100;
     D_001A74B0[0] = D_00148CC0;
-    command_pair.second = D_00149CC0;
+    D_001A74B0_pair[1] = D_00149CC0;
     if (options & 2)
         D_001A74F8[0] = 1;
     else
@@ -99,8 +113,8 @@ int func_00131DE8(int options)
             func_00115D48(D_001A7500, D_001A7528, 0xB1);
             for (;;) {}
         }
-        server = D_001A7064[0];
         delay = 10000;
+        server = D_001A7064[0];
         for (delay--; delay != -1; delay--) {}
         if (server != 0)
             break;
@@ -108,8 +122,8 @@ int func_00131DE8(int options)
 
     D_001A74C8[0] = 0;
     D_001A74D0[0] = 0;
-    D_001A74D8[0] = 0;
     D_001A7180[0] = 0;
+    D_001A74D8[0] = 0;
 
     do {
         bind_result = func_0011D450(D_001A7140, 0x123457, 0);
@@ -117,18 +131,18 @@ int func_00131DE8(int options)
             func_00115D48(D_001A7500, D_001A7528, 0xC6);
             for (;;) {}
         }
-        server = D_001A7164[0];
         delay = 10000;
+        server = D_001A7164[0];
         for (delay--; delay != -1; delay--) {}
     } while (server == 0);
 
-    *(int *)D_00146CC0 = 0;
-    D_001A7100[0] = 0;
-    *(int *)D_00147CC0 = 0;
-    D_001A7110[0] = 0;
     D_001A74A8[0] = 0xFFC;
-    D_001A74AC[0] = 0xFFC;
+    D_001A7100[0] = 0;
     init.read_active = D_001A7100;
     init.options = options;
+    D_001A7110[0] = 0;
+    D_001A74AC[0] = 0xFFC;
+    *(int *)D_00146CC0 = 0;
+    *(int *)D_00147CC0 = 0;
     return func_00132C48(0, 8, &init);
 }

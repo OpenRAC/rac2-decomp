@@ -1,20 +1,23 @@
-/* Tier: Claude Opus 5.5 (xhigh), 3 November 2026. Game -O2 -G8 -ffunction-sections.
- * Best check: 948/964 bytes, 0/28 USA v1.01 places; 142 of 241 diff rows differ
- * (previous retained draft: 145). Change from the Sol-high draft: `moved` is now a
- * block-local in each movement section, which gives section 2 retail's $v1.
- * What differs:
- * (1) The animation temporaries are swapped (ours: $a0 = 3, $v1 = 1; retail:
- *     $v1 = 3, $a0 = 1). A block-local `animation` gets the retail registers but
- *     moves the `= 3` out of the beqz delay slot (956 bytes, beql).
- * (2) The purchase guard is 16 bytes short. Retail re-tests the held bit
- *     (bnez $a1), uses a copy of the state address ($a0 = $v0), reloads mode, and
- *     compares it with a fresh constant 3. All of this needs block B (the
- *     mode == 3 check) to be a separate cse block in both cse1 and cse2, with
- *     gcse PRE making the address copy. A static inline helper is fully cse'd
- *     (928 bytes). Mode stays volatile only to keep the reload.
- * Declarations: in 002F5220.c this needs the F73Record D_00239BA0 declaration from
- * func_002F73A8 (the body casts to char *), the file's D_00139568, D_00138180,
- * D_001A79F8 (MACRO_ADDR), D_0021F240 and int func_002E5CF8(int, int, void *).
+/* 6 November 2026: 964/964 bytes, 0/28 USA v1.01 placements, game
+ * -O2 -G8 -ffunction-sections in src/game/002F5220.c. First difference +0xC4.
+ * The two confirm alternatives must be a positive OR, each with its pressed,
+ * held and mode tests. This reproduces the repeated held-bit test, state-base
+ * copy and mode reload that the previous 948-byte nested guard lost. A separate
+ * activation pointer and the same F93State alias on refusal also recover the
+ * retail activation/refusal tails without inventing accesses.
+ * Remaining: the two animation selections swap the registers holding 3 and 1;
+ * the item-kind/index/record region uses v0/a0/a1 where retail uses v1/a1/a0.
+ * Measured new trials: one-pass groups at the guard (944/952), animation
+ * initialization/read/store (968), and item-id/kind reads (968); explicit
+ * selected/offset/id locals and narrower pointer lifetimes leave 964 bytes
+ * with the same allocation differences. Putting the animation expression
+ * wholly inside the animated branch gives 972 bytes. No exact credit.
+ * Historical constraints, 3 November: a fully inlined guard helper shrank
+ * the body to 928 bytes; declaring animation wholly within its conditional
+ * recovered its registers but moved the constant out of the delay slot.
+ * Required surrounding declarations remain those of 002F5220.c: F73Record
+ * D_00239BA0, D_00139568, D_00138180, D_001A79F8, D_0021F240 and
+ * int func_002E5CF8(int, int, void *). Full linked builds are left to the lead.
  */
 extern int D_001B2240, D_001B223C;
 extern int D_001B2244 __attribute__((sda));
@@ -104,15 +107,10 @@ void func_002F93B0(void)
     {
         Input_93 *input = (Input_93 *)D_00138180;
         ShopInput_93 *state;
-        if (input->buttons & 0x40) {
-            int held = D_001B2244 & 0x40;
-            if (!held) {
+        if (((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode != 3) ||
+            ((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode == 3 &&
+             *(int *)((char *)&F93State + 0x144 + F93State.selected * 12) != 0)) {
                 state = &F93State;
-                if (state->mode == 3) {
-                    if (held) goto finish;
-                    if (state->mode != 3) goto finish;
-                    if (*(int *)((char *)state + 0x144 + state->selected * 12) == 0) goto finish;
-                }
                 if (state->mode == 0) {
                     int stride = sizeof(ShopRow_93);
                     int *kinds = &state->rows[0].kind;
@@ -128,14 +126,15 @@ void func_002F93B0(void)
                     if ((*(int *)&D_001A79F8) < *(unsigned short *)(record + 0x88)) goto rejected;
                 }
 activate:
-                state = &F93State;
-                if (state->animated) state->animation = 1;
-                state->busy = 1;
-                func_002E5CF8(0, 17, state->moby);
-                goto finish;
+                {
+                    ShopInput_93 *active = &F93State;
+                    if (active->animated) active->animation = 1;
+                    active->busy = 1;
+                    func_002E5CF8(0, 17, active->moby);
+                    goto finish;
+                }
 rejected:
-                func_002E5CF8(2, 17, *(char **)(((char *)&D_0021F240) + 0x28));
-            }
+                func_002E5CF8(2, 17, F93State.moby);
         }
     }
 finish:

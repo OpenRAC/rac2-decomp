@@ -72,3 +72,4 @@ func_00345B78	boot: instruction at +0x20 differs
 func_0034E070	boot: instruction differs
 func_002CAF18	00_aranos_tutorial: instruction at +0x30 differs
 func_0033A520	00_aranos_tutorial: instruction at +0x24 differs
+func_00340638	00_aranos_tutorial: instruction at +0x34 differs

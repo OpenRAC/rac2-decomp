@@ -1,3 +1,15 @@
+/* 6 November 2026, hill-climb: ~380 runs over independent statement orders (pre-loop
+ * calls/pointers, loop stores, t computation, uv stores) give the C below, 39 -> 36 rows;
+ * the $f0/$f1 swap, n in s7 and the spill order remain.
+ */
+/* 6 November 2026: new best C below (692/692, 0/1 USA, 39 differing rows after relocation
+ * noise, was 42). Writing each arm as `t=(float)n; t=t/D` lets jump cross-jump the two
+ * div.s into retail's shared one. Left: the arms and join use $f1/$f0 where retail has $f0/$f1
+ * (each arm's D load is a local-alloc quantity and takes $f0 before global t). Loading D into
+ * a shared variable fixes the FPRs but merges more (688). Also left: n s7 (retail s6), the
+ * preheader spill order, the U store placement. No change: ternary numerator (45), divide at
+ * the join (688), arms swapped (45), u+t operand order.
+ */
 /*
  * func_L14_003DFA60 (692 bytes) -- tier opus-2, NOT MATCHING.
  * Best check.py: "14_aranos_prison: instruction at +0x10 differs", 0 of 1 places;
@@ -54,9 +66,9 @@ void func_L14_003DFA60(char *self) {
  func_L03_002EFB60(mtx,mtx,*(float *)(self+0x2C)/ *(float *)(*(char **)(self+0x24)+0x24));
  qcopy(mtx+12,self+0x10);
  mtx[15]=1.0f;
+ src2=D_L14_001B03B8;
  func_00281DE8(p.pos,D_L14_001B0394,0,0x80);
  src=D_L14_001B03BC;
- src2=D_L14_001B03B8;
  for(i=0;i<4;i++) {
   v=p.pos[i].f;
   angle=func_00283B98(D_L14_001B03A0*0.01745329424738884f,(float)i*1.5707964f);
@@ -68,18 +80,15 @@ void func_L14_003DFA60(char *self) {
   if(i&1)v[2]=-1.0f; else v[2]=1.0f;
   if(D_001A7A44[0])v[1]=-v[1];
   func_00282F20(v,v,D_L14_001B03A4);
-  v[2]+=D_L14_001B03B0;
   v[0]=D_L14_001B03A8;
   v[3]=1.0f;
+  v[2]+=D_L14_001B03B0;
   p.color[i]=D_L14_001B03AC;
-  uv=p.uv[i];
-  u=*src2;
-  uv[0]=u;
-  if(i<2)t=(float)n/D_L14_001B039C;
-  else t=(float)(n+1)/D_L14_001B039C;
+  uv=p.uv[i]; u=*src2; uv[0]=u;
+  if(i<2){t=(float)n;t=t/D_L14_001B039C;} else{t=(float)(n+1);t=t/D_L14_001B039C;}
+  p.uv[i][1]=*src; src+=2;
   uv[0]=u+t;
-  p.uv[i][1]=*src;
-  src+=2;src2+=2;
+  src2+=2;
  }
  func_00280B90(&p,mtx,0);
 }

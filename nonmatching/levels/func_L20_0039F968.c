@@ -1,5 +1,9 @@
-/* 6 November 2026: copy-loop source cursor as (D[i] - 1)[h], (&D[i][-1])[h] and a char-minus-16
- * view: unchanged (+0xB0). A row pointer local (row[h] = row[h-1], prev = row - 1): 988 B. */
+/* 6 November 2026: retained source unchanged (996/996, 0/1). Copy-loop source as
+ * `(&D_L20_00234880[0][-1] + i * 25)[h]` (or a cast to Vector (*)[25]) gives retail's grouping
+ * last*16 + (i*400 + (base-16)), but base-16 is then its own lui/addiu and comes before base;
+ * retail derives it from base (addiu a1,v0,-0x10), so base must be live first. Pointer-pair and
+ * `prev = &D[i][-1]` forms are worse (68-192 rows).
+ */
 /* Claude Opus 5.5 (opus-1, xhigh) worker, task v2165, 2026-11-03.
  * USA v1.01: 996/996 bytes, 0/1 places; first difference +0xB0. About 36 of
  * 249 rows differ once relocations are ignored, all in two places:

@@ -1,10 +1,12 @@
-/* 6 November 2026: 972/972 B, 0/1; 42 to 36 rows (+0x9C first).
- * mode, then primitive and flags, then the loop: retail's a1/a0 for mode/primitive and a1 for band.
- * flip = 0 after the state load: retail's andi/mtc1 order at +0x7C.
- * Still differs: colour constant in a0 (retail v1), the order of the packet stores, spill slots
- * (phase 0x160, band*0x24 0x164, band 0x168; retail 0x168/0x160/0x164) and `addu v1,v0,v1`.
- * Tied or worse: declaration order, phase statement position, inline state+0x60 (75 rows),
- * colour store order/position, flags before primitive. */
+/* 6 November 2026: 972/972, 0/1 USA, 22 rows (was first diff +0x7C). `state = ...; flip = 0.0f;`
+ * (flip set after the state load) fixes the lhu/andi/mtc1 order. This source order gives retail's
+ * colour register ($v1) and its whole packet store order. Left: mode $a0/primitive $a1/band $a0
+ * (retail $a1/$a0/$a1), and the phase spill slot 0x160 (retail 0x168, above stride 0x160 and
+ * band 0x164). Local-alloc needs colour > primitive > mode. A hill-climb over the setup order
+ * (about 500 orders) only trades this for colour/primitive $a0/$v1 (16 rows). Declaring band
+ * before phase, and phase inside the loop (folds 0x60 into lwc1), do not move the slot.
+ * Colour chain/split/local forms all tie.
+ */
 /* Retained reconstruction, updated 2 November 2026; not a linked match.
  * Profile: -O2 -G0 -ffunction-sections.
  * Current US check: 972/972 bytes, 0/1 placements, first difference +0x7C.
@@ -52,8 +54,6 @@ void func_L02_003E7B58(char *actor) {
     flip = 0.0f;
     if (*(unsigned short *)(actor + 0x34) & 0x8000) flip = 1.0f;
     packet.mode = 0xFF9000000260ULL;
-    packet.primitive = 5;
-    packet.flags = 0x8000000000ULL;
     packet.tex0[0] = flip;
     packet.tex0[1] = 0.0f;
     packet.tex0[2] = 1.0f - flip;
@@ -64,6 +64,8 @@ void func_L02_003E7B58(char *actor) {
     packet.tex1[3] = 1.0f;
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = 0x7F7F7F7F;
     phase = (float *)(state + 0x60);
+    packet.primitive = 5;
+    packet.flags = 0x8000000000ULL;
     for (band = 0; band < 3; band++) {
         float scroll = phase[band] + 0.15f;
         for (piece = 0; piece < 3; piece++) {

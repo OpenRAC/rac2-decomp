@@ -1,4 +1,17 @@
-/* 6 November 2026: -g with -fno-rerun-loop-opt still 904 bytes; the label copy is still folded into a0. */
+/* 6 November 2026, USA v1.01, check.py only: retained original best C,
+ * 904/924 bytes, 0/1 placements, frame 0x60, under -O2 -G8
+ * -ffunction-sections -fno-rerun-loop-opt. No new match.
+ * New trials: real one-pass groups around draws, rounding and the initial
+ * draw pair; inline rounding helper; and scratch reuse for label/rounded y.
+ * These stay 904 bytes. Six additional physical-ABI-preserving interleavings
+ * (within-bank argument order/count/width unchanged) also tie at 904.
+ * A 64-bit label local reaches 924 bytes through dsll32/dsra32 sign-extension
+ * pairs, NOT retail's two daddu copies; narrowing it explicitly before the
+ * pointer cast does not remove them. That size-only route is rejected.
+ * Retain the original 32-bit address contract and the original remaining
+ * blockers: four label copies, saved GPR/FP allocation and draw scheduling.
+ * No suitable donor found in RAC1/RAC4 searches. Historical note follows.
+ */
 /* Retained manual C reconstruction; not linked and not matching.
  * Profile: -O2 -G8 -ffunction-sections
  * Local tools/check.py measurements: us: 908 compiled bytes, 0/1 placements, exit 1; us2: 908 compiled bytes, 0/1 placements, exit 1; pal: 908 compiled bytes, 0/1 placements, exit 1.

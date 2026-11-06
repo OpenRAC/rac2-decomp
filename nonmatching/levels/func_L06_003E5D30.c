@@ -1,3 +1,15 @@
+/* 6 November 2026 recheck: retained source is 968/976 bytes, 0/3 USA v1.01
+ * places, -O2 -G8 -ffunction-sections. The RAC1 donor jitter_strand_grid_update
+ * (src/overlays/l10_orxon/platforms_doors_and_bombthrower.c) confirms the grid
+ * shape and separate else-loop counter; transcribing those choices stays 968.
+ * Regalloc's byte-identical diagnostic identifies state pseudo 85 (12 refs,
+ * live 140, fp) ahead of strand-offset pseudo 159 (3 refs, live 206, spilled).
+ * New one-pass groups: smoothing-call group reaches 976 but still keeps state
+ * in fp; grouping the column loop or position w store gives 1000, position y
+ * store gives 992, and explicit grouped strand-offset computation gives 952.
+ * Equal size does not repair allocation. Retain the earlier source; reopen
+ * with evidence that changes the strand-offset versus state lifetime/priority.
+ */
 /* func_L06_003E5D30: near miss, 968/976 bytes, 0 of 3 places (USA v1.01, 1 November 2026).
 
    Profile: its own `-g8` unit, `-O2 -G8 -ffunction-sections` (the three $gp floats come out

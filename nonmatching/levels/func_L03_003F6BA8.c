@@ -1,3 +1,14 @@
+/* 6 November 2026 recheck: the retained guarded source currently gives
+ * 740/736 bytes, 0/1 USA v1.01 places, default -O2 -G0 -ffunction-sections.
+ * New EE integer-address cursors avoid out-of-array pointer increments, but
+ * still give 720 bytes with a count loop and 728 with a packet-end loop and
+ * -g. Signed endpoint comparison fixes sltu versus retail slt. Reusing the
+ * first packet's color base for its stores and later cursors gives 732, but
+ * spills the endpoint and disturbs the earlier setup; grouping the first
+ * transform gives 724, other store/address groups stay 732. Explicit inner
+ * back edges also stay 732. These do not resolve the cached matrix pointer,
+ * color-base allocation or setup scheduling, so retain the guarded C below.
+ */
 /* Second pass, 3 November 2026: three defined aggregate/offset trials.
  * A real QuadPacket cursor deriving fields inside the body gives 712/736
  * bytes with a 0x360 frame. Whole-array byte-offset streams give 720/736
