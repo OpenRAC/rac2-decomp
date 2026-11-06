@@ -368,6 +368,29 @@ local flag copy retain the same core mismatch: retail's `bltzl`/`beqz`/`bnel`
 forms and delay-slot advance, plus the global-store and vtable register choices.
 The marker remains; this result does not support an `ASM_FUNC` classification.
 
+**6 November 2026, retained near miss (USA v1.01, `-O2 -G8 -ffunction-sections`):**
+`func_002B6658` and `func_L00_0032CF60`, the only two sites with `lw v1; beqz; nop;
+daddu a0; jalr v1; nop`. Hypothesis: one cause for the v1 callback and the a0 move
+that neither branch nor call slot takes, namely a call written as one inline asm
+statement. Measured: `"move $4,%0\n\tjalr %1"` with inputs `t` and the callback and
+clobbers `$2`, `$4`, `$31` produces all of it, without pins or `.set`. The `$2`
+clobber is `qcopy`'s style. Adding volatile `flags` reads for the unstolen `lhu` gives
+`tools/check.py` 28/28 and 27/27 (the sibling also needs `-g`); `func_002B6658` also
+passes diagnostic `tools/build.py boot --strict` and `level 0 --strict`. The sibling
+had no linked build, and PAL and v2.00 were not checked. The asm alone, with `"memory"`
+or with `-frac2-sticky-volatile-refs` keeps `beql` and the stolen `lhu`. This is not a
+match: AGENTS.md forbids both forms in linked C, so both markers stay. Next: a
+maintainer decision on a reviewed shared helper for this call, and a permitted cause
+for the `flags` reload. The exact forms are in the two `nonmatching/` notes.
+
+**6 November 2026, retained near miss (USA v1.01, `-O2 -G8 -ffunction-sections -fno-gcse`):**
+`func_L05_00420360`, `func_L10_004239A0` and `func_L15_00430168` are one body, differing
+in addresses and one text id. The earlier "invisible boundary" is the display-mode helper
+already matched in `func_0032F3D0` and `func_L08_003DB518`, not a dead-store wrapper. With
+it, L10 is 1064/1064 and 0/1, with 18 of 266 masked lines left (was 29). Remaining: one
+sprite argument order, the `strlen` result move and one FP register swap. Next: find what
+orders that move. The form and the forms that tied are in `nonmatching/levels/func_L10_004239A0.c`.
+
 **28 October 2026 recheck:** `func_00282AB0`'s retained `-O2 -G0` candidate
 is 156/160 bytes and 0/28 in USA v1.01. The retail `add`/`addi` operations
 and plain `beqz` layout remain distinct from cc1's `addu`/`addiu` and

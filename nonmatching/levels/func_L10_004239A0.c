@@ -1,3 +1,4 @@
+/* 6 November 2026: retained best, legal C. 1064/1064 bytes, 0/1, own -g8 unit with -O2 -G8 -ffunction-sections -fno-gcse (without -fno-gcse: 1048 bytes). 18 of 266 lines still differ with relocations masked (29 before, and that needed the rejected dead-store wrappers). This supersedes the do/while(0) reading below: the invisible boundary is the display-mode helper of func_0032F3D0 and func_L08_003DB518 (hud_coord, whose dead test goes at flow2), with half/one and half2/one2 locals, and y passed in the call (a separate y statement gives 1068 bytes, 103 lines). Left: row 1 mov.s f12/ori a1 order; the strlen result move, last in retail's 46 and 131 rows but early here (a0 last on 46, t1 on 131); 210 row f0/f1 swapped. No change (18 lines): y or x in the call on other rows, value*scale in screen_y or a separate 210 helper, len local, UL colour, z before the call, a float y local, real strlen declaration, int strlen, inline draw wrappers. Worse: hud_coord on the 131 row (23), value*scale in hud_coord (19). Next: find what orders the strlen move. func_L05_00420360 and func_L15_00430168 are the same body. */
 /* Faithful-source review, 4 November 2026; retained, not linked.
  * 1064/1064 bytes, 0/1 USA placement, first mismatch +0xC.
  * Remove all three do/while(0) wrappers and their dead conditional float assignments. Keep the real display-mode adjustments that affect a consumed coordinate. FP save/allocation, rounding and argument scheduling remain open.
@@ -56,35 +57,56 @@ extern char *func_00288FB8(s32);
 extern u8 *func_00336D50(u8 *, s32);
 extern void func_00300968(u8 *, u32, f32, f32, f32, f32);
 extern s32 func_00115DA8(char *, char *, ...);
-extern s32 func_001157AC(char *);
+extern u32 func_001157AC(char *);
 extern s32 func_0027FB40(s32, s32, u64, char *, s32);
 extern void func_L05_00303000(s32, s32, s32, s32, u64, char *, s32);
 extern void func_0027F5B8(s32, s32, u64, char *, s32);
+
+/* A HUD coordinate scaled for the display and rounded to a whole pixel. The display-mode
+   test has no effect on the result, but it is real (as func_L11_004456A0). */
+static __inline__ s32 hud_coord(f32 value, f32 scale, f32 half, s32 active)
+{
+    f32 scaled = scale * value + half;
+    s32 result = (s32)scaled;
+
+    if (result != 0 && D_L10_001B2D80[0] == active)
+        scaled = 1.0f;
+    return result;
+}
+
+/* A screen y scaled for the display and rounded, moved by adjust in display mode 1. */
+static __inline__ s32 screen_y(f32 value, f32 scale, f32 half, s32 active, f32 adjust)
+{
+    f32 scaled = scale * value + half;
+
+    if (D_L10_001B2D80[0] == active)
+        return (s32)(scaled + adjust);
+    return (s32)scaled;
+}
+
 s32 func_L10_004239A0(void) {
     char buf[128];
-    f32 center = func_00283CE0(D_001A7340[0]) * 0.5f;
+    f32 half = 0.5f;
+    f32 center = func_00283CE0(D_001A7340[0]) * half;
     u8 *sprite;
     char *text;
-    s32 x, y, count, index, sy;
-    f32 scaled, fy;
+    s32 x, y, count, index, one, one2, entry;
+    f32 w, sc, z, half2;
     if (D_L10_001A904C[0] != 0) {
-        sprite = func_00336D50(D_L10_001A904C[0] + 0x8710, 0x45);
-        sy = (s32)(D_L10_001B2D84[0] * 200.0f + 0.5f);
-        fy = sy;
-        func_00300968(sprite, 0x60442D00, center, fy, 1.0f, 0.0f);
-        sprite = func_00336D50(D_L10_001A904C[0] + 0x8710, 0x44);
-        sy = (s32)(D_L10_001B2D84[0] * 200.0f + 0.5f);
-        fy = sy;
-        func_00300968(sprite, 0x55F0C070, center, fy, 1.0f, 0.0f);
+        entry = 0x8710;
+        w = 200.0f;
+        one = 1;
+        sprite = func_00336D50(D_L10_001A904C[0] + entry, 0x45);
+        y = hud_coord(w, D_L10_001B2D84[0], half, one);
+        sc = 1.0f;
+        func_00300968(sprite, 0x60442D00, center, (f32)y, sc, z = 0.0f);
+        sprite = func_00336D50(D_L10_001A904C[0] + entry, 0x44);
+        y = hud_coord(w, D_L10_001B2D84[0], half, one);
+        func_00300968(sprite, 0x55F0C070, center, (f32)y, sc, z);
         func_00115DA8(buf, func_00288FB8(0x2F72), D_L10_001B143C + 1);
         text = func_00288FB8(0x2F93);
         x = func_00283CF0(center);
-        scaled = D_L10_001B2D84[0] * 46.0f + 0.5f;
-        if (D_L10_001B2D80[0] == 1)
-            y = (s32)(scaled + -2.0f);
-        else
-            y = (s32)scaled;
-        func_0027FB40(x, y, 0x80F0F0F0, text, func_001157AC(text));
+        func_0027FB40(x, screen_y(46.0f, D_L10_001B2D84[0], half, one, -2.0f), 0x80F0F0F0, text, func_001157AC(text));
         text = func_00288FB8(0x31CB);
         y = (s32)(D_L10_001B2D84[0] * 131.0f + 0.5f);
         func_L05_00303000(117, y, 280, 400, 0x80F0F0F0, text, func_001157AC(text));
@@ -95,15 +117,12 @@ s32 func_L10_004239A0(void) {
         text = buf;
         if (count == 0) func_00115DA8(buf, func_00288FB8(0x11FB));
         else func_00115DA8(buf, func_00288FB8(0x2FC6), count);
-        y = (s32)(D_L10_001B2D84[0] * 210.0f + 0.5f);
-        func_L05_00303000(117, y, 280, 400, 0x80F0F0F0, text, func_001157AC(text));
-        scaled = D_L10_001B2D84[0] * 294.0f + 0.5f;
-        if (D_L10_001B2D80[0] == 1) y = (s32)(scaled + 3.0f);
-        else y = (s32)scaled;
+        half2 = 0.5f;
+        one2 = 1;
+        func_L05_00303000(117, hud_coord(210.0f, D_L10_001B2D84[0], half2, one2), 280, 400, 0x80F0F0F0, text, func_001157AC(text));
+        y = screen_y(294.0f, D_L10_001B2D84[0], half2, one2, 3.0f);
         func_0027F5B8(117, y, 0x80F0F0F0, func_00288FB8(0x31CC), -1);
-        scaled = D_L10_001B2D84[0] * 294.0f + 0.5f;
-        if (D_L10_001B2D80[0] == 1) y = (s32)(scaled + 3.0f);
-        else y = (s32)scaled;
+        y = screen_y(294.0f, D_L10_001B2D84[0], 0.5f, 1, 3.0f);
         func_0027F5B8(274, y, 0x80F0F0F0, func_00288FB8(0x31CD), -1);
     }
     return 1;

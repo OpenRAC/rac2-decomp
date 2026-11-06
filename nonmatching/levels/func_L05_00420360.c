@@ -1,3 +1,4 @@
+/* 6 November 2026: the same body as func_L10_004239A0 apart from addresses and the 0x11F5/0x11FB/0x11FF text id; start from that file's retained form and note, not from this draft. */
 /* Complete C reconstruction; not linked and no matching credit.
  * 2026-10-30, game -O2 -G8 -ffunction-sections:
  * 1064/1064 bytes, USA v1.01 0/1; USA v2.00 and PAL identities absent.
