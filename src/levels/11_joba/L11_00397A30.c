@@ -10,7 +10,7 @@ typedef struct ParticleSettings {
     s32 frameCount;
     f32 speed;
 } ParticleSettings;
-extern ParticleSettings D_L18_001B0730 __attribute__((sda));
+extern ParticleSettings D_L11_001AECB8 __attribute__((sda));
 extern s32 func_002A77E0(s32);
 extern s32 func_002A7820(s32, s32);
 extern void func_002ACB48(f32 *, f32);
@@ -26,6 +26,6 @@ void func_L11_00397A30(char *self) {
         *(Quad *)point = *(Quad *)(self + 0x10);
         func_002ACB48(point, 0.1f);
         func_002ACB48(direction, 0.0016666668f);
-        func_L02_003449D8(point, direction, &D_L18_001B0730, (void *)1, func_002A7820(-5, 5));
+        func_L02_003449D8(point, direction, &D_L11_001AECB8, (void *)1, func_002A7820(-5, 5));
     }
 }

@@ -8,7 +8,7 @@
    has them (the same effect as func_L23_003BF9B0). Each division stays on a line of its own.
    The structs are partial layouts measured from this function.
    Measured on this body:
-   - the plain (unmarked) externs D_L23_001B2144, D_L23_001A8FF0, D_001A79F0 and D_L23_001B234C
+   - the plain (unmarked) externs D_L22_001B1AC4, D_L22_001A8FF0, D_001A79F0 and D_L22_001B1CCC
      come out absolute (`lui`+op) outside delay slots and $gp-relative inside them, as retail;
      the floats marked sda are $gp-relative everywhere;
    - the entry address is an integer sum with the scaled index first, which gives retail's
@@ -91,9 +91,9 @@ typedef struct CamMgr_004402D8 {
     Cam_004402D8 *cam; /* 0x190 */
 } CamMgr_004402D8;
 
-extern Entry_004402D8 *D_L23_001B2144;
+extern Entry_004402D8 *D_L22_001B1AC4;
 
-extern s32 D_L23_001A8FF0;
+extern s32 D_L22_001A8FF0;
 
 extern s32 D_001A79F0;
 
@@ -103,37 +103,37 @@ extern Player_004402D8 D_00189E20;
 
 extern Pad_004402D8 D_00138180;
 
-extern CamMgr_004402D8 D_L23_001BA500;
+extern CamMgr_004402D8 D_L22_001B9B40;
 
-extern s32 D_L23_001B234C;
+extern s32 D_L22_001B1CCC;
 
-extern f32 D_L23_001B1D6C __attribute__((sda));
+extern f32 D_L22_001B16BC __attribute__((sda));
 
-extern f32 D_L23_001B1EEC __attribute__((sda));
+extern f32 D_L22_001B183C __attribute__((sda));
 
-extern f32 D_L23_001B1EF4 __attribute__((sda));
+extern f32 D_L22_001B1844 __attribute__((sda));
 
-extern f32 D_L23_001B1EF8 __attribute__((sda));
+extern f32 D_L22_001B1848 __attribute__((sda));
 
-extern f32 D_L23_001B1EFC __attribute__((sda));
+extern f32 D_L22_001B184C __attribute__((sda));
 
-extern f32 D_L23_001B1F00 __attribute__((sda));
+extern f32 D_L22_001B1850 __attribute__((sda));
 
-extern f32 D_L23_001B1F04 __attribute__((sda));
+extern f32 D_L22_001B1854 __attribute__((sda));
 
-extern f32 D_L23_001B1F08 __attribute__((sda));
+extern f32 D_L22_001B1858 __attribute__((sda));
 
-extern f32 D_L23_001B1F0C __attribute__((sda));
+extern f32 D_L22_001B185C __attribute__((sda));
 
-extern f32 D_L23_001B1F10 __attribute__((sda));
+extern f32 D_L22_001B1860 __attribute__((sda));
 
-extern f32 D_L23_001B1F14 __attribute__((sda));
+extern f32 D_L22_001B1864 __attribute__((sda));
 
-extern f32 D_L23_001B1F18 __attribute__((sda));
+extern f32 D_L22_001B1868 __attribute__((sda));
 
-extern f32 D_L23_001B1F1C __attribute__((sda));
+extern f32 D_L22_001B186C __attribute__((sda));
 
-extern f32 D_L23_001B1F20 __attribute__((sda));
+extern f32 D_L22_001B1870 __attribute__((sda));
 
 extern f32 func_00282E48(void *, void *);
 
@@ -179,12 +179,12 @@ extern void func_L00_00424B20(f32);
 /* Same body as func_L23_004402D8, with this function's own callees. */
 void func_L22_0042ACA0(Moby_004402D8 *moby)
 {
-    Entry_004402D8 *entry = (Entry_004402D8 *)(moby->f84 * 32 + (s32)D_L23_001B2144);
+    Entry_004402D8 *entry = (Entry_004402D8 *)(moby->f84 * 32 + (s32)D_L22_001B1AC4);
     Vars_004402D8 *vars = entry->vars;
     s32 i;
 
     if (vars->f20 == 0) {
-        if (D_L23_001A8FF0 != 0 || (D_001A79F0 == 16 && D_0018C0B4 == 0x81)) {
+        if (D_L22_001A8FF0 != 0 || (D_001A79F0 == 16 && D_0018C0B4 == 0x81)) {
             f32 tmp[4];
 
             tmp[0] = entry->x;
@@ -196,12 +196,12 @@ void func_L22_0042ACA0(Moby_004402D8 *moby)
         }
         return;
     }
-    if (D_L23_001BA500.cam->f86 != 0
-        || (D_L23_001A8FF0 == 0 && (D_001A79F0 != 16 || D_0018C0B4 != 0x81))) {
-        if (D_L23_001B1F20 < func_002B0360(D_L23_001BA500.f140)) {
-            D_L23_001B234C = 3;
+    if (D_L22_001B9B40.cam->f86 != 0
+        || (D_L22_001A8FF0 == 0 && (D_001A79F0 != 16 || D_0018C0B4 != 0x81))) {
+        if (D_L22_001B1870 < func_002B0360(D_L22_001B9B40.f140)) {
+            D_L22_001B1CCC = 3;
         } else {
-            D_L23_001B234C = 0;
+            D_L22_001B1CCC = 0;
         }
         func_L00_00424940(moby);
         return;
@@ -233,7 +233,7 @@ void func_L22_0042ACA0(Moby_004402D8 *moby)
         func_L00_00424B48(0);
     }
     func_L00_00424C28();
-    func_L00_00424B70(D_L23_001B1EF4, 0.2f);
+    func_L00_00424B70(D_L22_001B1844, 0.2f);
     if (func_00282948(&vars->f50) != 0 && !(D_00189E20.f170 > 0.005f)) {
         func_L00_00424F00(D_00189E20.f2290 + 0xC0, 0.0052359886f, 0.0f);
     }
@@ -243,7 +243,7 @@ void func_L22_0042ACA0(Moby_004402D8 *moby)
     if (D_00189E20.f22B4 == 2) {
         s32 n;
 
-        D_L23_001BA500.cam->f70->f250 = 2;
+        D_L22_001B9B40.cam->f70->f250 = 2;
         n = 0;
         if (D_00189E20.f49E != 0) {
             n = func_00283CF0(func_L00_002D2A10(90.0f, D_00189E20.f520, -1.0f));
@@ -252,39 +252,39 @@ void func_L22_0042ACA0(Moby_004402D8 *moby)
             func_L00_00424B70(0.5f, 1.0f);
             func_L00_00424BB8(0.05f, 0.2f);
             func_L16_0042FB10(0.04f, 0.0f);
-            func_L00_00424A88(0, D_L23_001B1F14, 0.005f);
-            func_L00_00424A08(1, D_L23_001B1F08, 0.01f);
-            func_L00_00424A50(D_L23_001B1F0C, 0.01f);
-            D_L23_001B1D6C = D_L23_001B1F1C * 0.017453294f;
-            func_L00_00424B20(D_L23_001B1F18 * 0.017453294f);
+            func_L00_00424A88(0, D_L22_001B1864, 0.005f);
+            func_L00_00424A08(1, D_L22_001B1858, 0.01f);
+            func_L00_00424A50(D_L22_001B185C, 0.01f);
+            D_L22_001B16BC = D_L22_001B186C * 0.017453294f;
+            func_L00_00424B20(D_L22_001B1868 * 0.017453294f);
         } else {
             f32 d;
             f32 t;
             f32 a;
             f32 b;
 
-            func_L00_00424A88(0, D_L23_001B1F10, 0.03f);
+            func_L00_00424A88(0, D_L22_001B1860, 0.03f);
             if (D_00189E20.f229C == 2) {
                 func_L00_00424BB8(0.04f, 0.2f);
             } else {
                 func_L00_00424BB8(0.015f, 0.2f);
             }
             d = func_00282E48(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
-            if (D_L23_001B1EEC < d) {
-                d = D_L23_001B1EEC;
+            if (D_L22_001B183C < d) {
+                d = D_L22_001B183C;
             } else if (d < 0.0f) {
                 d = 0.0f;
             }
-            t = d / D_L23_001B1EEC;
-            a = (D_L23_001B1F00 - D_L23_001B1EF8) * t + D_L23_001B1EF8;
-            b = (D_L23_001B1F04 - D_L23_001B1EFC) * t + D_L23_001B1EFC;
+            t = d / D_L22_001B183C;
+            a = (D_L22_001B1850 - D_L22_001B1848) * t + D_L22_001B1848;
+            b = (D_L22_001B1854 - D_L22_001B184C) * t + D_L22_001B184C;
             func_L00_00424A08(1, a, 0.005f);
             func_L00_00424A50(b, 0.005f);
         }
-        if (D_L23_001B1F20 < func_002B0360(D_L23_001BA500.f140)) {
-            D_L23_001B234C = 3;
+        if (D_L22_001B1870 < func_002B0360(D_L22_001B9B40.f140)) {
+            D_L22_001B1CCC = 3;
         } else {
-            D_L23_001B234C = 0;
+            D_L22_001B1CCC = 0;
         }
     } else if (D_00189E20.f2294 == 0x81) {
         func_L00_00424BB8(0.05f, 0.2f);
@@ -314,12 +314,12 @@ void func_L22_0042ACA0(Moby_004402D8 *moby)
             f32 b;
 
             d = func_00282E48(D_00189E20.f80, D_00189E20.fB0) - vars->f24;
-            if (D_L23_001B1EEC < d) {
-                d = D_L23_001B1EEC;
+            if (D_L22_001B183C < d) {
+                d = D_L22_001B183C;
             } else if (d < 0.0f) {
                 d = 0.0f;
             }
-            t = d / D_L23_001B1EEC;
+            t = d / D_L22_001B183C;
             a = (vars->f48 - vars->f40) * t + vars->f40;
             b = (vars->f4C - vars->f44) * t + vars->f44;
             func_L00_00424A08(0, a, 0.003f);

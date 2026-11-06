@@ -41,13 +41,13 @@ extern char D_00189EA0[];
 extern unsigned char D_0019B2E8[];
 extern int D_001A79F0;
 extern unsigned char D_001A7BC8[] MACRO_ADDR;
-extern int D_L06_001A8F00;
-extern char D_L06_001B1810[];
-extern int D_L06_001B2348;
-extern char *D_L06_001B290C;
-extern char D_L06_001BFA40[];
-extern short **D_L06_002AA490[];
-extern char D_L06_002E2210[];
+extern int D_L05_001A8F00;
+extern char D_L05_001B0EB0[];
+extern int D_L05_001B2048;
+extern char *D_L05_001B260C;
+extern char D_L05_001BF8C0[];
+extern short **D_L05_002B82C0[];
+extern char D_L05_002BB6B0[];
 
 typedef struct {
     char pad00[0x10]; char pos[0x10];
@@ -87,15 +87,15 @@ void func_L05_00414F90(Thing *m)
             break;
         if (D_00189E20.health <= 0)
             break;
-        if (D_L06_001A8F00 != 0)
+        if (D_L05_001A8F00 != 0)
             break;
         if (p->msg != -1 && func_002ACBC8(D_00189E20.body, p->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L06_002AA490[D_001A79F0] != 0 && D_L06_002AA490[D_001A79F0][p->idx] != 0) {
-            for (i = 0; D_L06_002AA490[D_001A79F0][p->idx][i] != -1; i++) {
-                int e = D_L06_002AA490[D_001A79F0][p->idx][i];
+        if (D_L05_002B82C0[D_001A79F0] != 0 && D_L05_002B82C0[D_001A79F0][p->idx] != 0) {
+            for (i = 0; D_L05_002B82C0[D_001A79F0][p->idx][i] != -1; i++) {
+                int e = D_L05_002B82C0[D_001A79F0][p->idx][i];
 
                 missing = 0;
                 if (p->tail.b.quiet == 0) {
@@ -103,8 +103,8 @@ void func_L05_00414F90(Thing *m)
                     if (D_00139768[(unsigned int)e >> 2] & bit)
                         continue;
                 }
-                if (func_00288AA0(D_L06_001BFA40, e) == 0 && i == 0) {
-                    func_0026FEB8(D_L06_002E2210, m->id, m->oclass, D_001A79F0, p->idx, e);
+                if (func_00288AA0(D_L05_001BF8C0, e) == 0 && i == 0) {
+                    func_0026FEB8(D_L05_002BB6B0, m->id, m->oclass, D_001A79F0, p->idx, e);
                     return;
                 }
                 fail = 0;
@@ -116,7 +116,7 @@ void func_L05_00414F90(Thing *m)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                func_0026FEB8(D_L06_001B1810, D_001A79F0, p->idx);
+                func_0026FEB8(D_L05_001B0EB0, D_001A79F0, p->idx);
         } while (0);
         if (fail != 0) {
             p->tail.b.had = 0;
@@ -124,15 +124,15 @@ void func_L05_00414F90(Thing *m)
             break;
         }
         p->tail.b.had = 1;
-        func_00288BE8(D_L06_001BFA40);
-        if (D_L06_001B2348 < 5 || (D_001A79F0 == 6 && p->idx == 0))
+        func_00288BE8(D_L05_001BF8C0);
+        if (D_L05_001B2048 < 5 || (D_001A79F0 == 6 && p->idx == 0))
             func_002F5CC8();
         func_002A7750(m, 3, -1);
         break;
     case 3:
         if (func_002F5D10() == 0) {
             if (p->link != -1) {
-                char *o = D_L06_001B290C + (p->link << 7);
+                char *o = D_L05_001B260C + (p->link << 7);
                 func_L00_002B9D60(o + 0x30, o + 0x70, 0, 1);
             }
             func_002A7750(m, 4, -1);
@@ -156,7 +156,7 @@ void func_L05_00414F90(Thing *m)
         }
         if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_L06_001B290C + (p->link << 7);
+                char *o = D_L05_001B260C + (p->link << 7);
                 func_002DF3F8(o + 0x30, o + 0x70);
             } else
                 func_002DF3F8(m->pos, m->dir);
@@ -180,7 +180,7 @@ void func_L05_00414F90(Thing *m)
         }
         if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
             if (p->link != -1) {
-                char *o = D_L06_001B290C + (p->link << 7);
+                char *o = D_L05_001B260C + (p->link << 7);
                 func_002DF3F8(o + 0x30, o + 0x70);
             } else
                 func_002DF3F8(D_00189EA0, D_00189EA0 + 0x10);

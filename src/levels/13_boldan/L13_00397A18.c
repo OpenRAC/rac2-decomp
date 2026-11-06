@@ -8,9 +8,9 @@ typedef struct { char pad[0x70]; float material; char tail[0x6C]; } Material;
 extern unsigned char D_00139574;
 extern char *D_0018C0B0 NOT_SDA;
 /* Keep the model load as one macro instruction, as in retail. */
-extern int D_L00_001AC850 __attribute__((sda));
-extern Collision D_L00_001BF200;
-extern Material D_L00_00262570[];
+extern int D_L13_001AC790 __attribute__((sda));
+extern Collision D_L13_001BFD00;
+extern Material D_L13_0026D270[];
 extern void func_00282CC0(char *, char *, char *);
 extern void func_002AFFD8(void *, void *, int);
 extern void func_00282D30(void *, void *, float);
@@ -56,7 +56,7 @@ void func_L13_00397A18(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L00_00262570)->material;
+    frame.packet.material = (D_00139574 + D_L13_0026D270)->material;
     qcopy(&frame.packet.vector, ctx);
     func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -66,16 +66,16 @@ void func_L13_00397A18(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L00_001BF200;
+        collision = &D_L13_001BFD00;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L00_001BF200;
+            reread = &D_L13_001BFD00;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == D_L13_001AC790 && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -87,7 +87,7 @@ void func_L13_00397A18(char *obj) {
             func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
             func_00282F20(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L00_001BF200;
+            collision = &D_L13_001BFD00;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;

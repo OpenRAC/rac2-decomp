@@ -16,10 +16,10 @@ extern void func_L00_0038E880(void *, void *, void *);
 extern void func_L00_0038F3D8(void *);
 extern char *D_0018C0B0 NOT_SDA;
 /* sda: one `lw` macro instruction at -G0, scheduled as a single load as in retail. */
-extern int D_L00_001AC850 __attribute__((sda));
-extern int D_L00_001B2630 __attribute__((sda)), D_L00_001B2638 __attribute__((sda));
-extern Collision D_L00_001BF200;
-extern Material D_L00_00262570[];
+extern int D_L30_001AC790 __attribute__((sda));
+extern int D_L30_001B34B0 __attribute__((sda)), D_L30_001B34B8 __attribute__((sda));
+extern Collision D_L30_001C0200;
+extern Material D_L30_002693F0[];
 extern void func_002FEE70(int, void *, int);
 extern void func_00300190(void *, void *);
 extern void func_00300248(void *, void *);
@@ -262,7 +262,7 @@ void func_L30_0038E7E0(unsigned char *obj) {
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L00_00262570 + D_00139568[12] * sizeof(Material)))->material;
+        ((Material *)((u32)D_L30_002693F0 + D_00139568[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
     func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
@@ -274,14 +274,14 @@ void func_L30_0038E7E0(unsigned char *obj) {
         if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L00_001B2630, D_L00_001B2638, 1,
+            func_002FD1B8(D_L30_001B34B0, D_L30_001B34B8, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
             func_00282C88(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
-            frame.position.f[2] = D_L00_001BF200.point.f[2];
+            frame.position.f[2] = D_L30_001C0200.point.f[2];
             effect = func_00312D58(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
@@ -301,16 +301,16 @@ void func_L30_0038E7E0(unsigned char *obj) {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
                This shape gives retail's reload of the hit moby and its register assignment. */
-            Collision *collision = &D_L00_001BF200;
+            Collision *collision = &D_L30_001C0200;
             char *hit, *model;
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
                 if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
-                reread = &D_L00_001BF200;
+                reread = &D_L30_001C0200;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
@@ -371,7 +371,7 @@ void func_L30_0038EBF8(char *obj) {
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
-    frame.packet.material = (D_00139574 + D_L00_00262570)->material;
+    frame.packet.material = (D_00139574 + D_L30_002693F0)->material;
     qcopy(&frame.packet.vector, ctx);
     func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
@@ -381,16 +381,16 @@ void func_L30_0038EBF8(char *obj) {
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
     if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L00_001BF200;
+        collision = &D_L30_001C0200;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
             if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L00_001BF200;
+            reread = &D_L30_001C0200;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L00_001AC850 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -402,7 +402,7 @@ void func_L30_0038EBF8(char *obj) {
             func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
             func_00282F20(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L00_001BF200;
+            collision = &D_L30_001C0200;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;

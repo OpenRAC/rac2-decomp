@@ -15,7 +15,7 @@ extern void func_00282D30(void *,void *,float);
 extern void func_00280B90(void *,void *,int);
 /* Observed target prefix: retail addresses its position at base + 0x140. */
 typedef struct { u8 reserved[0x140]; float position[4]; } FlareTargetView;
-extern FlareTargetView D_L02_001BA3C0 __attribute__((nosda));
+extern FlareTargetView D_L11_001BA780 __attribute__((nosda));
 extern u32 D_L11_001B2014 __attribute__((sda));
 
 /* Submit one billboarding flare at the object's current endpoint. */
@@ -36,8 +36,8 @@ void func_L11_0045A3C8(u8 *object)
     color=(D_L11_001B2014&0xFFFFFF)+(func_002A7820(32,48)<<24);
     packet.color[3]=color; packet.color[2]=color; packet.color[1]=color; packet.color[0]=color;
     rotation[3]=0;
-    rotation[2]=func_00283248(D_L02_001BA3C0.position[0]-*(float *)(object+0x10),D_L02_001BA3C0.position[1]-*(float *)(object+0x14));
-    rotation[1]=-func_00283248(func_00282E80(object+0x10,D_L02_001BA3C0.position),D_L02_001BA3C0.position[2]-*(float *)(object+0x18));
+    rotation[2]=func_00283248(D_L11_001BA780.position[0]-*(float *)(object+0x10),D_L11_001BA780.position[1]-*(float *)(object+0x14));
+    rotation[1]=-func_00283248(func_00282E80(object+0x10,D_L11_001BA780.position),D_L11_001BA780.position[2]-*(float *)(object+0x18));
     rotation[0]=func_002A7940();
     func_00283410(transform,rotation);
     transform[12]=*(float *)(object+0x10); transform[13]=*(float *)(object+0x14); transform[14]=*(float *)(object+0x18); transform[15]=1;

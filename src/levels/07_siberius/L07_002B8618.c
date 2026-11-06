@@ -18,7 +18,6 @@ typedef struct { s32 w[11]; } Rec2C;
 #define M2C_ERROR(d) (0)
 extern char D_00138180[];
 extern u8 D_00138320[];
-extern f32 D_L03_00291DB0[];
 extern u8 D_00138354[];
 extern u8 D_00139568[];
 extern u8 D_00188660[];
@@ -45,8 +44,6 @@ extern u8 D_L07_0025C210[];
 extern u8 D_L07_0025C270[];
 extern u8 D_L07_0025C274[];
 extern Rec2C D_L07_0025DD90[];
-extern u8 D_L03_00262610[];
-extern u8 D_L16_00263DA0[];
 extern s32 func_002761F8(s32, s32, s32, s32, s32);
 extern s32 func_00277F48(f32, s32, s32, s32, s32);
 extern void func_0027D330(s32);

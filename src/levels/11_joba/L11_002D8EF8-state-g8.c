@@ -115,9 +115,6 @@ extern u8 D_L11_001A7DE0[8] __attribute__((sda));
 extern u8 D_L11_001A7E00[8] __attribute__((sda));
 extern s32 D_L11_00275090[][11];
 extern s32 D_L11_00275090[][11];
-extern u8 *D_L08_001B3170;
-extern s32 D_L08_001B3178;
-extern u8 D_L19_001A8F20[] MACRO_ADDR;
 extern u8 D_00189E20[];
 extern u32 D_001A79F0;
 typedef struct { u16 count; u16 pad; u32 maximum; u32 levels; } Statistics;
@@ -130,7 +127,6 @@ extern f32 D_L11_001A7CD8 __attribute__((sda));
 extern f32 D_L11_001A7CDC __attribute__((sda));
 extern s32 D_L11_001A7DD8[2] __attribute__((sda));
 extern f32 D_L11_00275220[][25];
-extern u8 D_L08_00268430[];
 typedef struct { u8 pad0[0x148]; f32 f148; u8 pad14C[0x400 - 0x14C]; s32 i400; } L19State_1B9900;
 extern L19State_1B9900 D_L11_001BA780;
 
