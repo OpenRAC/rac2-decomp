@@ -23,4 +23,3 @@ void func_PAL_00353C68(unsigned char *object)
     func_003518E0(object, 3);
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00353D08);
