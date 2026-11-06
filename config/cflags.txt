@@ -3825,3 +3825,17 @@ src/pal/levels/16_snivelak/L16_004180B0-g8.c	-O2 -G8 -ffunction-sections -fno-sc
 src/pal/levels/shared/L04_003C7130-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_0040E0B0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L04_00405268-hover.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L09_003EE908-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/game/002DD850-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
+src/pal/game/002DDCE8-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
+src/pal/levels/shared/L05_00449FF0-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/pal/levels/shared/L18_0042C768-update-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/game/002BC6A0-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/20_yeedil/L20_00445F90-state-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L19_0041A8A4-platform-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_0042D540-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-zero-ti-por
+src/pal/levels/17_smolg/L17_003E79D8-cc.c	-O2 -G0 -ffunction-sections
+src/pal/levels/02_maktar_nebula/L02_00406698-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -frac2-keep-block-order -fno-sched-interblock
+src/pal/levels/shared/L00_0040779C-wander-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/shared/L00_004266C8-cc-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/game/00333360-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels

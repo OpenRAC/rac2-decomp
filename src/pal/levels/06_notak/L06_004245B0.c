@@ -77,8 +77,6 @@ done:
     return;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_004347BC);
-
 
 INCLUDE_ASM("asm/pal/levels", func_PAL_L06_004351A8);
 

@@ -31,7 +31,6 @@ void func_PAL_002BC58C(char *a0)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002BC6A0);
 
 #include "common.h"
 extern int func_00282978(char *p);
