@@ -4765,3 +4765,15 @@ absence from a bounded static scan resolves arbitrary indirect control flow.
 Keep per-placement raw scans private and state their coverage. Useful C stays
 in `nonmatching/`; the old dummy-frame and unrelated guessed bodies were removed
 from `func_L03_0041B848` and `func_L00_00309DB0` rather than promoted.
+
+### func_002CA070: case 8's local-alloc order (USA v1.01, boot and 27 programs)
+
+Profile: own unit, `-O2 -G16 -ffunction-sections -Wa,-G16`, current master compiler. The retained
+draft in `nonmatching/game/func_002CA070.c` differs only in five case-8 registers. Retail's
+allocation needs init > 0x18 > upd > page > c in local-alloc priority. For that, sched1 must emit
+the init store before the upd and c stores. `rank_for_schedule` compares `INSN_REG_WEIGHT` before
+LUID, so the stores that end their value's life always win. Measured on 7 November 2026: 28
+single flags, all 15,120 store orders with the addresses in locals, and 100,000 random source
+forms. None got more than 3 of the 5 registers. Next useful experiment: a case-8 shape that gives
+the init or upd value one more reference without extra code, for example a different call or
+struct form. Statement order is exhausted.
