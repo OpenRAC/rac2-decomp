@@ -181,6 +181,7 @@
 #define UpdateCollidingEffectParticle    func_002BB100
 #define snd_StartSoundSystem             func_00131DE8
 #define find_fde                         func_00123B40
+#define GetLocalizedString               func_00288FB8
 #define __ieee754_log                    func_00117CA0
 #define OpenVendorMenu                   func_002F8178
 #define DrawGadgebotSpawnContainer       func_L03_003CA4B0

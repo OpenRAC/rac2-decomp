@@ -3634,6 +3634,11 @@ src/us2/game/002F95E8-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/us2/levels/10_hrugis_cloud/L10_00426260-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/us2/levels/05_feltzin_system/L05_00422838-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/us2/game/002D1F28-cc-g8.c	-O2 -G8 -ffunction-sections
+src/us2/levels/shared/L00_00404C18-cc.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/us2/levels/shared/L00_00409CF0.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
+src/us2/levels/shared/L00_0037F858-init-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -Wa,-G8
+src/us2/game/0033A0B8-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
+src/us2/levels/01_oozla/L01_002C1D90-action-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/pal/levels/shared/L05_0039A808-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_003A6238-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_003EE450-cc-g8.c	-O2 -G8 -ffunction-sections
