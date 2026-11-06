@@ -1,3 +1,7 @@
+/* 6 November 2026: own unit with -frac2-keep-block-order -frac2-hazard-labels does not
+ * add the missing nop: the gap is gas's mtc1 a0->f0 / cvt.s.w exemption
+ * (tools/compiler/transformers/restrict_mtc1_exemption.py), a toolchain question, not C.
+ */
 /* Tier: opus-1 (v1494). USA v1.01 game compiler, own unit with
  * -O2 -G0 -ffunction-sections -frac2-keep-block-order (needed: without it the
  * prologue and dispatch order change).

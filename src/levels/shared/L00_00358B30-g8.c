@@ -1,24 +1,3 @@
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
-/* Claude Opus 5.5 (opus-1, task v1649), 30 October 2026. USA v1.01: 544/544 bytes, 0/27 places.
- * Profile: its own unit L00_0033F678-g8.c with -O2 -G8 -ffunction-sections
- * -frac2-keep-block-order (keeps the switch's default-last body and its branch);
- * requires the common.h transfer helpers. Everything matches up to +0x194, the
- * store group included, and from the loop exit on. What still differs (about nine
- * instructions) is the moby-list loop setup and its registers: retail clears i (a3)
- * first, then loads begin (a1) and end (a0); this C loads begin (a3), clears i (a0),
- * loads end (a1), so the loop body uses the other registers too. A probe that kept i
- * live into the SetHeroMode call (an extra fourth argument: a false prototype, not
- * kept) gave retail's allocation, so retail's i conflicts with a0-a2 there or begin/end
- * prefer a0/a1; the i=0 first order is a separate sched1 tie (load latency outranks it).
- * Fixed here against the older drafts: Hero and GameState structs give the base+offset
- * accesses and the shared high halves (s2/s3) of retail; the store order follows
- * register-death weights (the 6B |= 7 and the halfword store are the last uses of their
- * bases); the selector is a switch; the loop is a goto loop (no strength reduction);
- * func_L00_002B2A40 (SetHeroMode) takes the entity as its real third argument; the list
- * bounds are unsized sda arrays (assembler macro loads). Tried and tied: direct global
- * reads in the loop (PRE hoists them the same way), begin/end as one struct, loads
- * before i = 0, -frac2-gcse-unsplit-edges. -fno-schedule-insns and for(;;) are worse.
- */
 #include "common.h"
 
 typedef int Quadword __attribute__((mode(TI)));
@@ -75,7 +54,6 @@ extern void func_L00_00358E50(void);
 
 void func_L00_00358B30(void) {
     unsigned char *entity;
-    unsigned char *begin, *end;
     int kind;
     int i;
     D_00189E20.state = 15;
@@ -115,15 +93,12 @@ void func_L00_00358B30(void) {
         default:
             func_00282A28();
         }
-        i = 0;
-        begin = D_L00_001B1E9C[0];
-        end = D_L00_001B1EA0[0];
-    next:
-        entity = begin + (i << 8);
-        if (entity >= end) goto done;
-        i++;
-        if (*(short *)(entity + 0xAA) != kind) goto next;
-        func_L00_002B2A40(D_L00_0021DDB0.field54, D_L00_0021DDB0.field5C, entity);
+        for (i = 0; (entity = D_L00_001B1E9C[0] + (i << 8)) < D_L00_001B1EA0[0]; i++) {
+            if (*(short *)(entity + 0xAA) == kind) {
+                func_L00_002B2A40(D_L00_0021DDB0.field54, D_L00_0021DDB0.field5C, entity);
+                break;
+            }
+        }
     }
 done:
     func_002A0F48(D_00189E20.moby);

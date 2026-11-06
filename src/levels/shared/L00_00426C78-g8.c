@@ -1,45 +1,3 @@
-/* 6 November 2026: on the current compiler the draft is unchanged (908/908, 0/27). Writing
- * `1.5707964f - func_002831B0(x)` as a static inline acos helper ties: the inlined return copy is
- * folded before allocation, so the counts stay 151/31. Both suspicious interfaces were checked
- * against retail and are right ($f13 = temp[2] at both func_L00_00424F00 calls; 0 is returned
- * after func_L00_002D9D98). */
-/* opus-1 tier (v0916); USA v1.01. Unit profile: own -g8 file, default
- * "-O2 -G8 -ffunction-sections" (the $gp flag word D_L00_001B15DC needs -G8).
- * Counterpart: RAC1 camera_transition_update (rac1-decomp
- * src/overlays/shared/camera_modes_and_scripts.c); this body follows it, plus
- * RAC2's skip flag, the follow-camera type check and the Statistics update.
- *
- * Best check.py: 908/908 bytes, 0/27 places, first mismatch +0x48. The only
- * difference is global allocation: the transition pointer p gets $s1 and the
- * follow camera $s2 (retail: $s2 / $s1), and the second scratch vector address
- * (sp+0x10) gets $s2 instead of $s1. Operations, scheduling, delay slots and
- * all other registers equal retail.
- *
- * Cause, measured with tools/regalloc.py and cc1 -dl/-dg/-dS dumps: allocno
- * priority floor_log2(refs)*refs/live*10000 is p 39/151 -> 2582 against the
- * sp+0x10 pseudo 8/31 -> 2580, so p is allocated first and takes $s1 ($s0 is
- * held by local pseudos). Retail's order needs p's live length >= 152 (or the
- * sp+0x10 pseudo's <= 30): ONE more RTL insn anywhere in p's range outside the
- * sp+0x10 range (blocks before the first func_00282CF0 call, or after the
- * last func_00282DB0(v2, v1) call). Diagnostic only, not landable: an empty
- * asm after the asin call gives 152 and 27/27 places. Struct/union copies of
- * the hero position (ld/sd), a nosda/.data view of D_001A79F0 (split load in
- * different registers), do{}while(0) (loop weights, rescheduled) and
- * -fno-schedule-insns also flip the order but change the bytes.
- *
- * Tried without effect on the counts (still 151/31): RAC1 sequential length
- * tests, hero pointer variable, RAC1 !=-chains, nested call arguments,
- * separate asin temporaries, ++count/timer!=0 forms, int store of v.f[2],
- * V struct for the vectors, TI struct/global copies, split table load, inline
- * blend/stat/scale_ticks helpers, camera-view anchor variable, p computed after
- * the skip test (changes bytes), and -frac2-keep-block-order,
- * -frac2-gcse-unsplit-edges, -frac2-no-null-pointer-checks, -frac2-qcopy, -g.
- * Every RTL insn in both ranges maps 1:1 onto retail's code except the deleted
- * copies of the query result and of the sin result, so the missing insn must
- * be a hidden one (an uncombined call-result copy, a flow (use (const_int 0))
- * after a block-ending call, or a load post-reload CSE removes).
- * Next: find the source construct for that one hidden insn.
- */
 #include "common.h"
 extern float func_00282DB0(char *, char *);
 extern float func_00282DF0(char *);
@@ -132,7 +90,7 @@ clear:
         len *= func_00282DF0(v1);
     }
     if (len != 0.0f) {
-        dot = func_002831B0(func_00282DB0(v2, v1) / len);
+        do { dot = func_002831B0(func_00282DB0(v2, v1) / len); } while (0);
         if (1.3962636f <= 1.5707964f - dot) { func_L00_002D9D98(); return 0; }
     }
     p->timer = 30;

@@ -1,3 +1,7 @@
+/* 6 November 2026: unchanged. A named `float x = 454.0f;` gives retail's rematerialized
+ * 454.0 (no $f25 save) but cse folds x, so the frame is 0x90 and 436/444 bytes; the
+ * ghost $s0 save needs a GPR-class pseudo (regclass gives the 454.0 pseudo FP_REGS).
+ * Separate label/int y statements change nothing. */
 /* 4 November 2026 source-contract/lifetime trials; retained, not linked.
  * Three actual call/source trials remain unmatched: FP-first bank ordering gives 460/444 bytes;
  * interleaved bank ordering and real rounded-coordinate groups give 444/444, 0/1 USA placements,

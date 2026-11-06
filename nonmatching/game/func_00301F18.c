@@ -1,3 +1,15 @@
+/* 6 November 2026: one-pass group (docs/COMPILER-NOTES.md:54) from the parent-state test
+ * through the first func_00282CC0, with an `origin = object + 0x10` local for the three
+ * tail calls. Same profile and unit; 900/900 bytes, 0/28 USA places, 2 words left (was 8):
+ * the group weights &angles above &position, so retail's s7/fp roles come out, and
+ * `origin` keeps the address in s4 after the group. Left: the last func_00282CC0 sets
+ * a1 (copy of a0) before a2 = &position; retail sets a2 first and puts the a1 copy in
+ * the jal slot. The group's end splits that block. Measured worse: groups only around
+ * the anchor func_002833F0 (7: first jal slot, object+0xC0 placement), only around the
+ * tail copies (+4 nop, s5/s6 swap), the end after the last call (s7/fp back), a `frame`
+ * local for object+0xC0 (3-6). Next: a form where the last call's a1 is not a copy of
+ * a0 at sched1 while the group still ends before it.
+ */
 /* 4 November 2026: a genuine two-vector anchor aggregate was tested with
  * the existing qcopy/qcopy-barrier profile in the assigned production unit.
  * It remains 900/900 bytes, 0/28 USA placements, first mismatch +0x60:
@@ -48,12 +60,15 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     char *parent;
     float step, tilt, radius, lift;
     int detach;
+    u8 *origin;
     if (*(char **)(state+0x5c)) {
         func_002AD470(object,*(char **)(state+0x5c),state,state+0x10,&position,&angles);
     } else {
         qcopy(&position, state);
         qcopy(&angles, state+0x10);
     }
+    origin = object+0x10;
+    do {
     if (object[0x20]==3 && *(char **)(state+0x5c)) {
         parent=*(char **)(state+0x5c);
         detach=0;
@@ -92,10 +107,11 @@ void func_00301F18(u8 *object, void *outPosition, void *outAngles)
     func_002833F0(spinMatrix,&rotation);
     func_002833F0(anchorMatrix,&angles);
     func_00283738(object+0xc0,anchorMatrix,spinMatrix);
-    func_00282D30(object+0x10,&anchorMatrix[2],radius);
+    func_00282D30(origin,&anchorMatrix[2],radius);
     func_00282D30(&offset,object+0xc0,lift);
-    func_00282CC0(object+0x10,object+0x10,&offset);
-    func_00282CC0(object+0x10,object+0x10,&position);
+    func_00282CC0(origin,origin,&offset);
+    } while (0);
+    func_00282CC0(origin,origin,&position);
     if (outPosition) qcopy(outPosition, &position);
     if (outAngles) qcopy(outAngles, &angles);
 }

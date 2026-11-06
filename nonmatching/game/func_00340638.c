@@ -1,3 +1,8 @@
+/* 6 November 2026: retained source below unchanged (448/448, 0/28 USA, 20 words).
+ * One-pass groups around child (its assignment, the func_00336390 call or f[10]) drop the
+ * q addresses out of callee-saved registers (416 bytes). The matched func_00340498 layout
+ * (no pos/first/third locals, retail store order) gives 23 words.
+ */
 /* Opus 5.5 xhigh, task v1750; USA v1.01 game -O2 -G0 -ffunction-sections, 28 places.
  * Best: 448/448 bytes, 0 of 28 places, first mismatch +0x1C. 20 instructions differ, all from four
  * allocation or order facts:

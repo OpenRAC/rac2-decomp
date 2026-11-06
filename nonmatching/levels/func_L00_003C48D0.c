@@ -1,3 +1,13 @@
+/* 6 November 2026: two new checks, no match; the body below is kept (696/708).
+ * Plain indexed C (`func_00282CF0(delta[j], D[i][j], D[i][j - 1])`, j = 1..9, own
+ * -O2 -G0 unit) gives retail's D_240070 operand but strength-reduces the outer loop
+ * (frame 0x140). Writing the outer loop `for (i = 0; i < 5; i = next) { next = i + 1;`
+ * gives retail's s7 = i + 1 in the beqz slot and the per-iteration sll/mult (no outer
+ * givs), 684/708. Left: loop.c still hoists the D_1B2990/D_240080 addresses out of
+ * the outer loop (dump: savings 2, matched refs); retail rebuilds each one, so the
+ * outer loop got no loop.c work at all. Reopen with a reason the outer movables are
+ * not desirable (or the loop is skipped), not with alias tricks.
+ */
 /* Complete-strand offset reconstruction, 2026-11-03; not linked.
  * Check: USA v1.01, -O2 -G0 -ffunction-sections -fno-rerun-loop-opt,
  * 696/708 bytes, 0/27 placements; frame 0x130 rather than retail 0x120.

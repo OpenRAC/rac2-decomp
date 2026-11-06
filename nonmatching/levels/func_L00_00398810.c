@@ -1,3 +1,12 @@
+/* 6 November 2026: best C below unchanged (732/732, 0/27, 2 rows). The RAC1 donor
+ * spawn_decoy (rac1-decomp trespasser_and_throwing_gloves.c) has the same retire loop:
+ * `while (list[0] >= 6)` and `for (i = 1; i <= list[0]; i++) (u8 *)(base + (list[i] << 8))`
+ * with `s16 list[]` and `s32 base` MACRO_ADDR aliases of D_L00_001B1FF0/D_L00_001B1E9C.
+ * Transcribed, it gets retail's zero-init order, but &D and the constant 5 swap s3/s4
+ * (5 rows): priorities 3/82 (&D) against 3/80 (5) need retail's pre-header order
+ * [5, &D, 1]. Tried with it: groups around each retire statement, the inner loop or the
+ * whole scan (6-14 rows), `> 5`, struct count in the test or the bound, the call's list
+ * pointer, `* 0x100` (all 5 or worse). Reopen on that pre-header order. */
 /* Claude Opus 5.5 (opus-1), 29 October 2026: retained near miss, not linked.
  * Profile: -O2 -G0 -ffunction-sections (default; a unit of its own works the same).
  * USA v1.01: 732/732 bytes, 0/27 places, first difference +0x1EC; exactly two

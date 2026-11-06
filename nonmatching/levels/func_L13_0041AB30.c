@@ -1,3 +1,8 @@
+/* 6 November 2026: unchanged, 460/460, 0/2, 4 rows (the preheader copy). Tied: a second
+ * row pointer copied from the first, two pointer bivs a/b from the row, a separate q row,
+ * `p + j * 64 + 0x460`, a per-iteration local for the 0x460 cell, q = p + 0x100. An int
+ * offset summed three times is far worse (113 rows). Loop dump: both givs (1120, 1376) come
+ * from reg 108 = (i << 4) + s with no copy; retail's copy must come from another pseudo. */
 /* 4 November 2026 source-layout review, retained near miss.
  * Four new grid/address/group forms with -O2 -G8 -ffunction-sections -g
  * remain 460/460 bytes, 0/2 USA places (first +0x78 or +0x84).

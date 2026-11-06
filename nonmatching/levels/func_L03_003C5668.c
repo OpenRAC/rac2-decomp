@@ -1,3 +1,7 @@
+/* 6 November 2026: one check, no change. A `float *` return of a1 (the caller in
+ * L03_003C3220-g8.c declares `float *`; retail leaves a1 in v0) compiles the same:
+ * `sw a1,0x10(sp)` still sits at +0x20 instead of +0x4. 644/644 bytes, 0/2.
+ */
 /* Opus-1 (v1496), 29 October 2026: GNU game -O2 -G0 -ffunction-sections.
  * US, US2 and PAL: 644/644 bytes, 0/2 places each ("instruction at +0x4 differs").
  * One instruction is out of place: retail schedules the a1 spill `sw $a1,0x10($sp)`

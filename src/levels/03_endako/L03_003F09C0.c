@@ -320,7 +320,6 @@ u32 func_L03_0041D1D8(u8 *entity) {
 
 /* func_L03_0041D258 is in L03_0041D258-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_0041DAD0);
 
 /* Projects the state position onto its path, clamps lateral displacement,
  * advances the path blend nearby, and maintains its movement sound. */

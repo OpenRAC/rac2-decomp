@@ -1,3 +1,9 @@
+/* 6 November 2026: retained source below unchanged (820/820, 0/27 USA, 10 words).
+ * One-pass groups measured: around `sampleRow *= 16` gives retail's v1/v0 for the first
+ * sample but pins y&31 first (12 words); around the inner sample statements gives sample v1
+ * but moves col&1 to v0 (21+); around the first sample block or 00308700 calls breaks
+ * allocation (56-162). A static inline sample helper for both reads is identical (10).
+ */
 /* Claude Opus 5.5 (opus-1), v1655, 2026-10-30: 820/820 bytes, 0/27 US places
  * (also 0/27 PAL and US v2.00). Profile: default -O2 -G0 -ffunction-sections
  * (src/levels/shared/L00_002FC7A0.c, in place of the marker).

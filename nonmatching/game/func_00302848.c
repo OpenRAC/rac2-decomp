@@ -1,3 +1,7 @@
+/* 6 November 2026: retained source below unchanged (468/468, 0/28 USA, 12 words).
+ * -mno-split-addresses with the 16-byte arrays and D_001A8BD0 as plain (non-sda) externs
+ * gives 472 bytes and about 80 differing words (puff store block and branch-likely tail).
+ */
 /* 3 November 2026, second pass, current qualified compiler, default G8:
  * Fresh baseline: 468/468 bytes, 0/28 USA places, first mismatch +0x174.
  * The only remaining region is 00283D38's colour-load / f12 call setup.

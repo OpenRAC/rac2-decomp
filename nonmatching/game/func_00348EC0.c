@@ -1,3 +1,9 @@
+/* 6 November 2026: retained source below unchanged (644/644, 0/28 USA, 25 words).
+ * Retail loads D_001AE5F0 ($gp), D_001B23A4 and the count, then D_001A7344 last; this
+ * source loads D_001B23A4 first and D_001A7344 before the count. No change from: count
+ * read before sp, a `half` or `scale` local, menu->count in place of n, swapped product
+ * operands; a one-pass group around sp or start gives 23-26 words.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 644/644 bytes, 0/28 placements; first difference 0x98.
  * Profile: -O2 -G8 -ffunction-sections.
