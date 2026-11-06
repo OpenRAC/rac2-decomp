@@ -141,7 +141,7 @@ s32 func_L23_00419CE0(u64 arg0) {
 
 /* func_L23_0041AFE8 is matched in L23_0041AFE8-g8.c (built with -fno-sched-interblock). */
 
-INCLUDE_ASM("asm/levels", func_L23_0041B188);
+/* func_L23_0041B188 is matched in L23_0041B188-g8.c. */
 
 extern void func_L00_0030C930(void);
 

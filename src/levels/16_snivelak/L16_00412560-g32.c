@@ -1,25 +1,4 @@
-/* Claude Opus 5.5 xhigh (opus-2), task v2179, 2026-11-03: NOT MATCHED.
- * Flags (own unit): -O2 -G8 -ffunction-sections -Wa,-G32 (gp D_L16_001B16D0).
- * USA v1.01 cdiff: 1420/1420 bytes, 0/1 places; 10 rows differ beyond relocations,
- * all of them outer-loop spill-slot offsets 0x22C-0x23C (stores +0x1CC..+0x1D8,
- * loads +0x208/+0x210/+0x21C, i+1 at +0x224/+0x31C, &batch[1] reload at +0x35C).
- * Fixed since opus-1 (v2082, 32 rows): pos = batch[i].position[j] after the uv
- * stores (giv discovery order gives retail's cursor registers and increments);
- * &D_L16_001A8F20 MACRO_ADDR (unsplit la: lui/addiu adjacent, after the a0/a1
- * copies); i = 0 as the for-init, so no call precedes the loop label and flow
- * adds no (use 0) after func_00282F20 (that USE took sched1's second issue slot
- * beside the camera call, pushing i = 0 past the ray call).
- * Remaining: the five slots are gcse PRE reaching regs, numbered in hash-bucket
- * order. Raw hash (plus at X) = 14030+X, (plus (reg r) 1) = 14030+r, bucket =
- * raw % T, T = (max_cuid/2)|1 = 153 here (Expression hash table in -dG).
- * Retail's order (at+144, i+1, at+64, at+80, at+84) needs T in {143,149,157,
- * 159,161} AND the i+1 base regno r >= 145 (ours: i = reg 87; a block-local i
- * declared at the loop would be ~136). So retail's loop counter is created late
- * (inlined or nested scope after more pseudos?). Putting the whole i loop in a
- * static inline helper was far worse (344 rows).
- */
 #include "common.h"
-typedef int BeamQuadword __attribute__((mode(TI)));
 typedef struct { int word[4]; } BeamDamageData __attribute__((aligned(16)));
 typedef struct {
     float position[4][4];
@@ -79,48 +58,74 @@ void func_L16_00412560(u8 *moby)
     float sample[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *object;
-    int i, j, k, texture, seed;
+    int j, k, texture, seed;
     float size, speed;
-    func_0029FC20(*(void **)(state + 0x1f0), 2, bone);
-    func_002830C0(start, D_L16_001B16D0, bone);
+    float *pos;
+    /* These named values are what retail's slot order measures: gcse's reaching registers
+       take spill slots in hash-bucket order, with 157 buckets (312 insns when gcse starts)
+       and the counter's pseudo at 145 or above. The block around the counter's loop serves
+       the same purpose. Removing or adding one moves the spill slots. */
+    int joint = 2;
+    float drop = -0.1f;
+    int layers = 0x90001;
+    int ignore = 0;
+    int lowerRow = 2;
+    int drawFirst = 0;
+    int drawCount = 1;
+    void *body;
+    float *muzzle;
+    float *eye;
+    BeamDamageData *damage;
+    int shift = 24;
+    float length;
+
+    body = *(void **)(state + 0x1f0);
+    func_0029FC20(body, joint, bone);
+    muzzle = D_L16_001B16D0;
+    func_002830C0(start, muzzle, bone);
     object = *(u8 **)(state + 0x24c);
     if (object) {
         qcopy(target, (object + 0x10));
         target[2] = func_L16_00416EB8((char *)object);
     } else qcopy(target, (state + 0x210));
     func_00282CF0(end, moby + 0x10, target);
-    end[2] = -0.1f;
-    func_00282F70(end, end, *(float *)(state + 0x250));
+    end[2] = drop;
+    length = *(float *)(state + 0x250);
+    func_00282F70(end, end, length);
     func_00282CC0(end, end, target);
-    func_002A8C00(effect, (int)moby, 0x90001, (float)state[0x36], &D_L16_001A8F20);
-    if (func_002761F8(start, end, 0, moby, effect))
+    damage = &D_L16_001A8F20;
+    func_002A8C00(effect, (int)moby, layers, (float)state[0x36], damage);
+    if (func_002761F8(start, end, ignore, moby, effect))
         qcopy_nc(end, D_L16_001BFF60);
-    func_00282CF0(camera, D_L16_001B9B00, start);
+    eye = D_L16_001B9B00;
+    func_00282CF0(camera, eye, start);
     func_00282CF0(ray, end, start);
     func_00282DD8(side, ray, camera);
     func_00282F20(side, side, 1.0f);
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 4; j++) {
-            float *pos;
-            batch[i].color[j] = func_00283D38(D_L16_001B1820[i] & 0xff000000,
-                D_L16_001B1820[i], *(float *)(state + 0x254));
-            batch[i].uv[j][0] = D_L16_001B1800_GP[j][0];
-            batch[i].uv[j][1] = D_L16_001B1800[j][1];
-            pos = batch[i].position[j];
-            if (j & 1)
-                func_00282D30(pos, side, D_L16_001B17F8[i]);
-            else func_00282D30(pos, side, -D_L16_001B17F8[i]);
-            if (j < 2) func_00282CC0(pos, pos, start);
-            else func_00282CC0(pos, pos, end);
-            pos[3] = 1.0f;
+    {
+        int i;
+        for (i = 0; i < 2; i++) {
+            for (j = 0; j < 4; j++) {
+                batch[i].color[j] = func_00283D38(D_L16_001B1820[i] & 0xff000000,
+                    D_L16_001B1820[i], *(float *)(state + 0x254));
+                batch[i].uv[j][0] = D_L16_001B1800_GP[j][0];
+                batch[i].uv[j][1] = D_L16_001B1800[j][1];
+                pos = batch[i].position[j];
+                if (j & 1)
+                    func_00282D30(pos, side, D_L16_001B17F8[i]);
+                else func_00282D30(pos, side, -D_L16_001B17F8[i]);
+                if (j < lowerRow) func_00282CC0(pos, pos, start);
+                else func_00282CC0(pos, pos, end);
+                pos[3] = 1.0f;
+            }
+            batch[i].packet[1] = func_0027C878(D_L16_001B17E8[i]);
+            batch[i].packet[0] = 0;
+            batch[i].packet[2] = 0xff9000000260UL;
+            batch[i].packet[3] = 0x8000000048UL;
         }
-        batch[i].packet[1] = func_0027C878(D_L16_001B17E8[i]);
-        batch[i].packet[0] = 0;
-        batch[i].packet[2] = 0xff9000000260UL;
-        batch[i].packet[3] = 0x8000000048UL;
     }
-    func_00280B90(&batch[0], 0, 1);
-    func_00280B90(&batch[1], 0, 1);
+    func_00280B90(&batch[0], drawFirst, drawCount);
+    func_00280B90(&batch[1], drawFirst, drawCount);
     if (*(int *)(state + 0x258) != D_L16_001B2648) {
         *(int *)(state + 0x258) = D_L16_001B2648;
         func_00282CF0(delta, end, start);
@@ -131,7 +136,7 @@ void func_L16_00412560(u8 *moby)
             speed = func_002A7878(D_L16_001B1830[2], D_L16_001B1830[3]);
             func_00282F20(velocity, delta, speed * 0.016666668f);
             func_00282D08(sample, end, start, func_002A7878(0.0f, 1.0f));
-            func_002C16C0(sample, velocity, texture, (int)D_L16_001B182C >> 24,
+            func_002C16C0(sample, velocity, texture, (int)D_L16_001B182C >> shift,
                 D_L16_001B182C & 0xffffff, seed, size,
                 500.0f, 1.0f, 0.0f, 1.0f);
             size = func_002A7878(10.0f, 20.0f);

@@ -1,28 +1,8 @@
-/* func_L23_0041B188 (748 bytes, 1 place: 23:0041B188) -- NEAR MISS, not integrated.
- * opus-1 (Claude Opus 5.5), task v1374, 2026-10-29.
- * Profile: -O2 -G8 -ffunction-sections (a <file>-g8.c unit of its own; L23_0041B188-g8.c gets the
- * profile from its name, no cflags line).  Uses qcopy from common.h.
- * Best check.py: 748/748 bytes, 0/1 places; exactly two words differ (+0x1BC, +0x1C4), in the
- * kind-2 mask read of the `step >= *list` path: retail `addu $v0,$v0,$v1 ; ld $a1,8($v0)`
- * (table base first), here `addu $v1,$v1,$v0 ; ld $a1,8($v1)` (scaled slot first).
- * What closed the rest (register allocation, the +0x8 save order and every branch):
- * - each branch has its own block-local `ids` (state + 0x230).  gcse's LCM inserts the join's
- *   `state + 0x230` at the end of each branch block; in the step < 0 block that is after the
- *   4190C8 call, so cse2's copy from a shared `slots` made that pseudo cross a call (flow's count
- *   for a multi-block pseudo is never lowered by sched1) and it took $s0, displacing state.  A
- *   block-local pseudo gets its count recomputed by sched1 once the copy moves above the call,
- *   so it lands in $t0/$v1 as in retail, and state/p3A0/flip/obj/obj+0x10/side/slots/table-hi
- *   fall into $s0..$s6 exactly;
- * - `*(int *)(ids + (idx << 2))` (char arithmetic, the idiom of func_L23_0041D0A0) gives retail's
- *   `addu slots, idx4` order; `ids[idx]` expands as MULT and is put first;
- * - the kind-2 mask through a local `masks` keeps the +8 as the ld displacement (with the symbol
- *   it folds into %lo(D+8)).
- * Remaining: cse's fold_rtx puts an operand with a known constant value second, so (plus masks x)
- * becomes (plus x masks) whatever the spelling, and local-alloc then ties the sum to x.  Retail's
- * order needs the table address in a register cse does not know as constant there (cf.
- * func_L23_00418FD0, where the base is reused after a call).  Tried: struct-array field, u64
- * index [1], masks set before the slot test (hoists the lui, worse).
- */
+/* func_L23_0041B188 is a unit of its own: it reads $gp data (-G8).  Each branch keeps its own
+   block-local pointer to the slot ids, which lets gcse's copy at the join stay out of the call in
+   the step < 0 branch.  The kind-2 mask is read through `second`, a pointer to the table's second
+   mask: `masks + 8` stays a sum of its own until combine moves the +8 into the ld displacement,
+   which leaves the table base as the first operand of the addu, as in func_L23_00418FD0. */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -86,13 +66,14 @@ void func_L23_0041B188(char *obj) {
                 list = D_L23_001FF300[slot];
                 if (step >= *list) {
                     char *masks = D_L23_002595C8;
+                    char *second = masks + 8;
 
-                    func_L23_004190C8(obj, *(u64 *)(masks + (slot << 4) + 8), side, 1);
+                    func_L23_004190C8(obj, *(u64 *)(second + (slot << 4)), side, 1);
                 } else
                     *(short *)(state + 0x396) = step;
             }
             slots = state + 0x230;
-            qcopy((state + 0x3A0) ,((char *)D_L23_001FF300[*(int *)(slots + (*(short *)(state + 0x394) << 2))] + *(short *)(state + 0x396) * 16 + 0x10));
+            qcopy(state + 0x3A0, (char *)D_L23_001FF300[*(int *)(slots + (*(short *)(state + 0x394) << 2))] + *(short *)(state + 0x396) * 16 + 0x10);
             func_L23_00418650(state + 0x3A0, *(float *)(state + 0x588));
         }
         func_00282CF0((char *)&vec, state + 0x3A0, obj + 0x10);
@@ -102,7 +83,7 @@ void func_L23_0041B188(char *obj) {
         else if (dev < D_L23_001B14DC * 0.05f)
             dev = D_L23_001B14DC * 0.05f;
         func_00282F20((char *)&vec, (char *)&vec, dev);
-        qcopy(&D_L23_001B38D0,&vec);
+        qcopy(&D_L23_001B38D0, &vec);
         func_00282CC0(obj + 0x10, obj + 0x10, (char *)&vec);
         func_L23_00418650(obj + 0x10, *(float *)(state + 0x588));
     }

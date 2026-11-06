@@ -128,6 +128,10 @@ s32 func_L16_00404E40(u8 *moby)
 
 extern void func_002B60B0(void *, float, float, float, float);
 extern s32 func_00283CF0(float);
+extern s32 D_L16_001B2648 MACRO_ADDR;
+extern float func_00283198(float);
+extern void func_002AA548(void *, void *, float, float, float, float);
+extern void func_L16_00412F48(u8 *);
 extern void func_002A93B0(void *);
 extern s32 func_002B0ED8(void *, void *, s32);
 extern void func_L16_0040D188(u8 *);
@@ -235,13 +239,90 @@ void func_L16_00410C80(u8 *arg)
 
 /* func_L16_00410CC0 is defined in L16_00410CC0.c. */
 
-INCLUDE_ASM("asm/levels", func_L16_00410E40);
+extern s32 func_L16_00417788(void *);
+extern s32 func_002ACBC8(void *, s32);
+extern s32 func_002A77E0(s32);
+
+/* Picks the row of the level's table that is closest to the handle, then, from a random
+   start, the first other usable row, and copies it into the state's slot at 0x200. */
+void func_L16_00410E40(u8 *arg0)
+{
+    u8 **base;
+    u8 *state;
+    u8 *table;
+    u8 *slot;
+    s32 target;
+    u8 *p;
+    s32 i;
+    s32 best;
+    s32 found;
+    s32 start;
+    s32 rem;
+    s32 result;
+    f32 bestf;
+    f32 f;
+
+    base = D_L16_001FE7C0;
+    i = 0;
+    best = -1;
+    state = *(u8 **)(arg0 + 0x68);
+    bestf = 1024.0f;
+    table = base[*(s32 *)(state + 0x170)];
+    target = func_L16_00417788(*(void **)(state + 0x24C));
+    p = table + 0x10;
+    do {
+        f = func_00282E80(arg0 + 0x10, p);
+        if (f < bestf) {
+            bestf = f;
+            best = i;
+        }
+        i++;
+        p += 0x10;
+    } while (i < 8);
+    found = -1;
+    start = func_002A77E0(8);
+    i = 0;
+    while (i < 8) {
+        /* Never read: the invariant also computed after the loop is what makes gcse insert
+           it on the loop's entry path, which keeps loop.c off this loop (phony). */
+        slot = state + 0x200;
+        rem = (i + start) % 8;
+        result = func_002ACBC8(table + (rem * 16 + 0x10), target);
+        if (result == 0) {
+            i++;
+            continue;
+        }
+        if (rem != best) {
+            found = rem;
+            break;
+        }
+        i++;
+    }
+    qcopy(state + 0x200, table + (found * 16 + 0x10));
+    func_L16_00410CC0(arg0, state + 0x200);
+}
 
 /* func_L16_00410FA8 is in L16_00410CC0.c. */
 
 /* func_L16_004110D0 is compiled from L16_004110D0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L16_00411368);
+void func_L16_00411368(u8 *arg)
+{
+    u8 *s0;
+    u8 *s1;
+    float f20;
+    float period = 120.0f;
+
+    s0 = arg;
+    s1 = *(u8 **)(arg + 0x68);
+    f20 = 10.0f;
+    if (s0[0x20] == 0xD || s0[0x20] == 0xF || s0[0x20] == 0xE || s0[0x20] == 0x11)
+        f20 = 25.0f;
+    f20 = f20 + func_00283198((float)(D_L16_001B2648 % func_00283CF0(120.0f)) / period * 6.2831855f - 3.1415927f);
+    func_002AA548(s0 + 0x18, s1 + 0x268, *(float *)(s1 + 0x264) + f20,
+                  0.0083333338f, 0.0027777778f, 0.16666667f);
+    func_L16_00412F48(s0);
+}
 
 /* func_L16_00411480 is defined in L16_00403900-g8.c. */
 
@@ -279,7 +360,7 @@ void func_L16_004116C8(u8 *arg0, s32 arg1, s32 duration, float f)
 
 /* func_L16_00411F80 is defined in L16_00411F80.c. */
 
-INCLUDE_ASM("asm/levels", func_L16_00412560);
+/* func_L16_00412560 is defined in L16_00412560-g32.c. */
 
 /* func_L16_00412AF0 is defined in L16_00403900-g8.c (this unit has no $gp access for it). */
 

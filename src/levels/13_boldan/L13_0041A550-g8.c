@@ -1,33 +1,4 @@
-/* opus-1 tier (v2060), USA v1.01: 1504/1504 bytes, 0/1 places match,
- * 77 of 376 rows differ, first difference +0xBC.
- * Profile: -O2 -G8 -ffunction-sections, in an isolated -g8.c unit.
- * RAC1 counterpart: plasmabot.c start_vendor_beam_pulse.
- * Recovered here: the char * spawn prototype (a true one, game/002BAA28.c
- * returns a pointer; ignored call_value) fixes the first spawn loop's
- * scheduling and the slti register; a reused local s17 for the colour pick
- * keeps the test branch alive.
- * Still differs:
- * 1. PRE spill slots. Retail: 0x470 moby+0x10, 0x474 beam+0x18 (cnt), 0x478
- *    work, 0x47C delta; here the two pairs are swapped, 0x480..0x48C agree.
- *    Needed bucket order (raw hashes 14129 < 14138 < 15070 < 15086), which
- *    holds for table sizes 103 107 111 113 125 127 129 133 141 147 151 153 155
- *    181 183 185 199 207 213 217 219 223 227 229 231 261. This form has 171,
- *    the one-armed form 169: 181 needs about +20 cuids, 155 about -30, both
- *    more than five initial values can give. Retail may have more dead code
- *    at gcse time; unproven.
- * 2. Second spawn loop scheduling. Retail: addiu a0,2; addiu s1,0x10;
- *    addiu s2,0x10; jal rand; swc1 f0,0x42C; jal rand; addiu a0,0xA. Here the
- *    increments land after rand(10) and addiu a0,0xA sits before the jal.
- *    A one-armed `if (func_002A77E0(2)) s17 = (D_L13_001B16C0);` gives retail's
- *    order there (flow1 empties the arm; flow2 appears to tidy the jump away,
- *    measured only through the schedule), but cse1's path then runs through the
- *    if, spawn args reuse pseudos 305/311, loop hoists them, and 141 of 379 rows
- *    differ (+12 bytes). Retail seems two-armed at cse1 and one-armed by flow2.
- *    `if (c) s17 = A; else unused = B;` gives the same 141 of 379 rows.
- * Next useful experiment: a real statement that blocks cse1's path through the
- * colour pick in the second loop and adds or removes enough cuids for a valid
- * table size. All declarations are below.
- */
+/* RAC1 counterpart: plasmabot.c start_vendor_beam_pulse. */
 #include "common.h"
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vq_02C80;
 typedef struct { int idx; char pad4[14]; short s12; char pad14[4]; unsigned char cnt[8]; Vq_02C80 pts[32],off[32],a[4][4],b[4][4]; int r620; char pad624[0x650-0x624]; float rotation[3]; } D_02C80;
@@ -40,6 +11,8 @@ extern float D_L13_001B16A0 __attribute__((sda)),D_L13_001B16A4 __attribute__((s
 extern int D_L13_001B16C0 __attribute__((sda)),D_L13_001B16C4 __attribute__((sda)),D_L13_001B16AC __attribute__((sda)),D_L13_001B16B0 __attribute__((sda));
 extern char *D_L13_001B2A0C __attribute__((sda));
 extern char D_L13_001B98C0[];
+/* The two spark colours as read by the second loop's unused pick. */
+extern const int D_L13_001B16C0_1[], D_L13_001B16C4_1[];
 void func_L13_0041A550(char *moby) {
     D_02C80 *beam = (*(D_02C80 **)(moby+0x68));
     Vq_02C80 path[32];
@@ -49,14 +22,12 @@ void func_L13_0041A550(char *moby) {
 
     float length;
     int low, high, duration;
-    int i, j, k, branch;
+    int i = 0, j = 0, k = 0, branch = 0;
 
-    {
-        int min_ticks = D_L13_001B161C;
-        int max_ticks = D_L13_001B1620;
-        *(float *)(moby+0x1C)=1.0f;
-        duration = func_002A7820(min_ticks,max_ticks);
-    }
+    low = D_L13_001B161C;
+    high = D_L13_001B1620;
+    *(float *)(moby+0x1C)=1.0f;
+    duration = func_002A7820(low,high);
     beam->s12=(short)duration;
     beam->r620=(short)duration;
     length=func_002A7878(4.0f,8.0f);
@@ -71,7 +42,10 @@ void func_L13_0041A550(char *moby) {
             func_00282C88(&path[i]);
             func_00282C88(&path_steps[i]);
         } else {
-            func_002A7A00(&path[i], 0.0f, D_L13_001B16A0);
+            {
+                float radius = D_L13_001B16A0;
+                func_002A7A00(&path[i], 0.0f, radius);
+            }
             func_002A7A00(&path_steps[i], 0.0f, D_L13_001B16A4 * (1.0f/60.0f));
         }
         y = path[i].f[1];
@@ -101,14 +75,16 @@ void func_L13_0041A550(char *moby) {
         beam->cnt[branch] = (unsigned char)start;
         qcopy(&beam->a[0][branch], &beam->pts[start]);
         qcopy(&beam->b[0][branch], &beam->off[start]);
-        /*K*/
         {
             char *b_col, *prev_col, *cur_col;
-            prev_col = (char *)(branch * 16 + (int)beam);
+            prev_col = (char *)(branch * 16);
+            prev_col = prev_col + (int)beam;
             prev_col = prev_col + 0x420;
-            cur_col = (char *)(branch * 16 + (int)beam);
+            cur_col = (char *)(branch * 16);
+            cur_col = cur_col + (int)beam;
             cur_col = cur_col + 0x420;
-            b_col = (char *)(branch * 16 + (int)beam);
+            b_col = (char *)(branch * 16);
+            b_col = b_col + (int)beam;
             b_col = b_col + 0x520;
             for (k = 1; k < 4; k++) {
                 func_002A7A00(&delta, 0.1f, 0.1f);
@@ -121,7 +97,7 @@ void func_L13_0041A550(char *moby) {
 
 
     if (func_00282E80(moby+0x10, D_L13_001B98C0) >= 4.0f) {
-        int s17;
+        int color;
         int l;
         char *frame=(char *)((beam->idx<<7)+(int)D_L13_001B2A0C);
         beam->rotation[2]=*(float *)(frame+0x78);
@@ -131,21 +107,39 @@ void func_L13_0041A550(char *moby) {
         func_00283410(matrix,beam->rotation);
         qcopy(&matrix[3], moby+0x10);
         for (l = 0; l < 32; l += 8) {
-            Vq_02C80 *p = &beam->pts[l];
-            func_002830C0(&work, p, matrix);
-            qcopy(&delta, &p[32]);
+            func_002830C0(&work, &beam->pts[l], matrix);
+            qcopy(&delta, &beam->off[l]);
             delta.f[3] = (D_L13_001B16B8);
-            s17 = func_002A77E0(2) ? (D_L13_001B16C0) : (D_L13_001B16C4);
-            func_002BAA28(&work, &delta, &delta, (D_L13_001B16AC), (D_L13_001B16B0), l >> 1, 15, func_002A77E0(10) + 20, s17);
+            {
+                int heads = func_002A77E0(2) != 0;
+                color = heads ? (D_L13_001B16C0) : (D_L13_001B16C4);
+            }
+            {
+                int n = func_002A77E0(10) + 20;
+                int start = D_L13_001B16AC;
+                int end = D_L13_001B16B0;
+                func_002BAA28(&work, &delta, &delta, start, end, l >> 1, 15, n, color);
+            }
         }
         for (k = 0; k < 2; k++) {
             int n;
             func_002830C0(&work, &beam->a[3][k], matrix);
             qcopy(&delta, &beam->b[3][k]);
             delta.f[3] = (D_L13_001B16B8);
-            s17 = func_002A77E0(2) ? (D_L13_001B16C0) : (D_L13_001B16C4);
+            {
+                /* Result unused, as in RAC1's second loop. */
+                int heads = func_002A77E0(2) != 0;
+                color = heads ? D_L13_001B16C0_1[0] : D_L13_001B16C4_1[0];
+            }
             n = (func_002A77E0(10) + 20);
-            func_002BAA28(&work, &delta, &delta, (D_L13_001B16AC), (D_L13_001B16B0), beam->cnt[k] >> 1, 15, n, (D_L13_001B16C4));
+            {
+                {
+                int tip = D_L13_001B16C4;
+                int start = D_L13_001B16AC;
+                int end = D_L13_001B16B0;
+                func_002BAA28(&work, &delta, &delta, start, end, beam->cnt[k] >> 1, 15, n, tip);
+            }
+            }
         }
     }
 }

@@ -1,36 +1,4 @@
-/* functional: high. Near-miss draft within a few instructions of retail: differences are register allocation, scheduling and instruction shape. */
-/*
- * Tier: task v2035, Claude Opus 5.5, 1 November 2026.
- * Profile: -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * Best check.py result: 1676/1676 bytes; 0 of 1 places match, first difference +0x5b4.
- * No linked build or other-release check. All declarations needed are below.
- *
- * One non-relocation row still differs, in the last loop's preheader:
- *   ours   daddu $s4,$s6,$zero
- *   retail lw    $s4,0x474($sp)
- * CSE2 rewrites the hoisted (set 350 (plus at 1056)) into a copy of the first
- * particle loop's hoisted pseudo: the REG_EQUAL on that loop's (set a1 330) keeps
- * (plus at 1056) in the table across the loop exit, which has no label.
- * Retail needs the set to load gcse's reaching register instead. Tried:
- *  - one color local shared by both particle loops: gives the lw, and T=193 with
- *    no initialisers, but the empty test survives to sched1 and two increments
- *    land after the first random call.
- *  - a local velocity = &jitter before the dead ?: : gives the lw, but loop.c
- *    combines it with the qcopy's copy, so the in-loop lw $a0 goes (4 bytes short).
- *  - an inline out-parameter for the dead color: a real stack store and a branch.
- *
- * What the other parts need:
- *  - selected, half, timeStep and spread are initialised at their declarations
- *    (4, all really used). They set gcse's table to 193 buckets (max_cuid 384..387),
- *    which gives retail's slot order; any edit must keep that size.
- *  - velOffset/curOffset and the two-statement column keep retail's three i16+beam
- *    adds: a 3-insn combine split makes them after CSE2, and natural [j][i] flattens.
- *  - k is separate from j, or the last loop's $s3/$s4 swap.
- * Opus G2, 1 November 2026: the four initial values are dead (each is overwritten before any read), so
- * they must be replaced by read values. Forced bucket counts: 175-179, 193-197 and 203 keep the one row.
- */
 #include "common.h"
-typedef int VectorWord __attribute__((mode(TI)));
 typedef struct { float x, y, z, w; } __attribute__((aligned(16))) Vector;
 typedef Vector Row[4];
 typedef struct {
@@ -73,18 +41,28 @@ extern void func_002830C0(void *,void *,void *);
 extern int func_002A77E0(int);
 extern void *func_002BAA28(void *,void *,void *,int,int,int,int,int,int);
 
+/* The second particle loop draws this coin and never reads it. The test still has to be there at
+   gcse: it splits the block, so the call's &jitter takes the reaching register as in the first loop. */
+static inline void flipCoin(int *heads)
+{
+    if (func_002A77E0(2))
+        *heads = 1;
+    else
+        *heads = 0;
+}
+
 void func_L16_003AA3F0(BeamMoby *object)
 {
     Beam *beam = object->vars;
     Vector positions[32], velocities[32], scratch, jitter;
     Vector transform[4];
     const float frameTime = 0.01666666753590107f;
-    float half = 0.0f;
-    float timeStep = 0.0f;
+    float half;
+    float timeStep;
     float unit;
-    float spread = 0.0f;
+    float spread;
     int i, smoothIndex, branchIndex, particleIndex, j, k;
-    int selected = 0;
+    int selected;
     object->position.w = 1.0f;
     beam->lifetime = func_002A7820(D_L16_001AF884, D_L16_001AF888);
     beam->duration = beam->lifetime;
@@ -167,11 +145,11 @@ void func_L16_003AA3F0(BeamMoby *object)
             func_002BAA28(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, particleIndex >> 1, 15, duration + 20, color);
         }
         for (k = 0; k < 2; k++) {
-            int duration, unusedColor;
+            int duration, heads;
             func_002830C0(&scratch, &beam->branches[3][k], transform);
             qcopy(&jitter, &beam->branchVelocities[3][k]);
             jitter.w = D_L16_001AF920;
-            unusedColor = func_002A77E0(2) ? D_L16_001AF928 : D_L16_001AF92C;
+            flipCoin(&heads);
             duration = func_002A77E0(10);
             func_002BAA28(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, beam->selected[k] >> 1, 15, duration + 20, D_L16_001AF92C);
         }

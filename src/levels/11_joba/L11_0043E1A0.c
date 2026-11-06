@@ -841,7 +841,7 @@ INCLUDE_ASM("asm/levels", func_L11_00443D78);
 
 INCLUDE_ASM("asm/levels", func_L11_00444400);
 
-INCLUDE_ASM("asm/levels", func_L11_004456A0);
+/* func_L11_004456A0 is in L11_004456A0-g8.c. */
 
 /* func_L11_00445990 is defined in L11_00445990-g8.c ($gp accesses). */
 

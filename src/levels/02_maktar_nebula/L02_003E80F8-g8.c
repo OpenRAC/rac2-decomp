@@ -1,58 +1,3 @@
-/* Faithful-source review, 4 November 2026; retained, not linked.
- * 1748/1756 bytes, 0/1 USA placement.
- * Remove seven overwritten declaration initializers; keep count=0 because its value is consumed by the entity walk. The earlier 1756-byte five-row diagnostic depended on the removed values. Frame/PRE spills and geometry-loop scheduling remain open.
- * Measured in the assigned production unit with the profile recorded below.
- * Other-release checks were not rerun for this nonmatching source.
- * Earlier diagnostic measurements below are historical where superseded.
- */
-/* Nonmatching, Claude Opus 5.5 xhigh, task v2023 (1 November 2026).
- * Best check: 1756/1756 bytes, 0/1 USA v1.01 places; frame 0xB70. check.py's first
- * difference is at +0x494. cdiff shows 83 of 439 rows differing: 78 are relocation
- * display only and 5 are real, and those 5 are one displaced instruction.
- * Profile: -O2 -G8 -ffunction-sections, in a dedicated L02_003E80F8-g8.c unit, with
- * the INCLUDE_ASM line in L02_003DB310.c replaced. Not checked in PAL or USA v2.00.
- * Required declarations are included below; some are unused, kept so that this is
- * exactly the measured form.
- *
- * Remaining, at +0x484 to +0x494: retail orders `daddu s3,s4` before the two bound
- * loads, here it comes after them. In this form the loads are PRE inserts at the end
- * of the block and the copy is a loop.c hoist emitted after them. sched1 boosts all
- * of them equally, so the tie goes by LUID and the copy always sorts last. Retail
- * fits biv-elimination temps, which loop.c emits after its hoists.
- *
- * The natural first loop gives retail's order, but it is 2 instructions short because
- * `la sym__gp+off` assembles gp-relative here, while retail shows every `la sym+off`
- * absolute and every plain `la sym` gp-relative. The bound views and the do-while
- * below are a workaround for that. The natural form, with a top-level
- * `float *geometry`, was:
- *     geometry = (float *)D_L02_001B0AB0_gp;
- *     for (vertex = 0; vertex < 4; vertex++) {
- *     float extent = geometry[vertex * 4 + 2];
- *     if (vertex < 2) extent += D_L02_001B0B40;
- *     else extent -= D_L02_001B0B40;
- *     func_00282F20(packet[0].vertex[vertex], normal, extent);
- *     func_00282F20(offset, matrices[objectIndex], geometry[vertex * 4]);
- *     func_00282CC0(packet[0].vertex[vertex], packet[0].vertex[vertex], offset);
- *     }
- *
- * REVIEW: this form is over the limit and cannot land as it stands. The seven dead
- * initial values (i, layer, pass, nextLayer, nextPass, uvIndex, color) and the
- * block-scoped objectIndex only set the PRE spill-slot order. All seven slots match
- * retail with them. Slot order is bucket order, bucket = raw % ((max_cuid/2)|1), raw
- * of (plus fp C) = 14030+C and of (plus (reg n) 1) = 14030+n. Retail's order needs
- * 187, 201 or 203 buckets. This body has max_cuid 393 (197 buckets) and needs 400
- * for 201, with objectIndex at pseudo 103-157 or 304-358 (scoped, it is 309). With
- * 187 or 203 a top-level objectIndex (pseudo 95) fits, so the original probably has
- * about 11 more or 20 fewer instructions before gcse (inferred).
- *
- * Tried for the displaced row, all no better: explicit bound locals; bounds in reused
- * locals to avoid the boost (color gives s0/s3 swapped, remaining, nextPass and a
- * probe address are worse); plain Quad copy (173 rows); qcopy_nc (same output); an
- * explicit offset local (s0/s3/s5/s6 change). Tried for instruction count with five
- * initial values: `?:` on extent adds nothing; reusing id for the re-read loses the
- * lh; `* -2.0f` written out in both arms reaches 201 buckets but moves registers
- * (175 rows).
- */
 #include "include_asm.h"
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
@@ -63,19 +8,14 @@ extern unsigned short *D_L02_001FC060[];
 extern int D_L02_001B0A68[] __attribute__((sda)), D_L02_001B0A98[] __attribute__((sda));
 extern int D_L02_001B0A68_gp SDATA(D_L02_001B0A68), D_L02_001B0A98_gp SDATA(D_L02_001B0A98);
 extern float D_L02_001B0A78[][2] SDATA(D_L02_001B0A78);
-extern float D_L02_001B0AB0[][4] NOT_SDA;
+extern float D_L02_001B0AB0[][4] MACRO_ADDR;
 extern float D_L02_001B0AB0_gp[][4] SDATA(D_L02_001B0AB0);
-/* Measured address views: the sign boundary, geometry end, and strided UV V
- * pointer below do not establish separate owning allocations. */
-extern float D_L02_001B0AD0[][4] MACRO_ADDR;
-extern float D_L02_001B0AF0[][4] MACRO_ADDR;
 extern float D_L02_001B0AF0_gp[][4] SDATA(D_L02_001B0AF0);
 extern int D_L02_001B0B30 __attribute__((sda));
 extern unsigned int D_L02_001B0B38[] SDATA(D_L02_001B0B38);
 extern float D_L02_001B0B40 __attribute__((sda));
-extern float D_L02_001B0B48[][2] NOT_SDA;
+extern float D_L02_001B0B48[][2] MACRO_ADDR;
 extern float D_L02_001B0B48_gp[][2] SDATA(D_L02_001B0B48);
-extern float D_L02_001B0B4C[][2] MACRO_ADDR;
 extern char D_L02_001BA500[];
 extern float func_00283CE0(int);
 extern void func_00283410(void *, void *), func_0029FC20(void *, int, void *), func_002830C0(void *, void *, void *);
@@ -91,6 +31,10 @@ extern float func_002A7878(float, float), func_002A7940(void);
 extern unsigned int func_00283D38(unsigned int, unsigned int, float);
 extern void func_00281EB8(void *, int, unsigned int, int, float, float, float);
 
+/* Draws the actor's object group as rotating quads, then a mirrored quad and three effects per
+ * visible object. Each bound of the first vertex loop is built in two steps beside its test:
+ * loop.c moves such a pair out of the loop after the copy of offsetAddress, while a single load
+ * would stay ahead of that copy. */
 void func_L02_003E80F8(char *actor) {
     float matrices[32][16] __attribute__((aligned(16)));
     float rotation[16] __attribute__((aligned(16)));
@@ -104,8 +48,10 @@ void func_L02_003E80F8(char *actor) {
     unsigned short *entry;
     unsigned short id;
     float frame;
-    int count = 0, i, layer, pass, nextLayer, nextPass;
+    int count = 0, i = 0, layer, pass, nextLayer, nextPass;
     int uvIndex;
+    int draw;
+    float *offsetAddress;
     unsigned int color;
     *(Quad *)probe = 0;
     probe[0] = 30.0f;
@@ -149,22 +95,15 @@ void func_L02_003E80F8(char *actor) {
             nextLayer = layer + 1;
             func_00283098(packet[layer].vertex[pair], packet[layer].vertex[pair], doubled);
             func_00283098(packet[layer].vertex[pair + 1], packet[layer].vertex[pair + 1], doubled);
-            if (count > 0) {
-                float (*drawMatrix)[16] = matrices;
-                unsigned int *drawVisible = visible;
-                int remaining = count;
-                do {
-                    if (*drawVisible) func_00280B90(packet + layer, drawMatrix, 1);
-                    drawMatrix++;
-                    drawVisible++;
-                } while (--remaining);
+            for (draw = 0; draw < count; draw++) {
+                if (visible[draw]) func_00280B90(packet + layer, matrices[draw], 1);
             }
         }
     }
     packet[0].state[1] = func_0027C878(D_L02_001B0B30);
     for (uvIndex = 0; uvIndex < 4; uvIndex++) {
         packet[0].uv[uvIndex][0] = D_L02_001B0B48_gp[uvIndex][0];
-        packet[0].uv[uvIndex][1] = D_L02_001B0B4C[uvIndex][0];
+        packet[0].uv[uvIndex][1] = D_L02_001B0B48[uvIndex][1];
         packet[0].color[uvIndex] = D_L02_001B0B38[uvIndex & 1];
     }
     func_00283388(identity);
@@ -182,16 +121,22 @@ void func_L02_003E80F8(char *actor) {
         {
             float *g = geometry;
             float (*v)[4] = packet[0].vertex;
+            float (*lowerEnd)[4], (*allEnd)[4];
             do {
                 float extent = g[2];
-                if ((int)g < (int)D_L02_001B0AD0) extent += D_L02_001B0B40;
+                offsetAddress = offset;
+                lowerEnd = D_L02_001B0AB0;
+                lowerEnd += 2;
+                if ((int)g < (int)lowerEnd) extent += D_L02_001B0B40;
                 else extent -= D_L02_001B0B40;
                 func_00282F20(*v, normal, extent);
                 func_00282F20(offset, matrices[objectIndex], g[0]);
                 g += 4;
                 func_00282CC0(*v, *v, offset);
                 v++;
-            } while ((int)g < (int)D_L02_001B0AF0);
+                allEnd = D_L02_001B0AB0;
+                allEnd += 4;
+            } while ((int)g < (int)allEnd);
         }
         func_00280B90(packet, identity, 0);
         for (vertex = 0; vertex < 4; vertex++) {
@@ -205,7 +150,7 @@ void func_L02_003E80F8(char *actor) {
         *(Quad *)offset = 0;
         offset[0] = 2.666f;
         offset[3] = 1.0f;
-        func_002830C0(offset, offset, matrices[objectIndex]);
+        func_002830C0(offset, offsetAddress, matrices[objectIndex]);
         frame = func_002A7878(0.0f, 1.0f);
         color = func_00283D38(D_L02_001B0A98_gp, D_L02_001B0A98[1], frame);
         frame = func_002A7940();
