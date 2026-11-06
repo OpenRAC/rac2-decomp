@@ -1,30 +1,4 @@
-/* functional: high. Near-miss draft within a few instructions of retail: differences are register allocation, scheduling and instruction shape. */
-/*
- * func_L00_002A9460 (412 bytes, 27 places). Claude Opus 5.5 (opus-1), task v1533,
- * 29 October 2026. Best: 412/412 bytes, 0/27 USA places (tools/check.py);
- * only one delay slot differs. Profile: its own unit, -O2 -G0 -ffunction-sections,
- * approved qcopy from common.h. Remove the INCLUDE_ASM marker from
- * src/levels/shared/L00_002A6420.c when trying it.
- *
- * Counterpart of RAC1's update_hero_moby (src/overlays/shared/hero_idle_and_animation.c).
- * The identical-arm test of moby->pclass byte 6 is what retail shows: jump2's
- * cross-jumping merges the arms after flow, leaving the dead `lw 0x24; lbu 6` (no
- * volatile needed), and its join restarts cse, so the second half rebuilds the
- * D_00189E20 base from the shared %hi (gcse PRE) as retail's $s1 does.
- *
- * Remaining difference: `addiu $s1,$s1,%lo(D_00189E20)` (block after the join) fills
- * the delay slot of the first call (ref_00) here, of the second call (ref_01) in
- * retail. reorg's forward search from ref_00 passes the second qcopy asm (volatile:
- * needed.volatil = 1), but this tree's resource.c assigns `res->volatil =
- * MEM_VOLATILE_P (x)` at every later MEM, so the next ordinary load clears it and the
- * addiu is accepted. Retail behaves as if the flag stayed set (GCC 2.95's `|=`):
- * the search from ref_00 stops, the one from ref_01 (no asm in between) takes it.
- * With `=` both searches see the same state at the addiu, so no source wording
- * with this block structure can separate them; the old orch/main
- * -frac2-sticky-volatile-refs modelled exactly this and is not upstream.
- * Tried: -frac2-qcopy (+barrier) grouped copies instead of the asm (same slot),
- * the branch polarity (same).
- */
+/* func_L00_002A9460: needs -frac2-sticky-volatile-refs (reorg stops at the second qcopy asm); see docs/COMPILER-NOTES.md. */
 #include "common.h"
 
 /* Its first two callees differ by level (ref_ names); func_L00_002ADF80 is C in
