@@ -3353,6 +3353,7 @@ src/pal/levels/shared/L00_003BF548-cc.c	-O2 -G0 -ffunction-sections -frac2-zero-
 src/pal/game/002DB6C8-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/002CB710-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L01_003EE068-cc.c	-O2 -G64 -Wa,-G64 -ffunction-sections -fno-rerun-loop-opt
+src/pal/levels/17_smolg/L17_004266C8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L05_0041E5C8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00332038-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/game/00303578-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -3371,6 +3372,7 @@ src/pal/game/0032DB00-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/09_dobbo/L09_004005A8-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L01_00404E70-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/00313538-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/17_smolg/L17_00424618-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L04_0041A790-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002FACD0-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/0033F738-cc.c	-O2 -G0 -ffunction-sections
@@ -3379,6 +3381,7 @@ src/pal/levels/shared/L00_002B3000-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L05_0042CC68-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/03_endako/L03_003CEFA8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/03_endako/L03_00426850-cc-g8.c	-O2 -G8 -Wa,-G32 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/18_damosel/L18_004450C8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_003BC098-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-hazard-labels
 src/pal/levels/shared/L00_003E6790-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/02_maktar_nebula/L02_00401980-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -frac2-keep-block-order
@@ -3396,6 +3399,7 @@ src/pal/levels/11_joba/L11_00448690-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/11_joba/L11_0043E660-cc.c	-O2 -G0 -ffunction-sections
 src/pal/game/00334CB0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L04_00411778-cc.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/16_snivelak/L16_004164B8-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L00_002D5E90-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L05_003D5D90-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L05_0042C044-cc-g8.c	-O2 -G8 -ffunction-sections
@@ -3451,9 +3455,11 @@ src/pal/levels/shared/L04_00364B90-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy
 src/pal/levels/11_joba/L11_0045EBA0-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
 src/pal/levels/shared/L06_0047FE00-cc.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/11_joba/L11_00449550-cc.c	-O2 -G0 -ffunction-sections
+src/pal/levels/17_smolg/L17_003E90E8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/shared/L00_0042EA98-cc.c	-O2 -G0 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/shared/L00_00424EF0-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L05_00448114-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/18_damosel/L18_0043ECA0-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/15_gorn/L15_0043BF88-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L00_002D29E8-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/04_barlow/L04_00453220-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
@@ -3465,10 +3471,12 @@ src/pal/levels/shared/L00_00343940-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy
 src/pal/levels/shared/L06_00468CA0-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L02_0032D5F8-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/00_aranos_tutorial/L00_003D21C0-cc.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/18_damosel/L18_0044C9C0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/0033CB00-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_0042FA70-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/pal/levels/12_todano/L12_0042A8E0-cc.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/pal/levels/12_todano/L12_0041E358-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/19_grelbin/L19_003ED868-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L05_00448A58-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/pal/levels/shared/L00_00427960-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/pal/levels/shared/L00_003FAD60-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -3481,7 +3489,9 @@ src/pal/levels/07_siberius/L07_0037B708-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/11_joba/L11_0044C6C0-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections
 src/pal/levels/15_gorn/L15_00437CD0-cc.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L00_00340E18-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -fno-gcse
+src/pal/levels/16_snivelak/L16_004176B0-cc-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32
 src/pal/levels/08_tabora/L08_003D0B88-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/18_damosel/L18_003FF408-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/02_maktar_nebula/L02_003F4D60-cc.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges -frac2-hazard-labels
 src/pal/levels/01_oozla/L01_003C1C70-cc.c	-O2 -G0 -ffunction-sections -ffast-math
 src/pal/levels/shared/L07_003FB6B0-cc-g8.c	-O2 -G8 -ffunction-sections
@@ -3499,6 +3509,7 @@ src/pal/levels/shared/L00_002B6488-cc.c	-O2 -G0 -ffunction-sections -frac2-hazar
 src/pal/levels/16_snivelak/L16_00412170-cc.c	-O2 -G0 -ffunction-sections -fno-sched-interblock
 src/pal/game/00270FC0-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/0030E0E0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-hazard-labels
+src/pal/levels/18_damosel/L18_00441640-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/pal/levels/01_oozla/L01_003C4530-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002C0078-rc2.c	-O2 -G8 -mastra-r5900-extern-buffer -ffunction-sections -fno-builtin
 src/pal/levels/11_joba/L11_003E0F10-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
@@ -3508,6 +3519,7 @@ src/pal/game/002C23B8-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qc
 src/pal/game/0030DEC0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/003456B0-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/09_dobbo/L09_003E76B0-scan.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/17_smolg/L17_003D0990-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002CBD80-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/00343690-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/12_todano/L12_00418BD8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -3531,6 +3543,7 @@ src/pal/levels/12_todano/L12_0041B520-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/12_todano/L12_00422B60-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002C7D8C-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/11_joba/L11_0044D030-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/16_snivelak/L16_0041E3D8-cc-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/pal/levels/11_joba/L11_00450AA8-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/pal/levels/03_endako/L03_003E61B0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/game/002B1A50-cc-g8.c	-O2 -G8 -ffunction-sections
@@ -3554,6 +3567,9 @@ src/pal/levels/11_joba/L11_0039A270-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/00_aranos_tutorial/L00_002FE768-state-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/game/0030B4E0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/pal/game/002EF2D8-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/pal/levels/17_smolg/L17_003C7908-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/17_smolg/L17_003C7A80-anchor-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/17_smolg/L17_003CB570-path-g8.c	-O2 -G8 -g -ffunction-sections -fno-gcse
 src/pal/levels/09_dobbo/L09_0039EEE0-flags.c	-O2 -G0 -ffunction-sections -g
 src/pal/game/00331948-rc2.c	-O2 -G4 -ffunction-sections -fno-builtin
 src/pal/game/00317768-g8.c	-O2 -G8 -ffunction-sections
@@ -3568,6 +3584,7 @@ src/pal/levels/13_boldan/L13_0041F0C0-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/16_snivelak/L16_002F7B18-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/pal/levels/14_aranos_prison/L14_0042ED80-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/15_gorn/L15_00316F78-effects-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/18_damosel/L18_003FC158-state-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/pal/levels/02_maktar_nebula/L02_003ED0D8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
 src/pal/levels/14_aranos_prison/L14_003E8608-g.c	-O2 -G0 -ffunction-sections -g
 src/pal/game/00348DF8-g8.c	-O2 -G8 -ffunction-sections

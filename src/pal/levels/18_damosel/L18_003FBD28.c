@@ -129,8 +129,3 @@ void func_PAL_L18_003FBFB0(char *p)
     func_002A8C28(p, v, *(float *)(data + 0x110) + 0.2f, 10.0f, 1.0f, 0x4000000, 0, 1, 0);
     if (*(unsigned char *)(p + 0x20) >= 2) func_L00_002E6EF8(D_L18_003F9018, p);
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_003FC158);
-
-

@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L16_004176B0);
 
 #include "common.h"
 extern s32 func_313EA0(s32);

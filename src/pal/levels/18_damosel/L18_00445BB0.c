@@ -3,6 +3,7 @@
 INCLUDE_ASM("asm/pal/levels", func_PAL_L18_00445BB0);
 
 
+
 #include "common.h"
 extern void func_00282CF0(float *, const float *, const float *);
 extern void func_00282F20(char *, char *, float);
@@ -91,4 +92,3 @@ intact:
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L18_0044C9C0);
