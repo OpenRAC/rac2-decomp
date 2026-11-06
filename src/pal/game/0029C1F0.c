@@ -20,8 +20,14 @@ void func_PAL_0029C220(int a0, int a1, int a2, int a3, int a4, int a5, int a6, i
         func_003380B0((int *)(value + 0x36F28), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0029C7F0);
+extern void func_PAL_003506C0(int);
+
+void func_PAL_0029C7F0(void)
+{
+    char *value = D_001A8CFC[0];
+
+    if (value != 0)
+        func_PAL_003506C0((int)(value + 0x36F28));
+}
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0029C820);
-
-INCLUDE_ASM("asm/pal/game", func_PAL_0029C8A0);

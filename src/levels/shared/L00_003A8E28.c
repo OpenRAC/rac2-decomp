@@ -35,8 +35,145 @@ typedef struct {
 INCLUDE_ASM("asm/levels", func_L00_003A91A0);
 
 
-INCLUDE_ASM("asm/levels", func_L00_003A98E8);
+/* The 16-byte value of func_L00_003A98E8's vectors, the projectile's own variables and the game's
+ * collision result. */
+typedef int ProjectileQuad __attribute__((mode(TI)));
+typedef float ProjectilePoint[4] __attribute__((aligned(16)));
+typedef union {
+    ProjectileQuad q;
+    float f[4];
+} ProjectileVector;
+typedef struct {
+    ProjectileVector velocity;
+    char *owner;
+    short age;
+    short mode;
+    float life;
+    float speed;
+    float scale;
+    int counter24;
+    int counter28;
+    short counter2C;
+    short counter2E;
+    float spinX;
+    float spinY;
+    float spinZ;
+    int pad3C;
+    int target;
+    int pad44;
+    int effect;
+    int pad4C;
+    ProjectileVector backup;
+} ProjectileVars;
+typedef struct {
+    char pad[0x18];
+    char *moby;
+    int count;
+    ProjectileVector point;
+    ProjectileVector pushOut;
+    ProjectileVector normal;
+} ProjectileCollision;
 
+extern char *func_0029EFD0(int);
+extern float func_002A7940(void);
+extern float func_002A78D8(float, float);
+extern void func_00282F20(void *, void *, float);
+extern void func_002A0F48(void *);
+extern char *D_0018C0B0;
+extern int func_002761F8(void *, void *, int, void *, int);
+extern void func_00283028(void *, void *, void *);
+extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, float, float, float,
+                          float, int, float, int, int, int, int, int);
+extern void func_L00_003A9798(void *, void *, void *, int);
+extern void func_0029F338(void *);
+extern int func_002FED90(void *, void *, float, float, float);
+extern void func_002AFFD8(void *, void *, int);
+extern float func_00282DB0(void *, void *);
+extern void func_00282D30(void *, void *, float);
+extern void func_00282CF0(void *, void *, void *);
+extern ProjectileCollision ref_L00_003A98E8_0;
+extern int ref_L00_003A98E8_1 MACRO_ADDR;
+
+/* Spawns a projectile moby at `position' and fills in its variables, then tests the first stretch
+ * of its flight. A hit on anything but moby classes 0xC87 and 0xECC finishes the projectile on the
+ * spot, with a burst of particles, and returns 0. Otherwise it starts the projectile's effect and
+ * returns the moby. `mode' follows the FP arguments: the integer and FP banks are assigned apart,
+ * so it stays in $a3, and its argument move comes late enough to give it the shorter life. */
+char *func_L00_003A98E8(void *position, void *velocity, char *owner, float speed, float life,
+                        float scale, int mode)
+{
+    ProjectilePoint from;
+    ProjectilePoint near;
+    ProjectilePoint step;
+    ProjectilePoint forward;
+    ProjectilePoint projected;
+    char *moby = func_0029EFD0(0x5D8);
+    char *hit;
+    ProjectileVars *vars;
+    float along;
+
+    if (moby != 0) {
+        *(unsigned char *)(moby + 0x20) = 0;
+        *(unsigned char *)(moby + 0x30) = 255;
+        *(short *)(moby + 0x32) = 255;
+        *(unsigned char *)(moby + 0x31) = 1;
+        vars = *(ProjectileVars **)(moby + 0x68);
+        *(float *)(moby + 0xF8) = func_002A7940();
+        *(float *)(moby + 0xF4) = func_002A7940();
+        *(float *)(moby + 0xF0) = func_002A7940();
+        *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * 0.5f;
+        qcopy(moby + 0x10, position);
+        func_00282F20(vars, velocity, speed);
+        qcopy(&vars->backup, vars);
+
+        vars->owner = owner;
+        vars->speed = speed;
+        vars->mode = mode;
+        vars->life = life;
+        vars->scale = scale;
+        vars->age = 0;
+        vars->counter2E = 0;
+        vars->counter24 = 0;
+        vars->counter28 = 0;
+        vars->counter2C = 12;
+        vars->spinX = func_002A78D8(0.00087266473565f, 0.00436332356185f);
+        vars->spinY = func_002A78D8(0.00174532947131f, 0.00872664712369f);
+        vars->spinZ = func_002A78D8(0.00698131788522f, 0.0349065884948f);
+        vars->target = -1;
+        func_002A0F48(moby);
+
+        *(ProjectileQuad *)step = 0;
+        step[2] = 0.1333333333f;
+        *(ProjectileQuad *)near = *(ProjectileQuad *)(D_0018C0B0 + 0x10);
+        near[2] = *(float *)((char *)position + 8);
+        if (func_002761F8(near, position, 0, D_0018C0B0, 0)) {
+            hit = ref_L00_003A98E8_0.moby;
+            if (hit == 0
+                || (*(short *)(hit + 0xAA) != 0xC87 && *(short *)(hit + 0xAA) != 0xECC)) {
+                qcopy(moby + 0x10, &ref_L00_003A98E8_0.point);
+                func_00283028(step, from, &ref_L00_003A98E8_0.normal);
+                func_00282F20(step, step, 0.0333333333f);
+                func_002ABBB8(moby, step, 0, 0, 0, 10, 3, 9, 6, 3, 9, 0, -1, 15, 1, 1, -1, 0,
+                              0x810001);
+                func_L00_003A9798(moby, vars, moby + 0x10, 0);
+                func_0029F338(moby);
+                return 0;
+            }
+        }
+
+        vars->effect = func_002FED90(moby, 0, 1, 1, 1);
+        if (ref_L00_003A98E8_1) {
+            func_002AFFD8(moby + 0x10, forward, 1);
+            along = func_00282DB0(forward, vars);
+            func_00282D30(projected, forward, along);
+            func_00282CF0(vars, vars, projected);
+            qcopy(&vars->backup, vars);
+        }
+    }
+    return moby;
+}
+
+INCLUDE_ASM("asm/levels", func_L00_003B0DA0);
 
 /* func_L00_003AA4C8 is defined in L00_003AA4C8-effects-g.c. */
 
@@ -406,7 +543,6 @@ int func_L00_003B0B20(unsigned char from, unsigned char to, unsigned char *out)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L00_003B0DA0);
 
 /* func_L00_003B1270 is defined in L00_003A8E28-g8.c. */
 

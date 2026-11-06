@@ -111,8 +111,6 @@ void func_US2_00338F18(int object, int value, int count)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_00338F80);
-
 
 
 

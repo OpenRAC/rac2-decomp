@@ -2,9 +2,33 @@
 
 INCLUDE_ASM("asm/pal/game", func_PAL_002D5FF0);
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002D6058);
+/* func_PAL_002D6058, the PAL copy of func_002D5480: the same C, where the object offset 0x3BE08
+   becomes 0x3C210 and the callees are PAL's own. */
+extern char *D_001A8CFC[] __attribute__((sda));
+extern void func_00287E80(void);
+extern void func_PAL_003435C0(char *, char *, char *, char *);
+extern void func_PAL_00343690(char *, int);
+extern char D_002615F8[], D_00261698[], D_00261750[];
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002D60C8);
+int func_PAL_002D6058(void)
+{
+    func_00287E80();
+    if (D_001A8CFC[0] != 0) {
+        func_PAL_003435C0(D_001A8CFC[0] + 0x3C210, D_002615F8, D_00261698, D_00261750);
+        func_PAL_00343690(D_001A8CFC[0] + 0x3C210, 1);
+    }
+    return 0;
+}
+
+/* func_PAL_002D60C8, the PAL copy of func_L00_0034E950: the same C, calling PAL's func_PAL_0029D8A0. */
+extern int D_00138344;
+extern int func_PAL_0029D8A0(int);
+
+int func_PAL_002D60C8(void)
+{
+    func_PAL_0029D8A0(D_00138344);
+    return 0;
+}
 
 extern int D_00138344;
 extern void func_0029CF08(int);

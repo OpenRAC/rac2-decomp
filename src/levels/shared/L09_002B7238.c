@@ -256,7 +256,7 @@ int func_L09_0033E8B0(char *object, int index, void *out, int current, int direc
     return func_L01_00337888(object, entry, out, current, direction, step);
 }
 
-INCLUDE_ASM("asm/levels", func_L09_0037FCE8);
+/* func_L09_0037FCE8 is defined in L09_0037FCE8-g8.c. */
 
 
 /* func_L09_003A01D8 is matched in src/levels/shared/L09_002B7238-g8.c (-G8). */

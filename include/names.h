@@ -120,6 +120,7 @@
 #define snd_Pump                         func_00132028
 #define snd_BankLoadByLoc                func_00132318
 #define snd_BankLoadFromIOP              func_001326D8
+#define BuildAspectBlitStrips            func_00284088
 #define read_mpeg                        func_0034F048
 #define DrawGlowSprites                  func_002824B8
 #define LoadPifAsPSMT8H                  func_0026FC78
@@ -620,6 +621,7 @@
 #define ChooseVisibleGroupTarget         func_L03_003C5668
 #define UpdateEndakoRespawningEnemy      func_L03_0041BE50
 #define UpdateTodanoPathDriver           func_L12_004190A8
+#define DrawSlidingTextLine              func_L00_002E30B8
 #define IntegerPower                     func_L08_003277C0
 #define UpdateItemStatusHud              func_0034CEA0
 #define UpdateGroupEncounterController   func_L19_003DD9D8
@@ -920,5 +922,10 @@
 #define DrawRotatingObjectGroupEffects   func_L02_003E80F8
 #define FindHeroOrMobyTarget             func_L04_003429F8
 #define UpdateFadingMobyList             func_L00_003E7C88
+#define SpawnProjectile                  func_L00_003A98E8
+#define UpdateTrailStrips                func_L00_0038B208
+#define RideableMobyUpdate               func_L08_003C6AB0
+#define UpdateRacerRouteChoice           func_L04_00402D90
+#define DrawDomeEffect                   func_L04_003FBEF8
 
 #endif /* NAMES_H */

@@ -60,8 +60,6 @@ extern BatchA_A04_u32 D_001A79F0[] __attribute__((sda));
 
 extern BatchA_A04_u8 D_001395B8[];
 
-INCLUDE_ASM("asm/levels", func_L04_00402D90);
-
 extern void func_L00_002ECFE8(void *a0, void *a1, int a2, unsigned int a3,
                               float f12, float f13, float f14, int t0, int t1);
 
