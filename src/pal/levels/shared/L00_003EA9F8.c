@@ -105,6 +105,3 @@ zero_angle:
     }
     return 0;
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003EAE90);
