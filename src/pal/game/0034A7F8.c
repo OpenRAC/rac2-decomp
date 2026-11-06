@@ -18,8 +18,6 @@ void func_PAL_0034A808(char *a0, int a1, int *a2)
         func_L00_0042C360_1(a0 + 536 + i * 88, func_00288FB8_2(a2[i]));
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034A870);
-
 
 
 INCLUDE_ASM("asm/pal/game", func_PAL_0034B088);

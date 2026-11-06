@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L08_0042ECD0);
 
 #include "common.h"
 extern float D_L08_001B3A20[] __attribute__((sda));

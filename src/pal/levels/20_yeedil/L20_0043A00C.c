@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L20_0043A00C);
-
 #include "common.h"
 extern f32 func_00303270(f32, f32);
 extern s32 func_L09_00329028(char *, s32);
