@@ -1,9 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_0042E5F8);
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_0042ED80);
-
 #include "common.h"
 extern int func_00282948(void *);
 extern void func_00325DA0(void *, void *);

@@ -19,8 +19,6 @@ void func_PAL_L14_004284F8(char *a0)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L14_004288B0);
-
 extern void func_002B5278(char *object, float factor);
 extern void func_002B5258(char *object);
 extern void func_002B50E0(char *object, char *bone, float factor);

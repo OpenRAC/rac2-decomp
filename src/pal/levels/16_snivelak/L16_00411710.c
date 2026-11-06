@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L16_00411710);
-
 #include "common.h"
 extern s32 func_313EA0(s32);
 extern void func_002A7750(void *, s32, s32);
@@ -68,6 +66,3 @@ void func_PAL_L16_00411C78(u8 *arg)
     *(s32 *)(state + 0x354) = func_002B3BA8(arg, *(s32 *)(state + 0x350), 0.0f, 0.0f, 0, 0);
     *(float *)(arg + 0x18) = *(float *)(state + 0x358);
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L16_00411E88);
