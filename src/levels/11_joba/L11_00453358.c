@@ -144,6 +144,28 @@ extern void func_002A0F48(void *a0);
 
 extern void func_L00_002E6CF0(void *a0, void *a1);
 
+extern char *func_0029EFD0(int);
+extern void func_002B37E8(char *, char *);
+extern int func_002ACBC8(void *, int);
+extern void func_0029FCC0(char *, int, void *);
+extern void func_002830C0(void *, void *, void *);
+extern u8 *func_L11_003DD068(u8 *, u8 *, u8 *, float);
+extern float func_00283B98(float, float);
+extern void func_00282D30(void *, void *, float);
+extern void func_L00_0033C0D0(char *, void *, void *, void *, int);
+extern char D_00189EA0[];
+extern int D_L11_001B089C[] NOT_SDA __attribute__((sda));
+/* 64-byte records indexed by D_L11_001B089C[0]. */
+typedef struct { int unused; int flags; char pad[56]; } Entry61308;
+extern Entry61308 D_L11_002B6D40[];
+extern char *D_L11_001B359C[] NOT_SDA __attribute__((sda));
+extern char *D_L11_001B368C[] NOT_SDA __attribute__((sda));
+/* Lower and upper bound of a random value. */
+extern float D_L11_001B2388[] NOT_SDA __attribute__((sda));
+extern char D_L11_001B2378[] NOT_SDA __attribute__((sda));
+extern char D_L11_001B2368[] NOT_SDA __attribute__((sda));
+extern char D_L11_001B2358[] SDATA(D_L11_001B2358);
+
 extern void func_L11_0045B6C8(char *p);
 
 extern int D_L11_001CAE40;
@@ -195,7 +217,7 @@ extern void func_L11_00456540(char *);
 extern void func_L11_00456378(char *);
 extern void func_L11_00456EA0(void);
 
-INCLUDE_ASM("asm/levels", func_L11_00453358);
+/* func_L11_00453358 lives in L11_00453358-state-g8.c. */
 
 /* func_L11_00454508 lives in the sibling small-data unit (L11_00453358-g8.c). */
 

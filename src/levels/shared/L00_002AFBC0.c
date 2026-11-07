@@ -425,7 +425,7 @@ float func_L00_002B0480(Row_F3392e4bc *a, Row_F3392e4bc *b)
 
 /* func_L00_002B0528 is in L00_002B0528-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_002B0968);
+/* func_L00_002B0968 is in L00_002AFBC0-attach-g8.c. */
 
 /* for one fixed 80-byte slot: stores a value, rewrites a state word, dispatches through a function pointer at entry+100 unless the entry is null or carries a 253/254 sentinel, then releases two stored entry pointers, skipping the second when the slot index is 3 */
 void func_L00_002B1230(int slot, int value)

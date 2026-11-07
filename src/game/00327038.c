@@ -173,8 +173,6 @@ void func_00328758(char *self)
     }
 }
 
-INCLUDE_ASM("asm/game", func_0032A140);
-
 void func_00328848(char *a0)
 {
     char *rec = D_0022B0A0;

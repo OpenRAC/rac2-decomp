@@ -622,7 +622,7 @@ void func_L15_00437B18(void *a0) {
     func_L00_002E6EF8((void *)func_L15_00438518, a0);
 }
 
-INCLUDE_ASM("asm/levels", func_L15_00437B68);
+/* func_L15_00437B68 is in L15_00437B68-g8.c. */
 
 /* func_L15_00438260 is in L15_00438260-g8.c. */
 

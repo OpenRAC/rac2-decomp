@@ -539,9 +539,6 @@ void func_00319FB8(char *object)
     func_0031A340(object, data + 0x330, 0.15f, 0x1050B0, 0x10000000, 0x30000000);
 }
 
-INCLUDE_ASM("asm/game", func_0031A098);
-
-
 extern void func_0031A098(void *record);
 extern long long func_0027C878_1(int id);
 extern float func_00283248(float x, float y);

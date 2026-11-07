@@ -257,8 +257,7 @@ void func_002B67E0(int a0, int index) {
     func_001325E8(a0, func_002B6770, addr);
 }
 
-INCLUDE_ASM("asm/game", func_002B6828);
-
+/* func_002B6828 is matched in 002B6828.c. */
 
 /* func_002B68C8 is built from 002B68C8.c. */
 
@@ -339,13 +338,42 @@ void func_002B6E78(int index, int mode, int volume)
                   func_002B7FB0, (unsigned int)&s->channel[0]);
 }
 
+extern void func_002B7F58(int, long);
+
 /* While the primary stream channel is playing (handle neither 0 nor -1) and not already in
    state 9, start entry index + 3 and index + 2 of the stream table (offset plus the table
    base) on it if entry index + 1 is present: state 9, volume, track and mode recorded, then
    the stream call with the current handle as its eighth argument and bit 0 of the mode as
    flag 4. The locations are long sums passed to int parameters (one truncdisi2 each, as in
    retail), and the statements keep the order retail's scheduling and allocation need. */
-INCLUDE_ASM("asm/game", func_002B6F70);
+void func_002B6F70(int index, int mode, int volume)
+{
+    StreamState *s = (StreamState *)D_001A63A8;
+    SoundTable *d;
+    long first, second;
+    unsigned int current;
+    int stream_flags;
+    unsigned long callback_data;
+
+    if (s->channel[0].state == 9) return;
+    current = s->channel[0].handle;
+    if (current == 0 || current == 0xffffffffU) return;
+    d = (SoundTable *)D_0014B540;
+    if (!d->entries[index + 1].offset) return;
+    s->channel[0].state = 9;
+    second = d->entries[index + 2].offset + d->base;
+    s->channel[0].volume = volume;
+    s->channel[0].track = index;
+    s->channel[0].flags = mode;
+    s->channel[0].poll_interval = 10;
+    s->channel[0].crossfade = 0;
+    first = d->entries[index + 3].offset + d->base;
+    s->channel[0].sample_rate = 48000;
+    stream_flags = (mode & 1) << 2;
+    callback_data = (unsigned int)&s->channel[0];
+    func_00133350(first, second, 0, 0, (short)volume, 0, 1, current, 0, stream_flags,
+                  func_002B7F58, callback_data);
+}
 
 void func_002B7170(void) {
     ((void (*)(void))func_00133230)();

@@ -34,7 +34,6 @@ extern void func_L04_003A02A0(void *, int);
 
 extern void func_0029FCC0(void *, int, void *);
 
-INCLUDE_ASM("asm/levels", func_L08_00308888);
 
 void func_L08_00329EC0(float value, float *object) {
     object[29] = 0.2f;

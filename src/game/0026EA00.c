@@ -660,7 +660,7 @@ void func_00270550(char *object) {
 
 /* func_00270598 is in 00270598.c. */
 
-INCLUDE_ASM("asm/game", func_00270838);
+/* func_00270838 is in 00270838-g8.c. */
 
 void func_00270A00(char *object) {
     ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[4];

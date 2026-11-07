@@ -174,7 +174,7 @@ int func_L00_00424070(int a0, int a1)
 
 /* func_L00_004240D8 is in L00_004240D8-g8-dbg.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_004243C0);
+/* func_L00_004243C0 is in L00_004243C0-g8-dbg.c. */
 
 extern char *D_L00_001B8E10;
 

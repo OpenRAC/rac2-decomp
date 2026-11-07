@@ -107,7 +107,7 @@ extern void func_310440();
 
 /* func_L00_003B4198 is defined in L00_003B3158-rings.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003B4560);
+/* func_L00_003B4560 is defined in L00_003B3158-mesh-g8.c. */
 
 /* func_L00_003B4EF8 is defined in L00_003B4EF8-g8.c. */
 

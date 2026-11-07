@@ -1,25 +1,5 @@
-/* 2 November 2026: retained nonmatching C; no linked matching credit.
- * Profile: -O2 -G8 -ffunction-sections -g.
- * USA v1.01 check: 5132/5120 bytes, 0/2 placements.
- * Matched func_002E4AC8, func_L04_002E7C08 and func_L01_00355BA0 return signed int. Correcting
- * their ignored results leaves 5132/5120 bytes and 0/2 placements. Seven reset-store scheduling
- * and hero-state/branch-likely timing remain. No linked or native-runtime validation.
- */
-/* func_L04_00419918: near miss, 5132/5120 bytes, 0 of 2 places (USA v1.01, 1 November 2026).
-
-   Profile: its own `-g8` unit, `-O2 -G8 -ffunction-sections -g` (-g for the nop pair before
-   the div.s in case 2).
-
-   The hoverbike race controller of Barlow and Joba: a five-case switch on self[0x20] (retail's
-   table jtbl_002CA1A0) with a seven-case switch on self[0xBC] inside case 2 (jtbl_002CA1C0,
-   2 -> 3 -> 4 falling through). Every call, constant and global agrees with retail; the
-   globals at 0x1AA6A0..0x1AA6AC are four separate words (one reached through $gp), the
-   0x1A7xxx/0x1A8xxx and D_L04_001B24DC/25CC/31D4 words are MACRO_ADDR, the rest of 0x1B08F0..
-   0x1B2008 are sda; the sound slot is the SoundSlot cast of L20_0043ECB0.c (retail's mult).
-   What differs: scheduling and branch-likely filling throughout (store order of the seven
-   -1 resets, the 0x400 flag store in a delay slot, the hero-state tests reading 0x229C/0x2294),
-   12 bytes over in all. A first draft for a 5 KB function with two places. */
-
+/* func_L04_00419918, the hoverbike race controller of Barlow and Joba. Its own -G8 unit,
+ * built with -g (config/cflags.txt): the line notes give retail's nop pair before case 2's div.s. */
 #include "common.h"
 
 typedef float Vector[4] __attribute__((aligned(16)));
@@ -32,12 +12,13 @@ extern int D_00138320 NOT_SDA;
 extern int D_00138324 NOT_SDA;
 extern int D_001A79F0 MACRO_ADDR;
 extern int D_001A7904 MACRO_ADDR;
-extern unsigned char D_001A7B2E;
+extern unsigned char D_001A7AF8[] MACRO_ADDR;
 extern int D_L04_001A7CD0 MACRO_ADDR;
 extern float D_L04_001A7CCC MACRO_ADDR;
 extern int D_L04_001A7CD4 MACRO_ADDR;
 extern int D_L04_001A8ED0 MACRO_ADDR;
-extern int D_L04_001A8EE4 MACRO_ADDR;
+/* The race flag words; [5] is the flag func_L04_00402D90 sets. */
+extern int D_L04_001A8ED0_flags[] __asm__("D_L04_001A8ED0") MACRO_ADDR;
 extern int D_L04_001A8F00 MACRO_ADDR;
 extern int D_L04_001A8F08 MACRO_ADDR;
 extern int D_L04_001A8FE4 MACRO_ADDR;
@@ -53,7 +34,8 @@ extern int D_L04_001B08FC __attribute__((sda));
 extern int D_L04_001B0900 __attribute__((sda));
 extern int D_L04_001B0908 __attribute__((sda));
 extern int D_L04_001B090C __attribute__((sda));
-extern int D_L04_001B0910 __attribute__((sda));
+/* D_L04_001B0910 in Barlow; in Joba that name is bound to another variable. */
+extern int ref_L04_00419918_01 __attribute__((sda));
 extern u8 *D_L04_001B0914 __attribute__((sda));
 extern int D_L04_001B0918 __attribute__((sda));
 extern int D_L04_001B091C __attribute__((sda));
@@ -69,11 +51,11 @@ extern int D_L04_001B2008 __attribute__((sda));
 extern u8 *D_L04_001B24DC MACRO_ADDR;
 extern u8 *D_L04_001B25CC MACRO_ADDR;
 extern int D_L04_001B31D4 MACRO_ADDR;
-extern char D_L04_001B31A0[];
+extern char D_L04_001B31A0[] MACRO_ADDR;
 extern char D_L04_001B9540[];
 extern char D_L04_001B9680[];
 extern Quad D_L04_001BFAF0;
-extern float D_L04_001BDC30;
+extern float D_L04_001BDC30 NOT_SDA;
 extern void func_L00_002B30E8(void);
 extern void func_L00_002B9D60(void *, void *, int, int);
 extern int func_L04_002E7C08(int, int);
@@ -102,7 +84,7 @@ extern float func_002A7878(float, float);
 extern void func_002A91F0(void *, float *);
 extern void func_002A93B0(void *);
 extern void func_002AD7B8(int);
-extern void func_002B0C28(int, int, int);
+extern int func_002B0C28(int, int, int);
 extern int func_L00_003268E8(int);
 extern int func_002B38B8(void *);
 extern void func_L01_00323310(int, int);
@@ -138,21 +120,26 @@ extern void func_L04_00418BF0(void *, void *);
 extern void func_L04_004195E0(void *);
 extern void func_L04_0043ABE0(void);
 extern void func_L04_0040AC80(void);
-extern void func_L04_0040AC98(void);
+/* func_L04_0040AC98 in Barlow; Joba places its copy elsewhere. */
+extern void ref_L04_00419918_00(void);
 extern void func_L04_0040ACA8(void);
 extern void func_L04_0040AD28(void);
 extern void func_L04_0040CDD0(void);
 extern void func_L04_00411298(void);
 extern void func_00132B28(int);
-extern int func_00132028(void);
+extern void func_00132028(void);
 
-#define I(p, o) (*(int *)((u8 *)(p) + (o)))
-#define F(p, o) (*(float *)((u8 *)(p) + (o)))
-#define H(p, o) (*(unsigned short *)((u8 *)(p) + (o)))
-#define P(p, o) (*(u8 **)((u8 *)(p) + (o)))
-#define Q(p, o) (*(Quad *)((u8 *)(p) + (o)))
-#define MOBY(i) (D_L04_001B24DC + ((i) << 8))
-#define NODE(i) (D_L04_001B25CC + ((i) << 7))
+#define M_(p, t, o) (((struct { u8 pad[o]; t v; } *)(p))->v)
+#define I(p, o) M_(p, int, o)
+#define F(p, o) M_(p, float, o)
+#define H(p, o) M_(p, unsigned short, o)
+#define P(p, o) M_(p, u8 *, o)
+#define Q(p, o) M_(p, Quad, o)
+typedef struct { u8 b[0x100]; } MobyRec;
+typedef struct { int v[1]; } IdList;
+typedef struct { u8 b[0x80]; } NodeRec;
+#define MOBY(i) (((MobyRec *)D_L04_001B24DC)[i].b)
+#define NODE(i) (((NodeRec *)D_L04_001B25CC)[i].b)
 
 /* The hoverbike race controller of Barlow and Joba: spawns the bikes and the course, waits for
    the hero to mount, runs the countdown, the race and the finish, and puts everything back. */
@@ -163,6 +150,9 @@ void func_L04_00419918(u8 *self)
     u8 *s = P(self, 0x68);
     u8 *o;
     int k, flag, path;
+    IdList *ids;
+    float *fp;
+    int id;
     float d;
 
     if (self[0x31] != 0 && func_00282E48(self + 0x10, D_L04_001B9680) < 24.0f) {
@@ -182,11 +172,17 @@ void func_L04_00419918(u8 *self)
     }
     switch (self[0x20]) {
     case 0:
-        I(s, 0x330) = I(s, 0x328) = I(s, 0x3BC) = I(s, 0x714) = I(s, 0x74C) = I(s, 0x748) = I(s, 0x334) = -1;
+        I(s, 0x748) = -1;
+        I(s, 0x74C) = -1;
+        I(s, 0x714) = -1;
+        I(s, 0x3BC) = -1;
+        I(s, 0x328) = -1;
+        I(s, 0x330) = -1;
+        I(s, 0x334) = -1;
         D_L04_001AA6A0 = func_L04_0040AC80;
+        D_L04_001AA6A4 = ref_L04_00419918_00;
         D_L04_001AA6A8 = func_L04_0040ACA8;
-        D_L04_001AA6AC = func_L04_0040AC98;
-        D_L04_001AA6A4 = func_L04_0040AC98;
+        D_L04_001AA6AC = ref_L04_00419918_00;
         func_00283360(D_L04_001B31A0);
         D_L04_001B0914 = self;
         func_L04_0043ABE0();
@@ -207,12 +203,12 @@ void func_L04_00419918(u8 *self)
         Q(s, 0x2E0) = Q(self, 0xF0);
         qzero(s + 0x290);
         qzero(s + 0x2A0);
+        I(s, 0x314) = -1;
         I(s, 0x494) = -1;
         F(s, 0x660) = 0.01f;
         F(s, 0x664) = 0.02f;
         F(s, 0x668) = 0.03f;
         F(s, 0x66C) = 0.04f;
-        I(s, 0x314) = -1;
         I(s, 0x318) = 0;
         I(s, 0x498) = 0;
         I(s, 0x640) = 0;
@@ -225,16 +221,17 @@ void func_L04_00419918(u8 *self)
         }
         I(s, 0x768) = 0;
         I(s, 0x764) = 40;
+        fp = (float *)(s + 0x370);
         for (k = 0; k < 21; k++) {
             int id = ((int *)(s + 0x1E4))[k];
 
             if (id != -1) {
                 u8 *rider = P(MOBY(id), 0x68);
 
-                I(rider, 0x1C8) = 0;
                 I(rider, 0x120) = -1;
                 I(rider, 0x124) = 0;
                 I(rider, 0x1C4) = -1;
+                I(rider, 0x1C8) = 0;
             }
         }
         I(s, 0x340) = 0;
@@ -244,9 +241,9 @@ void func_L04_00419918(u8 *self)
             I(s, 0x340) += func_L04_0040A268(k);
         }
         for (k = 0; k < 6; k++) {
-            ((float *)(s + 0x370))[k] = func_002A7878(0.0f, 1.0f);
+            fp[k] = func_002A7878(0.0f, 1.0f);
         }
-        if (D_001A79F0 == 11 && func_L04_0040A1D0(0) > 0 && D_001A7B2E == 0) {
+        if (D_001A79F0 == 11 && func_L04_0040A1D0(0) > 0 && D_001A7AF8[0x36] == 0) {
             func_00288308(0x36);
         } else if (D_001A79F0 == 4 && func_L04_0040A1D0(0) > 0) {
             func_002AD7B8(5);
@@ -261,17 +258,18 @@ void func_L04_00419918(u8 *self)
             func_L04_00412E38(self, s, 0.02f, 0.00029f);
             flag = 1;
             F(self, 0x18) = F(s, 0x2D8) + func_00283198(F(s, 0x38C)) * 0.04f;
-            Q(a, 0) = 0;
+            qzero_nc(a);
             a[0] = F(s, 0x38C);
             func_002A91F0(s + 0x450, a);
             if (I(s, 0x238) != -1) {
-                o = MOBY(I(s, 0x238));
-                I(o, 0x98) = 0;
-                H(o, 0x34) |= 0x43;
+                u8 *m = MOBY(I(s, 0x238));
+
+                I(m, 0x98) = 0;
+                H(m, 0x34) |= 0x43;
                 if (I(s, 0x1E0) != -1) {
-                    o = MOBY(I(s, 0x1E0));
-                    I(o, 0x98) = 0;
-                    H(o, 0x34) |= 0x43;
+                    m = MOBY(I(s, 0x1E0));
+                    I(m, 0x98) = 0;
+                    H(m, 0x34) |= 0x43;
                 }
             }
         }
@@ -311,20 +309,22 @@ void func_L04_00419918(u8 *self)
         } else {
             if (I(s, 0x198) != -1) {
                 if (I(s, 0x19C) != -1) {
-                    o = NODE(I(s, 0x19C));
-                    func_002DF3F8(o + 0x30, o + 0x70);
+                    func_002DF3F8(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70);
                 } else {
                     func_002DF3F8(self + 0x10, self + 0xF0);
                 }
                 func_0027D330(0x10);
-                o = NODE(I(s, 0x198));
-                func_L00_002B9D60(o + 0x30, o + 0x70, 0x31, 1);
+                func_L00_002B9D60(NODE(I(s, 0x198)) + 0x30, NODE(I(s, 0x198)) + 0x70, 0x31, 1);
                 Q(self, 0x10) = Q(NODE(I(s, 0x198)), 0x30);
                 Q(self, 0xF0) = Q(NODE(I(s, 0x198)), 0x70);
             }
             func_L04_002E7C08(0x31, 1);
             func_L00_00303530(1, I(s, 0x488));
             I(s, 0x58) |= 1;
+            I(s, 0x340) = 0;
+            F(s, 0x28) = 2.0f;
+            I(s, 0x54) = 0;
+            F(s, 0x40) = 0.008333334f;
             F(s, 0x24) = 0.1f;
             F(s, 0x20) = 0.25f;
             F(s, 0x2C) = 2.0f;
@@ -332,10 +332,6 @@ void func_L04_00419918(u8 *self)
             F(s, 0x44) = 0.008333334f;
             F(s, 0x48) = 0.5f;
             F(s, 0x4C) = 0.0033333334f;
-            I(s, 0x340) = 0;
-            F(s, 0x28) = 2.0f;
-            I(s, 0x54) = 0;
-            F(s, 0x40) = 0.008333334f;
             I(s, 0x270) = 0;
             D_L04_001A8FE4 = 0;
             D_L04_001A8FE8 = 0;
@@ -343,14 +339,17 @@ void func_L04_00419918(u8 *self)
             I(s, 0x31C) = 0;
         }
         H(self, 0x34) |= 0x41;
-        o = 0;
-        if (I(s, 0x1DC) != -1) {
-            o = MOBY(I(s, 0x1DC));
-        }
-        if (o != 0) {
-            H(o, 0x34) |= 0x41;
-            if (D_L04_001B08F4 != 0) {
-                H(D_L04_001B08F4, 0x34) |= 0x41;
+        {
+            u8 *m = 0;
+
+            if (I(s, 0x1DC) != -1) {
+                m = MOBY(I(s, 0x1DC));
+            }
+            if (m != 0) {
+                H(m, 0x34) |= 0x41;
+                if (D_L04_001B08F4 != 0) {
+                    H(D_L04_001B08F4, 0x34) |= 0x41;
+                }
             }
         }
         self[0x20] = 2;
@@ -371,8 +370,9 @@ void func_L04_00419918(u8 *self)
     case 2:
         if (I(D_00189E20, 0x2294) == 0x86) {
             u8 *bike = P(D_00189E20, 0x2290);
+            float ratio = F(bike, 0x2C) / F(P(bike, 0x24), 0x24);
 
-            F(self, 0x2C) = F(P(self, 0x24), 0x24) * (F(bike, 0x2C) / F(P(bike, 0x24), 0x24));
+            F(self, 0x2C) = F(P(self, 0x24), 0x24) * ratio;
             return;
         }
         if (D_L04_001B0908 != 0) {
@@ -387,13 +387,13 @@ void func_L04_00419918(u8 *self)
             D_L04_001B0908 = 0;
             return;
         }
-        if (D_L04_001B0910 != 0) {
+        if (ref_L04_00419918_01 != 0) {
             D_L04_001A8ED0 = 1;
             H(self, 0x34) &= ~0x41;
             func_L04_0040AC30(self, s);
             I(s, 0x320) = -1;
             self[0x20] = 4;
-            D_L04_001B0910 = 0;
+            ref_L04_00419918_01 = 0;
             return;
         }
         switch (self[0xBC]) {
@@ -421,8 +421,8 @@ void func_L04_00419918(u8 *self)
                     H(D_L04_001B08F4, 0x34) &= ~0x41;
                 }
                 Q(o, 0x10) = Q(self, 0x10);
-                o[0x30] = 0;
                 Q(o, 0xF0) = Q(self, 0xF0);
+                o[0x30] = 0;
                 func_002A7398(o, 0, 0);
                 func_002A05A8(o);
                 func_002A0F48(o);
@@ -452,8 +452,16 @@ void func_L04_00419918(u8 *self)
             self[0xBC] = 4;
         case 4:
             func_L04_00418A58(self, s);
-            if ((I(s, 0x394) < 120 && D_L04_001B31D4 == 0) || (I(s, 0x394) < 90 && D_L04_001B31D4 == 1)
-                || (I(s, 0x394) < 60 && D_L04_001B31D4 == 2) || (I(s, 0x394) < 30 && D_L04_001B31D4 == 3)) {
+            if (I(s, 0x394) < 120 && D_L04_001B31D4 == 0) {
+                func_002E5CF8(0xD, 0, self);
+                D_L04_001B31D4++;
+            } else if (I(s, 0x394) < 90 && D_L04_001B31D4 == 1) {
+                func_002E5CF8(0xD, 0, self);
+                D_L04_001B31D4++;
+            } else if (I(s, 0x394) < 60 && D_L04_001B31D4 == 2) {
+                func_002E5CF8(0xD, 0, self);
+                D_L04_001B31D4++;
+            } else if (I(s, 0x394) < 30 && D_L04_001B31D4 == 3) {
                 func_002E5CF8(0xD, 0, self);
                 D_L04_001B31D4++;
             }
@@ -515,12 +523,12 @@ void func_L04_00419918(u8 *self)
                 if (D_L04_001B08F4 != 0) {
                     H(D_L04_001B08F4, 0x34) |= 0x41;
                 }
-                o[0x31] = 1;
                 F(o, 0x2C) = F(P(o, 0x24), 0x24) * 0.25f;
                 H(o, 0x32) = 0x7F;
+                o[0x31] = 1;
                 Q(o, 0x10) = Q(self, 0x10);
-                o[0x30] = 0;
                 Q(o, 0xF0) = Q(self, 0xF0);
+                o[0x30] = 0;
                 func_002A05A8(o);
                 func_002A0F48(o);
                 H(o, 0x34) |= 6;
@@ -529,10 +537,11 @@ void func_L04_00419918(u8 *self)
                 return;
             }
             func_0027D330(0x10);
-            k = ((int *)(s + 0x110))[I(s, 0x270)];
-            if (k != -1) {
-                Q(a, 0) = Q(NODE(((int *)(s + 0x110))[I(s, 0x270)]), 0x30);
-                Q(b, 0) = Q(NODE(((int *)(s + 0x110))[I(s, 0x270)]), 0x70);
+            ids = (IdList *)(s + 0x110);
+            id = ids->v[I(s, 0x270)];
+            if (id != -1) {
+                Q(a, 0) = Q(NODE(id), 0x30);
+                Q(b, 0) = Q(NODE(ids->v[I(s, 0x270)]), 0x70);
             } else if (I(s, 0x198) == -1) {
                 func_L00_002B30E8();
                 return;
@@ -548,10 +557,10 @@ void func_L04_00419918(u8 *self)
             func_L04_0040A3B8(self, 1);
             func_L04_00415EA8(self);
             func_L00_002B9D60(a, b, 0x31, 1);
-            D_00189E20[0x22B5] = 1;
             D_00189E20[0x22B7] = 1;
-            I(s, 0x4A0) = -1;
+            D_00189E20[0x22B5] = 1;
             I(s, 0x49C) = -1;
+            I(s, 0x4A0) = -1;
             F(s, 0x4A4) = -1.0f;
             I(s, 0x4B0) = 0;
             I(s, 0x4A8) = 0;
@@ -582,15 +591,16 @@ void func_L04_00419918(u8 *self)
         func_L04_00418A58(self, s);
         D_L04_001B08F8++;
         if (F(self, 0x18) < F(s, 0x26C) || func_L04_00410E48(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
-            float ahead;
+            float ahead, along;
+            int node = func_L04_00400AB0(self, P(s, 0x6D0), 1);
 
-            k = func_L04_00400AB0(self, P(s, 0x6D0), 1);
-            Q(self, 0x10) = Q(P(s, 0x6D0) + (k << 4), 0x10);
-            ahead = func_00283CE0(k) * F(P(s, 0x6D0), 0x1C);
+            /* The path's points are 16-byte records from +0x10. */
+            Q(self, 0x10) = Q(((Vector *)P(s, 0x6D0))[node], 0x10);
+            along = func_00283CE0(node) * F(P(s, 0x6D0), 0x1C);
             if (D_L04_001B08F0 != 0) {
-                ahead += 15.0f;
+                ahead = along + 15.0f;
             } else {
-                ahead += 5.0f;
+                ahead = along + 5.0f;
             }
             F(s, 0x6D8) = ahead;
             func_002C96F8(ahead, F(P(s, 0x6D0), 0x1C), P(s, 0x6D0), s + 0x654, s + 0x6D4, s + 0x6A0);
@@ -611,18 +621,18 @@ void func_L04_00419918(u8 *self)
         }
         func_00132B28(0x5D);
         func_00132028();
-        D_L04_001A8EE4 = 0;
+        D_L04_001A8ED0_flags[5] = 0;
         func_L04_0040AC30(self, s);
         self[0x20] = 4;
         func_L01_00323310(I(s, 0x488), -1);
         return;
     case 4:
-        I(D_L04_001B9540, 0x16C) = 0;
         D_L04_001A8ED0 = 1;
         I(D_L04_001B9540, 0x160) = 0;
         I(D_L04_001B9540, 0x168) = 0;
         I(D_L04_001B9540, 0x180) = 0;
         I(D_L04_001B9540, 0x188) = 0;
+        I(D_L04_001B9540, 0x16C) = 0;
         if (D_L04_001A7CD0 == 0) {
             D_L04_001A7CD0 = 1;
             D_L04_001A7CCC = 0.05f;
@@ -635,65 +645,72 @@ void func_L04_00419918(u8 *self)
         D_L04_001A8ED0 = 0;
         H(self, 0x34) &= ~0x41;
         func_0029B758(0, 0);
-        if (I(s, 0x19C) == -1) {
-            func_L04_0040A958(self, 1);
-            D_L04_001B0900 = 0;
-            return;
-        }
-        if (I(s, 0x320) == -1 || (D_L04_001B090C == 0 && func_L04_0040A1D0(0) == 1)) {
-            u8 *bike;
+        if (I(s, 0x19C) != -1) {
+            if (I(s, 0x320) == -1 || (D_L04_001B090C == 0 && func_L04_0040A1D0(0) == 1)) {
+                u8 *bike;
 
-            path = I(s, 0x480);
-            if (D_001A79F0 == 11) {
-                path = I(s, 0x484);
-            }
-            Q(a, 0) = Q(NODE(I(s, 0x19C)), 0x70);
-            if (D_L04_001B0BBC != 0) {
-                a[2] = 0.92f;
-            }
-            if (I(s, 0x320) == 1 && D_L04_001B090C == 0) {
-                D_L04_001B090C = I(s, 0x320);
-            }
-            if (D_L04_001B08F4 != 0) {
-                func_0029F338(D_L04_001B08F4);
-                D_L04_001B08F4 = 0;
-            }
-            bike = P(D_00189E20, 0x2290);
-            D_00189E20[0x22B5] = 0;
-            I(bike, 0x98) = I(P(bike, 0x24), 0x10);
-            func_L00_002B9D60(NODE(I(s, 0x19C)) + 0x30, a, 0, 1);
-            bike = P(D_00189E20, 0x2290);
-            F(bike, 0x2C) = F(P(bike, 0x24), 0x24);
-            Q(self, 0x10) = Q(s, 0x2D0);
-            self[0x20] = 1;
-            Q(self, 0xF0) = Q(s, 0x2E0);
-            F(self, 0x2C) = F(P(self, 0x24), 0x24);
-            func_L00_00303530(0, path);
-            D_L04_001BDC30 = func_00283198(0.56217057f) / func_00283180(0.56217057f);
-            func_0027AB40();
-            for (k = 0; k < 21; k++) {
-                int id = ((int *)(s + 0x1E4))[k];
+                path = I(s, 0x480);
+                if (D_001A79F0 == 11) {
+                    path = I(s, 0x484);
+                }
+                Q(a, 0) = Q(NODE(I(s, 0x19C)), 0x70);
+                if (D_L04_001B0BBC != 0) {
+                    a[2] = 0.92f;
+                }
+                if (I(s, 0x320) == 1 && D_L04_001B090C == 0) {
+                    D_L04_001B090C = I(s, 0x320);
+                }
+                if (D_L04_001B08F4 != 0) {
+                    func_0029F338(D_L04_001B08F4);
+                    D_L04_001B08F4 = 0;
+                }
+                bike = P(D_00189E20, 0x2290);
+                D_00189E20[0x22B5] = 0;
+                I(bike, 0x98) = I(P(bike, 0x24), 0x10);
+                func_L00_002B9D60(NODE(I(s, 0x19C)) + 0x30, a, 0, 1);
+                {
+                    u8 *ride = P(D_00189E20, 0x2290);
 
-                if (id != -1) {
-                    u8 *rider = P(MOBY(id), 0x68);
+                    F(ride, 0x2C) = F(P(ride, 0x24), 0x24);
+                }
+                Q(self, 0x10) = Q(s, 0x2D0);
+                Q(self, 0xF0) = Q(s, 0x2E0);
+                self[0x20] = 1;
+                F(self, 0x2C) = F(P(self, 0x24), 0x24);
+                func_L00_00303530(0, path);
+                {
+                    float q = func_00283198(0.56217057f) / func_00283180(0.56217057f);
 
-                    I(rider, 0x2C8) = 0;
-                    rider[0x251] = 0;
-                    if (P(rider, 0x8C) != 0) {
-                        func_0029F338(P(rider, 0x8C));
-                        P(rider, 0x8C) = 0;
+                    D_L04_001BDC30 = q;
+                }
+                func_0027AB40();
+                for (k = 0; k < 21; k++) {
+                    int id = ((int *)(s + 0x1E4))[k];
+
+                    if (id != -1) {
+                        u8 *rider = P(MOBY(id), 0x68);
+
+                        I(rider, 0x2C8) = 0;
+                        rider[0x251] = 0;
+                        if (P(rider, 0x8C) != 0) {
+                            func_0029F338(P(rider, 0x8C));
+                            P(rider, 0x8C) = 0;
+                        }
                     }
                 }
+                return;
             }
-            return;
-        }
-        if (func_L04_0040A1D0(D_L04_001B090C) == 1) {
-            D_L04_001B090C++;
-            if (D_L04_001B090C >= 5) {
-                D_L04_001B090C = 4;
+            if (func_L04_0040A1D0(D_L04_001B090C) == 1) {
+                D_L04_001B090C++;
+                if (D_L04_001B090C >= 5) {
+                    D_L04_001B090C = 4;
+                }
             }
+            func_L04_0040A958(self, 1);
+        } else {
+            func_L04_0040A958(self, 1);
+            D_L04_001B0900 = 0;
         }
-        func_L04_0040A958(self, 1);
         return;
     }
 }

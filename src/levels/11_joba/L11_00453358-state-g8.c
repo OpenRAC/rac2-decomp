@@ -1,27 +1,10 @@
-/* 4 November 2026 contract review: restore the integer returns of func_002A8C28,
- * func_002A8D70 and func_L07_00321D68, and the float return of func_002AA548, from their
- * matched definitions. The ignored results do not change the generated body: the retained
- * -O2 -G8 -ffunction-sections candidate passes 1/1 in both USA releases. PAL has no canonical
- * identity. It remains a held diagnostic because of the case-9 dead store below.
- */
-/* func_L11_00453358 (4,524 B, 1 place), 5 November 2026: exact in tools/check.py (1 of 1) and in
- * tools/build.py all --strict, but NOT landable under AGENTS.md / MATCHING-BLOCKERS blocker 26:
- * case 9's `height = 0.0f;` is a dead store whose only job is to keep a label between case 9's
- * func_002A7750(self, 11, -1) and its break until jump2, so jump2 does not cross-jump that tail
- * into case 13's (14, -1) one (without it: 4516 bytes). The merged twin func_L02_0040BE08 uses
- * the same store; a ruling on both, or a natural construct that leaves that label, is needed.
- * Tried without success: case 9 with an early break, and three inline-helper shapes for the
- * transition (an inlined body's return label is deleted too early).
- * Everything else is ordinary C: own -G8 unit with the default -g8 profile; the anim() and
- * turn() inline helpers give gcse retail's count (S 543), which orders the four spilled
- * reaching registers (pos, self+0xC0, self+0xF0, pv+0x1B0) as retail does.
- */
 /* func_L11_00453358: the Joba drone's state machine (patrol path, chase, grab, release, fall).
- * Own -G8 unit: the level gate D_L11_001A8FF4 and D_L11_001B1D40 are $gp-relative.
+ * Own -G8 unit: the level gate D_L11_001A8FF4 and D_L11_001B1D40 are $gp-relative, and its jump
+ * table and float pool need a .rodata of their own.
  * The four spilled pointers (self+0x10, self+0xC0, self+0xF0, pv+0x1B0) are gcse reaching
- * registers; their stack slots follow gcse's hash-bucket order, which depends on the insn
- * count at gcse. The anim() and turn() helpers are inlined; their expansion gives retail's
- * count (S 543) without changing any instruction.
+ * registers; their stack slots follow gcse's hash-bucket order, which depends on the insn count
+ * at gcse. The anim() and turn() helpers are inlined; written as helpers they give retail's count
+ * (539 buckets) without changing any instruction.
  * Case 9's `height = 0.0f;` is the same construct as case 9 of the matched twin
  * func_L02_0040BE08: it keeps case 9's tail apart from case 13's in jump2's cross-jumping.
  */
@@ -99,7 +82,7 @@ void func_L11_00453358(u8 *self)
     f32 m[4][4];
     u8 *pv;
     u8 *target;
-    f32 dist = 0.0f;
+    f32 dist;
     f32 height;
 
     pv = *(u8 **)(self + 0x68);
@@ -153,12 +136,12 @@ void func_L11_00453358(u8 *self)
         func_002A7750(self, 8, 3);
         break;
     case 7: {
-        u8 *path = 0;
-        u8 *p = 0;
+        u8 *path;
+        u8 *p;
         s32 i;
         s32 best;
-        f32 d = 0.0f;
-        f32 lim = 0.0f;
+        f32 d;
+        f32 lim;
 
         if (*(s16 *)(pv + 0x1FC) != 0)
             path = D_L11_001FF580[*(s32 *)(pv + 0x1E0)];
@@ -263,7 +246,7 @@ void func_L11_00453358(u8 *self)
         break;
     case 11: {
         s32 k;
-        f32 lim = 0.0f;
+        f32 lim;
         if (func_002B3890(self) != 0) {
             turn(self, 0.0022222223f, 0.06666667f);
             *(u16 *)(self + 0x96) = 0;
@@ -336,8 +319,8 @@ void func_L11_00453358(u8 *self)
         break;
     case 14: {
         s32 j;
-        u8 *t = 0;
-        f32 *rot = 0;
+        u8 *t;
+        f32 *rot;
         if (func_002B3868(self) != 0) {
             t = func_L11_004417E8(*(u8 **)(self + 0xB8));
             func_00282CF0(pv + 0x100, t, (self + 0x10));
@@ -391,8 +374,8 @@ void func_L11_00453358(u8 *self)
             *(f32 *)(pv + 0x108) = 0.016666668f;
             *(f32 *)(self + 0x18) = *(f32 *)(target + 8) + 0.3f;
         } else if (func_00277258((self + 0x10), 6, 0, 0.3f) != 0) {
-            f32 s = 0.0f;
-            s32 n = 0;
+            f32 s;
+            s32 n;
             *(f32 *)(pv + 0x108) = 0.016666668f;
             *(f32 *)(self + 0x18) = *(f32 *)(target + 8) + 0.3f;
             v10[0] = *(f32 *)(self + 0x10) + func_002A7878(-0.01f, 0.01f);

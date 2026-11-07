@@ -190,6 +190,7 @@
 #define SetPalMode                       func_0027B440
 #define PredictMineImpact                func_L00_003AE550
 #define FontPrintWindow                  func_0027FC70
+#define draw_joint_aligned_beam_effect   func_00308768
 #define draw_nanotech_ball               func_003146C0
 #define follow_camera_build_view         func_L00_00425560
 #define Camera_ResolveBlockedView        func_L01_002B5EA0
@@ -202,6 +203,9 @@
 #define RenderLocalizedUiEntryList       func_002D6230
 #define render_water_grids               func_L04_003A21F8
 #define update_slot_panes_and_effects    func_L08_00429560
+#define render_environment_mapped_object func_002ECB70
+#define update_hero_item_mobys           func_L00_002B0968
+#define Camera_ActivationCheckPriority   func_00270838
 
 /* descriptive */
 #define QueueMobyImpact                  func_002A8E20
@@ -894,6 +898,7 @@
 #define UpdateWeatherParticles           func_L01_00399510
 #define UpdateBouncingExplosive          func_L00_003F4210
 #define UpdateShipWeapons                func_L05_00443D08
+#define MeshDrawFourSigns                func_L00_003B4560
 #define UpdateLockOnWeapon               func_L00_003C8A90
 #define DrawCameraFacingRibbon           func_L04_0030C948
 #define UpdateRaceSelectionMenu          func_L04_0040BA68
@@ -907,6 +912,7 @@
 #define UpdateItemPurchaseConfirmation   func_L00_00373F48
 #define DrawEffectRecordQuads            func_L00_003A8940
 #define UpdateHomingMissile              func_L00_003E2510
+#define RecordHeroTrailNode              func_L00_003B0DA0
 #define DrawPositionRingTrail            func_L00_0041B1B8
 #define UpdateBouncingBlastProjectile    func_L00_004096B0
 #define UpdateWaveLineEffect             func_L00_00413358
@@ -923,9 +929,13 @@
 #define FindHeroOrMobyTarget             func_L04_003429F8
 #define UpdateFadingMobyList             func_L00_003E7C88
 #define SpawnProjectile                  func_L00_003A98E8
+#define SweepMobyArcProbe                func_00330150
 #define UpdateTrailStrips                func_L00_0038B208
+#define FollowCameraHideObstructions     func_L00_004243C0
 #define RideableMobyUpdate               func_L08_003C6AB0
 #define UpdateRacerRouteChoice           func_L04_00402D90
 #define DrawDomeEffect                   func_L04_003FBEF8
+#define UpdateHoverbikeRace              func_L04_00419918
+#define DrawScrollingGridLayers          func_L15_00437B68
 
 #endif /* NAMES_H */

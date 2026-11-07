@@ -195,7 +195,7 @@ INCLUDE_ASM("asm/game", func_0032F598);
 
 /* func_0032FFD8 is defined in its own sibling unit. */
 
-INCLUDE_ASM("asm/game", func_00330150);
+/* func_00330150 is defined in 0032EB28-probe-g8.c. */
 
 /* func_003304D8 is defined in 0032EB28-ground-g8.c. */
 

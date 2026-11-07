@@ -584,8 +584,6 @@ done:
 
 /* func_L06_00443280 is defined in L06_00443280-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L06_00443A38);
-
 /* func_L06_00443A38 is defined in L06_0041DED8-g8.c. */
 
 void func_L06_00443DE0(char *a0, int a1, int a2)

@@ -1,5 +1,9 @@
 #include "include_asm.h"
 
+typedef struct { unsigned char count[4]; int groups, runs; } RenderHeader;
+extern int D_001BAEC0[];
+extern void func_002932B8(int *, char *, unsigned char *, int);
+
 extern int *D_001A7288 __attribute__((section(".sdata")));
 extern char D_01FF7FF0[];
 extern int func_002B7C10(int, int, int);
@@ -495,7 +499,44 @@ void func_00293260(int *a0, int a1){
 }
 
 
-INCLUDE_ASM("asm/game", func_002933D0);
+/* Relocate render groups and remap each run's texture selectors. */
+void func_002933D0(RenderHeader *base, char *textures, unsigned char *map)
+{
+    int count = base->count[0] + base->count[1] + base->count[2];
+    int *groups = (int *)((char *)base + base->groups);
+    int *p = groups;
+    int *runs = (int *)((char *)base + base->runs);
+
+    if (count) {
+        int n = count;
+        do {
+            int off = p[0];
+            if (off < D_001BAEC0[2]) {
+                p[0] = off + (int)base;
+                p[2] += (int)base;
+            }
+            n--;
+            p += 4;
+        } while (n);
+    }
+    {
+        int *r = runs;
+        for (;;) {
+            unsigned char *sel = (unsigned char *)r;
+            r[3] += (int)base;
+            if (*sel != 255) {
+                do {
+                    *sel = map[*sel];
+                    sel++;
+                } while (*sel != 255);
+            }
+            if (r[3] < 0)
+                break;
+            r += 4;
+        }
+    }
+    func_002932B8(groups, textures, map, count);
+}
 
 
 

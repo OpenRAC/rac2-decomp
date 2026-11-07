@@ -410,7 +410,7 @@ void func_L06_003F4908(char *a0)
 
 /* func_L06_00400498 is in L06_00400498-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L06_004012B0);
+/* func_L06_004012B0 is in L06_004012B0.c. */
 
 /* Move a platform between its two paths according to the player's height. */
 void func_L06_00401820(Moby *moby)

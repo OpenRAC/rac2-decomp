@@ -233,7 +233,8 @@ int func_002EB158(int index)
 
 /* func_002EC408 is in 002EC408-g8.c (-G8 small data). */
 
-INCLUDE_ASM("asm/game", func_002ECB70);
+/* func_002ECB70 is matched in 002ECB70-g8.c (-G8 small data, -fno-gcse). */
+
 
 /* selects the level data bank when the resident context is in state 9 */
 void func_002ED058(void) {
