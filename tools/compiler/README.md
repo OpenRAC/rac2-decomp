@@ -248,6 +248,24 @@ in `config/cflags.txt`, and `-fno-rac2-frame-pointer-liveness` disables it;
 `tests/test_frame_pointer_liveness.py` covers the anchors, the default/disabled equality, the
 un-annulled slot and controls with `$fp` live at the exit, without `$fp` and with a frame pointer.
 
+`no_static_chain_base.py` adds `-frac2-no-static-chain-base`: alias.c's init_alias_analysis no
+longer seeds the static-chain register (`$v0`) or the struct-value register (none on MIPS) with a
+base address, as GCC 2.95.3 and later do (Richard Henderson, 22 August 2000). A seeded `$v0` set
+from another register after reload has no known base, so sched2 makes every store through it
+depend on the prologue's saves; unseeded, it takes the base of its first set, as `$v1` does, and
+retail's late saves follow (func_002BA0E0, with `-frac2-frame-pointer-liveness`). In a GNU C
+nested function, where `$v0` arrives holding the parent's frame address, neither GCC version is
+safe: the 2.95 seed (the default) makes the chain a stack reference that cannot alias an
+argument, and without it (2.95.3) a later set of `$v0` in the nested function, such as returning a
+local's address, gives every use of the chain that set's stack base. Either way a store through
+the chain can pass a store through a pointer argument to the same variable. So the option goes one
+step past 2.95.3 for nested functions only: with `current_function_needs_context` it marks the
+chain register as seen, so it gets no base at all. It is off by default, enabled per unit in
+`config/cflags.txt`, and `-fno-rac2-no-static-chain-base` disables it;
+`tests/test_no_static_chain_base.py` covers the anchors, the default/disabled equality, the moved
+saves, the store order in two nested functions (both swapped by one GCC version) and controls: a
+table too short for saves, a base returned by a call, a nested function's exact output.
+
 `wide_saves_below.py` adds `-frac2-wide-saves-below`. Without `-mastra-quad-saves`, a saved GPR
 whose save is wider than the 8-byte slot (a register the function writes in TImode, which
 save_restore_insns saves with `sq`) then takes a 16-byte slot at the bottom of the GPR save
@@ -273,7 +291,16 @@ game unit, nothing else changes. It is off by default, enabled per unit in `conf
 and `-fno-rac2-mult-add-no-flatten` disables it; `tests/test_mult_add_no_flatten.py` covers the
 anchors, the default/disabled equality, the kept grouping and a control (docs/COMPILER-NOTES.md).
 
+Most opt-in switches anchor their `toplev.c` definition and option-table entry and their
+`flags.h` declaration on an earlier switch's lines, so `build.sh` runs them in a fixed order and
+the `toplev.c` and `flags.h` sums describe the source with all of them applied in that order. Two
+pairs share an anchor and run in this order: `frame_pointer_liveness.py`, then
+`wide_saves_below.py` (both on the `-frac2-sticky-volatile-refs` lines, so after
+`sticky_volatile_refs.py`), and `mult_add_no_flatten.py`, then `no_static_chain_base.py` (both on
+the `-frac2-wide-saves-below` lines, so after `wide_saves_below.py`). Each inserts right after its
+anchor, so swapping the two of a pair changes the sums but not the compiler.
+
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
-`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c`, `expmed.c` and `tc-mips.c` hash as it
+`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c`, `expmed.c`, `alias.c` and `tc-mips.c` hash as it
 lists. The binaries' own hashes depend on the build host and path, so check a compiler by its
 output: `tools/build.py` compiles every matched function to the retail bytes.

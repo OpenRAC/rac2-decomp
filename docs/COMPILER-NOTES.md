@@ -200,6 +200,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Copy of a zero set in the same block stays a register copy | -frac2-keep-block-zero-copy | func_002F7320 |
 | A volatile asm ends the forward delay-slot search past later loads | -frac2-sticky-volatile-refs | func_L00_002A9460 |
 | Branch slot setting `$fp` annulled (`bnel`), retail `bne`; no frame pointer | -frac2-frame-pointer-liveness | func_L07_0040EC08, func_L04_00414698 |
+| Callee saves issued at the top, retail has them among stores through `$v0` | -frac2-no-static-chain-base (with -frac2-frame-pointer-liveness) | func_002BA0E0 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
 | Arguments spilled and branch to common epilogue | Measured -O0 unit, not an invented varargs helper | func_001175F0 |
@@ -495,6 +496,65 @@ their 11,949 functions. Among the retained drafts, forced on, it changes the two
 now deletes a dead set of `$fp` (insn_dead_p). A REG_DEAD note on an insn that reorg moves into
 a delay slot is erased (emit_delay_sequence), so the option only matters where the last use of
 `$fp` stays out of a slot.
+
+func_002BA0E0 (1,472 bytes, 28 places in each of USA v1.01, PAL and v2.00) fills the 111-entry
+callback table D_001F2340. After reload the table's address is in `$v0`, set by `addiu
+$v0,$a1,%lo(D_001F2340)` from the register holding its `%hi`. Retail issues the callee saves
+`sd $s0`, `$s1`, `$s3`..`$s7` right before the slot-24 store `sw $fp,0x60($v0)`; stock cc1 issues
+all nine at the top of the function. In sched2 every slot store `(mem (plus $v0 C))` has an
+output dependence on every save. init_alias_analysis (alias.c) seeds a few hard registers with a
+base address: the argument registers, the stack, frame and argument pointers, and, as in GCC 2.95,
+the static-chain register (`$v0`, STATIC_CHAIN_REGNUM) and the struct-value register (none on
+MIPS: STRUCT_VALUE is 0). A seeded register keeps its base only while each set of it is relative
+to itself, so record_set drops `$v0`'s at `$v0 = lo_sum ($a1, D_001F2340)`. find_base_term then
+finds no base for the stores, and write_dependence_p reports a conflict with the `$sp` saves.
+An unseeded hard register, `$v1` for one, takes the base of its first set (find_base_value), here
+the symbol, which cannot alias a stack slot. GCC removed both seeds: Richard Henderson's change of
+22 August 2000 (gcc-3.0 ChangeLog.4: "alias.c (init_alias_analysis): Do not register
+struct_value_incoming_rtx or static_chain_rtx as pointing to stack memory.") reverses an addition
+of October 1997 (ChangeLog.0) and is in gcc-2.95.3. A Pmode ADDRESS is the base the stack, frame and
+argument pointers get, so the seed declared the static chain, which points into another
+function's frame, a stack reference. [no_static_chain_base.py](../tools/compiler/transformers/no_static_chain_base.py)
+adds `-frac2-no-static-chain-base`, which leaves both seeds out. Checked against gcc-core-2.95 and
+gcc-core-2.95.3 from ftp.gnu.org: their alias.c files differ only in the copyright line and these
+nine lines (2.95 lines 1458-1466); gcc-3.0, 3.4.0 and 4.0.0 have neither seed (3.4 moves the other
+seeds to init_alias_once's static_reg_base_value). This tree's init_alias_analysis equals 2.95's
+token for token apart from 2.95's extra `! reg_overlap_mentioned_p` test on REG_EQUIV notes,
+another change; with the switch it equals 2.95.3's apart from the same test and, in nested
+functions only, one more line (below). The archive's compiler is dated 11 November 1999, before the
+GCC change, so the switch is inferred from retail's schedule, not a recovered patch.
+
+Neither GCC version gets a GNU C nested function right, where `$v0` arrives holding the parent's
+frame address. In a nested body `x = a*b*c*a; *p = 5;` (x the parent's, reached through the chain)
+called with `p == &x`, the store to x must come first. With the 2.95 seed (the default, and stock
+cc1) the chain is a stack reference, which base_alias_check says cannot alias an argument, and
+sched2 issues `sw $3,0($4)` (the `*p` store) before `sw $5,0($2)`: the bug GCC's change fixed.
+Without the seed, as in 2.95.3, `$v0` takes the base of its first set, and record_set does not
+follow the flow: if the same body then returns a local's address (`r = local; return r;`), the only
+set of `$v0` is `addu $2,$sp,16`, every use of the incoming chain gets that stack base, and the two
+stores swap again; 2.95.3 has the same code. So for nested functions the switch departs from pure
+2.95.3: when `current_function_needs_context` is set it also sets `reg_seen` for the chain
+register, so no set gives it a base, and stores through it conflict with every other store. That
+puts both stores in source order. A function that takes no static chain is unaffected by the extra
+line: `$v0` has no seed and takes the base of its first set, as in 2.95.3. The test fixture holds
+both nested bodies (`store_twice`, `store_and_local`) with their store orders, and `bump`, whose
+only change is that the chain stays in `$v0` instead of being copied to `$v1`.
+
+Without the switch, stock cc1 (upstream's recipe) and patched cc1 give identical assembly for all
+8,730 game-compiler units of `src/` in the three releases (12,091 functions; 144 SDK units use
+another compiler). Forced on in every one of them, it changes only func_002BA0E0's unit. Forced on
+for the 1,076 drafts in `nonmatching/` that compile (default flags, -G8, and with
+`-frac2-frame-pointer-liveness`), it changes one: the port-only func_00283A58 (plain floats for VU0
+code, 320 bytes for 152) has its loop rescheduled, with 80 differing words either way. Before the
+match, the same sweep also changed both func_002BA0E0 drafts: the port-only one, in ascending slot
+order, then matched with `-frac2-frame-pointer-liveness` and is now the unit; the older hill-climb
+order of the near-miss draft stayed 0 of 28. Only `$v0` loses its seed, so outside nested
+functions the switch matters only where the first set of `$v0` gives it a base and the stores
+through it compete with stack accesses. The witness has a unit of its own, `src/game/002BA0E0.c`,
+with both switches. With either alone it is 0 of 28 places in each release (1,476 bytes without
+`-frac2-frame-pointer-liveness`, which deletes a dead `lui $fp`). Round 9 (below) describes
+Lombyte's sce-991111b candidate 0060 the same way; it was swept enabled by default, before the
+frame-pointer switch existed.
 
 Patch 0057 enables `-mastra-split-trunc-slot`: split `truncdisi2` after reload and
 before scheduling so its second shift can fill the return slot. `func_0012E8C8`
@@ -1289,7 +1349,9 @@ patches. A lone lui at a branch target is not a unique signature of edge splitti
 env-gated in cc1 and swept over all 8595 non-SDK units and all 1206 near-miss files
 (-G0/-G8, labels renumbered). 0060 (no ADDRESS base for the static-chain/struct-value
 registers): 0 units change; one near miss moves (func_002BA0E0, 285 to 273 real rows, still
-1476/1472 bytes), and cc1 crashes on nonmatching/levels/func_L04_00441100.c. 0061 (unshared
+1476/1472 bytes), and cc1 crashes on nonmatching/levels/func_L04_00441100.c. (Since adopted as the
+opt-in `-frac2-no-static-chain-base`, above, which with `-frac2-frame-pointer-liveness` matches
+func_002BA0E0. That draft no longer compiles today, and stock cc1 also crashes on it.) 0061 (unshared
 stack MEMs): 0 units, 0 near misses. 0065 (unsplit gcse edges by default): 33 matched units
 change (11 functions in three releases, e.g. L04_002E04A8.c), so it stays opt-in; it moves no
 listed near miss. The 13 scheduler/gcse near misses (func_00342BE8 ... func_L06_00382608)
@@ -1650,6 +1712,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Width-ordered quad saves | [test_narrow_saves_below.py](../tests/test_narrow_saves_below.py) |
 | 16-byte slots for TImode GPR saves | [test_wide_saves_below.py](../tests/test_wide_saves_below.py), [wide_saves_below.c](../tests/fixtures/wide_saves_below.c) |
 | Unflattened giv start | [test_mult_add_no_flatten.py](../tests/test_mult_add_no_flatten.py), [mult_add_no_flatten.c](../tests/fixtures/mult_add_no_flatten.c) |
+| Static-chain alias seed | [test_no_static_chain_base.py](../tests/test_no_static_chain_base.py), [no_static_chain_base.c](../tests/fixtures/no_static_chain_base.c) |
 | Masks/sign seed | [test_dli_masks.py](../tests/test_dli_masks.py) |
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
