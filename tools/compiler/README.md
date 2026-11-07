@@ -46,7 +46,8 @@ The retail code was built with GNU EE-GCC 2.9-ee-991111b. `build.sh` rebuilds it
   (docs/COMPILER-NOTES.md).
   `no_recombine_givs.py` drops strength_reduce's call to `recombine_givs` (loop.c), as the
   gcc-2.95 release branch did, so address givs stay on the giv combine_givs chose, as in
-  retail; it is unconditional too.
+  retail; it is unconditional too. `no_extra_increment_givs.py` adds the opt-in
+  `-frac2-no-extra-increment-givs`, the other half of that release-branch change.
   `gcse_unsplit_edges.py` and `keep_block_order.py` add the opt-in
   `-frac2-gcse-unsplit-edges` and `-frac2-keep-block-order`, which leave out two
   Cygnus-local pieces of this tree that GCC 2.95 does not have.
@@ -266,6 +267,24 @@ chain register as seen, so it gets no base at all. It is off by default, enabled
 saves, the store order in two nested functions (both swapped by one GCC version) and controls: a
 table too short for saves, a base returned by a call, a nested function's exact output.
 
+`no_extra_increment_givs.py` adds `-frac2-no-extra-increment-givs`: strength_reduce (loop.c)
+no longer turns the extra increments of a biv into givs. A cursor advanced several times per
+iteration (`*p++ = a; *p++ = b;`) then keeps every increment, store and add in turn, instead of
+being split into reduced pointers stepped once per iteration. The FSF disabled this conversion for
+the gcc-2.95 release in the same change that disabled giv recombination (Jeffrey A Law,
+10 June 1999: "Disable biv->giv translations and giv recombination.  For the release branch
+only."); every 2.95.x release ships it as `if (0 && n_extra_increment && ! loop_has_volatile)`.
+`no_recombine_givs.py` takes the other half unconditionally. Retail keeps the increments in all
+seven loops of func_00284268, which with the option matches without the volatile view it needed
+before. The option does not edit check_dbra_loop, which also tests `loop_has_volatile`, but a
+loop counter incremented more than once now reaches it with all its increments, so such a loop
+counts up as written instead of being reversed (2.95 never converts). Forced on in every other game
+unit, it changes no object. It is off by default, enabled per unit in `config/cflags.txt`, and
+`-fno-rac2-no-extra-increment-givs` disables it;
+`tests/test_no_extra_increment_givs.py` covers the anchors, the default/disabled equality, a
+pointer cursor and an index cursor that keep their increments, the twice-incremented counter
+and controls: one increment, a volatile read, conditional increments and a reversed loop.
+
 `wide_saves_below.py` adds `-frac2-wide-saves-below`. Without `-mastra-quad-saves`, a saved GPR
 whose save is wider than the 8-byte slot (a register the function writes in TImode, which
 save_restore_insns saves with `sq`) then takes a 16-byte slot at the bottom of the GPR save
@@ -309,14 +328,17 @@ branch) against the option's `ori` before `mtc1`, and controls.
 
 Most opt-in switches anchor their `toplev.c` definition and option-table entry and their
 `flags.h` declaration on an earlier switch's lines, so `build.sh` runs them in a fixed order and
-the `toplev.c` and `flags.h` sums describe the source with all of them applied in that order. Two
+the `toplev.c` and `flags.h` sums describe the source with all of them applied in that order. Three
 pairs share an anchor and run in this order: `frame_pointer_liveness.py`, then
 `wide_saves_below.py` (both on the `-frac2-sticky-volatile-refs` lines, so after
-`sticky_volatile_refs.py`), and `mult_add_no_flatten.py`, then `no_static_chain_base.py` (both on
-the `-frac2-wide-saves-below` lines, so after `wide_saves_below.py`). Each inserts right after its
-anchor, so swapping the two of a pair changes the sums but not the compiler.
-`keep_float_pun_source.py` anchors on the `-frac2-no-static-chain-base` lines, so it runs after
-`no_static_chain_base.py`; it also changes `cse.c`, after `keep_block_zero_copy.py`, and `combine.c`.
+`sticky_volatile_refs.py`), `mult_add_no_flatten.py`, then `no_static_chain_base.py` (both on
+the `-frac2-wide-saves-below` lines, so after `wide_saves_below.py`), and
+`keep_float_pun_source.py`, then `no_extra_increment_givs.py` (both on the
+`-frac2-no-static-chain-base` lines, so after `no_static_chain_base.py`). Each inserts right after
+its anchor, so swapping the two of a pair changes the sums but not the compiler.
+`keep_float_pun_source.py` also changes `cse.c`, after `keep_block_zero_copy.py`, and `combine.c`.
+`no_extra_increment_givs.py` also changes `loop.c`: its strength_reduce guard is at another place
+than `no_recombine_givs.py`'s edit, and the `loop.c` sum describes both.
 
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
 `haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `combine.c`, `resource.c`, `expmed.c`, `alias.c` and `tc-mips.c` hash as it

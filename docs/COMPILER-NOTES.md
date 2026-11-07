@@ -202,6 +202,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Branch slot setting `$fp` annulled (`bnel`), retail `bne`; no frame pointer | -frac2-frame-pointer-liveness | func_L07_0040EC08, func_L04_00414698 |
 | Callee saves issued at the top, retail has them among stores through `$v0` | -frac2-no-static-chain-base (with -frac2-frame-pointer-liveness) | func_002BA0E0 |
 | A word stored into a float read twice: `lui`/`ori $v0` after the previous call, one `mtc1` into a saved FPR, `mov.s` per read | -frac2-keep-float-pun-source, write `*(s32 *)&f = K` | func_00349D58 |
+| A cursor advanced several times per iteration is split into reduced pointers (`sd 0/8/16/24` and one add); retail stores and adds after each | -frac2-no-extra-increment-givs (with -fno-rerun-loop-opt) | func_00284268 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
 | Arguments spilled and branch to common epilogue | Measured -O0 unit, not an invented varargs helper | func_001175F0 |
@@ -1318,10 +1319,94 @@ giv's last use is the call. Without the call the function matches at all 28 plac
 matched function in `tools/build.py all --strict`, none compiled differently; of the 922
 compilable near-miss drafts in nonmatching/, 9 compile differently, none close to a match.
 The same release-branch change also turned off the biv-to-giv conversion of extra biv
-increments (`n_extra_increment`); that has no retail witness yet and stays on (turning it off
-also changes no matched function). [tests/test_no_recombine_givs.py](../tests/test_no_recombine_givs.py)
+increments (`n_extra_increment`); that half is the opt-in `-frac2-no-extra-increment-givs`
+(below), with func_00284268 as its witness. [tests/test_no_recombine_givs.py](../tests/test_no_recombine_givs.py)
 checks the transformer and an authored loop: the digit read stays on the entry pointer
 (`lbu 36(entry)`, not `-1(name + 5)`), and a one-pointer loop is unchanged.
+
+### loop: extra biv increments stay bivs
+
+When a biv is incremented more than once per iteration, as a cursor is by `*p++ = a; *p++ = b;`,
+this tree's `strength_reduce` (loop.c, "If a biv is unconditionally incremented several times in
+a row, convert all but the last increment into a giv") counts the extra increments
+(`n_extra_increment`, biv_count - 1 per biv) and, under `if (n_extra_increment && !
+loop_has_volatile)`, turns every increment but the last into a DEST_REG giv of the biv: the uses
+after it read the new register, `bl->biv_count` drops by one and `bl->giv_count` grows by one
+for each. The reduced givs then become separate pointers stepped once per iteration, or offsets
+from the last one (`sd 0($a)`, `sd 0($b)`, `sd -24($c)` ... and one add of 32 each). The FSF
+disabled the conversion for the gcc-2.95 release: Jeffrey A Law, 10 June 1999 (gcc-2.95
+gcc/ChangeLog: "loop.c (strength_reduce): Disable biv->giv translations and giv recombination.
+For the release branch only."), the change that also put `recombine_givs` under `#if 0`
+(no_recombine_givs.py, above). [no_extra_increment_givs.py](../tools/compiler/transformers/no_extra_increment_givs.py)
+adds `-frac2-no-extra-increment-givs`, which adds `! flag_rac2_no_extra_increment_givs` to that
+guard, so every increment stays a biv increment: store, add, store, add.
+
+GCC history, from gcc-core-2.95.tar.gz, 2.95.1, 2.95.2 and 2.95.3 downloaded from ftp.gnu.org
+(SHA-256 70250b26..., 5f25da6a..., 65e68d39..., 56811ee6...; nothing in them run). All four ship
+the guard as `if (0 && n_extra_increment  && ! loop_has_volatile)` (2.95 and 2.95.1 gcc/loop.c
+line 4151, 2.95.2 line 4185, 2.95.3 line 4208) under the comment "Disabled for the gcc-2.95
+release.  There are still some problems with giv recombination.  We have a patch from Joern which
+should fix those problems.  But the patch is fairly complex and not really suitable for the
+gcc-2.95 branch at this stage.", the same words as the `#if 0` around `recombine_givs` (2.95
+lines 4757-4763). The ChangeLog entry is in each release's gcc/ChangeLog (2.95 lines 476-479) and
+none of them re-enables either half. This tree is the Cygnus development snapshot of 11 November
+1999, and its own loop.c runs the conversion (the guard has no `0 &&`). That Cygnus kept the
+conversion on is inferred from that source alone; no Cygnus ChangeLog entry or other Cygnus source
+says so. Its block differs from 2.95's dead one only by later development fixes (a `loc_mentioned_in_p` walk to the insn that holds the next increment's location, and no
+`reg_single_usage` growth). With the switch the conversion is skipped as in every 2.95 release; it
+is inferred from retail's loops, not a recovered patch.
+
+`loop_has_volatile` also gates check_dbra_loop's loop reversal (`num_nonfixed_reads <= 1 && !
+loop_has_call && ! loop_has_volatile && ...`). The switch does not edit that test or anything else
+in check_dbra_loop. Its input changes, though: a loop counter incremented more than once keeps all
+its increments, so check_dbra_loop sees biv_count 2 where the default had converted one to a giv
+and left 1. In the fixture's `pairs` (`p[i] = 0; i++; p[i] = 1; i++;` while `i < 32`) the default
+reverses the loop into a count-down from 30 (`bgez`), and with the switch it counts up as written
+(`slt $2,$3,32`); GCC 2.95, which never converts, gives check_dbra_loop both increments too. A
+loop whose counter has one increment (`clear16`) is reversed by
+both. A volatile read in the loop already skips the conversion in the default, so its output is
+the same with the switch (`fill_volatile`); that is the volatile view's only loop.c effect in
+func_00284268 too.
+
+Retail witness: func_00284268 (2,988 bytes, boot + 27 levels in USA v1.01, PAL and v2.00) sets up
+the anti-aliased frame-buffer packets and has seven loops whose cursors advance two or four times
+per iteration; retail stores and adds after each (`sd 0($c); addiu $c,$c,8` four times). The
+retained draft matched 28 of 28 places in every release only through a volatile view of the state
+pointer D_001A742C (one read per loop), which AGENTS.md does not allow. Its only loop.c effect
+is `loop_has_volatile`: with insn numbers masked, the gcse dumps with and without it differ only
+in the seven reads' MEM flag (`mem/v` for `mem/f`), and the volatile draft without the switch and
+the plain one with it give the same assembly apart from the seven `.set volatile` markers. With
+the switch the plain C, RAC1's own `*p++` wording (framebuf.c, SetupFS_AA_buffer), matches all
+seven loops: 2,988 bytes and 28 of 28 places in each release. Without the switch it
+is 3,036 bytes (0 of 28); without `-fno-rerun-loop-opt` 2,980 (0 of 28). The two D_001A6860 loops
+need the index form `store(&q[n], X); n++`, a reduced giv of n whose init comes last in the
+pre-header; a plain `*p++` cursor there is a biv equal to its own giv and keeps its init first.
+The function has a unit of its own, `src/game/00284268.c`, with both flags. The retained volatile
+draft, compiled without the switch, is bit-equivalent: it also matched 28 of 28 places in each release. The switch is chosen over
+that volatile reading on policy grounds, because AGENTS.md does not allow `volatile` on ordinary
+data, not because the bytes tell them apart.
+
+Without the switch, stock cc1 (upstream's recipe) and patched cc1 give identical assembly for all
+8,731 game-compiler units of `src/` in the three releases (12,092 functions; 144 SDK units use
+another compiler), with no compile errors. Forced on in every one of them, it changes only
+func_00284268's own unit: no matched function has a loop the conversion splits. Forced on for the
+1,074 drafts in `nonmatching/` that compile (of 1,134; default flags, -G8, -fno-rerun-loop-opt and
+both), it changes one, func_L05_0042B2C0, whose note already says retail "increments one output
+pointer twice by 12 bytes": with its own profile it goes from 2,112 to 1,984 bytes (retail 2,128),
+0 of 4 places either way, so other differences dominate. Retail does not split a cursor there:
+its inner strip loop (USA v1.01 level 5, 0x0042B730-0x0042B83C) keeps both increments of the
+output index (`addiu $s7,$s7,1` at 0x0042B74C and 0x0042B75C) and steps each of its four reduced
+address registers twice per iteration (`$s2` and `$s5` by 12, `$s0` by 8, `$s4` by 4). The draft
+gives that shape only with the switch (two steps of 12, 8 and 4, two `+1`s); without it, one step
+of 24, 16 and 8 and one `+2`. So retail's compiler kept every increment in this function too, as in
+func_00284268, and the switch is not a per-function one. The goto-loop record copy of
+`func_L00_00300618` (below) does not change: a goto loop has no loop notes.
+[tests/test_no_extra_increment_givs.py](../tests/test_no_extra_increment_givs.py) and
+[no_extra_increment_givs.c](../tests/fixtures/no_extra_increment_givs.c) cover the anchors (the
+option table on its own), the default/disabled equality, a pointer cursor and an index cursor
+whose four increments the default splits and the switch keeps, the twice-incremented counter
+above, and controls that do not change: one increment, a volatile read, increments under a test
+and a reversed single-increment loop.
 
 A scalar global read across pointer stores is `fixed_scalar_and_varying_struct_p`: cc1 assumes a
 fixed scalar cannot alias a varying array element, so the load is hoisted or moved over the stores.
@@ -1833,6 +1918,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Unflattened giv start | [test_mult_add_no_flatten.py](../tests/test_mult_add_no_flatten.py), [mult_add_no_flatten.c](../tests/fixtures/mult_add_no_flatten.c) |
 | Static-chain alias seed | [test_no_static_chain_base.py](../tests/test_no_static_chain_base.py), [no_static_chain_base.c](../tests/fixtures/no_static_chain_base.c) |
 | Integer words stored into floats | [test_keep_float_pun_source.py](../tests/test_keep_float_pun_source.py), [keep_float_pun_source.c](../tests/fixtures/keep_float_pun_source.c) |
+| Extra biv increments | [test_no_extra_increment_givs.py](../tests/test_no_extra_increment_givs.py), [no_extra_increment_givs.c](../tests/fixtures/no_extra_increment_givs.c) |
 | Masks/sign seed | [test_dli_masks.py](../tests/test_dli_masks.py) |
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
