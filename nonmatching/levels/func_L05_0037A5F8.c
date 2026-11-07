@@ -1,3 +1,6 @@
+/* 7 November 2026, label_y sweep: the first y uses label_y((void *)0, ...) and the two loop ys label_y((void *)alpha, ...): 67 -> 48 differences, 1168/1168 bytes (handles state 55, object 81, c 82 on the old count). The body below is the retained C with that change (label_y is
+ * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
+ * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /* v0893, GPT-6.1 Sol high, USA v1.01, current pinned compiler, 2026-10-29.
    Dedicated -O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
    -frac2-zero-ti-por: 1168/1168 bytes, 0/4 places, first mismatch +0x1C.
@@ -50,6 +53,24 @@ extern void func_002836E8(void *,void *);
 extern void func_00283098(void *,void *,void *);
 extern float func_002A7798(float);
 extern int func_00283CF0(float);
+extern int D_L05_001B2D80;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L05_001B2D80;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L05_0037A5F8(void)
 {
     float offset[4],rotation[4],rotate[12],view[12];
@@ -58,7 +79,7 @@ void func_L05_0037A5F8(void)
     u8 *object,*state;
     u16 *list,*nextList;
     int i,alpha,c;
-    y = (float)(int)(D_L05_001AC4E4*D_L05_001B2D84[0]+0.5f);
+    y = (float)label_y((void *)0, D_L05_001AC4E4, D_L05_001B2D84[0], 0.5f, 1);
     texture = func_0027C878(D_L05_001AC4FC);
     func_L05_003008C0(D_L05_001AC4E0,y,D_L05_001AC4E8,D_L05_001AC4EC,0,0,D_L05_001AC4F0,D_L05_001AC4F4,0x80808080ULL,texture);
     for (i=0;i<func_L00_004272A0();i++) {
@@ -87,7 +108,7 @@ void func_L05_0037A5F8(void)
                     if (distance > D_L05_001AC4E8+D_L05_001AC4E8) distance=D_L05_001AC4E8+D_L05_001AC4E8;
                     else if (distance < 0.0f) distance=0.0f;
                     x = offset[0]+D_L05_001AC4E0;
-                    y = (float)(int)((D_L05_001AC4E4-offset[1])*D_L05_001B2D84[0]+0.5f);
+                    y = (float)label_y((void *)alpha, D_L05_001AC4E4-offset[1], D_L05_001B2D84[0], 0.5f, 1);
                     c = *(s32 *)(state+0x150) | (alpha<<24);
                     color = c;
                     texture = func_0027C878(D_L05_001AC4FC);
@@ -107,7 +128,7 @@ void func_L05_0037A5F8(void)
                     if (distance > D_L05_001AC4E8+D_L05_001AC4E8) distance=D_L05_001AC4E8+D_L05_001AC4E8;
                     else if (distance < 0.0f) distance=0.0f;
                     x = offset[0]+D_L05_001AC4E0;
-                    y = (float)(int)((D_L05_001AC4E4-offset[1])*D_L05_001B2D84[0]+0.5f);
+                    y = (float)label_y((void *)alpha, D_L05_001AC4E4-offset[1], D_L05_001B2D84[0], 0.5f, 1);
                     c = *(s32 *)(state+0x150) | (alpha<<24);
                     color = c;
                     texture = func_0027C878(D_L05_001AC4FC);

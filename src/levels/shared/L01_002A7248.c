@@ -870,7 +870,7 @@ void func_L01_002E2608(MotionVec *corners, int texture, int kind, int color, int
 
 /* Defined in L01_002F14E8-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_002F1588);
+/* func_L01_002F1588 is defined in L01_002F1588.c. */
 
 
 

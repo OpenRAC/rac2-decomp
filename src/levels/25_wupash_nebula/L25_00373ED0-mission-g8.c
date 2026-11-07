@@ -1,20 +1,12 @@
-/* 5 November 2026: preserve this native-oriented variant rather than replacing it with the matching draft. Only the independently checked interfaces/widths are repaired; no new native runtime validation is claimed. */
-/* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
-/* sol-high retained draft, USA v1.01, game compiler -O2 -G8.
- * check.py: 1128/1128 bytes, 0 of 1 places match.
- * Six non-relocation instructions differ: the +0x24 and +0x78 context
- * stores are exchanged (+0xE4/+0xF4), the callback flag's constant remains
- * live from entry instead of being rematerialized at +0x158, and the second
- * vector-pair clear uses v0 rather than v1 (+0x304/+0x358/+0x35C).
- * Typed context/inventory views and MACRO_ADDR scalar declarations recover
- * retail's high-address lifetimes and the empty wait loop's bgez. A named
- * u32 completion-test result preserves sllv/and rather than srav/andi.
- * The four timer initializations are ordered to reproduce retail scheduling.
- * Callback arguments are 001B0CC0/001B0CB0, corrected from the earlier draft.
- * Explicit initialization pointer and chained second clear did not close
- * the remaining differences. No linked build was run. Required declarations
- * are included below; next useful input is independent lifetime/clear evidence.
- */
+/* func_L25_0040CDA0, the level's mission update (setup, timer, completion).
+   The function lives in its own small-data unit; its callees func_L25_003752D8, 00376FE0 and
+   00377608 are in L25_00373ED0-g8.c and really return void.
+
+   The timer y passes through label_y, the HUD label idiom (see its comment, and
+   L25_00373ED0-fade-g8.c). Its tests leave no instruction but keep the 1 in $s2 and decide
+   the registers of the later quadword clears. Case 1 sets active = 1 again before
+   func_L05_00379B60: retail sets $s2 there (addiu s2,zero,1 at +0x158). The countdown from six is
+   in retail too (its backward branch and padding). */
 #include "common.h"
 typedef unsigned int Quad __attribute__((mode(TI)));
 
@@ -64,9 +56,6 @@ extern int func_002E5DA0(int,int,char *,int);
 extern int func_L25_0040D208(void);
 extern void func_0029B758(int,void *);
 extern void func_L05_00442828(void *,void *,int);
-extern void func_L25_003752D8(void *);
-extern void func_L25_00376FE0(void *,float);
-extern void func_L25_00377608(void *,float);
 extern void func_L05_00445B58(void *,void *);
 extern void func_L05_0037B210(void);
 extern void func_00288CB0(int,int);
@@ -77,6 +66,32 @@ extern int func_L05_00442860(void);
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 #define H(p,o) (*(unsigned short *)((char *)(p)+(o)))
 
+extern void func_L25_003752D8(u8 *);
+extern void func_L25_00376FE0(u8 *, f32);
+extern void func_L25_00377608(u8 *, f32);
+
+
+extern int D_L25_001B2900;
+
+/* label_y, the HUD label idiom (accepted 7 November 2026; one shared definition, `active` the
+   literal 1 at every call). Its tests do not change the result: flow deletes their stores and
+   jump2 their jumps, but only after allocation and both scheduling passes. */
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L25_001B2900;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
 
 void func_L25_0040CDA0(char *obj)
 {
@@ -85,7 +100,7 @@ void func_L25_0040CDA0(char *obj)
     float b[4] __attribute__((aligned(16)));
     float c[4] __attribute__((aligned(16)));
     float d[4] __attribute__((aligned(16)));
-    int i;
+    int delay;
     int active = 1;
     MissionContext *ctx;
     switch (B(obj,0x20)) {
@@ -102,8 +117,8 @@ void func_L25_0040CDA0(char *obj)
         I(state,0x38)=180; I(state,0x34)=720; I(state,0x24)=0;
         ctx->health=*(float **)state;
         ctx->enabled=1;
-        ctx->owner=obj;
         D_L25_001B3060=540;
+        ctx->owner=obj;
         if (D_0018C0B0) H(D_0018C0B0,0x34)|=0x41;
     case 1:
         
@@ -111,16 +126,18 @@ void func_L25_0040CDA0(char *obj)
         
         if (func_00282948(state+0x34)) D_L25_00221850.timerVisible=0;
         else D_L25_00221850.timerVisible=1;
+        active = 1;
         func_L05_00379B60();
-        func_L05_0030C930((int)(D_L25_001B2904*-224.0f+0.5f),2);
+        func_L05_0030C930(label_y(obj, -224.0f, D_L25_001B2904, 0.5f, 1),2);
         qcopy(obj+0x10,(void *)((I(state,0x20)<<8) + D_L25_001B209C + 0x10));
         if (D_00138324&0x10) func_002E5DA0(0,0,obj,0xeee);
         if (D_L25_001A904C && !D_L25_001B0CDC) {
             func_0029B758(0,func_L25_0040D208);
             D_L25_001B0CDC=active;
         }
-        /* This counted wait and its backward branch are present in retail. */
-        for (i=6;i>=0;i--) {}
+        /* Retail executes this counted wait before reading the mission state:
+           6, decrement, padded backward bgez, decrement in its delay slot. */
+        for (delay=6; delay>=0; delay--) {}
         if (D_L25_00221850.paused || D_L25_001B1BC8<6) break;
         if (D_L25_00221850.completed<=0) {
             D_L25_00221850.timerVisible=1;
@@ -131,8 +148,8 @@ void func_L25_0040CDA0(char *obj)
             B(obj,0x20)=3;
             a[0]=359.0f; a[1]=440.0f; a[2]=524.0f;
             b[0]=403.0f; b[1]=456.0f; b[2]=524.0f;
-            func_L25_003752D8((void *)1);
-            func_L25_00376FE0(a,10.0f); func_L25_00377608(b,10.0f);
+            func_L25_003752D8((u8 *)1);
+            func_L25_00376FE0((u8 *)a,10.0f); func_L25_00377608((u8 *)b,10.0f);
             *(Quad *)d = *(Quad *)c = 0;
             c[0]=417.18f; c[1]=454.03f; c[2]=532.6f;
             d[0]=420.93f; d[1]=413.79f; d[2]=534.54f;

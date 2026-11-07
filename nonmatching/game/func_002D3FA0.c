@@ -1,3 +1,4 @@
+/* 7 November 2026, label_y sweep: every y rounding goes through label_y (the four centred sprite ys with handle t, every rectangle/text y with handle (void *)color). Same profile: 2460/2468 bytes (was 2428), masked aligned-diff rows 547 -> 174 (m1d h.py count). Retail still saves two more GPRs (s7, fp) and orders the sprite y conversion before the move of t. */
 /* 2 November 2026: retained nonmatching C; no linked matching credit.
  * Profile: -O2 -G8 -ffunction-sections.
  * USA v1.01 check: 2428/2468 bytes, 0/28 placements.
@@ -81,6 +82,24 @@ extern void func_002A0300(char *, int), func_002A0220(void), func_002A0380(void)
 extern void func_002ECB70(char *);
 extern void func_0027C540(int), func_0027C660(void);
 extern char *D_001A8CFC[] __attribute__((sda));
+extern int D_001B23A0;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_001B23A0;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 int func_002D3FA0(void)
 {
     MenuCorners corners = D_001ABA78;
@@ -93,38 +112,38 @@ int func_002D3FA0(void)
     func_0027C540(0);
     t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD0);
     px = (float)(D_001A7340[0] / 2);
-    py = (float)(int)((float)(D_001A7344[0] / 2) * D_001B23A4[0] + 0.5f);
+    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
     func_00300A00(t, 0x60442D00, px, py, 1.0f, 1.0f, 0.0f);
     t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD1);
     px = (float)(D_001A7340[0] / 2);
-    py = (float)(int)((float)(D_001A7344[0] / 2) * D_001B23A4[0] + 0.5f);
+    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
     func_00300A00(t, 0x60241700, px, py, 1.0f, 1.0f, 0.0f);
     t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD2);
     px = (float)(D_001A7340[0] / 2);
-    py = (float)(int)((float)(D_001A7344[0] / 2) * D_001B23A4[0] + 0.5f);
+    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
     func_00300A00(t, 0x55F0C070, px, py, 1.0f, 1.0f, 0.0f);
     t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD3);
     px = (float)(D_001A7340[0] / 2);
-    py = (float)(int)((float)(D_001A7344[0] / 2) * D_001B23A4[0] + 0.5f);
+    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
     func_00300A00(t, 0x55F0C070, px, py, 1.0f, 1.0f, 0.0f);
-    func_0028FC48(228, (int)(D_001B23A4[0] * 326.0f + 0.5f), 230, (int)(D_001B23A4[0] * 387.0f + 0.5f), color, 0);
-    func_0028FC48(286, (int)(D_001B23A4[0] * 326.0f + 0.5f), 288, (int)(D_001B23A4[0] * 387.0f + 0.5f), color, 0);
-    func_0028FC48(228, (int)(D_001B23A4[0] * 325.0f + 0.5f), 288, (int)(D_001B23A4[0] * 327.0f + 0.5f), color, 0);
-    func_0028FC48(228, (int)(D_001B23A4[0] * 386.0f + 0.5f), 288, (int)(D_001B23A4[0] * 388.0f + 0.5f), color, 0);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, (int)(D_001B23A4[0] * 36.0f + 0.5f), 192, (int)(D_001B23A4[0] * 96.0f + 0.5f), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, (int)(D_001B23A4[0] * 36.0f + 0.5f), -192, (int)(D_001B23A4[0] * 96.0f + 0.5f), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, (int)(D_001B23A4[0] * 228.0f + 0.5f), 192, -(int)(D_001B23A4[0] * 96.0f + 0.5f), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, (int)(D_001B23A4[0] * 228.0f + 0.5f), -192, -(int)(D_001B23A4[0] * 96.0f + 0.5f), &corners);
-    func_0028E868(func_0028E588(0xEAA8, 1), 402, (int)(D_001B23A4[0] * 50.0f + 0.5f), 89, (int)(D_001B23A4[0] * 115.0f + 0.5f), 64);
-    x = (int)(D_001B23A4[0] * 116.0f + 0.5f);
+    func_0028FC48(228, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, 1), 230, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, 1), color, 0);
+    func_0028FC48(286, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, 1), 288, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, 1), color, 0);
+    func_0028FC48(228, label_y((void *)color, 325.0f, D_001B23A4[0], 0.5f, 1), 288, label_y((void *)color, 327.0f, D_001B23A4[0], 0.5f, 1), color, 0);
+    func_0028FC48(228, label_y((void *)color, 386.0f, D_001B23A4[0], 0.5f, 1), 288, label_y((void *)color, 388.0f, D_001B23A4[0], 0.5f, 1), color, 0);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, 1), 192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, 1), -192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, 1), 192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, 1), -192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
+    func_0028E868(func_0028E588(0xEAA8, 1), 402, label_y((void *)color, 50.0f, D_001B23A4[0], 0.5f, 1), 89, label_y((void *)color, 115.0f, D_001B23A4[0], 0.5f, 1), 64);
+    x = label_y((void *)color, 116.0f, D_001B23A4[0], 0.5f, 1);
     func_0027FB40(445, x, 0x80F0F0F0ULL, func_00288FB8(0x3212), -1);
-    x = (int)(D_001B23A4[0] * 134.0f + 0.5f);
+    x = label_y((void *)color, 134.0f, D_001B23A4[0], 0.5f, 1);
     func_0027FB40(445, x, 0x80F0F0F0ULL, func_00288FB8(0x3213), -1);
     first = func_00288FB8(0x3213);
     second = func_00288FB8(0x2D55);
     func_00115DA8(text, D_001AB998, first, second);
-    func_0027FAA8(159, (int)(D_001B23A4[0] * 18.0f + 0.5f), 0x80F0F0F0ULL, text, -1);
-    x = (int)(D_001B23A4[0] * 187.0f + 0.5f);
+    func_0027FAA8(159, label_y((void *)color, 18.0f, D_001B23A4[0], 0.5f, 1), 0x80F0F0F0ULL, text, -1);
+    x = label_y((void *)color, 187.0f, D_001B23A4[0], 0.5f, 1);
     func_0027FAA8(445, x, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
@@ -159,7 +178,7 @@ int func_002D3FA0(void)
         x += 56;
     }
     func_0027C660();
-    func_002FC620(30, 385, (int)(D_001B23A4[0] * 50.0f + 0.5f), (int)(D_001B23A4[0] * 213.0f + 0.5f));
+    func_002FC620(30, 385, label_y((void *)color, 50.0f, D_001B23A4[0], 0.5f, 1), label_y((void *)color, 213.0f, D_001B23A4[0], 0.5f, 1));
     func_002A0250();
     func_002A01C8();
     func_002A01F0();

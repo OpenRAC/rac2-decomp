@@ -1,3 +1,4 @@
+/* 7 November 2026, label_y sweep: every text label y=Y(v) is label_y(text, (float)v, D_L11_001B3E04, 0.5f, 1), mode D_L11_001B3E00; the box keeps Y() (accepted HUD label idiom, definition above the function). Same profile: 1344/1332 bytes (was 1324), sweep-harness masked aligned diff 278 -> 143. Handle = the label x global: worse. */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 1324/1332 bytes, 0/1 placements; first difference size mismatch.
  * Profile: -O2 -G8 -ffunction-sections.
@@ -85,6 +86,24 @@ extern int *D_L11_001B14F8[] SDATA(D_L11_001B14F8);
 #define TABLE D_L11_001B14F8
 #define SEL (*(short *)(state+0x1e8))
 #define Y(a) ((int)((float)(a)*D_L11_001B3E04+0.5f))
+extern int D_L11_001B3E00;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L11_001B3E00;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L11_00443D78(unsigned char *object) {
     unsigned char box[32]; char buffer[64];
     unsigned char *state; char *text,*label,*unit; int i,value,y; u64 color;
@@ -99,22 +118,22 @@ void func_L11_00443D78(unsigned char *object) {
         label=((char *)func_00288FB8(0x2f44)); unit=((char *)func_00288FB8(0x2f5e)); value=func_L11_00442958(SEL);
         if(value<10000) func_00115DA8(buffer,D_L11_001B15A0,label,value,unit);
         else func_00115DA8(buffer,D_L11_001B16E8,label);
-        text=buffer; y=Y(D_L11_001B167C); color=D_L11_001B1680; func_0027F5B8(D_L11_001B1678,y,color,text,func_001157AC(text));
+        text=buffer; y=label_y(text, (float)D_L11_001B167C, D_L11_001B3E04, 0.5f, 1); color=D_L11_001B1680; func_0027F5B8(D_L11_001B1678,y,color,text,func_001157AC(text));
     }
 counts:
     if(D_001395B8[func_L11_0043E108(SEL)]) {
         label=((char *)func_00288FB8(0x2f3e));
         func_00115DA8(buffer,D_L11_001B16E8,label,D_001395B8[func_L11_0043E108(SEL)]);
-        text=buffer; y=Y(D_L11_001B16AC); color=D_L11_001B16B0; func_0027F5B8(D_L11_001B16A8,y,color,text,func_001157AC(text));
+        text=buffer; y=label_y(text, (float)D_L11_001B16AC, D_L11_001B3E04, 0.5f, 1); color=D_L11_001B16B0; func_0027F5B8(D_L11_001B16A8,y,color,text,func_001157AC(text));
     }
-    if(SEL!=0) { text=((char *)func_00288FB8(0x2f40)); y=Y(D_L11_001B168C); color=D_L11_001B1690; func_0027F538(D_L11_001B1688,y,color,text,func_001157AC(text)); }
+    if(SEL!=0) { text=((char *)func_00288FB8(0x2f40)); y=label_y(text, (float)D_L11_001B168C, D_L11_001B3E04, 0.5f, 1); color=D_L11_001B1690; func_0027F538(D_L11_001B1688,y,color,text,func_001157AC(text)); }
     for(i=SEL+1;i<13;i++) {
         if(!D_001395B8[func_L11_0043E108(TABLE[i][2])]) continue;
         if(i>=11 && !func_00288D58()) continue;
         if(i==8 && !D_L11_00279BA0[D_00139568[0x1e]].enabled) continue;
-        text=((char *)func_00288FB8(0x2f41)); y=Y(D_L11_001B169C); color=D_L11_001B16A0; func_0027F538(D_L11_001B1698,y,color,text,func_001157AC(text)); break;
+        text=((char *)func_00288FB8(0x2f41)); y=label_y(text, (float)D_L11_001B169C, D_L11_001B3E04, 0.5f, 1); color=D_L11_001B16A0; func_0027F538(D_L11_001B1698,y,color,text,func_001157AC(text)); break;
     }
-    text=((char *)func_00288FB8(0x2f3f)); y=Y(D_L11_001B16BC); color=D_L11_001B16C0; func_0027F538(D_L11_001B16B8,y,color,text,func_001157AC(text));
-    text=((char *)func_00288FB8(0x2f42)); y=Y(D_L11_001B16DC); color=D_L11_001B16E0; func_0027F538(D_L11_001B16D8,y,color,text,func_001157AC(text));
-    text=((char *)func_00288FB8(0x2f43)); y=Y(D_L11_001B16CC); color=D_L11_001B16D0; func_0027F538(D_L11_001B16C8,y,color,text,func_001157AC(text));
+    text=((char *)func_00288FB8(0x2f3f)); y=label_y(text, (float)D_L11_001B16BC, D_L11_001B3E04, 0.5f, 1); color=D_L11_001B16C0; func_0027F538(D_L11_001B16B8,y,color,text,func_001157AC(text));
+    text=((char *)func_00288FB8(0x2f42)); y=label_y(text, (float)D_L11_001B16DC, D_L11_001B3E04, 0.5f, 1); color=D_L11_001B16E0; func_0027F538(D_L11_001B16D8,y,color,text,func_001157AC(text));
+    text=((char *)func_00288FB8(0x2f43)); y=label_y(text, (float)D_L11_001B16CC, D_L11_001B3E04, 0.5f, 1); color=D_L11_001B16D0; func_0027F538(D_L11_001B16C8,y,color,text,func_001157AC(text));
 }

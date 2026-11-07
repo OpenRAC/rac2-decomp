@@ -1,3 +1,4 @@
+/* 7 November 2026, label_y sweep: both 206.0f label ys go through label_y (handle: the sprite; the second sprite now in `text`), the bars unchanged. Same profile (-O2 -G8 -fno-expensive-optimizations): still 1364/1388 bytes, but masked aligned-diff rows 392 -> 336 (m1d h.py count; not a check.py figure). The size gap and case layout remain. */
 /* Closer C3, 1 November 2026: the profile below is wrong. Retail has sched1 on: -O2 -G8 -fno-expensive-optimizations
  * -ffunction-sections. 206.0f, 0x8710, 0.5f are call-crossing pseudos and float up over the calls as in retail; literal args go
  * straight to hard regs; with that the first 0x128 bytes agree but for the save count. Left: one more saved GPR
@@ -72,6 +73,24 @@ extern char *func_00336D50(char *, int);
 extern void func_00300A00(char *, int, float, float, float, float, float);
 extern void func_0027DE50(int, int, int, int, unsigned long);
 
+extern int D_001B23A0;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_001B23A0;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 int func_002900B8(void)
 {
     float saved;
@@ -91,12 +110,12 @@ int func_002900B8(void)
         first = func_00283D38(0x442D00, 0x60442D00, pulse);
         second = func_00283D38(0xF0C070, 0x55F0C070, pulse);
         text = func_00336D50(D_001A8CFC[0] + 0x8710, 0xA6);
-        y = (float)(int)(D_001B23A4[0] * 206.0f + 0.5f);
+        y = (float)label_y(text, 206.0f, D_001B23A4[0], 0.5f, 1);
         scale = 1.0f;
         zero = 0.0f;
         func_00300A00(text, first, 484.0f, y, scale, scale, zero);
-        func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0xA7), second, 484.0f,
-                      (float)(int)(D_001B23A4[0] * 206.0f + 0.5f), 1.0f, 1.0f, 0.0f);
+        text = func_00336D50(D_001A8CFC[0] + 0x8710, 0xA7);
+        func_00300A00(text, second, 484.0f, (float)label_y(text, 206.0f, D_001B23A4[0], 0.5f, 1), 1.0f, 1.0f, 0.0f);
         switch (D_001A9004) {
         case 0:
             if (0.0f <= D_001A9008 && D_001A9008 <= 1.0f) {

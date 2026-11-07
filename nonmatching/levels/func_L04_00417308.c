@@ -1,3 +1,6 @@
+/* 7 November 2026, label_y sweep: SC(k) is label_y(p, (k), D_L04_001B2D44, 0.5f, 1) (h gives the same): 990 -> 607 differences, 5768 -> 5916/5968 bytes. Still a draft. The body below is the retained C with that change (label_y is
+ * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
+ * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /* Second-pass layout/ABI review, 2026-11-03; retained, not linked.
  * Profile: -O2 -G8 -ffunction-sections.
  * US check.py: 5768/5968 bytes,0/2 places; frame0x1C0.
@@ -139,10 +142,28 @@ extern void func_L04_00416E38();
 extern void func_L04_00417028(u8 *);
 extern void func_L04_0043AD48(void *, void *, int, int, void *, void *, void *);
 
-#define SC(k) ((int)(D_L04_001B2D44 * (k) + 0.5f))
+#define SC(k) label_y(p, (k), D_L04_001B2D44, 0.5f, 1)
 #define I(b, o) (*(s32 *)((b) + (o)))
 #define F(b, o) (*(float *)((b) + (o)))
 #define CLAMP01(x) do { if ((x) > 1.0f) (x) = 1.0f; if ((x) < 0.0f) (x) = 0.0f; } while (0)
+
+extern int D_L04_001B2D40;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L04_001B2D40;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
 
 s32 func_L04_00417308(void)
 {

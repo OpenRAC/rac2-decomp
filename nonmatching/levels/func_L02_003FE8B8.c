@@ -1,3 +1,4 @@
+/* 7 November 2026, label_y sweep: LBL's sprite y is label_y(ls, (f32)(yv), D_L02_001B3E04, 0.5f, 1), mode D_L02_001B3E00 (accepted HUD label idiom, definition above the function). Same profile (-fno-schedule-insns): 3568/3552 bytes (was 3560), sweep-harness masked aligned diff 509 -> 341; plain -O2 -G8 -ffunction-sections gives 310. Still far: size off by 16. */
 /* Claude Opus 5.5 (xhigh), task v1870, 31 October 2026.
  * Near miss, USA v1.01 level 02: 3560/3552 bytes, 0 of 1 places match; frame 0x180 and the
  * save set agree. 572 of retail's 888 words lie in a common subsequence that ignores relocated
@@ -128,7 +129,7 @@ extern s32 func_00115DA8(char *, char *, ...);
 
 #define LBL(id, c, xv, yv, a1, a2, a3) { \
         char *ls = func_00336D50(D_L02_001A904C[0] + 0x8710, id); \
-        s32 ly = Scale(yv); \
+        s32 ly = label_y(ls, (f32)(yv), D_L02_001B3E04, 0.5f, 1); \
         func_00300A00(ls, c, xv, ly, a1, a2, a3); }
 #define TITLE() \
         LBL(0x4C, D_L02_001B1424, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f); \
@@ -149,6 +150,24 @@ extern s32 func_00115DA8(char *, char *, ...);
 #define DRAWBUF(fn, r) \
             { s32 c = D_L02_001B1358; s32 n = func_001157AC(buf); fn((r), c, buf, n); }
 #define sprintf_n func_00115DA8
+
+extern int D_L02_001B3E00;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L02_001B3E00;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
 
 void func_L02_003FE8B8(u8 *moby)
 {

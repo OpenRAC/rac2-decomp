@@ -1,3 +1,8 @@
+/* 7 November 2026, label_y sweep: both title rows now use the accepted HUD label idiom,
+ * row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1); (definition above the
+ * function, mode D_L03_001B3280). Same -O2 -G0 profile, 656/656 bytes, 0/1 places; sweep-harness
+ * masked aligned diff 28 -> 21 rows. The title draws are exact except z = 0.0f (mtc1 $zero,$f21),
+ * issued one draw early; dropping the do-while groups gives more rows. */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 656/656, 41 real differences (text-call argument scheduling and the key-copy/.y pointer setup). */
 /* 7 November 2026, round 13: retained best C, USA v1.01 656/656 bytes, 0/1
  * places; -O2 -G0 -ffunction-sections. 41 differing instruction positions after
@@ -143,6 +148,23 @@ static __inline__ int menu_screen_y(float value, float offset)
     return (int)y;
 }
 
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L03_001B3280;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 int func_L03_003C7018(void)
 {
     if (D_L03_001A904C) {
@@ -152,7 +174,7 @@ int func_L03_003C7018(void)
 
             do {
                 title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc6);
-                row = (float)menu_round(D_L03_001B0150);
+                row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
@@ -166,7 +188,7 @@ int func_L03_003C7018(void)
 
             do {
                 title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
-                row = (float)menu_round(D_L03_001B0150);
+                row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;

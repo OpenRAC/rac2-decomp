@@ -1,3 +1,29 @@
+/* 6 November 2026, Codex follow-up to round 14 (accepted label_y precedent):
+ * Best retained source: 752/752 bytes, 0/8 USA v1.01 places, THREE real words.
+ * Same own-unit profile: -O2 -G8 -fno-expensive-optimizations
+ * -ffunction-sections -fno-builtin -fno-gcse. No linked build run.
+ * New improvement: retain the owner-approved menu_coord/menu_coord2 helpers for
+ * the four sprite draws and 23.0f text; use the exact accepted label_y helper
+ * (L15_00431590-g8.c) with the text handle for the final 373.0f text. This fixes
+ * all four 373/0.5 register differences without disturbing earlier allocation.
+ * Remaining +0x1A8/+0x1AC/+0x1B4: fourth draw moves f15=f14 before f16=zero,
+ * putting the color ori in the delay slot; retail delays f15=f14 instead.
+ * The exact label_y at every site also gives 752/752 and seven real words:
+ * it fixes 373 but changes the first two integer conversions v1 -> a1 (four
+ * words), retaining the fourth draw's three scheduling differences.
+ * New controls: actual conversion/draw/lookup statement groups, including
+ * -malign-loops=2; separate result locals, reuse for state/FP coordinates,
+ * equivalent fourth-draw constant arguments, and initial constant orders.
+ * None improved three. The accepted screen_coord with zero offset at these
+ * sites worsens the body; no real nonzero mode offset is evidenced here.
+ * With the all-label_y source, -g, -fno-regmove, -fno-caller-saves,
+ * -fno-sched-interblock, -fno-sched-spec and -frac2-hazard-labels tie seven;
+ * disabling either scheduling pass worsens it. Label-free fourth rounding
+ * and label_y only on draw four worsen the hybrid. No invalid hill-climb,
+ * volatile, asm, symbol aliases, artificial locals or addresses retained.
+ * Next useful input: a real fourth-draw source lifetime that keeps its f15
+ * argument from carrying REG_DEAD, without losing its f14 canonical copy.
+ */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 752/752, 7 words with the owner-allowed helper (373/0.5 FPR swap and the fourth draw's delay slot). */
 /* 7 November 2026, round 14 (dead-test helper allowed by owner ruling, master precedent:
  * src/game/002D2188-g8.c): best body below, 752/752, 0/8 USA, 7 real words (was ~9).
@@ -175,6 +201,23 @@ static __inline__ int menu_coord2(float scale, float value, float half)
     return result;
 }
 
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L02_001B3E00;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L02_003C43F0(char *obj) {
     char *text;
     int state;
@@ -210,5 +253,5 @@ void func_L02_003C43F0(char *obj) {
         func_0027FBD8(262, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     }
     text = func_00288FB8(0x2F5A);
-    func_0027FBD8(254, menu_coord(D_L02_001B3E04, 373.0f, 0.5f, on), 0x88FFFFFF, text, -1);
+    func_0027FBD8(254, label_y(text, 373.0f, D_L02_001B3E04, 0.5f, 1), 0x88FFFFFF, text, -1);
 }

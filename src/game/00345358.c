@@ -421,7 +421,6 @@ void func_00348640(char *a0, int a1, int *a2)
 
 /* func_003489E8 is built from 00345358-list-g8.c. */
 
-INCLUDE_ASM("asm/game", func_00348EC0);
 
 void *func_00349148(void *object) {
     return object;

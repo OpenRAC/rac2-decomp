@@ -1,3 +1,6 @@
+/* 7 November 2026, label_y sweep: the three sprite ys use label_y(first/second/third, ...), the anchor y label_y(object, ...): 141 -> 51 differences, 1144 -> 1152/1156 bytes (loop y with label_y: worse, alpha 68, state 75). The body below is the retained C with that change (label_y is
+ * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
+ * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /* 2 November 2026, remaining-function review: nonmatching; no linked credit.
  * Profile: -O2 -G8 -ffunction-sections -g -frac2-zero-ti-por.
  * US check: 1144/1156 bytes, 0/2 placements.
@@ -34,6 +37,24 @@ extern void func_00282F20(void *, void *, f32), func_002836E8(void *, void *);
 extern void func_00283098(void *, void *, void *);
 extern s32 func_00283CF0(f32);
 
+extern int D_L08_001B3240;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L08_001B3240;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L08_004207D0(u8 *object)
 {
     Vector difference, euler;
@@ -51,13 +72,10 @@ void func_L08_004207D0(u8 *object)
     first = func_00336D50(D_L08_001A904C + 0x8710, 0xBA);
     second = func_00336D50(D_L08_001A904C + 0x8710, 0xBB);
     third = func_00336D50(D_L08_001A904C + 0x8710, 0xBC);
-    func_00300A00(first, 0x60442D00, D_L08_001B1B84 + 4.0f,
-                 (f32)(s32)((D_L08_001B1B88 + 4.0f) * D_L08_001B3244 + 0.5f), 0.8f, -0.8f, 0.0f);
-    func_00300A00(second, 0x60241700, D_L08_001B1B84 + 4.0f,
-                 (f32)(s32)((D_L08_001B1B88 + 4.0f) * D_L08_001B3244 + 0.5f), 0.8f, -0.8f, 0.0f);
-    func_00300A00(third, 0x55F0C070, D_L08_001B1B84 + 4.0f,
-                 (f32)(s32)((D_L08_001B1B88 + 4.0f) * D_L08_001B3244 + 0.5f), 0.8f, -0.8f, 0.0f);
-    y = (f32)(s32)(D_L08_001B1B88 * D_L08_001B3244 + 0.5f);
+    func_00300A00(first, 0x60442D00, D_L08_001B1B84 + 4.0f, (f32)label_y(first, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    func_00300A00(second, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(second, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    func_00300A00(third, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(third, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    y = (f32)label_y(object, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
     texture = func_0027C878(D_L08_001B1BA0);
     func_L05_003008C0(D_L08_001B1B84, y, D_L08_001B1B8C, D_L08_001B1B90,
                      0, 0, D_L08_001B1B94, D_L08_001B1B98, 0x80808080UL, texture);

@@ -1,3 +1,6 @@
+/* 7 November 2026, label_y sweep: Y0 is label_y(ctl, ...) for the two gauge sprites and label_y(obj, ...) for the two count texts: 123 -> 78 differences, 3008/3008 bytes (text as handle: 3012 bytes; Y1/Y3 keep their real mode tests). The body below is the retained C with that change (label_y is
+ * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
+ * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /* 2026-11-03 w02 faithful-contract review, US object checks only.
  * Profile: -O2 -G8 -ffunction-sections -g.
  * Current check.py: 3008/3008 bytes,0/2 places,first+0x3E8.
@@ -158,7 +161,25 @@ static __inline__ int Y1(float y) {
         return (int)(y + 1.0f);
     return (int)y;
 }
-#define Y0(y) ((int)((float)(y) * D_L22_001B2984 + 0.5f))
+#define Y0(y) label_y(ctl, (float)(y), D_L22_001B2984, 0.5f, 1)
+
+extern int D_L22_001B2980;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L22_001B2980;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
 
 int func_L22_003A5018(void) {
     char textBuffer[64];
@@ -248,13 +269,13 @@ int func_L22_003A5018(void) {
     func_00115DA8(textBuffer, D_L22_001AF4D8, D_L22_001B1910.leftCount);
     text = textBuffer;
     {
-    int value = Y0(ref_L22_003A5018_33);
+    int value = label_y(obj, (float)ref_L22_003A5018_33, D_L22_001B2984, 0.5f, 1);
     int colour = ref_L22_003A5018_30;
     func_0027FB40(ref_L22_003A5018_32, value, colour, text, func_001157AC(text));
     }
     func_00115DA8(text, D_L22_001AF4D8, D_L22_001B1910.rightCount);
     {
-    int value = Y0(ref_L22_003A5018_35);
+    int value = label_y(obj, (float)ref_L22_003A5018_35, D_L22_001B2984, 0.5f, 1);
     int colour = ref_L22_003A5018_30;
     func_0027FB40(ref_L22_003A5018_34, value, colour, text, func_001157AC(text));
     }

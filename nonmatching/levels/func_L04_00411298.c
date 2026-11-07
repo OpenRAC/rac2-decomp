@@ -1,3 +1,6 @@
+/* 7 November 2026, label_y sweep: the sprite ys use label_y(sprite, ...), the 32/65-row texts label_y(str, ...), the bottom row label_y(text, fbottom, ...): 217 -> 135 differences, 3732/3732 bytes, first difference +0x178 -> +0x2DC (label_y(text) on the 65/106 rows: worse). The body below is the retained C with that change (label_y is
+ * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
+ * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /*
  * Tier: opus-1 (Claude Opus 5.5 xhigh), task v1879, 31 October 2026. Retained near miss, USA v1.01.
  * Game profile: -O2 -G8 -ffunction-sections in a dedicated -g8.c unit (e.g. L04_0040F8F0-hud-g8.c).
@@ -88,6 +91,24 @@ extern s32 func_00283D38(s32, s32, f32);
 extern s32 func_002E5CF8(s32, s32, void *);
 extern void func_002FC560(u32, u64);
 
+extern int D_L04_001B2D40;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L04_001B2D40;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 s32 func_L04_00411298(void) {
     char text[64];
     u8 *object = D_L04_001B0914;
@@ -135,13 +156,13 @@ tick:
         lap = func_L04_0040A1D0(D_L04_001B090C);
         if (lap > 2) lap = 2;
         sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x39);
-        func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)(s32)(D_L04_001B2D44 * 194.0f + 0.5f), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
+        func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
         sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x38);
-        func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)(s32)(D_L04_001B2D44 * 194.0f + 0.5f), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
+        func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
         str = func_00288FB8(0x2F93);
-        func_0027FAA8(D_001A7340 / 2, (s32)(D_L04_001B2D44 * 32.0f + 0.5f), 0x80F0F0F0ULL, str, func_001157AC(str));
+        func_0027FAA8(D_001A7340 / 2, label_y(str, 32.0f, D_L04_001B2D44, 0.5f, 1), 0x80F0F0F0ULL, str, func_001157AC(str));
         if (D_L04_001B093C > 0) {
-            func_0027FAA8(D_001A7340 / 2, (s32)(D_L04_001B2D44_gp * 65.0f + 0.5f), 0x80F0F0F0ULL, func_00288FB8(0x1233), -1);
+            func_0027FAA8(D_001A7340 / 2, label_y(str, 65.0f, D_L04_001B2D44_gp, 0.5f, 1), 0x80F0F0F0ULL, func_00288FB8(0x1233), -1);
             D_L04_001B093C--;
         } else if (D_L04_002C63C0[D_L04_001B090C].times[lap - 1]) {
             s32 recordTime;
@@ -159,13 +180,13 @@ tick:
     fbottom = (f32)bottom;
     alpha = (1.0f - (315.0f - fbottom) * 0.006329114f) * 0.72f + 0.08f;
     sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x47);
-    func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)(s32)(D_L04_001B2D44 * 196.0f + 0.5f), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
+    func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
     sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x46);
-    func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)(s32)(D_L04_001B2D44 * 196.0f + 0.5f), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
+    func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
     func_00115DA8(text, D_L04_001B0A40, func_00288FB8(0x2F7F),
         func_00288FB8(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), func_00288FB8(0x2F80));
     func_0027FAA8(D_001A7340 / 2, (s32)(D_L04_001B2D44 * 106.0f + 0.5f), 0x80F0F0F0ULL, text, func_001157AC(text));
-    func_0027F5B8(339, (s32)(fbottom * D_L04_001B2D44 + 0.5f), 0x80F0F0F0ULL, func_00288FB8(0x2F42), -1);
+    func_0027F5B8(339, label_y(text, fbottom, D_L04_001B2D44, 0.5f, 1), 0x80F0F0F0ULL, func_00288FB8(0x2F42), -1);
     y = 138;
     ahead = 0;
     racer = *(u8 **)(state + 0x39C);

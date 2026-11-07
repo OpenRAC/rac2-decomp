@@ -1,3 +1,6 @@
+/* 7 November 2026, label_y sweep: the two icon ys use label_y(icon, 200.0f, ...) and CENTER uses label_y(str_, ...): 319 -> 281 differences, 3360/3388 bytes (TEXT and ROW with label_y: no gain). The body below is the retained C with that change (label_y is
+ * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
+ * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /* opus-1 (Claude Opus 5.5, xhigh) retained attempt, 31 October 2026, USA v1.01.
  * Profile: -O2 -G8 -ffunction-sections -g, in a separate -g8.c unit.
  * check.py: 3356/3388 bytes, 0 of 2 places (Barlow and Joba). No linked build.
@@ -76,10 +79,28 @@ extern void func_0027F5B8(int, int, unsigned long, char *, int);
 extern int func_L04_0040A1D0(int);
 extern void func_002FC560(int, unsigned long);
 static __inline__ int Yt(float v) { return (int)(v * D_L04_001B2D44 + 0.5f); }
+extern int D_L04_001B2D40;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L04_001B2D40;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 #define Y(v) Yt((float)(v))
 #define YS(v) Y(v)
 #define TEXT(x,y,s) { char *str_ = (s); int row_ = Y(y); int len_ = func_001157AC(str_); func_0027FAA8(x,row_,0x80f0f0f0UL,str_,len_); }
-#define CENTER(y,s) { char *str_ = (s); int row_ = Y(y); int len_ = func_001157AC(str_); func_0027FBD8(center,row_,0x80f0f0f0UL,str_,len_); }
+#define CENTER(y,s) { char *str_ = (s); int row_ = label_y(str_, (float)(y), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FBD8(center,row_,0x80f0f0f0UL,str_,len_); }
 #define ROW(x,id) { int row_ = Y(286); char *str_ = func_00288FB8(id); func_0027F5B8(x,row_,0x80f0f0f0UL,str_,-1); }
 int func_L04_0040AD28(void)
 {
@@ -100,12 +121,12 @@ int func_L04_0040AD28(void)
     D_L04_001BDB80[44] = tangent;
     func_0027AB40();
     icon = func_00336D50(D_L04_001A904C + 0x8710,0x45);
-    py = (float)YS(200);
+    py = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     scale = 0.92f;
     if (D_001A7B90) scale = 0.9f;
     func_00300A00(icon,0x60442d00,centerf,py,1.0f,scale,0.0f);
     icon = func_00336D50(D_L04_001A904C + 0x8710,0x44);
-    py = (float)YS(200);
+    py = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     scale = 0.92f;
     if (D_001A7B90) scale = 0.9f;
     func_00300A00(icon,0x55f0c070,centerf,py,1.0f,scale,0.0f);

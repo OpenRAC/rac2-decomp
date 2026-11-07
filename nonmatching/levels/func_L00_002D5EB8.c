@@ -1,4 +1,30 @@
-/* Tier opus-1, 3 November 2026: 1368/1376 bytes, 0 of 27 places (check.py, -O2 -G8 -ffunction-sections,
+/* 6 November 2026, Codex loop-shape follow-up: 1376/1376 bytes, 0/27 USA places,
+ * -O2 -G8 -ffunction-sections in an isolated shared -g8.c unit. check.py reports
+ * "instruction at +0x3f0 differs" at every place; 46 instruction positions differ
+ * after excluding relocation address fields (first real register difference +0x64).
+ * This improves the previous 1368-byte draft but is not a match or a linked result.
+ * New source: a real D_00139568 cursor, an accumulated short-circuit skip predicate,
+ * and a one-pass group assigning the actual 18/53 exception constants. This recovers
+ * the 0x60 frame and keeps stride 0xE0 in s3 and the entry-table base in s2 across
+ * the last call. The group's b/c locals are initialized before use; every cursor
+ * increment stays in the for latch, including on continue paths. No dead operations.
+ * Remaining: map/table address registers in the earlier loop (s7/fp versus s4/s5),
+ * last-loop entry scheduling, exception-constant allocation, xori/zero branches for
+ * 10/9 instead of direct comparisons, flag-base register, and final store/arg order.
+ * New controls that did not close it: while/do/explicit latch and early-return loops;
+ * combined/nested predicates, inline and tri-state predicates; real one-pass groups;
+ * short-circuit OR/AND and skip updates; byte/short predicate types; map storage
+ * declarations; -fno-gcse, -fno-rerun-loop-opt, -fno-rerun-cse-after-loop,
+ * -fno-thread-jumps, -fno-sched-interblock, -fno-schedule-insns,
+ * -fno-strength-reduce, -fmove-all-movables, -fno-expensive-optimizations,
+ * -frac2-keep-block-order and -fno-force-mem. No usable RAC1/RAC4 donor found.
+ * Next useful experiment needs evidence for source lifetimes or late exit-test
+ * duplication; do not repeat these equivalent loop/flag trials. PAL/US2 not checked.
+ * The D5E30 declaration now agrees with its int definition; discarded-return code
+ * is byte-identical to the previous void declaration. The older analysis follows
+ * as history and describes its own indexed, ungrouped draft, not this candidate.
+ */
+/* Previous draft, tier opus-1, 3 November 2026: 1368/1376 bytes, 0 of 27 places (check.py, -O2 -G8 -ffunction-sections,
  * would need a `-g8.c` unit; the old 1336 draft no longer applies).
  * Declarations that matter: D_001A7A28, D_001A7398 and D_001A7AF8 are MACRO_ADDR incomplete arrays (tied
  * lui/lbu and unsplit la, which also stops the cross-jumped entry copy in the last loop); D_001A7A00 is an
@@ -29,7 +55,7 @@ typedef struct { char p[0x340]; int f340; char q[0x1248-0x344]; int f1248; } H;
 extern char D_00189E20[];
 typedef struct { int exists; unsigned char state; char pad[7]; int index; char pad2[58]; short value; char pad3[32]; int limit; char pad4[112]; } Entry1269;
 extern Entry1269 D_L00_00262570[];
-extern void func_L00_002D5E30(int*,int*,int*);
+extern int func_L00_002D5E30(int*,int*,int*);
 extern void func_0028A180(int,int), func_L00_003F1300(void), func_L00_0030C7F8(int), func_002B0A18(int,int), func_002E5E58(int,int,int);
 extern int func_00288D58(void), func_00287F60(int);
 extern void func_L00_0037E6A8(int,int), func_00287EB0(int), func_00288508(int);
@@ -85,12 +111,13 @@ void func_L00_002D5EB8(void) {
  }
  if((D_L00_001B19C8&127) || D_001A7A00[0x7A]) return;
  {
- int a=17,b=18,c=53;
+ unsigned char *p=D_00139568; int a,b,c; a=17;do {b=18;c=53;} while(0);
  ok=1;
- for(i=0;i<56;i++) {
-  if(D_L00_00262570[D_00139568[i]].exists) {
-   if(i==10) continue;
-   if(i==9) continue;
+ for(i=0;i<56;i++,p++) {
+  int skip = !D_L00_00262570[*p].exists;
+  if(!skip) skip=i==10;
+  if(!skip) skip=i==9;
+  if(!skip) {
    if(!D_001A7AF8[i]) {ok=0; break;}
    if(i==14) continue;
    if(i==12) continue;
@@ -98,7 +125,7 @@ void func_L00_002D5EB8(void) {
    if(i==b) continue;
    if(i==c) continue;
    if(func_00287F60(i)<=0) continue;
-   if(!D_L00_00262570[D_00139568[i]].state) {ok=0; break;}
+   if(!D_L00_00262570[*p].state) {ok=0; break;}
   }
  }
  }

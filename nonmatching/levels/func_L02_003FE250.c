@@ -1,3 +1,4 @@
+/* 7 November 2026, label_y sweep: every text label y is label_y(text or buf, (float)Y, D_L02_001B3E04, 0.5f, 1), mode D_L02_001B3E00 (accepted HUD label idiom, definition above the function). Same profile: 1296/1300 bytes (was 1304), sweep-harness masked aligned diff 129 -> 123. Header box conversions through label_y too: worse. */
 /*
  * GPT-6.1 Sol high tier, task v0936, 2026-10-29.
  * USA v1.01, pinned game -O2 -G8 -ffunction-sections.
@@ -62,6 +63,24 @@ extern int D_L02_001B1310 __attribute__((sda));
 extern int D_L02_001B1318 __attribute__((sda));
 extern int D_L02_001B131C __attribute__((sda));
 extern int D_L02_001B1320 __attribute__((sda));
+extern int D_L02_001B3E00;
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L02_001B3E00;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L02_003FE250(char *obj) {
     char box[32];
     char buf[64];
@@ -94,16 +113,16 @@ void func_L02_003FE250(char *obj) {
         value=func_L02_003FCDF8(*(short *)(state+0x118));
         if(value<10000) func_00115DA8(buf,D_L02_001B1228,text,value,suffix);
         else func_00115DA8(buf,D_L02_001B1328,text,value);
-{ int y=(int)((float)D_L02_001B12BC * D_L02_001B3E04 + 0.5f); u64 style=D_L02_001B12C0; int length=func_001157AC(buf); func_0027F5B8(D_L02_001B12B8,y,style,buf,length); }
+{ int y=label_y(buf, (float)D_L02_001B12BC, D_L02_001B3E04, 0.5f, 1); u64 style=D_L02_001B12C0; int length=func_001157AC(buf); func_0027F5B8(D_L02_001B12B8,y,style,buf,length); }
     }
     if(D_001395B8[func_L02_003F9B70(*(short *)(state+0x118))]) {
         text=func_00288FB8(0x2F3E);
         func_00115DA8(buf,D_L02_001B1328,text,D_001395B8[func_L02_003F9B70(*(short *)(state+0x118))]);
-{ int y=(int)((float)D_L02_001B12EC * D_L02_001B3E04 + 0.5f); u64 style=D_L02_001B12F0; int length=func_001157AC(buf); func_0027F5B8(D_L02_001B12E8,y,style,buf,length); }
+{ int y=label_y(buf, (float)D_L02_001B12EC, D_L02_001B3E04, 0.5f, 1); u64 style=D_L02_001B12F0; int length=func_001157AC(buf); func_0027F5B8(D_L02_001B12E8,y,style,buf,length); }
     }
     if (*(short *)(state+0x118)!=0) {
         text=func_00288FB8(0x2F40);
-{ int y=(int)((float)D_L02_001B12CC * D_L02_001B3E04 + 0.5f); u64 style=D_L02_001B12D0; int length=func_001157AC(text); func_0027F538(D_L02_001B12C8,y,style,text,length); }
+{ int y=label_y(text, (float)D_L02_001B12CC, D_L02_001B3E04, 0.5f, 1); u64 style=D_L02_001B12D0; int length=func_001157AC(text); func_0027F538(D_L02_001B12C8,y,style,text,length); }
     }
     for(i=*(short *)(state+0x118)+1;i<14;i++) {
         if(!D_001395B8[func_L02_003F9B70(*(int *)(D_L02_001B1190[i]+8))]) continue;
@@ -111,13 +130,13 @@ void func_L02_003FE250(char *obj) {
         if(i==7) { r=&D_L02_00264A70[D_00139568[0x1E]]; if(!r->enabled) continue; }
         if(i==8) { r=&D_L02_00264A70[D_00139568[0x2A]]; if(!r->enabled) continue; }
         text=func_00288FB8(0x2F41);
-{ int y=(int)((float)D_L02_001B12DC * D_L02_001B3E04 + 0.5f); u64 style=D_L02_001B12E0; int length=func_001157AC(text); func_0027F538(D_L02_001B12D8,y,style,text,length); }
+{ int y=label_y(text, (float)D_L02_001B12DC, D_L02_001B3E04, 0.5f, 1); u64 style=D_L02_001B12E0; int length=func_001157AC(text); func_0027F538(D_L02_001B12D8,y,style,text,length); }
         break;
     }
     text=func_00288FB8(12095);
-{ int y=(int)((float)D_L02_001B12FC * D_L02_001B3E04 + 0.5f); u64 style=D_L02_001B1300; int length=func_001157AC(text); func_0027F538(D_L02_001B12F8,y,style,text,length); }
+{ int y=label_y(text, (float)D_L02_001B12FC, D_L02_001B3E04, 0.5f, 1); u64 style=D_L02_001B1300; int length=func_001157AC(text); func_0027F538(D_L02_001B12F8,y,style,text,length); }
     text=func_00288FB8(12098);
-{ int y=(int)((float)D_L02_001B131C * D_L02_001B3E04 + 0.5f); u64 style=D_L02_001B1320; int length=func_001157AC(text); func_0027F538(D_L02_001B1318,y,style,text,length); }
+{ int y=label_y(text, (float)D_L02_001B131C, D_L02_001B3E04, 0.5f, 1); u64 style=D_L02_001B1320; int length=func_001157AC(text); func_0027F538(D_L02_001B1318,y,style,text,length); }
     text=func_00288FB8(12099);
-{ int y=(int)((float)D_L02_001B130C * D_L02_001B3E04 + 0.5f); u64 style=D_L02_001B1310; int length=func_001157AC(text); func_0027F538(D_L02_001B1308,y,style,text,length); }
+{ int y=label_y(text, (float)D_L02_001B130C, D_L02_001B3E04, 0.5f, 1); u64 style=D_L02_001B1310; int length=func_001157AC(text); func_0027F538(D_L02_001B1308,y,style,text,length); }
 }

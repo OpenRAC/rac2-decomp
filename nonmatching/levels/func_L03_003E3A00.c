@@ -1,3 +1,6 @@
+/* 7 November 2026, label_y sweep: the two sprite label ys use label_y((void *)q, ...): 316 -> 280 differences, still 1856/1860 bytes (sprite-local handles give the same 280; the label loop keeps its real mode test). The body below is the retained C with that change (label_y is
+ * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
+ * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /* func_L03_003E3A00: near miss, 1856/1860 bytes, 0 of 8 places (USA v1.01, 1 November 2026).
 
    Profile: its own `-g8` unit, `-O2 -G8 -ffunction-sections -g` (-g for the nop pair before
@@ -92,6 +95,23 @@ extern int func_0027FB40(int, int, unsigned long, char *, int);
 
 /* Draws the puzzle: the walked path between the nodes, the turns still open from the current
    node, the button prompts, the timer bar, the path-length boxes and the four counters. */
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L03_001B3280;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L03_003E3A00(u8 *p)
 {
     Vector turn;
@@ -147,10 +167,10 @@ void func_L03_003E3A00(u8 *p)
 
     if (D_L03_001A904C != 0) {
         func_00300A00((char *)func_00336D50((char *)(D_L03_001A904C + 0x8710), 0xCB), 0x60442D00,
-                      D_L03_001B0BC8, (int)(D_L03_001B0BCC * D_L03_001B3284 + 0.5f), D_L03_001B0BD0,
+                      D_L03_001B0BC8, label_y((void *)q, D_L03_001B0BCC, D_L03_001B3284, 0.5f, 1), D_L03_001B0BD0,
                       D_L03_001B0BD4, 0.0f);
         func_00300A00((char *)func_00336D50((char *)(D_L03_001A904C + 0x8710), 0xCC), 0x55F0C070,
-                      D_L03_001B0BC8, (int)(D_L03_001B0BCC * D_L03_001B3284 + 0.5f), D_L03_001B0BD0,
+                      D_L03_001B0BC8, label_y((void *)q, D_L03_001B0BCC, D_L03_001B3284, 0.5f, 1), D_L03_001B0BD0,
                       D_L03_001B0BD4, 0.0f);
     }
 
