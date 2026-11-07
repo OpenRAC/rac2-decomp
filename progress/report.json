@@ -1,45 +1,45 @@
 {
  "version": 2,
  "measures": {
-  "fuzzy_match_percent": 95.64016321328877,
+  "fuzzy_match_percent": 95.68484049774985,
   "total_code": "5524060",
-  "matched_code": "5283220",
-  "matched_code_percent": 95.64016321328877,
+  "matched_code": "5285688",
+  "matched_code_percent": 95.68484049774985,
   "total_functions": 8527,
-  "matched_functions": 8410,
-  "matched_functions_percent": 98.62788788554005,
-  "complete_code": "1825140",
-  "complete_code_percent": 33.03982940083924,
-  "total_units": 1098,
-  "complete_units": 1056
+  "matched_functions": 8412,
+  "matched_functions_percent": 98.65134279347953,
+  "complete_code": "1826612",
+  "complete_code_percent": 33.066476468394626,
+  "total_units": 1099,
+  "complete_units": 1057
  },
  "categories": [
   {
    "id": "executable",
    "name": "Boot executable",
    "measures": {
-    "fuzzy_match_percent": 93.7796194879909,
+    "fuzzy_match_percent": 93.92094813085188,
     "total_code": "1041544",
-    "matched_code": "976756",
-    "matched_code_percent": 93.7796194879909,
+    "matched_code": "978228",
+    "matched_code_percent": 93.92094813085188,
     "total_functions": 3078,
-    "matched_functions": 3043,
-    "matched_functions_percent": 98.862897985705,
-    "complete_code": "858736",
-    "complete_code_percent": 82.44836511947646
+    "matched_functions": 3044,
+    "matched_functions_percent": 98.89538661468487,
+    "complete_code": "860208",
+    "complete_code_percent": 82.58969376233745
    }
   },
   {
    "id": "level_code",
    "name": "Level code",
    "measures": {
-    "fuzzy_match_percent": 96.07247358403183,
+    "fuzzy_match_percent": 96.09469324816688,
     "total_code": "4482516",
-    "matched_code": "4306464",
-    "matched_code_percent": 96.07247358403183,
+    "matched_code": "4307460",
+    "matched_code_percent": 96.09469324816688,
     "total_functions": 5449,
-    "matched_functions": 5367,
-    "matched_functions_percent": 98.49513672233438,
+    "matched_functions": 5368,
+    "matched_functions_percent": 98.51348871352542,
     "complete_code": "966404",
     "complete_code_percent": 21.559409938525597
    }
@@ -48,15 +48,15 @@
    "id": "game",
    "name": "Boot game code",
    "measures": {
-    "fuzzy_match_percent": 93.7796194879909,
+    "fuzzy_match_percent": 93.92094813085188,
     "total_code": "1041544",
-    "matched_code": "976756",
-    "matched_code_percent": 93.7796194879909,
+    "matched_code": "978228",
+    "matched_code_percent": 93.92094813085188,
     "total_functions": 3078,
-    "matched_functions": 3043,
-    "matched_functions_percent": 98.862897985705,
-    "complete_code": "858736",
-    "complete_code_percent": 82.44836511947646
+    "matched_functions": 3044,
+    "matched_functions_percent": 98.89538661468487,
+    "complete_code": "860208",
+    "complete_code_percent": 82.58969376233745
    }
   },
   {
@@ -78,13 +78,13 @@
    "id": "levels",
    "name": "Level-specific code",
    "measures": {
-    "fuzzy_match_percent": 97.0132168688867,
+    "fuzzy_match_percent": 97.05028185765556,
     "total_code": "2687172",
-    "matched_code": "2606912",
-    "matched_code_percent": 97.0132168688867,
+    "matched_code": "2607908",
+    "matched_code_percent": 97.05028185765556,
     "total_functions": 2424,
-    "matched_functions": 2383,
-    "matched_functions_percent": 98.3085808580858,
+    "matched_functions": 2384,
+    "matched_functions_percent": 98.34983498349835,
     "complete_code": "966404",
     "complete_code_percent": 35.96360783753329
    }
@@ -393,13 +393,13 @@
    "id": "level_20",
    "name": "Level 20: Yeedil",
    "measures": {
-    "fuzzy_match_percent": 96.71804952892384,
+    "fuzzy_match_percent": 97.31498573586173,
     "total_code": "166852",
-    "matched_code": "161376",
-    "matched_code_percent": 96.71804952892384,
+    "matched_code": "162372",
+    "matched_code_percent": 97.31498573586173,
     "total_functions": 152,
-    "matched_functions": 148,
-    "matched_functions_percent": 97.36842105263158,
+    "matched_functions": 149,
+    "matched_functions_percent": 98.02631578947368,
     "complete_code": "0",
     "complete_code_percent": 0.0
    }
@@ -27920,13 +27920,13 @@
   {
    "name": "game/002B7E28",
    "measures": {
-    "fuzzy_match_percent": 74.48253557567917,
-    "total_code": "12368",
+    "fuzzy_match_percent": 84.54478707782673,
+    "total_code": "10896",
     "matched_code": "9212",
-    "matched_code_percent": 74.48253557567917,
-    "total_functions": 36,
+    "matched_code_percent": 84.54478707782673,
+    "total_functions": 35,
     "matched_functions": 34,
-    "matched_functions_percent": 94.44444444444444,
+    "matched_functions_percent": 97.14285714285714,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "total_units": 1,
@@ -28093,15 +28093,6 @@
      "address": "8736",
      "metadata": {
       "virtual_address": "2859080"
-     }
-    },
-    {
-     "name": "func_002BA0E0",
-     "size": "1472",
-     "fuzzy_match_percent": 0.0,
-     "address": "8888",
-     "metadata": {
-      "virtual_address": "2859232"
      }
     },
     {
@@ -28296,6 +28287,41 @@
    "metadata": {
     "complete": true,
     "source_path": "src/game/002B8548.c",
+    "progress_categories": [
+     "executable",
+     "game"
+    ]
+   }
+  },
+  {
+   "name": "game/002BA0E0",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1472",
+    "matched_code": "1472",
+    "matched_code_percent": 100.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1472",
+    "complete_code_percent": 100.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "functions": [
+    {
+     "name": "func_002BA0E0",
+     "size": "1472",
+     "fuzzy_match_percent": 100.0,
+     "address": "0",
+     "metadata": {
+      "virtual_address": "2859232"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "src/game/002BA0E0.c",
     "progress_categories": [
      "executable",
      "game"
@@ -74678,13 +74704,13 @@
   {
    "name": "Level 20: Yeedil",
    "measures": {
-    "fuzzy_match_percent": 96.71804952892384,
+    "fuzzy_match_percent": 97.31498573586173,
     "total_code": "166852",
-    "matched_code": "161376",
-    "matched_code_percent": 96.71804952892384,
+    "matched_code": "162372",
+    "matched_code_percent": 97.31498573586173,
     "total_functions": 152,
-    "matched_functions": 148,
-    "matched_functions_percent": 97.36842105263158,
+    "matched_functions": 149,
+    "matched_functions_percent": 98.02631578947368,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "total_units": 1,
@@ -75144,7 +75170,7 @@
     {
      "name": "func_L20_0039F968",
      "size": "996",
-     "fuzzy_match_percent": 0.0,
+     "fuzzy_match_percent": 100.0,
      "address": "950048",
      "metadata": {
       "virtual_address": "3799400"
