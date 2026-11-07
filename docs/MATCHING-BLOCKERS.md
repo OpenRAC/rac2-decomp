@@ -4713,6 +4713,15 @@ The related retained investigations establish these constraints:
   The two strip-loop controls in `func_00284268` remain 2,996/2,988 bytes with worse
   opcode agreement. Keep the measured earlier source rather than generalizing the
   successful loader record-copy remedy to these loops.
+  **Resolved 8 November 2026:** the cause was loop.c's conversion of extra biv
+  increments into givs, which GCC 2.95 ships disabled. With the opt-in
+  `-frac2-no-extra-increment-givs` (and `-fno-rerun-loop-opt`), RAC1's plain `*p++`
+  wording matches all seven loops, with the index form `store(&q[n], X); n++` in the
+  two D_001A6860 loops: 2,988 bytes, 28 of 28 places in USA v1.01, PAL and v2.00,
+  in `src/game/00284268.c` (docs/COMPILER-NOTES.md, "loop: extra biv increments stay
+  bivs"). The goto controls above and the earlier `put(&p)` inline only imitated whole
+  increments; a volatile view of the state pointer reproduced them only through
+  `loop_has_volatile` and is not allowed.
 - `func_L13_00438D88` has a real 32-byte route record, with its path pointer at
   +0x10. That view and `-fno-force-addr` retain the seven diagnostic rows in its
   mode-2 head; `-fno-force-mem` gives 2,700/2,704 bytes and disturbs FP scheduling.

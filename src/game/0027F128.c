@@ -534,8 +534,6 @@ ASM_FUNC("asm/game", func_00283EB0);
 
 ASM_FUNC("asm/game", func_00283EF0);
 
-INCLUDE_ASM("asm/game", func_00284268);
-
 extern long long D_001A6D78;
 
 void func_00284E18(s32 a0, s32 a1, s32 a2) {
