@@ -1,3 +1,20 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 492/492, 5 words with the owner-allowed helper (x4 load/divide uses s0, retail v1; x4 needs a third reference). */
+/* 7 November 2026, round 14: the dead-test helper is now allowed by owner ruling (master
+ * precedent: src/game/002D2188-g8.c), so the round-9 body below is admissible except for the
+ * last 5 words (x4 load/sum in s0, retail v1); still 492/492, 0/2. Measured (~50 compiles,
+ * scratch m2/r14): helper shapes (mode read first, after the rounding, at the test, as a real
+ * `D_L04_001B2D40[0]` array) x last-call forms (`x4 = D; x4 /= 2`, `x4 = D / 2`, both as
+ * direct call arguments as in src/levels/shared/L00_003DDEC8-g8.c:56): 5 / 8 / 8 words at
+ * best. y4 before x4: 484 bytes (`on` dies before x4 is born; the ghost $s2 needs on, x4 and
+ * y4 live together). One-pass groups around x4's set: 17-20 words (x4 live 12, not 7).
+ * x4 reusing x1/x3: 496 bytes; y1/y3: 8 words (old set folded, still 2 refs). long x4:
+ * sign-extend pair, ghost lost. unsigned/short y4: no help. Global.c allocno_compare is
+ * floor_log2(refs)*refs/live: x4 2 refs/live 7 loses to y4 3/7 (the helper's `result != 0`
+ * test is y4's third ref); a mode-only last test (2 refs, tie, x4 is the lower pseudo) gives
+ * every register right (v1 load, v0 srl, s0, s1) but drops the block boundary (19 words).
+ * Next: a source shape that gives x4 a third reference, or the test a ref other than y4,
+ * while keeping a block end after the last fix.
+ */
 /* 6 November 2026, Codex follow-up (USA v1.01, check.py only): the retained
  * -O2 -G0 -ffunction-sections -fno-gcse diagnostic rechecks at 492/492 bytes,
  * 0/2 places, five actual instruction differences (+0x180, +0x184, +0x18c,

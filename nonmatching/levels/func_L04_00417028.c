@@ -1,3 +1,19 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 736/736, 5 words with the owner-allowed helper (final width temporaries tie to x4 in s0, retail v1). */
+/* 7 November 2026, round 14: the dead-test helper is allowed by owner ruling
+ * (master precedent: src/game/002D2188-g8.c). Best C below: 736/736 bytes, 0/2 places,
+ * five words off (was seven), any -O2 -G0 unit (-fno-gcse no longer matters).
+ * Fix: load the mode first in the helper, as matched L02_003FF6E8 does
+ * (`int mode = D_L04_001B2D40;` before the multiply). The second-box x now uses v0.
+ * Left: final width. Retail: lw v1; srl v0,v1; addu v1,v1,v0; sra s0,v1. Here x4
+ * is local to the last block, so local-alloc ties the load/addu temporaries to x4
+ * (s0). Measured, no gain (~25 checks, ~80 compiles): x4 via a w local, `x4 /= 2`,
+ * groups around x4 or x4+y4, x4 before/after the cast, 18 flags. With the y4 rounding
+ * also through the helper, x4 crosses the branch and the temporaries leave s0, but
+ * x4/y4 swap s0/s1 (y4 has 3 refs vs 2, same live length) and v0/v1 swap (7 words).
+ * `x4 = D_001A7340; x4 /= 2;` plus helper y4 fixes s0/s1 but loads into s0 (5 words).
+ * Next: a real reason for x4 to live across blocks with only two refs, or for the
+ * y4 result to rank below x4 in global-alloc.
+ */
 /* 6 November 2026, round 10: the retained C below still uses a dead-test helper
  * (`scaled = 1.0f` is never read), so it is not admissible under blocker 26.
  * Compliant best (no dead test, plain `return (int)(scale * value + half)` or inline
@@ -131,10 +147,11 @@ extern int D_L04_001B2D40 __attribute__((sda));
 /* The shared HUD rounding helper; the dead mode arm leaves a scheduling boundary. */
 static __inline__ int menu_coord(float value, float scale, float half, int active)
 {
+    int mode = D_L04_001B2D40;
     float scaled = scale * value + half;
     int result = (int)scaled;
 
-    if (result != 0 && D_L04_001B2D40 == active)
+    if (result != 0 && mode == active)
         scaled = 1.0f;
     return result;
 }

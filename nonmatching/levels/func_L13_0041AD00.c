@@ -1,3 +1,10 @@
+/* 7 November 2026, round 13: no gain (79 words). In retail the row copy is allocated before
+ * the original in both loops (k loop: copy $s5, original $s6; i loop: copy $s0, original
+ * $s5) and the uv pointer before the D pointer. The original always has more weighted refs
+ * (k loop 16 vs 13), so no spelling flips it: 240 row forms (association, which pointer is
+ * the copy, increment order), 80 single-level groups around the row statements, a per-branch
+ * offset variable (107), rows hoisted as loop invariants (no copy, 153), add operand swap,
+ * goto loops (96 local, not admissible) and -flive-range (346) all tie or lose. */
 /* 6 November 2026, round 12: 1376/1376 bytes, 0/2, 79 differing words excluding relocation
  * fields (was 101). Changes: index test `index>-1` gives retail's slti/beqz/slti/bnel;
  * branch row b = branch*16 + (k*64 + s) with no group gives retail's operand order and

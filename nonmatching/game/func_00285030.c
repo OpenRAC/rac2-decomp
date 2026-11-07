@@ -1,3 +1,21 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 680/680, 6 rows (0x8000 issued early takes a2 from 0xE). */
+/* 7 November 2026, FINAL: 680/680 bytes, 0/28 USA places, six real rows (game -O2 -G8 -ffunction-sections); not linked. A fresh C written from the assembly alone (RAC1-style += cursor, RenderTarget struct) reproduces everything to +0x1C8 and, with 0x4410/0x106 in early single-use locals, ties the retained six rows; with literals it gives 16 (the D_001A6480 la then issues after 0x4410/0x106). New controls this round, all tie or worsen: early locals for 0x30003/0x47/0x4400..8001/header/0xE/0x8000 (11-107 rows), reusing bw or tex for 0x106/0x4410 (16-30), and -frac2-gcse-unsplit-edges, -frac2-keep-block-zero-copy, -frac2-sticky-volatile-refs, -fno-regmove, -fno-cse-follow-jumps, -fno-peephole, -fno-caller-saves (6 each; -fno-rerun-cse-after-loop 72). Exact remaining blocker: in the final packet block sched1 issues the 0x8000 coordinate constant in the free ALU slot beside t[1]'s store, so in local-alloc it overlaps 0xE and takes a2 (0xE -> t0, 0x30003 -> t2); the only source change that fills that slot (0x106 written in the block) makes 0x106 outrank the D_001A6480 la and take t2. No rule-compliant source orders la before an in-block 0x106 while keeping 0x8000 late. */
+/* 6 November 2026 near-miss follow-up (checked 7 November 2026): retained
+ * 680/680, 0/28 USA places, six real differing instruction rows, game -O2 -G8
+ * -ffunction-sections. New controls: reusing an actual earlier header/selector
+ * value for w or w2 ties at six or grows to 688 bytes; assigning w/w2 in both
+ * mode arms grows to 684-688 bytes. A shared selector local across both packets
+ * gives 7-14 rows at 680 bytes, or shrinks incorrectly to 676 bytes. Grouping a
+ * real coordinate-bias initialization before t[0..8], with early or in-block
+ * 0x106, gives 21-55 rows at 680 bytes. Twelve full-packet inline emitter
+ * parameter orders tie at six; signed coordinate-packing helpers give 6-9 rows.
+ * These helpers preserve the real stores and arithmetic, with no added accesses.
+ * Discarded two bias-after-first-use trials and three C89 declaration-order
+ * compile failures; neither is evidence of an improvement. No valid new form
+ * improves the retained source. Remaining: early 0x8000 issue, 0xE/0x30003
+ * allocation, and the alternative in-block 0x106/state-address priority tie.
+ * Marker restored; no linked build or secondary-release check was run.
+ */
 /* 7 November 2026, decomp-permuter: best score 135 (base 225) only by giving 0x106 and 0 one variable (changes meaning); no rule-compliant gain. Setup: /tmp/claude-1000/-home-lynder063-rac2-decomp/lead/work/perm. */
 /* 6 November 2026 (round 11c, prototype audit): func_00282A88() given its established (void *, int) prototype: same 6 rows. func_00125F20 really returns int (src/core/00125E58.c:63), so its unused result stays int. Other callees agree. */
 /* 6 November 2026, round 11b: unchanged best, 680/680, 0/28, 6 rows. No matched sibling uses

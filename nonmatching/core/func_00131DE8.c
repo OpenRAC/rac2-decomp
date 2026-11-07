@@ -1,3 +1,32 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: 572/576, one instruction (the final jal delay slot: ours daddu a2,sp, retail nop). It matches only with GCC 2.95's set-side sticky-volatile rule, which breaks matched func_00132498 when forced on; the owner ruled not to land that switch. */
+/* 7 November 2026, round 9 compiler check: this C matches (1/1 us, pal, us2) with
+ * the set-side GCC 2.95 `|=` in resource.c mark_set_resources (env probe). Forced on in
+ * all 8,734 game units it changes only this unit and matched func_00132498 (1 -> 0/1),
+ * so it is not landed; see docs/COMPILER-NOTES.md (sticky-volatile-refs).
+ */
+/* 7 November 2026, round fourteen: 572/576 bytes, 0/1 USA boot. Everything
+ * through the last 0xFFC store now equals retail; only the final jal slot
+ * differs (here `daddu $a2,$sp`, retail nop), which shifts the epilogue.
+ * Fixed the server/limit swap: the server fields are now the real
+ * sceSifClientData `serve` member (+0x24) of the two client structs, read
+ * through the struct (two-instruction lui/lw macro, so it stays out of the
+ * bgez slot without a group), and each loop has its own server local with no
+ * do/while(0) group. That drops the server allocno from refs 10 (the group
+ * added loop depth) to refs 4/live 5, below the hoisted -1 limit (refs 5,
+ * live 6), so the limit takes v1 first as in retail.
+ * Jal slot: reorg's backward scan from the call (resource.c
+ * mark_set_resources) assigns `res->volatil = MEM_VOLATILE_P (x)` at every
+ * stored MEM, so the plain 0x74A8 and payload stores clear the flag the
+ * volatile 0x7110 store set, and `daddu $a2,$sp` is taken. Retail's nop needs
+ * the set-side GCC 2.95 `|=` (the half -frac2-sticky-volatile-refs leaves
+ * out), or a volatile payload field: measured, `int *volatile read_active`
+ * with a non-volatile sda 0x7110 gives retail's whole tail order, but 0x7110
+ * then fills the slot (one-word gp form); volatile on a local is not allowed
+ * anyway. Next: an opt-in set-side sticky switch (compiler change, not done
+ * here). Volatile on D_001A7100/D_001A7110 in 00133580-g8.c and
+ * 00133688-rc2.c was checked: both still match (1/1 USA), not landed.
+ * About 12 check.py runs.
+ */
 /* 6 November 2026, round ten: 572/576 bytes, 0/1 USA boot, 25 differing
  * instruction positions after relocation (was 32). Same game -O2 -G0 unit.
  * D_001A7100/D_001A7110 are the CdSafeState count and error that the IOP
@@ -97,14 +126,27 @@ extern int D_001A74A8[] SDATA(D_001A74A8) __attribute__((sda));
 extern int D_001A74AC[] __attribute__((sda));
 extern long D_001A74D8[] __attribute__((sda));
 extern int D_001A7180[] __attribute__((sda));
-extern u8 D_001A7040[] __attribute__((sda));
-extern u8 D_001A7140[] __attribute__((sda));
+typedef struct {
+    void *paddr;
+    unsigned int pid;
+    int tid;
+    unsigned int mode;
+} SifRpcData;
+typedef struct {
+    SifRpcData rpcd;
+    unsigned int command;
+    void *buff;
+    void *cbuff;
+    void (*func)(void *);
+    void *para;
+    void *serve;
+} SifClientData;
+extern SifClientData D_001A7040 __attribute__((sda));
+extern SifClientData D_001A7140 __attribute__((sda));
 /* CdSafeState count and error (RAC1 sound_read_work): the IOP writes them through
  * SIF DMA, as in 001334B8-g8.c, so they are volatile. */
 extern volatile int D_001A7100[] __attribute__((sda));
 extern volatile int D_001A7110[] __attribute__((sda));
-extern void *D_001A7064[] __attribute__((sda));
-extern void *D_001A7164[] __attribute__((sda));
 extern char D_001A7500[], D_001A7528[];
 
 extern void func_0011CF78(int);
@@ -117,6 +159,7 @@ int func_00131DE8(int options)
     int bind_result;
     int delay;
     void *server;
+    void *server1;
     struct {
         int *read_active;
         int options;
@@ -137,15 +180,13 @@ int func_00131DE8(int options)
     func_0011CF78(0);
 
     for (;;) {
-        bind_result = func_0011D450(D_001A7040, 0x123456, 0);
+        bind_result = func_0011D450(&D_001A7040, 0x123456, 0);
         if (bind_result < 0) {
             func_00115D48(D_001A7500, D_001A7528, 0xB1);
             for (;;) {}
         }
         delay = 9999;
-        do {
-            server = D_001A7064[0];
-        } while (0);
+        server = D_001A7040.serve;
         do {
             delay--;
         } while (delay != -1);
@@ -159,19 +200,17 @@ int func_00131DE8(int options)
     D_001A7180[0] = 0;
 
     do {
-        bind_result = func_0011D450(D_001A7140, 0x123457, 0);
+        bind_result = func_0011D450(&D_001A7140, 0x123457, 0);
         if (bind_result < 0) {
             func_00115D48(D_001A7500, D_001A7528, 0xC6);
             for (;;) {}
         }
         delay = 9999;
-        do {
-            server = D_001A7164[0];
-        } while (0);
+        server1 = D_001A7140.serve;
         do {
             delay--;
         } while (delay != -1);
-    } while (server == 0);
+    } while (server1 == 0);
 
     D_001A7100[0] = 0;
     *(int *)D_00146CC0 = 0;

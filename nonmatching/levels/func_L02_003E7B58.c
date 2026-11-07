@@ -1,3 +1,30 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 972/972, 8 rows, all in the inner texture block (retail loads the whole D_L02_001B0A00 address into a2 as a spilled hoisted address; every hoisting form breaks the setup block). */
+/* 7 November 2026, final round: 972/972, USA 0/1, 8 real rows (was 10), all in the inner
+ * texture block; the whole setup block now matches. Profile for the C below:
+ * -O2 -G0 -ffunction-sections -fno-rerun-loop-opt (17 units use it). The separate idx statement
+ * makes the D_L02_001B0A00 low part live 2 insns, so loop.c finds it "not desirable"; without
+ * -fno-rerun-loop-opt the second loop pass (105 insns) still hoists it. Remaining blocker: that
+ * low part stays a local pseudo in the loop ($a0, high rematerialised in $v0); retail rematerialises
+ * the whole address in $a2 (band stride $v0, D_L02_002A53B0 $a1), the pattern of a hoisted, spilled
+ * pseudo. Every form that hoists it (life >= 3) puts its high/lo pair in the setup block, where it
+ * outranks band = 0 in sched1; then the inner block matches but setup stays at 12 lines (~25000
+ * setup orders, 4 texture/index forms, 4 piece-loop orders). -mno-split-addresses fixes the inner
+ * block but leaves setup at 26; -fno-gcse gives 194 rows. Reopen only on a form that hoists the
+ * table address outside the setup block. */
+/* 7 November 2026, round 12: 972/972, USA 0/1, 10 real rows (was 11). New setup order:
+ * tex0[0..3], tex1[1], tex1[3], mode, primitive, tex1[2], tex1[0], colour chain, flags.
+ * This gives retail's mode $a1, flags $a2 and band $a1; left are colour $a0/primitive $v1
+ * (retail $v1/$a0) and the primitive store slot. Sched1 model (-fsched-verbose): one memory
+ * insn per cycle; stores whose register dies rank first by LUID, then the hoisted ALU queue
+ * high/lo D_L02_001B0A00, high/lo D_L02_002A53B0, state+0x60, then band = 0. Band lands in
+ * the cycle of the sixth such store, so primitive can never still be live at band's birth
+ * (needed for band to avoid $a0). Removing one hoisted chain (diagnostic only) gives retail's
+ * whole setup block in 6 of 720 kill-store orders; no legitimate form found that keeps that
+ * chain out of block 4: separate index temp, *(p + i), i[p], unsigned index, local table
+ * pointers, phase set before the loop/branch, band = 0 hoisted (12 places), colour forms,
+ * a separate texLast constant (diagnostic), -mno-split-addresses (48 rows). 6000 random
+ * 12-statement orders never reach colour $v1/primitive $a0/band $a1; hill-climb from here
+ * stays at 10. Reopen on evidence that retail kept one table address out of the pre-header. */
 /* 6 November 2026 (round 11c, prototype audit): every callee prototype agrees with its matched C in src or the established asm prototype; void helpers never write $v0; every int/float/pointer result is read. No correction to test. */
 /* 6 November 2026, Codex round 11: retained C unchanged, 972/972 bytes,
  * USA v1.01 0/1 places, 11 real instruction differences; final baseline diff
@@ -107,14 +134,14 @@ void func_L02_003E7B58(char *actor) {
     packet.tex0[1] = 0.0f;
     packet.tex0[2] = 1.0f - flip;
     packet.tex0[3] = 0.0f;
+    packet.tex1[2] = 1.0f - flip;
     packet.tex1[1] = 1.0f;
+    packet.tex1[0] = flip;
+    packet.tex1[3] = 1.0f;
+    packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = 0x7F7F7F7F;
     packet.mode = 0xFF9000000260ULL;
     packet.primitive = 5;
-    packet.tex1[2] = 1.0f - flip;
-    packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = 0x7F7F7F7F;
-    packet.tex1[0] = flip;
     packet.flags = 0x8000000000ULL;
-    packet.tex1[3] = 1.0f;
     for (band = 0; band < 3; band++) {
         int off = band * 4;
         float *phase = (float *)(state + 0x60);
@@ -128,7 +155,10 @@ void func_L02_003E7B58(char *actor) {
             first += (float)piece * 0.43094158f;
             tile = func_00283CF0((scroll + (float)piece - 1.0f) + 9.0f) % 9;
             last = first + 0.43094158f;
-            packet.texture = func_0027C878(D_L02_001B0A00[D_L02_002A53B0[band][tile]]);
+            {
+                int idx = D_L02_002A53B0[band][tile];
+                packet.texture = func_0027C878(D_L02_001B0A00[idx]);
+            }
             texFirst = 0.0f;
             texLast = 1.0f;
             if (last < 0.1f || first > 0.9f) continue;

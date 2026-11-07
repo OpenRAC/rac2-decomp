@@ -1,3 +1,4 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: exact (3/3 in us, us2, pal) only with a one-field struct local that keeps cse from merging two 255 constants; the owner ruled that construct out, so it stays a held near miss. */
 /* 6 November 2026, round 9: exact (3/3 in us, us2, pal; own -O2 -G0 -ffunction-sections -g unit) when the byte flag at 0x30 is stored from a local `struct { unsigned short value; } mark` set to 255 before the 0x34 store and the halfword at 0x32 from an `int half = 255` after it: cse2 then keeps the two 255 constants apart as retail does. A plain `unsigned short mark` gives 0/3. Held, not landed: the one-field struct exists only to steer cse, so it needs a maintainer ruling (compare blocker 26). */
 /* 6 November 2026, round 3: unchanged, 488/488 bytes, 0/3 places, 5 rows.
  * All 120 orders of the three header stores, the state load and the 0x20 store,

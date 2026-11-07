@@ -1,3 +1,4 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: the catalogue entry address itself is in doubt (see the entry hypothesis below); this is a catalogue question, not C. */
 /* 3 November 2026: entry hypothesis remains held after a fresh US 28-placement
  * audit. The canonical name is absent from the PAL and US2 catalogues.
  * The 856-byte row begins with `sw $zero,0x50($a0); nop`; the previous body's

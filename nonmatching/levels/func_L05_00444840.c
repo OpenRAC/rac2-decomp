@@ -1,3 +1,32 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 736/736, 2 rows (a1/a2 setup order before the second func_L05_00444D60 call). The three address loads tie on every scheduler key; no EE GCC build (991111a/-01/b-r4, SN 2.73a) reproduces retail's order from this C, so the source shape is still unknown. */
+/* 7 November 2026, Antigravity worker (round 12, lessons 32 & 36 / scheduler analysis):
+ * USA v1.01, check.py only: 736/736 bytes, 0/4 places, 2 non-relocation rows at +0x124/+0x128.
+ * Profile: -O2 -G8 -ffunction-sections -freduce-all-givs.
+ * Exhaustive scheduler and Haifa dependency audit confirms the exact mechanism and blocker:
+ * 1. In calls.c:expand_call, arguments are emitted in parameter order (a0, a1, a2, a3).
+ *    In sched1, insn 180 (a1: addiu $a1, $sp, 0x8) and insn 182 (a2: addiu $a2, $sp, 0xC)
+ *    tie on priority (call priority + 1), weight (1: sets 1 reg, kills 0), class (3) and
+ *    dependents (1: call_insn 186). Because of the complete tie, sched1 sorts by INSN_LUID,
+ *    preserving emission order (a1 before a2).
+ * 2. In sched2 (haifa-sched.c:rank_for_schedule), register pressure weight is inactive
+ *    (reload_completed == 1). The tie-breaker is INSN_DEPEND count before INSN_LUID.
+ * 3. Moving `i = 0;` outside the `do { ... } while(0)` group introduces an output dependence
+ *    on hard register $a2 (insn 182 -> i = 0), boosting insn 182's dependent count from 1 to 2.
+ *    This produces the EXACT retail sequence at the call (+0x124: addiu $a2, $sp, 0xC;
+ *    +0x128: addiu $a1, $sp, 0x8; +0x12C: daddu $a3, $zero, $zero; 100% byte match).
+ * 4. BUT NOTE_INSN_LOOP_BEG acts as an impenetrable sched2 barrier. Because `i = 0;` precedes
+ *    the barrier while `range = 40;` is inside the group, `i = 0` is emitted at clock 19 and
+ *    `range = 40` at clock 20, inverting retail lines 93-94 (+0x170 daddu $a2; +0x174 addiu $a3).
+ * 5. Conversely, placing `range = 40;` before the barrier also gives $a3 an output dependence,
+ *    boosting $a3 above $a1 in the call (yielding a2, a3, a1 instead of retail's a2, a1, a3),
+ *    and causes loop.c to recognize the scan loop as reducible (swelling the function to 768 bytes).
+ * 6. Lesson 32 probes: inline helper wrappers (project_coords), pointer temporaries (px, py),
+ *    and expression forms (&target_x + 1) do not change actual argument emission order in expand_call
+ *    nor reg_weight in sched1 (no pseudo dies at the move).
+ * 7. Under the 6 November 2026 rules (no volatile, no inline asm, no #define aliases, no dead stores,
+ *    no redundant reloads, no padding locals, no one-field struct wrappers), the a1/a2 tie cannot be
+ *    broken in clean C. Retaining baseline 2-row near miss (736/736 bytes).
+ */
 /* 6 November 2026, decomp-permuter (40 min, 3 threads, --stack-diffs, retail-byte scorer): no candidate beat the base score 20 (2 rows); best rule-compliant result is the retained C. Setup: /tmp/claude-1000/-home-lynder063-rac2-decomp/lead/work/perm. */
 /* 6 November 2026 (round 11c, prototype audit): every declared callee agrees with its matched C or the established asm prototype (func_L05_00444D60 is void in src/levels/shared/L05_00428350.c:327; func_002AB1F0, func_00282C30, func_00283CE0, func_00282E48, func_002761F8 results are all read). No void/int correction exists for the a1/a2 tie; not rerun. */
 /* 6 November 2026, lead (round 11b): loop-structure probes all stay a1-then-a2 in cc1 -S: exclusion scan as an inline helper, the whole candidate filter as an inline helper, a next-candidate helper returning the cursor, a pointer-walk exclusion, break/goto-next exclusion forms, for/for(;;) outer loops, pos = object + 0x10 at the loop top, and all 12 -frac2-* switches plus 12 scheduler/cse flags. -dL shows loop.c (scan_loop, loop_has_call) substitutes both &target temporaries into the a1/a2 moves in every form. With -fno-schedule-insns and -fno-schedule-insns2 the order is still a1, a2, so both schedulers tie (same priority, weight, class and 7 dependents) and keep the expand order. A pseudo a2 = P that dies there would win sched1 on weight, but local-alloc only replaces P by sp+12 when REG_N_REFS is 2, and flow weights refs by loop depth (P counts 4 inside the loop), so P keeps a register. */

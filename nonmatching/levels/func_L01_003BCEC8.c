@@ -1,3 +1,4 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: exact only with qzero(state + 8), whose sq address is 8 mod 16; the owner ruled out breaking common.h's 16-byte contract, so it stays a near miss. */
 /* func_L01_003BCEC8 (Oozla debris update). Tier opus-1 (Claude Opus 5.5), 29 October 2026.
  * Profile: -O2 -G8 -ffunction-sections (an L01_003BB9D0-g8.c unit: D_L01_001AFE30 is $gp).
  * Best qualified result: 632/636 bytes, 0/1 places (USA v1.01).

@@ -1,3 +1,4 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: exact only with a new quadword-swap (qswap) helper in common.h; the owner ruled that helper out, so it stays a near miss. */
 /* func_L00_003ADCD8 - 456 bytes. opus-1 (Claude Opus 5.5), task v2197, 3 November 2026.
  *
  * NOT LANDABLE: exact bytes need a quadword-swap helper that include/common.h

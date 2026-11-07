@@ -1,3 +1,28 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 684/708 bytes, 61 differences (outer-loop base hoisting and inner-pointer scheduling). */
+/* 6 November 2026, round 10: retained C is 684/708 bytes, 0/27 USA
+ * places, own -O2 -G0 -ffunction-sections -fno-sched-interblock -fno-gcse unit.
+ * A one-pass group around the draw loop's real timer read recovers retail's
+ * s0=timer, s1=0x7F7F7F, s2=count; the draw body and countdown now agree.
+ * Aligned comparison excluding relocations and shifted branch displacements:
+ * 61 differing instructions, versus 69 for the round-9 C by the same method.
+ * This count is not directly comparable with the older 71/84 measurements.
+ * Remaining: the outer loop hoists the point base into s6 instead of keeping
+ * the delta base sp+0x10 there; initial timer address/shift scheduling, inner
+ * refresh-loop pointer allocation and draw-preheader address order differ.
+ * New measured attempts: external entries at the outer update, guard, byte
+ * offset and enabled arm give unchanged or worse code (640..684 bytes).
+ * Grouped delta-base initialization saves it in s6, but spills either values
+ * or next (692/700 bytes, at least 63 aligned differences). Grouping the real
+ * timer offset, first guard, geometry loops or alpha tail does not improve.
+ * One shared workspace struct/array ties; reusing an index/address cursor,
+ * unsigned indices or one adjacent timer-table owner does not improve.
+ * Disabling sched1 worsens the three strongest forms (676/692 bytes);
+ * no-force-mem adds one difference; no-cse-skip-blocks/follow-jumps tie.
+ * Enabling interblock scheduling ties the retained instruction sequence.
+ * No forbidden source steering was used. Next useful input: evidence for
+ * the outer-loop entry or genuine point/delta address lifetimes; do not
+ * repeat the grouped-buffer or loop-entry variants without new evidence.
+ */
 /* 6 November 2026, round 9: retained C below, own unit with
  * -O2 -G0 -ffunction-sections -fno-sched-interblock -fno-gcse: 684/708 bytes,
  * 0/27 USA places, but 71 real instruction differences (aligned diff, relocs
@@ -123,7 +148,9 @@ void func_L00_003C48D0(u8 *object)
     }
     strand = D_L00_00240080[0];
     for (k = 0; k < 5; strand += 10, k++) {
-        if (D_L00_001B2990[k]) {
+        int enabled;
+        do { enabled = D_L00_001B2990[k]; } while (0);
+        if (enabled) {
             alpha = (u32)func_00283CF0(func_00283CE0(D_L00_001B29A0[k]) * D_L00_001B29D4) << 24;
             alternate = D_L00_001AFF24_gp;
             color = D_L00_001AFF20_gp;

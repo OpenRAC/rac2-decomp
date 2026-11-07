@@ -1,3 +1,17 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 768/768, 2 words with the owner-allowed dead-test helper (icon block delay slots swapped; sched1 ties a0=0xEAA7 / a1=count-1 and cse folds any temp back to a constant). */
+/* 7 November 2026, round 14: unchanged, 768/768 bytes, 0/5 USA, 2 words off (icon
+ * block beqz/jal slots). The dead-test helpers are allowed by owner ruling. Why the slots
+ * swap: sched1 ties a0 = 0xEAA7 and a1 = count - 1 on priority, then picks the lower
+ * INSN_REG_WEIGHT (a1: 0, the count dies; a0: 1). reorg fills the jal slot first from the
+ * insn before it, then the beqz slot from the fall-through, so the sched1 order decides.
+ * Proof: passing the count as `active` to the icon block's top rounding keeps it live,
+ * and both slots become retail's, but the count then crosses the call and moves to a
+ * saved register (lw s0, 7 words off). cse always folds a 0xEAA7 temp (CONST_COSTS is 0),
+ * so a0 cannot kill a pseudo. No gain: inline icon wrapper in either parameter order;
+ * hud_round in the precedent form (display-mode load) gives 30 rows (x2 copied early).
+ * unit/zero copies through `height` are live copies, not dead stores; hud_camera() is
+ * an inline accessor, not a reload.
+ */
 /* 6 November 2026, round 10: 768/768 bytes, 0/5 USA, still 2 words off. The round-9
  * second `camera = D_L01_001BD9C0;` was a redundant reload (the address is a link-time
  * constant; nothing in between can change it). Now an inline accessor `hud_camera()`
@@ -83,6 +97,8 @@ extern int func_0028E588(int, int);
 extern void func_0028E868(int, int, int, int, int, int);
 
 extern int D_L01_001B2DC0[] __attribute__((sda));
+
+/* dead-test helper allowed by owner ruling (master precedent: src/game/002D2188-g8.c) */
 
 static __inline__ int hud_coord(float value, float scale, float half, int active)
 {

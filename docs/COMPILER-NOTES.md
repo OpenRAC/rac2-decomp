@@ -460,6 +460,12 @@ adds `-frac2-sticky-volatile-refs`: the MEM and ASM_OPERANDS cases of
 mark_referenced_resources keep the flag set. Forced on in every game unit it changes none of
 8,510 others. The mark_set_resources half of the same upstream change is not applied: forced
 on it also changes matched func_00132498 (0 of 1 places).
+7 November 2026, round 9: the set-side `|=` alone (env probe in mark_set_resources) makes
+func_00131DE8 match (1 of 1 in us, pal, us2) but, forced on in all 8,734 game units, changes only
+that unit and matched func_00132498 (1 -> 0 of 1): sched2 puts the hoisted
+`lui $s0,%hi(D_001A7578)` before the plain D_001A74D0 and volatile D_001A74D8 stores, and retail
+fills the `b` slot with it past the volatile store. func_00132498 reads no SIF field; dropping
+its volatile D_001A74D8 gives 0 of 1 with or without the rule. Not landed.
 
 func_L07_0040EC08 (952 bytes, 1 place in each USA release) and func_L04_00414698 (6,032 bytes, 2
 places in each) differ from stock cc1 in one opcode each: retail fills a branch slot with a set of

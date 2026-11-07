@@ -1,3 +1,41 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 656/656, 41 real differences (text-call argument scheduling and the key-copy/.y pointer setup). */
+/* 7 November 2026, round 13: retained best C, USA v1.01 656/656 bytes, 0/1
+ * places; -O2 -G0 -ffunction-sections. 41 differing instruction positions after
+ * masking relocation fields (was 43). The .y walk now starts from its own
+ * pointer, float *py = &D_L03_001B0160[0].y, declared before the key array:
+ * the setup is lui/addiu of D_L03_001B0160+4 (no base+4 add) and the pseudo
+ * order keeps i in s3 and the buffer in s4. Declared after the keys, or with
+ * the assignment split from the declaration, i and the buffer swap (44).
+ * Left: the .y high part is a separate local register (lui v1) scheduled
+ * first, so the key copy uses a3/a0/a1 and the high/low pair is not the
+ * retail lui s6/addiu s6 (retail needs it materialized at the copy point),
+ * plus the text-call title move and zero placement (23). Measured, no better:
+ * all 688 placements of title/row/x/c/d/zero before, inside or after the group
+ * or as call arguments (best 43 on the old base, 41 on this one); one zero
+ * variable at function, block or group level (43-49); a group around the .y
+ * assignment (44); py at function or if-body start (72-88); `int i = 0` at
+ * four places (41-46); inline draw helper (644 bytes). Analysis: the group end
+ * is a scheduling barrier on the merged a0 = v0 copy, so title cannot rise as
+ * in retail; plain calls drop the barrier and interleave the argument loads.
+ */
+/* Superseded 6 November 2026, round 10: retained best C, USA v1.01 656/656 bytes, 0/1
+ * places; -O2 -G0 -ffunction-sections. 43 differing instruction positions after
+ * masking relocation fields (was 49). Two inline helpers, as in matched
+ * func_002CE5D0 (menu_screen_y): menu_round for the title row and
+ * menu_screen_y(value, offset) with `if (flag == 1) return (int)(y + offset);`
+ * for the loop. The loop body now matches, including the increments after
+ * cvt.s.w and $f2 for the adjustment. Left: in both text calls the title move
+ * (daddu a0,v0) and the int->float row conversion are placed differently and
+ * zero is set too early (12 + 11 positions); the key copy uses a0/a1/a3 instead
+ * of v1/a0/a2 and the .y pointer is base+4 instead of its own lui/addiu (20).
+ * Measured, no better: calls written as arguments (lesson 28; 668 bytes
+ * without the outer group, 54-60 with it); inline title-draw helper (73);
+ * groups of title+row only (46), title outside the group (54); float-returning
+ * round helper; int-offset helper (672 bytes); `int i = 0` before keys (48,
+ * fixes i in the delay slot but swaps s3/s4); [][2] and pointer y views;
+ * -fno-sched-interblock (tie), -fno-schedule-insns, -mno-split-addresses
+ * (648 bytes); 40-step hill-climb over the group statement order (tie).
+ */
 /* 6 November 2026, round 10: retained best C, USA v1.01 656/656 bytes, 0/1
  * places; -O2 -G0 -ffunction-sections. 43 differing instruction positions after
  * masking relocation fields (was 49). Two inline helpers, as in matched
@@ -137,6 +175,7 @@ int func_L03_003C7018(void)
             func_00300A00(title, 0x55f0c070, x, row, c, d, z);
         } while (0);
         {
+            float *py = &D_L03_001B0160[0].y;
             int keys[4] = {11599,12116,12769,12770};
             unsigned char buffer[128];
             int i;
@@ -151,7 +190,7 @@ int func_L03_003C7018(void)
                     func_00115DA8((char *)buffer, D_L03_001B0198, label);
                 }
                 x = func_00283CF0(D_L03_001B0160_gp[i].x);
-                func_0027FB40(x, func_00283CF0((float)menu_screen_y(D_L03_001B0160[i].y, (float)shift)), 0x80808080UL, buffer, 0x80);
+                func_0027FB40(x, func_00283CF0((float)menu_screen_y(py[i * 2], (float)shift)), 0x80808080UL, buffer, 0x80);
             }
         }
         if (D_001A7A7C[0]) {

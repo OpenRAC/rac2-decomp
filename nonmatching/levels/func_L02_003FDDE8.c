@@ -1,3 +1,20 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 964/964, 26 rows with the owner-allowed helper (label copy from v0 scheduled early in draws 3/4). */
+/* 7 November 2026, round 14: the dead-test helper is allowed by owner ruling (master
+ * precedent: src/game/002D2188-g8.c); it already loads the mode first, as
+ * L02_003FF6E8-g8.c:43 does. The `#define TABLE` alias is gone (D_L02_001B1190 used by its
+ * own name). Best C below: 964/964 bytes, 0/1 places, 26 real rows (four draws).
+ * Draw 3/4 cause (sched1 dump, -dS): the label copy `r87 = $v0` is ready right after the
+ * call and takes the first free ALU slot (t=8, beside the buttons load), so local-alloc
+ * finds $v0 free and puts the rounded int in $v0, the high address in $v1, buttons in $a0.
+ * Retail ($v1 for both, high in $a0) needs the copy to stay after the fix insn, which list
+ * scheduling only does if the copy depends on it. No source with that dependency found.
+ * Measured, no gain (~55 compiles): int-returning helper (L02_003FF6E8 form) for all draws
+ * (70 rows) or draws 3/4 (28/72); draw 3/4 through an inline draw helper or the label call
+ * as an argument (944 bytes, 190+); `half, one` variables in draws 3/4 (952-960); draw 3
+ * statement permutations (28 best); sc/z order and placement (32-51); a late `label = t`
+ * copy (944, test folds away); 18 flags incl. -fno-sched-interblock, -fno-sched-spec,
+ * -frac2-* switches, -g (no change), -fno-regmove (968), -fno-rerun-cse-after-loop (37).
+ */
 /* 6 November 2026, USA v1.01, check.py only: 964/964 compiled bytes (exact size),
  * 0/1 places match. 20 non-reloc instruction differences remain across 4 draws
  * under `-O2 -G8 -ffunction-sections -fno-rerun-loop-opt -fno-gcse`.
@@ -87,7 +104,6 @@ extern HelpInput D_00138180;
 extern u8 D_00139568[], D_001395B8[];
 extern HelpEntry D_L02_00264A70[];
 extern u8 *D_L02_001B1190[] SDATA(D_L02_001B1190);
-#define TABLE D_L02_001B1190
 
 extern void func_L00_0037B7B0(void);
 extern int func_00336D50(u8 *, int);
@@ -167,7 +183,7 @@ void func_L02_003FDDE8(u8 *object, int enabled)
             func_00300A00(label, c, x, fy, D_L02_001B1260, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x118) + 1; i < 14; i++) {
-            if (D_001395B8[func_L02_003F9B70(*(int *)(TABLE[i] + 8))] == 0) continue;
+            if (D_001395B8[func_L02_003F9B70(*(int *)(D_L02_001B1190[i] + 8))] == 0) continue;
             if (i >= 12 && !func_00288D58()) continue;
             if (i == 7) {
                 r = &D_L02_00264A70[D_00139568[0x1e]];

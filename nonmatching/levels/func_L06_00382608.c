@@ -1,3 +1,24 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 584/584, 66 differences (timer hoisting, registers and switch setup). */
+/* 6 November 2026, round 12: 584/584 bytes, 0/2 USA v1.01 placements,
+ * default game -O2 -G0 -ffunction-sections; first difference +0x9C.
+ * 66 unequal instruction words after masking only relocation fields, down
+ * from the retained baseline's 75 under the same comparison. The draw
+ * helper's float argument now follows its two pointer arguments: integer
+ * bank order/count/widths, f12 and the return contract remain unchanged.
+ * This alone gives 70 words. Reusing one borrowed pointer for the scale
+ * source, then the current point, gives 66; both assignments serve actual
+ * calls. No volatile, inline asm, symbol aliases or dummy operations added.
+ * Remaining: no pre-loop timer << 16 hoist, gcse caches advance's frame
+ * address, outer index/next and point registers differ, and the switch's
+ * constant 1 is still set after the scale call rather than in saved s1.
+ * New controls: all draw-FP interleavings; one-pass initial table/timer/copy
+ * groups; simple-path timer snapshots before/inside the outer body with
+ * scheduling/gcse controls; explicit next-index reuse as the case-2 glyph;
+ * route/local-vector aggregate views; digit-block groups; qcopy_nc
+ * combinations across all three copies; source/point borrowed-pointer lifetimes and scale-FP
+ * interleavings. No further gain. 184 check.py calls including baseline and
+ * final confirmation; no linked build. Older scores below are history.
+ */
 /* 6 November 2026, round 10: no gain, retained C still 584/584, 68 rows.
  * Own-unit flags on this C: -fno-sched-interblock, -fno-rerun-loop-opt,
  * -fmove-all-movables and pairs tie (the outer loop is phony here);
@@ -90,7 +111,7 @@ extern char *D_L06_001FE500[];
 extern float D_L06_001B9A90[];
 extern void func_00282F20(void *, const void *, float);
 extern void func_00282CC0(void *, const void *, const void *);
-extern u8 *func_L03_00339128(void *, void *, int, int, u8, s16, u8, float);
+extern u8 *func_L03_00339128(void *, void *, float, int, int, u8, s16, u8);
 
 void func_L06_00382608(void *data, int path, int owner, int flags, int stride, float scale)
 {
@@ -100,6 +121,7 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
     char *polygon;
     int timer;
     int index;
+    float *vector;
 
     if (path == -1) {
         func_0026FEB8(D_L06_001AA660);
@@ -112,22 +134,24 @@ void func_L06_00382608(void *data, int path, int owner, int flags, int stride, f
     if (index < *(int *)polygon) {
 route_point:
         do {
-        func_00282F20(advance, D_L06_001B9A90, scale * 1.2f);
+        vector = D_L06_001B9A90;
+        func_00282F20(advance, vector, scale * 1.2f);
         qcopy(point, polygon + (index * 16 + 0x10));
+        vector = point;
         switch (flags & 7) {
         case 1:
-            func_L03_00339128(point, data, 0, owner, 0x7F, timer, 0xFF, scale);
+            func_L03_00339128(vector, data, scale, 0, owner, 0x7F, timer, 0xFF);
             break;
         case 2:
-            func_L03_00339128(point, data, 1, owner, 0x7F, timer, 0xFF, scale);
+            func_L03_00339128(vector, data, scale, 1, owner, 0x7F, timer, 0xFF);
             break;
         case 4:
             point[2] += scale * 0.5f;
             {
                 int n = index;
                 do {
-                    func_L03_00339128(point, data, n % 10 + 2, owner, 0x7F, timer, 0xFF, scale);
-                    func_00282CC0(point, point, advance);
+                    func_L03_00339128(vector, data, scale, n % 10 + 2, owner, 0x7F, timer, 0xFF);
+                    func_00282CC0(vector, vector, advance);
                     n /= 10;
                 } while (n != 0);
             }

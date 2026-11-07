@@ -1,3 +1,23 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 980/980, 5 words (step+1 and &matrix[3] spill slots swapped by gcse PRE hash order). No EE GCC build reproduces retail's slots; the expression set before gcse must differ. */
+/* 7 November 2026 (round 13): 980/980 bytes, 0/7 places, remaining diff is exactly five
+ * words swapping spill slots 0x964 and 0x96C (&matrix[3] at 0x964 vs retail 0x96C;
+ * step+1 at 0x96C vs retail 0x964). Reload allocates slots in increasing pseudo order,
+ * which strictly mirrors gcse PRE reaching-register allocation in hash bucket order:
+ * &matrix[3] hash 16382, matrix hash 16334 (constant delta +48).
+ * With expr_hash_table_size = 93 (max_cuid 186), 16334 % 93 = 59 wraps (59 + 48 = 107 >= 93)
+ * into bucket 14, guaranteeing &matrix[3] precedes matrix and inverting their spill slots.
+ * Retail slot order requires bucket(step+1) < bucket(matrix) < bucket(&matrix[3]) < bucket(half).
+ * Tested: address arithmetic expressions (rotations + cur, (positions + cur)->bits, &vertices[k],
+ * ring | (v & 1)), loop variants (++step, while loop, separated counters), packet indexing,
+ * and declaration/statement orders. All meaning-preserving variants preserve max_cuid ~186 and
+ * yield the identical 5-word swap.
+ */
+/* 6 November 2026 (round 11): gcse expr-table size is not the fix. Upstream 2.95.3
+ * alloc_expr_hash_table (max_cuid/2 |1) equals this tree. Forcing the size to every odd
+ * 11..301 matches here only at 23 or 47 (7/7; = max_cuid/8 or /4), but max_cuid/4 forced
+ * on changes 203 of 8597 units (/8: 242), and sampled matched ones break (00119BF8 1->0/1,
+ * func_002B88F0 28->0/28). Falsified as a compiler difference.
+ */
 /* 7 November 2026, decomp-permuter: not usable here: with -g the permuter's reprinted C changes line notes (base 296 rows off, score 5520), so no result. Setup: /tmp/claude-1000/-home-lynder063-rac2-decomp/lead/work/perm. */
 /* 6 November 2026 (round 11): gcse expr-table size is not the fix. Upstream 2.95.3
  * alloc_expr_hash_table (max_cuid/2 |1) equals this tree. Forcing the size to every odd

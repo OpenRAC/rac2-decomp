@@ -1,3 +1,19 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 924/924, 23 differences with the owner-allowed dead-test helper (label copy issued before the rounding fix in the 0x4b/0x4a draws, as in func_L02_003FDDE8). */
+/* 7 November 2026, round 14, USA v1.01, check.py only (~75 runs): dead-test helper now
+ * allowed by owner ruling. Best C below: 924/924 bytes, 0/1 places, 23 real rows (was 25).
+ * Change: the helper returns (float)result after the test instead of converting first;
+ * this fixes the first two draws' sched2 order (mtc1 f21 / lwc1 f14 before daddu a0).
+ * Left: label v1 not a2 (4 rows in draws 1-2) and the 0x4b/0x4a draws: retail field v1
+ * (hi a0), andi v1, rounded int v1; here hi v1/field a0 (local-alloc: hi life 2 beats
+ * field life 5) and int v0. Retail needs v0 busy over the field and the int, i.e. sched1
+ * putting the label copy after the fix in the late draws; here it issues at t=7-8.
+ * Label gets a2 only when a pseudo in v1 is allocated first: colour after fy in 0x4a
+ * (X,F,C: mode in v1, 26 rows) or field via c (27 rows); both break the late draws.
+ * No gain: helper written exactly like the matched ones (904), int return (904), literal
+ * 1/one/half swaps, all c/x/fy orders in both late draws (23-32 or 904), pad/if colour
+ * forms, separate late labels (904/916), helper param orders, -fno-sched-interblock (no
+ * effect), do-while(0) groups around fy/c/x/label/draw (37-200 or 904/928).
+ */
 /* 6 November 2026, round 10b: no admissible donor. Every other copy of this routine (L02_003FDDE8; the 194-instruction copy in levels 02/03/04/09/12/17/20/30; L04_0040C880, L11_003FC4D8) is unmatched, and every matched sibling of the rounding helper (L11_004456A0, L02_003FF6E8, L00_004003F0, L00_003DDEC8, game 0032F3D0/002D2188/00326A10) uses the same dead display-mode test. Retail's daddu a2,v0 ... daddu a0,a2 needs a block boundary between the label call and the draw; without the dead test lesson-27 flags, -frac2-* switches and nested calls stay at 904-924 bytes. */
 /* 6 November 2026 (Codex follow-up), USA v1.01, check.py only:
  * Retained round-7 C unchanged: 924/924 bytes, 0/1 places. The baseline has
@@ -158,22 +174,21 @@ extern unsigned int D_L11_001B1648 __attribute__((sda));
 
 extern int D_L11_001B3E00;
 
+/* dead-test helper allowed by owner ruling (master precedent: src/game/002D2188-g8.c) */
 static __inline__ float scaled_coord(int value, float scale, float half, int active)
 {
     int mode = D_L11_001B3E00;
     float scaled = (float)value * scale;
     float h;
     int result;
-    float coord;
 
     h = half;
     scaled = scaled + h;
     result = (int)scaled;
-    coord = (float)result;
 
     if (result != 0 && mode == active)
         scaled = 1.0f;
-    return coord;
+    return (float)result;
 }
 
 void func_L11_00443940(u8 *object, int enabled)

@@ -1,3 +1,25 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 944/964 bytes, 52 differences (retail keeps 15.0f in a saved $f20 with a 0x30 frame; no source form keeps it). */
+/* 7 November 2026, round 13: no better admissible C; the C below is unchanged
+ * (944/964 bytes, USA v1.01 0/1, 52 real differences). Frame: 0x30 is only the
+ * $f20 save slot (s0/s1/ra at 0-0x17, $f20 at 0x20); no temporary slot is
+ * needed (lesson 40 ruled out). Retail reads $f20 once (mov.s $f12) and stores
+ * 15.0 nowhere, so no later field takes it. -O2 sets -fexpensive-optimizations,
+ * so preserve_subexpressions_p is 1 and every call argument starts in a pseudo
+ * (calls.c precompute_register_parameters); combine then folds the constant
+ * into $f12 unless that pseudo has another use. Inline helpers (two float
+ * parameters, one parameter, a u8 wrapper) and t-2.2f / t*k second uses all
+ * fold to li.s $f12. Matched func_002C2658 keeps 0.7 in $f20 because its
+ * arguments are precomputed before an inner call in the same argument list;
+ * FloatToInt has one argument, so that does not apply. The only compiler route
+ * found is a stale REG_N_CALLS_CROSSED: sched1 keeps the flow count for a
+ * pseudo live in more than one block (haifa-sched.c, end of
+ * find_post_sched_live), so a cross-block use removed by combine would leave
+ * $f20; no admissible source shape for that was found. Tail: `impact: if (hit)`
+ * reproduces retail's a0 copy and beqz recheck exactly (tail matches; local
+ * aligned count 78 -> 69), but it is a redundant test and is not kept. target
+ * copy / clear-hit forms are worse (81-91); -frac2-no-null-pointer-checks and
+ * -frac2-keep-block-order do not change them.
+ */
 /* 6 November 2026, round 10: hill-climbed order of the cached inputs and the
  * independent parameter stores; 944/964 bytes, USA v1.01 0/1, 52 real differing
  * instructions (was 58). No matched sibling exists: no other retail routine has

@@ -1,3 +1,4 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 976/976, 112 differences (strand-offset spill and reset/smoothing scheduling). */
 /* 6 November 2026, round 10: no change, 976/976 bytes, 112 real differences, 0/3 places.
  * No matched sibling: the only other 0xD10-frame copies are this shared routine at
  * L13/L17; the RAC1 donor order (f[1] before f[3], no groups) gives 225-227.

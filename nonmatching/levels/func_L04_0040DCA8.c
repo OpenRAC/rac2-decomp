@@ -1,3 +1,16 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 740/740, 3 words with the owner-allowed shared scratch type (0x1D0 frame matches; c2.z/c3.z/c2.y store order: sched1 has five free memory slots after the last call and only four stores that may fill them). */
+/* 7 November 2026, round 14: unchanged, 3 real words (c2.z/c3.z/c2.y at +0x224/+0x230/
+ * +0x238). The 64-byte scratch type is now allowed (owner ruling: shared with the matched
+ * func_L30_0041B848); frame 0x1D0 as retail. Re-measured: sched2 has h ready at t33, so at
+ * t34 both h stores and the 1.0 stores are ready and it picks by sched1 order; retail's
+ * order needs the h stores ahead of c1.w/c2.y in sched1. sched1 has h at t31 and five
+ * memory slots t26-t30 (t25 is issue-bound), but only four stores (c1.y, c0.y, c3.w,
+ * c0.w) may come first. Four order climbs (about 3000 compiles each, plain, named h and
+ * h/nh forms) stop at 3. The L30 do-while loop with explicit vertex/corner pointers gives
+ * identical code. The only no-op copy (corner giv init r192 = r190, deleted by reload)
+ * crosses the loop calls, so sched1 hoists it to t4; a $1-based init would anchor it
+ * after the call but moves addiu s2 into block 2. h computed before the last call takes
+ * f21 (wrong allocation). */
 /* 6 November 2026, round 12: unchanged, 3 real words. sched1 ready lists show t25 is
  * issue-bound (2 issues: sq clear + mul), not memory-bound, so retail needs one more
  * pre-reload issue before t28 (e.g. a copy reload deletes, or a register zero with
@@ -94,6 +107,7 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     B971Packet packet;
     float tmp[2];
     float transform[4][4] __attribute__((aligned(16)));
+    /* scratch type shared with func_L30_0041B848, allowed by owner ruling */
     struct { float angles[4]; float rotation[3][4]; } scratch;
     Corner corners[4];
     float c, sn;

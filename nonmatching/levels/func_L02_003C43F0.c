@@ -1,3 +1,30 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 752/752, 7 words with the owner-allowed helper (373/0.5 FPR swap and the fourth draw's delay slot). */
+/* 7 November 2026, round 14 (dead-test helper allowed by owner ruling, master precedent:
+ * src/game/002D2188-g8.c): best body below, 752/752, 0/8 USA, 7 real words (was ~9).
+ * Unit L02_003C43F0-menu-g8.c, same flags as round 9 (-fno-gcse).
+ * New:
+ *  - 373.0f call passes `on` (not 1): the li 1 leaves that block and sched2 now loads 373
+ *    before the scale, as retail. Left: 373 in $f1, 0.5 in $f2 (retail $f2/$f1); local-alloc
+ *    ties the two 2-ref qtys and the older (373) wins. No change from 6 helper parameter
+ *    orders, value*scale, half + scale*value, menu_coord2 (31 words, unit-wide effects),
+ *    the call written inside the arguments (48).
+ *  - fourth draw: `s = one;` after the rounding, args (s, s), and s also used earlier
+ *    (`s = (float)y;` for the first draw). cse make_regs_eqv keeps s canonical only when s
+ *    lives outside the cse block, so the copy survives in the last block: retail's
+ *    mov.s $f14,$f20 ... mov.s $f15,$f14 now appear. Left: sched2 puts f15 before f16/ori,
+ *    so the delay slot gets the ori. Cause: REG_DEAD of s is on the f15 move (last use),
+ *    sched1 prefers it and its LUID order carries to sched2. Retail's order needs f15 to
+ *    carry no death, i.e. f15's source was the constant 1.0f, rewritten to $f14 by
+ *    reload_cse_simplify_set. That works only with no CODE_LABEL between `one = 1.0f`
+ *    (draw 1) and draw 4, so retail's draws 2-4 had no dead-test helper.
+ *  - Tested that hybrid: draw 1 helper, draws 2-4 `t = scale * k + half; do { y = t; }
+ *    while (0);`, draw 4 args (one, 1.0f): reload_cse does turn f15 into a register copy.
+ *    $s1 = on needs on to have 4 refs (one 23.0f call through menu_coord with on);
+ *    then 756 bytes, ~85 words (k/zero f21/f22 swapped by 0.6% priority, late
+ *    daddu $a0 in draws 2-4, argument order, an extra nop, 23.0f registers). Not closed.
+ * No gain: s = one before the helper (copy lands in the rounding block), args (s, one) or
+ * (one, s), a `t = (float)y` local.
+ */
 /* 6 November 2026, round 10: best compliant form (no dead test) is 744/752 bytes, 0/8 USA,
  * 81 differing words by aligned diff; listing below. Same profile as round 9 (-fno-gcse).
  * Each of the four 203.0f roundings is `t = scale * k + half; do { y = t; } while (0);`
@@ -153,7 +180,7 @@ void func_L02_003C43F0(char *obj) {
     int state;
     char *id;
     int y, on, entry;
-    float one, zero, half, k;
+    float one, zero, half, k, s;
 
     entry = 0x8710;
     k = 203.0f;
@@ -163,13 +190,16 @@ void func_L02_003C43F0(char *obj) {
     y = menu_coord(D_L02_001B3E04, k, half, on);
     one = 1.0f;
     zero = 0.0f;
-    func_00300A00(id, 0x60442D00, 258.0f, (float)y, one, one, zero);
+    s = (float)y;
+    func_00300A00(id, 0x60442D00, 258.0f, s, one, one, zero);
     func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x6F), 0x60442D00, 258.0f,
                   (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
     func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x71), 0x55F0C070, 258.0f,
                   (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
-    func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x72), 0x55F0C070, 258.0f,
-                  (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
+    id = func_00336D50(D_L02_001A904C + entry, 0x72);
+    y = menu_coord(D_L02_001B3E04, k, half, on);
+    s = one;
+    func_00300A00(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
     func_002FC560(0x47, 0x5360BUL);
     state = *(unsigned char *)(obj + 0x20);
     if (state == 7) {
@@ -180,5 +210,5 @@ void func_L02_003C43F0(char *obj) {
         func_0027FBD8(262, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     }
     text = func_00288FB8(0x2F5A);
-    func_0027FBD8(254, menu_coord(D_L02_001B3E04, 373.0f, 0.5f, 1), 0x88FFFFFF, text, -1);
+    func_0027FBD8(254, menu_coord(D_L02_001B3E04, 373.0f, 0.5f, on), 0x88FFFFFF, text, -1);
 }

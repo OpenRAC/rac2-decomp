@@ -1,3 +1,7 @@
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 412/412 flat form, 11 rows from one register swap (global-alloc needs obj > base > stride > p; only padding-like nested groups reorder them). */
+/* 7 November 2026, FINAL: no match. Retained best is the flat C below (no groups): 412/412, 0/1 USA v1.01, own unit -O2 -G0 -ffunction-sections -fno-schedule-insns, 11 real rows, scheduling exact. Blocker: one register swap, p s1 / table base s3 (retail base s1, p s3); global-alloc priority needs obj > base > stride > p but gets obj .415 > p .298 > stride .143 > base .139, and only loop-depth weight can lift base/stride. The 2-difference grouped form (comment at the end) needs nested depth-4/depth-6 do/while(0) padding, so it is not kept.
+ * Final-round trials (17 check.py runs): reusing n/an int-typed base for obj[0x23] or the 0x34 halfword in cases 1/2 reorders priorities (n reuse: obj, stride, p, base; base reuse: obj, base, p, stride) but the reused value then sits in an s register (retail v1) and case 2's test turns signed: 15-21 rows. A real 3-step loop for the (0x28,2)/(0x14,4)/(0xA,6) calls with -funroll-loops unrolls fully and gives base > stride > p, but obj drops to last and 0.0f is rematerialised per call (no f20): 408 bytes, 59 rows.
+ */
 /* 6 November 2026, round 11c: flat form stays at 11 rows. Local-alloc priorities (refs/length after REG_EQUIV x2): obj .415 (13/94) > p .298 (7/47) > stride .143 (5/70) > base .139 (5/72). The base would need 8 refs to pass p; without REG_EQUIV it reaches only .278. Setting tbl/n in cases 1/2 lengthens base/stride (352/392) and drops them further; typed-array forms bring back the 416-byte layout. Only loop-depth weighting (groups) reorders them. */
 /* 6 November 2026, round 11b (13 more check.py runs): no match.
  * Call-3 fixes tried on the two-difference C below, each still two: call 3's
@@ -169,39 +173,17 @@ void func_L03_00421930(u8 *obj)
     s32 n;
     s32 index;
     s32 k;
-    float zero;
 
     switch (obj[0x20]) {
     case 0:
-        do {
-            do {
-                do {
-                    do {
-                        index = *(s16 *)(p + 0x36);
-                        n = 0x150;
-                        zero = 0.0f;
-                        tbl = D_L03_00259A30;
-                        func_L00_00322A98(obj, &tbl[index * n]);
-                        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x28, 2, zero);
-                    } while (0);
-                } while (0);
-            } while (0);
-        } while (0);
-        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x14, 4, zero);
-        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0xA, 6, zero);
-        do {
-            do {
-                do {
-                    do {
-                        do {
-                            do {
-                                func_002A7750(obj, 1, -1);
-                            } while (0);
-                        } while (0);
-                    } while (0);
-                } while (0);
-            } while (0);
-        } while (0);
+        index = *(s16 *)(p + 0x36);
+        n = 0x150;
+        tbl = D_L03_00259A30;
+        func_L00_00322A98(obj, &tbl[index * n]);
+        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x28, 2, 0.0f);
+        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x14, 4, 0.0f);
+        func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0xA, 6, 0.0f);
+        func_002A7750(obj, 1, -1);
         break;
     case 1:
         k = 0x150;
@@ -225,3 +207,47 @@ void func_L03_00421930(u8 *obj)
         break;
     }
 }
+
+/* Round-11 grouped form, case 0 only (2 differences; nested groups = padding, not kept):
+ * void func_L03_00421930(u8 *obj)
+ * {
+ *     u8 *p = *(u8 **)(obj + 0x68);
+ *     char *tbl;
+ *     s32 n;
+ *     s32 index;
+ *     s32 k;
+ *     float zero;
+ *
+ *     switch (obj[0x20]) {
+ *     case 0:
+ *         do {
+ *             do {
+ *                 do {
+ *                     do {
+ *                         index = *(s16 *)(p + 0x36);
+ *                         n = 0x150;
+ *                         zero = 0.0f;
+ *                         tbl = D_L03_00259A30;
+ *                         func_L00_00322A98(obj, &tbl[index * n]);
+ *                         func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x28, 2, zero);
+ *                     } while (0);
+ *                 } while (0);
+ *             } while (0);
+ *         } while (0);
+ *         func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0x14, 4, zero);
+ *         func_L00_00322AC0(&tbl[*(s16 *)(p + 0x36) * n], 0xA, 6, zero);
+ *         do {
+ *             do {
+ *                 do {
+ *                     do {
+ *                         do {
+ *                             do {
+ *                                 func_002A7750(obj, 1, -1);
+ *                             } while (0);
+ *                         } while (0);
+ *                     } while (0);
+ *                 } while (0);
+ *             } while (0);
+ *         } while (0);
+ *         break;
+ */
