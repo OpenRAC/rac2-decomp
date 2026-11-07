@@ -1,28 +1,21 @@
-/* Opus 5.5 xhigh (task v2123), 3 November 2026: 6020/6032 bytes, 0 of 2 places (04 and 11);
- * opcode alignment 1494 of 1508 equal, 15 hunks (previous draft 5976 bytes on -G0).
- * Unit: src/levels/shared/L04_0040F8F0-hover-g8.c, cflags line
- *   src/levels/shared/L04_0040F8F0-hover-g8.c<TAB>-O2 -G8 -ffunction-sections -g
- * Declarations needed (below): D_L04_001B08F0 and D_001A7CC0 __attribute__((sda)) (gp), D_00189FC0,
- *   D_00138320 and D_001B24DC NOT_SDA (absolute at -G8); hero/config struct casts for D_00189E20 and
- *   D_001B9540 (per-block lui/addiu bases, as retail).
- * Findings:
- *  - Dead pitch comparison (retail 00415D58..): `if (f21 > 1.2217305f) height = 0.0f;` after the case-2
- *    func_00283C80 call. flow1 deletes the dead store (cse does not), the empty branch survives to jump2,
- *    which deletes it; the c.lt.s stays (delete_computation skips it after reload with sched2 on).
- *    NOTE REVIEW: that is the one allowed dead store to a local with a real effect.
- *  - GP/absolute debug word: file-scope `extern int D_001A7CC0 __attribute__((sda));` gives the gp read in
- *    the else arm; a block-scope `extern int D_001A7CC0;` inside the func_00282948()==0 arm makes a
- *    separate decl whose RTL has no sda flag, so that read is lui 0x1A / lw 0x7CC0 as in retail.
- *    dbg is set in both arms (if/else), so reorg steals the gp load into the bnez delay slot.
- *  - qcopy for the vD0/vE0/v20/D_001B9900 copies; object+0x10, st+0x290 and st+0x2B0 written as expressions
- *    at every use (no pos/vel/s2 locals) so GCSE PRE makes the retail reaching-register copies
- *    (addiu $fp,$s7,0x10; daddu $s3,$s1; daddu $s2,$s0).
- *  - ?: arguments for the two D_L04_001B08F0 constant pairs and the 0x338 limit constant; damping = 0.016f
- *    set right after grip and multiplied later (retail keeps 0.016 in $f23 across func_002AA140).
- * Remaining: saved-register rotation (ours st=$s5/object=$s6, retail $s6/$s7), bne vs bnel at 004147A8,
- *   cvt.w.s $f3 vs $f2 at 00415404 (round value lives in $f2 vs $f21), lwc1 0x14($s7)/lui 0x1B order at
- *   00415668, a missing addiu $a0,15 / sw 0x32C / b block near 00415878 (cross-jumped tail), and the
- *   lui $s1,0x1B / sw 0x16C order around 0041596C and 00415A58.
+/* func_L04_00414698: hover board physics for the rider (Barlow, Joba). A unit of its own for
+ * -G8, -g, -frac2-hazard-labels and -frac2-frame-pointer-liveness (config/cflags.txt). The hazard
+ * option puts the 00414AD8 bc1f target on the nop at 00414BF8, as retail. Without the liveness
+ * option flow keeps $fp live after reload and reorg annuls the slot of the branch at 004147A8
+ * (bnel where retail has bne, same slot `addiu $fp,$s7,0x10`; docs/COMPILER-NOTES.md).
+ * D_L04_001B08F0 and D_001A7CC0 are sda ($gp); D_00189FC0 and D_00138320 are NOT_SDA (absolute);
+ * D_L04_001B24DC is plain (unsplit -G8 macro load); D_L04_001A8F20 is MACRO_ADDR (unsplit la).
+ * Source notes:
+ *  - x is one float reused for the sink factor, the saved OF(0xF0) and the case-2 pitch (all retail
+ *    $f21); yaw stays a separate block-local.
+ *  - object + 0xC0, object + 0x10 and st + 0x2A0 are written as expressions at every use: gcse's PRE
+ *    makes retail's reaching-register copies, and a local pseudo would block $s5 for st and object.
+ *  - SPAWN's `r` is block-scoped, one pseudo per spawn, so local-alloc takes each (single-death rule)
+ *    and the case-2 constants land in retail's $f20-$f24.
+ *  - Retail keeps a dead pitch comparison: `if (x > 1.2217306f) height = 0.0f;`. flow1 deletes the
+ *    dead store and jump2 the empty branch; the c.lt.s stays.
+ *  - The block-scope `extern int D_001A7CC0;` in one arm is a second declaration without the sda
+ *    flag, which gives retail's absolute read there.
  */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
@@ -37,9 +30,9 @@ extern Quad D_001B9900;
 extern int D_00138320 NOT_SDA;
 extern int D_001A7CC0 __attribute__((sda));
 extern int D_L04_001B08F0 __attribute__((sda));
-extern u8 *D_001B24DC NOT_SDA;
+extern u8 *D_L04_001B24DC;
 extern float D_001BFB00[];
-extern char D_L04_001A8F20[];
+extern char D_L04_001A8F20[] MACRO_ADDR;
 extern float func_002A89A8(char *, int, float);
 extern int func_00278E78(void);
 extern int func_002E59B0(void *, int);
@@ -94,6 +87,7 @@ extern void func_L04_002DAD10(Quad);
 typedef struct { u8 pad000[0x1A0]; float heading; u8 pad1A4[0x24B8 - 0x1A4]; float turnScale; } L04_HoverHero;
 typedef struct { u8 pad000[0x158]; float f158; u8 pad15C[4]; float f160; u8 pad164[4]; int f168; int f16C;
                  u8 pad170[0x10]; float f180; u8 pad184[4]; int f188; } L04_HoverCfg;
+typedef struct { u8 pad00[0x40]; float v[4]; } L04_HoverTarget;
 #define HERO ((L04_HoverHero *)D_00189E20)
 #define CFG ((L04_HoverCfg *)D_001B9540)
 #define I(o) (*(s32 *)(st + (o)))
@@ -104,13 +98,14 @@ typedef struct { u8 pad000[0x158]; float f158; u8 pad15C[4]; float f160; u8 pad1
 #define HEAD (HERO->heading)
 #define SND_STOP(field) { int h = I(field); if (h != -1) { u8 *e = D_00188660 + h * 0x70; if (*(u8 **)(e + 0x88) == object && e[0x74] != 0) func_002E59F8(h); } I(field) = -1; }
 
+#define SPAWN(id, a, b) { float r = func_002A7940(); func_002AF000(dir->f, 0.083333336f, r, func_002A7878(0.78539824f, 1.5707965f)); func_00282CD8(&v80, dir, &v50); func_L04_00407078(object, id, (Vec *)(object + 0x10), object + 0xF0, 0, 0, dir, tag, tag, a, b); }
+
 /* Hover board physics for the rider: steering, speed, landing and crash handling. */
 void func_L04_00414698(u8 *object, u8 *st)
 {
     Vec v20, v30, v40, v50, start, v70, v80, v90, vA0, vB0, vC0, vD0, vE0, vF0;
     int flag, flag2, idle, dbg;
     float ground, height, limit, speed, grip, factor, damping, x;
-    u8 *prev;
 
     flag = 0;
     start.q = *(Quad *)(object + 0x10);
@@ -136,15 +131,14 @@ void func_L04_00414698(u8 *object, u8 *st)
             func_002AA2E8((float *)(st + 0x30C), 0.050000004f, 0.0030555557f);
         } else {
             if (func_00278E78() == 0 && S(0x274) == 0) {
-                u8 *s5, *s0;
+                u8 *s0;
                 float yaw, z;
                 if (F(0x30C) > 0.19166668f) {
                     idle = 0;
                     func_002AA2E8((float *)(st + 0x30C), 0.19166668f, 0.0031944446f);
                 }
                 I(0x278) = 0;
-                s5 = object + 0xC0;
-                func_00282D30(&v70, s5, 0.95f);
+                func_00282D30(&v70, (object + 0xC0), 0.95f);
                 s0 = object + 0xD0;
                 func_00282D30(&v80, s0, 0.45f);
                 func_00282D30(&v90, s0, -0.45f);
@@ -168,13 +162,13 @@ void func_L04_00414698(u8 *object, u8 *st)
                 if (func_002A77E0(func_00283CF0(1.0f / F(0x30C)) - 1) == 0) {
                     if (F(0x30C) >= 0.1f) {
                         func_L04_00362768(&vD0, &vC0, 0x40, 0.6f);
-                        func_00282D30(&v70, s5, -0.4f);
+                        func_00282D30(&v70, (object + 0xC0), -0.4f);
                         func_00282CC0(&vD0, &vD0, &v70);
                         func_L04_00362768(&vD0, &vC0, 0x40, 0.7f);
                         func_00282CC0(&vD0, &vD0, &v70);
                         func_L04_00362768(&vD0, &vC0, 0x40, 0.8f);
                         func_L04_00362768(&vE0, &vC0, 0x40, 0.6f);
-                        func_00282D30(&v70, s5, -0.4f);
+                        func_00282D30(&v70, (object + 0xC0), -0.4f);
                         func_00282CC0(&vE0, &vE0, &v70);
                         func_L04_00362768(&vE0, &vC0, 0x40, 0.7f);
                         func_00282CC0(&vE0, &vE0, &v70);
@@ -182,7 +176,7 @@ void func_L04_00414698(u8 *object, u8 *st)
                     }
                 }
                 if (F(0x30C) <= 0.1f && func_002A77E0(2) == 0) {
-                    func_00282D30(&v70, s5, 0.5f);
+                    func_00282D30(&v70, (object + 0xC0), 0.5f);
                     func_00282CC0(&vF0, (object + 0x10), &v70);
                     vF0.f[2] = ground;
                     func_002C19D8(&vF0, 0, 0x40645050, 0.8f, 14700.0f);
@@ -266,13 +260,11 @@ void func_L04_00414698(u8 *object, u8 *st)
     func_L04_00412C58(object, st, height, 0.2f, 0.23f, 12.0f, 0.1f);
     if (height > 0.44f) {
         S(0x274) = 1;
-        prev = st + 0x2A0;
         U16(0x276) = U16(0x276) + 1;
     } else {
-        prev = st + 0x2A0;
         if (S(0x274) != 0 && S(0x276) >= 13 && F(0x358) < 0.0f && func_00278E78() != 0) {
             if (S(0x276) >= 46) {
-                func_00282D30(&v30, prev, 0.5f);
+                func_00282D30(&v30, (st + 0x2A0), 0.5f);
                 func_00282CD8(&v70, &v30, (object + 0x10));
                 v40.q = *(Quad *)(st + 0x2A0);
                 v30.f[2] = OF(0x18);
@@ -288,16 +280,16 @@ void func_L04_00414698(u8 *object, u8 *st)
                 }
             }
             if (st[0x349] == 0 && func_00278E78() != 5) {
-                float sink, t;
+                float sink;
                 if (F(0x358) > -0.05f) F(0x358) = -0.05f;
                 sink = F(0x358);
-                t = 1.0f - (sink + 0.35f) * 2.857143f;
-                if (t > 1.0f) t = 1.0f;
-                if (t < 0.0f) t = 0.0f;
-                I(0x34C) = (int)(t * 5.0f) + 15;
-                if (t < 0.5f) t = 0.5f;
+                x = 1.0f - (sink + 0.35f) * 2.857143f;
+                if (x > 1.0f) x = 1.0f;
+                if (x < 0.0f) x = 0.0f;
+                I(0x34C) = (int)(x * 5.0f) + 15;
+                if (x < 0.5f) x = 0.5f;
                 st[0x349] = 1;
-                F(0x354) = t * 0.06f;
+                F(0x354) = x * 0.06f;
                 F(0x2A8) = sink * -0.3f;
             }
         }
@@ -321,7 +313,7 @@ void func_L04_00414698(u8 *object, u8 *st)
     *(Quad *)(st + 0x2A0) = *(Quad *)(st + 0x290);
     F(0x358) = F(0x2A8);
     {
-    int result = func_L04_00413A38(object, (object + 0x10), (st + 0x290), prev, &v30, &v50, (st + 0x2B0), &flag, 1, &flag2,
+    int result = func_L04_00413A38(object, (object + 0x10), (st + 0x290), (st + 0x2A0), &v30, &v50, (st + 0x2B0), &flag, 1, &flag2,
                                    F(0x30C) + F(0x27C), F(0x280), 0.16666667f, F(0x24), F(0x20));
     if (result != 0) {
         if (D_L04_001B08F0 != 0) func_00282D30((st + 0x290), (st + 0x290), 0.85f);
@@ -332,7 +324,7 @@ void func_L04_00414698(u8 *object, u8 *st)
         switch (result) {
         case 1:
             if (I(0x1DC) != -1) {
-                u8 *target = D_001B24DC + (I(0x1DC) << 8);
+                u8 *target = D_L04_001B24DC + (I(0x1DC) << 8);
                 float a = func_00283BE0(OF(0xF8), func_00283248(v30.f[0] - OF(0x10), v30.f[1] - OF(0x14)));
                 int dir;
                 if (a > 0.52359885f && a < 2.617994f) {
@@ -356,8 +348,10 @@ void func_L04_00414698(u8 *object, u8 *st)
                         SND_STOP(0x328)
                         I(0x328) = func_002E5CF8(4, 4, object);
                         I(0x32C) = 4;
+                        I(0x324) = 15;
+                    } else {
+                        I(0x324) = 15;
                     }
-                    I(0x324) = 15;
                 }
                 break;
             case 1:
@@ -366,8 +360,10 @@ void func_L04_00414698(u8 *object, u8 *st)
                         SND_STOP(0x328)
                         I(0x328) = func_002E5CF8(5, 4, object);
                         I(0x32C) = 5;
+                        I(0x324) = 15;
+                    } else {
+                        I(0x324) = 15;
                     }
-                    I(0x324) = 15;
                 }
                 break;
             case 2:
@@ -383,13 +379,15 @@ void func_L04_00414698(u8 *object, u8 *st)
         case 2:
             if (I(0x4D8) == 0) {
                 if (object[0x20] != 3) {
-                    float r;
+                    char *tag;
+                    Vec *dir;
                     func_L04_0040E248(object, st);
-                    CFG->f168 = 0x3C;
                     CFG->f188 = 0x5A;
+                    CFG->f168 = 0x3C;
                     CFG->f160 = 0.2f;
-                    CFG->f16C = 0;
                     CFG->f180 = 0.1f;
+                    tag = D_L04_001A8F20;
+                    CFG->f16C = 0;
                     func_L00_002D6900(0x1C);
                     func_0032C700((object + 0x10), 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.666f, 20.0f, 1, 1, 0, 0);
                     func_L00_00322EC8(st + 0x4E0);
@@ -398,26 +396,12 @@ void func_L04_00414698(u8 *object, u8 *st)
                     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xFBFF;
                     *(s16 *)(object + 0x96) = 0x64;
                     func_00282D30(&v50, &v50, func_002A7878(0.1f, 0.2f));
-                    r = func_002A7940();
-                    func_002AF000(v70.f, 0.083333336f, r, func_002A7878(0.78539824f, 1.5707965f));
-                    func_00282CD8(&v80, &v70, &v50);
-                    func_L04_00407078(object, 0xB3D, (Vec *)(object + 0x10), object + 0xF0, 0, 0, &v70, D_L04_001A8F20, D_L04_001A8F20, 0.0f, 0.05f);
-                    r = func_002A7940();
-                    func_002AF000(v70.f, 0.083333336f, r, func_002A7878(0.78539824f, 1.5707965f));
-                    func_00282CD8(&v80, &v70, &v50);
-                    func_L04_00407078(object, 0xB3E, (Vec *)(object + 0x10), object + 0xF0, 0, 0, &v70, D_L04_001A8F20, D_L04_001A8F20, 0.0f, 0.05f);
-                    r = func_002A7940();
-                    func_002AF000(v70.f, 0.083333336f, r, func_002A7878(0.78539824f, 1.5707965f));
-                    func_00282CD8(&v80, &v70, &v50);
-                    func_L04_00407078(object, 0xB3F, (Vec *)(object + 0x10), object + 0xF0, 0, 0, &v70, D_L04_001A8F20, D_L04_001A8F20, 0.0f, 0.0f);
-                    r = func_002A7940();
-                    func_002AF000(v70.f, 0.083333336f, r, func_002A7878(0.78539824f, 1.5707965f));
-                    func_00282CD8(&v80, &v70, &v50);
-                    func_L04_00407078(object, 0xB40, (Vec *)(object + 0x10), object + 0xF0, 0, 0, &v70, D_L04_001A8F20, D_L04_001A8F20, 0.0f, 0.05f);
-                    r = func_002A7940();
-                    func_002AF000(v70.f, 0.083333336f, r, func_002A7878(0.78539824f, 1.5707965f));
-                    func_00282CD8(&v80, &v70, &v50);
-                    func_L04_00407078(object, 0xB40, (Vec *)(object + 0x10), object + 0xF0, 0, 0, &v70, D_L04_001A8F20, D_L04_001A8F20, 0.0f, 0.05f);
+                    dir = &v70;
+                    SPAWN(0xB3D, 0.0f, 0.05f)
+                    SPAWN(0xB3E, 0.0f, 0.05f)
+                    SPAWN(0xB3F, 0.0f, 0.0f)
+                    SPAWN(0xB40, 0.0f, 0.05f)
+                    SPAWN(0xB40, 0.0f, 0.05f)
                     if (I(0x1DC) != -1) {
                         v90.q = *(Quad *)(object + 0x10);
                         v90.f[2] = v90.f[2] + 0.25f;
@@ -427,10 +411,12 @@ void func_L04_00414698(u8 *object, u8 *st)
                         func_00282CD8(&vA0, &v80, &v90);
                         if (func_002761F8(&v90, &v80, 2, 0, 0) != 0) {
                             if (func_00278E78() != result) {
-                                float f21 = func_00283248(*(float *)(D_001BFAC0 + 0x48), func_00282E20(D_001BFAC0 + 0x40));
-                                float f20 = func_00283B98(func_00283248(*(float *)(D_001BFAC0 + 0x40), *(float *)(D_001BFAC0 + 0x44)), 3.1415927f);
+                                L04_HoverTarget *hit = (L04_HoverTarget *)D_001BFAC0;
+                                float f20;
+                                x = func_00283248(hit->v[2], func_00282E20(hit->v));
+                                f20 = func_00283B98(func_00283248(hit->v[0], hit->v[1]), 3.1415927f);
                                 func_00283C80(func_00283248(v80.f[0], v80.f[1]), f20);
-                                if (f21 > 1.2217305f) height = 0.0f;
+                                if (x > 1.2217306f) height = 0.0f;
                             }
                         }
                     }

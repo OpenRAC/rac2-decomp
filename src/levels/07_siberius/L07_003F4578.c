@@ -301,7 +301,7 @@ void func_L07_00408338(u8 *a0)
 
 /* func_L07_0040E980 is defined in L07_0040E980-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L07_0040EC08);
+/* func_L07_0040EC08 is defined in L07_0040EC08-g8.c. */
 
 
 extern void func_338D68(void *a, s32 b, void *c, void *d, s32 e, f32 f);

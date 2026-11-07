@@ -65,6 +65,8 @@ src/levels/02_maktar_nebula/L02_003D5118.c	-O2 -G0 -ffunction-sections -frac2-qc
 src/levels/02_maktar_nebula/L02_003D6388-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/02_maktar_nebula/L02_003D6A20-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -g
 src/levels/07_siberius/L07_003EE708-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/levels/07_siberius/L07_0040EC08-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
+src/levels/shared/L04_00414698-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels -frac2-frame-pointer-liveness
 src/levels/02_maktar_nebula/L02_003EB648-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/02_maktar_nebula/L02_003DBB70.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/02_maktar_nebula/L02_003EAA68.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-barrier

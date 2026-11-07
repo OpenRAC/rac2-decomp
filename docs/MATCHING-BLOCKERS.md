@@ -1309,13 +1309,20 @@ pools, `.sdata` and unsupported assembly data directives remain rejected.
 
 ## 7. Annulled integer branch delay slots
 
-**6 November 2026, retained near miss:** `func_L07_0040EC08` is 952/952
+**7 November 2026, local match (branch `fp-liveness-1107`, not merged):** the cause was the
+compiler, not the source. The EE tree's flow.c keeps `$fp` live after reload even without a frame
+pointer, so reorg annuls a branch slot that sets it. `-frac2-frame-pointer-liveness` (GCC 2.95's
+2 June 1999 flow.c/haifa-sched.c change, docs/COMPILER-NOTES.md) gives `bne`:
+`func_L07_0040EC08` (1 place in each USA release) and `func_L04_00414698` (2 places in each)
+match from their retained drafts unchanged, each a unit of its own with the option. Neither is in
+the PAL catalogue. A `bnel` whose slot sets `$fp` from the target, in a function without a frame
+pointer, is the signature; other annulled slots are unaffected.
+
+History, 6 November 2026, retained near miss: `func_L07_0040EC08` was 952/952
 bytes, 0/1 in both USA releases under game `-O2 -G8 -ffunction-sections`;
 PAL has no canonical identity. Only `bnel` versus retail's `bnez` at +0x328
-remains. One-pass groups around the mode tests/calls and early-continue
-forms retain it; a shared health-label form grows to 956 bytes. The retained
-source explains the reorg jump-budget hypothesis. New evidence must change
-the first mode-branch slot selection; no linked match is claimed.
+remained. One-pass groups around the mode tests/calls and early-continue
+forms retained it; a shared health-label form grew to 956 bytes.
 
 Historical mismatches involved bnel/beql with a taken-path slot where retail used a normal branch and fall-through work, often one word different. The wave 9 correction counted 342 then-matched functions containing a likely branch: the compiler does emit them from ordinary C. That count is historical, not today's corpus size.
 

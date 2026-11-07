@@ -405,7 +405,7 @@ void func_L04_00412E38(void *arg0, void *arg1, float fparg0, float fparg1) {
 /* func_L04_004135B8 is defined in L04_004135B8-g8.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L04_00414698);
+/* func_L04_00414698 is defined in L04_00414698-g8.c. */
 
 /* func_L04_00415E28 is a near miss: nonmatching/levels/func_L04_00415E28.c */
 
