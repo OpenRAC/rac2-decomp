@@ -197,6 +197,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Quad slots: `sd $ra` below `sq $s0` | -mastra-quad-saves -frac2-narrow-saves-below, `register_precision(ra, 64)` | func_L01_00324550, func_L08_00389B68 |
 | Copy of a zero set in the same block stays a register copy | -frac2-keep-block-zero-copy | func_002F7320 |
 | A volatile asm ends the forward delay-slot search past later loads | -frac2-sticky-volatile-refs | func_L00_002A9460 |
+| Branch slot setting `$fp` annulled (`bnel`), retail `bne`; no frame pointer | -frac2-frame-pointer-liveness | func_L07_0040EC08, func_L04_00414698 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
 | Arguments spilled and branch to common epilogue | Measured -O0 unit, not an invented varargs helper | func_001175F0 |
@@ -401,6 +402,35 @@ adds `-frac2-sticky-volatile-refs`: the MEM and ASM_OPERANDS cases of
 mark_referenced_resources keep the flag set. Forced on in every game unit it changes none of
 8,510 others. The mark_set_resources half of the same upstream change is not applied: forced
 on it also changes matched func_00132498 (0 of 1 places).
+
+func_L07_0040EC08 (952 bytes, 1 place in each USA release) and func_L04_00414698 (6,032 bytes, 2
+places in each) differ from stock cc1 in one opcode each: retail fills a branch slot with a set of
+`$fp` from the branch target without annulling it (`bne`, slots `lw $fp,0x50($sp)` and
+`addiu $fp,$s7,0x10`), stock annuls it (`bnel`). Neither function keeps a frame pointer; `$fp`
+holds an ordinary value. The EE tree's flow.c still treats HARD_FRAME_POINTER_REGNUM as always
+live after reload: mark_regs_live_at_end marks it live at the end, mark_set_1 never kills it,
+mark_used_regs gives it no REG_DEAD note, insn_dead_p never deletes a set of it, and
+haifa-sched.c's attach_deaths gives it no REG_DEAD note after sched2. reorg's
+mark_target_live_regs (resource.c) starts from those live sets and notes; when
+find_dead_or_set_registers' budget (one conditional branch) runs out before the fall-through
+path sets `$fp`, `$fp` stays live there and the slot must be annulled. GCC 2.95 has John Wehle's
+change of 2 June 1999 (gcc/ChangeLog: "Only give FRAME_POINTER_REGNUM and
+HARD_FRAME_POINTER_REGNUM special treatment if reload hasn't run or the frame pointer is
+needed"). [frame_pointer_liveness.py](../tools/compiler/transformers/frame_pointer_liveness.py)
+adds `-frac2-frame-pointer-liveness`, which puts that condition, `! reload_completed ||
+frame_pointer_needed`, on the five flow.c tests and attach_deaths. Checked against
+gcc-core-2.95.tar.gz from ftp.gnu.org (flow.c 2276, 2965/2968, 3278/3281, 3740/3746, 3923/3926;
+haifa-sched.c 4633/4636): with the condition substituted, the five functions equal 2.95's token
+for token. The exceptions are an extra pair of parentheses and 2.95's ASM_OPERANDS case in
+mark_used_regs, which belongs to another change and is not added. sched.c, also in the
+ChangeLog entry, is not built for the r5900. Without the switch, stock and patched cc1 give
+identical assembly for every one of the 8,628 game-compiler units of `src/` in the three
+releases (144 SDK units use another compiler). Forced on in all of them, it changes none of
+their 11,949 functions. Among the retained drafts, forced on, it changes the two witnesses
+(`bnel` to `bne`, nothing else), func_002BA0E0 and func_L02_003FDDE8; in the last two, flow2
+now deletes a dead set of `$fp` (insn_dead_p). A REG_DEAD note on an insn that reorg moves into
+a delay slot is erased (emit_delay_sequence), so the option only matters where the last use of
+`$fp` stays out of a slot.
 
 Patch 0057 enables `-mastra-split-trunc-slot`: split `truncdisi2` after reload and
 before scheduling so its second shift can fill the return slot. `func_0012E8C8`

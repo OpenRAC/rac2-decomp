@@ -83,16 +83,17 @@ python3 $T/no_recombine_givs.py gcc/loop.c
 python3 $T/narrow_saves_below.py gcc
 python3 $T/keep_block_zero_copy.py gcc
 python3 $T/sticky_volatile_refs.py gcc
+python3 $T/frame_pointer_liveness.py gcc
 sha256sum --check --quiet <<'SUMS'
 91ac97768f907db2c50b5e04c150b7c7d72c2da3f15d21f0a7f4e802ba8378fb  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-02327fa692839411d825948959ddfc2d2fa96bf0840acffe6b277bb21f650d2d  gcc/toplev.c
-3098888cc26ac83c936a8d505662b6ba1aa9039811e89c534f4ea8f1a851e7d6  gcc/haifa-sched.c
+eb031ea8c47f929f5518bfb80bcf4e86a7303a1958504f16d20425e26fda8469  gcc/toplev.c
+fa211f12b39de727c033f57a16ab627572547901d9cf8d2a7aa2e5dd77949e9e  gcc/haifa-sched.c
 656c2b9546b5c38d96cfe25b02620cce02b625f5637ecad6386f0a4d89f3e0fe  gcc/reorg.c
-99e6bdd7649c0f9af0e2e5c02518eb65001d34bda4b7c7430e3b101857db54da  gcc/flags.h
+3a47625c6a5e91aa014a81348ea9563983d27f202388351f2b510e3d67c89b9c  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
-ba947e44256e3d5144e353a4976aac931a4941acc8dcb1dc0fda99fa8b7b504a  gcc/flow.c
+efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
 17c1a41578b92c102dea8c189e1e7372e637662e690d5226c87a4122a32d1225  gas/config/tc-mips.c
 6d4c688bdf8517a1da1b35a04bb1e3b6137093a6224b3ed52666581e3a7bd557  gcc/reload1.c
 2f6ffa23d379d620ec38db4e527b2cbd5583865195cd8b364aa2c1ce07433faf  gcc/loop.c
@@ -151,6 +152,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_null_pointer_checks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_narrow_saves_below.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_keep_block_zero_copy.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sticky_volatile_refs.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_frame_pointer_liveness.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

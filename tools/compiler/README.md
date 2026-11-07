@@ -238,6 +238,16 @@ default, enabled per unit in `config/cflags.txt`, and `-fno-rac2-sticky-volatile
 disables it; `tests/test_sticky_volatile_refs.py` covers the anchors, the default/disabled
 equality, the stopped search and a control without the asm.
 
+`frame_pointer_liveness.py` adds `-frac2-frame-pointer-liveness`: GCC 2.95's frame-pointer
+liveness after reload (John Wehle, 2 June 1999). flow.c's mark_regs_live_at_end, insn_dead_p,
+mark_set_1 and mark_used_regs and haifa-sched.c's attach_deaths treat the frame pointers as
+always live only before reload or when the function needs a frame pointer, so an ordinary value
+in `$fp` gets deaths and reorg can fill a branch slot that sets `$fp` without annulling it
+(func_L07_0040EC08, func_L04_00414698: `bne` for `bnel`). It is off by default, enabled per unit
+in `config/cflags.txt`, and `-fno-rac2-frame-pointer-liveness` disables it;
+`tests/test_frame_pointer_liveness.py` covers the anchors, the default/disabled equality, the
+un-annulled slot and controls with `$fp` live at the exit, without `$fp` and with a frame pointer.
+
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
 `haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c` and `tc-mips.c` hash as it
 lists. The binaries' own hashes depend on the build host and path, so check a compiler by its
