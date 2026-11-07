@@ -201,6 +201,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | A volatile asm ends the forward delay-slot search past later loads | -frac2-sticky-volatile-refs | func_L00_002A9460 |
 | Branch slot setting `$fp` annulled (`bnel`), retail `bne`; no frame pointer | -frac2-frame-pointer-liveness | func_L07_0040EC08, func_L04_00414698 |
 | Callee saves issued at the top, retail has them among stores through `$v0` | -frac2-no-static-chain-base (with -frac2-frame-pointer-liveness) | func_002BA0E0 |
+| A word stored into a float read twice: `lui`/`ori $v0` after the previous call, one `mtc1` into a saved FPR, `mov.s` per read | -frac2-keep-float-pun-source, write `*(s32 *)&f = K` | func_00349D58 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
 | Arguments spilled and branch to common epilogue | Measured -O0 unit, not an invented varargs helper | func_001175F0 |
@@ -1397,6 +1398,110 @@ under that option. `func_L01_003BD560` and `func_L03_00384340` (a max.s of two f
 `func_L00_002EE050`, -O1 -ffast-math retains the argument registers, whereas -O2
 adds a move and gives 12 bytes. The older blanket impossibility claim is false.
 
+### Integer words stored into floats
+
+The HUD widgets pass packed colours as float arguments. Retail has both forms for the same kind
+of bit pattern. In func_0034B2C8 and func_00349D58 every colour read once comes out as `li.s`
+(`lui $at`, `ori $at`, `mtc1 $at`, also for values as odd as 0x70242335), while a colour read
+twice is set in `$v0` right after the previous call, moved once into a saved FPR and copied for
+each read:
+
+```text
+lui   $v0,0x6044; ...; ori $v0,$v0,0x2D00; ...; mtc1 $v0,$f20; ...; mov.s $f13,$f20; jal ...
+...; mov.s $f13,$f20; jal ...
+```
+
+The denormals that `mips_const_double_ok` refuses (0x442D00, 0x1EFF, 0x80001EFF) look the same
+as the second form. A retail scan (boot and the 27 levels, 54,127 `lui`/`mtc1` sites, 13 of them
+normal values built outside `$at`) finds this form only here: of the other eight, seven are in
+`ASM_FUNC` routines and one is 1.0f in the unmatched func_002A1130. `lui` and `ori` are apart, so
+the constant is an SImode `movsi` split at RTL level, not a `li.s` macro. `mov.s` waits out the `mtc1` latency, so it is real movsf RTL.
+
+The source form is the write-side pun, `f32 f; *(s32 *)&f = K;`, used for every colour of both
+functions. purge_addressof turns it into `(set (reg:SI g) K)` and
+`(set (subreg:SI (reg:SF f) 0) (reg:SI g))` after cse1. In this tree g does not survive when f is
+read twice:
+
+- cse2 writes K into the SUBREG store, or, if K is live in an older register, that register;
+- if not, combine's combinable_i3pat moves the SUBREG to the source (expand_field_assignment) and
+  gen_lowpart_common folds K: `(set f const_double)`, a `li.s` that sched1 hoists to the block start;
+- sched1 splits `(set (subreg:SI f) K)` into hi/ior (mips.md's `large_int` split). Three operands
+  against the two reads make f a GR_REGS pseudo in a saved GPR, with an `mtc1` per read. With
+  three reads, two reads in a loop, or reads across a branch, f stays FP_REGS, and the ior's
+  output reload is lost: **`lui; mtc1` and no `ori`, wrong code from the default compiler** (see
+  the known issue below).
+
+With `-frac2-keep-float-pun-source` ([keep_float_pun_source.py](../tools/compiler/transformers/keep_float_pun_source.py))
+cse_insn leaves that insn's source register alone, and combinable_i3pat refuses it as I3 unless
+f has a single use (find_single_use, which finds the use even where it returns 0). g crosses no
+call, so sched_analyze_1 keeps its set after the previous call; f, with one SUBREG store against
+two reads, is FP_REGS; g dies in the store, so reload's output for it is the `mtc1`. A single
+use folds as before (`(set (subreg f) g)` + `(set $f13 f)`), and a read-side pun
+(`*(f32 *)&i`) has no SUBREG store and is not touched. The insn test is RAC2_FLOAT_PUN_SET_P in
+`flags.h`: SImode SUBREG of an SFmode pseudo, register source, nothing about a function.
+
+**Known issue: the default compiler loses the low half.** Without the switch, a word with a
+nonzero low half stored through `*(s32 *)&f = K` and read three times, twice in a loop, or on both
+sides of a branch compiles to `lui $v0,hi; mtc1 $v0,$fN` with no `ori`: f gets the wrong value,
+silently. Measured (tests/fixtures/keep_float_pun_source.c, `three_reads`, `reads_in_loop`,
+`reads_across_branches`; tests/test_keep_float_pun_source.py asserts it so that the default stays
+stock) with four compilers: this tree, whose reload1.c and cse.c are GCC 2.95.2's (patches 0047
+and 0048); the same patch and transformer stack without 0047 and 0048; the
+gnu-ee-binutils-gcc-1.1 archive (2.9-ee-991111b) with only patch 0000's host fixes; and the
+unmodified SDK compiler (2.9-ee-991111-01, tools/compiler/sdk). All four drop the `ori`, so the
+defect is the EE 2.9 base's, not 0047's or 0048's. In the global-alloc dump the ior reads the
+`$v0` left by the `lui`'s output reload (no input reload insn) and has no output reload into the
+FPR. The default stays as it is: an unconditional guard would change the default compiler's
+output, so this entry records the defect instead (no guard was built). C in `src/` that links is
+compared with retail's bytes, so it cannot carry the defect unnoticed. C built with the default
+compiler outside `src/`, notably
+`nonmatching/functional/` and native-port references, can contain it: compile such a unit with
+the switch, or check that every `lui` feeding an `mtc1` of a pun has its `ori`.
+
+What is measured, and what is not:
+
+- Measured: retail's form at the colour sites (above). With the switch, func_00349D58 matches,
+  28 of 28 places in us, pal and us2. func_0034B2C8 is a near miss, not a match: all 16 colour
+  sites take retail's form, down to `$at` against `$v0`, the FPR numbers and 0x1EFF's `$v0`, but
+  the function gives 6,048 of 6,048 bytes with 12 words differing and 0 of 28 places, from two
+  jal-slot orders that have nothing to do with the colours (its draft header). The forms tried in
+  stock cc1 are listed in nonmatching/game/func_0034B2C8.c's header; none gave retail's form.
+- The circularity, said plainly: the switch was designed to produce retail's form at these
+  sites, so the two functions it matches are not independent evidence that SCE's compiler had
+  such a rule. What does not depend on that design is the sweep: no other unit of `src/` changes
+  under the switch, so it reproduces this form and nothing else.
+- Not a backport. gcc-core 2.95, 2.95.1, 2.95.2 and 2.95.3 from ftp.gnu.org and this tree agree on
+  fold_rtx's SUBREG case, gen_lowpart_if_possible, gen_lowpart_common's SFmode case,
+  gen_lowpart_for_combine, combine's SUBREG simplification, expand_field_assignment,
+  split_block_insns and the `large_int` split (token comparison), and no ChangeLog entry concerns
+  them. For the lost output reload, gcc-core 3.0, 3.0.4, 3.1, 3.2, 3.2.3, 3.3, 3.3.6, 3.4.0 and
+  3.4.6 were compared too (sources read, nothing built or run from them). reload1.c is largely
+  rewritten by 3.0 (3,278 lines added and 4,068 removed against 2.95.2) and reload.c much changed,
+  so no fix can be read off a diff; no ChangeLog entry up to 3.4.6 describes a lost output reload
+  of a SUBREG store, an inherited input reload dropping an output, or this split. The nearest,
+  2000-09-18 (forget_old_reloads_1 clears spill_reg_store when a hard register is stored), is
+  about a different case and was not tested. The `large_int` split is unchanged through 3.3.6;
+  3.4 removed it (2003-05-03, mips_move_integer: constants are built at expansion), so the RTL
+  that loses the `ori` no longer forms there, which is a different design, not a reload fix. The
+  public EE-GCC releases checked are the two above (2.9-ee-991111b and 2.9-ee-991111-01); no other
+  EE-GCC release was available here.
+- Speculation: that SCE's game compiler could not have kept a path that loses the `ori`, and so
+  fixed it locally, is a guess. The measured part is narrower: no tested compiler gives retail's
+  two-read form by default, the publicly released EE compilers lose the `ori` too, and retail's
+  code at these sites shows neither the defect nor the stock forms. Where retail's behaviour comes
+  from is unverified; the option states the behaviour, not a patch.
+- Unsafe cases: none known. g and f hold the same bits either way, and the rule only keeps a
+  register that the unchanged RTL already uses.
+
+Sweep (8 November 2026), with stock and patched compilers from the pinned toolchain: without the
+switch, all 8,740 game-compiler units of `src/` (us, pal and us2; 144 SDK units use the other
+compiler) give identical assembly. Forced on everywhere, it changes func_00349D58 and none of the
+other 12,100 functions. Over the 1,123 files of `nonmatching/` (1,063 compile, at -G0 and at
+-G8) it changes only func_0034B2C8's two drafts. In func_00349D58 the first fade's two keys, 0x80F0C070 and
+0x80F0F0F0, are colours read once, `li.s` through `$at` each; both go through the helper like
+every other colour. (An earlier note took key 1 for a second read of 0x80F0C070: its literal,
+`-2.2126951167197445e-38f`, is 0x80F0F0F0.)
+
 ### Transfer hazards
 
 Mtc1 uses the next instruction's FPR read, not distance from the GPR's last write.
@@ -1713,6 +1818,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | 16-byte slots for TImode GPR saves | [test_wide_saves_below.py](../tests/test_wide_saves_below.py), [wide_saves_below.c](../tests/fixtures/wide_saves_below.c) |
 | Unflattened giv start | [test_mult_add_no_flatten.py](../tests/test_mult_add_no_flatten.py), [mult_add_no_flatten.c](../tests/fixtures/mult_add_no_flatten.c) |
 | Static-chain alias seed | [test_no_static_chain_base.py](../tests/test_no_static_chain_base.py), [no_static_chain_base.c](../tests/fixtures/no_static_chain_base.c) |
+| Integer words stored into floats | [test_keep_float_pun_source.py](../tests/test_keep_float_pun_source.py), [keep_float_pun_source.c](../tests/fixtures/keep_float_pun_source.c) |
 | Masks/sign seed | [test_dli_masks.py](../tests/test_dli_masks.py) |
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |

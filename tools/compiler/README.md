@@ -291,6 +291,22 @@ game unit, nothing else changes. It is off by default, enabled per unit in `conf
 and `-fno-rac2-mult-add-no-flatten` disables it; `tests/test_mult_add_no_flatten.py` covers the
 anchors, the default/disabled equality, the kept grouping and a control (docs/COMPILER-NOTES.md).
 
+`keep_float_pun_source.py` adds `-frac2-keep-float-pun-source`. `f32 f; *(s32 *)&f = K;` reaches
+cse2 as a set of an integer pseudo g and `(set (subreg:SI (reg:SF f) 0) (reg:SI g))`. With the
+option cse_insn leaves that insn's source alone (no constant, no older register with the same
+value), and combinable_i3pat refuses it as I3 unless f has a single use, which folds to `li.s` as
+before. An f read twice then keeps `lui`/`ori` in a GPR that crosses no call, one `mtc1` into a
+saved FPR and a `mov.s` per read, as retail has at every such site. Without it f reads
+twice lose g: `li.s` hoisted to the block start, or sched1 splits the SUBREG store and f sits in a
+saved GPR with an `mtc1` per read, or, if the reads win FP_REGS, reload drops the `ori` and the
+default compiler emits wrong code (a known issue of the EE 2.9 base, also in the SDK compiler).
+The rule is inferred from retail: no GCC release has it
+(docs/COMPILER-NOTES.md). It is off by default, enabled per unit in `config/cflags.txt`, and
+`-fno-rac2-keep-float-pun-source` disables it; `tests/test_keep_float_pun_source.py` covers the
+anchors, the default/disabled equality, the set after the previous call, the one move, the
+older-register case, the default's lost `ori` (three reads, reads in a loop, reads across a
+branch) against the option's `ori` before `mtc1`, and controls.
+
 Most opt-in switches anchor their `toplev.c` definition and option-table entry and their
 `flags.h` declaration on an earlier switch's lines, so `build.sh` runs them in a fixed order and
 the `toplev.c` and `flags.h` sums describe the source with all of them applied in that order. Two
@@ -299,8 +315,10 @@ pairs share an anchor and run in this order: `frame_pointer_liveness.py`, then
 `sticky_volatile_refs.py`), and `mult_add_no_flatten.py`, then `no_static_chain_base.py` (both on
 the `-frac2-wide-saves-below` lines, so after `wide_saves_below.py`). Each inserts right after its
 anchor, so swapping the two of a pair changes the sums but not the compiler.
+`keep_float_pun_source.py` anchors on the `-frac2-no-static-chain-base` lines, so it runs after
+`no_static_chain_base.py`; it also changes `cse.c`, after `keep_block_zero_copy.py`, and `combine.c`.
 
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
-`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c`, `expmed.c`, `alias.c` and `tc-mips.c` hash as it
+`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `combine.c`, `resource.c`, `expmed.c`, `alias.c` and `tc-mips.c` hash as it
 lists. The binaries' own hashes depend on the build host and path, so check a compiler by its
 output: `tools/build.py` compiles every matched function to the retail bytes.
