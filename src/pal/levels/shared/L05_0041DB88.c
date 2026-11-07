@@ -46,7 +46,6 @@ void func_PAL_L05_0041DB88(char *arg0)
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L05_0041EA08);
 
 /* func_L05_00419F10 is defined in L05_00419F10-g8.c. */
 

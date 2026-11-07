@@ -13,7 +13,19 @@ void func_PAL_L00_0030F308(void)
         func_0033F030(value + 0x3BB08);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0030F338);
+extern int func_PAL_00340A50(char *, int);
+
+/* func_PAL_L00_0030F338, the PAL copy of func_L00_0030D4E8: the same C, where the object offset
+ * 0x3B7C0 becomes 0x3BB08. */
+int func_PAL_L00_0030F338(int a0)
+{
+    int v = D_L00_001A904C_2;
+
+    if (v != 0) {
+        return func_PAL_00340A50((char *)v + 0x3BB08, a0);
+    }
+    return 0;
+}
 
 extern void func_00345358(int);
 

@@ -289,7 +289,6 @@ unsigned char *func_PAL_L04_003FE7B0(unsigned char *owner, float *pos,
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_00400108);
 
 extern int func_00283CF0(float);
 typedef struct {

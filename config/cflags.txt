@@ -4137,4 +4137,9 @@ src/pal/levels/30_insomniac_museum/L30_004106D0-dust-g8.c	-O2 -G8 -ffunction-sec
 src/pal/levels/shared/L00_0037BEC8-g8.c	-O2 -G8 -ffunction-sections -fno-builtin
 src/pal/levels/shared/L08_003CA1C8-emit-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-gcse -g
 src/pal/levels/shared/L08_004239F0-emit-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-gcse -g
+src/pal/levels/shared/L05_0041CA40-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L04_00400108-cc.c	-O2 -G0 -ffunction-sections -g
+src/pal/levels/shared/L05_0041EA08-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
+src/pal/levels/shared/L04_0041D788-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L04_0041E49C-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_0038FE10-g8.c	-O2 -G8 -ffunction-sections

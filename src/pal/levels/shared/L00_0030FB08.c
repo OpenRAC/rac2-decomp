@@ -1,8 +1,18 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0030FB08);
-
 extern int D_L00_001A904C_2 __attribute__((sda));
+extern int func_PAL_00341C18(int, int);
+
+/* func_PAL_L00_0030FB08, the PAL copy of func_L00_0030DCB8: the same C, where 0x3A388 becomes 0x3A570
+   and the callee is PAL's own func_PAL_00341C18. */
+int func_PAL_L00_0030FB08(int argument)
+{
+    int value = D_L00_001A904C_2;
+
+    if (value != 0)
+        return func_PAL_00341C18(value + 0x3A570, argument);
+    return 0;
+}
 
 void func_PAL_L00_0030FB48(void)
 {
