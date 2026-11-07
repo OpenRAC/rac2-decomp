@@ -2375,6 +2375,18 @@ sched1 and changing scan/declaration spelling were neutral. A positive selected
 guard plus a named zero gave 1112. Reopen with an independently supported source
 shape for the shared global-address lifetime, rather than repeating those forms.
 
+**7 November 2026, resolved (all three releases):** `func_002BA0E0` (1,472 bytes, 28
+places in us, pal and us2) issued all nine callee saves at the top where retail has seven of them
+right before the slot-24 table store. Cause: alias.c seeds `$v0`, the static-chain register, with
+a base, loses it at `$v0 = lo_sum ($a1, D_001F2340)`, and sched2 then orders every store through
+`$v0` after the saves. No C form changes this. The opt-in `-frac2-no-static-chain-base` (GCC
+2.95.3's alias seeds; in nested functions it also gives the chain no base, see
+docs/COMPILER-NOTES.md) together with `-frac2-frame-pointer-liveness` matches the ascending-slot
+draft in `src/game/002BA0E0.c`: strict linked builds of us, pal and us2 place it at 28 of 28
+places each; with either switch alone it stays 0 of 28. The signature is saves at the top ahead
+of stores through a pointer that `$v0` holds after reload. The argument registers keep their
+seeds (as in later GCC), so the switch does not help there.
+
 <a id="blocker-25"></a>
 
 ## 25. Small constants: rematerialised against reused (both directions)

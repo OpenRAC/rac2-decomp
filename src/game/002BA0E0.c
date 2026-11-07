@@ -1,22 +1,8 @@
-/* Closer b, 2026-11-01: the store sequence and registers follow retail for the first 30 stores; retail's callee saves come
- * late, each just before its register's first use, so its stores outrank the saves in sched2 (anti-dependences from
- * reusing few registers). One `lui $fp` too many. A hill climb over statement order (42,768 compiles) took 227 raw lines
- * to 93, still 1476/1472: this order. Volatile, struct, sized and pointer views of the table and the scheduler flags don't help. */
-/* Retained manual reconstruction, 2026-10-24.
- * Profile: -O2 -G0 -ffunction-sections.
- * Final measurements: us: 0/28 placements, exit1, 1476 compiled bytes; us2:
- * 0/28 placements, exit1, 1476 compiled bytes; pal: 0/28 placements, exit1,
- * 1476 compiled bytes.
- * Remaining: All 111 callback slots, including the two repeated
- * func_002B9380 entries, are reconstructed. The address-only initializer
- * leaves callback argument lists unspecified and does not call them.
- * Default, -g and -fno-gcse all produce 1476 versus 1472 bytes with
- * differing save/scheduling details.
- * Reopen with: Concrete callback-table source-lifetime or compiler
- * scheduling evidence resolving the one-word excess and delayed callee
- * saves; three tied profile trials are a stopping point.
- * No byte-match or linked-build credit is claimed.
- */
+/* func_002BA0E0: fills the 111-entry callback table D_001F2340, slots in ascending order. A unit
+ * of its own for -frac2-frame-pointer-liveness and -frac2-no-static-chain-base (config/cflags.txt):
+ * the first deletes a dead `lui $fp`; without the second the table base in $v0 has no alias base
+ * after reload, so every store depends on the prologue's saves and sched2 issues them at the top,
+ * where retail has them among the stores (docs/COMPILER-NOTES.md). */
 extern void func_002B9288();
 extern void func_002B9380();
 extern void func_002BA6A0();
@@ -131,114 +117,114 @@ extern void (*D_001F2340[])();
 void func_002BA0E0(void)
 {
     D_001F2340[0] = func_002BA6A0;
-    D_001F2340[25] = func_002BE400;
-    D_001F2340[2] = func_002BABE8;
-    D_001F2340[13] = func_002BC8E8;
-    D_001F2340[19] = func_002BD508;
-    D_001F2340[31] = func_002BF390;
-    D_001F2340[29] = func_002BEBC8;
-    D_001F2340[36] = func_002BFE80;
-    D_001F2340[9] = func_002BBA38;
-    D_001F2340[39] = func_002C0200;
-    D_001F2340[15] = func_002BCC58;
-    D_001F2340[7] = func_002BB798;
     D_001F2340[1] = func_002BA978;
-    D_001F2340[20] = func_002BD5B0;
-    D_001F2340[14] = func_002BCA10;
+    D_001F2340[2] = func_002BABE8;
+    D_001F2340[3] = func_002BAE48;
     D_001F2340[4] = func_002BAF68;
     D_001F2340[5] = func_002BB058;
-    D_001F2340[3] = func_002BAE48;
-    D_001F2340[21] = func_002BD9B0;
-    D_001F2340[24] = func_002BE150;
-    D_001F2340[17] = func_002BD390;
-    D_001F2340[33] = func_002BF6F0;
     D_001F2340[6] = func_002BB100;
-    D_001F2340[11] = func_002BBF40;
-    D_001F2340[10] = func_002BBB70;
-    D_001F2340[37] = func_002BFFE8;
-    D_001F2340[12] = func_002BC510;
-    D_001F2340[16] = func_002BD0D0;
-    D_001F2340[27] = func_002BE928;
-    D_001F2340[23] = func_002BDEB0;
-    D_001F2340[22] = func_002B9288;
-    D_001F2340[30] = func_002BEE78;
-    D_001F2340[26] = func_002BE7E8;
+    D_001F2340[7] = func_002BB798;
     D_001F2340[8] = func_002BB928;
+    D_001F2340[9] = func_002BBA38;
+    D_001F2340[10] = func_002BBB70;
+    D_001F2340[11] = func_002BBF40;
+    D_001F2340[12] = func_002BC510;
+    D_001F2340[13] = func_002BC8E8;
+    D_001F2340[14] = func_002BCA10;
+    D_001F2340[15] = func_002BCC58;
+    D_001F2340[16] = func_002BD0D0;
+    D_001F2340[17] = func_002BD390;
+    D_001F2340[18] = func_002BD398;
+    D_001F2340[19] = func_002BD508;
+    D_001F2340[20] = func_002BD5B0;
+    D_001F2340[21] = func_002BD9B0;
+    D_001F2340[22] = func_002B9288;
+    D_001F2340[23] = func_002BDEB0;
+    D_001F2340[24] = func_002BE150;
+    D_001F2340[25] = func_002BE400;
+    D_001F2340[26] = func_002BE7E8;
+    D_001F2340[27] = func_002BE928;
+    D_001F2340[28] = func_002BE9B8;
+    D_001F2340[29] = func_002BEBC8;
+    D_001F2340[30] = func_002BEE78;
+    D_001F2340[31] = func_002BF390;
+    D_001F2340[32] = func_002BF520;
+    D_001F2340[33] = func_002BF6F0;
     D_001F2340[34] = func_002BF8F0;
     D_001F2340[35] = func_002BFC50;
-    D_001F2340[40] = func_002C04C0;
-    D_001F2340[32] = func_002BF520;
+    D_001F2340[36] = func_002BFE80;
+    D_001F2340[37] = func_002BFFE8;
     D_001F2340[38] = func_002C00F8;
-    D_001F2340[47] = func_002C1DB8;
-    D_001F2340[52] = func_002C2170;
-    D_001F2340[49] = func_002C1EF0;
-    D_001F2340[50] = func_002C1FC0;
-    D_001F2340[53] = func_002C23B8;
+    D_001F2340[39] = func_002C0200;
+    D_001F2340[40] = func_002C04C0;
+    D_001F2340[41] = func_002C0C78;
+    D_001F2340[42] = func_002C0E50;
     D_001F2340[43] = func_002C14E0;
     D_001F2340[44] = func_002C1840;
-    D_001F2340[48] = func_002C1E58;
-    D_001F2340[41] = func_002C0C78;
-    D_001F2340[46] = func_002C1C88;
-    D_001F2340[18] = func_002BD398;
-    D_001F2340[51] = func_002C2080;
-    D_001F2340[54] = func_002C2658;
-    D_001F2340[28] = func_002BE9B8;
     D_001F2340[45] = func_002C1B38;
-    D_001F2340[42] = func_002C0E50;
+    D_001F2340[46] = func_002C1C88;
+    D_001F2340[47] = func_002C1DB8;
+    D_001F2340[48] = func_002C1E58;
+    D_001F2340[49] = func_002C1EF0;
+    D_001F2340[50] = func_002C1FC0;
+    D_001F2340[51] = func_002C2080;
+    D_001F2340[52] = func_002C2170;
+    D_001F2340[53] = func_002C23B8;
+    D_001F2340[54] = func_002C2658;
     D_001F2340[55] = func_002C27B0;
     D_001F2340[56] = func_002C28F8;
     D_001F2340[57] = func_002C29A8;
     D_001F2340[58] = func_002C2C80;
     D_001F2340[59] = func_002C30F8;
-    D_001F2340[63] = func_002C38A8;
-    D_001F2340[66] = func_002C3EE8;
-    D_001F2340[62] = func_002C37E0;
-    D_001F2340[64] = func_002C38E0;
-    D_001F2340[61] = func_002C3430;
-    D_001F2340[65] = func_002C3B10;
-    D_001F2340[68] = func_002C43D0;
-    D_001F2340[67] = func_002C4100;
-    D_001F2340[74] = func_002C4D20;
-    D_001F2340[79] = func_002C5408;
-    D_001F2340[72] = func_002C4B10;
-    D_001F2340[80] = func_002C5550;
-    D_001F2340[76] = func_002C5020;
     D_001F2340[60] = func_002C3280;
-    D_001F2340[71] = func_002C47F0;
-    D_001F2340[75] = func_002C4F08;
-    D_001F2340[73] = func_002C4B58;
-    D_001F2340[70] = func_002C4788;
-    D_001F2340[78] = func_002C5120;
-    D_001F2340[83] = func_002C6360;
+    D_001F2340[61] = func_002C3430;
+    D_001F2340[62] = func_002C37E0;
+    D_001F2340[63] = func_002C38A8;
+    D_001F2340[64] = func_002C38E0;
+    D_001F2340[65] = func_002C3B10;
+    D_001F2340[66] = func_002C3EE8;
+    D_001F2340[67] = func_002C4100;
+    D_001F2340[68] = func_002C43D0;
     D_001F2340[69] = func_002C4500;
+    D_001F2340[70] = func_002C4788;
+    D_001F2340[71] = func_002C47F0;
+    D_001F2340[72] = func_002C4B10;
+    D_001F2340[73] = func_002C4B58;
+    D_001F2340[74] = func_002C4D20;
+    D_001F2340[75] = func_002C4F08;
+    D_001F2340[76] = func_002C5020;
+    D_001F2340[77] = func_002C5070;
+    D_001F2340[78] = func_002C5120;
+    D_001F2340[79] = func_002C5408;
+    D_001F2340[80] = func_002C5550;
     D_001F2340[81] = func_002C58A8;
     D_001F2340[82] = func_002C5D00;
-    D_001F2340[88] = func_002C6748;
+    D_001F2340[83] = func_002C6360;
     D_001F2340[84] = func_002C64E0;
+    D_001F2340[85] = func_002B9380;
     D_001F2340[86] = func_002C6868;
     D_001F2340[87] = func_002C6A08;
-    D_001F2340[77] = func_002C5070;
+    D_001F2340[88] = func_002C6748;
     D_001F2340[89] = func_002C6B80;
-    D_001F2340[94] = func_002C7538;
     D_001F2340[90] = func_002C6EF0;
     D_001F2340[91] = func_002C7058;
-    D_001F2340[97] = func_002C7AE8;
     D_001F2340[92] = func_002C72A8;
+    D_001F2340[93] = func_002B9380;
+    D_001F2340[94] = func_002C7538;
     D_001F2340[95] = func_002C7628;
-    D_001F2340[101] = func_002C8350;
     D_001F2340[96] = func_002C7888;
+    D_001F2340[97] = func_002C7AE8;
     D_001F2340[98] = func_002C7D58;
     D_001F2340[99] = func_002C7F78;
-    D_001F2340[107] = func_002C8A38;
-    D_001F2340[102] = func_002C8428;
     D_001F2340[100] = func_002C8268;
+    D_001F2340[101] = func_002C8350;
+    D_001F2340[102] = func_002C8428;
     D_001F2340[103] = func_002C85D8;
     D_001F2340[104] = func_002C8610;
-    D_001F2340[85] = func_002B9380;
-    D_001F2340[93] = func_002B9380;
     D_001F2340[105] = func_002C87B0;
     D_001F2340[106] = func_002C8888;
-    D_001F2340[109] = func_002C8F40;
+    D_001F2340[107] = func_002C8A38;
     D_001F2340[108] = func_002C8CA0;
+    D_001F2340[109] = func_002C8F40;
     D_001F2340[110] = func_002C90A0;
 }

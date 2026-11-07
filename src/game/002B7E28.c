@@ -339,8 +339,6 @@ ASM_FUNC("asm/game", func_002B9420);
 /* Original assembly: qmfc2 VU0 op and trapping add/addi; the compiler cannot emit them. */
 ASM_FUNC("asm/game", func_002BA048);
 
-INCLUDE_ASM("asm/game", func_002BA0E0);
-
 void func_002BA6A0(char *p)
 {
     float *f = (float *)p;
