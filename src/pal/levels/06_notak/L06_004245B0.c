@@ -78,7 +78,6 @@ done:
 }
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L06_004485C0);
 
 extern void func_36C158();
 extern void func_36C1B0(float);

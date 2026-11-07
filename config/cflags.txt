@@ -4157,6 +4157,9 @@ src/pal/levels/shared/L01_0037B73C-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L05_0041CA40-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L04_00400108-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L05_0041EA08-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
+src/pal/levels/shared/L06_003E93C8-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/06_notak/L06_004485C0-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/06_notak/L06_00423250-cc.c	-O2 -G0 -ffunction-sections
 src/pal/levels/shared/L04_0041D788-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L04_0041E49C-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/us2/levels/02_maktar_nebula/L02_0043B510-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
@@ -4174,5 +4177,10 @@ src/us2/levels/13_boldan/L13_0041E1E0-cc-g8.c	-O2 -G8 -ffunction-sections -malig
 src/us2/levels/23_damosel_orbit/L23_00416E88-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/us2/levels/20_yeedil/L20_0043A530-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/us2/levels/22_dobbo_orbit/L22_004106C0-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/shared/L00_00386990-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_0042A488-g8.c	-O2 -G8 -ffunction-sections -g
+src/pal/levels/shared/L04_00407168-route.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/15_gorn/L15_00436368-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/pal/levels/26_jamming_array/L26_003D881C-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/us2/levels/15_gorn/L15_00432488-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/shared/L00_0038FE10-g8.c	-O2 -G8 -ffunction-sections
