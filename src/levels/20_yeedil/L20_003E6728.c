@@ -1,28 +1,10 @@
-/*
- * Retained handwritten near miss; historical evidence only.
- * No linked-image equality or complete retail semantics is established.
- * Compiler: game EE-GCC 2.9-ee-991111b (project profile).
- * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier.
- * Reported final C / retail: 1464 / 1484 bytes; size equality is not a match.
- * us: 0/1 placements; 1464/1484 bytes.
- * us2: not run after us mismatch; no exact candidate.
- * pal: not run after us mismatch; no exact candidate.
- * Residual: Nine source/profile trials; final 1464 versus 1484 bytes with the correct 0x2A0 frame. Quadword copies have the qualified materialized transfer shape, but allocation and stack-cached vector addresses differ in the second strip loop. Explicit pointers reached1484 bytes with incorrect initialization lifetime; conditional initialization expanded the frame.
- * Reopening condition: Recover natural temporary-vector pointer lifetimes; retain the two color interpolation banks and the three float input widths.
- * Where listed, tools/check.py measurements predate retention; no compilation was rerun for this copy.
- */
-
-/* Historical manual summary: Earlier wide-copy experiments required mixed addressing forms; pointer and structure-assignment variants did not reproduce the same allocation and scheduling. The current manual draft supersedes that screen. The original map is retained privately; no extracted instruction, opcode, address or generated table is reproduced here. */
-
-/* Not matched, 2026-10-23.
- * Nine source/profile trials; final 1464 versus 1484 bytes with the correct 0x2A0 frame. Quadword copies have the qualified materialized transfer shape, but allocation and stack-cached vector addresses differ in the second strip loop. Explicit pointers reached1484 bytes with incorrect initialization lifetime; conditional initialization expanded the frame.
- * Profile: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
- * Final us check: func_L20_003E6728: 0 of 1 places match (src/levels/20_yeedil/L20_003E6728.c); exit 1.
- * This source has not passed a linked build or a runtime test.
- */
+/* func_L20_003E6728: Yeedil's own copy of func_L00_003C5310 (same C); needs -frac2-sticky-volatile-refs, see docs/COMPILER-NOTES.md. */
 #include "common.h"
 
-typedef int Quadword __attribute__((mode(TI)));
+/* Own unit: -fmove-all-movables lets loop.c hoist the second strip loop's
+ * copy-destination address in its first pass (the default threshold leaves it
+ * to the rerun pass), which gives retail's preheader order and allocation. */
+
 typedef struct { float f[4]; } Vector __attribute__((aligned(16)));
 typedef struct {
     Vector vertex[4];
@@ -50,7 +32,6 @@ void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
     QuadPacket strip, bevel;
     Vector cross, scaledCross, radial, tangent, left, right, nextRadial, previousRadial, scaledRadial, equalRadial1, equalRadial2, offset;
     float step, fraction, previousLength, nextLength;
-    Vector *farther;
     int current, previous, next;
     func_00281DE8(&strip,texture1,1,128);
     strip.color[0]=strip.color[1]=strip.color[2]=strip.color[3]=colorStart1;
@@ -80,8 +61,8 @@ void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
         func_00282CF0(&strip.vertex[3],&points[current],&cross);
         strip.color[2]=strip.color[3]=func_00283D38(colorStart1,colorEnd1,fraction);
         func_00280B90(&strip,0,0);
-        *(Quadword *)&strip.vertex[0]=*(Quadword *)&strip.vertex[2];
-        *(Quadword *)&strip.vertex[1]=*(Quadword *)&strip.vertex[3];
+        qcopy(&strip.vertex[0],&strip.vertex[2]);
+        qcopy(&strip.vertex[1],&strip.vertex[3]);
         strip.color[0]=strip.color[1]=strip.color[2];
         fraction+=step;
         previous=current;
@@ -95,17 +76,16 @@ void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
         func_00282CF0(&nextRadial,&points[current],&D_L20_001B9FC0);
         nextLength=func_00282DF0(&nextRadial);
         if (previousLength<nextLength) {
-            if (previousLength==0.0f) *(Quadword *)&equalRadial1=*(Quadword *)&nextRadial;
+            if (previousLength==0.0f) qcopy(&equalRadial1,&nextRadial);
             else func_00282D30(&equalRadial1,&previousRadial,nextLength/previousLength);
-            farther=&equalRadial1;
             func_00282CC0(&left,&D_L20_001B9FC0,&nextRadial);
+            func_00282CC0(&right,&D_L20_001B9FC0,&equalRadial1);
         } else {
-            if (nextLength==0.0f) *(Quadword *)&equalRadial2=*(Quadword *)&previousRadial;
+            if (nextLength==0.0f) qcopy(&equalRadial2,&previousRadial);
             else func_00282D30(&equalRadial2,&nextRadial,previousLength/nextLength);
             func_00282CC0(&left,&D_L20_001B9FC0,&equalRadial2);
-            farther=&previousRadial;
+            func_00282CC0(&right,&D_L20_001B9FC0,&previousRadial);
         }
-        func_00282CC0(&right,&D_L20_001B9FC0,farther);
         func_00282CF0(&tangent,&right,&left);
         func_00282D30(&offset,&tangent,inset);
         func_00282CF0(&left,&left,&offset);
@@ -119,7 +99,7 @@ void func_L20_003E6728(Vector *points,int count,int texture1,int texture2,
         func_00282CF0(&bevel.vertex[3],&right,&scaledCross);
         bevel.color[2]=bevel.color[3]=func_00283D38(colorStart2,colorEnd2,fraction);
         func_00280B90(&bevel,0,0);
-        *(Quadword *)&previousRadial=*(Quadword *)&nextRadial;
+        qcopy(&previousRadial,&nextRadial);
         bevel.color[0]=bevel.color[1]=bevel.color[2];
         current=(current+1)%count;
         fraction+=step;

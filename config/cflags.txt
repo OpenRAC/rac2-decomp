@@ -4015,6 +4015,7 @@ src/pal/levels/07_siberius/L07_003FCC48-g8.c	-O2 -G8 -ffunction-sections
 src/game/002CF5B0-g32.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/levels/shared/L02_002EFB60-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses -frac2-sticky-volatile-refs
 src/levels/shared/L00_003C5310.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels -fmove-all-movables -frac2-sticky-volatile-refs
+src/levels/20_yeedil/L20_003E6728.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels -fmove-all-movables -frac2-sticky-volatile-refs
 src/pal/levels/03_endako/L03_003CF460-cc-g8.c	-O2 -G8 -ffunction-sections -fno-gcse -g
 src/pal/game/003004C8-preview.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/01_oozla/L01_003D0A08-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-hazard-labels
@@ -4207,3 +4208,4 @@ src/game/0026EA00-loader.c	-O2 -G0 -ffunction-sections -fcall-used-hi1 -fcall-us
 src/levels/shared/L00_003C3D90-g8.c	-O2 -G8 -ffunction-sections -g -frac2-mult-add-no-flatten
 src/levels/23_damosel_orbit/L23_00416388-hud-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g
 src/game/00284268.c	-O2 -G0 -ffunction-sections -fno-rerun-loop-opt -frac2-no-extra-increment-givs
+src/levels/30_insomniac_museum/L30_0040B9D8-g8.c	-O2 -G8 -ffunction-sections

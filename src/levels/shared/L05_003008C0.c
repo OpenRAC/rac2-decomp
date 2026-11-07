@@ -9,16 +9,19 @@ extern int D_L05_002A1800[];
 
 extern int func_002FEF40(int);
 
-extern int func_L05_00302CE8(int, int, int, int, int, int, int, int, char *);
+typedef struct L05Glyph L05Glyph;
+extern int func_L05_00302CE8(int, int, int, int, unsigned long long, unsigned char *, int,
+                             unsigned long long, L05Glyph *);
 
-extern char D_L05_002A2DB0[];
+extern L05Glyph D_L05_002A2DB0[];
 
-/* Forward the seven arguments with a fresh step and the shared table. */
-void func_L05_00303000(int a0, int a1, int a2, int a3, int a4, int a5, int a6)
+/* Word-wrapped text in a box with a fresh texture and the shared font; returns the height used. */
+int func_L05_00303000(int x, int y, int width, int height, unsigned long long color,
+                      unsigned char *text, int count)
 {
     int step = func_002FEF40(2);
 
-    func_L05_00302CE8(a0, a1, a2, a3, a4, a5, a6, step, D_L05_002A2DB0);
+    return func_L05_00302CE8(x, y, width, height, color, text, count, step, D_L05_002A2DB0);
 }
 
 

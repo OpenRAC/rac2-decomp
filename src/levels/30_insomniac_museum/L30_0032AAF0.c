@@ -518,6 +518,6 @@ void func_L30_0040B4E0(float *a0, float *a1, float *a2, float *a3, float *a4, fl
 }
 
 
-INCLUDE_ASM("asm/levels", func_L30_0040B9D8);
+/* func_L30_0040B9D8 is defined in L30_0040B9D8-g8.c. */
 
 /* func_L30_0040C270 is defined in L30_0040C270-g8.c. */

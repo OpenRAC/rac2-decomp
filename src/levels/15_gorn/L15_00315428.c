@@ -61,7 +61,7 @@ s32 func_L15_00381CF0(char *arg0) {
 
 /* func_L15_0042DCE0 is defined in L15_0042DCE0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L15_0042E1B0);
+/* func_L15_0042E1B0 is defined in L15_0042E1B0-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L15_0042EFE0);
 
@@ -70,7 +70,7 @@ INCLUDE_ASM("asm/levels", func_L15_0042EFE0);
 
 /* func_L15_0042FFB8 is defined in L15_00315428-g8.c (it reaches a global through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L15_00430168);
+/* func_L15_00430168 lives in L15_00430168-g8.c. */
 
 /* func_L15_00430590 is defined in L15_00430590-g8.c. */
 

@@ -56,7 +56,7 @@ extern u32 D_L05_001FB220[];
 extern u8 *D_L05_001B251C[] __attribute__((sda));
 extern s32 D_001B1350 __attribute__((sda));
 
-INCLUDE_ASM("asm/levels", func_L05_00420360);
+/* func_L05_00420360 lives in L05_00420360-g8.c. */
 
 /* func_L05_00420788 lives in L05_00420788-g8.c. */
 
@@ -70,7 +70,7 @@ INCLUDE_ASM("asm/levels", func_L05_00420360);
 
 /* func_L05_00421100 lives in L05_00421100-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L05_00421B98);
+/* func_L05_00421B98 lives in L05_00421B98-g8.c. */
 
 
 /* State 0 waits for func_00379860, then enters state 1. State 1 calls func_0037B538 and, when the

@@ -621,6 +621,6 @@ INCLUDE_ASM("asm/levels", func_L10_004227A0);
 
 /* func_L10_00423788 is in L10_003170D0-collision.c. */
 
-INCLUDE_ASM("asm/levels", func_L10_004239A0);
+/* func_L10_004239A0 lives in L10_004239A0-g8.c. */
 
 /* func_L10_00423DC8 is in L10_00423DC8-g8.c. */

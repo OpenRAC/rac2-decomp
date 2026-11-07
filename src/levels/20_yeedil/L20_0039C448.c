@@ -347,7 +347,7 @@ void func_L20_003C0350(char *arg0) {
     } while (*(s16 *)s0++ >= 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L20_003E6728);
+/* func_L20_003E6728 is defined in L20_003E6728.c. */
 
 
 

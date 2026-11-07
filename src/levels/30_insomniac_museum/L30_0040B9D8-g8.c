@@ -1,46 +1,4 @@
-/* func_L30_0040B9D8: opus-1 worker (v1989), USA v1.01, game -O2 -G8 -ffunction-sections.
- * Tier: one instruction short with allowed forms; exact bytes only with a form the rules forbid.
- * Best check, this file as written: 2196 bytes versus 2200 retail, 0 of 1 places match.
- * Only difference: retail's second `addiu v1,zero,1` in case 0 (before `swc1 f0,0x60(s2)`, used by
- * `sb v1,0x20(s3)`) is missing, and one beqz displacement follows from it. Compile as a -g8 unit.
- *
- * EXACT-BYTES FORM, NOT ALLOWED (invented test on an unrelated global, dead store in its arm):
- * replace the case 0 health line with
- *   {float t; if (D_L30_001A8F00) t=1.0f; t=D_L30_001B17B0;
- *    D_00189E20.maxHealth=D_00189E20.health=s->health=t;}
- * That gave 2200 bytes, 1 of 1 places match; PAL and US2 are "in neither catalogue". Level link
- * check not run on it.
- *
- * Why it works: qzero_nc's bare volatile asm flushes cse1, so obj->state=1 keeps its own QI
- * constant, scheduled in retail's slot. reload_cse_regs_1 then deletes it as a no-op, because v1
- * already holds SI 1 and QI is narrower. It survives only if a CODE_LABEL or a v1 set lies between
- * `sw v1,D_L30_001B180C` and that constant at reload time. An arm emptied by flow1 keeps the label
- * through reload; flow2 then drops the branch, the test and its load, so the bytes cannot
- * identify retail's real test. Measured with one test only, on a loaded global.
- *
- * Ruled out for the v1 kill. Compiled: a dead `s->count=2` store (the sb between the stores keeps
- * it alive in flow2's mem_set_list); a written-out else arm for the flag store (PRE moves s4/s1 out
- * of the test block, which needs the critical edge of `if (!copied) memcpy(...);`, and no
- * cross-jump resulted). Read from the compiler source, not compiled: lq to v0 (TImode is one GPR on
- * the R5900); output_block_move (no lq). Reasoned only, not compiled: other dead-store targets; a
- * test on activate (cprop should fold it); a test on copied (it must die at the branch for a3 to be
- * reused by the memcpy loops). Null tests on s or obj are forbidden. No sibling function with this
- * palette and health code was found by searching src for the memcpy and maxHealth forms.
- * To finish: recover what the test was. A DImode first constant would also keep the second one
- * (TRULY_NOOP_TRUNCATION fails from 64 bits), but no source form for that was found.
- *
- * Forms found here: char activate blocks the jump1 cmove, giving retail's bnel/movz shape; typed
- * PaletteRow computed pointer for the palette read; int return of func_L00_002C42E0 (the callee's
- * true type) gives case 4's -1 in v1; func_002ABBB8's real interleaved prototype fixes case 5;
- * the call in case 3's tail is func_002A7750, not func_002A7470.
- * Earlier draft corrections kept: state-nonzero always sets +0xA8 to 255; the +0x1A4 mask-0x4 gate
- * is positive; phase/bob tuning symbols were interchanged; case 6 shares the default exit, as
- * retail's seven-entry table does.
- *
- * closer D: reload_cse_regno_equal_p compares a CONST_INT by mode, so the second constant lives only with a label
- * between, or with a first constant in a wider mode. Moving the store to `copied = 1` gives 2200 bytes but puts the
- * first constant in a0 and costs 28 words. Per-arm flag stores give 2240 to 2244 bytes.
- */
+/* Museum vehicle update: collision damage, activation, driving and respawn. */
 #include "common.h"
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
@@ -109,6 +67,18 @@ typedef struct {
  char pad70[0x96-0x70]; unsigned short timer; int flags, animation;
  char padA0[8]; unsigned char hitFlag; char padA9[0xF0-0xA9]; float rotation[4];
 } MuseumVehicle;
+/* dead-test helper allowed by owner ruling (master precedent).
+ * As in label_y, the dead test preserves a block until reload; flow2 removes it.
+ * The returned health is always the level's initial vehicle health. */
+static __inline__ float initial_health(void)
+{
+    float health;
+    if (D_L30_001A8F00)
+        health = 1.0f;
+    health = D_L30_001B17B0;
+    return health;
+}
+
 void func_L30_0040B9D8(MuseumVehicle *obj) {
     VehicleVars *s; char *hit;
 
@@ -147,7 +117,7 @@ void func_L30_0040B9D8(MuseumVehicle *obj) {
         if (!copied) memcpy(D_L30_0025CEB0,palette,0x400);
         D_L30_001B180C=1;
         qcopy(&s->spawn,obj->position); qzero_nc(s);
-        D_00189E20.maxHealth=D_00189E20.health=s->health=D_L30_001B17B0;
+        D_00189E20.maxHealth=D_00189E20.health=s->health=initial_health();
         obj->state=1;
         s->power.bits=0;s->count=0;
         break; }
