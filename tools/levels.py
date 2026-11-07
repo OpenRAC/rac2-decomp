@@ -843,10 +843,8 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_002FBEB4": (748, 4),
     "func_PAL_00303BA4": (916, 76),
     "func_PAL_00314B5C": (4204, 4),
-    "func_PAL_003161FC": (284, 4),
     "func_PAL_003198A4": (5296, 92),
     "func_PAL_0033423C": (2672, 28),
-    "func_PAL_003373BC": (188, 4),
     "func_PAL_L00_00349574": (96, 4),
     "func_PAL_L00_0034ADE4": (96, 4),
     "func_PAL_L00_0038822C": (844, 4),
@@ -951,8 +949,6 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_US2_002D6024": (192, 4),
     "func_US2_002FAB0C": (1532, 4),
     "func_US2_002FBCEC": (748, 4),
-    "func_US2_00315AEC": (316, 4),
-    "func_US2_003364DC": (196, 4),
     "func_US2_L00_00348244": (96, 4),
     "func_US2_L00_00349AAC": (96, 4),
     "func_US2_L00_00390CB4": (936, 4),
@@ -1016,6 +1012,10 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_PAL_L17_003A7DB0": (528, 8),
     "func_PAL_L23_003C1280": (4068, 8),
     "func_US2_003342A8": (1604, 64),
+    # `mov.s $f0,$f3; nop` after the previous return and its padding nop, at all 27
+    # places; every level's table points at +8, the stack-frame prologue. USA v1.01's
+    # and v2.00's func_L00_003ABEC0 have the same skip.
+    "func_PAL_L00_003AF690": (2596, 8),
     # A row that starts inside its function: the prologue is 32 bytes earlier, in
     # the row before it (see FUNCTION_END_EXTRA), and the end does not move.
     "func_PAL_0029C8A0": (456, -32),
@@ -1061,6 +1061,10 @@ FUNCTION_END_EXTRA = {
     "func_PAL_002FB8D0": (1196, 12),
     "func_PAL_L00_0039C018": (1044, 12),
     "func_PAL_0029C820": (128, -36),
+    # Boot only: the row stopped before `ld $ra`, and its `jr $ra; addiu $sp,$sp,0xD0`
+    # was a row of its own, func_PAL_0026F578 (see FUNCTION_RESIDUES). The function
+    # is 12 bytes longer than USA v1.01's func_0026EDE8 and has no padding nop after it.
+    "func_PAL_0026EC50": (2340, 12),
 }
 
 
@@ -1222,6 +1226,20 @@ FUNCTION_RESIDUES = {
     "func_US2_00338F80": 8,
     "func_US2_0034DBC8": 16,
     "func_US2_L20_0036F994": 8,
+    # 7 November 2026, third pass: the release rows over the bytes of USA v1.01's
+    # func_00314CF8, func_00335270 and func_003356E8 (retired above). Boot only; each
+    # follows a completed return (and a padding nop in four), is `addiu $sp,$sp,N; nop`
+    # pairs with a few orphan stores and a `mov.s`, has no return, branch or prologue,
+    # and runs into the next prologue. Nothing in the boot enters it. Sizes are the
+    # rows' current extents, after the filler-nop skip four of them had.
+    "func_PAL_003161FC": 280,
+    "func_PAL_00336F58": 240,
+    "func_PAL_003373BC": 184,
+    "func_US2_00315AEC": 312,
+    "func_US2_003364DC": 192,
+    # Not a remnant: the `jr $ra` and delay slot of func_PAL_0026EC50, which
+    # FUNCTION_END_EXTRA now runs to its end. Named here so that its row goes.
+    "func_PAL_0026F578": 8,
 }
 
 
