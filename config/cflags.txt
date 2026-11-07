@@ -4076,6 +4076,7 @@ src/game/00301F18-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-
 src/pal/levels/30_insomniac_museum/L30_0041AC18-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_0041DBF0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/pal/game/002ECB88-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_00305570-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections
 src/pal/levels/shared/L00_003B2120-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels
 src/pal/levels/shared/L03_003C5A84-state-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels -malign-loops=2
 src/pal/levels/11_joba/L11_00425B68-state-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -4099,6 +4100,7 @@ src/levels/shared/L09_0037FCE8-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L08_003C9330-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L08_003D1540-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L08_003CA508-g8.c	-O2 -G8 -ffunction-sections -g -ffast-math -frac2-qcopy -frac2-qcopy-barrier
+src/pal/levels/shared/L00_00425F08-anim-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L04_00419918-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_003B0DA0-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels -frac2-gcse-unsplit-edges
 src/pal/game/0033423C-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
@@ -4113,4 +4115,18 @@ src/levels/08_tabora/L08_00308888-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -f
 src/levels/06_notak/L06_004012B0.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order
 src/game/002ECB70-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
 src/levels/shared/L00_003B3158-mesh-g8.c	-O2 -G8 -ffunction-sections -frac2-sticky-volatile-refs
+src/pal/game/00309A30-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/03_endako/L03_00422F18-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_0035B058-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
+src/pal/game/002D0500-cc.c	-O2 -G32 -Wa,-G32 -ffunction-sections
+src/pal/game/002FA330-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L00_002B0860-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/06_notak/L06_00404FE8-cc.c	-O2 -G0 -ffunction-sections -frac2-keep-block-order
+src/pal/levels/shared/L00_002CA888-cc.c	-O2 -G0 -ffunction-sections -fno-rerun-loop-opt
+src/pal/game/002EDA88-cc-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
+src/pal/levels/shared/L00_003B7FC0-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-sticky-volatile-refs
+src/pal/levels/02_maktar_nebula/L02_00417A48-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
+src/pal/game/00303950-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/11_joba/L11_00458F28-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/0032B930-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L00_0038FE10-g8.c	-O2 -G8 -ffunction-sections

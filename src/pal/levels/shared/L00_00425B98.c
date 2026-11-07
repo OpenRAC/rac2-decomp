@@ -124,7 +124,3 @@ void func_PAL_L00_00425B98(MoveObject *object, TI128 *input)
         func_00282CC0(&next->v00, &correction, &next->v00);
     }
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00425F08);
-

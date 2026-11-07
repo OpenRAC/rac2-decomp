@@ -4,5 +4,4 @@
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_003B7FC0);
 

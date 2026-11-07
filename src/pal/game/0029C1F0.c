@@ -29,5 +29,3 @@ void func_PAL_0029C7F0(void)
     if (value != 0)
         func_PAL_003506C0((int)(value + 0x36F28));
 }
-
-INCLUDE_ASM("asm/pal/game", func_PAL_0029C820);

@@ -2,7 +2,6 @@
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00309A30);
 
 #include "common.h"
 typedef struct { f32 f[4]; } __attribute__((aligned(16))) V4;

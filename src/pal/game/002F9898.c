@@ -3,7 +3,6 @@
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002FA330);
 
 /* func_PAL_002FAB40, the PAL copy of func_002F9BC0: the same C, with the thousands separator
    chosen by the language byte D_PAL_001A7C3C ('.' for 3, 4 and 5, ' ' for 2, ',' elsewhere). */
