@@ -398,7 +398,7 @@ void func_L02_0040FB80(u8 *a0) {
 
 /* func_L02_00411750 is defined in L02_00411750-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_00411D18);
+/* func_L02_00411D18 is defined in L02_00411D18.c. */
 
 extern s32 D_001A79F0 __attribute__((sda));
 extern u8 D_0019B2E8[];
