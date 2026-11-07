@@ -625,9 +625,6 @@ char *func_00349CB8(char *object)
 }
 
 
-INCLUDE_ASM("asm/game", func_00349D58);
-
-
 /* Measured target: byte-identical across all 27 levels. */
 void func_0034A4A8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x0) = a1; }
 

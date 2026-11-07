@@ -1796,6 +1796,21 @@ imprecisely, so bisect the *object* word, not the `.s`. The pair that lands corr
 rounds down onto the retail word). Debug recipe: compile a one-line probe with
 the configured compiler/profile and inspect the object, not only the assembly.
 
+**7 November 2026, resolved for func_00349D58, near miss for func_0034B2C8:** a float built
+from bits and read twice. Retail sets the word in `$v0` after the previous call, moves it once
+into a saved FPR and `mov.s`es it per read; the same kind of word read once is `li.s`. None of
+the forms tried in stock cc1 (listed in nonmatching/game/func_0034B2C8.c's header) gives that:
+cse2 or combine loses the integer register. The spelling is the write-side pun,
+`f32 f; *(s32 *)&f = K;`, with the opt-in `-frac2-keep-float-pun-source` (docs/COMPILER-NOTES.md,
+"Integer words stored into floats"; no GCC release has this rule, and the switch was designed from
+retail's form, so these matches do not show its origin). Results: func_00349D58 28 of 28 places in
+us, pal and us2 in `src/game/00349D58.c`; func_0034B2C8 stays a near miss, 6,048 of 6,048 bytes, 12
+words differing, 0 of 28: all 16 colours are right, two jal-slot orders remain (its draft header).
+Known issue: the default compiler miscompiles this pun when the reads win FP_REGS (three reads,
+two in a loop, reads across a branch): `lui; mtc1`, no `ori`. The unmodified SDK compiler and the
+bare 2.9-ee-991111b tree do the same; C built with the default compiler outside `src/`
+(`nonmatching/functional/`, port references) can contain it. See the notes' known-issue paragraph.
+
 <a id="blocker-14"></a>
 
 ## 14. Store order is not one universal rotation

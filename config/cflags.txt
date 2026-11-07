@@ -4198,3 +4198,4 @@ src/game/002F9BC0-preview-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L08_003CDF98-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -ffast-math
 src/game/0030F7B0-ball-sw-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/19_grelbin/L19_00417318-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
+src/game/00349D58.c	-O2 -G0 -ffunction-sections -frac2-keep-float-pun-source
