@@ -84,14 +84,15 @@ python3 $T/narrow_saves_below.py gcc
 python3 $T/keep_block_zero_copy.py gcc
 python3 $T/sticky_volatile_refs.py gcc
 python3 $T/frame_pointer_liveness.py gcc
+python3 $T/wide_saves_below.py gcc
 sha256sum --check --quiet <<'SUMS'
-91ac97768f907db2c50b5e04c150b7c7d72c2da3f15d21f0a7f4e802ba8378fb  gcc/config/mips/mips.c
+c949997ebc1ed001fc7d905723c8e9348f5c364db2b61bc4e84b9729b6a67f07  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-eb031ea8c47f929f5518bfb80bcf4e86a7303a1958504f16d20425e26fda8469  gcc/toplev.c
+c0ed4bcda13c518f9526daeab24747323996a0fb006cb360b0d8ba260d21f304  gcc/toplev.c
 fa211f12b39de727c033f57a16ab627572547901d9cf8d2a7aa2e5dd77949e9e  gcc/haifa-sched.c
 656c2b9546b5c38d96cfe25b02620cce02b625f5637ecad6386f0a4d89f3e0fe  gcc/reorg.c
-3a47625c6a5e91aa014a81348ea9563983d27f202388351f2b510e3d67c89b9c  gcc/flags.h
+36f131877144c14cc1d2a68b25f65d07d9eadce42b03fe0860e531450aef8f8d  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
 17c1a41578b92c102dea8c189e1e7372e637662e690d5226c87a4122a32d1225  gas/config/tc-mips.c
@@ -153,6 +154,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_narrow_saves_below.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_keep_block_zero_copy.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sticky_volatile_refs.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_frame_pointer_liveness.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_wide_saves_below.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

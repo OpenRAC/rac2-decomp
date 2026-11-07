@@ -248,6 +248,22 @@ in `config/cflags.txt`, and `-fno-rac2-frame-pointer-liveness` disables it;
 `tests/test_frame_pointer_liveness.py` covers the anchors, the default/disabled equality, the
 un-annulled slot and controls with `$fp` live at the exit, without `$fp` and with a frame pointer.
 
+`wide_saves_below.py` adds `-frac2-wide-saves-below`. Without `-mastra-quad-saves`, a saved GPR
+whose save is wider than the 8-byte slot (a register the function writes in TImode, which
+save_restore_insns saves with `sq`) then takes a 16-byte slot at the bottom of the GPR save
+area. The other GPRs keep 8-byte slots above it in register order, and compute_frame_size grows
+to match (func_L02_00411D18: `sq $s2,0x620` below `sd $s0,0x630`, frame 0x690). Stock cc1
+puts that `sq` in an 8-byte slot, where it overwrites the neighbouring save. The layout comes
+from that one witness; the order of two or more wide saves is not evidenced. The mask is taken
+while reload runs, from the renumbered insns and `reg_renumber`, and kept for the function, so
+the arg-pointer offsets agree with the final frame. A save the prologue then finds wider than
+its slot is an error. The widened save mode carries over to later functions of a unit, so the
+witness has a file of its own. With `-mastra-quad-saves` the option does nothing. It is off by
+default, enabled per unit in `config/cflags.txt`, and `-fno-rac2-wide-saves-below` disables it;
+`tests/test_wide_saves_below.py` covers the anchors, the default/disabled equality, one and two
+wide saves, stack arguments, a unit-wide carried mode, the quad-save profiles and a control
+(docs/COMPILER-NOTES.md).
+
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
 `haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c` and `tc-mips.c` hash as it
 lists. The binaries' own hashes depend on the build host and path, so check a compiler by its

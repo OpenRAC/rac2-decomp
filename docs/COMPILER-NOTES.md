@@ -195,6 +195,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | libgcc `_eh.o` (L_eh): preserve the frame at final calls and place the exception-return stub correctly | sdk profile with -fexceptions, as GCC's libgcc Makefile builds _eh.o (rac3-decomp builds its copy the same way) | func_00120A30, func_001208E8; paired throw/rethrow func_00120F00 and func_001210E0 |
 | Whole GPR save area uses sq/lq | -mastra-quad-saves | func_00119BC8, func_00115F28, func_00115C90 |
 | Quad slots: `sd $ra` below `sq $s0` | -mastra-quad-saves -frac2-narrow-saves-below, `register_precision(ra, 64)` | func_L01_00324550, func_L08_00389B68 |
+| 8-byte slots, but a TImode-held saved GPR gets `sq` in a 16-byte slot below them | -frac2-wide-saves-below | func_L02_00411D18 |
 | Copy of a zero set in the same block stays a register copy | -frac2-keep-block-zero-copy | func_002F7320 |
 | A volatile asm ends the forward delay-slot search past later loads | -frac2-sticky-volatile-refs | func_L00_002A9460 |
 | Branch slot setting `$fp` annulled (`bnel`), retail `bne`; no frame pointer | -frac2-frame-pointer-liveness | func_L07_0040EC08, func_L04_00414698 |
@@ -367,9 +368,9 @@ Two variadic level functions mix widths in quad slots: func_L01_00324550 (132 by
 11 places; `sd $ra,0x200` below `sq $s0,0x210`) and func_L08_00389B68 (264 bytes, 4 places;
 `sd $ra,0x0` below `sq $s0,0x10`), each restoring `lq $s0` before `ld $ra`. A scan of every
 catalogue prologue finds one other frame mixing `sq` and `sd` GPR saves, func_L02_00411D18
-(`sq $s2` in a 16-byte slot below 8-byte ones), which this rule does not cover. The stock EE
-attribute `register_precision(ra, 64)` on the prototype narrows the `$ra` save to `sd`, but
-the save loop still gives `$ra` the top slot.
+(`sq $s2` in a 16-byte slot below 8-byte ones), which `-frac2-wide-saves-below` covers
+(below). The stock EE attribute `register_precision(ra, 64)` on the prototype narrows the
+`$ra` save to `sd`, but the save loop still gives `$ra` the top slot.
 [narrow_saves_below.py](../tools/compiler/transformers/narrow_saves_below.py) adds
 `-frac2-narrow-saves-below`: with `-mastra-quad-saves` the loop walks the registers saved at
 the slot's full width first, then the narrower ones, so the narrower save sits below. A frame
@@ -378,6 +379,42 @@ without `-mastra-quad-saves` the option has no effect. Forced on in every game u
 none of 7,572 (144 SDK units use another compiler). `register_precision` sets the mode for the
 rest of the unit, so each function has a file of its own. The attribute is an inference from
 the save widths, not a recovered source line.
+
+func_L02_00411D18 (1,928 bytes, one place in each of USA v1.01, v2.00 and PAL) holds a TImode
+value in `$s2` across calls. Retail saves it with `sq $s2,0x620` below `sd $s0,0x630`,
+`sd $s1,0x638` and `$s3`..`$ra` at 0x640..0x670, with `$f20`/`$f21` at 0x680/0x688 in a
+0x690-byte frame, and restores in register order (`ld $s0`, `ld $s1`, `lq $s2`, `ld $s3` ...).
+It is the only one of 7,980 framed retail functions that holds TImode in a saved GPR. Without
+`-mastra-quad-saves` every GPR slot is 8 bytes, but save_restore_insns saves a register in the
+widest mode the function writes it in, so stock cc1 gives a 0x680 frame and `sq $s2,0x630` in an
+8-byte slot. `sq` ignores the low four address bits, so that store overwrites `$s3`'s save.
+[wide_saves_below.py](../tools/compiler/transformers/wide_saves_below.py) adds
+`-frac2-wide-saves-below`. In a unit without `-mastra-quad-saves`, a saved GPR whose save is
+wider than the slot then takes a 16-byte slot at the bottom of the GPR save area. The other
+GPRs keep 8-byte slots above it in register order, and compute_frame_size adds 8 bytes for
+each such register. The switch keys on the mode of the save, never on a function. **The layout
+is inferred from this one witness.** Retail has no frame with two or more wide GPR saves, so
+their order is not evidenced: the switch places them upwards from the bottom in register
+order. A frame whose only GPR saves are wide is not evidenced either.
+
+The frame size fixes the arg-pointer offsets during reload, before the prologue scans the save
+modes, so the switch computes its mask while reload runs too. It reads the insns, whose pseudos
+alter_reg has already renumbered to their hard registers (through `reg_renumber` for any it has
+not), and adds the modes `mips_reg_mode` and `register_precision` give. The mask from the last
+call before reload completes is kept for the rest of the function; that call is the one
+verify_initial_elim_offsets checks against the offsets reload used. If the prologue then finds a
+save wider than its slot, cc1 stops with an error instead of emitting an overlapping store. A
+build that takes no mask during reload, as an earlier private patch did, gives the fixture's
+stack-argument function a 48-byte frame (32 without the switch) but still reads the arguments at
+32 and 40 (`$sp`), in the save area; `tests/test_wide_saves_below.py` fails on it.
+`mips_reg_mode` stays widened for the rest of a unit, with or without the switch: a later
+function that saves `$s2` saves it with `sq` too. So the witness has a unit of its own,
+`src/levels/02_maktar_nebula/L02_00411D18.c`, which all three releases link. With
+`-mastra-quad-saves` every slot is already 16 bytes and the switch does nothing, so it leaves
+that switch and `-frac2-narrow-saves-below` unchanged. Without the switch, all 8,629
+game-compiler units of `src/` (the three releases' C) compile to the same assembly as before.
+Forced on in every one of them, it changes only func_L02_00411D18 and none of 11,949 other
+functions in 8,628 other units (144 SDK units use another compiler).
 
 func_002F7320 (132 bytes, 28 places) starts `daddu $t1,$zero,$zero ... daddu $a3,$t1,$zero`
 for `int result = 0; int i = result;`. Stock cse folds that copy to `move $a3,$0`: CONST_INT
@@ -1584,6 +1621,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Inheritance into non-spill registers | [test_reload_reg_used_guard.py](../tests/test_reload_reg_used_guard.py) |
 | Null-pointer-check pass | [test_no_null_pointer_checks.py](../tests/test_no_null_pointer_checks.py) |
 | Width-ordered quad saves | [test_narrow_saves_below.py](../tests/test_narrow_saves_below.py) |
+| 16-byte slots for TImode GPR saves | [test_wide_saves_below.py](../tests/test_wide_saves_below.py), [wide_saves_below.c](../tests/fixtures/wide_saves_below.c) |
 | Masks/sign seed | [test_dli_masks.py](../tests/test_dli_masks.py) |
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
