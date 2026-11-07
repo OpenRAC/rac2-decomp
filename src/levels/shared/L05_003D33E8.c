@@ -176,7 +176,6 @@ void func_L05_00417448(char *object)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L05_00417D48);
 
 
 /* func_L05_00418440 is matched in L05_00418440.c (built with -mno-split-addresses). */

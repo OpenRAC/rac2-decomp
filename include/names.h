@@ -937,5 +937,6 @@
 #define DrawDomeEffect                   func_L04_003FBEF8
 #define UpdateHoverbikeRace              func_L04_00419918
 #define DrawScrollingGridLayers          func_L15_00437B68
+#define DrawBoltCounterPanel             func_0034DB98
 
 #endif /* NAMES_H */

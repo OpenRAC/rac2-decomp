@@ -153,7 +153,7 @@ extern void func_0033E1B0(void *, void *);
 
 INCLUDE_ASM("asm/game", func_0034CEA0);
 
-INCLUDE_ASM("asm/game", func_0034DB98);
+/* func_0034DB98 is in 0034CEA0-g8.c. */
 
 
 /* walks 26 consecutive 72-byte records calling one leaf per record, then calls four more leaves on fixed offsets of the same object and returns the object pointer */

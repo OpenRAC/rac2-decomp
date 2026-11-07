@@ -1,60 +1,31 @@
-/* 4 November 2026, measured object-field follow-up; not linked.
- * The retained note's proposed moby-struct experiment was tested at -O2 -G8
- * -ffunction-sections: 1204/1204 bytes, 0/4 USA v1.01 places. Its measured
- * position/mode/flags/state fields and child +0x98 timer fields preserve the
- * accesses, but move the first mismatch earlier, from +0xEC to +0xCC, and
- * rotate the selector register to a1. The better original C is retained.
- * Do not repeat that whole-object typing as an untested remedy. US2/PAL
- * compilation was not repeated after the US mismatch; no linked match.
- */
-/* Complete C near miss; not linked and no matching credit.
- * Tier: opus-2 (Claude Opus 5.5, xhigh), task v2201, 2026-11-03 (supersedes opus-1's v2143 draft, 109 rows).
- * Build as src/levels/shared/L05_00417D48-g8.c (game -O2 -G8; no extra flags).
- * Best check.py: 1204/1204 bytes, 0 of 4 places match, first difference +0xEC,
- * 101 of 301 rows differ (us).
- * Needed declarations (below): D_001A7AF0, D_L05_001B34F0 and D_L05_001B3510 MACRO_ADDR;
- * D_0018B650 and the selector tables D_L05_001A8F70..FA0 nosda; D_L05_001B3500 plain;
- * func_L05_0041C708 (char *, float, int, int); one reused masked-index variable `flags`;
- * o+0x68 is a struct (State_L05_00417D48) accessed through members.
- * Fixed since v2143: case-0 tail store order (0x58, 0x54, 0x5C, 0xA0 in source order),
- * case-1 `slt` (compare the two calls directly), qcopy registers (MACRO_ADDR destination),
- * and the struct-member state: with cast-pointer stores, sched1 keeps the D_001A7AF0 and table
- * loads below `st+0x50 = func_L05_00432080()`; struct-member stores do not alias a fixed scalar
- * (alias.c fixed_scalar_and_varying_struct_p), so they rise above it as in retail.
- * Remaining: (1) the shifted selector index `flags` is v0 here (a2 with cast pointers); retail
- * a3 in every segment. Retail's >>6 segment holds the F88 table base in a2 while flags is live,
- * so a2 conflicts with flags there; ours puts that base in v1 and D in a0.
- * (2) Segment 1: retail loads D_001A7AF0 into v1 before the D_0018B650 store and builds the
- * F70 table base in a0. (3) The >>7 segment's D load and reorg's skip of the merge reload.
- * Next: make the per-segment local registers (D v1/v0, table base a0/a2) come out as retail's.
- * Try struct members for o as well, or a different statement order for the 0x50 store.
- */
 #include "common.h"
 
-extern void func_L05_00418200(char *);
+extern void func_L05_00418200(void *);
 extern void func_00282C88(char *);
 extern unsigned int D_001A7AF0 MACRO_ADDR;
-extern char *D_0018B650 __attribute__((nosda));
+/* A pointer table whose slot 0 holds the active object (L30_003B3F70-g8.c also reads it as an array). */
+extern void *D_0018B650[] __attribute__((nosda));
 extern char D_L05_001B34F0[] MACRO_ADDR;
 extern char D_L05_001B3510[] MACRO_ADDR;
 extern float D_L05_001B3500;
-extern short D_L05_001A8F70[] __attribute__((nosda));
-extern short D_L05_001A8F78[] __attribute__((nosda));
-extern short D_L05_001A8F80[] __attribute__((nosda));
-extern short D_L05_001A8F88[] __attribute__((nosda));
-extern short D_L05_001A8F90[] __attribute__((nosda));
-extern short D_L05_001A8F98[] __attribute__((nosda));
-extern short D_L05_001A8FA0[] __attribute__((nosda));
-extern char *func_L05_0041C708(char *, float, int, int);
-extern char *func_L05_00432080(char *, float);
+/* Model ids per equipment selector, one 4-entry table per D_001A7AF0 bit field. */
+extern short D_L05_001A8F70[] MACRO_ADDR;
+extern short D_L05_001A8F78[] MACRO_ADDR;
+extern short D_L05_001A8F80[] MACRO_ADDR;
+extern short D_L05_001A8F88[] MACRO_ADDR;
+extern short D_L05_001A8F90[] MACRO_ADDR;
+extern short D_L05_001A8F98[] MACRO_ADDR;
+extern short D_L05_001A8FA0[] MACRO_ADDR;
+extern char *func_L05_0041C708(void *, float, int, int);
+extern char *func_L05_00432080(void *, float);
 extern int func_002ED8A0(int);
 extern int func_L05_0037AC00(void);
 extern int func_L05_0037AC40(void);
 extern int func_00282948(char *);
-extern int func_002E59B0(char *, int);
-extern int func_002E5CF8(int, int, char *);
-extern void func_L05_00418288(char *);
-extern void func_L00_004450C0(char *);
+extern int func_002E59B0(void *, int);
+extern int func_002E5CF8(int, int, void *);
+extern void func_L05_00418288(void *);
+extern void func_L00_004450C0(void *);
 
 typedef struct {
     int f0;
@@ -103,10 +74,22 @@ typedef struct {
     int f27C;
 } State_L05_00417D48;
 
-void func_L05_00417D48(char *o)
+typedef struct {
+    char pad0[0x10];
+    char pos[0x10];
+    unsigned char state;
+    char pad21[0x13];
+    unsigned short modeBits;
+    char pad36[0x32];
+    State_L05_00417D48 *pVar;
+} Obj_L05_00417D48;
+
+/* State 0 spawns the equipment parts chosen by the D_001A7AF0 selector bits; state 1 updates timers and the
+ * position copy. */
+void func_L05_00417D48(Obj_L05_00417D48 *o)
 {
-    State_L05_00417D48 *st = *(State_L05_00417D48 **)(o + 0x68);
-    int mode = *(unsigned char *)(o + 0x20);
+    State_L05_00417D48 *st = o->pVar;
+    int mode = o->state;
     int id;
     unsigned int flags;
 
@@ -131,14 +114,14 @@ void func_L05_00417D48(char *o)
         st->f268 = 0;
         st->f26C = 0;
         st->f27C = 0;
-        *(unsigned char *)(o + 0x20) = 1;
-        *(unsigned short *)(o + 0x34) |= 0x100;
+        o->state = 1;
+        o->modeBits |= 0x100;
         func_L05_00418200(o);
         func_00282C88(D_L05_001B34F0);
-        D_0018B650 = o;
+        D_0018B650[0] = o;
         flags = D_001A7AF0 & 3;
         D_L05_001B3500 = 0;
-        *(unsigned short *)(o + 0x34) |= 0x41;
+        o->modeBits |= 0x41;
         st->f40 = func_L05_0041C708(o, 0.05f, 0, D_L05_001A8F70[flags]);
         if (st->f40) *(int *)(st->f40 + 0x98) = 0;
         flags = (D_001A7AF0 >> 2) & 3;
@@ -199,7 +182,7 @@ void func_L05_00417D48(char *o)
         }
         if (!func_002E59B0(o, st->f30)) st->f30 = func_002E5CF8(0, 4, o);
         func_L05_00418288(o);
-        qcopy(D_L05_001B3510, o + 0x10);
+        qcopy(D_L05_001B3510, o->pos);
         func_L00_004450C0(o);
         break;
     }
