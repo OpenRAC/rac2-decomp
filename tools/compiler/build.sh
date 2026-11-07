@@ -85,14 +85,15 @@ python3 $T/keep_block_zero_copy.py gcc
 python3 $T/sticky_volatile_refs.py gcc
 python3 $T/frame_pointer_liveness.py gcc
 python3 $T/wide_saves_below.py gcc
+python3 $T/mult_add_no_flatten.py gcc
 sha256sum --check --quiet <<'SUMS'
 c949997ebc1ed001fc7d905723c8e9348f5c364db2b61bc4e84b9729b6a67f07  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-c0ed4bcda13c518f9526daeab24747323996a0fb006cb360b0d8ba260d21f304  gcc/toplev.c
+1f1a5eca35917752d176159a6a5ac814333b24e5e3f0f178754df1619f6f711a  gcc/toplev.c
 fa211f12b39de727c033f57a16ab627572547901d9cf8d2a7aa2e5dd77949e9e  gcc/haifa-sched.c
 656c2b9546b5c38d96cfe25b02620cce02b625f5637ecad6386f0a4d89f3e0fe  gcc/reorg.c
-36f131877144c14cc1d2a68b25f65d07d9eadce42b03fe0860e531450aef8f8d  gcc/flags.h
+f5af048dc0a6af246af7df2331f13bd8b7ff9f0585f602e91c3d329c0973afba  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
 17c1a41578b92c102dea8c189e1e7372e637662e690d5226c87a4122a32d1225  gas/config/tc-mips.c
@@ -100,6 +101,7 @@ efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
 2f6ffa23d379d620ec38db4e527b2cbd5583865195cd8b364aa2c1ce07433faf  gcc/loop.c
 a2dd997196a573b94aef15338115cfdb1c2a7e29f3dc1857597695f1a0bf9b20  gcc/cse.c
 8e2768736759358567dc26fe0379d8fbe8b6f5bc3d9dc35adeb573cb99eac63f  gcc/resource.c
+23fccc683e52141c78256e75795be2b6573cc2be5683247c86379d416f213729  gcc/expmed.c
 SUMS
 
 # bison 1.28: the 1999 grammars need its skeleton.
@@ -155,6 +157,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_keep_block_zero_copy.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sticky_volatile_refs.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_frame_pointer_liveness.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_wide_saves_below.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_mult_add_no_flatten.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

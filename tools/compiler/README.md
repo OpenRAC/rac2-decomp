@@ -264,7 +264,16 @@ default, enabled per unit in `config/cflags.txt`, and `-fno-rac2-wide-saves-belo
 wide saves, stack arguments, a unit-wide carried mode, the quad-save profiles and a control
 (docs/COMPILER-NOTES.md).
 
+`mult_add_no_flatten.py` adds `-frac2-mult-add-no-flatten`: expand_mult_add (expmed.c), which
+builds a reduced giv's start for loop.c, folds its `b*m + a` tree with flag_schedule_insns
+clear, so the CYGNUS LOCAL reduce_expression_tree_depth (fold-const.c) does not flatten it
+there. func_L20_0039F968's source cursor then starts as retail's `x*16 + (i*400 + (D-16))`,
+not `(x*16 + i*400) + (D-16)`; FSF 2.95.2 (SN v2.73a) gives the same shape. Forced on in every
+game unit, nothing else changes. It is off by default, enabled per unit in `config/cflags.txt`,
+and `-fno-rac2-mult-add-no-flatten` disables it; `tests/test_mult_add_no_flatten.py` covers the
+anchors, the default/disabled equality, the kept grouping and a control (docs/COMPILER-NOTES.md).
+
 `build.sh` stops unless `mips.c`, `mips.h`, `mips.md`, `toplev.c`, `flags.h`,
-`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c` and `tc-mips.c` hash as it
+`haifa-sched.c`, `gcse.c`, `flow.c`, `reorg.c`, `reload1.c`, `loop.c`, `cse.c`, `resource.c`, `expmed.c` and `tc-mips.c` hash as it
 lists. The binaries' own hashes depend on the build host and path, so check a compiler by its
 output: `tools/build.py` compiles every matched function to the retail bytes.
