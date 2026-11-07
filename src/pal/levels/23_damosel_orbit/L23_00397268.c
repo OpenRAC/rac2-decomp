@@ -243,8 +243,3 @@ finish:
             func_PAL_L00_00391958(obj, &frame.velocity, &frame.normal);
     }
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L23_003C1280);
-
-

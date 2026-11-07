@@ -1,7 +1,4 @@
 #include "include_asm.h"
-
-INCLUDE_ASM("asm/pal/game", func_PAL_002CE9BC);
-
 extern char *D_001A8CFC[] __attribute__((sda));
 extern void func_PAL_003435D0(void *, int);
 extern void func_PAL_003435C0(char *, char *, char *, char *);

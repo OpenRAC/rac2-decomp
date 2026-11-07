@@ -10,6 +10,8 @@ unsigned int func_PAL_0034EC30(unsigned char *owner)
     return *(unsigned int *)address & 0xff000000u;
 }
 
+INCLUDE_ASM("asm/pal/game", func_PAL_0034F060);
+
 
 extern void func_00336920(char *, int, int);
 
@@ -120,12 +122,7 @@ void func_PAL_0034EFF0(int *self, int value)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034F060);
-
-
 INCLUDE_ASM("asm/pal/game", func_PAL_0034F068);
-
-INCLUDE_ASM("asm/pal/game", func_PAL_0034FD60);
 
 extern void func_003363D0(void *p);
 extern void func_PAL_0034D238(void *p);

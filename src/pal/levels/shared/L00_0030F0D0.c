@@ -25,9 +25,31 @@ void func_PAL_L00_0030F100(void)
         func_003465D0(value + 0x39BA0);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0030F130);
+extern int func_PAL_00348DF8(int, int);
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0030F1B8);
+/* Reads the object base from a shared global and, when it is non-zero, returns the handler's
+ * result at a fixed byte offset in it; otherwise returns 0. */
+int func_PAL_L00_0030F130(int argument)
+{
+    int value = D_L00_001A904C_2;
+
+    if (value != 0)
+        return func_PAL_00348DF8(value + 0x39620, argument);
+    return 0;
+}
+
+extern int func_PAL_0033B218(int, int);
+
+/* Reads the object base from a shared global and, when it is non-zero, returns the handler's
+ * result at a fixed byte offset in it; otherwise returns 0. */
+int func_PAL_L00_0030F1B8(int argument)
+{
+    int value = D_L00_001A904C_2;
+
+    if (value != 0)
+        return func_PAL_0033B218(value + 0x3B4C8, argument);
+    return 0;
+}
 
 extern void func_00339590(int);
 
@@ -41,4 +63,15 @@ void func_PAL_L00_0030F1F8(void)
         func_00339590(value + 0x3B4C8);
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_0030F228);
+extern int func_PAL_0033BE50(int, int);
+
+/* Reads the object base from a shared global and, when it is non-zero, returns the handler's
+ * result at a fixed byte offset in it; otherwise returns 0. */
+int func_PAL_L00_0030F228(int argument)
+{
+    int value = D_L00_001A904C_2;
+
+    if (value != 0)
+        return func_PAL_0033BE50(value + 0x3B030, argument);
+    return 0;
+}

@@ -19,8 +19,6 @@ void func_PAL_00339B88(char *p, int a1, int a2, float f12, float f13)
     *(float *)(*(int *)(p + 4)) = 1.0f;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00339BF8);
-
 extern void func_00115AC0(void *, int, int);
 extern void func_PAL_00339BF8(void *, int, int, float, float);
 

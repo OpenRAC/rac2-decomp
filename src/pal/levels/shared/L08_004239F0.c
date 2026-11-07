@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L08_004239F0);
-
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef unsigned int Quad __attribute__((mode(TI)));
