@@ -284,7 +284,7 @@ void func_L20_0039F230(char *arg0) {
 
 /* func_L20_0039F560 is defined in L20_0039F560-g8.c (it reaches data through $gp and needs the qcopy profile without interblock scheduling). */
 
-INCLUDE_ASM("asm/levels", func_L20_0039F968);
+/* func_L20_0039F968 is defined in L20_0039F968-g8.c. */
 
 
 /* func_L20_003AB090 is defined in L20_003AB090.c. */

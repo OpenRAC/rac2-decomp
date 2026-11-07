@@ -4189,3 +4189,4 @@ src/us2/levels/15_gorn/L15_00432488-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac
 src/us2/levels/shared/L04_0041B01C-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_0038FE10-g8.c	-O2 -G8 -ffunction-sections
 src/levels/02_maktar_nebula/L02_00411D18.c	-O2 -G0 -ffunction-sections -frac2-wide-saves-below
+src/levels/20_yeedil/L20_0039F968-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-mult-add-no-flatten
