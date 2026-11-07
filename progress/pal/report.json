@@ -1,32 +1,32 @@
 {
  "version": 2,
  "measures": {
-  "fuzzy_match_percent": 95.35815769906174,
+  "fuzzy_match_percent": 95.41060749786374,
   "total_code": "5696876",
-  "matched_code": "5432436",
-  "matched_code_percent": 95.35815769906174,
+  "matched_code": "5435424",
+  "matched_code_percent": 95.41060749786374,
   "total_functions": 8607,
-  "matched_functions": 8475,
-  "matched_functions_percent": 98.4663645869641,
-  "complete_code": "1674780",
-  "complete_code_percent": 29.398217549407782,
-  "total_units": 1343,
-  "complete_units": 1286
+  "matched_functions": 8476,
+  "matched_functions_percent": 98.47798303706286,
+  "complete_code": "1677768",
+  "complete_code_percent": 29.45066734820979,
+  "total_units": 1344,
+  "complete_units": 1287
  },
  "categories": [
   {
    "id": "executable",
    "name": "Boot executable",
    "measures": {
-    "fuzzy_match_percent": 93.88928417872512,
+    "fuzzy_match_percent": 94.1735123679214,
     "total_code": "1051268",
-    "matched_code": "987028",
-    "matched_code_percent": 93.88928417872512,
+    "matched_code": "990016",
+    "matched_code_percent": 94.1735123679214,
     "total_functions": 3087,
-    "matched_functions": 3044,
-    "matched_functions_percent": 98.60706187236799,
-    "complete_code": "932932",
-    "complete_code_percent": 88.74349832773375
+    "matched_functions": 3045,
+    "matched_functions_percent": 98.63945578231292,
+    "complete_code": "935920",
+    "complete_code_percent": 89.02772651693003
    }
   },
   {
@@ -48,15 +48,15 @@
    "id": "game",
    "name": "Boot game code",
    "measures": {
-    "fuzzy_match_percent": 93.88928417872512,
+    "fuzzy_match_percent": 94.1735123679214,
     "total_code": "1051268",
-    "matched_code": "987028",
-    "matched_code_percent": 93.88928417872512,
+    "matched_code": "990016",
+    "matched_code_percent": 94.1735123679214,
     "total_functions": 3087,
-    "matched_functions": 3044,
-    "matched_functions_percent": 98.60706187236799,
-    "complete_code": "932932",
-    "complete_code_percent": 88.74349832773375
+    "matched_functions": 3045,
+    "matched_functions_percent": 98.63945578231292,
+    "complete_code": "935920",
+    "complete_code_percent": 89.02772651693003
    }
   },
   {
@@ -64668,13 +64668,13 @@
   {
    "name": "game/0027F128",
    "measures": {
-    "fuzzy_match_percent": 75.33565390353058,
-    "total_code": "16088",
+    "fuzzy_match_percent": 92.51908396946565,
+    "total_code": "13100",
     "matched_code": "12120",
-    "matched_code_percent": 75.33565390353058,
-    "total_functions": 127,
+    "matched_code_percent": 92.51908396946565,
+    "total_functions": 126,
     "matched_functions": 125,
-    "matched_functions_percent": 98.4251968503937,
+    "matched_functions_percent": 99.2063492063492,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "total_units": 1,
@@ -65780,15 +65780,6 @@
      }
     },
     {
-     "name": "func_00284268",
-     "size": "2988",
-     "fuzzy_match_percent": 0.0,
-     "address": "21784",
-     "metadata": {
-      "virtual_address": "2640680"
-     }
-    },
-    {
      "name": "func_00284E18",
      "size": "40",
      "fuzzy_match_percent": 100.0,
@@ -66232,6 +66223,41 @@
    "metadata": {
     "complete": true,
     "source_path": "src/game/00282C50.c",
+    "progress_categories": [
+     "executable",
+     "game"
+    ]
+   }
+  },
+  {
+   "name": "game/00284268",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "2988",
+    "matched_code": "2988",
+    "matched_code_percent": 100.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "2988",
+    "complete_code_percent": 100.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "functions": [
+    {
+     "name": "func_00284268",
+     "size": "2988",
+     "fuzzy_match_percent": 100.0,
+     "address": "0",
+     "metadata": {
+      "virtual_address": "2640680"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "src/game/00284268.c",
     "progress_categories": [
      "executable",
      "game"
