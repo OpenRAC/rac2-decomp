@@ -613,7 +613,7 @@ void func_L10_0041ED50(u8 *arg0) {
 
 /* func_L10_00421288 is in L10_003170D0-state-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L10_00421790);
+/* func_L10_00421790 is in L10_00421790-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L10_004227A0);
 

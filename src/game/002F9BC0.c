@@ -62,7 +62,6 @@ extern int ref_L00_002FB170_00[];
 
 void func_002FB170(void) { func_002B7AD0(); ref_L00_002FB170_00[0x23] = 0; ref_L00_002FB170_00[0x22] = 0; }
 
-INCLUDE_ASM("asm/game", func_002FB1A0);
 
 typedef struct { int key; int value; } Func002FBFB8Entry;
 extern Func002FBFB8Entry D_00264F70[];

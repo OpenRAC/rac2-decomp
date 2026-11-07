@@ -4189,5 +4189,9 @@ src/us2/levels/15_gorn/L15_00432488-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac
 src/us2/levels/shared/L04_0041B01C-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_0038FE10-g8.c	-O2 -G8 -ffunction-sections
 src/levels/02_maktar_nebula/L02_00411D18.c	-O2 -G0 -ffunction-sections -frac2-wide-saves-below
+src/levels/20_yeedil/L20_004441D8-g8.c	-O2 -G8 -ffunction-sections -frac2-sticky-volatile-refs
 src/levels/20_yeedil/L20_0039F968-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-mult-add-no-flatten
 src/game/002BA0E0.c	-O2 -G0 -ffunction-sections -frac2-frame-pointer-liveness -frac2-no-static-chain-base
+src/game/002F9BC0-preview-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L08_003CDF98-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -ffast-math
+src/game/0030F7B0-ball-sw-g8.c	-O2 -G8 -ffunction-sections -g

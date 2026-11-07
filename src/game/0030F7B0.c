@@ -513,7 +513,7 @@ void func_00313548(unsigned char *object, float *out, int index)
 
 /* func_00313678 uses the profile in 0030F7B0-qcopy.c. */
 
-INCLUDE_ASM("asm/game", func_003136D0);
+/* func_003136D0 is in 0030F7B0-ball-sw-g8.c. */
 
 /* func_003146C0 is in 0030F7B0-ball-g8.c. */
 

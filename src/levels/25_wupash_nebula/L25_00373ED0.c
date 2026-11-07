@@ -6,7 +6,7 @@
 
 INCLUDE_ASM("asm/levels", func_L25_0040CDA0);
 
-INCLUDE_ASM("asm/levels", func_L25_0040D208);
+/* func_L25_0040D208 is in L25_00373ED0-hud-g8.c. */
 
 extern char *func_002A9640(char *a0, int a1, int a2);
 

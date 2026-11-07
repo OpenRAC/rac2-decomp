@@ -1,18 +1,17 @@
-/* functional: high. Draft that compiled to retail bytes alone but has not landed in a linked build; the differences left are placement only. */
-/*
- * func_003136D0: exact bytes in USA v1.01 with 15 dead initial values at declarations, whose only effect is gcse's insn count (the PRE spill-slot order). Over the limit of five per function ruled on 31 October 2026, so not linked; a maintainer can rule on it. Everything below is the whole unit `src/game/0030F7B0-ball-g8.c` as it matched, with flags `-O2 -G8 -ffunction-sections -g` (batch v1895).
- */
-/* func_003136D0: nanotech ball update (RAC1 nanotech_ball_update, 4080 bytes, 28 places).
- * -g gives retail's two NOPs before div.s. Three wordings below carry the match:
- * - D_001A7A44[2] is read at an offset from its array name, so the macro load is two words and
- *   never fills a branch slot; D_001AF180 is reached through its $gp view.
- * - The interpolation arm keeps &v40 in a local and copies in a scoped block: the extra block note
- *   gives the pseudo the lifetime loop needs to hoist it, so the later &v40 is rebuilt after the call.
- * - The initial stores on locals are dead (flow deletes them, no word remains). gcse sizes its
- *   expression table from the insn count and numbers its reaching registers in hash order, which
- *   decides the four spill slots at 0x7C-0x88: retail's order needs the 513-bucket table.
- */
 #include "common.h"
+
+/*
+ * func_003136D0, the nanotech ball update (RAC1 nanotech_ball_update). It has a unit of its own
+ * because PAL and USA v2.00 have func_003146C0 but not this function, and its jump table must not
+ * reach their .rodata.
+ *
+ * Eight initial values below are overwritten before they are read: both `c = m`, `i = 0` in the
+ * state 2 block, `n = 5`, `e = 0`, `p = 0`, `old_health = 0` and `n = 0` in the fly-in arm. Each is
+ * a value that local really holds at some point. They bring the function to 1024 RTL insns at gcse,
+ * which sizes the PRE hash table at 513: that is what puts the four PRE registers of &v10, &v20,
+ * &d->v20 and &m->rot_row2 into retail's spill slots 0x7C-0x88. 988-1003 or 1024-1039 insns all fit.
+ * Without them the code is the same apart from those four slots.
+ */
 /* Adapted from RAC1 nanotech_ball_update (OpenRAC/rac1-decomp, GPL-3.0). */
 typedef struct { float x,y,z,w; } __attribute__((aligned(16))) Vec;
 typedef struct Moby { char pad0[16]; Vec pos; unsigned char state; char pad21[15]; unsigned char update_dist; char pad31[3]; unsigned short flags; char pad36[0x32]; void *pvars; char pad6c[0x2c]; int collision; char pad9c[0x1c]; struct Moby *owner; unsigned char command; char padbd[3]; Vec rot_row0,rot_row1,rot_row2,rot; } Moby;
@@ -57,22 +56,15 @@ typedef struct D_2D9EA0 {
     int f7C;
 } D_2D9EA0;
 extern char D_00189E20[], D_00189EA0[];
-/* One table: the second eight entries are at 0x80, which no name of a level has. */
-extern Vec D_L00_0023A670[];
+extern Vec D_L00_0023A670[], D_L00_0023A6F0[];
 extern float D_001AF180_gp[] SDATA(D_001AF180);
 extern char D_L00_001B8DC0[];
-/* OpenRAC: the orb that turns the shared orbit table (func_00313600) is the executable's 0x001B17AC, at each
-   level's own place (level 3 0x001B266C). D_L00_001B1AEC is level 0's place: run as that address in every level,
-   no orb became the master in level 3 (a word of its own held there), the table never turned and the crates'
-   sparks stood still. */
-extern Moby *D_001B17AC;
-#define D_L00_001B1AEC D_001B17AC
+extern Moby *D_L00_001B1AEC;
 extern int D_001A7A00;
 extern unsigned char D_001A7A44[] MACRO_ADDR;
 extern unsigned char D_001A7A0A;
 extern int D_001AD7EC, D_001B1688;
 extern int D_001AF11C __attribute__((sda)), D_001AF1A0 __attribute__((sda));
-extern void func_002B00D8(void *,void *,void *,float);
 extern void func_002AD330(void *,void *,void *,void *);
 extern int func_00312B58(void *), func_002ACD38(void *);
 extern void func_002A7750(void *,int,int), func_0029B720(int);
@@ -85,7 +77,6 @@ extern int D_001AF164 __attribute__((sda));
 extern int D_001AF160 __attribute__((sda));
 extern int D_001AF15C __attribute__((sda));
 extern unsigned short D_001AF158 __attribute__((sda));
-extern float D_001AF12C __attribute__((sda));
 extern float D_001AF128 __attribute__((sda));
 extern int D_001AF118 __attribute__((sda));
 extern float D_001AF114 __attribute__((sda));
@@ -94,6 +85,8 @@ extern unsigned char D_001AF10C __attribute__((sda));
 extern float func_002A7878(float, float);
 extern int func_002A77E0(int);
 
+extern float D_001AF12C __attribute__((sda));
+extern void func_002B00D8(void *, void *, void *, float);
 extern void func_002833F0(void *, void *);
 extern void func_00282F20(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
@@ -110,8 +103,8 @@ extern void func_002ACEC0(void *, void *, float, void *);
 extern int func_002A7820(int, int);
 extern void func_00313600(void);
 extern int func_00283DB8(void *, float);
-extern void func_0027CDC8(void (*)(void), Moby *);
-extern void func_003146C0(void);
+extern void func_0027CDC8(void (*)(unsigned char *), Moby *);
+extern void func_003146C0(unsigned char *);
 extern float func_00282E80(void *, void *);
 extern void func_00313548(void *, void *, int);
 extern Part_2D9EA0 *func_002C36D0(void *, int, int, int);
@@ -131,8 +124,8 @@ void func_003136D0(Moby *m) {
 
     switch (m->state) {
     case 0: {
-        Moby *c = 0;
-        int i = 0;
+        Moby *c = m;
+        int i;
         m->state = 1;
         m->flags |= 0x41;
         m->collision = 0;
@@ -148,44 +141,44 @@ void func_003136D0(Moby *m) {
         d->h56 = 0;
         d->owner = 0;
         for (i = 0; i < 4; i++) d->f60[i] = (float)func_002A77E0(0xFF);
-        for (i = 3; i >= 0; i--) d->h58[i] = D_001AF174;
-        for (i = 7; i >= 0; i--) d->slots[i] = 0;
+        for (i = 0; i < 4; i++) d->h58[i] = D_001AF174;
+        for (i = 0; i < 8; i++) d->slots[i] = 0;
         if (D_L00_001B1AEC == 0) {
             func_002833F0(&m->rot_row0, &m->rot);
             D_L00_001B1AEC = m;
             m->update_dist = 0xFF;
             d->pending = 0;
             func_00282F20(&D_L00_0023A670[0], &m->rot_row0, D_001AF130);
-            qcopy_nc(&D_L00_0023A670[8], &m->rot_row2);
+            qcopy_nc(&D_L00_0023A6F0[0], &m->rot_row2);
             func_00282F20(&D_L00_0023A670[1], &m->rot_row1, D_001AF130);
-            qcopy_nc(&D_L00_0023A670[9], &m->rot_row0);
+            qcopy_nc(&D_L00_0023A6F0[1], &m->rot_row0);
             func_00282F20(&D_L00_0023A670[2], &m->rot_row2, D_001AF130);
-            qcopy_nc(&D_L00_0023A670[10], &m->rot_row1);
+            qcopy_nc(&D_L00_0023A6F0[2], &m->rot_row1);
             func_00282CC0(&D_L00_0023A670[3], &m->rot_row0, &m->rot_row2);
             func_00282F20(&D_L00_0023A670[3], &D_L00_0023A670[3], D_001AF130);
-            func_00282DD8(&D_L00_0023A670[11], &D_L00_0023A670[3], &m->rot_row1);
+            func_00282DD8(&D_L00_0023A6F0[3], &D_L00_0023A670[3], &m->rot_row1);
             func_00282CC0(&D_L00_0023A670[4], &m->rot_row0, &m->rot_row1);
             func_00282F20(&D_L00_0023A670[4], &D_L00_0023A670[4], D_001AF130);
-            func_00282DD8(&D_L00_0023A670[12], &D_L00_0023A670[4], &m->rot_row2);
+            func_00282DD8(&D_L00_0023A6F0[4], &D_L00_0023A670[4], &m->rot_row2);
             func_00282CF0(&D_L00_0023A670[5], &m->rot_row1, &m->rot_row2);
             func_00282F20(&D_L00_0023A670[5], &D_L00_0023A670[5], D_001AF130);
-            func_00282DD8(&D_L00_0023A670[13], &D_L00_0023A670[5], &m->rot_row0);
+            func_00282DD8(&D_L00_0023A6F0[5], &D_L00_0023A670[5], &m->rot_row0);
             func_00282CF0(&D_L00_0023A670[6], &m->rot_row0, &m->rot_row2);
             func_00282F20(&D_L00_0023A670[6], &D_L00_0023A670[6], D_001AF130);
-            func_00282DD8(&D_L00_0023A670[14], &D_L00_0023A670[6], &m->rot_row1);
+            func_00282DD8(&D_L00_0023A6F0[6], &D_L00_0023A670[6], &m->rot_row1);
             func_00282CF0(&D_L00_0023A670[7], &m->rot_row0, &m->rot_row1);
             func_00282F20(&D_L00_0023A670[7], &D_L00_0023A670[7], D_001AF130);
-            func_00282DD8(&D_L00_0023A670[15], &D_L00_0023A670[7], &m->rot_row2);
+            func_00282DD8(&D_L00_0023A6F0[7], &D_L00_0023A670[7], &m->rot_row2);
         }
         {
-            float a = 0.0f;
+            float a;
             a = func_002A7878(0.0f, 6.2831855f);
             func_002AF000(&d->v20, 1.0f, a, func_002A7878(-1.5707964f, 1.5707964f));
         }
         d->v20.w = func_002A78D8(0.785398006f, 1.5707964f);
     }
     case 1: {
-        Moby *c = 0;
+        Moby *c = m;
         qcopy_nc(&m->pos, &m->owner->pos);
         qcopy_nc(&d->pos, &m->owner->pos);
         func_002B00D8(&m->pos, &d->pos, &d->pos, -0.5f);
@@ -210,10 +203,10 @@ void func_003136D0(Moby *m) {
             }
         }
         {
-            Hero *g = (Hero *)(D_00189E20);
+            Hero *g = (Hero *)D_00189E20;
             int lim = D_001A7A00;
             if (g->vehicle_mode == 1) lim = 4;
-            if (m->state != 1 && D_L00_001B1AEC != 0 && ((D_2D9EA0 *)D_L00_001B1AEC->pvars) != 0 && g->health.hp != 0
+            if (m->state != 1 && D_L00_001B1AEC != 0 && (D_2D9EA0 *)D_L00_001B1AEC->pvars != 0 && g->health.hp != 0
                 && (g->health.hp + ((D_2D9EA0 *)D_L00_001B1AEC->pvars)->pending < lim || (D_001A7A44[2] != 0 && g->invulnerable_frames == 0))
                 && (d->slots[0] || d->slots[1] || d->slots[2] || d->slots[3] || d->slots[4] || d->slots[5] || d->slots[6] || d->slots[7])
                 && func_00282E48(&m->pos, D_00189EA0) < 10.0f
@@ -222,7 +215,7 @@ void func_003136D0(Moby *m) {
                 m->state = 3;
                 ((D_2D9EA0 *)D_L00_001B1AEC->pvars)->pending++;
                 if (D_001A7A44[2] != 0) *(short *)(D_00189EA0 + 0x15C) = 0x258;
-                d->h54 = (D_001AF158);
+                d->h54 = D_001AF158;
                 func_00282D30(&v30, D_00189EA0 + 0x240, -D_001AF170);
                 func_00282CC0(&v30, D_00189EA0, &v30);
                 func_00282D30(&v0, D_00189EA0 + 0x240, -D_001AF16C);
@@ -251,7 +244,7 @@ void func_003136D0(Moby *m) {
                             dst->y = src->y;
                             dst->z = src->z;
                         }
-                        x->h1E = x->h1C = (func_002A7820(D_001AF160, D_001AF164));
+                        x->h1E = x->h1C = func_002A7820(D_001AF160, D_001AF164);
                     }
                 }
             }
@@ -264,10 +257,10 @@ void func_003136D0(Moby *m) {
         v0.w = 1.0f;
         if (func_00283DB8(&v0, 64.0f) >= 0) {
             int i;
-            int n = 0;
+            int n = 5;
             func_0027CDC8(func_003146C0, m);
-            if (10.0f < func_00282E80(&m->pos, D_L00_001B8DC0)) n = (5);
-            else n = (40);
+            if (10.0f < func_00282E80(&m->pos, D_L00_001B8DC0)) n = 5;
+            else n = 40;
             for (i = 0; i < 8; i++) {
                 Part_2D9EA0 *e = 0;
                 Part_2D9EA0 *p = 0;
@@ -309,7 +302,7 @@ void func_003136D0(Moby *m) {
                 }
             }
         } else if (D_001AD7EC || d->owner) {
-            int i = 0;
+            int i;
             for (i = 0; i < 8; i++) if (d->slots[i]) qcopy_nc(&d->slots[i]->pos, &m->pos);
         }
         break;
@@ -322,21 +315,20 @@ void func_003136D0(Moby *m) {
             if (func_00313210(m) != 0 && func_002A77E0(5) == 0) func_003130F0(m);
         }
         {
-            Hero *g = (Hero *)(D_00189E20);
+            Hero *g = (Hero *)D_00189E20;
             int lim = D_001A7A00;
             if (g->vehicle_mode == 1) lim = 4;
             if (g->health.hp == lim && g->invulnerable_frames != 0 && D_001A7A44[2] != 0) {
-                int r = 0;
-                r = (D_001AF15C);
+                int r = D_001AF15C;
                 if (d->h54 < r) {
-                    int i = 0;
+                    int i;
                     d->h54 = r;
                     for (i = 0; i < 4; i++) d->h58[i]++;
                 }
             }
         }
         if (func_00282978(&d->h54)) {
-            int i = 0;
+            int i;
             for (i = 0; i < 8; i++) {
                 if (d->slots[i] != 0) {
                     func_002B9180(d->slots[i]);
@@ -351,15 +343,16 @@ void func_003136D0(Moby *m) {
             func_00282CC0(&v20, D_00189E20 + 0x80, &v20);
             for (i = 0; i < 8; i++) {
                 Part_2D9EA0 *e = d->slots[i];
-                Ext_2D9EA0 *x = 0;
+                Ext_2D9EA0 *x;
                 if (e == 0) continue;
                 x = (Ext_2D9EA0 *)(e + 1);
                 if (func_00282978(&x->h1E)) {
                     if (d->h56 == 0) {
-                        Hero *g = (Hero *)(D_00189E20);
+                        Hero *g = (Hero *)D_00189E20;
                         int lim = D_001A7A00;
-                        int old_health = g->health.hp;
+                        int old_health = 0;
                         if (g->vehicle_mode == 1) lim = 4;
+                        old_health = g->health.hp;
                         if (g->health.hp != 0) {
                             int amount = 1;
                             if (D_001A7A0A) amount = D_001AF1A0;
@@ -385,7 +378,7 @@ void func_003136D0(Moby *m) {
                     d->slots[i] = 0;
                 } else {
                     float t;
-                    float k = 0.0f;
+                    float k;
                     Part_2D9EA0 *n = 0;
                     V_2D9EA0 *mid = &v40;
                     {
@@ -413,7 +406,7 @@ void func_003136D0(Moby *m) {
                     v50.x = func_002A78D8(0.0f, 0.00999999978f) + e->pos.x;
                     v50.y = func_002A78D8(0.0f, 0.00999999978f) + e->pos.y;
                     v50.z = func_002A78D8(0.0f, 0.00999999978f) + e->pos.z;
-                    n = func_002C36D0(&v50, (0x14), 0, 0);
+                    n = func_002C36D0(&v50, 0x14, 0, 0);
                     if (n != 0) {
                         if (d->special) n->f4 = D_001AF11C;
                         else n->f4 = D_001AF118;
@@ -424,7 +417,7 @@ void func_003136D0(Moby *m) {
                     v50.x = func_002A78D8(0.0f, 0.00999999978f) + v40.x;
                     v50.y = func_002A78D8(0.0f, 0.00999999978f) + v40.y;
                     v50.z = func_002A78D8(0.0f, 0.00999999978f) + v40.z;
-                    n = func_002C36D0(&v50, (0x14), 0, 0);
+                    n = func_002C36D0(&v50, 0x14, 0, 0);
                     if (n != 0) {
                         if (d->special) n->f4 = D_001AF11C;
                         else n->f4 = D_001AF118;

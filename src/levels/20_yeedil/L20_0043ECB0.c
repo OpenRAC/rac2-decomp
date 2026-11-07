@@ -334,7 +334,8 @@ char *func_L20_00443D58(char *arg0) {
 /* func_L20_00444138 is defined in L20_00444138-g8.c (it reads a global through $gp and
    needs its own -mno-split-addresses). */
 
-INCLUDE_ASM("asm/levels", func_L20_004441D8);
+/* func_L20_004441D8 is defined in L20_004441D8-g8.c (it reaches globals through $gp and
+   needs -frac2-sticky-volatile-refs). */
 
 /* func_L20_004448A8 is defined in L20_004448A8-g8.c (it needs the -G8 profile with split addresses). */
 

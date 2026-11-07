@@ -933,6 +933,7 @@
 #define UpdateTrailStrips                func_L00_0038B208
 #define FollowCameraHideObstructions     func_L00_004243C0
 #define RideableMobyUpdate               func_L08_003C6AB0
+#define UpdateHeroNpc                    func_L08_003CDF98
 #define UpdateRacerRouteChoice           func_L04_00402D90
 #define DrawDomeEffect                   func_L04_003FBEF8
 #define UpdateHoverbikeRace              func_L04_00419918
