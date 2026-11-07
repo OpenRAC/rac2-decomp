@@ -48,5 +48,3 @@ return_value:
     }
     return result;
 }
-
-INCLUDE_ASM("asm/us2/levels", func_US2_L00_00348244);

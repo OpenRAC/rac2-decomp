@@ -4158,4 +4158,20 @@ src/pal/levels/shared/L04_00400108-cc.c	-O2 -G0 -ffunction-sections -g
 src/pal/levels/shared/L05_0041EA08-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
 src/pal/levels/shared/L04_0041D788-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L04_0041E49C-cc-g8.c	-O2 -G8 -ffunction-sections -g
+src/us2/levels/02_maktar_nebula/L02_0043B510-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/00_aranos_tutorial/L00_0040FFA0-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/05_feltzin_system/L05_00416530-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/10_hrugis_cloud/L10_00416FF0-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/11_joba/L11_0046F118-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/01_oozla/L01_00412040-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/14_aranos_prison/L14_00423180-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/12_todano/L12_00418AE8-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/15_gorn/L15_004208A0-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/17_smolg/L17_00419430-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/18_damosel/L18_00438070-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/13_boldan/L13_0041E1E0-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/23_damosel_orbit/L23_00416E88-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/20_yeedil/L20_0043A530-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/22_dobbo_orbit/L22_004106C0-cc-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/15_gorn/L15_00432488-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/shared/L00_0038FE10-g8.c	-O2 -G8 -ffunction-sections
