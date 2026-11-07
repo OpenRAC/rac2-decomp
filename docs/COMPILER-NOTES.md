@@ -216,6 +216,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Loop constants hoisted though the loop is over `threshold` for them | -fmove-all-movables on a file of its own | func_L00_004287E8, func_L16_004117A8 |
 | Hoisted addresses, branch joined with an empty edge block | -frac2-gcse-unsplit-edges | func_L00_00370408 |
 | Float min/max expands into compare and branch | -ffast-math; optimization level still affects allocation | func_L01_003BD560, func_L00_002EE050 |
+| A loop constant stays in the loop where retail hoists it: loop.c's threshold is 61 in this tree, retail's 64 | -fcall-used-hi1 -fcall-used-lo1 -fcall-used-accum1 on a file of its own (see below) | func_0026EDE8 |
 
 `-G8` can change allocation even without GP accesses: `func_L17_003BCBC8` puts
 colour constants in different registers. The effect can be a loop hoist: with
@@ -223,6 +224,19 @@ colour constants in different registers. The effect can be a loop hoist: with
 callee-saved register and saves it; with `-G8` it re-materialises `lui`/`lw` at
 each use, which is what retail does (`func_L10_004174C8`, `func_L02_003CCFE8`).
 A successful profile is not proof of the original SDK flags.
+
+Patch 0055 (r5900-no-second-hilo) keeps the r5900's second hi/lo pair (`HI1`, `LO1`,
+`ACCUM1`) fixed, because retail game code never uses it. A side effect is that loop.c
+counts fewer allocatable registers, which lowers its hoisting threshold from 64 to 61
+in every unit. In `func_0026EDE8`'s memory-card wait loop retail hoists constants
+that this tree keeps in the loop: measured from loop.c's pass-2 decisions, the
+function needs a threshold of 64 or more and below 67. `-fcall-used-hi1
+-fcall-used-lo1 -fcall-used-accum1` make the pair call-used instead of fixed, which
+restores the threshold of 64 for that unit only; no code uses the registers. Applied
+to every unit the flags change 6 of 160 sampled matched units, so retail's register
+setup is not simply one or the other everywhere and the flags stay per unit. Use them
+only when a function's own loop.c dump shows the threshold is the blocker, and give
+the measured threshold in the commit.
 
 ## Frames, calls and ABI
 
