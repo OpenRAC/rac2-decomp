@@ -4148,6 +4148,7 @@ src/pal/game/0032B930-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_004007B0-g8-dbg.c	-O2 -G8 -ffunction-sections -g -frac2-sticky-volatile-refs
 src/pal/game/00339BF8.c	-O2 -G0 -ffunction-sections -frac2-keep-block-zero-copy
 src/pal/levels/23_damosel_orbit/L23_003C1280-g8.c	-O2 -G8 -ffunction-sections -ffast-math
+src/us2/levels/08_tabora/L08_003093B8-cc.c	-O2 -G64 -Wa,-G64 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/pal/levels/shared/L02_002F1100-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses -frac2-sticky-volatile-refs
 src/pal/levels/30_insomniac_museum/L30_004106D0-dust-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/shared/L00_0037BEC8-g8.c	-O2 -G8 -ffunction-sections -fno-builtin
@@ -4183,4 +4184,5 @@ src/pal/levels/shared/L04_00407168-route.c	-O2 -G0 -ffunction-sections -frac2-gc
 src/pal/levels/15_gorn/L15_00436368-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/pal/levels/26_jamming_array/L26_003D881C-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/us2/levels/15_gorn/L15_00432488-qcopy-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
+src/us2/levels/shared/L04_0041B01C-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_0038FE10-g8.c	-O2 -G8 -ffunction-sections
