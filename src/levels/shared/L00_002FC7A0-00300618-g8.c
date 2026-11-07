@@ -1,24 +1,11 @@
-/* functional: medium. The matching draft (11,280/11,348 bytes) with five behaviour fixes; the rest is the same reads, writes and calls in retail's order, with different register use. One captured call (level 00 load, reload != 0) ran 2329 of 2837 instructions; every unrun block was read against retail. */
-/*
- * func_L00_00300618 (11,348 bytes): the level-data loader. Relocates the level
- * image's sections into the 64-byte-aligned level heap: header globals, ties
- * (bounds from func_00283098 class bounds x the tie matrix), shrubs, the moby
- * instances (spawn rules from the save's per-level bitmaps D_0019B2E8 and
- * D_0019B4A8, func_0029F0C8 per moby), blobs, groups and the occlusion
- * tables, spawns the hero at the start position, and returns the heap end.
- *
- * Fixes against the draft (nonmatching/levels/func_L00_00300618.c):
- *  - D_001A728C = heap only when !reload (retail stores it after
- *    func_002B7C80 in that branch; with reload the old value is used);
- *  - func_00283098 takes the tie/shrub matrix as a third argument (it
- *    transforms the class bound by it); the draft passed two;
- *  - section 0x10's record is D_L00_0027D848 (lui 0x28 - 0x27B8), not 0x277848;
- *  - the save bitmaps are D_0019B2E8 / D_0019B4A8 (lui 0x1A - 0x4D18/-0x4B58),
- *    not D_001A52E8 / D_001A54A8;
- *  - when section 0x90 is applied (D_L00_001B1A50 = 2) retail skips the
- *    D_L00_001B1A50 = 0 and D_L00_001C9340.i1C = 0 stores; they belong to
- *    the else branch;
- *  - the hero's update callback is func_L00_003603C0 by name, not 0x3603C0.
+/* func_L00_00300618: the level gameplay loader. It relocates the level file's
+ * sections (ties, shrubs, mobys, moby groups, paths, occlusion) into the aligned level
+ * heap and returns the heap cursor. RAC1 counterpart: load_level_gameplay
+ * (rac1-decomp src/overlays/shared/level_gameplay_loading.c), whose source shapes
+ * this follows: the function-scope scratch int `tmp`, sequential record reads through
+ * char pointers, and header words read as ints (RAC1 reads them as struct members).
+ * The section-8 records are copied by an explicit goto loop: a do loop has its four
+ * cursor advances turned into address givs by this cc1 (docs/COMPILER-NOTES.md).
  */
 #include "common.h"
 
@@ -26,8 +13,8 @@ typedef int TI128_00618 __attribute__((mode(TI)));
 typedef union { TI128_00618 q; float f[4]; int i[4]; } Vec00618;
 
 #define ALIGN64_00618(p) ((char *)(((int)(p) + 0x3F) & 0xFFFFFFC0u))
-#define SECTION_00618(off) (hdr + *(int *)(hdr + (off)))
-#define SAVE_CELL_00618(uid) D_0019B4A8[(D_001A79F0 << 10) + ((uid) >> 1)]
+#define SECTION_00618(off) (hdr + ((int *)hdr)[(off) / 4])
+#define SAVE_CELL_00618(uid) D_0019B4A8[((uid) >> 1) + (D_001A79F0 << 10)]
 
 typedef struct {
     char pad00[0xC];
@@ -49,8 +36,9 @@ typedef struct {
 typedef struct { char pad00[0x529C]; int i529C; char pad52A0[0x18]; int i52B8; int i52BC; } Boot00618;
 typedef struct { char pad00[0x23C]; int i23C; int i240; int i244; } Cfg00618;
 typedef struct { void *hero; char pad04[0x3C]; int i40; int i44; int i48; } Sel00618;
-typedef struct { char pad00[0x1730]; int count; char *table; } Slots00618;
-typedef struct { char pad00[0xC]; int count; int i10; unsigned short *bits; int i18; int i1C; } Tutorial00618;
+typedef struct { char pad00[8]; int i8; char pad0C[0x84]; } Sound00618;  /* 0x90 */
+typedef struct { char pad00[0x1730]; int count; Sound00618 *table; } Slots00618;
+typedef struct { char pad00[0xC]; int count; int i10; unsigned short *bits; int i18; int i1C; float pos[2][4]; float dir[2][4]; } Tutorial00618;
 typedef struct { char pad00[4]; char *p4; char *p8; int iC; int i10; int i14; } Coll00618;
 
 typedef struct {
@@ -80,8 +68,7 @@ typedef struct {
     unsigned short h3E;
     float f40;
     char pad44[0xC];
-    char matrix[0xC];             /* 0x50 */
-    float f5C;
+    Vec00618 sphere;              /* 0x50: centreXYZ and radius */
 } TieClass00618;
 
 typedef struct {
@@ -148,7 +135,7 @@ typedef struct {
     char pad20[0x10];
 } GroupEntry00618;                /* 0x30 */
 
-typedef struct {
+typedef struct Groups00618 {
     int count;                    /* 0x00 */
     char *p4;
     char *p8;
@@ -156,28 +143,41 @@ typedef struct {
     char *p10;
     char *p14;
     char pad18[0x18];
-    GroupEntry00618 entries[1];   /* 0x30 */
+    GroupEntry00618 entries[0];   /* 0x30 */
 } Groups00618;
 
+typedef struct { int offset; int size; } Blob00618;
 typedef struct { int p14; int i18; int p1C; int i20; } Reloc00618;
 extern Reloc00618 D_L00_001A9014 MACRO_ADDR;
-typedef struct { int pFC; int p00; } GroupTab00618;
-extern GroupTab00618 D_L00_001B1AFC MACRO_ADDR;
-typedef struct { char * p84; int i88; char * p8C; int i90; char * p94; int i98; char * p9C; int iA0; int iA4; char * pA8; } Tabs00618;
-extern Tabs00618 D_L00_001B1F84 MACRO_ADDR;
-typedef struct { char * pC0; int iC4; } Rails00618;
-extern Rails00618 D_L00_001B16C0 MACRO_ADDR;
-typedef struct { char * pB0; int iB4; int iB8; int iBC; } Parts00618;
-extern Parts00618 D_L00_001B20B0 MACRO_ADDR;
+extern int D_L00_001B1AFC MACRO_ADDR;
+extern struct Groups00618 *D_L00_001B1B00 MACRO_ADDR;
+extern char *D_L00_001B1F84 MACRO_ADDR;   /* clip volumes, 0x90 bytes each */
+extern int D_L00_001B1F88 MACRO_ADDR;
+extern char *D_L00_001B1F8C MACRO_ADDR;   /* cuboids */
+extern int D_L00_001B1F90 MACRO_ADDR;
+extern char *D_L00_001B1F94 MACRO_ADDR;   /* spheres */
+extern int D_L00_001B1F98 MACRO_ADDR;
+extern char *D_L00_001B1F9C MACRO_ADDR;   /* cylinders */
+extern int D_L00_001B1FA0 MACRO_ADDR;
+extern int D_L00_001B1FA4 MACRO_ADDR;     /* path count */
+extern char *D_L00_001B1FA8 MACRO_ADDR;   /* path data */
+typedef struct { Vec00618 head; char *data; int i14; char pad18[8]; } Rail00618;   /* 0x20 */
+extern Rail00618 *D_L00_001B16C0 MACRO_ADDR;
+extern int D_L00_001B16C4 MACRO_ADDR;
+extern char *D_L00_001B20B0 MACRO_ADDR;
+extern int D_L00_001B20B4 MACRO_ADDR;
+extern int D_L00_001B20B8 MACRO_ADDR;
+extern int D_L00_001B20BC MACRO_ADDR;
 
 extern LoadCtx00618 D_L00_001BF140;
 extern Boot00618 D_0014B540;
-extern char *D_001A728C MACRO_ADDR;
+typedef struct { int stage, busy; int *archive0; int archive1; } ArchiveLoad;
+extern ArchiveLoad D_001A7280 MACRO_ADDR;
 extern char D_00189E20[];
 extern char D_L00_001B8C80[];
 extern char D_L00_001D1740[];
 extern int D_001A7B90 MACRO_ADDR;
-extern float D_001A790C __attribute__((sda));
+extern float D_001A790C MACRO_ADDR;
 extern Coll00618 D_L00_001BF200;
 extern char D_L00_001BF280[];
 extern char D_L00_001B1A80[];
@@ -199,12 +199,12 @@ extern float D_L00_001B1B18 MACRO_ADDR;
 extern float D_L00_001B1B1C MACRO_ADDR;
 extern Sel00618 D_00152C00;
 extern Tutorial00618 D_L00_001C9340;
-extern int D_L00_001A8F0C __attribute__((sda));
+extern int D_L00_001A8F0C MACRO_ADDR;
 extern int D_L00_001B20C0 MACRO_ADDR;
 extern float D_L00_001B2500 MACRO_ADDR;
 extern float D_L00_001B2408 MACRO_ADDR;
 extern int D_L00_001B1EB4 MACRO_ADDR;
-extern int D_L00_001B255C __attribute__((sda));
+extern int D_L00_001B255C MACRO_ADDR;
 extern char D_00100AE0[];
 extern char D_L00_001C6F40[];
 extern char D_L00_001C7040[];
@@ -214,10 +214,13 @@ extern int D_L00_001B1CDC MACRO_ADDR;
 extern char D_L00_001C5940[];
 extern char D_L00_001C5B40[];
 extern int D_L00_001B24D4 MACRO_ADDR;
+typedef struct { char pad00[0x36]; unsigned short h36; char pad38[2]; unsigned short h3A; char pad3C; unsigned char b3D; char pad3E[2]; } Tfrag00618;   /* 0x40 */
 extern char *D_L00_001B24D0 MACRO_ADDR;
-extern char D_L00_0027D848[];
-extern unsigned char D_001A7BB4 MACRO_ADDR;
-extern char *D_L00_001B1B80 MACRO_ADDR;
+typedef struct { char pad00[0x2C]; int count; } TextHdr00618;
+extern TextHdr00618 D_L00_0027D848;
+extern unsigned char D_001A7BB2[] MACRO_ADDR; /* option bytes; [2] is the language */
+typedef struct { int offset; int pad4[3]; } Text00618;
+extern Text00618 *D_L00_001B1B80 MACRO_ADDR;
 extern int D_L00_001B2520 MACRO_ADDR;
 extern Tie00618 *D_L00_001B2514 MACRO_ADDR;
 extern Tie00618 *D_L00_001B2518 MACRO_ADDR;
@@ -225,7 +228,7 @@ extern Matrix00618 *D_L00_001B251C MACRO_ADDR;
 extern int D_L00_001B2524 MACRO_ADDR;
 extern int D_L00_001B2540 MACRO_ADDR;
 extern int D_L00_001B2544 MACRO_ADDR;
-extern int D_L00_001B2548 __attribute__((sda));
+extern int D_L00_001B2548 MACRO_ADDR;
 extern int D_L00_001B2510 MACRO_ADDR;
 extern TieClass00618 *D_L00_00226700[];
 extern unsigned char D_L00_00226A00[];
@@ -233,16 +236,17 @@ extern Shrub00618 *D_L00_001B23F8 MACRO_ADDR;
 extern int D_L00_001B23F4 MACRO_ADDR;
 extern Matrix00618 *D_L00_001B2400 MACRO_ADDR;
 extern unsigned char *D_L00_001B2404 MACRO_ADDR;
-extern Shrub00618 *D_L00_001B23FC __attribute__((sda));
-extern char D_L00_001ACE90[];
+extern Shrub00618 *D_L00_001B23FC MACRO_ADDR;
+extern int D_L00_001ACE90[];
 extern ShrubClass00618 *D_L00_0021EA20[];
 extern unsigned char D_L00_0021EBA0[];
-extern char *D_L00_001B1844 MACRO_ADDR;
+typedef struct { float f0, f4, f8; int iC; float f10, f14, f18; int i1C; } Cam00618;
+extern Cam00618 *D_L00_001B1844 MACRO_ADDR;
 extern int D_L00_001B1848 MACRO_ADDR;
 extern Slots00618 D_00188660;
 extern int D_L00_001C5480[][3];
 extern int D_L00_001C5540[][3];
-extern Moby00618 *D_L00_001B1E9C MACRO_ADDR;
+extern Moby00618 *D_L00_001B1E9C[] MACRO_ADDR; /* moby array start (array: in-struct for alias analysis) */
 extern Moby00618 *D_L00_001B18DC MACRO_ADDR;
 extern Moby00618 *D_L00_001B1EA0 MACRO_ADDR;
 extern Moby00618 *D_L00_001B1EA4 MACRO_ADDR;
@@ -251,8 +255,9 @@ extern short D_L00_001FB660[];
 extern int D_001A79F0 MACRO_ADDR;
 extern unsigned char D_0019B2E8[];
 extern unsigned char D_0019B4A8[];
-extern unsigned char D_L00_0021DDB0[];
-extern unsigned char D_L00_001B1CE0[];
+typedef struct { unsigned char pad[0x464]; unsigned char byUid[0]; } Progress00618;
+extern Progress00618 D_L00_0021DDB0;
+extern unsigned char D_L00_001B1CE0[] MACRO_ADDR;
 extern int D_L00_001FA920[];
 extern int D_L00_001B1EB8 MACRO_ADDR;
 extern char *D_L00_001FDA80[];
@@ -262,7 +267,6 @@ extern int D_L00_001B1CD4 MACRO_ADDR;
 extern char *D_L00_001B1F40 MACRO_ADDR;
 extern int D_L00_001B1F10 MACRO_ADDR;
 extern char D_L00_001FE140[];
-#define GROUPS_00618 ((Groups00618 *)D_L00_001B1AFC.p00)
 extern int D_L00_001B1A40 MACRO_ADDR;
 extern unsigned short *D_L00_001B19F0 MACRO_ADDR;
 extern int D_L00_001B1A50 MACRO_ADDR;
@@ -270,11 +274,11 @@ extern short D_L00_001FDE78 NOT_SDA;
 extern short D_L00_001FDEF8 NOT_SDA;
 extern short D_L00_001B1FB0 MACRO_ADDR;
 extern short D_L00_001B1FF0 MACRO_ADDR;
-extern short D_L00_001B2030 __attribute__((sda));
+extern short D_L00_001B2030 MACRO_ADDR;
 extern int D_L00_00220DA0[];
 extern int D_L00_001B19C8 MACRO_ADDR;
 extern int D_L00_001B1AEC MACRO_ADDR;
-extern int D_L00_001AA0F8 __attribute__((sda));
+extern int D_L00_001AA0F8 MACRO_ADDR;
 extern char D_L00_001A8A78[] __attribute__((sda));
 extern char D_L00_001A8A48[] __attribute__((sda));
 extern char *D_L00_001B18D0 MACRO_ADDR;
@@ -326,21 +330,23 @@ extern void func_L00_003E8150(void);
 extern void func_L00_002E9098(void);
 extern void func_L00_00403BF8(void);
 extern void func_00272198(float);
-extern void func_L00_003603C0(void);
+extern void func_L00_003603C0(unsigned char *);
 
 char *func_L00_00300618(int reload)
 {
     char *hdr = D_L00_001BF140.data;
     char *heap = D_L00_001BF140.heap;
     float *startPos;
+    short *idx = D_L00_001FB660; /* moby index by file order, rebuilt at each use */
+    int tmp; /* scratch int: section 0x44's data base, a group's offset and end flag in the group loop */
     char *p;
 
     if (!reload) {
         func_002B7C80(heap, D_0014B540.i52B8 + D_0014B540.i529C, D_0014B540.i52BC);
-        D_001A728C = heap;
+        D_001A7280.archive1 = (int)heap;
     }
     func_0011AEA0(0);
-    func_0029D4D0(D_001A728C, hdr);
+    func_0029D4D0((void *)D_001A7280.archive1, hdr);
     func_0011AEA0(0);
     func_00282A60(D_00189E20, 0, 0x2540);
     func_00282A60(D_L00_001B8C80, 0, 0x410);
@@ -356,9 +362,9 @@ char *func_L00_00300618(int reload)
     }
     D_L00_001BF200.p4 = D_L00_001BF280;
     D_L00_001BF200.p8 = D_L00_001B1A80;
-    D_L00_001BF200.i14 = 0;
     D_L00_001BF200.iC = 0;
     D_L00_001BF200.i10 = 0;
+    D_L00_001BF200.i14 = 0;
     func_00282A88(D_L00_001DE860, 0x1C000);
     func_00282A88(D_L00_001FA860, 0xC0);
 
@@ -387,8 +393,8 @@ char *func_L00_00300618(int reload)
         D_L00_001A8FF0 = 1;
         D_L00_001B1B10 = *(float *)(p + 4);
         D_L00_001B1B14 = *(float *)(p + 8);
-        D_L00_001B1B1C = 1.0f;
         D_L00_001B1B18 = *(float *)(p + 0xC);
+        D_L00_001B1B1C = 1.0f;
     }
     startPos = (float *)(p + 0x10);
     p += 0x20;
@@ -398,32 +404,30 @@ char *func_L00_00300618(int reload)
     D_L00_001C9340.count = 0;
     p += 0x10;
     if (*(int *)(p + 0xC)) {
-        Tutorial00618 *t = &D_L00_001C9340;
-        char *e;
         int i;
 
         D_L00_001C9340.count = *(int *)(p + 0xC);
-        e = (char *)t;
-        for (i = 0; i < t->count; i++) {
-            *(float *)(e + 0x20) = *(float *)p;
-            *(float *)(e + 0x24) = *(float *)(p + 4);
-            *(float *)(e + 0x28) = *(float *)(p + 8);
-            *(float *)(e + 0x40) = *(float *)(p + 0x10);
-            *(float *)(e + 0x44) = *(float *)(p + 0x14);
-            *(float *)(e + 0x48) = *(float *)(p + 0x18);
+        for (i = 0; i < D_L00_001C9340.count; i++) {
+            float *e = (float *)((char *)&D_L00_001C9340 + (i << 4));
+
+            e[8] = *(float *)p;
+            e[9] = *(float *)(p + 4);
+            e[10] = *(float *)(p + 8);
+            e[16] = *(float *)(p + 0x10);
+            e[17] = *(float *)(p + 0x14);
+            e[18] = *(float *)(p + 0x18);
             p += 0x20;
-            e += 0x10;
         }
     } else {
         p += 0x20;
     }
     D_L00_001A8F0C = *(int *)p;
     func_00279FF0();
-    D_L00_001B20C0 = 0x1F4000;
     D_L00_001B2500 = 983040.0f;
     D_L00_001B2408 = 500.0f;
-    D_L00_001B1EB4 = 0x3C0;
     D_L00_001B255C = 0x3C0;
+    D_L00_001B1EB4 = 0x3C0;
+    D_L00_001B20C0 = 0x1F4000;
     func_00284E18(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
     func_002FC070(D_00100AE0);
     func_00282A88(D_L00_001C6F40, 0x100);
@@ -445,7 +449,7 @@ char *func_L00_00300618(int reload)
     }
 
     /* section 0x84 */
-    if (*(int *)(hdr + 0x84)) {
+    if (((int *)hdr)[0x84 / 4]) {
         char *s = SECTION_00618(0x84);
         int n = *(int *)s;
 
@@ -500,29 +504,26 @@ char *func_L00_00300618(int reload)
     }
     D_L00_001BF140.mark4C = heap;
 
-    /* section 0x10: the variant table selected by D_001A7BB4 */
-    if (*(int *)(hdr + 0x10)) {
-        char *s = hdr + *(int *)(hdr + 0x10 + D_001A7BB4 * 4);
-        char *rec = D_L00_0027D848;
+    /* section 0x10: the help text of the current language (D_001A7BB2[2]) */
+    if (((int *)hdr)[0x10 / 4]) {
+        int lang = D_001A7BB2[2] * 4;
+        char *s = hdr + *(int *)(hdr + lang + 0x10);
         int size;
+        int i;
 
-        *(int *)(rec + 0x2C) = *(int *)s;
+        D_L00_0027D848.count = *(int *)s;
         s += 4;
         size = *(int *)s;
-        D_L00_001B1B80 = heap;
+        s += 4;
+        D_L00_001B1B80 = (Text00618 *)heap;
         size += 3;
         size &= ~3;
         size -= 8;
-        func_00282AB0(heap, s + 4, size);
-        {
-            char *e = D_L00_001B1B80;
-            int delta = (int)(e - 8);
-            int i;
+        func_00282AB0(heap, s, size);
+        for (i = 0; i < D_L00_0027D848.count; i++) {
+            int delta = (int)D_L00_001B1B80 - 8;
 
-            for (i = 0; i < *(int *)(rec + 0x2C); i++) {
-                *(int *)e += delta;
-                e += 0x10;
-            }
+            D_L00_001B1B80[i].offset += delta;
         }
         heap = ALIGN64_00618(heap + size);
     }
@@ -561,6 +562,7 @@ char *func_L00_00300618(int reload)
             Matrix00618 *m = D_L00_001B251C + i;
             int draw;
             int occl;
+            float scale;
 
             tie->b1D = D_L00_00226A00[*(int *)s];
             if (tie->b1D != last) {
@@ -589,9 +591,10 @@ char *func_L00_00300618(int reload)
             s += 0x50;
             tie->h12 = i;
             m->row[3].f[3] = D_L00_00226700[tie->b1D]->f40;
-            func_00283098(tie, D_L00_00226700[tie->b1D]->matrix, m);
-            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->f5C
-                * func_L00_002EE050(func_L00_002EE050(func_00282DF0(&m->row[0]), func_00282DF0(&m->row[1])), func_00282DF0(&m->row[2]));
+            func_00283098(tie, &D_L00_00226700[tie->b1D]->sphere, m);
+            scale = func_00282DF0(&m->row[0]);
+            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
+            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
             func_00282D60(tie, tie, m->row[3].f[3]);
             func_00282CC0(tie, tie, &m->row[3]);
             (D_L00_001B251C + i)->row[0].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[0]);
@@ -606,7 +609,7 @@ char *func_L00_00300618(int reload)
     }
 
     /* section 0x94: tie groups */
-    if (*(int *)(hdr + 0x94)) {
+    if (((int *)hdr)[0x94 / 4]) {
         short *s = (short *)SECTION_00618(0x94);
         int idx = *s++;
 
@@ -680,13 +683,13 @@ char *func_L00_00300618(int reload)
         if (D_L00_001B23F4)
             func_00282A60(D_L00_001B2404, 0, D_L00_001B23F4 * 0x60);
         last = -1;
-        *(unsigned char **)(D_L00_001ACE90 + 4) = D_L00_001B2404;
+        D_L00_001ACE90[1] = (int)D_L00_001B2404;
         D_L00_001B23FC = D_L00_001B23F8 + D_L00_001B23F4;
         for (i = 0; i < D_L00_001B23F4; i++) {
             int cls = D_L00_0021EBA0[*(int *)s];
             Shrub00618 *shrub = D_L00_001B23F8 + i;
             Matrix00618 *m = D_L00_001B2400 + i;
-            float radius, a, b;
+            float radius, a, b, scale;
             int w, h, r, g, bl;
 
             shrub->b1A = cls;
@@ -732,12 +735,14 @@ char *func_L00_00300618(int reload)
             s += 4;
             bl = *(int *)s;
             s += 8;
-            m->row[0].i[3] = ((bl << 16) | ((g << 8) | 0x80000000)) | r;
+            g = (g << 8) | 0x80000000;
+            m->row[0].i[3] = (bl << 16) | g | r;
             shrub->h1C = *(unsigned short *)s;
             s += 0x10;
             func_00283098(shrub, D_L00_0021EA20[cls], m);
-            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC
-                * func_L00_002EE050(func_L00_002EE050(func_00282DF0(&m->row[0]), func_00282DF0(&m->row[1])), func_00282DF0(&m->row[2]));
+            scale = func_00282DF0(&m->row[0]);
+            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
+            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
             func_00282D60(shrub, shrub, m->row[3].f[3]);
             func_00282CC0(shrub, shrub, &m->row[3]);
         }
@@ -755,17 +760,23 @@ char *func_L00_00300618(int reload)
         int i;
 
         for (i = 0; i < D_L00_001B23F4; i++) {
-            unsigned char *c = D_L00_001B2404 + i * 0x60;
-            int r = 0, g = 0, b = 0;
-            int k;
+            unsigned char *q = D_L00_001B2404 + i * 0x60;
+            int r = 0;
+            int g = 0;
+            int b = 0;
+            int n = 24;
+            int j;
 
-            for (k = 0; k < 24; k++) {
-                r += c[0];
-                g += c[1];
-                b += c[2];
-                c += 4;
+            for (j = 0; j < n; j++) {
+                r += q[0];
+                g += q[1];
+                b += q[2];
+                q += 4;
             }
-            (D_L00_001B2400 + i)->row[1].i[3] = ((b / 24) << 16) | ((g / 24) << 8) | (r / 24);
+            g /= n;
+            b /= n;
+            r /= n;
+            *(int *)((char *)D_L00_001B2400 + i * 0x40 + 0x1C) = (b << 16) | (g << 8) | r;
         }
     }
 
@@ -775,7 +786,6 @@ char *func_L00_00300618(int reload)
         int n = *s++;
         int size = *s++;
         int *offs;
-        char *base;
 
         s += 2;
         offs = s;
@@ -783,7 +793,7 @@ char *func_L00_00300618(int reload)
         heap += n << 2;
         heap = ALIGN64_00618(heap);
         s += n;
-        base = heap;
+        tmp = (int)heap;
         heap += size;
         heap = ALIGN64_00618(heap);
         if (n) {
@@ -792,22 +802,22 @@ char *func_L00_00300618(int reload)
             for (i = 0; i < n; i++) {
                 if (offs[i] != -1) {
                     D_L00_001A9014.i20 = i + 1;
-                    ((int *)D_L00_001A9014.p1C)[i] = (int)(base + offs[i]);
+                    ((int *)D_L00_001A9014.p1C)[i] = tmp + offs[i];
                 } else {
                     ((int *)D_L00_001A9014.p1C)[i] = 0;
                 }
             }
         }
         if (size)
-            func_00282B50(base, (char *)(((int)s + 0xF) & ~0xF), size);
+            func_00282B50((char *)tmp, (char *)(((int)s + 0xF) & ~0xF), size);
     }
 
     /* section 8: 32-byte records */
-    if (*(int *)(hdr + 8)) {
+    if (((int *)hdr)[8 / 4]) {
         char *s = SECTION_00618(8);
         int n = *(int *)s;
 
-        D_L00_001B1844 = heap;
+        D_L00_001B1844 = (Cam00618 *)heap;
         s += 0x10;
         D_L00_001B1848 = n;
         heap += n << 5;
@@ -815,44 +825,45 @@ char *func_L00_00300618(int reload)
             func_00282A60(D_L00_001B1844, 0, n << 5);
         heap = ALIGN64_00618(heap);
         if (D_L00_001B1848 > 0) {
-            char *e = D_L00_001B1844;
+            Cam00618 *e = D_L00_001B1844;
             int left = D_L00_001B1848;
 
         copy_record:
-            *(int *)(e + 0xC) = *(int *)s;
+            e->iC = *(int *)s;
             s += 4;
-            *(float *)e = *(float *)s;
-            *(float *)(e + 4) = *(float *)(s + 4);
-            *(float *)(e + 8) = *(float *)(s + 8);
+            e->f0 = ((float *)s)[0];
+            e->f4 = ((float *)s)[1];
+            e->f8 = ((float *)s)[2];
             s += 0xC;
-            *(float *)(e + 0x10) = *(float *)s;
-            *(float *)(e + 0x14) = *(float *)(s + 4);
-            *(float *)(e + 0x18) = *(float *)(s + 8);
+            e->f10 = ((float *)s)[0];
+            e->f14 = ((float *)s)[1];
+            e->f18 = ((float *)s)[2];
             s += 0xC;
-            *(int *)(e + 0x1C) = *(int *)s;
+            e->i1C = *(int *)s;
             s += 4;
-            e += 0x20;
+            e++;
             if (--left)
                 goto copy_record;
         }
     }
 
     /* section 0xC: 0x90-byte records */
-    if (*(int *)(hdr + 0xC)) {
+    if (((int *)hdr)[0xC / 4]) {
         char *s = SECTION_00618(0xC);
         int n = *(int *)s;
 
         s += 0x10;
         D_00188660.count = n;
         if (n) {
-            int i, off;
+            int size = n * 0x90;
+            int i;
 
-            D_00188660.table = heap;
-            heap += n * 0x90;
+            D_00188660.table = (Sound00618 *)heap;
+            heap += size;
             heap = ALIGN64_00618(heap);
-            func_00282A60(D_00188660.table, 0, n * 0x90);
-            for (i = 0, off = 0; i < D_00188660.count; i++, off += 0x90) {
-                char *e = D_00188660.table + off;
+            func_00282A60(D_00188660.table, 0, size);
+            for (i = 0; i < D_00188660.count; i++) {
+                Sound00618 *e = D_00188660.table + i;
 
                 func_00282AB0(e, s, 0x90);
                 s += 0x90;
@@ -866,169 +877,208 @@ char *func_L00_00300618(int reload)
     /* section 0x4C: the mobys */
     D_L00_001BF140.mark58 = heap;
     {
-        int *s = (int *)SECTION_00618(0x4C);
+        char *p = SECTION_00618(0x4C);
+        int levels = (int)D_0019B2E8;
+        int n2;
         int count = 0;
-        short *cursor = D_L00_001FB660;
-        int n, extra;
+        int n;
+        char *next;
+        int i;
 
-        n = *s++;
-        extra = *s++;
-        s += 2;
-        D_L00_001B1E9C = (Moby00618 *)heap;
-        func_00282A60(heap, 0, (n + extra) << 8);
+        n = *(int *)p;
+        p += 4;
+        n2 = *(int *)p;
+        p += 0xC;
+        D_L00_001B1E9C[0] = (Moby00618 *)heap;
+        func_00282A60(heap, 0, (n + n2) << 8);
         func_00282A60(D_L00_001C5480, 0, 0xC0);
         func_00282A60(D_L00_001C5540, 0, 0xC0);
-        if (n > 0) {
-            do {
-                int *next = s + (*s >> 2);
-                int skip = 0;
-                int cls, w2, flags, uid, bolts, bolts2, xp, xp2, w9;
-                Moby00618 *moby;
+        for (i = 0; i < n; i++) {
+            int cls;
+            int w2;
+            int flags;
+            int uid;
+            int bolts;
+            int bolts2;
+            int xp;
+            int xp2;
+            int w9;
+            int b1;
+            int x1;
+            char skip = 0;
 
-                s++;
-                cls = *s++;
-                w2 = *s++;
-                flags = *s++;
-                uid = *s++;
-                bolts = *s++;
-                bolts2 = *s++;
-                xp = *s++;
-                xp2 = *s++;
-                w9 = *s++;
-                if (cls >= 0 && w9 > 0) {
-                    int lvl = (D_0019B2E8[(D_001A79F0 << 4) + cls] >> (w2 * 2)) & 3;
+            next = p + ((*(int *)p >> 2) << 2);
+            p += 4;
+            cls = *(int *)p;
+            p += 4;
+            w2 = *(int *)p;
+            p += 4;
+            flags = *(int *)p;
+            p += 4;
+            uid = *(int *)p;
+            p += 4;
+            bolts = *(int *)p;
+            p += 4;
+            bolts2 = *(int *)p;
+            p += 4;
+            xp = *(int *)p;
+            p += 4;
+            xp2 = *(int *)p;
+            p += 4;
+            w9 = *(int *)p;
+            p += 4;
+            b1 = bolts;
+            x1 = xp;
+            if (cls >= 0 && w9 > 0) {
+                int k = cls + D_001A79F0 * 16;
+                int lvl = (*(unsigned char *)(k + levels) >> (w2 * 2)) & 3;
 
-                    if (lvl == 0)
-                        lvl = func_L00_002E3B38(cls);
-                    if (*s == 0x1F5 || *s == 0x200) {
-                        skip = w9 < lvl;
-                    } else if (lvl < w9) {
-                        D_L00_001C5540[cls][w2] += bolts;
-                        D_L00_001C5480[cls][w2] += xp;
-                        skip = 1;
-                    }
+                if (lvl == 0)
+                    lvl = func_L00_002E3B38(cls);
+                if (*(int *)p == 0x1F5 || *(int *)p == 0x200) {
+                    skip = w9 < lvl;
+                } else if (lvl < w9) {
+                    D_L00_001C5480[cls][w2] += x1;
+                    D_L00_001C5540[cls][w2] += b1;
+                    skip = 1;
                 }
-                if (!skip && flags) {
-                    if (D_L00_0021DDB0[uid + 0x464]) {
-                        skip = 1;
-                    } else if (flags & 3) {
-                        if (D_L00_001B1CE0[cls] & 0x80) {
-                            if (flags & 2) {
-                                int odd = uid & 1;
-                                int c = SAVE_CELL_00618(uid);
-
-                                if (!(odd ? (c >> 4) & 8 : c & 8)) {
-                                    unsigned char *cell = &SAVE_CELL_00618(uid);
-                                    int c2 = *cell;
-                                    int v = odd ? c2 | 0x80 : c2 | 8;
-                                    unsigned char v8 = v;
-                                    unsigned char w = odd ? v8 & 0x8F : v8 & 0xF8;
-
-                                    *cell = w;
-                                }
-                                bolts = bolts2;
-                                xp = xp2;
-                            } else {
-                                skip = 1;
-                            }
-                        } else {
-                            skip = !(flags & 1);
-                        }
-                    } else if (flags & 8) {
-                        int odd = uid & 1;
-
-                        if (reload) {
-                            unsigned char *cell = &SAVE_CELL_00618(uid);
-                            int c = *cell;
-                            unsigned char w = odd ? c & 0x8F : c & 0xF8;
-
-                            *cell = w;
-                        } else {
+            }
+            if (!skip && flags) {
+                if (D_L00_0021DDB0.byUid[uid]) {
+                    skip = 1;
+                } else if (flags & 3) {
+                    if (D_L00_001B1CE0[cls] & 0x80) {
+                        if (flags & 2) {
+                            int odd = uid & 1;
                             int c = SAVE_CELL_00618(uid);
 
-                            if (odd ? (c >> 4) & 7 : c & 7)
-                                skip = 1;
+                            if (!(odd ? (c >> 4) & 8 : c & 8)) {
+                                unsigned char *cell = &SAVE_CELL_00618(uid);
+                                int c2 = *cell;
+                                int v = odd ? c2 | 0x80 : c2 | 8;
+                                int c3;
+                                int w;
+
+                                *cell = v;
+                                c3 = *cell;
+                                w = odd ? c3 & 0x8F : c3 & 0xF8;
+                                *cell = w;
+                            }
+                            b1 = bolts2;
+                            x1 = xp2;
+                        } else {
+                            skip = 1;
                         }
-                    } else if ((flags & 0xC) == 4) {
+                    } else {
+                        skip = !(flags & 1);
+                    }
+                } else if (flags & 8) {
+                    if (reload) {
+                        int odd = uid & 1;
+                        unsigned char *cell = &SAVE_CELL_00618(uid);
+                        int c = *cell;
+                        int w = odd ? c & 0x8F : c & 0xF8;
+
+                        *cell = w;
+                    } else {
                         int odd = uid & 1;
                         int c = SAVE_CELL_00618(uid);
 
                         if (odd ? (c >> 4) & 7 : c & 7)
                             skip = 1;
                     }
-                }
-                if (skip) {
-                    *cursor = -1;
-                } else {
-                    int snap;
-                    float lift;
-                    int r, g, b, pvar;
+                } else if ((flags & 0xC) == 4) {
+                    int odd = uid & 1;
+                    int c = SAVE_CELL_00618(uid);
 
-                    *cursor = count;
-                    moby = D_L00_001B1E9C + count;
-                    func_0029F0C8(moby, *s++);
-                    moby->hB2 = uid;
-                    moby->bB0 = cls;
-                    moby->bB1 = w2 & 0xF;
-                    if (flags == 0)
-                        moby->bB1 |= 0x80;
-                    moby->hB4 = bolts;
-                    moby->hB6 = xp;
-                    if (moby->pClass)
-                        moby->f2C = ((MobyClass00618 *)moby->pClass)->f24 * *(float *)s;
-                    s++;
-                    moby->h32 = *(unsigned short *)s;
-                    s++;
-                    moby->b30 = *(unsigned char *)s;
-                    s += 3;
-                    moby->pos.f[0] = *(float *)s;
-                    moby->pos.f[1] = *(float *)(s + 1);
-                    moby->pos.f[2] = *(float *)(s + 2);
-                    s += 3;
-                    moby->rot[0] = *(float *)s;
-                    moby->rot[1] = *(float *)(s + 1);
-                    moby->rot[2] = *(float *)(s + 2);
-                    s += 3;
-                    moby->b21 = *(unsigned char *)s;
-                    s++;
-                    snap = *s++;
-                    lift = *(float *)s++;
-                    if (snap) {
-                        float h = func_002A89A8(&moby->pos, 0, 0.5f);
-
-                        if (0.0f < h)
-                            moby->pos.f[2] = h + lift;
-                    }
-                    s++;
-                    moby->h36 = 0x7F80;
-                    moby->i68 = *s++;
-                    if (*s == 0)
-                        moby->h36 = 0;
-                    s++;
-                    if (moby->pClass)
-                        ((MobyClass00618 *)moby->pClass)->h44 |= *(unsigned short *)s;
-                    moby->h34 |= *(unsigned short *)s;
-                    s++;
-                    if (moby->pClass)
-                        func_002A0F48(moby);
-                    r = *s++;
-                    g = *s++;
-                    b = *s++;
-                    pvar = *s++;
-                    func_002A0468(moby, (b << 16) + (g << 8) + r, 0, 0, 0);
-                    moby->i38 = pvar;
-                    moby->b7E &= 0xFE;
-                    if (D_001A79F0 >= 0 && *s != -1)
-                        func_L00_00309140(moby, *s);
-                    count++;
+                    if (odd ? (c >> 4) & 7 : c & 7)
+                        skip = 1;
                 }
-                cursor++;
-                s = next;
-            } while (--n);
+            }
+            if (skip) {
+                idx[i] = -1;
+            } else {
+                Moby00618 *m;
+                int snap;
+                float lift;
+                int pv;
+                int r;
+                int g;
+                int b;
+                int upd;
+
+                idx[i] = count;
+                m = D_L00_001B1E9C[0] + count;
+                func_0029F0C8(m, *(int *)p);
+                p += 4;
+                m->hB2 = uid;
+                m->bB0 = cls;
+                m->bB1 = w2 & 0xF;
+                if (flags == 0)
+                    m->bB1 |= 0x80;
+                m->hB4 = b1;
+                m->hB6 = x1;
+                if (m->pClass)
+                    m->f2C = ((MobyClass00618 *)m->pClass)->f24 * *(float *)p;
+                p += 4;
+                m->h32 = *(unsigned short *)p;
+                p += 4;
+                m->b30 = *(unsigned char *)p;
+                p += 0xC;
+                m->pos.f[0] = ((float *)p)[0];
+                m->pos.f[1] = ((float *)p)[1];
+                m->pos.f[2] = ((float *)p)[2];
+                p += 0xC;
+                m->rot[0] = ((float *)p)[0];
+                m->rot[1] = ((float *)p)[1];
+                m->rot[2] = ((float *)p)[2];
+                p += 0xC;
+                m->b21 = *(unsigned char *)p;
+                p += 4;
+                snap = *(int *)p;
+                p += 4;
+                lift = *(float *)p;
+                p += 4;
+                if (snap) {
+                    float h = func_002A89A8(&m->pos, 0, 0.5f);
+
+                    if (0.0f < h)
+                        m->pos.f[2] = h + lift;
+                }
+                p += 4;
+                pv = *(int *)p;
+                m->h36 = 0x7F80;
+                p += 4;
+                m->i68 = pv;
+                if (*(int *)p == 0)
+                    m->h36 = 0;
+                p += 4;
+                if (m->pClass)
+                    ((MobyClass00618 *)m->pClass)->h44 |= *(unsigned short *)p;
+                m->h34 |= *(unsigned short *)p;
+                p += 4;
+                if (m->pClass)
+                    func_002A0F48(m);
+                r = *(int *)p;
+                p += 4;
+                g = *(int *)p;
+                p += 4;
+                b = *(int *)p;
+                p += 4;
+                upd = *(int *)p;
+                p += 4;
+                func_002A0468(m, (b << 16) + (g << 8) + r, 0, 0, 0);
+                m->i38 = upd;
+                m->b7E &= 0xFE;
+                if (D_001A79F0 >= 0 && *(int *)p != -1)
+                    func_L00_00309140(m, *(int *)p);
+                count++;
+            }
+            p = next;
         }
         {
-            Moby00618 *tail = D_L00_001B1E9C + count;
-            int total = (count + extra) << 8;
+            Moby00618 *tail = D_L00_001B1E9C[0] + count;
+            int total = (count + n2) << 8;
 
             D_L00_001B18DC = tail;
             func_0029F0C8(tail, 0);
@@ -1037,361 +1087,375 @@ char *func_L00_00300618(int reload)
             D_L00_001B1EA0 = D_L00_001B18DC + 1;
             D_L00_001B1EA0->state = 0xFF;
             D_L00_001B1EAC = heap;
-            heap += extra << 7;
+            heap += n2 << 7;
             heap = ALIGN64_00618(heap);
             D_L00_001BF140.mark5C = heap;
-            D_L00_001B1EA4 = (Moby00618 *)((char *)D_L00_001B1E9C + total - 0x100);
+            D_L00_001B1EA4 = (Moby00618 *)((char *)D_L00_001B1E9C[0] + total - 0x100);
         }
     }
 
     /* sections 0x60 / 0x5C: pointed-to blobs copied into the heap */
-    if (*(int *)(hdr + 0x60)) {
-        char *blob = SECTION_00618(0x60);
-        int *dir = (int *)SECTION_00618(0x5C);
-        Moby00618 *moby;
+    if (((int *)hdr)[0x60 / 4]) {
+        char *pv = SECTION_00618(0x60);
+        Blob00618 *tbl = (Blob00618 *)SECTION_00618(0x5C);
         int i;
+        Moby00618 *m;
 
         for (i = 0; i < D_L00_001B1848; i++) {
-            int *slot = (int *)(D_L00_001B1844 + (i << 5) + 0x1C);
-            int idx = *slot;
+            int k = D_L00_001B1844[i].i1C;
 
-            if (idx < 0) {
-                *slot = 0;
+            if (k < 0) {
+                D_L00_001B1844[i].i1C = 0;
             } else {
-                int *e = (int *)((char *)dir + (idx << 3));
-                int size = e[1];
+                int size = tbl[k].size;
+                char *src = pv + tbl[k].offset;
 
-                *slot = (int)heap;
-                func_00282B50(heap, blob + e[0], size);
-                e[0] = (int)heap;
+                D_L00_001B1844[i].i1C = (int)heap;
+                func_00282B50(heap, src, size);
+                tbl[k].offset = (int)heap;
                 heap += size;
             }
         }
         for (i = 0; i < D_00188660.count; i++) {
-            int *slot = (int *)(D_00188660.table + i * 0x90 + 8);
-            int idx = *slot;
+            int k = D_00188660.table[i].i8;
 
-            if (idx < 0) {
-                *slot = 0;
+            if (k < 0) {
+                D_00188660.table[i].i8 = 0;
             } else {
-                int *e = (int *)((char *)dir + (idx << 3));
-                int size = e[1];
+                int size = tbl[k].size;
+                char *src = pv + tbl[k].offset;
 
-                *slot = (int)heap;
-                func_00282B50(heap, blob + e[0], size);
-                e[0] = (int)heap;
+                D_00188660.table[i].i8 = (int)heap;
+                func_00282B50(heap, src, size);
+                tbl[k].offset = (int)heap;
                 heap += size;
             }
         }
-        for (moby = D_L00_001B1E9C; moby != D_L00_001B1EA0; moby++) {
-            if (moby->oClass == 0) {
-                moby->i68 = 0;
+        for (m = D_L00_001B1E9C[0]; m != D_L00_001B1EA0; m++) {
+            if (m->oClass == 0) {
+                m->i68 = 0;
             } else {
-                int idx = moby->i68;
+                int k = m->i68;
 
-                if (idx < 0) {
-                    moby->i68 = 0;
+                if (k < 0) {
+                    m->i68 = 0;
                 } else {
-                    int *e = (int *)((char *)dir + (idx << 3));
-                    int size = e[1];
+                    int size = tbl[k].size;
+                    char *src = pv + tbl[k].offset;
 
-                    moby->i68 = (int)heap;
-                    func_00282B50(heap, blob + e[0], size);
-                    e[0] = (int)heap;
+                    m->i68 = (int)heap;
+                    func_00282B50(heap, src, size);
+                    tbl[k].offset = (int)heap;
                     heap += size;
                 }
             }
         }
+        heap = ALIGN64_00618(heap);
     }
-    heap = ALIGN64_00618(heap);
     D_L00_001BF140.mark60 = heap;
 
-    /* section 0x58: fix-ups through the blob directory */
-    if (*(int *)(hdr + 0x58)) {
-        int *s = (int *)SECTION_00618(0x58);
-        int *dir = (int *)SECTION_00618(0x5C);
+    /* section 0x58: moby references through the blob directory */
+    if (((int *)hdr)[0x58 / 4]) {
+        int *q = (int *)SECTION_00618(0x58);
+        Blob00618 *tbl = (Blob00618 *)SECTION_00618(0x5C);
 
-        while (s[0] >= 0) {
-            int *e = (int *)((char *)dir + (s[0] << 3));
+        while (q[0] >= 0) {
+            int x = tbl[q[0]].offset;
+            int off = q[1];
 
-            if (e[0] >= D_L00_001BF140.i18) {
-                int *slot = (int *)(e[0] + s[1]);
+            if (x >= D_L00_001BF140.i18) {
+                int *r = (int *)(x + off);
 
-                if (*slot >= 0)
-                    *slot = D_L00_001FB660[*slot];
+                if (*r >= 0)
+                    *r = idx[*r];
             }
-            s += 2;
+            q += 2;
         }
     }
-    if (*(int *)(hdr + 0x64)) {
-        int *s = (int *)SECTION_00618(0x64);
-        int *dir = (int *)SECTION_00618(0x5C);
 
-        while (s[0] >= 0) {
-            int *e = (int *)((char *)dir + (s[0] << 3));
+    /* section 0x64: pointer relocations through the blob directory */
+    if (((int *)hdr)[0x64 / 4]) {
+        int *q = (int *)SECTION_00618(0x64);
+        Blob00618 *tbl = (Blob00618 *)SECTION_00618(0x5C);
 
-            if (e[0] >= D_L00_001BF140.i18)
-                *(int *)(e[0] + s[1]) += e[0];
-            s += 2;
+        while (q[0] >= 0) {
+            int x = tbl[q[0]].offset;
+            int off = q[1];
+
+            if (x >= D_L00_001BF140.i18) {
+                int *r = (int *)(x + off);
+
+                *r += x;
+            }
+            q += 2;
         }
     }
 
     /* section 0x50: moby groups */
-    if (*(int *)(hdr + 0x50)) {
-        int *s = (int *)SECTION_00618(0x50);
+    if (((int *)hdr)[0x50 / 4]) {
+        char *q = SECTION_00618(0x50);
         char *base = heap;
-        int n = *s++;
-        int size = *s++;
-        int *offs = s + 2;
+        int *offs;
+        int n;
+        int size;
         int i;
 
+        n = *(int *)q;
+        q += 4;
+        size = *(int *)q;
+        offs = (int *)(q + 0xC);
         heap += size;
+        q = (char *)offs + (n << 2);
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(base, offs + n, size);
+            func_00282B50(base, q, size);
         func_00282A60(D_L00_001FA920, 0, 0x3C0);
-        for (i = 0; i < n; i++) {
-            int off = *offs++;
+        for (i = 0; i < n; i++, offs++) {
+            tmp = *offs;
+            if (tmp >= 0) {
+                int g = (int)(base + tmp);
+                unsigned short *src;
+                short *dst;
 
-            if (off >= 0) {
-                short *list = (short *)(base + off);
-                short *src = list;
-                short *dst = list;
-                int end;
-
-                D_L00_001FA920[i] = (int)list;
+                D_L00_001FA920[i] = g;
+                src = (unsigned short *)g;
+                dst = (short *)src;
                 D_L00_001B1EB8 = i + 1;
                 do {
-                    int id = D_L00_001FB660[*(unsigned short *)src & 0x7FFF];
+                    int id = *src;
+                    short t;
 
-                    end = *src & 0x8000;
-                    if (id >= 0)
-                        *dst++ = id;
-                    if (end) {
+                    tmp = *(short *)src;
+                    g = (id & 0x7FFF) << 1; /* the entry's slot in the moby index, in two steps */
+                    g += (int)idx;
+                    tmp &= 0x8000;
+                    t = *(short *)g;
+                    if (t >= 0)
+                        *dst++ = t;
+                    if (tmp) {
                         if (D_L00_001FA920[i] < (int)dst)
                             dst[-1] |= 0x8000;
                         else
                             D_L00_001FA920[i] = 0;
+                        break;
                     }
                     src++;
-                } while (!end);
+                } while (!tmp);
             }
         }
     }
 
-    /* section 0x54 */
-    if (*(int *)(hdr + 0x54)) {
-        int *s = (int *)SECTION_00618(0x54);
+    /* section 0x54: blob pointers into a copied pool */
+    if (((int *)hdr)[0x54 / 4]) {
+        char *q = SECTION_00618(0x54);
         char *base = heap;
-        int size = *s++;
-        int n = *s++;
-        int *dir;
+        Blob00618 *tbl;
+        int size;
+        int n;
         int i;
 
-        s += 2;
+        size = *(int *)q;
+        q += 4;
+        n = *(int *)q;
+        q += 0xC;
         heap += size;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(base, s, size);
-        s = (int *)((char *)s + size);
-        dir = (int *)SECTION_00618(0x5C);
+            func_00282B50(base, q, size);
+        q += size;
+        tbl = (Blob00618 *)SECTION_00618(0x5C);
         for (i = 0; i < n; i++) {
-            int word = s[0];
-            int *e = (int *)((char *)dir + ((word & 0xFFFF) << 3));
+            int w = *(int *)q;
+            int hi = w >> 16;
+            int x = tbl[w & 0xFFFF].offset;
 
-            if (e[0] >= D_L00_001BF140.i18)
-                *(int *)(e[0] + (word >> 16)) = (int)(base + s[1]);
-            s += 2;
+            if (x >= D_L00_001BF140.i18)
+                *(int *)(x + hi) = (int)(base + *(int *)(q + 4));
+            q += 8;
         }
     }
 
-    /* section 0x78 */
-    if (*(int *)(hdr + 0x78)) {
-        int *s = (int *)SECTION_00618(0x78);
-        char *blob;
+    /* section 0x78: paths */
+    if (((int *)hdr)[0x78 / 4]) {
+        char *q = SECTION_00618(0x78);
+        char *src;
         int size;
+        int i;
 
-        D_L00_001B1F84.iA4 = s[0];
-        blob = (char *)s + s[1];
-        size = s[2];
-        D_L00_001B1F84.pA8 = heap;
+        D_L00_001B1FA4 = *(int *)q;
+        src = q + *(int *)(q + 4);
+        size = *(int *)(q + 8);
+        D_L00_001B1FA8 = heap;
         heap += size;
-        s += 4;
+        q += 0x10;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(D_L00_001B1F84.pA8, blob, size);
-        if (D_L00_001B1F84.iA4 > 0) {
-            char *base = D_L00_001B1F84.pA8;
-            char **q = D_L00_001FDA80;
-            int left = D_L00_001B1F84.iA4;
-
-            do {
-                *q++ = base + *s++;
-            } while (--left);
+            func_00282B50(D_L00_001B1FA8, src, size);
+        for (i = 0; i < D_L00_001B1FA4; i++) {
+            D_L00_001FDA80[i] = D_L00_001B1FA8 + *(int *)q;
+            q += 4;
         }
     }
 
-    /* section 0x7C */
-    if (*(int *)(hdr + 0x7C)) {
-        int *s = (int *)SECTION_00618(0x7C);
-        int n = s[0];
-        char *blob;
+    /* section 0x7C: rails */
+    if (((int *)hdr)[0x7C / 4]) {
+        char *q = SECTION_00618(0x7C);
+        char *src;
         char *copy;
+        int n;
         int size;
+        int i;
 
-        D_L00_001B16C0.iC4 = n;
-        blob = (char *)s + s[1];
-        size = s[2];
-        D_L00_001B16C0.pC0 = heap;
+        n = *(int *)q;
+        D_L00_001B16C4 = n;
+        src = q + *(int *)(q + 4);
+        size = *(int *)(q + 8);
+        D_L00_001B16C0 = (Rail00618 *)heap;
         heap += n << 5;
-        s += 4;
+        q += 0x10;
         heap = ALIGN64_00618(heap);
         if (n > 0) {
-            char *e = D_L00_001B16C0.pC0;
-            int left = n;
+            Rail00618 *e = D_L00_001B16C0;
 
+            i = n;
             do {
-                qcopy(e, s);
-                s += 4;
-                *(int *)(e + 0x14) = *s;
-                s += 4;
-                e += 0x20;
-            } while (--left);
+                qcopy(e, q);
+                q += 0x10;
+                e->i14 = *(int *)q;
+                q += 0x10;
+                e++;
+            } while (--i != 0);
         }
         copy = heap;
         heap += size;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(copy, blob, size);
-        if (D_L00_001B16C0.iC4 > 0) {
-            char *e = D_L00_001B16C0.pC0 + 0x10;
-            int left = D_L00_001B16C0.iC4;
-
-            do {
-                *(char **)e = copy + *s++;
-                e += 0x20;
-            } while (--left);
+            func_00282B50(copy, src, size);
+        for (i = 0; i < D_L00_001B16C4; i++) {
+            D_L00_001B16C0[i].data = copy + *(int *)q;
+            q += 4;
         }
     }
 
-    /* section 0x74: 0x90-byte records from 0x80-byte source records */
-    if (*(int *)(hdr + 0x74)) {
-        char *s = SECTION_00618(0x74);
-        int n = *(int *)s;
+    /* section 0x74: clip volumes, 0x90-byte records from 0x80-byte sources */
+    if (((int *)hdr)[0x74 / 4]) {
+        char *q = SECTION_00618(0x74);
+        int n = *(int *)q;
+        int i;
 
-        D_L00_001B1F84.p84 = heap;
-        D_L00_001B1F84.i88 = n;
-        s += 0x10;
+        D_L00_001B1F84 = heap;
+        D_L00_001B1F88 = n;
+        q += 0x10;
         heap += n * 0x90;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F84.p84, 0, n * 0x90);
-        {
-            int i, off;
-
-            for (i = 0, off = 0; i < D_L00_001B1F84.i88; i++, off += 0x90) {
-                func_00282AB0(D_L00_001B1F84.p84 + off, s, 0x90);
-                s += 0x80;
-            }
+            func_00282A60(D_L00_001B1F84, 0, n * 0x90);
+        for (i = 0; i < D_L00_001B1F88; i++) {
+            func_00282AB0(D_L00_001B1F84 + i * 0x90, q, 0x90);
+            q += 0x80;
         }
     }
 
-    /* sections 0x68, 0x6C, 0x70: 0x80-byte records */
-    if (*(int *)(hdr + 0x68)) {
-        char *s = SECTION_00618(0x68);
-        int n = *(int *)s;
+    /* sections 0x68, 0x6C, 0x70: cuboids, spheres and cylinders */
+    if (((int *)hdr)[0x68 / 4]) {
+        char *q = SECTION_00618(0x68);
+        int n = *(int *)q;
         int i;
 
-        D_L00_001B1F84.p8C = heap;
-        s += 0x10;
-        D_L00_001B1F84.i90 = n;
+        D_L00_001B1F8C = heap;
+        q += 0x10;
+        D_L00_001B1F90 = n;
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F84.p8C, 0, n << 7);
-        for (i = 0; i < D_L00_001B1F84.i90; i++) {
-            func_00282AB0(D_L00_001B1F84.p8C + (i << 7), s, 0x80);
-            s += 0x80;
+            func_00282A60(D_L00_001B1F8C, 0, n << 7);
+        for (i = 0; i < D_L00_001B1F90; i++) {
+            func_00282AB0(D_L00_001B1F8C + (i << 7), q, 0x80);
+            q += 0x80;
         }
     }
-    if (*(int *)(hdr + 0x6C)) {
-        char *s = SECTION_00618(0x6C);
-        int n = *(int *)s;
+    if (((int *)hdr)[0x6C / 4]) {
+        char *q = SECTION_00618(0x6C);
+        int n = *(int *)q;
         int i;
 
-        D_L00_001B1F84.p94 = heap;
-        s += 0x10;
-        D_L00_001B1F84.i98 = n;
+        D_L00_001B1F94 = heap;
+        q += 0x10;
+        D_L00_001B1F98 = n;
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F84.p94, 0, n << 7);
-        for (i = 0; i < D_L00_001B1F84.i98; i++) {
-            func_00282AB0(D_L00_001B1F84.p94 + (i << 7), s, 0x80);
-            s += 0x80;
+            func_00282A60(D_L00_001B1F94, 0, n << 7);
+        for (i = 0; i < D_L00_001B1F98; i++) {
+            func_00282AB0(D_L00_001B1F94 + (i << 7), q, 0x80);
+            q += 0x80;
         }
     }
-    if (*(int *)(hdr + 0x70)) {
-        char *s = SECTION_00618(0x70);
-        int n = *(int *)s;
+    if (((int *)hdr)[0x70 / 4]) {
+        char *q = SECTION_00618(0x70);
+        int n = *(int *)q;
         int i;
 
-        D_L00_001B1F84.p9C = heap;
-        s += 0x10;
-        D_L00_001B1F84.iA0 = n;
+        D_L00_001B1F9C = heap;
+        q += 0x10;
+        D_L00_001B1FA0 = n;
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F84.p9C, 0, n << 7);
-        for (i = 0; i < D_L00_001B1F84.iA0; i++) {
-            func_00282AB0(D_L00_001B1F84.p9C + (i << 7), s, 0x80);
-            s += 0x80;
+            func_00282A60(D_L00_001B1F9C, 0, n << 7);
+        for (i = 0; i < D_L00_001B1FA0; i++) {
+            func_00282AB0(D_L00_001B1F9C + (i << 7), q, 0x80);
+            q += 0x80;
         }
     }
 
     /* section 0x88 */
-    if (*(int *)(hdr + 0x88)) {
+    if (((int *)hdr)[0x88 / 4]) {
         char *s = SECTION_00618(0x88);
-        int size = *(int *)s + 0x4000;
+        int size = *(int *)s;
 
         D_L00_001B1880 = heap;
-        func_00282AB0(heap, s + 0x10, size);
+        s += 0x10;
+        size += 0x4000;
         heap += size;
+        func_00282AB0(D_L00_001B1880, s, size);
+        heap = ALIGN64_00618(heap);
     }
-    heap = ALIGN64_00618(heap);
 
     /* section 0x80 */
-    if (*(int *)(hdr + 0x80)) {
+    if (((int *)hdr)[0x80 / 4]) {
         char *s = SECTION_00618(0x80);
         int n = *(int *)s;
 
         D_L00_001B1CD8 = heap;
+        s += 0x10;
         D_L00_001B1CD4 = n;
         heap = (char *)(((int)heap + (n << 4) + 0x83F) & 0xFFFFFFC0u);
         if (n)
-            func_00282AB0(D_L00_001B1CD8, s + 0x10, (n << 4) + 0x800);
+            func_00282AB0(D_L00_001B1CD8, s, (n << 4) + 0x800);
         else
-            func_00282AB0(D_L00_001B1CD8, s + 0x10, 0x800);
+            func_00282AB0(D_L00_001B1CD8, s, 0x800);
     }
 
     /* section 0x8C */
-    if (*(int *)(hdr + 0x8C)) {
+    if (((int *)hdr)[0x8C / 4]) {
         char *s = SECTION_00618(0x8C);
         int n = *(int *)s;
 
         D_L00_001B1F40 = heap;
+        s += 0x10;
         D_L00_001B1F10 = n;
         heap += n << 5;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282AB0(D_L00_001B1F40, s + 0x10, n << 5);
+            func_00282AB0(D_L00_001B1F40, s, n << 5);
     }
-    D_L00_001B20B0.pB0 = heap;
+    D_L00_001B20B0 = heap;
     D_L00_001BF140.mark64 = heap;
-    D_L00_001B20B0.iB8 = -1;
     heap += 0x20000;
-    D_L00_001B20B0.iB4 = 0;
-    D_L00_001B20B0.iBC = 0;
+    D_L00_001B20B8 = -1;
+    D_L00_001B20B4 = 0;
+    D_L00_001B20BC = 0;
     func_00282A88(D_L00_001FE140, 0x200);
 
     if (D_001A79F0 >= 0) {
@@ -1418,155 +1482,153 @@ char *func_L00_00300618(int reload)
 
     /* section 0x98: the group record and its five tables */
     {
-        char *s = SECTION_00618(0x98);
-        int size = *(int *)s;
-        Groups00618 *g;
+        char *s;
+        int size;
         int i;
 
-        D_L00_001B1AFC.p00 = (int)heap;
-        func_00282AB0(heap, s + 4, size);
+        s = SECTION_00618(0x98);
+        D_L00_001B1B00 = (Groups00618 *)heap;
+        size = *(int *)s;
         heap += size;
-        g = GROUPS_00618;
-        if (g->p4)
-            g->p4 += (int)g;
+        func_00282AB0(D_L00_001B1B00, s + 4, size);
+        if (D_L00_001B1B00->p4)
+            D_L00_001B1B00->p4 += (int)D_L00_001B1B00;
         else
-            g->p4 = 0;
-        g = GROUPS_00618;
-        if (g->p8)
-            g->p8 += (int)g;
+            D_L00_001B1B00->p4 = 0;
+        if (D_L00_001B1B00->p8)
+            D_L00_001B1B00->p8 += (int)D_L00_001B1B00;
         else
-            g->p8 = 0;
-        g = GROUPS_00618;
-        if (g->pC)
-            g->pC += (int)g;
+            D_L00_001B1B00->p8 = 0;
+        if (D_L00_001B1B00->pC)
+            D_L00_001B1B00->pC += (int)D_L00_001B1B00;
         else
-            g->pC = 0;
-        g = GROUPS_00618;
-        if (g->p10)
-            g->p10 += (int)g;
+            D_L00_001B1B00->pC = 0;
+        if (D_L00_001B1B00->p10)
+            D_L00_001B1B00->p10 += (int)D_L00_001B1B00;
         else
-            g->p10 = 0;
-        g = GROUPS_00618;
-        if (g->p14)
-            g->p14 += (int)g;
+            D_L00_001B1B00->p10 = 0;
+        if (D_L00_001B1B00->p14)
+            D_L00_001B1B00->p14 += (int)D_L00_001B1B00;
         else
-            g->p14 = 0;
-        g = GROUPS_00618;
-        for (i = 0; i < g->count; i++) {
-            if (g->entries[i].h0 == 0)
-                g->entries[i].iC = 0;
+            D_L00_001B1B00->p14 = 0;
+        for (i = 0; i < D_L00_001B1B00->count; i++) {
+            GroupEntry00618 *e;
+
+            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            if (e[1].h0)
+                e[1].iC += (int)D_L00_001B1B00->p4;
             else
-                g->entries[i].iC += (int)g->p4;
-            if (g->entries[i].h2 == 0)
-                g->entries[i].i10 = 0;
+                e[1].iC = 0;
+            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            if (e[1].h2)
+                e[1].i10 += (int)D_L00_001B1B00->p8;
             else
-                g->entries[i].i10 += (int)g->p8;
-            if (g->entries[i].h4 == 0)
-                g->entries[i].i14 = 0;
+                e[1].i10 = 0;
+            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            if (e[1].h4)
+                e[1].i14 += (int)D_L00_001B1B00->pC;
             else
-                g->entries[i].i14 += (int)g->pC;
-            if (g->entries[i].h6 == 0)
-                g->entries[i].i18 = 0;
+                e[1].i14 = 0;
+            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            if (e[1].h6)
+                e[1].i18 += (int)D_L00_001B1B00->p10;
             else
-                g->entries[i].i18 += (int)g->p10;
-            if (g->entries[i].h8 == 0)
-                g->entries[i].i1C = 0;
+                e[1].i18 = 0;
+            e = (GroupEntry00618 *)D_L00_001B1B00 + i;
+            if (e[1].h8)
+                e[1].i1C += (int)D_L00_001B1B00->p14;
             else
-                g->entries[i].i1C += (int)g->p14;
+                e[1].i1C = 0;
         }
         {
-            int bytes = GROUPS_00618->count * 0x1C;
+            int bytes;
 
-            D_L00_001B1AFC.pFC = (int)heap;
-            func_00282A60(heap, 0, bytes);
+            D_L00_001B1AFC = (int)heap;
+            bytes = D_L00_001B1B00->count * 0x1C;
             heap += bytes;
+            func_00282A60((void *)D_L00_001B1AFC, 0, bytes);
         }
-        for (i = 0; i < GROUPS_00618->count; i++)
-            ((int *)D_L00_001B1AFC.pFC)[i] = D_L00_001B1AFC.pFC + (GROUPS_00618->count << 2) + i * 0x18;
+        {
+            int j;
+
+            for (j = 0; j < D_L00_001B1B00->count; j++)
+                *(int *)((j << 2) + D_L00_001B1AFC) = D_L00_001B1AFC + (D_L00_001B1B00->count << 2) + j * 0x18;
+        }
     }
 
-    if (D_L00_001B1A40 && *(int *)(hdr + 0x90)) {
-        int *s = (int *)SECTION_00618(0x90);
-        int *base = s;
-        int nTies = s[0];
-        int nShrubs = s[1];
-        int nMobys = s[2];
-        int *rec;
-        int tiesChanged = 1;
-        int shrubsChanged;
-        int tieSize;
-        int i;
+    if (D_L00_001B1A40 && ((int *)hdr)[0x90 / 4]) {
+        int *q = (int *)SECTION_00618(0x90);
+        int *q0;
+        int n1;
+        int n2;
+        int n3;
+        int bad1 = 1;
+        int bad2;
+        unsigned short *table;
 
-        s += 4;
-        rec = s;
+        q0 = q;
+        n1 = q[0];
+        n2 = q[1];
+        n3 = q[2];
+        q += 4;
         if (D_L00_001C9340.count) {
-            tieSize = nTies << 3;
-            rec += nTies << 1;
-            if (D_L00_001C9340.i18 == nTies)
-                tiesChanged = 0;
-            D_L00_001C9340.i1C = tiesChanged == 0;
-        } else if (D_L00_001B24D4 == nTies) {
-            tiesChanged = 0;
-            tieSize = nTies << 3;
-            if (nTies > 0) {
-                unsigned char *e = (unsigned char *)D_L00_001B24D0 + 0x3D;
-                int left = nTies;
+            q += n1 * 2;
+            if (D_L00_001C9340.i18 == n1)
+                bad1 = 0;
+            D_L00_001C9340.i1C = bad1 == 0;
+        } else if (D_L00_001B24D4 == n1) {
+            int i;
 
-                do {
-                    if (*e != rec[1])
-                        tiesChanged = 1;
-                    e += 0x40;
-                    rec += 2;
-                } while (--left);
+            bad1 = 0;
+            for (i = 0; i < n1; i++) {
+                if (((Tfrag00618 *)D_L00_001B24D0)[i].b3D != q[1])
+                    bad1 = 1;
+                q += 2;
             }
         } else {
-            tieSize = nTies << 3;
-            rec += nTies << 1;
+            q += n1 * 2;
         }
-        shrubsChanged = 1;
-        if (D_L00_001B2518 - D_L00_001B2514 == nShrubs) {
-            shrubsChanged = 0;
-            if (nShrubs > 0) {
-                unsigned short *e = &D_L00_001B2514->h10;
-                int left = nShrubs;
+        bad2 = 1;
+        if (D_L00_001B2518 - D_L00_001B2514 == n2) {
+            int i;
 
-                do {
-                    if (*e != *(unsigned short *)(rec + 1))
-                        shrubsChanged = 1;
-                    e += 0x10;
-                    rec += 2;
-                } while (--left);
+            bad2 = 0;
+            for (i = 0; i < n2; i++) {
+                int id = (unsigned short)q[1];
+
+                if (D_L00_001B2514[i].h10 != id)
+                    bad2 = 1;
+                q += 2;
             }
         } else {
-            rec += nShrubs << 1;
+            q += n2 * 2;
         }
         {
-            unsigned short *table = D_L00_001B19F0;
-            int *r = rec;
-            Moby00618 *moby;
+            Moby00618 *m;
+            int i;
 
+            table = D_L00_001B19F0;
             func_00282A60(table, -1, 0x10000);
-            for (i = 0; i < nMobys; i++) {
-                if ((unsigned)(r[1] + 0x4000) < 0x8000)
-                    table[r[1] + 0x4000] = *(unsigned short *)r;
-                r += 2;
+            for (i = 0; i < n3; i++) {
+                if ((unsigned)(q[i * 2 + 1] + 0x4000) < 0x8000)
+                    table[q[i * 2 + 1] + 0x4000] = q[i * 2];
             }
-            for (moby = D_L00_001B1E9C; moby->state != 0xFF; moby++) {
-                if (moby->h36 != 0x7F80) {
-                    if ((unsigned)(moby->hB2 + 0x4000) < 0x8000) {
-                        short v = table[moby->hB2 + 0x4000];
+            for (m = D_L00_001B1E9C[0]; m->state != 0xFF; m++) {
+                if (m->h36 != 0x7F80) {
+                    if ((unsigned)(m->hB2 + 0x4000) < 0x8000) {
+                        short v = table[m->hB2 + 0x4000];
 
                         if (v < 0)
-                            moby->h36 = 0x7F80;
+                            m->h36 = 0x7F80;
                         else
-                            moby->h36 = ((v >> 3) << 8) | (1 << (v & 7));
+                            m->h36 = ((v >> 3) << 8) | (1 << (v & 7));
                     } else {
-                        moby->h36 = 0x7F80;
+                        m->h36 = 0x7F80;
                     }
                 }
             }
         }
-        if (tiesChanged) {
+        if (bad1) {
             if (D_L00_001B24D4 > 0) {
                 unsigned short *e = (unsigned short *)(D_L00_001B24D0 + 0x3A);
                 int left = D_L00_001B24D4;
@@ -1577,51 +1639,60 @@ char *func_L00_00300618(int reload)
                 } while (--left);
             }
         } else if (D_L00_001C9340.count) {
-            int *r = base + 4;
+            int i;
 
-            for (i = 0; i < nTies; i++) {
-                D_L00_001C9340.bits[i] = ((r[0] >> 3) << 8) | (1 << (r[0] & 7));
-                r += 2;
+            q = q0 + 4;
+            for (i = 0; i < n1; i++) {
+                int w = q[0];
+
+                D_L00_001C9340.bits[i] = ((w >> 3) << 8) | (1 << (w & 7));
+                q += 2;
             }
         } else {
-            int *r = base + 4;
+            int i;
 
-            for (i = 0; i < nTies; i++) {
-                *(unsigned short *)(D_L00_001B24D0 + 0x3A + i * 0x40) = ((r[0] >> 3) << 8) | (1 << (r[0] & 7));
-                r += 2;
+            q = q0 + 4;
+            for (i = 0; i < n1; i++) {
+                int w = q[0];
+
+                ((Tfrag00618 *)D_L00_001B24D0)[i].h3A = ((w >> 3) << 8) | (1 << (w & 7));
+                q += 2;
             }
         }
-        if (shrubsChanged) {
-            unsigned short *table = D_L00_001B19F0;
-            int *r = (int *)((char *)base + 0x10 + tieSize);
-            Tie00618 *tie;
+        if (bad2) {
+            Tie00618 *t;
+            int i;
 
+            table = D_L00_001B19F0;
+            q = &q0[n1 * 2 + 4];
             func_00282A60(table, 0xFFFEFFFE, 0x8000);
-            for (i = 0; i < nShrubs; i++) {
-                if ((unsigned)r[1] < 0x4000)
-                    table[r[1]] = *(unsigned short *)r;
-                r += 2;
+            for (i = 0; i < n2; i++) {
+                if ((unsigned)q[i * 2 + 1] < 0x4000)
+                    table[q[i * 2 + 1]] = q[i * 2];
             }
-            for (tie = D_L00_001B2514; tie != D_L00_001B2518; tie++) {
-                if ((unsigned)tie->h10 < 0x4000) {
-                    short v = table[tie->h10];
+            for (t = D_L00_001B2514; t != D_L00_001B2518; t++) {
+                int id = t->h10;
+
+                if ((unsigned)id < 0x4000) {
+                    short v = table[id];
 
                     if (v < 0)
-                        tie->h10 = 0x7F80;
+                        t->h10 = 0x7F80;
                     else
-                        tie->h10 = ((v >> 3) << 8) | (1 << (v & 7));
+                        t->h10 = ((v >> 3) << 8) | (1 << (v & 7));
                 } else {
-                    tie->h10 = 0x7F80;
+                    t->h10 = 0x7F80;
                 }
             }
         } else {
-            int *r = (int *)((char *)base + 0x10 + tieSize);
-            Tie00618 *tie = D_L00_001B2514;
+            int i;
 
-            for (i = 0; i < nShrubs; i++) {
-                tie->h10 = ((r[0] >> 3) << 8) | (1 << (r[0] & 7));
-                r += 2;
-                tie++;
+            q = &q0[n1 * 2 + 4];
+            for (i = 0; i < n2; i++) {
+                int w = q[0];
+
+                D_L00_001B2514[i].h10 = ((w >> 3) << 8) | (1 << (w & 7));
+                q += 2;
             }
         }
         D_L00_001B1A50 = 2;
@@ -1629,7 +1700,7 @@ char *func_L00_00300618(int reload)
         Moby00618 *moby;
         Tie00618 *tie;
 
-        for (moby = D_L00_001B1E9C; moby != D_L00_001B1EA4; moby++)
+        for (moby = D_L00_001B1E9C[0]; moby != D_L00_001B1EA4; moby++)
             moby->h36 = 0x7F80;
         for (tie = D_L00_001B2514; tie != D_L00_001B2518; tie++)
             tie->h10 = 0x7F80;
@@ -1675,8 +1746,9 @@ char *func_L00_00300618(int reload)
     D_L00_001AA0F8 = 0xE0;
     if (D_00152C00.hero) {
         Moby00618 *m = D_00152C00.hero;
+        char *hero = D_00189E20;
 
-        *(long long *)((char *)m + 0x38) = *(long long *)(*(char **)(D_00189E20 + 0x2290) + 0x38);
+        *(long long *)((char *)m + 0x38) = *(long long *)(*(char **)(hero + 0x2290) + 0x38);
     }
     func_00272198(8.0f);
     switch (D_001A79F0) {

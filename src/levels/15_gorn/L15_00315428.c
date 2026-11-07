@@ -80,7 +80,7 @@ INCLUDE_ASM("asm/levels", func_L15_00430168);
 
 /* func_L15_00430DF0 is defined in L15_00430DF0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L15_00431590);
+/* func_L15_00431590 is defined in L15_00431590-g8.c. */
 
 /* func_L15_00432008: attempt kept in drafts (176 bytes, 4 instructions over). */
 /* func_L15_00432008 is defined in L15_00315428-g8.c (this unit has no $gp access for it). */

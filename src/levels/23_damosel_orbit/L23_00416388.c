@@ -322,7 +322,7 @@ void func_L23_0041CCC0(char *arg0) {
 
 /* func_L23_0041D398 is matched in L23_0041D398-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L23_0041DA48);
+/* func_L23_0041DA48 is matched in L23_00416388-hud-g16.c (built with -G16 -g). */
 
 /* A three-label switch, the third one sharing the default's body (the recipe of
  * func_L22_003A65E0): with only two cases cc1 emits a comparison chain, and the third label is

@@ -7,7 +7,7 @@
 
 /* func_L19_00411EF0 is defined in L19_00411EF0-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L19_00412140);
+/* func_L19_00412140 is defined in L19_00412140-g8.c. */
 
 /* func_L19_004160A0 is defined in L19_004160A0-g8.c. */
 
@@ -41,6 +41,31 @@ void func_L19_00417A00(char *a0)
 
 INCLUDE_ASM("asm/levels", func_L19_00417F88);
 
+typedef int TI128 __attribute__((mode(TI)));
+typedef float V[4] __attribute__((aligned(16)));
+typedef struct {
+    float u, v;
+} UV;
+typedef struct {
+    V p[4];
+    int color[4];
+    UV uv[4];
+    long zero, texture, state, flags;
+} Quad;
+
+extern char D_L19_001BFEA0[], D_L19_001B9A40[];
+extern UV D_L19_001B1C08[] MACRO_ADDR;
+extern void func_0029FC20(void *, int, void *);
+extern void func_00282F20(void *, void *, float);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_002A7988(void *, float, float);
+extern void func_00282CF0(void *, void *, void *);
+extern void func_00282DD8(void *, void *, void *);
+extern void func_00280B90(void *, int, int);
+extern float func_002A7940(void);
+extern void func_00281EB8(void *, int, int, int, float, float, float);
+extern int func_002761F8(void *, void *, int, void *, void *);
+extern long func_0027C878(int);
 /* func_L19_0041B078 is defined in L19_0041B078-g8.c. */
 
 /* func_L19_0041BFD0 is defined in L19_0041BFD0-g8.c. */

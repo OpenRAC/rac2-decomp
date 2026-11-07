@@ -4198,5 +4198,12 @@ src/game/002F9BC0-preview-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L08_003CDF98-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -ffast-math
 src/game/0030F7B0-ball-sw-g8.c	-O2 -G8 -ffunction-sections -g
 src/pal/levels/19_grelbin/L19_00417318-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
+src/levels/19_grelbin/L19_00412140-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
+src/levels/shared/L00_002FC7A0-00300618-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/game/00349D58.c	-O2 -G0 -ffunction-sections -frac2-keep-float-pun-source
+src/levels/08_tabora/L08_0041D808-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
+src/levels/01_oozla/L01_003A6638-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
+src/game/0026EA00-loader.c	-O2 -G0 -ffunction-sections -fcall-used-hi1 -fcall-used-lo1 -fcall-used-accum1
+src/levels/shared/L00_003C3D90-g8.c	-O2 -G8 -ffunction-sections -g -frac2-mult-add-no-flatten
+src/levels/23_damosel_orbit/L23_00416388-hud-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g
 src/game/00284268.c	-O2 -G0 -ffunction-sections -fno-rerun-loop-opt -frac2-no-extra-increment-givs

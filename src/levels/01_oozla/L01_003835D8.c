@@ -73,8 +73,6 @@ void func_L01_003A6350(u8 *arg0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003A6638);
-
 void func_L01_003A6448(float *arg0, float *arg1) {
     *arg0 = -D_00189E20.f1FB0;
     *arg1 = -D_00189E20.f1FB4;

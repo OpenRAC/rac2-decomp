@@ -49,7 +49,7 @@ extern void func_32AF78(void *a0);
 
 /* func_L10_00424528 is defined in L10_00424528-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L10_00424CD0);
+/* func_L10_00424CD0 is defined in L10_00424028-hud-g8.c. */
 
 /* func_L10_00425508 is defined in L10_00424028-reward-g8.c. */
 

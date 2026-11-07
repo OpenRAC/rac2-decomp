@@ -650,8 +650,6 @@ void func_L08_0040FAE8(char *object)
 }
 
 
-INCLUDE_ASM("asm/levels", func_L08_0041D808);
-
 extern void func_00283098(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
 extern int func_00283CF0(float);

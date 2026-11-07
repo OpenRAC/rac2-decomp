@@ -180,6 +180,7 @@
 #define PlayBonusReelWithGameLoop        func_002EBC70
 #define sceVibSetActParam                func_00128FD0
 #define UpdateCollidingEffectParticle    func_002BB100
+#define CollLine                         func_002761F8
 #define snd_StartSoundSystem             func_00131DE8
 #define find_fde                         func_00123B40
 #define GetLocalizedString               func_00288FB8
@@ -938,6 +939,9 @@
 #define DrawDomeEffect                   func_L04_003FBEF8
 #define UpdateHoverbikeRace              func_L04_00419918
 #define DrawScrollingGridLayers          func_L15_00437B68
+#define RunBootTitleLoop                 func_0026EDE8
+#define UpdateSteeredMoby                func_L01_003A6638
+#define DrawFadingHudIconPairs           func_L10_00424CD0
 #define DrawBoltCounterPanel             func_0034DB98
 
 #endif /* NAMES_H */

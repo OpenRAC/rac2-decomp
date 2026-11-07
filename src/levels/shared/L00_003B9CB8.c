@@ -790,8 +790,6 @@ void func_L00_003C3920(char *unused, char *arg)
     } while (i >= 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003C3D90);
-
 INCLUDE_ASM("asm/levels", func_L00_003C48D0);
 
 

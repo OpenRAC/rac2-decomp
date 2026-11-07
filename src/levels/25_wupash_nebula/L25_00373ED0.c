@@ -70,4 +70,4 @@ int func_L25_0040DCD0(char *obj, int flag)
     return ret;
 }
 
-INCLUDE_ASM("asm/levels", func_L25_0040DE40);
+/* func_L25_0040DE40 is defined in L25_00373ED0-fade-g8.c. */

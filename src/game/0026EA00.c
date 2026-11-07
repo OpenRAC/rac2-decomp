@@ -212,7 +212,7 @@ void func_0026EC58(unsigned short *out)
     out[0x2e/2] = out[0x0e/2];
 }
 
-INCLUDE_ASM("asm/game", func_0026EDE8);
+/* func_0026EDE8 is in 0026EA00-loader.c. */
 
 unsigned int func_0026F710(void)
 {

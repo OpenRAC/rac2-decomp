@@ -726,7 +726,7 @@ void func_L00_00300610(void)
 {
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00300618);
+/* func_L00_00300618 is matched in L00_002FC7A0-00300618-g8.c (built with -G8). */
 
 /* func_L00_003032F0 is matched in L00_003032F0.c (built with -fno-gcse). */
 
