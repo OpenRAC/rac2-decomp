@@ -1940,6 +1940,27 @@ section and rejects ambiguous or partial records. Bare strings without that
 evidence remain unsupported. Tests cover mixed records, aliases, adjacent pools,
 escaping and rejection cases; no string or compiler section is rewritten.
 
+### `la` of a gp symbol with an addend
+
+Retail mixes forms for one gp table: `la D` is `addiu reg,$gp,D` but `la D+4`,
+`D+8`, `D+12` are absolute `lui; addiu` (func_00294F10 at -G64,
+func_L01_003801B8 at -G8). Our gas, like SCE's 991111 `as.exe`, keeps `$gp`
+for every addend. SN's `ps2eeas` (checked under wine on authored controls,
+-G8 and -G64) uses the absolute pair for any nonzero addend, whatever the
+symbol size, `.extern` size or local `.sdata` definition. It does the same
+for loads and stores, but retail does not: forcing that half on changes 17
+matched units, so only the `la` half is modelled.
+
+Patch 0062 exposes it as `-Wa,--r5900-la-addend=sn`; the default and `gnu`
+keep the old output. Forced on over all 8905 units of the three releases it
+changes one matched unit, `L00_003F9570-g8.c`, whose `$gp` `la` was written as
+table+16. That address is past the 4-float table, so it is a separate retail
+object; the unit now names it `D_L00_001B0A80` (owner ruling 8 November 2026)
+and the forced-on sweep changes nothing. With every access through the SDATA
+alias, func_00294F10's coefficient loops and func_L01_003801B8's column
+pointers take retail's form. [tests/test_la_addend.py](../tests/test_la_addend.py)
+covers both profiles, unchanged loads/stores and invalid options.
+
 ## Reading output and identifying limits
 
 Compare R5900 words and resolved relocations, not mnemonics alone. Move can become

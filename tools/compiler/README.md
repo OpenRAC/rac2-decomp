@@ -195,6 +195,14 @@ word/address macros, option rejection and
 composition with the isolated sign-bit profile. Use standard per-file
 `-Wa,--r5900-unsigned32-mask=sn` flags and qualify each complete unit and release.
 
+Patch `0062` adds the opt-in `--r5900-la-addend=sn` profile. SN's assembler
+builds `la sym+addend` (nonzero addend) as the absolute `lui; addiu` pair even
+when the symbol is gp-relative; the bare symbol keeps the single `$gp` addiu.
+Loads and stores are not changed (SN's own load/store half would change 17
+matched units). `--r5900-la-addend=gnu` restores the default GNU `$gp` form.
+`tests/test_la_addend.py` covers both profiles, unchanged loads/stores and
+option rejection. Pass it as `-Wa,--r5900-la-addend=sn`.
+
 Pass assembler options per file through standard `-Wa,` syntax in
 `config/cflags.txt`, for example:
 

@@ -1,0 +1,82 @@
+--- a/gas/config/tc-mips.c
++++ b/gas/config/tc-mips.c
+@@ -200,6 +200,9 @@
+ /* Preserve GNU unsigned32-mask seeds unless a unit selects the SN profile. */
+ static int r5900_unsigned32_mask_sn = 0;
+ 
++/* Keep the GNU $gp form for `la sym+addend' unless a unit selects SN's.  */
++static int r5900_la_addend_sn = 0;
++
+ /* The argument of the -mabi= flag. */
+ static char* mips_abi_string = 0;
+ 
+@@ -3347,6 +3350,19 @@
+ 
+ /* Load an address into a register.  */
+ 
++/* SN's assembler builds `la' of a symbol with a nonzero addend as the
++   absolute lui/addiu pair even when the symbol is gp-relative; only the
++   bare symbol gets the single $gp-relative addiu.  Loads and stores are
++   not affected.  */
++static int
++r5900_la_addend_absolute (ep)
++     expressionS *ep;
++{
++  return (r5900_la_addend_sn
++	  && ep->X_op == O_symbol
++	  && ep->X_add_number != 0);
++}
++
+ static void
+ load_address (counter, reg, ep)
+      int *counter;
+@@ -3377,6 +3393,7 @@
+ 	   addiu	$reg,$reg,<sym>		(BFD_RELOC_LO16)
+ 	 If we have an addend, we always use the latter form.  */
+       if ((valueT) ep->X_add_number >= MAX_GPREL_OFFSET
++          || r5900_la_addend_absolute (ep)
+           || nopic_need_relax (ep->X_add_symbol, 1))
+ 	p = NULL;
+       else
+@@ -4335,6 +4352,7 @@
+ 	     lui/addiu pair in one register, as ld_st already does.  The
+ 	     deferred relaxation pair would resolve to gp at link time.  */
+ 	  if ((valueT) offset_expr.X_add_number >= MAX_GPREL_OFFSET
++	      || r5900_la_addend_absolute (&offset_expr)
+ 	      || nopic_need_relax (offset_expr.X_add_symbol, 1)
+ 	      || (! mips_opts.noreorder
+ 		  && ! S_IS_DEFINED (offset_expr.X_add_symbol)
+@@ -9403,6 +9421,9 @@
+ #define OPTION_R5900_UNSIGNED32_MASK (OPTION_MD_BASE + 43)
+   {"r5900-unsigned32-mask", required_argument, NULL, OPTION_R5900_UNSIGNED32_MASK},
+ 
++#define OPTION_R5900_LA_ADDEND (OPTION_MD_BASE + 44)
++  {"r5900-la-addend", required_argument, NULL, OPTION_R5900_LA_ADDEND},
++
+ #define OPTION_CALL_SHARED (OPTION_MD_BASE + 7)
+ #define OPTION_NON_SHARED (OPTION_MD_BASE + 8)
+ #define OPTION_XGOT (OPTION_MD_BASE + 19)
+@@ -9428,6 +9449,15 @@
+ {
+   switch (c)
+     {
++    case OPTION_R5900_LA_ADDEND:
++      if (strcmp (arg, "gnu") == 0)
++        r5900_la_addend_sn = 0;
++      else if (strcmp (arg, "sn") == 0)
++        r5900_la_addend_sn = 1;
++      else
++        as_fatal (_("invalid R5900 la-addend profile: %s"), arg);
++      break;
++
+     case OPTION_R5900_UNSIGNED32_MASK:
+       if (strcmp (arg, "gnu") == 0)
+         r5900_unsigned32_mask_sn = 0;
+@@ -9808,6 +9838,7 @@
+   fprintf(stream, _("\
+ MIPS options:\n\
+ --r5900-unsigned32-mask=gnu|sn  select the positive 32-bit mask seed [gnu]\n\
++--r5900-la-addend=gnu|sn  la sym+addend: $gp form or absolute pair [gnu]\n\
+ --r5900-sign-bit=signed|unsigned  select the isolated sign-bit seed [signed]\n\
+ -membedded-pic		generate embedded position independent code\n\
+ -EB			generate big endian output\n\

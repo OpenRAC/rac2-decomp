@@ -6,7 +6,7 @@
 # Run it on 32-bit-capable x86-64 Linux (gcc -m32), e.g. in the rac2-linux container
 # (docs/BUILDING.md). It downloads the two inputs to build/downloads/ and checks them,
 # applies the patches in tools/compiler/patches/ (Lombyte's sce-991111b stack, MIT, with its
-# retired 0034 and its earlier 0020), the 0057/0058 compiler profiles, the 0059/0061 assembler options and the
+# retired 0034 and its earlier 0020), the 0057/0058 compiler profiles, the 0059/0061/0062 assembler options and the
 # transformers in tools/compiler/transformers/,
 # refuses to build unless the patched sources hash as listed below, and builds.
 #
@@ -43,6 +43,7 @@ git apply --whitespace=nowarn "$HERE"/patches/0058-*.patch       # the opt-in -m
 git apply --whitespace=nowarn "$HERE"/patches/0059-*.patch       # per-object sign-bit seed selection
 git apply --whitespace=nowarn "$HERE"/patches/0060-*.patch       # leading-ones dli: lui-anchored first field
 git apply --whitespace=nowarn "$HERE"/patches/0061-*.patch       # opt-in SN positive unsigned32-mask seed
+git apply --whitespace=nowarn "$HERE"/patches/0062-*.patch       # opt-in SN absolute `la sym+addend`
 T=$HERE/transformers
 python3 $T/neutralise_timode_anchor.py gcc/config/mips/mips.c
 python3 $T/enable_loop_padding.py gcc/config/mips/mips.h
@@ -100,7 +101,7 @@ fa211f12b39de727c033f57a16ab627572547901d9cf8d2a7aa2e5dd77949e9e  gcc/haifa-sche
 2fed8663ae4c3f2381614f6e847f4a9a958d591f3a7f60a9b9d07125ca3ab6ed  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
-438587407af89c1c9787f92f11997c1b9d258dac156a8199ec87369f2c523736  gas/config/tc-mips.c
+9445eb651da98432bdf608d6865b722db1068d8847af1a16f533189c812a0f14  gas/config/tc-mips.c
 6d4c688bdf8517a1da1b35a04bb1e3b6137093a6224b3ed52666581e3a7bd557  gcc/reload1.c
 94489f80e8769d277c3cfd7c73a3d5ee3f8ce0af790f61ef3c575b593b3b4099  gcc/loop.c
 d210a06544c16ce97a326b878527df1ea6730074ce8507a55830615df2820242  gcc/cse.c
