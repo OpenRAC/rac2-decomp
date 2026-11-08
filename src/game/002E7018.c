@@ -194,7 +194,7 @@ void func_002EAAA8(void *arg, int *status) {
     }
 }
 
-INCLUDE_ASM("asm/game", func_002EAB18);
+/* func_002EAB18 is in 002E7018-load.c (its views of D_00152C00 and D_001BAEC0 differ from this file's). */
 
 
 /* D_001B8840 is declared above func_002E7090 (List2E7090). */

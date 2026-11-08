@@ -4208,4 +4208,7 @@ src/game/0026EA00-loader.c	-O2 -G0 -ffunction-sections -fcall-used-hi1 -fcall-us
 src/levels/shared/L00_003C3D90-g8.c	-O2 -G8 -ffunction-sections -g -frac2-mult-add-no-flatten
 src/levels/23_damosel_orbit/L23_00416388-hud-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g
 src/game/00284268.c	-O2 -G0 -ffunction-sections -fno-rerun-loop-opt -frac2-no-extra-increment-givs
+src/levels/shared/L03_003E3A00-g8.c	-O2 -G8 -ffunction-sections -g -Wa,-G32 -frac2-gcse-unsplit-edges
 src/levels/30_insomniac_museum/L30_0040B9D8-g8.c	-O2 -G8 -ffunction-sections
+src/levels/shared/L00_002AE388-blend-g8.c	-O2 -G8 -ffunction-sections -fcall-used-hi1 -fcall-used-lo1 -fcall-used-accum1
+src/levels/shared/L00_002EC970-beam.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por

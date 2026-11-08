@@ -192,6 +192,7 @@
 #define PredictMineImpact                func_L00_003AE550
 #define FontPrintWindow                  func_0027FC70
 #define draw_joint_aligned_beam_effect   func_00308768
+#define update_hero_item_slot_animation_blends func_L00_002AED68
 #define draw_nanotech_ball               func_003146C0
 #define follow_camera_build_view         func_L00_00425560
 #define Camera_ResolveBlockedView        func_L01_002B5EA0
@@ -207,6 +208,7 @@
 #define render_environment_mapped_object func_002ECB70
 #define update_hero_item_mobys           func_L00_002B0968
 #define Camera_ActivationCheckPriority   func_00270838
+#define DrawVendorEffects                func_L01_003801B8
 
 /* descriptive */
 #define QueueMobyImpact                  func_002A8E20
@@ -942,6 +944,12 @@
 #define RunBootTitleLoop                 func_0026EDE8
 #define UpdateSteeredMoby                func_L01_003A6638
 #define DrawFadingHudIconPairs           func_L10_00424CD0
+#define DrawPathPuzzleHud                func_L03_003E3A00
+#define DrawTaperedBeam                  func_L00_002EC970
+#define UpdateCameraPoseTrigger          func_L01_00394240
+#define InitializeLevelRuntime           func_002EAB18
+#define UpdateLightningArcs              func_L00_00395428
 #define DrawBoltCounterPanel             func_0034DB98
+#define DrawEmitterParticles             func_L04_003C4050
 
 #endif /* NAMES_H */

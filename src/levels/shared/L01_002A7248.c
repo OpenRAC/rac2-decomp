@@ -1599,7 +1599,7 @@ void func_L01_00371228(int a0, int a1) {
         D_L01_001395B8[i] |= (unsigned char)(1 << a1);
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003801B8);
+/* func_L01_003801B8 is in L01_003801B8-g8.c for its GP accesses. */
 
 /* func_L01_003808C0 is in L01_003808C0-g8.c for its GP accesses. */
 
@@ -1790,5 +1790,3 @@ void func_L01_00394148(void)
         D_L01_001B1E80[2] = 2.1f;
     }
 }
-
-INCLUDE_ASM("asm/levels", func_L01_00394240);

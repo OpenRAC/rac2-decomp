@@ -1,20 +1,20 @@
-/* sol-high near miss, USA v1.01, default -O2 -G0 -ffunction-sections.
- * Best check: 1588/1588 bytes, 0 of 4 places; first mismatch at +0x54.
- * This improves the earlier 1580-byte -G8 draft: the save-table branches and
- * prologue now mostly agree. Remaining differences include the save-table
- * address register, conditional lock-flag stores, state/active store order,
- * and the placement of the case-2 entry. Equal size is not an exact match.
- * Incomplete sda arrays recover the tied absolute macros without hoisting;
- * explicitly capturing the camera index before the lock write preserves
- * retail's conditional reload, and sharing the camera-table pointer across
- * both qcopies prevents an extra pointer load. Capturing saveIndex before
- * the activation stores reproduces its earlier load. All declarations follow.
- * -G8 and -mno-split-addresses were worse; do not repeat those blindly.
- * Remaining lock stores need retail's two-word absolute macro form without
- * turning into GP stores in likely slots or splitting the address into a GPR.
- * Corrected the old draft's camera symbols: 0x001B94C0 and 0x001B9780.
- */
 #include "common.h"
+
+/* func_L01_00394240 has a unit of its own because it calls func_L01_00394148
+   with the moby, which that function's (void) definition in L01_002A7248.c
+   does not accept. func_L01_00394148 is this level's copy of the helper
+   func_L04_00423178(object), which tests kinds instead of the object's id, so
+   its parameter went unused. Retail still sets up the call: the move of the
+   moby into $a0 takes the issue slot beside `sd $s3` and is deleted after
+   scheduling ($a0 already holds it). That puts `li $s2,1` after `sd $s4`. */
+typedef int MotionQuad __attribute__((mode(TI)));
+typedef union { float v[4]; MotionQuad q; } MotionVec;
+typedef struct { MotionVec forward[4]; MotionVec inverse[4]; } MotionPath;
+extern MotionPath *D_L01_001B264C[] __attribute__((sda));
+extern char D_L01_001B94C0[];
+extern char D_00189EA0[];
+extern void func_L01_00394148(void *); /* the parameter is unused */
+
 typedef int CamQuad __attribute__((mode(TI)));
 typedef struct {
     CamQuad position, rotation;
@@ -26,18 +26,17 @@ typedef struct {
     char pad34[0x34]; CamVars *vars; char pad6C[0x3E]; s16 id; u16 group;
     char padAE[2]; u8 index; char padB1; u16 saveIndex; char padB4[8]; u8 active;
 } CamMoby;
-extern void func_L01_00394148(CamMoby *);
 extern u8 D_0019B2E8[];
 extern int D_001A79F0[] __attribute__((sda));
 extern u8 D_0019B4A8[];
-extern u8 D_L01_0021E4B0[];
-extern char D_00189EA0[];
+extern struct { u8 header[0x464]; u8 collected[0]; } D_L01_0021E4B0;
 extern int D_0018A160 NOT_SDA;
 extern int ref_L01_00394240_00 MACRO_ADDR;
-extern CamQuad D_L01_001B94C0[2];
-extern char *D_L01_001B264C[] __attribute__((sda));
 extern int D_L01_001B1FA8[] __attribute__((sda));
-extern int D_L01_001B22A8[] NOT_SDA;
+extern struct {
+    s16 f0, f2, f4, pad6;
+    s32 busy;
+} D_L01_001B22A0 MACRO_ADDR;
 extern int D_L01_001B9780 NOT_SDA;
 extern char D_L01_002A4370[];
 extern void func_0026FEB8(void *, int, int);
@@ -72,7 +71,7 @@ void func_L01_00394240(CamMoby *m)
         }
         break;
     case 1:
-        if (D_L01_0021E4B0[0x464 + (s16)m->saveIndex]) goto saved_state;
+        if (D_L01_0021E4B0.collected[(s16)m->saveIndex]) goto saved_state;
         saved = D_0019B4A8[((s16)m->saveIndex >> 1) + (D_001A79F0[0] << 10)];
         if (m->saveIndex & 1) {
             if ((saved >> 4) & 7) goto saved_state;
@@ -85,56 +84,54 @@ void func_L01_00394240(CamMoby *m)
         }
         if ((func_002ACBC8(D_00189EA0, v->trigger) || m->active == 1) &&
             (!v->requireHero || *(int *)(D_00189EA0 + 0x2C0))) {
-            qcopy(&position, &D_L01_001B94C0[0]);
-            qcopy(&rotation, &D_L01_001B94C0[1]);
+            qcopy(&position, D_L01_001B94C0);
+            qcopy(&rotation, D_L01_001B94C0 + 16);
             if (v->source == -1) func_L00_002B9D60(D_00189EA0, D_00189EA0 + 0x10, 0x6F, 1);
-            else func_L00_002B9D60(D_L01_001B264C[0] + v->source * 128 + 0x30,
-                                  D_L01_001B264C[0] + v->source * 128 + 0x70, 0x6F, 1);
+            else func_L00_002B9D60(&D_L01_001B264C[0][v->source].forward[3],
+                                  &D_L01_001B264C[0][v->source].inverse[3], 0x6F, 1);
             if (v->mode) func_00335438(&position, &rotation, 2, v->parameter, 0);
-            else func_00335438(D_L01_001B264C[0] + v->camera * 128 + 0x30,
-                              D_L01_001B264C[0] + v->camera * 128 + 0x70, 0, 0, 0);
+            else func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+                              &D_L01_001B264C[0][v->camera].inverse[3], 0, 0, 0);
             D_L01_001B1FA8[0] = 1;
             m->state = 2;
             m->active = 1;
-            { int camera = v->camera;
-            if (v->lock) { D_L01_001B22A8[0] = 1; camera = v->camera; }
-            { char *base = D_L01_001B264C[0];
-            qcopy(&v->position, base + camera * 128 + 0x30);
-            qcopy(&v->rotation, base + camera * 128 + 0x70); } }
+            if (v->lock) D_L01_001B22A0.busy = 1;
+            { int camera = v->camera; MotionPath *base = D_L01_001B264C[0];
+            qcopy(&v->position, &base[camera].forward[3]);
+            qcopy(&v->rotation, &base[camera].inverse[3]); }
         }
         if (D_001A79F0[0] == 19 &&
             (func_002ACBC8(D_00189EA0, v->trigger) || m->active == 1 || func_002B38B8(m)) &&
             (!v->requireHero || D_0018A160)) {
-            qcopy(&position, &D_L01_001B94C0[0]);
-            qcopy(&rotation, &D_L01_001B94C0[1]);
+            qcopy(&position, D_L01_001B94C0);
+            qcopy(&rotation, D_L01_001B94C0 + 16);
             if (v->source == -1) func_L00_002B9D60(D_00189EA0, D_00189EA0 + 0x10, 0x6F, 1);
-            else func_L00_002B9D60(D_L01_001B264C[0] + v->source * 128 + 0x30,
-                                  D_L01_001B264C[0] + v->source * 128 + 0x70, 0x6F, 1);
+            else func_L00_002B9D60(&D_L01_001B264C[0][v->source].forward[3],
+                                  &D_L01_001B264C[0][v->source].inverse[3], 0x6F, 1);
             if (v->mode) func_00335438(&position, &rotation, 2, v->parameter, 0);
-            else if (D_001A79F0[0] == 19) func_00335438(D_L01_001B264C[0] + v->camera * 128 + 0x30,
-                                                 D_L01_001B264C[0] + v->camera * 128 + 0x70, 1, 0, 0);
-            else func_00335438(D_L01_001B264C[0] + v->camera * 128 + 0x30,
-                              D_L01_001B264C[0] + v->camera * 128 + 0x70, 0, 0, 0);
+            else if (D_001A79F0[0] == 19) func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+                                                 &D_L01_001B264C[0][v->camera].inverse[3], 1, 0, 0);
+            else func_00335438(&D_L01_001B264C[0][v->camera].forward[3],
+                              &D_L01_001B264C[0][v->camera].inverse[3], 0, 0, 0);
             { unsigned int saveIndex = m->saveIndex;
+            u8 *p;
+            u8 b;
             D_L01_001B1FA8[0] = 1;
-            m->state = 2;
             m->active = 1;
+            m->state = 2;
             if (saveIndex & 1) {
-                int level = D_001A79F0[0];
-                int index = (s16)saveIndex;
-                u8 *p = D_0019B4A8 + ((index >> 1) + (level << 10));
-                if (((*p >> 4) & 7) != 7) *p += 16;
+                p = &D_0019B4A8[((s16)saveIndex >> 1) + (D_001A79F0[0] << 10)];
+                b = *p;
+                if (((b >> 4) & 7) != 7) *p = b + 16;
             } else {
-                int level = D_001A79F0[0];
-                int index = (s16)saveIndex;
-                u8 *p = D_0019B4A8 + ((index >> 1) + (level << 10));
-                if ((*p & 7) != 7) ++*p;
+                p = &D_0019B4A8[((s16)saveIndex >> 1) + (D_001A79F0[0] << 10)];
+                b = *p;
+                if ((b & 7) != 7) *p = b + 1;
             } }
-            { int camera = v->camera;
-            if (v->lock) { D_L01_001B22A8[0] = 1; camera = v->camera; }
-            { char *base = D_L01_001B264C[0];
-            qcopy(&v->position, base + camera * 128 + 0x30);
-            qcopy(&v->rotation, base + camera * 128 + 0x70); } }
+            if (v->lock) D_L01_001B22A0.busy = 1;
+            { int camera = v->camera; MotionPath *base = D_L01_001B264C[0];
+            qcopy(&v->position, &base[camera].forward[3]);
+            qcopy(&v->rotation, &base[camera].inverse[3]); }
         }
         break;
     case 2:
@@ -142,13 +139,13 @@ void func_L01_00394240(CamMoby *m)
             if (v->mode) func_003355A8(2);
             else func_003355A8(0);
             ref_L01_00394240_01(0);
-            if (v->lock) D_L01_001B22A8[0] = 0;
+            if (v->lock) D_L01_001B22A0.busy = 0;
             D_L01_001B1FA8[0] = 0;
             D_L01_001B9780 = 0;
             m->state = 3;
             m->active = 0;
         } else {
-            if (v->lock) D_L01_001B22A8[0] = 1;
+            if (v->lock) D_L01_001B22A0.busy = 1;
             func_00335370(&v->position);
             func_003353C8(&v->rotation);
         }

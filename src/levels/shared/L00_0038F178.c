@@ -383,8 +383,6 @@ char *func_L00_00395240(char *arg)
     return object;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_00395428);
-
 /* func_L00_003959C0 is defined in L00_003959C0-g8.c. */
 
 /* func_L00_00395A88 is defined in L00_00395A88-g8.c. */

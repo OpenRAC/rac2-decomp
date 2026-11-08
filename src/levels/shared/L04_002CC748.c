@@ -1472,7 +1472,7 @@ finish:
 
 /* func_L04_003C3BA0 is matched in L04-particle-emitter-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L04_003C4050);
+/* func_L04_003C4050 is matched in L04-particle-render-g8.c. */
 
 /* Initialises particle i of this emitter: a random unit-cube direction, a random
    speed, size and lifetime from the emitter's three ranges, a zero age, the current

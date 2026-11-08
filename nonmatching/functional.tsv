@@ -64,9 +64,7 @@ func_002B9380	nonmatching/functional/func_002B9380.c
 func_002CC6B0	nonmatching/functional/func_002CC6B0.c
 func_002F3CF8	nonmatching/functional/func_002F3CF8.c
 func_0034CEA0	nonmatching/functional/func_0034CEA0.c
-func_L00_002AED68	nonmatching/functional/func_L00_002AED68.c
 func_L00_002D5EB8	nonmatching/functional/func_L00_002D5EB8.c
-func_L00_002EC970	nonmatching/functional/func_L00_002EC970.c
 func_L00_0032CF60	nonmatching/functional/func_L00_0032CF60.c
 func_L00_0036BE28	nonmatching/functional/func_L00_0036BE28.c
 func_L00_0036C9AC	nonmatching/functional/func_L00_0036C9AC.c
@@ -126,7 +124,6 @@ func_002F0D00	nonmatching/functional/func_002F0D00.c
 func_002F5118	nonmatching/functional/func_002F5118.c
 func_L00_002E2048	nonmatching/functional/func_L00_002E2048.c
 func_L05_0037A5F8	nonmatching/functional/func_L05_0037A5F8.c
-func_L01_00394240	nonmatching/functional/func_L01_00394240.c
 func_L06_003E5D30	nonmatching/functional/func_L06_003E5D30.c
 func_00282C90	nonmatching/functional/func_00282C90.c
 func_00283360	nonmatching/functional/func_00283360.c
@@ -139,7 +136,6 @@ func_0028D1E8	nonmatching/functional/func_0028D1E8.c
 func_L00_0036EF68	nonmatching/functional/func_L00_0036EF68.c
 func_L04_0032F62C	nonmatching/functional/func_L04_0032F62C.c
 func_L04_0032F994	nonmatching/functional/func_L04_0032F994.c
-func_L04_003C4050	nonmatching/functional/func_L04_003C4050.c
 func_L05_00444840	nonmatching/functional/func_L05_00444840.c
 func_L05_0041EF00	nonmatching/functional/func_L05_0041EF00.c
 func_L15_0042EFE0	nonmatching/functional/func_L15_0042EFE0.c
@@ -171,7 +167,6 @@ func_L22_002F3B38	nonmatching/functional/func_L22_002F3B38.c
 func_L04_0032F1D8	nonmatching/functional/func_L04_0032F1D8.c
 func_L04_0032F340	nonmatching/functional/func_L04_0032F340.c
 func_00281A08	nonmatching/functional/func_00281A08.c
-func_L01_003801B8	nonmatching/functional/func_L01_003801B8.c
 func_L22_003A5018	nonmatching/functional/func_L22_003A5018.c
 func_002761F8	nonmatching/functional/func_002761F8.c
 func_00277258	nonmatching/functional/func_00277258.c
@@ -186,7 +181,6 @@ func_L00_002E0200	nonmatching/functional/func_L00_002E0200.c
 func_002A3110	nonmatching/functional/func_002A3110.c
 func_L01_003BCEC8	nonmatching/functional/func_L01_003BCEC8.c
 func_L02_003C43F0	nonmatching/functional/func_L02_003C43F0.c
-func_L00_00395428	nonmatching/functional/func_L00_00395428.c
 func_00282D48	nonmatching/functional/func_00282D48.c
 func_002900B8	nonmatching/functional/func_002900B8.c
 func_002A3DB8	nonmatching/functional/func_002A3DB8.c
@@ -220,7 +214,6 @@ func_002E2988	nonmatching/functional/func_002E2988.c
 func_002F4FA0	nonmatching/functional/func_002F4FA0.c
 func_L00_002EDCF0	nonmatching/functional/func_L00_002EDCF0.c
 func_L04_0032F3C0	nonmatching/functional/func_L04_0032F3C0.c
-func_002EAB18	nonmatching/functional/func_002EAB18.c
 func_002F5FB8	nonmatching/functional/func_002F5FB8.c
 func_002CA070	nonmatching/functional/func_002CA070.c
 func_L00_002A3B88	nonmatching/functional/func_L00_002A3B88.c

@@ -112,7 +112,7 @@ s32 func_L00_002AEAC0(s32 value) {
 
 /* func_L00_002AEB18 is defined in a sibling unit. */
 
-INCLUDE_ASM("asm/levels", func_L00_002AED68);
+/* func_L00_002AED68 is defined in a sibling unit. */
 
 /* func_L00_002AF3D8 is defined in a sibling unit. */
 
