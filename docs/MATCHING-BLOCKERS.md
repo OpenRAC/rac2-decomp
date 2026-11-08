@@ -1106,6 +1106,24 @@ that loop.c skipped that loop: reload can rebuild a hoisted base. The next
 useful experiment is promotion of the real alpha-table base while preserving
 the strand index's shortened lifetime. No strict linked match is claimed.
 
+**7 November 2026, round 11 (retained near miss):** USA v1.01, retained C with
+`-O2 -G0 -ffunction-sections -fno-sched-interblock -fno-gcse`: adding
+`-frac2-mult-add-no-flatten` reduces 63 aligned instruction differences to 52
+(684/708 bytes, 0/27). Retail's inner-loop pointer starts all have that
+switch's unflattened `x*16 + (i*160 + (D - 16))` form. Retail is split-address
+code, so `-mno-split-addresses` (39 differences with a loop-2 `delta` pointer)
+is not its profile. The loop dump confirms that the outer loop's table and
+`160` invariants are hoisted but receive no hard register, so reload
+rematerializes them as in retail. The remaining saved-register base is the
+first inner loop's preheader copy of `D_L00_00240080` (REG_EQUIV, live 154,
+`$s7`). Retail loads that base afresh for every pointer start. No change came
+from `-G8`, `-fno-rerun-loop-opt`, `-fno-rerun-cse-after-loop`,
+`-fno-cse-follow-jumps`, `-fno-cse-skip-blocks`, `-fno-regmove`, `-fforce-addr`
+or `-fno-expensive-optimizations`. The full list is in the retained source.
+Round 12 retains an index-form first guard with `timer_offset` defined inside it,
+which reproduces retail's `sll $v1` / `daddu $s5,$v1` copy: 692/708 bytes, 47
+aligned differences, 564/708 bytes in aligned agreement.
+
 **Signature:** retail emits `lui $r,%hi(D)` + `lw`/`addiu` *inside* the loop body; cc1 hoists the address into a callee-saved register, so the loop loses an instruction, the 8-byte alignment `nop` before the label disappears, and the frame grows by two saves.
 
 **Measured:** `for` and `do/while` both fold. Those tested loop forms did not move the original attempts. Later source/profile remedies mean this is not a universal impossibility claim; wave 8 recorded the two observations below.
