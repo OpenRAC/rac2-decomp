@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, lesson 48 sweep): scripted moves of every statement by 1..6 (548 singles + 109 pairs) and top-level items (548): best legal is 150 vs base 151 aligned differences (h/pF0 one-step moves, noise), size stays 3556/3552; DRAWBUF with strlen before the colour load 3540 bytes/174, a colour local in DRAW no change. Callee prototypes checked against src: consistent. */
 /* 8 November 2026, Sonnet round (o7c): body below is 3556/3552 bytes (was 3564), 0/1, about 100
  * aligned words differ (relocations masked). Change: a `half = 0.5f;` local after
  * func_L00_0037B7B0 (precedent: func_L02_003FF6E8, func_L08_0041D808) used by every box chain and

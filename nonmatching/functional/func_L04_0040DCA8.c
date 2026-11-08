@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round s16, lesson 48, scripted scorer): every single corner store/clear moved to every slot between the packet setup and the vertex loop, packet state/colour/uv stores moved across the call window, and all pairwise corner-block moves (~800 compiles): none below 3 words. */
 /* functional: high. Near-miss draft within a few instructions of retail: differences are register allocation, scheduling and instruction shape. */
 /* func_L04_0040DCA8 (740 bytes, 6 places). Tier opus-1, 28 October 2026.
  * Unit: default flags (-O2 -G0 -ffunction-sections), in L04_00402D90.c or a

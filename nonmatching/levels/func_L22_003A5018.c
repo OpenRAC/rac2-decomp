@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round s16, lesson 48, scripted scorer): one2=1, text=textBuffer, one=1, y/x/width/ref_43++ and gauge-2 assignments moved to every legal slot (~350 compiles): none below 2 rows; one2=1 after the count 2 block gives 4. */
 /* 8 November 2026, Sonnet round (o9, ~6 check.py runs, one 1500 s permuter run: no gain over 130). Still 2 rows (count 1). Colour read before label_y's value, before text = textBuffer, or before the first sprintf: all 3028 bytes (frame 0x100). */
 /* 8 November 2026, o7b follow-up (~22 check.py runs): count 1's 2 rows unchanged by every honest order of the colour
  * load and the strlen argument: colour inside the draw call's argument list (also with `len =`), strlen through a
