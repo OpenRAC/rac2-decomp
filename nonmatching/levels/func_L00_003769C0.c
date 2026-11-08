@@ -1,3 +1,30 @@
+/* 8 November 2026 (nominalsan, Opus 5.5): compiles to 1212 bytes (retail 1216), 0/27 USA, default flags.
+ * Aligned with relocations masked, 303 of retail's 304 instructions agree: retail fills the backward bne's
+ * delay slot with `lui v0,%hi(wanted base)` from the loop top, this C with the colour `addu`.
+ * What moved it: `wanted` computed at its use (haifa then moves the madd ahead of the key's addu); the colour
+ * read as `tbl + (off + 4)` (cse1 puts a known constant second; this form keeps retail's (tbl, off) and the
+ * table's low part in the loop); the rows as `D_L00_0022F7C0 + 0x140` (no hoisted high part taking v0 before
+ * y); `j = 0` before the do/while(0) and `wanted` declared first (global-alloc ties j and wanted at 1.5, the
+ * lower pseudo wins, giving retail's a2/a3).
+ * Remaining: `top` is outside the loop notes, so reorg (mostly_true_jump) predicts the bne not taken. A loop
+ * note directly before `top` fixes it: as a probe only, `j=0; do { do { } while(0); top: ... } while(0);`
+ * matches 27/27 in USA, PAL and v2.00 (tools/check.py), but empty loops are excluded (docs/COMPILER-NOTES.md).
+ * Why nonempty forms fail: the table's low part stays in the loop only if its register is shared with the
+ * colour block (scan_loop), which needs both in one group because cse1 stops at a loop end; reorg needs the
+ * bne in a loop containing `top`; the allocation needs `j = 0` one level shallower than the rest; and a group
+ * starting with its label is a real loop unless entered from outside. Measured, no match: jump-into-loop
+ * shapes with retail's control flow (1132-1148 bytes), smaller groups (1080-1140), rac1's
+ * `while (t[i].key != END && t[i].key != id) i++;` idiom and for/break forms (1012-1044), -g,
+ * __builtin_expect. Siblings: rac1's render_vendor_item_icon_strip_pass shares the scroll and pulse code;
+ * RAC2's func_L00_00376600 shares the row loop and rows at +0x140; neither has the search.
+ * Next: the original construct that leaves a loop note before `top`, with evidence (e.g. a debug macro).
+ */
+/* 7 November 2026 (nominalsan, Opus 5.5): 1220 bytes with -fmove-all-movables, 11 instructions differing.
+ * Kept from it: the `fade()` helper (y+2 in s0 copied to s6) and the search in a do/while(0), which flow counts
+ * as a loop (idx s2, colour s3, as retail) and loop.c skips as phony. Measured then, no gain: real for/while
+ * searches, a single-flag sweep (-frac2-*, -fno-sched-*, -fno-strength-reduce, -G8, -g), and three
+ * decomp-permuter runs on the earlier C (about 1.1 million candidates; only the colors[] store order kept).
+ */
 /* Closer C, 1 November 2026: -O2 -G0 -ffunction-sections -fmove-all-movables, 1212/1216, 43 rows. Retail's search keeps
  * its integer index, so it is a goto loop: loop.c reduces every do/while or for form. Left: retail recomputes the
  * entry address for the colour (addu v0,a1,a0; lw 4(v0)), idx/colour take s2/s3 the other way, i+1/y+56 swapped.
@@ -22,9 +49,7 @@ extern int D_001A7344[] __attribute__((sda));
 typedef struct { int words[0x744/4]; } Menu705;
 extern Menu705 D_L00_0022F7C0[];
 typedef struct { int key; unsigned int color; } MenuColor;
-extern MenuColor D_L00_0028E9F0[] __attribute__((sda));
-typedef struct { int words[7]; } MenuRow;
-extern MenuRow D_L00_0022F900[] __attribute__((sda));
+extern MenuColor D_L00_0028E9F0[];
 extern void func_002FC620(int, int, int, int);
 extern int func_00282C30(int);
 extern void func_00285548(int,int,int,int,int,int,unsigned int);
@@ -32,6 +57,12 @@ extern char *func_0028E588(int,int);
 extern int func_0028EA58(char *,int,int,int,int,unsigned int *);
 #define MW(o) (D_L00_0022F7C0[0].words[(o)/4])
 #define MY(y) ((int)(D_L00_001B25E0[0]*(y)+0.5f)+(D_001A7B90[0]?4:0))
+static __inline__ int fade(int v)
+{
+    double d=256.0f-(float)v;
+    if(d<0.0) d=0.0-d;
+    return 128-(int)(d*0.75);
+}
 void func_L00_003769C0(void)
 {
     int y;
@@ -39,7 +70,6 @@ void func_L00_003769C0(void)
     unsigned int pulse;
     unsigned int color;
     unsigned int colors[4];
-
 
     bottom=MY(382.0f);
     top=(int)(D_L00_001B25E0[0]*320.0f+0.5f);
@@ -58,38 +88,40 @@ void func_L00_003769C0(void)
         char *text, *row;
         idx=i+MW(0x80);
         if(idx<0 || idx>=MW(0x740)) continue;
-        row=(char *)&D_L00_0022F900[idx];
+        row=(char *)D_L00_0022F7C0+0x140+idx*28;
         text=func_0028E588(0xea97,*(int *)row);
-        d=256.0f-(float)(y+2);
-        if(d<0.0) d=0.0-d;
-        a=128-(int)(d*0.75);
-        d=256.0f-(float)(y+40);
-        if(d<0.0) d=0.0-d;
-        b=128-(int)(d*0.75);
+        a=fade(y+2);
+        b=fade(y+40);
         if(a<0) a=0;
         if(b<0) b=0;
         a<<=24; b<<=24;
         if(*(int *)row==0) {
-            int j=0;
             char *label;
             int key;
             int off;
+            int *wanted;    /* declared before j: equal allocation priorities go to the lower pseudo */
+            int j;
+
+            j=0;
         top:
-            off=j*8;
-            key=((MenuColor *)((char *)D_L00_0028E9F0+off))->key;
-            if(key) {
-                j++;
-                if(*(int *)((char *)D_L00_0022F7C0+0x158+idx*28)!=key) goto top;
-                color=((MenuColor *)((char *)D_L00_0028E9F0+off))->color;
-            }
+            do {
+                off=j*8;
+                key=*(int *)((char *)D_L00_0028E9F0+off);
+                if(key) {
+                    j++;
+                    wanted=(int *)((char *)D_L00_0022F7C0+0x158+idx*28);
+                    if(*wanted!=key) goto top;
+                    color=*(unsigned int *)((char *)D_L00_0028E9F0+(off+4));
+                }
+            } while(0);
             label=func_0028E588(0xea97,1);
             colors[2]=colors[0]=a|color;
             colors[3]=colors[1]=b|color;
             func_0028EA58(label,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
             color=0xf0f0b0;
         }
-        colors[2]=colors[0]=a|color;
         colors[3]=colors[1]=b|color;
+        colors[2]=colors[0]=a|color;
         func_0028EA58(text,y+2,MY(332.0f),40,(int)(D_L00_001B25E0[0]*40.0f+0.5f),colors);
     }
     }
