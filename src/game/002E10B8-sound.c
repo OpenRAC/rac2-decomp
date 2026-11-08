@@ -13,7 +13,7 @@ typedef struct {
 
 extern u8 D_00188660[];
 extern int D_001A7B98 __attribute__((sda));
-extern void func_00131DE8(int);
+extern int func_00131DE8(int);
 extern void func_00132938(int);
 extern void func_00132978(int, int);
 extern void func_001329B0(int, int, int);

@@ -1271,6 +1271,9 @@ bytes, 808 to 722 words). The four words left in the retained draft are a `$v0`/
 fake lifetimes. Its true type is `void`: it has no return statement, and none of its callers
 reads `$v0` after the call, in C or in assembly, in any release (one call per program; in each
 the call's slot is a nop and the next instructions write `$v0` or call another function).
+With both, func_L00_002A3B88 is 27 of 27. The two functions are `src/core/00131DE8.c` (a game
+unit; 00131780.c is an SDK unit) and `src/levels/shared/L00_002A3B88-g8.c`, with no switch.
+00131DE8.c's comment gives the RAC2 evidence that the IOP writes 0x001A7100..0x001A713F.
 
 The signature: retail's `jal` slot is a nop while the insns just before the call are a plain
 store and then a volatile store. A store retail lets into a slot past a volatile store is a

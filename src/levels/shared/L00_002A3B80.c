@@ -7,7 +7,8 @@ int func_L00_002A3B80(void)
     return ref_L00_002A3B80_00;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_002A3B88);
+/* func_L00_002A3B88 is defined in L00_002A3B88-g8.c: its declarations of D_00189E20 and
+   D_001A7398 conflict with this file's. */
 
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;

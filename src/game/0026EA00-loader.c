@@ -115,7 +115,7 @@ extern void func_002B67E0(int, int);
 extern int func_002B7B18(int, int, int);
 extern short func_002B7CE0(int);
 extern void func_002B9000(void);
-extern int func_002C9C20(void);
+extern void func_002C9C20(void);
 extern void func_002CA8A8(void);
 extern int func_002E9268(void);
 extern void func_002EA8E8(void);

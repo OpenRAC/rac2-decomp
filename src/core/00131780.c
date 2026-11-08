@@ -195,7 +195,7 @@ ASM_FUNC("asm/core", func_00131CB0);
 
 /* func_00131D98 is defined in 00131D98.c. */
 
-INCLUDE_ASM("asm/core", func_00131DE8);
+/* func_00131DE8 is defined in 00131DE8.c (game compiler). */
 
 /* func_00132028 is in its own -g8 unit. */
 

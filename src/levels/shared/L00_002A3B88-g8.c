@@ -1,47 +1,9 @@
-/* 4 November 2026 actual-contract review; retained near miss, not linked.
- * USA v1.01 check.py: 3428/3432 bytes, 0/27 placements; first difference size mismatch.
- * Profile: -O2 -G8 -ffunction-sections.
- * func_002C9C20 and func_002E9268 keep their defined int returns. The one-word delay-slot
- * residual is unchanged. A selected volatile store chosen only to affect scheduling remains
- * unsupported.
- * Earlier measurements below are historical where superseded by this note.
- */
-/* Claude Opus 5.5 xhigh retry, 2026-10-31 (task v1862). Unmatched: not a linked match.
- * Goes in src/levels/shared/L00_002A3B88-g8.c (-G8; take the marker out of L00_002A3B80.c).
- * This body, USA v1.01, -O2 -G8 -ffunction-sections: 3428/3432 bytes, 0/27 places.
- * PAL and USA v2.00: "in neither catalogue". All declarations it needs follow.
- *
- * One real difference: at the first call of the loop header (0x002A404C-0x002A4070)
- * retail keeps `daddu $s3,$zero,$zero` before the dsll32 and has a nop in the jal slot;
- * this body lets reorg move that clear into the slot. Every later row is that shift
- * plus relocated fields; the rest of the function already agrees.
- *
- * EXACT-BYTES FORM, 27/27 places, NOT ALLOWED (a volatile cast on one chosen access),
- * so reported FAILED as WORKER2.md requires. Replace the header's accumulator line with:
- *     *(volatile long *)&D_001A7200 = D_001A7200 + (unsigned int)*(volatile int *)0x10000800;
- *
- * Why: reorg scans back from the jal. resource.c (line 713) overwrites set.volatil at each
- * store, so a plain `sd` clears what the volatile T0 `sw` set and the clear is eligible;
- * a volatile `sd` keeps it set and every earlier insn conflicts. Retail's store therefore
- * behaves as volatile while its `ld` behaves as plain (below).
- *
- * Measured and rejected:
- * - `extern volatile` on D_001A7200: 3432 bytes but T0 is read first; 5 rows differ.
- *   Reading it into a local first fixes the order, and $a0/$v1 swap (8 rows): volatile
- *   reads chain, so sched1 issues the ld before the address's ori (seen in the dump). By
- *   local-alloc's formula (computed, not dumped) address 30/20 then ties total 24/16 and
- *   the older qty wins. It also breaks the matched func_001339B0 (probed, reverted), so
- *   the object is not volatile in retail.
- * - Commuted addition: 10 rows differ. Reordering flush/extra only changes which clear
- *   lands in the slot.
- * - Plain T0 read, also through a local: combine folds it to lwu (3424 bytes), so retail's
- *   read is volatile.
- * - RAC1's wording (run_level_main_loop, `long ... MACRO_ADDR`, `+=`) is this body.
- *
- * Reopen only if the maintainers rule on the cast, or with C that makes the store alone
- * volatile. No emitted branch targets this range, so a surviving label cannot explain it.
- */
-
+/* func_L00_002A3B88 (RunLevelLoop): clears level state, restores its settings and services frames
+ * until loading ends. A -G8 unit of its own. In the loop header the plain `sd` of D_001A7200 and
+ * then the volatile T0_COUNT (0x10000800) clear come just before the first jal; the compiler's
+ * default set-side volatile rule (GCC 2.95's) leaves that slot empty, as retail does, where the
+ * EE tree's rule fills it with the clear of the frame accumulator (docs/COMPILER-NOTES.md).
+ * 0x10000800 is the EE timer 0 count register. */
 #include "common.h"
 
 /* Partial views of the resident settings, weapon table and per-level statistics. */
@@ -121,17 +83,15 @@ extern unsigned char D_L00_0021DDB0[];
 extern short D_001A63F0 NOT_SDA;
 extern unsigned char D_0018D278[];
 
-/* Current C interfaces and observed argument banks of the retail call sites.
- * Assembly-only callees with discarded results are declared for their effects;
- * their original return types are not established by these call sites. */
+/* The callees' prototypes, as their definitions in src/ declare them. */
 extern void func_00282A88(void *, int);
 extern void func_0026FEB8(const char *, ...);
 extern void func_002EED08(void), func_00290758(void);
 extern void func_00292078(int), func_00292408(int), func_002926B8(int), func_002925F0(int);
 extern int func_002AD860(int);
-extern void func_L00_00303990(int, int);
+extern int func_L00_00303990(int, int);
 extern void func_00294F10(void), func_0028AB70(void), func_0029CD48(void);
-extern int func_002C9C20(void);
+extern void func_002C9C20(void);
 extern int func_002B49E0(int, int, int, int, unsigned char *);
 extern void func_0027D330(int), func_002B6E78(int, int, int), func_002B72E8(int);
 extern void func_00133220(void);
@@ -166,7 +126,6 @@ extern void func_00133230(void), func_002E5FE0(void), func_002B7170(void), func_
 extern void func_L00_0032B500(int), func_00297670(void *), func_002EC408(void);
 
 /* Clears level state, restores its settings and services frames until loading ends. */
-#define T0_COUNT (*(volatile unsigned int *)0x10000800)
 void func_L00_002A3B88(void)
 {
     int i, allowed, oldMode, flush, extra, limit, ticks, sound, period;
@@ -250,7 +209,7 @@ void func_L00_002A3B88(void)
             func_002B9000();
             func_L00_0036F488();
             if (D_L00_001A7C80 == 1) {
-                T0_COUNT = 0;
+                *(volatile unsigned int *)0x10000800 = 0;
                 func_002B9000();
                 func_L00_0036F488();
             }
@@ -344,11 +303,11 @@ void func_L00_002A3B88(void)
             }
         }
         func_002FC3C0(1);
-        elapsed = func_00283CE0(T0_COUNT);
+        elapsed = func_00283CE0(*(volatile unsigned int *)0x10000800);
         D_L00_001B19CC = elapsed * (D_001A7B90 ? 0.00008680556f : 0.00010416667f);
         if (!D_00189E20.flush && !D_L00_001B19D4[0]) {
             if (!D_L00_001A8F00[0]) {
-                ticks = T0_COUNT;
+                ticks = *(volatile unsigned int *)0x10000800;
                 limit = D_001A7B90 ? 11520 : 9600;
                 if (D_L00_001A7C80 == 0) {
                     if (limit < ticks) {
@@ -394,7 +353,7 @@ void func_L00_002A3B88(void)
                 }
                 func_L00_003584B0();
             } else if (D_L00_001A8F00[0] == 2) {
-                int now = T0_COUNT;
+                int now = *(volatile unsigned int *)0x10000800;
                 int budget = D_001A7B90 ? 11520 : 9600;
                 if (budget < now && !D_L00_001BCB24) {
                     func_002B9000();

@@ -694,7 +694,7 @@ int func_002C9B88 (int *p)
   return 0;
 }
 
-int func_002C9C20(void)
+void func_002C9C20(void)
 {
     char *b = D_001F2840;
     int value = -1;

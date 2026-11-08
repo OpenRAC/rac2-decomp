@@ -1962,6 +1962,24 @@ No flag or artificial scheduling dependency is needed beyond the existing G8 uni
 (27/27) match with `-frac2-sticky-volatile-refs`: GCC 2.95's `res->volatil |=`
 keeps reorg's search stopped after the copy's volatile asm.
 
+**8 November 2026, resolved (set side):** `func_L00_002A3B88` (3,432 bytes, 27/27 USA v1.01; v2.00
+has its own row; PAL's counterpart, `func_PAL_L00_002A3988` (3,524 bytes), is unmatched) and
+`func_00131DE8` (576 bytes, 1/1 in us, pal and us2) were 4 bytes short: the EE tree's compiler
+filled a `jal` slot that retail leaves empty with an insn from before a plain store and then a
+volatile store. The EE tree's mark_set_resources resets `volatil` at the plain store, so reorg's
+backward search goes past the volatile one. GCC 2.95's `|=` there (the mark_set_resources half of
+the change `-frac2-sticky-volatile-refs` takes the other half of) is now the compiler's default,
+`-fno-rac2-sticky-volatile-sets` to opt out; it gives the empty slot with no per-unit flag.
+`func_00131DE8`'s volatile store is to the CD read status block at 0x001A7100, which the IOP writes:
+the EE hands it its address and invalidates the block's cache lines before each poll read
+(src/core/00131DE8.c names the functions). The one matched function it changed, `func_00132498`, had
+stored its callback argument through a volatile no second context writes; as an sda array element
+(`D_001A74D0_1[1]`) it matches with either rule (docs/COMPILER-NOTES.md, "reorg: a volatile store
+stays marked"). `func_L00_002A3B88` also needed the true `void` type of `func_002C9C20`, which has
+no return statement and whose result no caller reads (C or assembly, in any release); the `int`
+return's unused `$v0` swapped `$v0`/`$v1` at 0x002A3D7C. Signature: retail's slot is a nop right
+after `<plain store>; <volatile store>; jal`.
+
 **Named examples now resolved:** func_L18_0042FAA8, func_L02_003D69F0 and func_L23_003C0E98 each pass1/1. Their older measurements below are retained as history, not current blockers.
 
 **Signature:** the multiset of instructions is right and the size is right (or off by one), but
@@ -2787,7 +2805,7 @@ particular label spelling does not unblock the loop layout.
   tests it with `bgtz`, converts it through `func_00283CE0(int)` and takes a
   reciprocal. Preserve the separate float input and use an integer duration;
   casts of frame counts to `void *` are not the semantic contract.
-- **An integer register does not imply an `int` result.** The retained
+- **An integer register does not imply an `int` result.** The matched
   `func_L00_002A3B88` forwards `func_0028E640`'s complete 64-bit texture descriptor
   to `func_0028F410`. The callee builds it with a shift and OR; truncating to
   32 bits would be a false interface even if a later allocation looked closer.
@@ -3020,7 +3038,7 @@ Historical examples, to requalify in the final unit:
 - **The address of a member can leave a base pseudo.** With one union for a frame area, `scratch.fx.a` sets a pseudo for `&scratch` first. Cse folds the member but keeps that pseudo for the base member, so its `addiu` appears too early (func_L18_004401E0). Retail's overlap of four vectors and a request block is block-scoped storage: declare the vectors in a block nested one level inside the `if`, with nothing after them, as the slots are then freed for the request block's own nested scope.
 - **A catalogue row's name is not always its address.** func_L05_0033D3A0 sits at 0x33D3A8 and func_L16_003A8D58 at 0x3A8D60; the eight bytes before each are the previous function's end. Read the address from the row before generating assembly. Fuzzy twin screens should use it too: func_L05_0033D3A0 turned out to be func_002B1350 with a data name changed.
 - **An `sda` read at a nonzero offset stays out of delay slots (1 November 2026).** func_L01_003980D0 read a byte at 0x001A7A0A. As a plain global it splits into `lui` + `lbu` with two registers, and the `lui` fills the branch slot. As an `sda` scalar it is a one-word load that reorg moves into the slot, where it becomes a $gp load. Declared as `D_001A7A00[]` under `sda` and read at `[0xA]`, it is a length-2 macro load: tied `lui v0 / lbu v0`, not eligible for the slot, so reorg takes retail's `beql` from the target. The offset's value is real: 0x001A7A00 is a known object elsewhere in `src/`. Try this where retail has a tied load after a branch-likely.
-- **Plain server snapshots and delay-slot filling (6 November 2026, retained near miss).** `func_00131DE8`, USA v1.01 boot, game `-O2 -G0 -ffunction-sections`: removing volatile from the earlier retained C gives 552/576 bytes, 0/1 places, 70 differing instruction positions after resolving relocations. Grouping each necessary server snapshot in a one-pass loop and using a decrement-first delay recovers retail's two `9999` bgez slots. Independent initialization-store ordering and groups around read-state clears reach 572/576, 32 positions (retained in `nonmatching/core/func_00131DE8.c`). Server/limit registers remain swapped and the final store/argument schedule leaves the epilogue four bytes early. Scalar/owner declarations, distinct loop locals, bind-result reuse, explicit limits and nested decrement groups do not resolve it; unsigned comparisons add a two-instruction limit. SDA client fields also keep the load out of the slot but do not fix allocation. Next useful input is allocator/scheduler dumps of this plain-C source. Approximately 200 check.py calls; no linked build or matching credit. Older volatile-based notes are superseded history.
+- **Plain server snapshots and delay-slot filling (6 November 2026; resolved 8 November 2026 by the compiler's default set-side volatile rule, section 19).** `func_00131DE8`, USA v1.01 boot, game `-O2 -G0 -ffunction-sections`: removing volatile from the earlier retained C gives 552/576 bytes, 0/1 places, 70 differing instruction positions after resolving relocations. Grouping each necessary server snapshot in a one-pass loop and using a decrement-first delay recovers retail's two `9999` bgez slots. Independent initialization-store ordering and groups around read-state clears reach 572/576, 32 positions (retained in `nonmatching/core/func_00131DE8.c`). Server/limit registers remain swapped and the final store/argument schedule leaves the epilogue four bytes early. Scalar/owner declarations, distinct loop locals, bind-result reuse, explicit limits and nested decrement groups do not resolve it; unsigned comparisons add a two-instruction limit. SDA client fields also keep the load out of the slot but do not fix allocation. Next useful input is allocator/scheduler dumps of this plain-C source. Approximately 200 check.py calls; no linked build or matching credit. Older volatile-based notes are superseded history.
 - **A table field through a struct orders the `addu` (1 November 2026).** func_L00_0039E7A8 indexed two level tables at +0x464 through local byte pointers, which put the index first. `struct { char pad[0x464]; u8 disabled[1]; }` read as `table.disabled[i]` puts the base first at all three sites and closed the function; func_L01_003980D0 already read its table that way. It did not move func_L00_003D3388, whose retail order is the other way round (index first after a `mult`).
 - **Encoding correction:**0x700014A9 is por v0,zero,zero, not pcpyld. TI zero materialisation is reachable in appropriate cases; retention/folding depends on current source/profile(section 17). The word alone neither proves handwritten assembly nor proves a complete C match.
 - **A register copy retail keeps means its source was overwritten.** gcse's cprop removes `b = a` whenever `a` is untouched between the copy and b's uses, so a surviving `daddu` in front of a long stretch says `a` is set again later: one scratch variable doing two jobs. func_0028C6D0 (37 words to 0): `scratch` holds the colour, is copied into `color`, then takes the string length. func_L00_003ED198 (57 words to 0, size 1712 to 1720): an int holds &delta, is copied into the loop's pointer, then takes the random phase in the loop; a block-local `float *t` used only up to the call gives retail's `$v0`-then-`$s5` pair. Measured with cprop switched off in a research cc1: most near misses get worse, so cprop itself runs in retail.
