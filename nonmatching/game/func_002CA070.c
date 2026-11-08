@@ -1,3 +1,35 @@
+/* 7 November 2026 (opus, DrLegitamate): current master compiler, own unit -O2 -G16 -Wa,-G16.
+ * This draft: 10 rows differ, all in case 8 (upd/page/c registers); everything else is relocations.
+ * Retail's allocation is init $v0, 0x18 $v1, upd $a1, page $a2, c $a3, i.e. local-alloc priority
+ * init > 0x18 > upd > page > c. With cc1 -dl the block-10 sched1 order confirms the priority
+ * model (floor_log2(refs) * refs / life): with refs fixed (page 5, init 5, c 4, upd 4, 0x18 3) the
+ * only way is sched1 emitting the init store before the upd and c stores and the 0x14 page store
+ * last (next, a0, a, b, init, upd, c, page). Haifa's rank_for_schedule prefers the lower
+ * INSN_REG_WEIGHT before LUID, so the stores that kill their value (upd, c, the last page store)
+ * always precede the init store, whose value the call still uses.
+ * Measured: 28 single per-file flags (none better; most far worse); all 15,120 orders of the
+ * seven stores with the four addresses in locals (every local declaration order with page first);
+ * 100,000 random forms (locals or constants per value, Menu/Cutscene pointers, chained page/next
+ * and a/b stores, three call spellings). The best of all of them gets 3 of the 5 registers.
+ * Locals declared page, c, upd, init with stores next, upd, page, c, init (a, b first) give page
+ * $a2 and c $a3 as retail but swap upd and 0x18 (7 rows). Reopen only with a source cause for one
+ * more reference to the init or upd value, or a different call/struct shape for case 8.
+ * Same day, second pass. An instrumented local-alloc (printing each qty's refs, birth/death in half-luids
+ * and QTY_CMP_PRI) gives this draft's case-8 block: init 5 refs [12,44] 3125 $v0, 0x18 3 refs
+ * [24,34] 3000 $v1, page 5 [6,40] 2941 $a1, c 4 [8,36] 2857 $a2, upd 4 [10,38] 2857 $a3.
+ * Retail needs upd > page > c below 3000: with these refs, page life >= 36 and c life >= 30
+ * while upd stays at 28. The only schedule that does it loads page's %hi before D_00210A40's
+ * and stores ..., init, upd, page, c (c last). rank_for_schedule compares INSN_REG_WEIGHT before
+ * LUID, so page's last store (it ends page and the menu base, weight -2) always goes early.
+ * Also measured: a function-wide `list` variable shared by the cases (as retail's shared case
+ * tails suggest) makes page's value global and unties its %hi, but reaches at most 6 of 10
+ * register checks; a 300,000-sample grammar mixing constants, case-local and function-wide
+ * variables for all five values, chained stores and both call spellings: at most 6 of 10;
+ * every single flag and every pair of 48 flags on three base drafts: no gain; a direct
+ * func_002CB510(0) call gives all five registers but compiles to jal (MIPS defines
+ * NO_FUNCTION_CSE), where retail calls through the stored value; a null-guarded call keeps the
+ * branch.
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the measured int returns of func_002CB510 and func_0029D830 and the void contract of func_002DE3A0.
  * The 1372-byte source remains a near miss; interface corrections do not qualify its allocation/scheduling.
