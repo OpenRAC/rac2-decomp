@@ -1,3 +1,4 @@
+/* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build gives retail's 101 a0/t0 registers: stock 991111 and SN v2.73a/v2.74 keep our choice (3428 bytes); SN 2.95.3 (3500) and 2.96 (3348) change registers but not to retail's. Not a compiler-build difference. */
 /* 8 November 2026 (round 12, unit placement): no match, still the same 8 rows (the four 101 a0/t0
  * pairs). Retail places each trio member right after a matched HUD sibling and the 488-byte menu
  * func_L05_0041ED18 (L15: E1B0, EDF8, EFE0; L05: DF58, ED18, EF00). Measured in L15 by appending

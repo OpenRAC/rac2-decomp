@@ -1,3 +1,4 @@
+/* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build gives retail's +0x1A8..+0x1B4 order: SN 2.95.x and 2.96-ee keep our tie choice (752-764 bytes); stock 991111 is 816 bytes and different. Not a compiler-build difference. */
 /* 8 November 2026 (round 12, ~14 check.py runs, retained C and flags): no semantics-preserving way found; retained C stays 752/752, 3 words.
  * Retail's state-7 branch has no 0.0 argument (254, y, 0x88FFFFFF, text, -1) and its add.s uses f23 (half), so the only
  * invisible place for `zero` there is menu_coord2's dead compare: `scaled != none` with zero passed (same value as 0.0f).

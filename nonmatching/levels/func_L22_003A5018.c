@@ -1,3 +1,4 @@
+/* 8 November 2026 (m2z, caller-save angle): global.c:1516 tries caller-saves only when find_reg found no register (best_reg < 0), so CALLER_SAVE_PROFITABLE (4*calls < refs) never decides s-register versus call-clobbered while an s-register is free. cc1 -S on the retained C with and without -fno-caller-saves: identical body (0 lines differ). Uses s0-s7 and fp across 48 calls, but no pseudo takes a caller-save slot (no call-clobbered save/restore pairs); a source change that forced one would add save/restore code that retail lacks. Its 14 rows are scheduling (see round two). Angle closed; no check.py runs. */
 /* 8 November 2026, round two (6 check.py runs plus free cc1 -S scoring). Body: the same 14 rows, now
  * with plain MACRO_ADDR declarations in place of the `_base[0]` #define aliases (no-alias rule).
  * L23 sibling (func_L23_0041DA48, matched, so its compiled code is retail) against L22 retail:

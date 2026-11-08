@@ -1,3 +1,4 @@
+/* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build reproduces retail in any of the 5 clusters: SN builds give our exact 656-byte order in all; stock 991111 differs only in cluster 1 (not retail either); 2.96 is 652 bytes. Not a compiler-build difference. */
 /* 8 November 2026, round 15 (master compiler, ~28 check.py runs): 656/656 bytes, 0/1 places; aligned
  * masked diff 16 -> 15 rows. Profile now -O2 -G0 -ffunction-sections -Wa,--r5900-la-addend=sn (own
  * unit): one SDATA declaration of D_L03_001B0160 gives retail's mixed forms (.x walk addiu s5,$gp; .y

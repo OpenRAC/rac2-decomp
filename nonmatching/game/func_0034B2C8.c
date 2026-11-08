@@ -1,3 +1,42 @@
+/* 6 November 2026 worker follow-up (measured on the 7 November checkout):
+ * USA v1.01, boot + 27 levels; own unit, -O2 -G0 -ffunction-sections
+ * -frac2-keep-float-pun-source. Retained rule-compliant C below: 6048/6048 bytes,
+ * 210 instruction words differ at their offsets after resolving external relocations;
+ * check.py: func_0034B2C8: 0 of 28 places match (src/game/0034B2C8.c).
+ * No linked build run (worker restriction).
+ *
+ * New result: func_00115DA8 is sprintf and returns int, as its matched definition
+ * in src/core/00115DA8.c shows. Correcting the old void/nonvariadic declaration
+ * fixes all nine words around loop 1's second sprintf, including the colour store
+ * in the jal delay slot. The clean old-return control differs at 219 words; the
+ * corrected declaration gives 210. func_00115484 also returns its destination;
+ * correcting that declaration to void * has no instruction effect.
+ *
+ * The previous draft's 12-word result depended on `(void)&o`, a no-code expression
+ * used solely to change PRE spill order. With that expression still present,
+ * correcting sprintf leaves only 3 words different (+0x494/+0x498/+0x49C):
+ *   ours:  sw s5,0x48(sp); sw v1,0x30(sp); jal func_00335F20
+ *   retail: sw v1,0x30(sp); jal func_00335F20; sw s5,0x48(sp)
+ * The next instruction is the same s5=0 in both. This is diagnostic only, not a
+ * landable candidate. The expression and the unused initial `color = 0` are
+ * removed from the retained C to follow the no-steering rule. Removing just the
+ * unused colour initializer costs no instructions; removing the address hint
+ * changes PRE's spill layout, explaining most of the retained 210 differences.
+ *
+ * New experiments: correct return contracts; sched2 verbose dump; real widget
+ * pointer lifetimes; counter initialization positions, widths and equivalent loop
+ * controls; nonempty groups around setup calls/stores; zero-vector spellings.
+ * None improves the clean result. Sticky-volatile-refs has no effect here (there
+ * is no qcopy asm). Disabling sched2 differs at 665 words in the diagnostic
+ * control; disabling interblock/speculation retains its three differences.
+ * sched2 gives the old-s5 spill an anti-dependence to the counter's s5=0, so it
+ * outranks the v1 spill. A real source/alias/lifetime cause for the PRE ordering
+ * and that anti-dependence is needed; no pins, barriers or dead expressions.
+ *
+ * All earlier measurements below are historical controls, before this cleanup;
+ * their references to the unchanged C, dead initializer/address hint and spill
+ * order do not describe the current retained source.
+ */
 /* 7 November 2026: compile as its own unit (src/game/0034B2C8.c) with -O2 -G0 -ffunction-sections
  * -frac2-keep-float-pun-source. 6048 of 6048 bytes, 1508 of 1512 instructions aligned, 12 words differ
  * in place, 0 of 28 places. All 16 colours are right with the one helper hud_bits_34B2C8, the double-use
