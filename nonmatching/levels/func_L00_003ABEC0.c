@@ -29,6 +29,12 @@
    func_0032DA58, -fno-sched-interblock, -frac2-keep-block-order, -frac2-gcse-unsplit-edges,
    -frac2-sticky-volatile-refs, -frac2-hazard-labels. Worse: spin = 0.0f before the normal
    test (moves spin into $f20), `if (!bounce) ... else ...` (bnel form), -fno-schedule-insns.
+   Twin search (8 November): matched twin func_L00_0040A4A8 discards func_002A89A8's result
+   (`if (explode) func_002A89A8(...)`), so it has no spelling of the spin argument; its flags
+   (-frac2-gcse-unsplit-edges) and one-line if/call forms leave 2592 bytes. Diagnostic:
+   -fno-schedule-insns2 gives retail's bounce block exactly (daddu $a0,$s6 in the beqz slot) but
+   the join becomes a1, a2, mov.s, a0 (retail mov.s, a1, a2) and the rest breaks; so retail's
+   order there is the RTL order and sched2 ties decide it.
    Dead ends from the earlier rounds (all with position/heading locals): a pointer variable
    reused for the offset, -fno-gcse, groups around the copies. */
 

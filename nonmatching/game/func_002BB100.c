@@ -1,3 +1,4 @@
+/* 8 November 2026, permuter round 4 (35 min -j3, base 130): best 120 only by duplicating the then-arm under `if (cfg->minimum || ai)` (reads uninitialised ai), invalid; no plain gain. C below unchanged, 5 positions (gap A). */
 /* 8 November 2026, round 3 (gap A only, 12 checks, best body unchanged): no plain form
  * makes $s0 live at the else target. Tried: function-scope `n = D_001BAFC0` before the if
  * (+0x8, 53 diffs); inverted `if (!(flags&1) || !call) copy; else {...}` (1680 bytes);

@@ -1,3 +1,11 @@
+/* 8 November 2026, region donors (v101/m8h): retail's corner-store window (+0x224..+0x238) has no matched opcode twin beyond 6 generic insns (L00_00395A88+0x128 uv stores, ascending order). Nothing to transcribe. */
+/* 8 November 2026, round 16 (twin func_L14_004308D0): unchanged, 3 real words. Twin-style UV loop
+ * (separate u/v cursor steps) and twin vertex loop (j = 3..0, dst/mat pointers) give identical code;
+ * loop-init placement inside the corner block, natural per-corner order (with/without named h),
+ * per-corner clears, a `one` local, -corners[0].f[2] for -h, and inline SetCorner(ptr, y, z[, w])
+ * (frame 0x1F0) gain nothing. Flags: twin's default is ours; -G8, -g, -frac2-qcopy,
+ * -fmove-all-movables, -fforce-mem/-addr, -fno-rerun-loop-opt, -fno-cse-follow-jumps: same 3;
+ * -fno-force-mem 7, -fno-gcse/-fno-rerun-cse-after-loop/-fno-expensive-optimizations far worse. */
 /* 8 November 2026: decomp-permuter, corner block only, 20 min -j4: best 1175 (base 1225) uses fake int temporaries and is 39 words off in check.py; no admissible gain, still 3 words. */
 /* 8 November 2026, round 15: unchanged, 3 real words. sched1 dump: 0.3 and -1.0 const loads
  * are memory-typed (t23/t24), the four TImode const-0 clears are alu-typed, so t25 is

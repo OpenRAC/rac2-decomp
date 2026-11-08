@@ -1,3 +1,4 @@
+/* 8 November 2026 (permuter, 35 min -j3, seeded from the C below): best score 75 (base 135), never 0. The one gain
 /* sol-high, USA v1.01. 8 November 2026: 1360/1360 bytes, 0/2 places, first mismatch +0x198
  * (was +0x8). Flags: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges in a -g8.c unit.
  * Fixed: hud_coord dead-test helper (owner ruling) gives retail's ghost callee-saved reg and the

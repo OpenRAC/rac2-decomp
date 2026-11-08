@@ -1,3 +1,5 @@
+/* 8 November 2026 (permuter round two, 35 min -j3, whole function, seeded from the C below): best score 60 (base 85), never 0.
+/* 8 November 2026, region donors (v101/m8h): same draw-1 unit $s1 preference as func_L02_003FE250; no matched function has the value<10000 sprintf/str=unit shape. Nothing to transcribe. */
 /* 8 November 2026 (permuter, 25 min -j4, draw-1 block of func_L02_003FE250 only): best score 60 (base 85), never 0; the
  * gains are invalid C (an extra `if (str)` read before set duplicating arm1) or y3 reused as the value<10000 flag. No winner. */
 /* 8 November 2026 (round 18, ~6 runs): best C below 1332/1332 bytes, 5/5 words (was 10/10). Using `text`

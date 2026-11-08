@@ -1,3 +1,5 @@
+/* 8 November 2026 (m3, round 3 permuter): 35-minute decomp-permuter run (-j3) on the Quad v[10] C. Best candidate only moves f5C after flags88 (f60, flags88, f5C, f80): still 2 rows (sw 0x88 / swc1 0x60 swapped), one of the 24 orders already measured. Nothing new. */
+/* 8 November 2026, region donor (v101/m8h): func_L16_00404A60 (L16_00403900-g8.c:206) writes the same f58/f5C/f60=1.5708/f80=1.5533 run with the 0x88 |= before it and gets li 1.5708 before li 1.5533. Tried flags88 |= 5 before f84 (with and without f58 after f50): 7 words (sw 0x88 goes first). Retained C stays at 2. */
 /* 8 November 2026, round 3: a 25-minute decomp-permuter run (-j4) on the 2-row pitch C found nothing better (best outputs 148-155 differing rows). */
 /* 8 November 2026, round 2: Quad v[10] is allowed by owner ruling of 8 November 2026 (retail's
  * frame reserves the unused slots), so 2 rows remain. Further tries (about 15 compiles):

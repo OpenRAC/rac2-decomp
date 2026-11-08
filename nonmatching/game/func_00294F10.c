@@ -1,3 +1,6 @@
+/* 8 November 2026 (m3, follow-up): narrow destination ruled out. Retail stores the result with sw 0x238 (word, like the earlier -1 store at the same slot), and 00292888-g8.c's header is int *, so no s16/u8 field fits; retail never sign-extends it, so a short local would add the same sll/sra. */
+/* 8 November 2026 (m3, round 3 permuter): 35-minute decomp-permuter run (-j3). Best useful hint: `= (short)func_002EED58(...)` makes the 0x238 store ready two cycles later and gives retail's exact order (a0, a1, sw 0x238, addiu s2 = &D_001A95B8, jal, sw 0x240 in the slot) but adds sll/sra and truncates, so not usable. So retail's store input becomes ready at least one cycle after the call result; (long), (long long), (unsigned) casts and a `name = D_001A95B8` local set before either call give the same 6 rows (sched1 still issues the address addiu after the call: low priority). */
+/* 8 November 2026, region donors (v101/m8h): no matched function has jal; daddu a0,sX; daddu a1,sY; sw v0 (call result stored after the next call's argument moves), strict or by opcode with register roles. Nothing to transcribe. */
 /* 8 November 2026, Claude Opus 5.5 (task v101/m3k), USA v1.01.
  * Best: 1452/1452 bytes, 0/28 places, 6 differing instructions (was 45).
  * Profile: own unit, -O2 -G64 -Wa,-G64 -ffunction-sections -g

@@ -1,3 +1,4 @@
+/* 8 November 2026, permuter round 4: see nonmatching/game/func_0028A670.c (draw 2 fixed only by an unsigned-char active helper variant; not landed). */
 /* functional: medium. Near-miss draft, not byte-compared in the latest sweep: paths the captured calls never take are unproven. */
 /* func_0028A670. Opus 5.5 (v1961). Unit profile of src/game/00288D88.c: -O2 -G0 -ffunction-sections.
  * Best: 1192/1192 bytes, 0/28 USA v1.01 places, 151 of 298 cdiff rows differ, first mismatch +0xC.

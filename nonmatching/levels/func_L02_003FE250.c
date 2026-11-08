@@ -1,3 +1,5 @@
+/* 8 November 2026, permuter round 4 (35 min -j3, base 85): best 60 = 1 position, but only via `if (str) <arm1> else <arm1>` before the arms (str read before set: makes str conflict with unit, unit -> $s0), invalid. Also hoisting the 0x2f5e lookup above 0x2f44 (80, changes call order). Declaration order of text/unit/str and arm2 spellings (buffer vs unit in sprintf/str) give no change. C below unchanged, 5 words. */
+/* 8 November 2026, region donors (v101/m8h): draw-1 diff is a global-alloc preference (unit $s1); no matched function has the value<10000 sprintf/str=unit shape, and register-role windows over +0x130..+0x180 find no donor. Nothing to transcribe. */
 /* 8 November 2026 (permuter, 25 min -j4, draw-1 block of func_L02_003FE250 only): best score 60 (base 85), never 0; the
  * gains are invalid C (an extra `if (str)` read before set duplicating arm1) or y3 reused as the value<10000 flag. No winner. */
 /* 8 November 2026 (round 3, ~20 runs): no gain; the C below stays at 5/5 words, all in draw 1 (unit $s1, retail $s0).

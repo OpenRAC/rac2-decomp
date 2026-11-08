@@ -791,8 +791,7 @@ void func_L00_003C3920(char *unused, char *arg)
     } while (i >= 0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003C48D0);
-
+/* func_L00_003C48D0 is defined in L00_003C48D0-g8.c. */
 
 
 /* func_L00_003C5310 is defined in L00_003C5310.c. */

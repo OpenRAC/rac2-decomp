@@ -1,3 +1,13 @@
+/* 8 November 2026 (round 12, ~14 check.py runs, retained C and flags): no semantics-preserving way found; retained C stays 752/752, 3 words.
+ * Retail's state-7 branch has no 0.0 argument (254, y, 0x88FFFFFF, text, -1) and its add.s uses f23 (half), so the only
+ * invisible place for `zero` there is menu_coord2's dead compare: `scaled != none` with zero passed (same value as 0.0f).
+ * Effect (lreg dump): zero (base 5 refs / 140 insns, priority .071) becomes 7 refs / 206 (.068, both branches) or 6 / 178
+ * (.067, state 7 only, else literal); k is 5 / 144 (.069), so global-alloc swaps k/zero into f21/f22: 13 words. With zero
+ * live there, draw 4 becomes f15, ori, jal, f16 (ori right, f15/f16 swapped). zero needs len < ~201 or an 8th ref;
+ * `scaled != none && result != 0` reaches 202 but changes code (78 words). No change: dead `scaled = none` (deleted
+ * before counting), zero/k set order (sched1 moves the sets), helper parameter order. */
+/* 8 November 2026 (decomp-permuter round, 35 min, -j4, randomisation, retained C and flags): base score 140 (3 words); best 25 fixes the fourth draw's f16/ori/f15 order but only by passing 0.0 (the zero local, reused for 0.5 before the first menu_coord) as the state-7 23.0f text's half: a semantic change (add.s f23, not f21). With that text's half restored, back to the same 3 words; a second candidate (30) also changed values. Hint: keeping zero's register live into the state-7 branch gives retail's order. */
+/* 8 November 2026, region donor (v101/m8h): func_L05_00421B98 (L05_00421B98-g8.c:87, same family L10/L15/L25) +0x304 compiles retail's draw-4 shape (f14=f20, f16, ori, jal, f15=f14) via HUD_SPRITE(..., fade, fade, 0.0f) with y inline. Tried here: y inline + (one, one, zero) / (s, s, zero) with s set before the fetch / block-local sprite and x: 5 words (f16, ori, jal right, but f15=f20 early and f14 in the slot); s after the fetch: 11; (one, s) / (s, one) inline: 764 bytes; (s, one) with y precomputed: 5; (one, one) precomputed: 5. Retained C stays at 3. */
 /* 8 November 2026 (round 10, ~42 check.py runs, master compiler): retained C still 752/752, 3 words (+0x1A8/+0x1AC/+0x1B4).
  * sched1 dump (-dS -fsched-verbose): in draw 4's block the f15 move (f15 = s) carries s's REG_DEAD, so its register
  * weight is 0 and it ties the f16 move (zero dies, weight 0); the lower LUID (f15) wins, and the ori ends in the delay

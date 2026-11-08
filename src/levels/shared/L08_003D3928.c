@@ -266,7 +266,7 @@ void func_L08_0041E630(float *a0, float *a1, float *a2, float *a3, float *p4)
 
 /* func_L08_0041EA88 is defined in L08_0041EA88-match.c. */
 
-INCLUDE_ASM("asm/levels", func_L08_004207D0);
+/* func_L08_004207D0 is defined in L08_004207D0-g8.c. */
 
 /* func_L08_0042E678 is defined in L08_0042E678-g8.c. */
 

@@ -1,3 +1,12 @@
+/* 8 November 2026 (round 12, unit placement): no match, still the same 8 rows (the four 101 a0/t0
+ * pairs). Retail places each trio member right after a matched HUD sibling and the 488-byte menu
+ * func_L05_0041ED18 (L15: E1B0, EDF8, EFE0; L05: DF58, ED18, EF00). Measured in L15 by appending
+ * this draft to L15_0042E1B0-g8.c (its label_y, externs, -O2 -G8; func_L15_0042E1B0 still matched):
+ * externs after the body or with the unit's externs, with and without func_L05_0041ED18's body
+ * between, MenuY written through the unit's screen_coord: 8 rows each. So cse symbol hashing and
+ * unit order do not cause the rows. Also tried: `text` as the 242 rows' label_y handle (85 rows).
+ * The L05 port was not tried (the L15 one changed nothing).
+ */
 /* func_L15_0042EFE0: near miss, 3420/3420 bytes, 0 of 1 place (USA v1.01, 7 November 2026).
  *
  * Same body as func_L10_004227A0. This is that note's round-three draft, with this level's data

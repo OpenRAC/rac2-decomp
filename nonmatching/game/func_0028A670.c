@@ -1,3 +1,15 @@
+/* 8 November 2026 (0x8710 push): the v0/a2 choice is reload1's round robin (last_spill_reg). In the C below no GR reload
+ * follows draw 1's fix (whose last reload is f1), so draw 2's 0x8710 reload wraps to v0. Passing `one` in draw 1 (spilled, so
+ * the dead branch gets an a1 reload) gives a2 but then draw 2's fix scratch wraps to v0 (4 words); `one != 0` in draw 2 fixes
+ * that but leaves `active` dead (B2 order lost, 7). Per-draw locals, literal or pointer forms of 0x8710: no change (2). */
+/* 8 November 2026 (round twelve, m8i): 10 -> 2 words, same 1192 bytes. Draw 2 `one != 0` (4 positions) confirmed;
+ * then a permuter-found `unsigned char active = one;` set just before the draw-1 id call and passed as
+ * `active` to hud_coord (float value) in draws 1 and 2 fixes draw 1 (addiu a1,0xB2 order, early daddu a0,v0,
+ * mfc1 v1; fix scratch now a1 as retail). Left: draw 2 0x8710 reload in v0 (retail a2): reload round robin;
+ * `active` is spilled and its reload (v0) sits between. Tried without gain: active placement (before width,
+ * after the id call), int/u16 type, `one != 0` assignment, active in draw 3 (11), hud_coord2 in draw 1 (8),
+ * draw-2 `(unsigned char)one`/`active != 0` (7), draw-3 `one != 0` (6). C below is the 2-word version. */
+/* 8 November 2026, permuter round 4 (35 min -j3, base 130): draw 2 fixed (10 -> 4 positions: draw-1 `daddu a0,v0` early and fix scratch v0, retail v1) by `(unsigned char)one` as draw 2's active, or plainly by a second hud_coord with an `unsigned char` (or unsigned short) active used for draw 2 only (`one != 0` also works). Not landed: a param-type-only helper variant needs an owner ruling, and draw 1 stays (u8/u16 active in hud_coord2, casts, literal 1, `one = 1` per draw: 5-6 words; 12 more permuter minutes from that base found nothing). C below unchanged. */
 /* 8 November 2026 (source round, v101 wasJ): 11 -> 10 words, same 1192 bytes. Draw 1 now uses
  * hud_coord2 (int value, mode read first: L08_0041D808-g8.c scaled_coord precedent); this fixes
  * draw 1's `addiu a1,0xB2` order. Left: draw 1 fix output is v0 (mfc1 v0) and `daddu a0,v0` early;
@@ -63,20 +75,10 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
-static __inline__ int hud_coord2(int value, float scale, float half, int active)
-{
-    int mode = D_001B23A0;
-    float scaled = (float)value * scale + half;
-    int result = (int)scaled;
-
-    if (result != 0 && mode == active)
-        scaled = 1.0f;
-    return result;
-}
-
 void func_0028A670(void)
 {
     char text[16];
+    unsigned char active;
     CounterWidths widths;
     int firstX, y, secondY, x, firstY, secondX;
     unsigned int color;
@@ -162,12 +164,13 @@ void func_0028A670(void)
             len = func_001157AC(text);
             if (len > 0) {
                 width = widths.value[len - 1];
+                active = one;
                 id = func_00336D50(D_001A8CFC + 0x8710, 178);
                 func_00300A00((char *)id, first,
-                    (float)firstX, (float)hud_coord2(firstY, D_001B23A4, 0.5f, one), scale, scale, width);
+                    (float)firstX, (float)hud_coord((float)firstY, D_001B23A4, 0.5f, active), scale, scale, width);
                 id = func_00336D50(D_001A8CFC + 0x8710, 179);
                 func_00300A00((char *)id, second,
-                    (float)secondX, (float)hud_coord((float)secondY, D_001B23A4, 0.5f, one), scale, scale, width);
+                    (float)secondX, (float)hud_coord((float)secondY, D_001B23A4, 0.5f, active), scale, scale, width);
                 func_0027F980(x, hud_coord((float)y, D_001B23A4, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
             }
         }
