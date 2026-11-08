@@ -44,7 +44,7 @@ int func_001261F0(int unused_mode) {
         if (gp->interlace != 1) {
             return 1;
         }
-        return (*(volatile unsigned long *)0x12001000 >> 13) & 1;
+        return (GS_CSR >> 13) & 1;
     }
     csr = (r1_func_00118F60() >> 13) & 1;
     if (gp->interlace != 1) {
@@ -68,35 +68,35 @@ ASM_FUNC("asm/core", func_00126284);
 int func_001265B0(GsLoadImage *src, void *dst) {
     unsigned int count = 0;
 
-    while (*(volatile unsigned int *)0x1000A000 & 0x100) {
+    while (D2_CHCR & 0x100) {
         if (count++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_001532D0);
             return -1;
         }
     }
 
-    *(volatile unsigned int *)0x1000A020 = 6;
+    D2_QWC = 6;
     if (((unsigned int)src & 0x70000000) == 0x70000000) {
-        *(volatile unsigned int *)0x1000A010 = ((unsigned int)src & 0x0FFFFFFF) | 0x80000000;
+        D2_MADR = ((unsigned int)src & 0x0FFFFFFF) | 0x80000000;
     } else {
-        *(volatile unsigned int *)0x1000A010 = (unsigned int)src & 0x0FFFFFFF;
+        D2_MADR = (unsigned int)src & 0x0FFFFFFF;
     }
-    *(volatile unsigned int *)0x1000A000 = 0x101;
+    D2_CHCR = 0x101;
 
-    while (*(volatile unsigned int *)0x1000A000 & 0x100) {
+    while (D2_CHCR & 0x100) {
         if (count++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_001532D0);
             return -1;
         }
     }
 
-    *(volatile unsigned int *)0x1000A020 = (unsigned int)(int)(src->q[10] & 0x7FFF);
+    D2_QWC = (unsigned int)(int)(src->q[10] & 0x7FFF);
     if (((unsigned int)dst & 0x70000000) == 0x70000000) {
-        *(volatile unsigned int *)0x1000A010 = ((unsigned int)dst & 0x0FFFFFFF) | 0x80000000;
+        D2_MADR = ((unsigned int)dst & 0x0FFFFFFF) | 0x80000000;
     } else {
-        *(volatile unsigned int *)0x1000A010 = (unsigned int)dst & 0x0FFFFFFF;
+        D2_MADR = (unsigned int)dst & 0x0FFFFFFF;
     }
-    *(volatile unsigned int *)0x1000A000 = 0x101;
+    D2_CHCR = 0x101;
     return 0;
 }
 

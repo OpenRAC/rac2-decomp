@@ -121,10 +121,10 @@ void func_0011C8D8(void) {
     r1_D_00154F80[1].arg = &r1_D_00154F58;
     r1_func_0011D9A8();
     r1_func_00118D80(0);
-    if (*(volatile unsigned *)0x1000E010 & 0x20) {
-        *(volatile unsigned *)0x1000E010 = 0x20;
+    if (D_STAT & 0x20) {
+        D_STAT = 0x20;
     }
-    if (!(*(volatile unsigned *)0x1000C000 & 0x100)) {
+    if (!(D5_CHCR & 0x100)) {
         r1_func_00118E40();
     }
     r1_D_00154F54 = r1_func_00118AB0(5, r1_func_0011AC48, 0);

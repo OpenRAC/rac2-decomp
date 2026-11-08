@@ -90,7 +90,7 @@ int func_0012B678(void *arg0) {
         ret = 2;
     }
 
-    while (((*(volatile unsigned int *)0x1000D400 >> 8) & 1) != 0)
+    while (((D9_CHCR >> 8) & 1) != 0)
         ;
 
     if (ret == 0) {

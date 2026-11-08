@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 
 
 typedef int s32;
@@ -119,30 +120,30 @@ block_9:
         var_17_68 = sp8;
         for (var_16_70 = 0; var_16_70 < arg1->unkC; var_16_70++) {
             temp_2_73 = func_0011F5E0();
-            *(volatile s32 *)0x1000D480 = 0;
-            *(volatile s32 *)0x1000D410 = var_18_22;
-            *(volatile s32 *)0x1000D420 = var_20_40;
-            *(volatile s32 *)0x1000D400 = 0x101;
+            D9_SADR = 0;
+            D9_MADR = var_18_22;
+            D9_QWC = var_20_40;
+            D9_CHCR = 0x101;
             if (temp_2_73 == 0) {
                 goto block_15;
             }
             func_0011F628();
         block_15:
-            while (*(volatile u32 *)0x1000D400 & 0x100) {
+            while (D9_CHCR & 0x100) {
             }
             temp_2_106 = func_0011F5E0();
-            *(volatile s32 *)0x1000D080 = 0;
-            *(volatile s32 *)0x1000D010 = var_17_68;
-            *(volatile s32 *)0x1000D020 = var_20_40;
-            *(volatile s32 *)0x1000D000 = 0x100;
+            D8_SADR = 0;
+            D8_MADR = var_17_68;
+            D8_QWC = var_20_40;
+            D8_CHCR = 0x100;
             if (temp_2_106 == 0) {
                 goto block_19;
             }
             func_0011F628();
         block_19:
-            while (*(volatile u32 *)0x1000D000 & 0x100) {
+            while (D8_CHCR & 0x100) {
             }
-            while (*(volatile u32 *)0x1000D020 != 0) {
+            while (D8_QWC != 0) {
             }
             var_17_68 += var_30_43;
             var_18_22 += var_21_38;

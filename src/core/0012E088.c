@@ -18,9 +18,9 @@ extern void func_0012E088(void *, int);
  */
 void func_0012E088(void *arg0, int arg1) {
     int r = r1_func_0011D960();
-    *(volatile unsigned int *)0x1000B010 = ((unsigned int)arg0 & 0x0FFFFFFF) | 0x80000000;
-    *(volatile unsigned int *)0x1000B020 = arg1 >> 4;
-    *(volatile unsigned int *)0x1000B000 = 0x100;
+    D3_MADR = ((unsigned int)arg0 & 0x0FFFFFFF) | 0x80000000;
+    D3_QWC = arg1 >> 4;
+    D3_CHCR = 0x100;
     if (r != 0) {
         r1_func_0011D9A8();
     }

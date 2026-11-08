@@ -106,7 +106,7 @@ int func_00126F60(int arg0) {
     int flag;
     int i;
 
-    flag = *(volatile unsigned int *)0x1000E000 & 1;
+    flag = D_CTRL & 1;
 
     for (i = 0; i < 10; i++) {
         if (r1_D_001534F8[i] != 0) {
@@ -121,13 +121,13 @@ int func_00126F60(int arg0) {
     }
 
     *(unsigned int *)0x1000E010 = 0xFF1F;
-    *(unsigned int *)0x1000E010 = *(volatile unsigned int *)0x1000E010 & 0xFF1F0000;
+    *(unsigned int *)0x1000E010 = D_STAT & 0xFF1F0000;
 
     func_00126F00(buf, 0x14);
     func_00127040(buf);
 
     if (arg0 == 1) {
-        *(volatile unsigned int *)0x1000E000 = *(volatile unsigned int *)0x1000E000 | 1;
+        D_CTRL = D_CTRL | 1;
     }
     return flag;
 }

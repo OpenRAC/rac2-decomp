@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 typedef int s32;
@@ -55,8 +56,8 @@ int func_00350BC8(ViBuf *vb) {
         return 0;
     }
     func_00350808(5);
-    chcr = *(volatile unsigned int *)0x1000B400;
-    rd = func_00350750(vb, *(volatile unsigned int *)0x1000B410);
+    chcr = D4_CHCR;
+    rd = func_00350750(vb, D4_MADR);
     done = (rd + vb->count - vb->fC) % vb->count;
     vb->fC = (vb->fC + done) % vb->count;
     vb->f10 -= done;

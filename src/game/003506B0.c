@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 typedef int s32;
@@ -53,17 +54,17 @@ s32 func_00350750(u8 *a2, s32 a1) {
 
 void func_00350798(u32 a0) {
     func_0011F5E0();
-    *(volatile u32 *)0x1000f590 = *(volatile u32 *)0x1000f520 | 0x10000;
-    *(volatile u32 *)0x1000b000 = a0;
-    *(volatile u32 *)0x1000f590 = *(volatile u32 *)0x1000f520 & 0xfffeffff;
+    D_ENABLEW = D_ENABLER | 0x10000;
+    D3_CHCR = a0;
+    D_ENABLEW = D_ENABLER & 0xfffeffff;
     func_0011F628();
 }
 
 void func_00350808(u32 a0) {
     func_0011F5E0();
-    *(volatile u32 *)0x1000f590 = *(volatile u32 *)0x1000f520 | 0x10000;
-    *(volatile u32 *)0x1000b400 = a0;
-    *(volatile u32 *)0x1000f590 = *(volatile u32 *)0x1000f520 & 0xfffeffff;
+    D_ENABLEW = D_ENABLER | 0x10000;
+    D4_CHCR = a0;
+    D_ENABLEW = D_ENABLER & 0xfffeffff;
     func_0011F628();
 }
 
@@ -111,9 +112,9 @@ int func_00350918(int *p)
         F0b028b34_FUN_00350878((char *)(p[1] + i * 16), (i * 2048 + p[0]) & 0x0FFFFFFF, 3, 128);
     }
     F0b028b34_FUN_00350878((char *)(p[1] + i * 16), p[1] & 0x0FFFFFFF, 2, 0);
-    *(volatile unsigned int *)0x1000B420 = 0;
-    *(volatile unsigned int *)0x1000B410 = p[0] & 0x0FFFFFFF;
-    *(volatile unsigned int *)0x1000B430 = p[1] & 0x0FFFFFFF;
+    D4_QWC = 0;
+    D4_MADR = p[0] & 0x0FFFFFFF;
+    D4_TADR = p[1] & 0x0FFFFFFF;
     F0b028b34_FUN_00350808(5);
     return 1;
 }
