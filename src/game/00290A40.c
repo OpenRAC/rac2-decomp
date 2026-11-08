@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 extern void *func_00115484(void *, int, int);
@@ -272,8 +273,8 @@ void func_00290C60(void)
     func_001265B0(buffer, D_001BB000);
     func_001244B8(0, 0);
     func_0026FE48();
-    *(volatile int *)0x10000810 = 0x82;
-    *(volatile int *)0x10000800 = 0;
+    T1_MODE = 0x82;
+    T1_COUNT = 0;
     func_002889B8(D_001BAD40);
 }
 

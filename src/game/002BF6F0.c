@@ -1342,7 +1342,7 @@ void func_002C47E8(char *p) {
  *(int *)(p+4)=func_00283D38(*(int *)(q+8),*(int *)(q+12),f);
  if(*(short *)(q+16)) {
   /* Retail writes zero to the hardware register at 0x10000000. */
-  *(volatile int *)0x10000000=0;
+  T0_COUNT=0;
   func_002AE838(v,q);func_00282CC0(p+16,p+16,(char *)v);
   f=func_00283CE0_2(*(short *)(p+10))/func_00283CE0_2(*(short *)(q+16));
   *(int *)(p+4)=func_00283D38(*(int *)(p+4)&0xffffff,*(int *)(p+4),1.0f-f);

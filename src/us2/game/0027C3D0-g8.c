@@ -204,7 +204,7 @@ void func_US2_0027C3D0(void)
     }
     func_002FC070(D_00100AE0);
     func_0011AEA0(0);
-    ticks = func_00283CE0(*(volatile int *)0x10000800);
+    ticks = func_00283CE0(((int)T1_COUNT));
     D_001B1690[0] = ticks * (D_001A7B90[0] ? (1.0f / 11520.0f) : (1.0f / 9600.0f));
     func_002FC3C0(2);
     if (D_001B1594[0] & 2) {

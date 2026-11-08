@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 /* Both accumulator words live in small data, so this file is built with -G8.
@@ -9,7 +10,7 @@ extern float ref_L00_002B62A0_01 __attribute__((sda));
    the small-data float accumulator. */
 void func_002B62A0(void)
 {
-    unsigned int ticks = *(volatile unsigned int *)0x10000000;
+    unsigned int ticks = T0_COUNT;
 
     ref_L00_002B62A0_00 = ref_L00_002B62A0_00 + 1;
     ref_L00_002B62A0_01 = ref_L00_002B62A0_01 + (float)ticks;

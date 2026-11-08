@@ -217,7 +217,7 @@ full_health:
 health_done:
         func_L00_0042A500(p->f46C);
         D_L22_001AF304 = 1;
-        func_001163A0(*(volatile unsigned int *)0x10000800);
+        func_001163A0(T1_COUNT);
         p->f4EC=1;
         D_L22_001B2A8C=0; D_L22_001B2AB4=D_L22_001B1910;
         D_L22_001B2A90=0;
