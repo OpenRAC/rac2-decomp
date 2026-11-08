@@ -28,6 +28,12 @@ typedef double             f64;
  */
 #define SDATA(sym) __asm__(#sym "__gp") MACRO_ADDR
 
+/* EE hardware registers, named once here. Hardware, so volatile (AGENTS.md); matched C uses
+ * the name, never a cast on the address. A register is an integer address, not a linked
+ * symbol: an extern symbol at that address lets the compiler keep the address in a register
+ * across a loop, where retail rebuilds the constant at each access (func_L00_002A3B88). */
+#define T0_COUNT (*(volatile unsigned int *)0x10000800) /* EE timer 0 count */
+
 /* Approved EE transfer helpers, adapted from rac1-decomp (GPL-3.0).
  * Both addresses must be
  * 16-byte aligned. Each helper really reads/writes memory; the clobber keeps

@@ -3,7 +3,7 @@
  * then the volatile T0_COUNT (0x10000800) clear come just before the first jal; the compiler's
  * default set-side volatile rule (GCC 2.95's) leaves that slot empty, as retail does, where the
  * EE tree's rule fills it with the clear of the frame accumulator (docs/COMPILER-NOTES.md).
- * 0x10000800 is the EE timer 0 count register. */
+ * T0_COUNT (include/common.h) is the EE timer 0 count register, 0x10000800. */
 #include "common.h"
 
 /* Partial views of the resident settings, weapon table and per-level statistics. */
@@ -194,8 +194,8 @@ void func_L00_002A3B88(void)
         D_L00_001B19D4[0] = 0;
         flush = 0;
         extra = 0;
-        D_001A7200 += (unsigned int)*(volatile int *)0x10000800;
-        *(volatile int *)0x10000800 = 0;
+        D_001A7200 += T0_COUNT;
+        T0_COUNT = 0;
         func_00280710();
         func_002FC280();
         func_002FC220();
@@ -209,7 +209,7 @@ void func_L00_002A3B88(void)
             func_002B9000();
             func_L00_0036F488();
             if (D_L00_001A7C80 == 1) {
-                *(volatile unsigned int *)0x10000800 = 0;
+                T0_COUNT = 0;
                 func_002B9000();
                 func_L00_0036F488();
             }
@@ -303,11 +303,11 @@ void func_L00_002A3B88(void)
             }
         }
         func_002FC3C0(1);
-        elapsed = func_00283CE0(*(volatile unsigned int *)0x10000800);
+        elapsed = func_00283CE0(T0_COUNT);
         D_L00_001B19CC = elapsed * (D_001A7B90 ? 0.00008680556f : 0.00010416667f);
         if (!D_00189E20.flush && !D_L00_001B19D4[0]) {
             if (!D_L00_001A8F00[0]) {
-                ticks = *(volatile unsigned int *)0x10000800;
+                ticks = T0_COUNT;
                 limit = D_001A7B90 ? 11520 : 9600;
                 if (D_L00_001A7C80 == 0) {
                     if (limit < ticks) {
@@ -353,7 +353,7 @@ void func_L00_002A3B88(void)
                 }
                 func_L00_003584B0();
             } else if (D_L00_001A8F00[0] == 2) {
-                int now = *(volatile unsigned int *)0x10000800;
+                int now = T0_COUNT;
                 int budget = D_001A7B90 ? 11520 : 9600;
                 if (budget < now && !D_L00_001BCB24) {
                     func_002B9000();
