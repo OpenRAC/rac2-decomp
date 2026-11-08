@@ -1,3 +1,13 @@
+/* 8 November 2026, Sonnet round (o27): unchanged 3048/3056 bytes, aligned diff 7 words. RTL dumps:
+ * b1/b2 set in draw 1's do/while(0) group stay separate through cse1 (the LOOP_END note ends its
+ * block) but cse2 (after_loop ignores loop notes) merges them into the lookup's 0x8710 pseudo; long
+ * (truncate is folded), unsigned short/int, sets before the lookup (b1 becomes canonical for all)
+ * and inits at the declaration (local-alloc moves each single-use init to its use, calls-crossed 0,
+ * so sched1 cannot lift it) all fail. Retail's $s1/$s2 sets cross ten calls, so at sched1 they were
+ * in draw 1's block but cse2 must not have seen them equal; no plain-C form found. Draw 1 order:
+ * tex lookup inside the group or as a direct argument (+12), colour local, non-inline call (+125)
+ * all worse or equal. -frac2-* flags tried: no change; -fno-rerun-cse-after-loop breaks the clamps.
+ */
 /* 8 November 2026, Sonnet round (o17): 3048/3056 bytes, 0/28 places, aligned diff 7 words (was 24).
  * New: draw 1's constants and draw go in a do/while(0) group after its lookup (scale/half/one/zero,
  * the draw, then minus), so the loop note keeps 208.0/0.5 after the call as retail; the tail's two

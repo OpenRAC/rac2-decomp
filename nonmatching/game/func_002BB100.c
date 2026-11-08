@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, lesson 49): re-measured 5 differing instructions (gap A only); x,y,z and the separate cfg local rewritten as expressions: unchanged. Ghidra shows flags reloaded at the end of both arms, matching ours; still needs $s0 live at the else target. */
 /* 8 November 2026 (Sonnet round): re-measured 14 positions; permuter -j2 25 min from the note's C: best 925 vs base 930, no plain gain. Gap A unchanged. */
 /* 8 November 2026, permuter round 4 (35 min -j3, base 130): best 120 only by duplicating the then-arm under `if (cfg->minimum || ai)` (reads uninitialised ai), invalid; no plain gain. C below unchanged, 5 positions (gap A). */
 /* 8 November 2026, round 3 (gap A only, 12 checks, best body unchanged): no plain form

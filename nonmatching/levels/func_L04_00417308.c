@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round o22, cc1 harness, ~115 compiles + one 1500 s permuter run): 112/259 -> 106/260 (masked/full), 5980/5968 bytes. Steps: mv = v90 set inside the draw block and a plain rounding for the marker y (no label_y branches there), so loop.c hoists &v90 to s3 right before the marker loop like retail; one2 kept as the active of the post-loop label_y so h still spills to 0x10C (q1 118/266); locals declared pa, pb, arr, hp and pa = p + 0x494 before pb (arr/pa/pb now spill to retail 0x11C/0x114/0x118; 110/261); rank colour as c = *(n20 < 4 ? &B.v[n20 - 1] : &B.v[3]) (one load, branch; 109/264); both tan stores as { float q = ...; u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; } (retail lui early, addiu + 0xB0 offset; 106/260). Still open: hp gets s7 instead of spilling to 0x124, so &sy/&sy2 sit at 0x124/0x128 (retail 0x128/0x12C); &vF0 gets s5 not fp; &D_L04_001B31A0 still hoisted to s2 (float[]/struct/&D_L04_001B3190[0x10] forms no help); rank colour offsets (retail selects (n20-1)*4 vs 12 by branch; every index/offset ternary gives movz); 0x8710 reg starts one sprite row late (permuter only found fake temps there). No gain: statement-move sweeps (K=4) on t1 and the final C, shared char *s (s1 not s3), inline h + 0x10 (128), mv at loop top (PRE hoists again). */
 /* 8 November 2026 (Sonnet round o21, cc1 harness, ~230 compiles): 202/409 -> 112/259 (masked/full), 5968/5968 bytes (size now equal). h now spills to 0x10C like retail: the marker loop got its own one2 = 1 (h[0xBC] test, label_y active, and a hud_coord_a(value, scale, half, active) variant for the two loop boxes; 9 refs beat h), mv = v90 pointer (retail s3), single-set mcol (made col conflict with e), half = 0.5f / tenth = 0.1f locals before the loop (retail f22/f24 hoists; cprop cannot put a constant into add.s/mul.s), half also before the ruler for (retail f23). fb row: first coordinate as label_y(&vF0, ...) shares the clamp 1.0/0.0 with the sprite rows (retail f20/f22); dropped the do/while(0) on the 0x360 func_0027EAE8; vD0.f[1] store first (x2), context->kind before owner, pb before pa. NEEDS AN OWNER RULING before any landing: hud_coord_a (hud_coord with an active param) and label_y with &vF0 as handle. Still open: mv = v90 is hoisted by gcse PRE to before the ruler loop (s6 live there; retail sets s3 just before the marker loop); hp (h+0x10) keeps $fp instead of spilling to 0x124 because &vF0 gets s5 not fp, so spill slots 0x114..0x12C are shifted; &D_L04_001B31A0 hoisted to s2 (retail rematerializes); one/s swap s2/s3 at the top (one shared char *s for both text rows gives retail s3 but scores 116/265); rank colour retail branch form not found (index/ternary forms give movz). No gain: -fmove-all-movables, -fno-gcse, plain y in the marker label_y (&v90 hoists, 189), separate ruler col, fone/fzero locals (cprop folds them), shared s. */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0028EA58 is declared int but src is void; func_L04_00417028 is declared (u8 *) but src is (void). Both corrected: 6020/5968 bytes and the masked row count unchanged. */
 /* 8 November 2026, Sonnet round (o8c, ~45 compiles): 230/457 -> 202/409 (masked/full, aligned diff), 6020/5968
@@ -260,7 +261,7 @@ s32 func_L04_00417308(void)
     Vec vD0, vE0, vF0;
     float tmp;
     s32 sy, sy2, sy3;
-    u8 *hp, *arr, *pa, *pb;
+    u8 *pa, *pb, *arr, *hp;
     float fr, fs, fm, fe, f21, fa, fd;
     int n33, n20, ne, i, col, idx, v, va, v3, vy;
     int one = 1;
@@ -310,7 +311,7 @@ s32 func_L04_00417308(void)
     if ((u32)(h[0xBC] - 1) < 4 || D_L04_001A8FE8 < 0x3C)
         func_L04_0040C880(h);
     if (D_L04_001A904C != 0) {
-        F(D_L04_001BDB80, 0xB0) = func_00283198(0.56217057f) / func_00283180(0.56217057f);
+        { float q = func_00283198(0.56217057f) / func_00283180(0.56217057f); u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; }
         func_0027AB40();
         { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2D); func_00300A00(spr, 0x60442D00, 10.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2E); func_00300A00(spr, 0x55F0C070, 10.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
@@ -379,7 +380,7 @@ s32 func_L04_00417308(void)
             char *s = func_00288FB8(D_L04_002CA1E0[n20 - 1]);
             int y = LY(s, 24.0f);
             int c;
-            if (n20 < 4) c = B.v[n20 - 1]; else c = B.v[3];
+            c = *(n20 < 4 ? &B.v[n20 - 1] : &B.v[3]);
             func_0027F5B8(x, y, c, s, -1);
         }
         {
@@ -399,8 +400,8 @@ s32 func_L04_00417308(void)
         func_002830C0(&vE0, &vD0, m);
         arr = p + 0x1E4;
         fd = func_00282DB0(&vE0, D_L04_001B31A0);
-        pb = p + 0x498;
         pa = p + 0x494;
+        pb = p + 0x498;
         func_00282D30(&vD0, D_L04_001B31A0, fd);
         func_00282CD8(&vF0, &vE0, &vD0);
         func_002AA2E8(&D_L04_001B31D0, vE0.f[0] * -1.25f, 0.050000004f);
@@ -443,7 +444,6 @@ s32 func_L04_00417308(void)
         j = 0;
         one2 = 1;
         tenth = 0.1f;
-        mv = v90;
         half = 0.5f;
         do {
             ne = I(arr, j * 4);
@@ -497,10 +497,11 @@ s32 func_L04_00417308(void)
                         vD0.f[1] = F(o, 0x1D4);
                         vD0.f[0] = 0.0f;
                         vD0.f[2] = 0.0f;
+                        mv = v90;
                         func_00283410(mv, &vD0);
                         func_00282D30(mv, mv, F(obj, 0xC));
                         func_00282D30(&v90[2], &v90[2], F(obj, 0xC));
-                        func_00300AA8(obj, (float)I(o, 0x1CC), (float)label_y(obj, (float)I(o, 0x1D0), D_L04_001B2D44, half, one2),
+                        func_00300AA8(obj, (float)I(o, 0x1CC), (float)(int)((float)I(o, 0x1D0) * D_L04_001B2D44 + half),
                                       mcol, 0.0f, mv);
                     } else {
                         I(o, 0x1D0) = -1;
@@ -538,13 +539,13 @@ s32 func_L04_00417308(void)
         func_00283410(m, &vD0);
         func_00282D30(m, m, F(obj, 0xC));
         func_00282D30(&m[2], &m[2], F(obj, 0xC));
-        func_00300AA8(obj, (float)I(p, 0x49C), (float)LY(obj, (float)I(p, 0x4A0)), 0x8000A6E4, 0.0f, m);
+        func_00300AA8(obj, (float)I(p, 0x49C), (float)label_y(obj, (float)I(p, 0x4A0), D_L04_001B2D44, 0.5f, one2), 0x8000A6E4, 0.0f, m);
         func_L04_0043AD48(&sy, &sy2, I(p, 0x314), I(p, 0x318), pa, pb, p);
         func_0028FC48(sy, HC((float)sy2), sy + 4, HC((float)(sy2 + 4)), 0x8000A6E4, 0);
         func_002FC560(0x47, 0x5360B);
         if (h[0x20] != 3) {
             fe = F(p, 0x28C) * 0.008726647f;
-            F(D_L04_001BDB80, 0xB0) = func_00283198(fe) / func_00283180(fe);
+            { float q = func_00283198(fe) / func_00283180(fe); u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; }
             func_0027AB40();
         }
     }

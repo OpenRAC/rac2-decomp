@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round 2, lesson 49): removing the `edge` local in both case-0 loops (`upper = lower - step + scale;`, `lower = upper + step - 1.0f;`) puts 1.0/0.0 in retail's $f22/$f21: 27 -> 18 differing rows. Body below is that C. Left: text call 2 (retail f15=f14), mov $f3 copy read by the 128 multiply (both cases), f0 temp in the case-0 init lines. No gain from: other call-2 argument spellings, dropping `y`/`half`/`step`, `s` locals, a `sc` copy of D_001B23A4 at any subset of the case-0 sites. */
 /* 8 November 2026 (Sonnet round): re-measured 77 differing rows (-g8 unit, profile above). Moving the 1.0/0.0 set before/after label_y, a y local for call 2, literal 1.0f/0.0f in the case-0 compare and in edge+scale: no change or worse (b3 237). 25-minute permuter (-j2) best 375 -> 235 only via `D_001A9008 <= (long long)scale` (a changed compare, not honest); no honest gain. */
 /* 8 November 2026, round 2: 1388/1388 bytes, about 20 instructions differ. GPRs and case 1/2 are now exact:
  * case 1/2 passes literal 1, and `one` keeps retail's $s2 because the case-0 `top` call sits in a one-pass
@@ -180,8 +181,7 @@ int func_002900B8(void)
                 s = (float)hud_coord(128.0f, D_001B23A4[0], half, one);
                 step = s * 0.25f;
                 lower = (float)hud_coord(285.0f, D_001B23A4[0], half, one);
-                edge = lower - step;
-                upper = edge + scale;
+                upper = lower - step + scale;
                 for (i = 0; i < 5; i++) {
                                         if (upper <= (float)top)
                         upper = (float)top;
@@ -192,8 +192,7 @@ int func_002900B8(void)
                         break;
                 }
                 upper = (float)hud_coord(128.0f, D_001B23A4[0], 0.5f, one);
-                edge = upper + step;
-                lower = edge - 1.0f;
+                lower = upper + step - 1.0f;
                 for (i = 0; i < 5; i++) {
                                         if ((float)top <= lower)
                         lower = (float)top;

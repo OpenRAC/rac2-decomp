@@ -1,5 +1,29 @@
-/* func_002DC3C8 in its own -G8 unit: a timed text page whose states show a text, scroll it and wait.
-   The catalogue starts it at 0x002DC3D0; the 8 bytes before it are residue of the previous body. */
+/* 9 November 2026 (o16): measured with the catalogue row shifted +8 (to 0x002DC3D0, 848 bytes),
+ * the C below equals retail in all 214 instructions (opcodes and registers; relocations not
+ * compared). The +8 shift itself stays unproved under docs/MATCHING-BLOCKERS.md "Entry still
+ * unproved" (no traced entry; a store at the start is not an entry witness); the owner chose to
+ * keep the 856-byte row. Reopen only on a traced entry or object-origin evidence. */
+/* 8 November 2026: no RAC1/RAC4 twin. ~/rac1-decomp/src and ~/rac4-decomp have no timed text-page state machine with these text ids, timers (180/240/300) or the 0x900 pad test; the open question stays the catalogue entry (+0 vs +8). */
+/* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: the catalogue entry address itself is in doubt (see the entry hypothesis below); this is a catalogue question, not C. */
+/* 3 November 2026: entry hypothesis remains held after a fresh US 28-placement
+ * audit. The canonical name is absent from the PAL and US2 catalogues.
+ * The 856-byte row begins with `sw $zero,0x50($a0); nop`; the previous body's
+ * complete control flow ends before it (boot return 0x002DC3BC, delay slot
+ * 0x002DC3C0, alignment nop 0x002DC3C4). No direct transfer, aligned loaded-word
+ * candidate or straight-line address construction identifies +0, +4 or +8.
+ * EE scans exclude .vutext; arbitrary computed indirect targets are unresolved.
+ * The twenty words at boot 0x0026CDF0 are internal case targets consumed by
+ * the state-indexed load and `jr $a0`, not callback witnesses for the entry.
+ * Resetting state before a multi-state switch is suspicious, but does not prove
+ * that the store belongs to a different function. No entry correction is made.
+ *
+ * Historical retained measurement (31 October): this ordinary C body was
+ * 848 bytes under -O2 -G8 -ffunction-sections, 0/28 against the unchanged row;
+ * a private +8 comparison reported 28/28. That is not boundary or linked-build
+ * proof and was not rerun here. Preserve the complete draft without promotion.
+ * Reopen on an independently traced call/callback entry or object-origin
+ * evidence that distinguishes +8 from the store-prefixed entry.
+ */
 #include "common.h"
 /* The menu system D_001F2840 and the input words at D_00138180. */
 typedef struct { char pad[0x1c0]; u64 held; } InputC3;

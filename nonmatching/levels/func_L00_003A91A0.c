@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, lesson 49/48): re-measured; every local checked against retail (all real or already expressions); dropping col/side_u, origin[] as byte-offset exprs (+0x10 folded first), and a statement-move sweep (+-2 over the loop prologue, 18 stmts) gave no row below base; only slot order and strip-loop adds remain. */
 /* 8 November 2026 (Sonnet round): re-measured 37 differ (unit L00_003A91A0-g8.c scratch); permuter -j2 25 min from this C: no score below base 575. Slot order (30) and strip-loop adds (6) unchanged. */
 /* Nonmatching C, updated 8 November 2026 (clean rewrite from retail asm); not a linked match.
  * Same family as func_L00_003F6308: identical opcodes, only data addresses and the 0x5CB/0xC04 id differ;

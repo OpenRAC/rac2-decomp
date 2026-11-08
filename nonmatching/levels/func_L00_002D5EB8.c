@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round 2, lesson 49): dropping the a/b/c locals (write 17/18/53 as literals in the compares) moves hi(D_00139568)/hi(table) to retail's s4/s5 and 17/18/53 to fp/s7/s6: 46 -> 29 differing rows (first diff +0x3F0 now the entry copy). Body below is that C. Left: retail makes a fresh lui for the entry lbu (ours reuses s4), 10/9 are `addiu a2,10; beq` (ours xori), one nop. Every skip spelling tried (|| chain, continue forms, 10/9 first, nested if) is worse (93 or wrong size). */
 /* 8 November 2026 (Sonnet round): re-measured, 100 differing rows, first diff +0x3F0. Retail keeps hi(D_00139568) in s4 and hi(table) in s5 (ours s7/fp), constants 17/18/53 in fp/s7/s6. 25-minute permuter (-j2) best 2110 -> 1690 only via an address-taken local (`new_var = &a`) and a comma on &count: not honest. No match. */
 /* 8 November 2026, re-measured on master's compiler (sticky-volatile default, mtc1 fix):
  * unchanged, 1376/1376, 0/27 USA, 46 positions; check.py first difference +0x3F0.
@@ -133,7 +134,7 @@ void func_L00_002D5EB8(void) {
  }
  if((D_L00_001B19C8&127) || D_001A7A00[0x7A]) return;
  {
- unsigned char *p=D_00139568; int a,b,c; a=17;do {b=18;c=53;} while(0);
+ unsigned char *p=D_00139568; 
  ok=1;
  for(i=0;i<56;i++,p++) {
   int skip = !D_L00_00262570[*p].exists;
@@ -143,9 +144,9 @@ void func_L00_002D5EB8(void) {
    if(!D_001A7AF8[i]) {ok=0; break;}
    if(i==14) continue;
    if(i==12) continue;
-   if(i==a) continue;
-   if(i==b) continue;
-   if(i==c) continue;
+   if(i==17) continue;
+   if(i==18) continue;
+   if(i==53) continue;
    if(func_00287F60(i)<=0) continue;
    if(!D_L00_00262570[*p].state) {ok=0; break;}
   }
