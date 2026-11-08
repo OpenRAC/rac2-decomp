@@ -53,8 +53,7 @@ void func_0012C230(void *arg0, int *PMV, int *dmvector, int h_r_size,
 
 /* rac1-decomp src/core/00125630.c: func_00128560 */
 void func_0012C380(char *arg0, unsigned int arg1) {
-    volatile int *reg = (volatile int *)0x10002000;
-    *reg = arg1;
+    IPU_CMD = arg1;
     *(int *)(arg0 + 0x818) = r1_D_00132F70[arg1 >> 28];
 }
 
@@ -65,7 +64,7 @@ void func_0012C380(char *arg0, unsigned int arg1) {
 void func_0012C3B0(void *arg0) {
     int counter = 0;
 
-    while ((*(volatile int *)0x10002010 & 0x80004000) == 0x80000000) {
+    while ((((int)IPU_CTRL) & 0x80004000) == 0x80000000) {
         if (counter++ >= 0x1389) {
             r1_func_0012BCC8(*(int *)((char *)arg0 + 0x858));
             counter = 0;
@@ -90,7 +89,7 @@ void func_0012C3B0(void *arg0) {
 long func_0012C458(void *arg0) {
     long v;
     int counter = 0;
-    while ((v = *(volatile long *)0x10002000) < 0 && (*(volatile int *)0x10002010 & 0x4000) == 0) {
+    while ((v = ((long)IPU_CMD64)) < 0 && (((int)IPU_CTRL) & 0x4000) == 0) {
         if (counter++ >= 0x1389) {
             r1_func_0012BCC8(*(int *)((char *)arg0 + 0x858));
             counter = 0;

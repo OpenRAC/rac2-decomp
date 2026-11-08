@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 extern void func_0011AC60(int value);
@@ -14,19 +15,19 @@ int func_00350DC8(int *p)
     func_0011AC60(p[16]);
     p[17] = 0;
     func_00350808_1(5);
-    p[7] = *(volatile int *)0x1000B410;
-    p[8] = *(volatile int *)0x1000B430;
-    p[9] = *(volatile int *)0x1000B420;
-    p[10] = *(volatile int *)0x1000B400;
-    if (*(volatile int *)0x10002010 & 0xF0)
-        while (*(volatile int *)0x10002010 & 0xF0)
+    p[7] = ((int)D4_MADR);
+    p[8] = ((int)D4_TADR);
+    p[9] = ((int)D4_QWC);
+    p[10] = ((int)D4_CHCR);
+    if (((int)IPU_CTRL) & 0xF0)
+        while (((int)IPU_CTRL) & 0xF0)
             ;
     func_00350798(0);
-    p[11] = *(volatile int *)0x1000B010;
-    p[12] = *(volatile int *)0x1000B020;
-    p[13] = *(volatile int *)0x1000B000;
-    p[14] = *(volatile int *)0x10002020;
-    p[15] = *(volatile int *)0x10002010;
+    p[11] = ((int)D3_MADR);
+    p[12] = ((int)D3_QWC);
+    p[13] = ((int)D3_CHCR);
+    p[14] = ((int)IPU_BP);
+    p[15] = ((int)IPU_CTRL);
     func_0011AC40(p[16]);
     return 1;
 }
@@ -111,26 +112,26 @@ int func_00350ED8(struct ipu_fifo *p)
     }
     if (p->d3_madr != 0) {
         if (p->d3_qwc != 0) {
-            *(volatile unsigned *)0x1000B010 = p->d3_madr;
-            *(volatile unsigned *)0x1000B020 = p->d3_qwc;
+            D3_MADR = p->d3_madr;
+            D3_QWC = p->d3_qwc;
             func_00350798(p->d3_chcr | 0x100);
         }
     }
     if (p->count != 0) {
-        if (*(volatile int *)0x10002010 < 0)
-            while (*(volatile int *)0x10002010 < 0)
+        if (((int)IPU_CTRL) < 0)
+            while (((int)IPU_CTRL) < 0)
                 ;
-        *(volatile unsigned *)0x10002000 = bp_pos;
-        if (*(volatile int *)0x10002010 < 0)
-            while (*(volatile int *)0x10002010 < 0)
+        IPU_CMD = bp_pos;
+        if (((int)IPU_CTRL) < 0)
+            while (((int)IPU_CTRL) < 0)
                 ;
     }
-    *(volatile unsigned *)0x1000B410 = madr;
-    *(volatile unsigned *)0x1000B430 = tadr;
-    *(volatile unsigned *)0x1000B420 = qwc;
+    D4_MADR = madr;
+    D4_TADR = tadr;
+    D4_QWC = qwc;
     if (p->count != 0)
         func_00350808_1(chcr);
-    *(volatile unsigned *)0x10002010 = p->ipu_ctrl;
+    IPU_CTRL = p->ipu_ctrl;
     p->saved = 1;
     func_0011AC40(p->intr);
     return 1;
@@ -140,9 +141,9 @@ extern void func_0011AC30(int value);
 int func_00351210(int *p)
 {
     func_00350808_1(5);
-    *(volatile int *)0x1000B420 = 0;
-    *(volatile int *)0x1000B410 = 0;
-    *(volatile int *)0x1000B430 = 0;
+    D4_QWC = 0;
+    D4_MADR = 0;
+    D4_TADR = 0;
     func_0011AC30(p[16]);
     return 1;
 }

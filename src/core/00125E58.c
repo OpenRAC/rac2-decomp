@@ -115,18 +115,18 @@ int func_00126104(void *arg0) {
     unsigned int i;
 
     i = 0;
-    while (*(volatile int *)0x1000A000 & 0x100) {
+    while (((int)D2_CHCR) & 0x100) {
         if (i++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_00153178);
             return -1;
         }
     }
-    *(volatile int *)0x1000A020 = (int)(*(long *)arg0 & 0x7FFF) + 1;
+    D2_QWC = (int)(*(long *)arg0 & 0x7FFF) + 1;
     if ((p & 0x70000000) == 0x70000000) {
-        *(volatile int *)0x1000A010 = (p & 0x0FFFFFFF) | 0x80000000;
+        D2_MADR = (p & 0x0FFFFFFF) | 0x80000000;
     } else {
-        *(volatile int *)0x1000A010 = p & 0x0FFFFFFF;
+        D2_MADR = p & 0x0FFFFFFF;
     }
-    *(volatile int *)0x1000A000 = 0x101;
+    D2_CHCR = 0x101;
     return 0;
 }

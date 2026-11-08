@@ -188,7 +188,7 @@ each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
   a jump table or a per-unit cast of a global other units read plainly. A retail reload
   is evidence of a missing cause such as a struct member, type or alias, not of a
   qualifier. Name what is volatile: a register or a block is declared once, in a shared
-  header (`T0_COUNT` in `include/common.h`), or as the named, typed extern of the block,
+  header (`T1_COUNT` in `include/ps2_hw.h`), or as the named, typed extern of the block,
   and matched C uses that name, never a cast on a bare address such as
   `*(volatile u32 *)0x10000800`.
 - **Addresses.** Code and data in a program image are always symbols, never numbers.

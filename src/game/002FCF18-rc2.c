@@ -32,8 +32,8 @@ void func_002FCF18(void) {
     s32 temp_s0;
     s32 temp_s1;
 
-    temp_s1 = *(volatile s32 *)0x10009000;
-    temp_s0 = *(volatile s32 *)0x10009030;
+    temp_s1 = ((s32)D1_CHCR);
+    temp_s0 = ((s32)D1_TADR);
     func_0026FEB8(((s32)D_001AD538));
     func_0026FEB8(((s32)D_001AD550), temp_s1, temp_s0);
     func_0026FEB8(((s32)D_001AD568));

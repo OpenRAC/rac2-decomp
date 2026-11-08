@@ -60,11 +60,11 @@ int func_00127040(void *arg0) {
     unsigned int rbor;
     unsigned int rbsr;
 
-    ctrl = *(volatile unsigned int *)0x1000E000;
-    pcr = *(volatile unsigned int *)0x1000E020;
-    sqwc = *(volatile unsigned int *)0x1000E030;
-    rbor = *(volatile unsigned int *)0x1000E050;
-    rbsr = *(volatile unsigned int *)0x1000E040;
+    ctrl = D_CTRL;
+    pcr = D_PCR;
+    sqwc = D_SQWC;
+    rbor = D_RBOR;
+    rbsr = D_RBSR;
     if (env->sts >= 10) {
         return -1;
     }
@@ -90,11 +90,11 @@ int func_00127040(void *arg0) {
     sqwc = (env->tqwc << 16) | env->sqwc;
     rbor = (unsigned int)env->rbadr;
     rbsr = env->rbmsk;
-    *(volatile unsigned int *)0x1000E000 = ctrl;
-    *(volatile unsigned int *)0x1000E020 = pcr;
-    *(volatile unsigned int *)0x1000E030 = sqwc;
-    *(volatile unsigned int *)0x1000E050 = rbor;
-    *(volatile unsigned int *)0x1000E040 = rbsr;
+    D_CTRL = ctrl;
+    D_PCR = pcr;
+    D_SQWC = sqwc;
+    D_RBOR = rbor;
+    D_RBSR = rbsr;
     r1_D_00159AD8 = *env;
     return 0;
 }
@@ -134,13 +134,13 @@ int func_001272A8(void *arg0) {
     int en;
     unsigned int prev, old;
     en = r1_func_0011D960();
-    prev = *(volatile unsigned int *)0x1000F520;
+    prev = D_ENABLER;
     if ((prev & 0x10000) == 0)
-        *(volatile unsigned int *)0x1000F590 = prev | 0x10000;
-    *(volatile unsigned int *)0x1000E000;
+        D_ENABLEW = prev | 0x10000;
+    D_CTRL;
     old = *d;
     *d = old & 0xFFFFFEFF;
-    *(volatile unsigned int *)0x1000F590 = prev;
+    D_ENABLEW = prev;
     if (en != 0) r1_func_0011D9A8();
     return old;
 }

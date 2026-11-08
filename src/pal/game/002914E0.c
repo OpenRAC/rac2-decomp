@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 /* func_PAL_002914E0, the PAL copy of func_00290C60 (RAC1's InitOnce): the same C, where D_001A7B90 is
@@ -210,8 +211,8 @@ void func_PAL_002914E0(void)
     func_001265B0(buffer, D_001BB000);
     func_001244B8(0, 0);
     func_PAL_0026FCB8();
-    *(volatile int *)0x10000810 = 0x82;
-    *(volatile int *)0x10000800 = 0;
+    T1_MODE = 0x82;
+    T1_COUNT = 0;
     func_002889B8(D_001BAD40);
 }
 

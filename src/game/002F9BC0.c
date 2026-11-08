@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 extern int func_00115DA8_1(char *, char *, ...);
@@ -96,12 +97,12 @@ int func_002FC010(int arg, int bit)
 
 void func_002FC070(int mask)
 {
-    while (*(volatile int *)0x10008000 & 0x100)
+    while (((int)D0_CHCR) & 0x100)
         Fbbb7bee1_FUN_00282A38(16);
-    *(volatile int *)0x10008020 = 0;
-    *(volatile int *)0x10008030 = mask & 0x0FFFFFFF;
-    *(volatile int *)0x10008000 = 325;
-    while (*(volatile int *)0x10008000 & 0x100)
+    D0_QWC = 0;
+    D0_TADR = mask & 0x0FFFFFFF;
+    D0_CHCR = 325;
+    while (((int)D0_CHCR) & 0x100)
         Fbbb7bee1_FUN_00282A38(16);
 }
 

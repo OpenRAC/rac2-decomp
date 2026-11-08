@@ -241,19 +241,19 @@ int func_0012F0E0(int arg0, struct PES_BS *bs, struct PES_HDR *hdr) {
 void func_0012F690(void) {
     int r = r1_func_0011D960();
 
-    *(volatile unsigned int *)0x1000F590 =
-        *(volatile unsigned int *)0x1000F520 | 0x10000;
-    *(volatile unsigned int *)0x1000B000 &= ~0x100;
-    *(volatile unsigned int *)0x1000B400 &= ~0x100;
-    *(volatile unsigned int *)0x1000F590 =
-        *(volatile unsigned int *)0x1000F520 & ~0x10000;
+    D_ENABLEW =
+        D_ENABLER | 0x10000;
+    D3_CHCR &= ~0x100;
+    D4_CHCR &= ~0x100;
+    D_ENABLEW =
+        D_ENABLER & ~0x10000;
 
     if (r != 0) {
         r1_func_0011D9A8();
     }
 
-    *(volatile unsigned int *)0x1000B020 = 0;
-    *(volatile unsigned int *)0x1000B420 = 0;
+    D3_QWC = 0;
+    D4_QWC = 0;
     r1_func_0012D068();
 }
 

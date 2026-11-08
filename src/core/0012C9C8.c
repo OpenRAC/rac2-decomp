@@ -20,7 +20,7 @@ void func_0012C9C8(void *arg0) {
     int pad;
 
     func_0012C3B0(arg0);
-    pad = -(*(volatile int *)0x10002020 & 7) & 7;
+    pad = -(((int)IPU_BP) & 7) & 7;
     if (pad != 0) {
         func_0012C788(arg0, pad);
     }
@@ -132,12 +132,12 @@ void func_0012CDB0(void *arg) {
     arg0->top_field_first = func_0012C878(arg0, 1);
     arg0->frame_pred_frame_dct = func_0012C878(arg0, 1);
     arg0->concealment_mvs = func_0012C878(arg0, 1);
-    temp_6_65 = (*(volatile unsigned int *)0x10002010 & 0xFFBFFFFF) | (func_0012C878(arg0, 1) << 0x16);
-    *(volatile unsigned int *)0x10002010 = temp_6_65;
-    temp_6_77 = (*(volatile unsigned int *)0x10002010 & 0xFFDFFFFF) | (func_0012C878(arg0, 1) << 0x15);
-    *(volatile unsigned int *)0x10002010 = temp_6_77;
-    temp_6_89 = (*(volatile unsigned int *)0x10002010 & 0xFFEFFFFF) | (func_0012C878(arg0, 1) << 0x14);
-    *(volatile unsigned int *)0x10002010 = temp_6_89;
+    temp_6_65 = (IPU_CTRL & 0xFFBFFFFF) | (func_0012C878(arg0, 1) << 0x16);
+    IPU_CTRL = temp_6_65;
+    temp_6_77 = (IPU_CTRL & 0xFFDFFFFF) | (func_0012C878(arg0, 1) << 0x15);
+    IPU_CTRL = temp_6_77;
+    temp_6_89 = (IPU_CTRL & 0xFFEFFFFF) | (func_0012C878(arg0, 1) << 0x14);
+    IPU_CTRL = temp_6_89;
     arg0->repeat_first_field = func_0012C878(arg0, 1);
     func_0012C878(arg0, 1);
     arg0->progressive_frame = func_0012C878(arg0, 1);

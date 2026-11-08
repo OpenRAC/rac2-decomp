@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 typedef unsigned char u8;
 extern char *D_001B23CC[] __attribute__((sda));
 extern char *ref_L00_0034F408_00 __attribute__((sda));
@@ -44,8 +45,8 @@ int func_0034F408(int stream_source, int source_mode, int callback_context) {
     struct AudioDecoderThreadArgs decoder_thread;
     int thread_id;
     int opened;
-    *((volatile int *)0x1000E000) |= 3;
-    *((volatile int *)0x1000E010) = 4;
+    D_CTRL |= 3;
+    D_STAT = 4;
     func_00350590(ref_L00_0034F408_00);
     func_0012F690();
     func_00351720(((char *)D_001B23CC[0]) + 0xD9048, D_001B23C8 + 0x1D05C0, 0xEB768,

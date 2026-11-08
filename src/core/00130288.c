@@ -236,12 +236,12 @@ void func_001307B0(void *arg, int cmd, int addr) {
     cb[0] = 2;
     r1_func_0012BC78(*(void **)(mp + 0x858), cb);
     r1_func_00128590(mp);
-    *(volatile int *)0x10002000 = 0;
+    IPU_CMD = 0;
     r1_func_00128590(mp);
     intr = r1_func_0011D960();
-    *(volatile int *)0x1000B410 = addr & 0x0FFFFFFF;
-    *(volatile int *)0x1000B420 = 4;
-    *(volatile int *)0x1000B400 = 0x101;
+    D4_MADR = addr & 0x0FFFFFFF;
+    D4_QWC = 4;
+    D4_CHCR = 0x101;
     if (intr != 0) {
         r1_func_0011D9A8();
     }

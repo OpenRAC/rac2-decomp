@@ -149,16 +149,16 @@ void func_00125D94(GsDispEnv *env) {
     GsGParam *info = r1_func_00121D08();
 
     if (info->version == 1) {
-        *(volatile unsigned long *)0x12000000 = env->pmode;
-        *(volatile unsigned long *)0x12000070 = env->dispfb;
-        *(volatile unsigned long *)0x12000080 = env->display;
-        *(volatile unsigned long *)0x120000C0 = env->bgcolor;
+        GS_PMODE = env->pmode;
+        GS_DISPFB1 = env->dispfb;
+        GS_DISPLAY1 = env->display;
+        GS_EXTDATA = env->bgcolor;
     } else {
-        *(volatile unsigned long *)0x12000000 = env->pmode;
-        *(volatile unsigned long *)0x12000020 = env->smode2;
-        *(volatile unsigned long *)0x12000090 = env->dispfb;
-        *(volatile unsigned long *)0x120000A0 = env->display;
-        *(volatile unsigned long *)0x120000E0 = env->bgcolor;
+        GS_PMODE = env->pmode;
+        GS_SMODE2 = env->smode2;
+        GS_DISPFB2 = env->dispfb;
+        GS_DISPLAY2 = env->display;
+        GS_BGCOLOR = env->bgcolor;
     }
 }
 

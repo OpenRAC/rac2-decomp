@@ -28,7 +28,7 @@ void func_PAL_L30_003890DC(u8 *object) {
         if (w >= 13) {
             short a1 = *(short *)(object + 0xAA);
             short a2 = *(short *)(object + 0xB2);
-            unsigned int ticks = *(volatile unsigned int *)0x10000800;
+            unsigned int ticks = T1_COUNT;
 
             func_0026FEB8(D_L30_001AEE98, a1, a2);
             func_001163A0(ticks);

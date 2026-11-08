@@ -202,7 +202,7 @@ void func_002FCD18(void)
     if (D_001B22C4 != 0) {
         return;
     }
-    if ((*(volatile unsigned int *)0x1000E010 & 0x20000) == 0) {
+    if ((D_STAT & 0x20000) == 0) {
         *(unsigned int *)0x1000E010 = 0x20000;
     }
     D_001B22C0 = func_0011A930(1, func_002FCE18, 0);
@@ -213,8 +213,8 @@ void func_002FCD18(void)
 /* shared native body of family 349daa693c44d158 */
 void func_002FCDA8(void)
 {
-    if ((*(volatile u32 *)0x1000E010 & 0x20000) != 0) {
-        *(volatile u32 *)0x1000E010 = 0x20000;
+    if ((D_STAT & 0x20000) != 0) {
+        D_STAT = 0x20000;
     }
     func_0011A950(1, D_L03_001B31A0);
     func_0011A950(15, D_L03_001B31A4);

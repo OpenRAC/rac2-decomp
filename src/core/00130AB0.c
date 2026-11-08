@@ -28,17 +28,17 @@ extern void func_00130B18(unsigned int);
  */
 void func_00130AB0(unsigned int chcr) {
     r1_func_0011D960();
-    *(volatile unsigned int *)0x1000F590 = *(volatile unsigned int *)0x1000F520 | 0x10000;
-    *(volatile unsigned int *)0x1000B000 = chcr;
-    *(volatile unsigned int *)0x1000F590 = *(volatile unsigned int *)0x1000F520 & 0xFFFEFFFF;
+    D_ENABLEW = D_ENABLER | 0x10000;
+    D3_CHCR = chcr;
+    D_ENABLEW = D_ENABLER & 0xFFFEFFFF;
     r1_func_0011D9A8();
 }
 
 /* rac1-decomp src/core/0012CC90.c: func_0012CCF8 */
 void func_00130B18(unsigned int chcr) {
     r1_func_0011D960();
-    *(volatile unsigned int *)0x1000F590 = *(volatile unsigned int *)0x1000F520 | 0x10000;
-    *(volatile unsigned int *)0x1000B400 = chcr;
-    *(volatile unsigned int *)0x1000F590 = *(volatile unsigned int *)0x1000F520 & 0xFFFEFFFF;
+    D_ENABLEW = D_ENABLER | 0x10000;
+    D4_CHCR = chcr;
+    D_ENABLEW = D_ENABLER & 0xFFFEFFFF;
     r1_func_0011D9A8();
 }

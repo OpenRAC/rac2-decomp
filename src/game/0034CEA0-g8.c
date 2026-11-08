@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 extern char D_L00_001BD2C0[];
 extern int D_L00_001A8FB4;
 extern char *D_L00_001A904C;
@@ -61,7 +62,7 @@ void func_0034F690(void)
     func_0034F898(D_001B23CC[0] + 0xd9100);
     func_003506A8(D_001B23CC[0] + 0xd9040);
     func_00124B88(0);
-    *(volatile unsigned int *)0x1000e000 &= ~2u;
+    D_CTRL &= ~2u;
 }
 
 extern char *ref_L00_0034EF58_01[] __attribute__((sda));

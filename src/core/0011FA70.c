@@ -55,7 +55,7 @@ void func_0011FAB8(void) {
     unsigned int i;
     int old;
 
-    if (*(volatile unsigned int *)0x10001810 & 0x100) {
+    if (T3_MODE & 0x100) {
         return;
     }
 

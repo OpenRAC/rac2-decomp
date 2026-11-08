@@ -275,8 +275,8 @@ void func_0026EDE8(void)
         D_001B1840 = tables[D_001A7BB0[4]];
         D_00254E78.count = counts[D_001A7BB0[4]];
         /* T1_COUNT, the timer-1 counter register. */
-        D_001A7200 += *(volatile unsigned int *)0x10000800;
-        *(volatile unsigned int *)0x10000800 = 0;
+        D_001A7200 += T1_COUNT;
+        T1_COUNT = 0;
         func_00280710();
         func_002FC280();
         func_002FC220();
@@ -345,7 +345,7 @@ void func_0026EDE8(void)
         func_00298F00();
         func_00298178();
         func_002FC3C0(1);
-        time = func_00283CE0(*(volatile unsigned int *)0x10000800);
+        time = func_00283CE0(T1_COUNT);
         D_001B168C = time * (D_001A7B90[0] ? 0.0000868055578f : 0.000104166669f);
         func_0027B948();
         func_002B4C18();

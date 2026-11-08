@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 typedef signed int s32;
@@ -350,8 +351,8 @@ void func_L04_00412130(RankObject *object) {
     s32 count = 0;
     s32 i, j, k, l;
 
-    *(volatile s32 *)0x10000010 = 0x81;
-    *(volatile s32 *)0x10000000 = 0;
+    T0_MODE = 0x81;
+    T0_COUNT = 0;
     state = object->state;
     slot = state->slots;
     for (k = 0; k < 21; k++, slot++) {

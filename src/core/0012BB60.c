@@ -5,8 +5,6 @@ extern void func_0012C3B0(void *);
 
 extern void r1_func_0012C468(void *, void *);
 
-#define IPU_CTRL   ((volatile unsigned int *)0x10002010)
-
 /* func_0012C508 returns a short: its epilogue sign-extends $v0. */
 extern short func_0012C508(int, int);
 
@@ -74,7 +72,7 @@ int func_0012BB60(void *arg0, int *arg1, int *arg2, int *arg3, void *arg4, void 
     unsigned int g1;
     unsigned int g2;
 
-    *IPU_CTRL = (*IPU_CTRL & 0xF8FFFFFF) | (d->unk150 << 24);
+    IPU_CTRL = (IPU_CTRL & 0xF8FFFFFF) | (d->unk150 << 24);
     sp20 = arg3;
     sp24 = arg5;
     v = func_0012C508((int)d, 1);

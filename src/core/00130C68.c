@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 
 
 /*
@@ -51,21 +52,21 @@ void sceIpuRestartDMA(struct IpuContext *ctx) {
     src = ctx->unk8 + count;
     if (ctx->unk10 != 0) {
         if (ctx->unk14 != 0) {
-            *(volatile u32 *)0x1000B010 = ctx->unk10;
-            *(volatile u32 *)0x1000B020 = ctx->unk14;
+            D3_MADR = ctx->unk10;
+            D3_QWC = ctx->unk14;
             SetD3Chcr(ctx->unk18 | 0x100);
         }
     }
-    while (*(volatile s32 *)0x10002010 < 0) {
+    while (((s32)IPU_CTRL) < 0) {
     }
-    *(volatile u32 *)0x10002000 = magic;
-    while (*(volatile s32 *)0x10002010 < 0) {
+    IPU_CMD = magic;
+    while (((s32)IPU_CTRL) < 0) {
     }
     if (dst != 0) {
         if (src != 0) {
-            *(volatile u32 *)0x1000B410 = dst;
-            *(volatile u32 *)0x1000B430 = ctx->unk4;
-            *(volatile u32 *)0x1000B420 = src;
+            D4_MADR = dst;
+            D4_TADR = ctx->unk4;
+            D4_QWC = src;
             SetD4Chcr(ctx->unkC | 0x100);
         }
     }

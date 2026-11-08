@@ -23,21 +23,21 @@ void func_0012E110(void *arg0, unsigned int arg1, int arg2) {
     int r;
     int event[8];
 
-    while (*(volatile int *)0x10002010 < 0) {
+    while (((int)IPU_CTRL) < 0) {
     }
     r = r1_func_0011D960();
-    *(volatile unsigned int *)0x1000B010 = arg1 & 0x0FFFFFFF;
-    *(volatile unsigned int *)0x1000B020 = (unsigned int)arg2 << 6;
-    *(volatile unsigned int *)0x1000B000 = 0x100;
+    D3_MADR = arg1 & 0x0FFFFFFF;
+    D3_QWC = (unsigned int)arg2 << 6;
+    D3_CHCR = 0x100;
     if (r != 0) {
         r1_func_0011D9A8();
     }
     r1_func_00128560(arg0, arg2 | 0x70000000);
     event[0] = 4;
     r1_func_0012BC78(*(int *)(p + 0x858), event);
-    while (((*(volatile unsigned int *)0x1000B000 >> 8) & 1) != 0) {
+    while (((D3_CHCR >> 8) & 1) != 0) {
     }
-    while (*(volatile int *)0x10002010 < 0) {
+    while (((int)IPU_CTRL) < 0) {
     }
 }
 
@@ -77,16 +77,16 @@ void func_0012E378(void *arg0, unsigned int arg1, int arg2) {
     rec.err = 0;
     rec.done = 0;
     rp = &rec;
-    while (*(volatile int *)0x10002010 < 0) {
+    while (((int)IPU_CTRL) < 0) {
     }
     h = r1_func_00118AC0_2A558(3, (void *)r1_func_0012A418_2A558, 0, rp);
-    *(volatile unsigned int *)0x1000E010 = 8;
+    D_STAT = 8;
     r1_func_00119460_2A558(3);
     r = r1_func_0011D960();
     {
-        volatile unsigned int *madr = (volatile unsigned int *)0x1000B010;
-        volatile unsigned int *qwc = (volatile unsigned int *)0x1000B020;
-        volatile unsigned int *chcr = (volatile unsigned int *)0x1000B000;
+        volatile unsigned int *madr = &D3_MADR;
+        volatile unsigned int *qwc = &D3_QWC;
+        volatile unsigned int *chcr = &D3_CHCR;
         *madr = arg1 & 0x0FFFFFFF;
         *qwc = 0xFFC0;
         *chcr = 0x100;
@@ -94,7 +94,7 @@ void func_0012E378(void *arg0, unsigned int arg1, int arg2) {
     if (r != 0) {
         r1_func_0011D9A8();
     }
-    *(volatile unsigned int *)0x10002000 = 0x700003FF;
+    IPU_CMD = 0x700003FF;
     event[0] = 4;
     r1_func_0012BC78(*(void **)(p + 0x858), event);
     while (rec.done < rec.total) {
@@ -102,7 +102,7 @@ void func_0012E378(void *arg0, unsigned int arg1, int arg2) {
     if (rec.err != 0) {
         r1_func_0012C468_a(p, r1_D_00153AB0);
     }
-    while (*(volatile int *)0x10002010 < 0) {
+    while (((int)IPU_CTRL) < 0) {
     }
     r1_func_001193F8(3);
     r1_func_00118AD0(3, h);
@@ -153,27 +153,27 @@ void func_0012E608(void *arg0, int *arg1) {
     ev[0] = 2;
     n = arg1[3] * arg1[4];
     r1_func_0012BC78_result(*(void **)(p + 0x858), ev);
-    if ((*(volatile unsigned int *)0x10002010 & 0x4000) != 0) {
-        *(volatile unsigned int *)0x10002010 = 0x40000000;
+    if ((IPU_CTRL & 0x4000) != 0) {
+        IPU_CTRL = 0x40000000;
     }
     small = n < 0x400;
-    while (*(volatile int *)0x10002010 < 0) {
+    while (((int)IPU_CTRL) < 0) {
     }
     r1_func_00128560(arg0, 0);
     addr = arg1[0];
-    while (*(volatile int *)0x10002010 < 0) {
+    while (((int)IPU_CTRL) < 0) {
     }
     mask = 0x0FFFFFFF;
     loc[1] = addr & mask;
     loc[0] = n * 0x18;
     if ((unsigned int)loc[0] > 0xFFFF) {
         h = r1_func_00118AC0(4, (void *)r1_func_0012A718, 0, &loc[0]);
-        *(volatile unsigned int *)0x1000E010 = 0x10;
+        D_STAT = 0x10;
         r1_func_00119460(4);
         r = r1_func_0011D960();
-        *(volatile unsigned int *)0x1000B410 = loc[1];
-        *(volatile unsigned int *)0x1000B420 = 0xFFFF;
-        *(volatile unsigned int *)0x1000B400 = 0x101;
+        D4_MADR = loc[1];
+        D4_QWC = 0xFFFF;
+        D4_CHCR = 0x101;
         if (r != 0) {
             r1_func_0011D9A8();
         }
@@ -188,9 +188,9 @@ void func_0012E608(void *arg0, int *arg1) {
         r1_func_00118AD0(4, (int)h);
     } else {
         r = r1_func_0011D960();
-        *(volatile unsigned int *)0x1000B410 = arg1[0] & mask;
-        *(volatile unsigned int *)0x1000B420 = loc[0];
-        *(volatile unsigned int *)0x1000B400 = 0x101;
+        D4_MADR = arg1[0] & mask;
+        D4_QWC = loc[0];
+        D4_CHCR = 0x101;
         if (r != 0) {
             r1_func_0011D9A8();
         }
