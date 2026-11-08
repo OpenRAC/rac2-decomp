@@ -223,10 +223,10 @@ void func_001257D0(short mode, short inter, short out, short ff) {
     switch (mode) {
     case 0:
         gp = (sceGsGParam *)r1_func_00121D08();
-        *(volatile unsigned long *)0x12001000 = 0x200;
+        GS_CSR = 0x200;
         gp->sceGsInterMode = inter;
         gp->sceGsOutMode = out;
-        gp->sceGsVersion = (short)((*(volatile unsigned long *)0x12001000 >> 16) & 0xFF);
+        gp->sceGsVersion = (short)((GS_CSR >> 16) & 0xFF);
         r1_func_00118DE0(0xFF00);
         gp->sceGsFFMode = (ff != 0);
         if (gp->sceGsVSCfunc != 0) {
@@ -238,14 +238,14 @@ void func_001257D0(short mode, short inter, short out, short ff) {
         r1_func_00118A50(inter & 1, out & 0xFF, ff & 1);
         break;
     case 1:
-        *(volatile unsigned long *)0x12001000 = 0x100;
+        GS_CSR = 0x100;
         break;
     case 5:
         gp = (sceGsGParam *)r1_func_00121D08();
         gp->sceGsFFMode = (ff != 0);
         gp->sceGsInterMode = inter;
         gp->sceGsOutMode = out;
-        gp->sceGsVersion = (short)((*(volatile unsigned long *)0x12001000 >> 16) & 0xFF);
+        gp->sceGsVersion = (short)((GS_CSR >> 16) & 0xFF);
         r1_func_00118A50(inter & 1, out & 0xFF, ff & 1);
         break;
     }

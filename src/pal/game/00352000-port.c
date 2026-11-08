@@ -23,7 +23,7 @@ int func_PAL_003521A8(void) {
     int *h = (int *)func_00126F38(2);
     int *buf;
 
-    D_001AE7DC[0] = D_001A7BB8 ? D_001AE7DC[0] ^ 1 : (int)((*(volatile unsigned long long *)0x12001000 >> 13) & 1);
+    D_001AE7DC[0] = D_001A7BB8 ? D_001AE7DC[0] ^ 1 : (int)((GS_CSR >> 13) & 1);
     if (D_001AE7D0[0] != 0) {
         D_001AE7D4[0] = D_001AE7D4[0] + 1;
         D_001AE7E0[0] = func_001244B8(1, 0);

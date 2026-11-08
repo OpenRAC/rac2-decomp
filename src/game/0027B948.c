@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 #include "include_asm.h"
 
 /* Rotated sprite construction follows RAC1 draw.c (GPL-3.0). */
@@ -68,16 +69,16 @@ extern void func_0027EA28(void *v, void *x);
 void func_0027B948(void)
 {
     GsRegisterValue framebuffer, display;
-    *(volatile GsRegisterValue *)0x120000e0 = 0;
-    *(volatile GsRegisterValue *)0x12000000 = 0xffa1;
-    *(volatile GsRegisterValue *)0x12000020 = D_001A6488[0];
+    GS_BGCOLOR = 0;
+    GS_PMODE = 0xffa1;
+    GS_SMODE2 = D_001A6488[0];
     framebuffer = D_001A6488[1];
-    *(volatile GsRegisterValue *)0x12000070 = framebuffer;
-    *(volatile GsRegisterValue *)0x12000090 = framebuffer;
+    GS_DISPFB1 = framebuffer;
+    GS_DISPFB2 = framebuffer;
     display = D_001A6488[2];
-    *(volatile GsRegisterValue *)0x12000080 = display;
-    *(volatile GsRegisterValue *)0x120000a0 = display;
-    *(volatile GsRegisterValue *)0x120000d0 = 0;
+    GS_DISPLAY1 = display;
+    GS_DISPLAY2 = display;
+    GS_EXTWRITE = 0;
 }
 
 /* Set up aligned GS buffer state and emit pinned register/clear helper calls; source identity and matching require complete-unit qualification */
