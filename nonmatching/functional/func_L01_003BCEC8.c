@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, s21): plain TI128 spelling of the +8 clear tried, 632/636 (see levels/func_L01_003BCEC8.c); no legal form found. */
 /* functional: high. The near-miss draft (632/636 bytes) with common.h's qcopy/qzero asm helpers written as plain quadword copies and clears. Retail clears the private block's first quadword through s + 8 (`addiu a0,s1,8; sq zero,0(a0)`); SQ ignores the low four address bits, so with the 16-aligned private block that clears s+0..s+0xF, which is what this C writes (a host 16-byte store at s + 8 would clear s+8..s+0x17 instead). Level 01's callees mapped through functions.tsv. */
 /* func_L01_003BCEC8 (Oozla, level 01 only): debris piece update. State 0 destroys it; state 1 switches
  * to state 2 with a 10-frame fade timer when the timer (private+0x30) expires; state 2 fades alpha (+0x23)

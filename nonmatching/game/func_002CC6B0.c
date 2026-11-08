@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, o13): set_window_vertical with int parameters gives 40 rows (was 41; own rdump count); swapped parameter order/store order, local top, self-assignment, no do-while, anchor local, += forms do not help (40-84). Lesson-48 move sweep (302 moves, depth 5) finds nothing under 40; 25-min permuter from the int-parameter C found only formatting/fake temporaries. Div-guard store remains the compiler flow2 issue. */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0027FC70 4th parameter is declared long but src/game/0027F128-fpw-g8.c has int len: corrected, 41 -> 41 rows, no change. */
 /* 8 November 2026 (Sonnet round, o6b): new best 40 rows (2076 bytes; intermediate store still deleted): in */
 /* 8 November 2026 (round 12b, m3x, const base): D_001AB984 read into a local before the +=
@@ -120,7 +121,7 @@ extern void func_0027ECC8(int, int, int, int, int);
 #define TEXT(id) func_00288FB8(id)
 #define DRAW(c,t) func_0027FC70(&win,c,t,-1,tex,glyphs)
 static inline int translated_edge(int extent, int origin) { return extent + origin; }
-static inline void set_window_vertical(Win *p, unsigned short top, unsigned short anchor) { p->s[5] = anchor; p->s[0] = top; }
+static inline void set_window_vertical(Win *p, int top, int anchor) { p->s[5] = anchor; p->s[0] = top; }
 int func_002CC6B0(unsigned char *w) {
     char buf[0x40];
     int id;

@@ -485,6 +485,7 @@ FUNCTION_ENTRY_OFFSETS = {
     "func_002D9730": (100, 40),
     "func_002DB1B0": (524, 8),
     "func_002DB988": (288, 16),
+    "func_002DC3C8": (856, 8),
     "func_002DC900": (436, 8),
     "func_002DE0D0": (716, 16),
     "func_002EDA10": (1516, 72),
