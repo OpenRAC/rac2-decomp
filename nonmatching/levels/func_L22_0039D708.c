@@ -1,3 +1,23 @@
+/* Sonnet round o23, 8 November 2026 (after o18); retained, not linked. Same
+ * profile. check.py US: 16068/16068 bytes, 0/2 places, first difference
+ * +0x8B8; 11 instructions differ once relocations are masked (o18: 20).
+ * Fix: func_002A8D70 is declared (void *, int, float, float, int, float,
+ * int, int, int) as in the matched src/game units 003173B0.c, 00318340.c,
+ * 00322CC0.c and 0031ABE0-qcopy.c (same registers as 002A7750.c's
+ * (x, y, z, object, ...) definition); the object argument then comes first
+ * and retail's four call setups follow (lw 0x440 after the 0x98 store).
+ * The 0x3E0-0x448 block reads D_L22_001AF30C into a block local before
+ * the 3.2f store and passes D_L22_001B2AAC = v (mov.s f12 from f1 now).
+ * Still open: case 3's a0 for the 0x12 call (retail's case-3 tail is
+ * cross-jumped only from a2: a label at its a2 must exist first), the lw
+ * a0 0x448 vs the D_L22_001B2AAC store (needs the store first and v not
+ * tied to f12 in sched1), the lui a3 / lwc1 0x3E0 order (retail loads
+ * limit3EC in the else arm, but then local-alloc gives it f0, not f1),
+ * and addiu s1 / lw 0xCC order twice. Tried: func_L22_003A2988 as
+ * (float, void *) (fixes the 0x448 order, loses the mov.s), case 3/4
+ * rewrites, limit3EC placements, a +-3 move sweep (1282 variants), one
+ * capped permuter run; none better.
+ */
 /* Sonnet round o18, 8 November 2026 (after round eleven); retained, not
  * linked. Same profile. check.py US: 16068/16068 bytes, 0/2 places, first
  * difference +0x8B8; 4000/4017 opcodes aligned, 20 instructions differ once
@@ -316,7 +336,7 @@ extern float func_002A89A8(void *, int, float);
 extern void func_002A8BD0(void *, int, int, float);
 extern void func_002A8C00(int, int, int, float, int);
 extern int func_002A8C28(int, int, int, float, float, float, int, int, int);
-extern int func_002A8D70(float, float, float, void *, int, int, int, int, int);
+extern int func_002A8D70(void *, int, float, float, int, float, int, int, int);
 extern void func_002A8E20(void *, void *);
 extern void * func_002A9640(void *, int, int);
 extern float func_002AA3A8(int, int, float, float, float, float);
@@ -900,9 +920,11 @@ void func_L22_0039D708(s8 *arg0) {
                         temp_a0_17 = M2C_FIELD(temp_s6, void **, 0x448);
                         M2C_FIELD(temp_a0_17, s128 *, 0x10) = *(s128 *)(arg0 + 0x10);
                         func_002A7470(temp_a0_17, 6, 0, 4);
-                        M2C_FIELD(M2C_FIELD(temp_s6, void **, 0x448), f32 *, 0x48) = 3.2f;
-                        D_L22_001B2AAC = D_L22_001AF30C;
-                        func_L22_003A2988(M2C_FIELD(temp_s6, void **, 0x448) + 0x10, D_L22_001AF30C);
+                        {
+                            f32 v = D_L22_001AF30C;
+                            M2C_FIELD(M2C_FIELD(temp_s6, void **, 0x448), f32 *, 0x48) = 3.2f;
+                            func_L22_003A2988(M2C_FIELD(temp_s6, void **, 0x448) + 0x10, D_L22_001B2AAC = v);
+                        }
                         goto block_183;
                     }
                     temp_v1_14 = M2C_FIELD(arg0, u16 *, 0x96);
@@ -1197,9 +1219,8 @@ block_184:
                     switch (temp_v1_3) {            /* switch 3; irregular */
                     case 9:                         /* switch 3 */
                         if ((func_0029F530((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) > 7.0f) && (func_0029F530((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) < 12.0f)) {
-                            hit = (void *) M2C_FIELD(temp_s6, s32 *, 0x440);
                             M2C_FIELD(arg0, s32 *, 0x98) = 0;
-                            func_002A8D70(4.0f, 10.0f, 1.0f, hit, 3, 0x10007, 0, 2, 0);
+                            func_002A8D70((void *) M2C_FIELD(temp_s6, s32 *, 0x440), 3, 4.0f, 10.0f, 0x10007, 1.0f, 0, 2, 0);
                             M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(arg0, u8 *, 0x60) & 2) {
@@ -1212,9 +1233,8 @@ block_184:
                         break;
                     case 10:                        /* switch 3 */
                         if ((func_0029F530((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) > 7.0f) && (func_0029F530((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) < 12.0f)) {
-                            hit = (void *) M2C_FIELD(temp_s6, s32 *, 0x440);
                             M2C_FIELD(arg0, s32 *, 0x98) = 0;
-                            func_002A8D70(4.0f, 10.0f, 1.0f, hit, 4, 0x10007, 0, 2, 0);
+                            func_002A8D70((void *) M2C_FIELD(temp_s6, s32 *, 0x440), 4, 4.0f, 10.0f, 0x10007, 1.0f, 0, 2, 0);
                             M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(arg0, u8 *, 0x60) & 2) {
@@ -1741,7 +1761,7 @@ block_184:
                     case 0xA:
                         if ((func_0029F530((void *) temp_a0_9) > 7.0f) && (func_0029F530((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) < 12.0f)) {
                             M2C_FIELD(arg0, s32 *, 0x98) = 0;
-                            func_002A8D70(4.0f, 50.0f, 0.0f, (void *) M2C_FIELD(temp_s6, s32 *, 0x440), 3, 0x8B0000, 0, 2, 0);
+                            func_002A8D70((void *) M2C_FIELD(temp_s6, s32 *, 0x440), 3, 4.0f, 50.0f, 0x8B0000, 0.0f, 0, 2, 0);
                             M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(M2C_FIELD(temp_s6, s32 *, 0x440), u8 *, 0x60) & 2) {
@@ -1753,7 +1773,7 @@ block_184:
                     case 9:
                         if ((func_0029F530((void *) temp_a0_9) > 7.0f) && (func_0029F530((void *) M2C_FIELD(temp_s6, s32 *, 0x440)) < 12.0f)) {
                             M2C_FIELD(arg0, s32 *, 0x98) = 0;
-                            func_002A8D70(4.0f, 50.0f, 0.0f, (void *) M2C_FIELD(temp_s6, s32 *, 0x440), 4, 0x8B0000, 0, 2, 0);
+                            func_002A8D70((void *) M2C_FIELD(temp_s6, s32 *, 0x440), 4, 4.0f, 50.0f, 0x8B0000, 0.0f, 0, 2, 0);
                             M2C_FIELD(arg0, s32 *, 0x98) = (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x24), s32 *, 0x10);
                         }
                         if (M2C_FIELD(M2C_FIELD(temp_s6, s32 *, 0x440), u8 *, 0x60) & 2) {

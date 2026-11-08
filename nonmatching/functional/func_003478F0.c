@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round 2): matching attempt improved to 14 differing rows (see nonmatching/game/func_003478F0.c); this functional variant is unchanged. */
 /* functional: high. Same calls, arguments, reads and writes in retail's order; written without the near miss's register-allocation shaping. The bottom-row y adds the panel origin's x (pos[0]), exactly as retail does. */
 
 /* Draws the 6x4 weapon grid of the weapon-select menu (owner o): for each cell of D_00259F58 (id at +6), the

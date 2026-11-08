@@ -1,3 +1,5 @@
+/* 9 November 2026 (Sonnet round 3, lesson 48/49 sweeps): 6 differing rows (was 7), one swap left: 0x18 $a3 (retail $v1) and c $v1 (retail $a3); upd $a1 and page $a2 now match. Form: `upd` a function-scope local assigned in case 8 just before its store, stores in source order a, next, c, upd=, page, b, init (b late). Scripted sweeps with a local scorer (~100k variants: every order of the 7 stores x local/expression/declared-early/assigned-late for page, c, upd, 0x18, init x every declaration order; init/0x18 as locals): none below 6. This is now the body C below. */
+/* 8 November 2026 (Sonnet round 2, lesson 49; permuter-found, hand-cleaned): the upd value kept in one function-scope local (`upd = func_002CB648;` before the c store, `D_00210A40.upd = upd;`) gives 7 differing rows (was 10): page now $a2 as retail; still 0x18 $a1 (retail $v1), c $v1 (retail $a3), upd $a3 (retail $a1). Page/c/0x18 as extra locals, both orders of upd/c: no gain (7-10). 1500 s permuter run -j2 only found this local (65 -> 60). */
 /* 8 November 2026 (Sonnet round, measured): the retained C gives 4 register rows in case 8 (page $a1/c $a2/upd $a3 against retail upd $a1/page $a2/c $a3). Statement orders (upd before page, a/b chained, next from page, a repeated upd store) leave 4 rows or worsen to 7. */
 /* 8 November 2026 (m2z, caller-save angle): global.c:1516 tries caller-saves only when find_reg found no register (best_reg < 0), so CALLER_SAVE_PROFITABLE (4*calls < refs) never decides s-register versus call-clobbered while an s-register is free. cc1 -S on the retained C with and without -fno-caller-saves: identical body (0 lines differ). Uses s0-s2 with s3-s7 free across 22 calls; the 7 rows are not decided by caller-saves. Angle closed; no check.py runs. */
 /* 7 November 2026 (opus, DrLegitamate): current master compiler, own unit -O2 -G16 -Wa,-G16.
@@ -202,6 +204,7 @@ void func_002CA070(void)
     int queued = 0;
     int s, j, k, n, t, u;
     int *p;
+    void (*upd)(void);
 
     D_001BAF80[4] |= 0x80000000;
     D_001F2840.unk134 = 0;
@@ -252,11 +255,12 @@ void func_002CA070(void)
         break;
     case 8:
         D_00210A40.a = 0x18;
-        D_00210A40.b = 0x18;
-        D_001F2840.page = D_00259018;
-        D_00210A40.c = D_00258D70;
-        D_00210A40.upd = func_002CB648;
         D_001F2840.next = D_00259018;
+        D_00210A40.c = D_00258D70;
+        upd = func_002CB648;
+        D_00210A40.upd = upd;
+        D_001F2840.page = D_00259018;
+        D_00210A40.b = 0x18;
         D_00210A40.init = func_002CB510;
         D_00210A40.init(0);
         func_002C9AD8(&D_00210A40);

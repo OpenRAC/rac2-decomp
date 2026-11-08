@@ -1,3 +1,5 @@
+/* 9 November 2026 (Sonnet round 3, lessons 42-49): re-measured 1480/1484, 69 rows differ once sp offsets are ignored (208 raw). Retail has `mult; addu` with D_00239BA0 base in its own reg; madd goes away only with a two-statement `entry = D_00239BA0; entry += D_00139568[record[3]];` (state block) and a block-local `icon = D_00239BA0; icon += ...` (icon site), but both shift gcse/preheader allocation (row+1/y+step spills lost, 73-197 rows, 1472-1488 bytes), so not kept; one-expression spellings (cast, char* base, tbl local, ctx local, raw unsigned-int sum) all still madd. Purchased fallback: 5 spellings (if, &&, ?: with state/0, state=0 first) identical movz. Permuting the five global loads (119 orders) changes nothing. s5/s6: retail state has 13 refs, hoisted y+height 9 (ours swapped counts), so not a ref-count tie. Frame 0xA0/0xB0 untouched (no honest 16-byte local found). */
+/* 8 November 2026 (Sonnet round 2, lesson 49): removed fake locals `key` (retail reloads record[3] from the halfword each time) and `entry` for the icon lookup (written as D_00239BA0[D_00139568[record[3]]].icon); now 1480/1484 bytes (was 1472), 208 differing rows (251 before; no pad[4] needed any more). Also tried: gap/areaWidth/areaHeight as expressions (worse, 284), texture inlined into the call (same), bottom as one local set per row (261, worse), `y += yStep, row++` (-2). Left: s5/s6 state/bottom swap, spill slots 0x30/0x34 order, madd (mtlo/madd) where retail has mult+addu for D_00239BA0 indexing (every spelling of the index expression gives madd), purchased movz vs movn. */
 /* 8 November 2026 (Sonnet round): rewrite from retail asm and Ghidra reproduces the same C; unchanged 1472/1484, 51 lines. With a diagnostic int pad[4] the 0xB0 frame and all stack offsets match; 1 -O2 -G8 permuter run (1500 s, -j2) best 1480/1484 (worse), none cleanable. Purchased-state spelling 'state==0 && purchased' still gives movz, not movn. */
 /* Claude, task v101 wcD, 8 November 2026: retained near miss, body revised.
  * Profile: -O2 -G8 -ffunction-sections (dedicated -g8.c unit, no extra flags).
@@ -118,16 +120,15 @@ int func_002D9008(char *object)
         yStart = (areaHeight - height) >> 1;
     }
     index = 0;
-    for (row = 0, y = yStart; row < *(int *)(object + 0x40); row++, y += yStep) {
+    for (row = 0, y = yStart; row < *(int *)(object + 0x40); y += yStep, row++) {
         x = xStart;
         for (column = 0; column < *(int *)(object + 0x44); column++) {
             state = 0;
             if (record[2] == 0 ? D_001A7AF8[record[3]] : D_001395B8[record[3]]) {
                 if ((unsigned short)record[2] == 0) {
-                    int key = record[3];
-                    entry = &D_00239BA0[D_00139568[key]];
+                    entry = &D_00239BA0[D_00139568[record[3]]];
                     state = 0;
-                    if (D_001F2840.slots[entry->slot] == key)
+                    if (D_001F2840.slots[entry->slot] == record[3])
                         state = ((*(int *)(object + 0x30) ^ 1) & 1) << 2;
                     if (state == 0) { if (!entry->purchased) state = 0; else state = 3; }
                     if (D_001F2840.override144 && (*(int *)(object + 0x30) & 8)) state = 2;
@@ -143,8 +144,7 @@ int func_002D9008(char *object)
                 }
                 if (state == 4)
                     func_0028FC48(x - 64, y - 64, x + width + 64, y + height + 64, 0x80FFFFFFUL, 1);
-                entry = &D_00239BA0[D_00139568[record[3]]];
-                texture = func_0028E588(entry->icon, record[1]);
+                texture = func_0028E588(D_00239BA0[D_00139568[record[3]]].icon, record[1]);
                 func_0028EE98(texture, x, y, width, height, 128);
                 if (state == 2)
                     func_0028FC48(x - 64, y - 64, x + width + 64, y + height + 64, 0x60202020UL, 1);

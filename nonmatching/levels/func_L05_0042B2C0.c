@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round o28, lesson 49): re-measured 2112/2128, frame 0x1A0 vs 0x150 (520/529 differing rows, 322 opcode-only). Retail register roles read from the asm: first ring loop counts fp 29..0 with pointer givs s5/s1/s2 and &radial s4, &inverse s6; startU is kept in f22 and u in f21 (two values; here they merge into f21); the inner loop keeps &radial in a caller-saved reg (one 128-bit sq/lq caller-save), out in s7 only incremented, and ECE0/00E0/FBE0 pointer givs s2/s0/s4 plus an out*12 offset s5. Tried: &rotation2/&inverse2 as pointer locals set before the first loop (522 rows, no frame change). Permuter 1500 s: best candidates use volatile (not landable). */
 /* 8 November 2026 re-measure (today's compiler: set-side sticky volatile default,
  * mtc1 hazard-nop fix): this C in its own -g8 unit with -frac2-zero-ti-por gives
  * 2112/2128 bytes, frame 0x1A0 vs 0x150; the gap is not 2 instructions but ~400

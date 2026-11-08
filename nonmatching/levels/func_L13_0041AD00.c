@@ -1,3 +1,5 @@
+/* 9 November 2026 (Sonnet round s39): base still 13 words (all spill-slot order). No gain: loop tests != (17-30), unsigned j/k (14/17), while+continue j loop (167), swapped if/else arms (64-232), swapped k arms (18-23), joined/reordered c tests (16+), duplicated k-loop tails per if/else arm (1600/1632 bytes: jump2 does not merge them). Permuter (-j2, 1500 s) found 11 words: declare `long new_var;` between t and j and write `new_var = P[1].zero = P[2].zero = 0; P[0].zero = new_var;` (a fake temp for the zero store, so kept out of the body; the declaration order alone and plain chain reorderings stay 13). Slots still differ (uv 0x29C vs retail 0x2B0). */
+/* 8 November 2026 (Sonnet round, lesson 49 + declaration sweep): re-measured 1376/1376, 15 differing words excluding relocations (note said 14). Locals checked against retail: d (one reg $s7), tex/flags, c, i/j/n/k all real, nothing to inline. Greedy sweep of every scalar/array declaration position (about 190 compiles): `int n; int j; int k;` declared right after `flags` (body below now) gives 13 words; a permuter run (-j2, 1500 s) only found the same `int n` move (60 vs 70). Spill-slot order still differs. */
 /* 8 November 2026 (Sonnet round, lesson 48 sweep): every single statement move of 1-6 places inside a run of simple statements, every top-level simple statement moved up to 6 top-level items, and pairs of the best singles: no variant beats the base (14 words); moves either tie or get worse. */
 /* 8 November 2026 (Sonnet round, measured): uv store as a row pointer, a float pointer, a value local or split product: still 14 words; the uv store per arm in one loop or both: 142-263 words. Permuter (-j2, 1500 s, 200 base): best 190, no spill-slot change. */
 /* 8 November 2026 (named-local slot order, the func_00281A08 technique): retail's spill slots 0x29C..0x2B0 hold j+1, n+1, j*16, &cnt, i+1, uv; ours have uv first, then the same five. Named jn/nn/in/cnt locals (loop step = next form) keep registers and schedule but take the lowest slots (0x280..), ahead of the loop-invariant stack-address temps, so the order gets worse (46 words); a named uv = P[0].uv is folded back into the PRE register (no change); named v270/v260 pointers change size (1360). Named locals only move a value earlier; retail needs uv moved last. */
@@ -131,7 +133,9 @@ void func_L13_0041AD00(char *m) {
     float v270[4] __attribute__((aligned(16)));
     long tex;
     long flags;
-    int j, n, k;
+    int n;
+    int j;
+    int k;
     int c;
     int t;
 

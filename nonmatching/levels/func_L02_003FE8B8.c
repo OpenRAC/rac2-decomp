@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round o25, lesson 49): body below is 3560/3552 bytes (check.py), 0/1, 43 masked aligned differences (this body was 79 at 3556 on the same harness). Changes: label_y written inside the func_00300A00 call (as matched L15_00431590) -> 68 (fixes the int-x labels and the second label of each group: xv load before the colour); block-scoped `s32 ofs = 0x8710;` per arm, the else arm split into the data+0xD0 block and a block around 0x4E/0x4F -> 49 (every arm's 0x8710 register now retail's; borderline local, same precedent as `entry = 0x8710` in func_L08_0041D808); SUM init `obj` before `i` -> 45; box-form hill-climb (6 forms x 18 coordinates + 3 pointer modes): rD0 h grouped -> 44; box 5 h written as hud_coord(...) inside the func_002802E0 call (lesson 49, from the permuter) -> 43; a hill-climb adding in-call forms for every coordinate finds nothing further. Lesson 49 audit: retail never holds &r70/&rF0 (plain &r70/&rF0/&r90: 49-85, PRE copies them to $s regs; retail evicts them and saves ghost $s4/$s6). Left: first label of each group (constant li.s in the block) loads the colour before xv in sched1 and takes $a1 for the label_y result (retail $v1); else-arm labels $v1 vs $v0; box 5/6 constant 3 grouping; box address copies. One 1500 s permuter run from the 44 body: the box-5 in-call h above; its later bests are dishonest (volatile return type, 0x4F held in a variable). */
 /* 8 November 2026 (Sonnet round, lesson 48 sweep): scripted moves of every statement by 1..6 (548 singles + 109 pairs) and top-level items (548): best legal is 150 vs base 151 aligned differences (h/pF0 one-step moves, noise), size stays 3556/3552; DRAWBUF with strlen before the colour load 3540 bytes/174, a colour local in DRAW no change. Callee prototypes checked against src: consistent. */
 /* 8 November 2026, Sonnet round (o7c): body below is 3556/3552 bytes (was 3564), 0/1, about 100
  * aligned words differ (relocations masked). Change: a `half = 0.5f;` local after
@@ -189,12 +190,10 @@ extern s32 func_00115DA8(char *, char *, ...);
 
 #define LBL(id, c, xv, yv, a1, a2, a3) { \
         char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); \
-        s32 ly = label_y(ls, (f32)(yv), D_L02_001B3E04, half, 1); \
-        func_00300A00(ls, c, xv, ly, a1, a2, a3); }
+        func_00300A00(ls, c, xv, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, half, 1), a1, a2, a3); }
 #define LBL5(id, c, xv, yv, a1, a2, a3) { \
         char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); \
-        s32 ly = label_y(ls, (f32)(yv), D_L02_001B3E04, 0.5f, 1); \
-        func_00300A00(ls, c, xv, ly, a1, a2, a3); }
+        func_00300A00(ls, c, xv, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, 0.5f, 1), a1, a2, a3); }
 #define TITLE() \
         LBL(0x4C, D_L02_001B1424, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f); \
         LBL(0x4D, D_L02_001B1420, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f)
@@ -205,7 +204,7 @@ extern s32 func_00115DA8(char *, char *, ...);
         LBL(0x50, D_L02_001B1420, D_L02_001B13FC, D_L02_001B1400, D_L02_001B1404, 1.0f, 0.0f)
 #define SUM() \
             sum = 0; \
-            for (i = 5, obj = data + 0x90; i >= 0; i--, obj += 4) { \
+            for (obj = data + 0x90, i = 5; i >= 0; i--, obj += 4) { \
                 sum += *(s32 *)obj; \
             }
 #define DRAW(fn, r, s) \
@@ -268,7 +267,6 @@ void func_L02_003FE8B8(u8 *moby)
     f32 save;
     s32 sum;
     s32 i;
-    s32 ofs;
     s32 n;
     f32 t;
     f32 half;
@@ -301,18 +299,17 @@ void func_L02_003FE8B8(u8 *moby)
     func_002802E0(&rB0, x, y, D_L02_001B1370[0], D_L02_001B1374[0], D_L02_001B135C, h, 0, 3);
     x = hud_coord((f32)D_L02_001B13B0, D_L02_001B3E04, half);
     do { t = (f32)D_L02_001B13B4[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    h = hud_coord((f32)D_L02_001B13AC, D_L02_001B3E04, half);
     pF0 = &rF0;
-    func_002802E0(pF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, h, 0, 3);
+    func_002802E0(pF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, hud_coord((f32)D_L02_001B13AC, D_L02_001B3E04, half), 0, 3);
     do { x = hud_coord((f32)D_L02_001B1398, D_L02_001B3E04, half); } while (0);
     do { t = (f32)D_L02_001B139C[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    h = hud_coord((f32)D_L02_001B1394, D_L02_001B3E04, half);
+    do { h = hud_coord((f32)D_L02_001B1394, D_L02_001B3E04, half); } while (0);
     func_002802E0(&rD0, x, y, D_L02_001B13A0[0], D_L02_001B13A4[0], D_L02_001B1390, h, 0, 3);
     save = ((HudRenderState *)D_L02_001BEA00)->text_scale;
     ((HudRenderState *)D_L02_001BEA00)->text_scale = 0.62f;
     func_0027AB40();
     if (*(s16 *)(data + 0x120) == 3) {
-        ofs = 0x8710;
+        s32 ofs = 0x8710;
         TITLE();
         sprintf_n(buf, D_L02_001B1428, 0x1E - *(s32 *)(data + 0xD4) / 60);
         DRAWBUF(func_00280270, p90);
@@ -323,7 +320,7 @@ void func_L02_003FE8B8(u8 *moby)
         DRAWBUF(func_00280270, &r50);
         DRAW(func_00280190, p70, func_00288FB8(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 5) {
-        ofs = 0x8710;
+        s32 ofs = 0x8710;
         TITLE();
         sprintf_n(buf, D_L02_001B1428, 0x3C - *(s32 *)(data + 0xD4) / 60);
         DRAWBUF(func_00280270, p90);
@@ -334,7 +331,7 @@ void func_L02_003FE8B8(u8 *moby)
         DRAWBUF(func_00280270, &r50);
         DRAW(func_00280190, p70, func_00288FB8(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 0xC) {
-        ofs = 0x8710;
+        s32 ofs = 0x8710;
         TITLE();
         n = 120 - *(s32 *)(data + 0xD4) / 60;
         func_00115DA8(buf, D_L02_001B1428, n);
@@ -345,8 +342,8 @@ void func_L02_003FE8B8(u8 *moby)
         }
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
     } else {
-        ofs = 0x8710;
         if (*(u8 **)(data + 0xD0) != 0) {
+            s32 ofs = 0x8710;
             LABEL();
             LABEL50();
             obj = *(u8 **)(data + 0xD0);
@@ -363,8 +360,11 @@ void func_L02_003FE8B8(u8 *moby)
                 break;
             }
         }
+        {
+        s32 ofs = 0x8710;
         LBL5(0x4E, D_L02_001B1424, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f);
         LBL5(0x4F, D_L02_001B1420, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f);
+        }
         func_00115DA8(buf, D_L02_001B1430, *(s16 *)(data + 0x122) + 1, *D_L02_001B1190[*(s16 *)(data + 0x120)]);
         DRAWBUF(func_00280270, pF0);
         DRAW(func_00280190, &rD0, func_00288FB8(0x2F60));

@@ -1,3 +1,5 @@
+/* 9 November 2026 (Sonnet round 3, lesson 42/49 sweeps): no gain. Exact-row measure (slot offsets counted) 33; post-loop locals in slot order (o+0x258, o+0x210, o+0x17c, o+0x2a0) 29 exact but 29 slot-blind (worse than 14); `ids=(short*)ref+3; id=ids+(row<<2)*5` gives the separate la then +6 form but 17 slot-blind rows and moves spill slots; operand order of the first coordinate y (P1+(yb+ys*row)) 17 vs 18; all 24 float-local declaration orders and expression/local masks of xb,yb,xs,ys: no change in FPR numbers (load order is yb,ys,xb,xs against retail yb,xs,xb,ys). Body C unchanged (14 rows). */
+/* 8 November 2026 (Sonnet round 2, lesson 49): fake locals removed/reshaped: `ids` is now the plain array cast with +3 shorts (row base la + 6 no longer folds: 35 -> 16 differing rows, same 1452 bytes), `record` inlined, first-y written yb + ys*row (14 rows). Not helpful: the xb/yb/xs/ys scalars as expressions (31), base/stride pair copies as expressions (128-243), currentSlots/currentWeapons removed (110). Permuter (1500 s, -j2) best 420 vs base 435, only the yb+ys*row swap above. Left: eight spill-slot offsets, la/+6 form (retail la a3 then addiu 6 separate), first-coordinate FPR numbers. Profile: -O2 -G8 -ffunction-sections -fno-rerun-loop-opt. */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0026F7A0 is declared int(void *) but src/game/0026EA00.c is unsigned int(void). Unsigned return: 39 -> 39 rows. Calling it with no argument (as src declares) gives 106 rows: retail loads the argument, so the src definition is incomplete rather than this note being wrong. */
 /* 8 November 2026 (Sonnet round): rewrite from the note C with -fno-rerun-loop-opt (own cflags line, removed) re-measured 1452/1452, 35 real differing rows, all spill-slot order plus first-coordinate FPR numbers; 1 permuter run (1500 s, -j2) best score 390 vs 435 but 1448 bytes (worse), nothing adopted. */
 /* 8 November 2026 re-measure on master's compiler; retained near miss, not linked.
@@ -98,8 +100,8 @@ void func_003478F0(char *o)
 
   func_00336320(o);func_00336320(o+0x4c);func_00336320(o+0x130);
   for(row=0;row<6;row++) {
-   short *ids=&ref_00347468_10[0].id;
-   short *id=ids+(row<<2)*5;
+   short *ids=(short *)ref_00347468_10;
+   short *id=ids+(row<<2)*5+3;
    for(col=0;col<4;col++,id+=5) {
 
     { int *color=((int *)func_00335E20(o+0x3b4));
@@ -108,7 +110,7 @@ void func_003478F0(char *o)
       float ys=D_L00_001AE75C;
       float xs=D_L00_001AE758;
       *color=0x60241700;
-      func_00335E38(o+0x3b4,(xs*(float)col+xb)+(*(float **)(o+0x498))[0],(ys*(float)row+yb)+(*(float **)(o+0x498))[1],0.0f,0.0f);
+      func_00335E38(o+0x3b4,(xs*(float)col+xb)+(*(float **)(o+0x498))[0],(yb+(ys*(float)row))+(*(float **)(o+0x498))[1],0.0f,0.0f);
     }
     *((int *)func_00335E20(o+0x98))=0x30f0c070;
     *((int *)func_00335E20((o+0x3b4)))=0x60241700;
@@ -116,8 +118,7 @@ void func_003478F0(char *o)
     if(D_001A7AF8[*id]) {
      MenuWeaponRecord *weapons=D_L00_00239BA0;
      unsigned char *slots=D_00139568;
-     MenuWeaponRecord *record=&weapons[slots[*id]];
-     func_00336920((o+0x378),record->icon,0);
+     func_00336920((o+0x378),weapons[slots[*id]].icon,0);
 
      func_00335E38((o+0x378),(53.5f*(float)col+(float)D_L00_001AE748)+(*(float **)(o+0x498))[0],(47.0f*(float)row+(float)D_L00_001AE74C)+(*(float **)(o+0x498))[1],0.0f,0.0f);
      if(weapons[slots[*id]].icon==0xea7e) {
