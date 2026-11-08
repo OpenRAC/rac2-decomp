@@ -1,3 +1,13 @@
+/* 8 November 2026, Sonnet round (o8c, ~45 compiles): 230/457 -> 202/409 (masked/full, aligned diff), 6020/5968
+ * bytes. Changes: ruler `i = 0` moved before the func_00282D30 call (retail sets i in that call's delay slot,
+ * so i gets $s2 and hp now spills like retail's 0x124 slot); two wrong constants fixed (rank icon HC(17.0f),
+ * first ruler box HC(36.0f)); rank colour as `if (n20 < 4) c = B.v[n20 - 1]; else c = B.v[3];` (aligns
+ * $s0/$s3/$s5 there; retail still shares one lw via a branch, k-index forms give movz). h still keeps $s7:
+ * -dg shows the marker loop's hoisted 1 (r842, refs 5, len 458, prio 218) and two &stack temps lose to h
+ * (prio 330); retail needs h below them. Plain y in the 0x300AA8 call hoists &v90 but drops the 1 (223).
+ * No gain: hud_coord two-branch variant (360), a `half` local in the ruler loop (205), permuter run
+ * (only fake temps / moved statements).
+ */
 /* 8 November 2026, HUD-recipe rewrite on master's compiler (~95 check.py runs). Re-measured first: the
  * 7 November body was 5916/5968 bytes, 300 differing words with registers masked / 584 with registers
  * (aligned diff of check.py's disassembly, relocations masked). The body below is 6004/5968 bytes,
@@ -294,7 +304,7 @@ s32 func_L04_00417308(void)
             case 2: idx = 1; break;
             case 3: idx = 2; break;
             }
-            func_0028EA58(func_0028E588(0x7568, idx), 0x3E, HC(16.0f), 0x28, HC(35.0f), &vF0);
+            func_0028EA58(func_0028E588(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vF0);
             fr = (float)I(p, 0x364) / (float)C.v[I(p, 0x360)];
             CLAMP01(fr);
             do { func_0027EAE8(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vF0); } while (0);
@@ -345,7 +355,8 @@ s32 func_L04_00417308(void)
             int x = n20 >= 0xA ? 0x11D : 0x123;
             char *s = func_00288FB8(D_L04_002CA1E0[n20 - 1]);
             int y = LY(s, 24.0f);
-            int c = B.v[n20 < 4 ? n20 - 1 : 3];
+            int c;
+            if (n20 < 4) c = B.v[n20 - 1]; else c = B.v[3];
             func_0027F5B8(x, y, c, s, -1);
         }
         {
@@ -356,9 +367,10 @@ s32 func_L04_00417308(void)
         }
         func_00283388(m);
         func_00283698(m, D_L04_001B31A0);
-        func_0028FC48(0x157, HC(21.0f), 0x1AB, HC(37.0f), 0x25F0C070, 0);
+        func_0028FC48(0x157, HC(36.0f), 0x1AB, HC(37.0f), 0x25F0C070, 0);
         func_0028FC48(0x151, HC(28.0f), 0x1AB, HC(29.0f), 0x25F0C070, 0);
         func_0028FC48(0x160, HC(45.0f), 0x1AB, HC(46.0f), 0x25F0C070, 0);
+        i = 0;
         func_00282D30(&vD0, h + 0xC0, F(p, 0x30C) + F(p, 0x27C));
         hp = h + 0x10;
         func_002830C0(&vE0, &vD0, m);
@@ -369,7 +381,7 @@ s32 func_L04_00417308(void)
         func_00282D30(&vD0, D_L04_001B31A0, fd);
         func_00282CD8(&vF0, &vE0, &vD0);
         func_002AA2E8(&D_L04_001B31D0, vE0.f[0] * -1.25f, 0.050000004f);
-        for (i = 0; i < 9; i++) {
+        for (; i < 9; i++) {
             sy = (int)(D_L04_002605D0[i].y + D_L04_001B31D0);
             if (sy < 0x164 && D_L04_001B31D0 < 0.0f) {
                 if (i == 0)

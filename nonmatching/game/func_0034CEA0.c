@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): best C below is now 3316/3316 bytes, frame 0x100, 0/28 (first difference +0x38). Two fixes: (1) the colour loop constant 0x1C was hoisted because loop pass 2 counted 58 real insns against a threshold of 61 (-dL: 2164 moved at 61, 816 at 58, 842 refused at 55), so i*0x1C became a giv and took a callee-saved register; `if (previous < 0) previous += 8` raises the count to 59 and restores retail's in-loop mult (it costs addiu v1,s1,7 for li 7; p = i; if (--p < 0) p = 7 also gives 59 but reshuffles elsewhere, 3328). (2) a named local bolt = &self->boltWidgets[0] used for func_00349B20, the state test and func_00349AE0 raises its refs from 3 to 4 (tools/regalloc.py priority 4/91, was 1/60, against 2/59 for the self+0x148 copy), so it takes $fp and the self+0x11F4 spill and 0x110 frame go. Left: spill-slot order (391 gcse buckets vs 415; the forbidden 84-dummy/48-asm diagnostic on this C puts 0x20-0x34 and 0x4C-0x70 in retail order), prologue schedule, hero bne delay slot (retail fills from the fallthrough; sda, section(.sdata), nosda and struct declarations of D_001A7A00 do not change it; switch arms do not either), low (low = 1 at the top of the selected block gives retail's movn but +12 bytes). Inline SetAlpha helpers and full ITEM() rereads leave the bucket count at 391. One permuter run (stopped after 12 min, best 4130 against 4815) only found fake hoisted temporaries. */
 /* 8 November 2026 (round 12): re-measured on master's compiler (sticky-volatile default, mtc1 nop fix): still 3328/3316, 0/28, frame 0x110. No RAC1/RAC4 twin (0x70202080, 0x60442D00, 0.11666667 absent). Flags: -g, -Wa,--r5900-la-addend=sn, -fno-sched-interblock, -frac2-keep-block-zero-copy, -frac2-hazard-labels change nothing; -fno-strength-reduce 3332, -fmove-all-movables 3356, -fno-rerun-loop-opt 3328 (worse), -fno-expensive-optimizations 3304, -fno-schedule-insns 3312, -fno-gcse 3108. A static inline SetAlpha(w, a) helper for the four single-use alpha merges gives 3324 but keeps the 0x110 frame, the self+0x11F4 spill and the slot order. */
 /* 7 November 2026 (round 9): -fcall-used-hi1/lo1/accum1 do not change the gcse PRE order here; no constant pseudo-number or cuid offset shared by the hash-order near misses fixes it (docs/COMPILER-NOTES.md, patch 0055). */
 /* 2026-11-03 w02 faithful-contract review, US object checks only.
@@ -146,6 +147,7 @@ void func_0034CEA0(void *object)
     Ui48 *widget;
     float scale, width;
     Ui94 *a0;
+    Ui94 *bolt;
     self->alternateBolts = func_002B0D70();
     if (D_001B18D4[0]) {
         int i;
@@ -232,7 +234,7 @@ heroFallback:
         int i;
         for (i = 0; i < 8; i++) {
             previous = i - 1;
-            if (previous < 0) previous = 7;
+            if (previous < 0) previous += 8;
             if (D_001B18D4[0] && D_001B18D4[0]->slots[i].present) {
                 MenuSlot *slot = &D_001B18D4[0]->slots[i];
                 ItemRecord *rec;
@@ -279,7 +281,8 @@ heroFallback:
             c->word = (c->word & 0xFFFFFF) | alpha2;
         }
     }
-    func_00349B20(&self->boltWidgets[0]);
+    bolt = &self->boltWidgets[0];
+    func_00349B20(bolt);
     func_00349B20(&self->boltWidgets[1]);
     func_00349B20(&self->boltWidgets[2]);
     func_00349B20(&self->boltWidgets[3]);
@@ -291,8 +294,8 @@ heroFallback:
         func_00349AE0(&self->endAmmoWidget, 0);
         self->ammoHidden = 1;
     }
-    if (self->boltTimer && --self->boltTimer == 0) if (!((a0 = &self->boltWidgets[0])->state)) {
-        func_00349AE0(a0, 0);
+    if (self->boltTimer && --self->boltTimer == 0) if (!bolt->state) {
+        func_00349AE0(bolt, 0);
         func_00349AE0(&self->boltWidgets[1], 0);
         func_00349AE0(&self->boltWidgets[2], 0);
         self->boltHidden = 1;

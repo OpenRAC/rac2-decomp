@@ -1,3 +1,15 @@
+/* 8 November 2026, Sonnet round: 3048/3056 bytes, 0/28 places, aligned diff 24 words (was 37). New:
+ * `sel = *(int *)(o+0x74)` read before the post-loop test gives retail's beqz with the lw in its slot;
+ * 129.0f/208.0f written inside draw_background and plain 0x8710 literals for the two 134 draws
+ * (b1/b2 dropped: cse merged them anyway); a separate `char *label` now scores the same as reusing
+ * selectedAvailable, so no owner ruling is needed. Left: the 208.0/0.5 sets in draw 1 and the tail's
+ * 0.5 are hoisted above the block's first call (they cross calls, so sched1 fills idle slots with
+ * them; retail keeps them after the call), and retail's $s1/$s2 copies of 0x8710 for the 134 draws.
+ * A do/while(0) right after draw 1's lookup stops the hoist (a loop note is a sched barrier) but
+ * swaps the float registers (50 words); hud_coord dead tests make every constant per-draw.
+ * One capped permuter run (seed: this C): best 1550 from 1940, only by a volatile local or by
+ * hoisting a colour store out of the switch (changes behaviour); nothing honest to keep.
+ */
 /* 8 November 2026, round 2: 3060/3056 bytes (one word long), 0/28 places, aligned diff 37 words
  * (round 1: 56). The 0x8710 offset is now four sources, as retail: a literal for draws 1-10 (cse
  * gives $s0), and locals b1, b2, b3 initialised at their declaration for the two 134 draws and the
@@ -77,9 +89,9 @@ extern int func_001157AC(char *);
 extern int func_00283D38(int,int,float);
 extern int func_0027FAA8(int,int,u64,char *,int);
 
-static __inline__ void draw_background(char *tex, int color, float x, float y, float sx, float sy, float rot)
+static __inline__ void draw_background(char *tex, int color, float sx, float sy, float rot)
 {
-    func_00300A00(tex, color, x, (float)(int)(D_001B23A4 * y + 0.5f), sx, sy, rot);
+    func_00300A00(tex, color, 129.0f, (float)(int)(D_001B23A4 * 208.0f + 0.5f), sx, sy, rot);
 }
 
 int func_0028D1E8(unsigned char *o)
@@ -89,7 +101,9 @@ int func_0028D1E8(unsigned char *o)
     int colors[4], colors2[4];
     float open, text, angle;
     float one, zero, minus;
-    int b1 = 0x8710, b2 = 0x8710, b3 = 0x8710;
+    int b3 = 0x8710;
+    int sel;
+    char *label;
     int i, selectedAvailable, x, y, frame, available, color, previous;
     unsigned char *fade = o + 0x70;
     open = func_00283CE0(o[0x70]) / func_00283CE0(8);
@@ -101,23 +115,23 @@ int func_0028D1E8(unsigned char *o)
     one = 1.0f;
     zero = 0.0f;
     minus = -1.0f;
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 8), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 9), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 10), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 11), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 12), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 13), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 14), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 15), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, minus, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + b1, 134), 0x55F0C070, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + b2, 134), 0x55F0C070, 129.0f, 208.0f, minus, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 8), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 9), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 10), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 11), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 12), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 13), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 14), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 15), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, minus, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, minus, one, zero);
     if (*(int *)(o+0x74) >= 0) {
         colors[0] = func_002A9588(0x80442D00,0x80FFDE8D,25,0,0);
         previous = *(int *)(o+0x74)-1;
         if (previous < 0) previous = 7;
-        draw_background((char *)func_00336D50(D_001A8CFC + b3, 16), colors[0], 129.0f, 208.0f, one, one, (float)previous);
+        draw_background((char *)func_00336D50(D_001A8CFC + b3, 16), colors[0], one, one, (float)previous);
         {
             int k = *(int *)(o+0x74);
             func_0028FC48(positions.xy[k][0],(int)((float)positions.xy[k][1]*D_001B23A4+0.5f),
@@ -184,17 +198,18 @@ int func_0028D1E8(unsigned char *o)
         }
         func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,frame),x,y,30,28,colors2);
     }
-    if (selectedAvailable && *(int *)(o+0x74)>=0 && *(int *)(o+0x74)<8) {
+    sel = *(int *)(o+0x74);
+    if (selectedAvailable && sel>=0 && sel<8) {
         RadialLabels labels=D_001A8E70;
-        int id=labels.ids[*(int *)(o+0x74)];
+        int id=labels.ids[sel];
         if (id==0x2F34 && D_001B189C[1]) id=0x2F35;
-        selectedAvailable=func_00288FB8(id);
-        if (selectedAvailable && func_001157AC((char *)selectedAvailable)) {
+        label=(char *)func_00288FB8(id);
+        if (label && func_001157AC(label)) {
             float alpha = text * open;
             color=func_00283D38(0x00E0C0A0,0x80E0C0A0,alpha);
             previous=func_00283D38(0,0x80000000,alpha);
-            func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,(char *)selectedAvailable,-1);
-            func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,(char *)selectedAvailable,-1);
+            func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,label,-1);
+            func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,label,-1);
         }
     }
     return *(int *)(o+0x58);

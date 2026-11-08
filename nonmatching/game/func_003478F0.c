@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): rewrite from the note C with -fno-rerun-loop-opt (own cflags line, removed) re-measured 1452/1452, 35 real differing rows, all spill-slot order plus first-coordinate FPR numbers; 1 permuter run (1500 s, -j2) best score 390 vs 435 but 1448 bytes (worse), nothing adopted. */
 /* 8 November 2026 re-measure on master's compiler; retained near miss, not linked.
  * USA v1.01: unchanged, 1452/1452 bytes, 0/28 places, first difference +0x4c, same rows.
  * New finding: the spill-slot order is gcse's PRE reaching-reg order, which is

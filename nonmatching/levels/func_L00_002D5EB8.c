@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): re-measured, 100 differing rows, first diff +0x3F0. Retail keeps hi(D_00139568) in s4 and hi(table) in s5 (ours s7/fp), constants 17/18/53 in fp/s7/s6. 25-minute permuter (-j2) best 2110 -> 1690 only via an address-taken local (`new_var = &a`) and a comma on &count: not honest. No match. */
 /* 8 November 2026, re-measured on master's compiler (sticky-volatile default, mtc1 fix):
  * unchanged, 1376/1376, 0/27 USA, 46 positions; check.py first difference +0x3F0.
  * Mechanism of the last loop, from cc1 dumps (-dj -dG -dL): expand_end_loop rotates

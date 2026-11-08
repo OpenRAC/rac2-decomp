@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): rewrite from retail asm and Ghidra reproduces the same C; unchanged 1472/1484, 51 lines. With a diagnostic int pad[4] the 0xB0 frame and all stack offsets match; 1 -O2 -G8 permuter run (1500 s, -j2) best 1480/1484 (worse), none cleanable. Purchased-state spelling 'state==0 && purchased' still gives movz, not movn. */
 /* Claude, task v101 wcD, 8 November 2026: retained near miss, body revised.
  * Profile: -O2 -G8 -ffunction-sections (dedicated -g8.c unit, no extra flags).
  * check.py: 1472/1484 bytes, 0 of 28 USA v1.01 places; 51 differing lines

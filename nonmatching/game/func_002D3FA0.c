@@ -1,3 +1,15 @@
+/* 8 November 2026, Sonnet round (o2): the two post-loop label_y calls take their own `active`
+ * locals on2/on3 (= 1, set at the top, handle 0). Their dead mode tests go at flow2, so on2/on3
+ * become ghosts s6+s7 and the loop pseudos now take s1-s5 as retail. Still 2464/2468 bytes; 23
+ * aligned rows (the 55-row form scores 30 on the same counter). Left: fp save, color copy at
+ * rectangle 1/3, text pointer s3 (retail s2), loop-2 x2/base swap (x2 is allocated before the
+ * base), `li a0,30` order, and the loop-1 align nop (goes with fp). Measured: flow2 never deletes a
+ * set of $fp (flow.c insn_dead_p), so retail's fp pseudo had no set left after reload; a ghost
+ * only forms from an `active` test (handle tests are threaded and survive flow2, keeping the set).
+ * Tried without gain: post-loop handles = text-draw results, &corners, format address, y2, x2;
+ * a third post-loop active (dead label_y, int helper, mode read before the loops); const mode;
+ * single x for both loops (32); x2 set earlier (fp then holds a kept li 1); one as post-loop
+ * active (29); handles 0/y1/y2/text after sprintf (39-129). Permuter (1500 s) best 27 rows. */
 /* 8 November 2026, round 2: the second loop gets its own column variable x2 (x only in the first
  * loop). Retail's y3 then takes s1 before x, so loop 1 is exact apart from s4/s5 and loop 2 apart
  * from x2/base (s1/s2) and s4/s5: 55 masked rows (was 71), still 2464/2468 bytes with -fno-gcse.
@@ -159,6 +171,7 @@ int func_002D3FA0(void)
     char *first, *second;
     int t;
     int y1, y2, y3;
+    int on2 = 1, on3 = 1;
     int one = 1;
     float px, py;
     func_0027C540(0);
@@ -216,7 +229,7 @@ int func_002D3FA0(void)
         x2 += 56;
     }
     func_0027C660();
-    func_002FC620(30, 385, label_y((void *)y2, 50.0f, D_001B23A4[0], 0.5f, one), label_y((void *)y2, 213.0f, D_001B23A4[0], 0.5f, one));
+    func_002FC620(30, 385, label_y((void *)0, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)0, 213.0f, D_001B23A4[0], 0.5f, on3));
     func_002A0250();
     func_002A01C8();
     func_002A01F0();

@@ -1,42 +1,9 @@
-/* func_L00_003ABEC0: near miss, 2592/2588 bytes, 0 of 27 places (USA v1.01, 8 November 2026).
-   Retail begins at 0x003ABEC8 in level 00 (the catalogue keeps the old name).
-
-   Profile: its own unit, `-O2 -G0 -ffunction-sections -g` (-g for the nop pair before each
-   div.s); D_L00_001B1FB0 in the `.sdata` macro form, so its `la` stays out of the bounds
-   checks' delay slots.
-
-   The homing shot. 8 November 2026 (master compiler): everything up to +0x920 matches except
-   relocations, and the rest is the same code shifted by one word. What fixed the old
-   $s2/$s4/$s6/$fp allocation: no `position`/`heading` locals. Writing `object + 0x10` and
-   `object + 0xC0` at every use lets gcse PRE build retail's reaching registers (addiu $s2 /
-   daddu $s6,$s2 in the locked arm, addiu $s6 in the else arm, $fp for the heading; the same
-   for offset: addiu $s0 / daddu $s2,$s0). Also: the arccos argument in its own statement
-   (`angle = func_00282DB0(...); angle = ... / (length * distance)`) gives the line label that
-   puts retail's one nop between mul.s and div.s; the damage read through a `Material *`
-   local gives retail's v1/a0/a1 temporaries; qcopy_nc for the shot direction lets
-   post-reload cse keep &u in $a0 (qcopy's memory clobber forced a second lw from 0xCC(sp)).
-   What differs: the bounce block. Retail fills `beqz $s1` with `daddu $a0,$s6` from the
-   fall-through and its join block issues `mov.s $f12,$f0` first (then a0 in the jal slot);
-   here sched2 ranks the 0.5 constant before a0 and a1/a2 before the mov.s, so reorg takes
-   `daddu $a1,$s6` from the target (one extra word) and the mov.s goes in the jal slot.
-   Tried 8 November: if/else and ternary forms of spin (worse), one-line if, an interleaved
-   (void *, float, int) prototype, a one-pass group around func_0032DA58 or around
-   func_L00_003AC8E8 (adds an alignment nop; the second gives a1, a2, mov.s, a0).
-   Round 2 (8 November): reorg tries the fall-through first (beqz predicted not taken) but
-   the fall-through is not its own thread, so it stops at the first insn it cannot take, the
-   two-word 0.5 constant; retail's sched2 must have put `daddu $a0,$s6` first. Tried without
-   change: a block-local `pos` for the argument, a (float, ...) interleaved prototype for
-   func_0032DA58, -fno-sched-interblock, -frac2-keep-block-order, -frac2-gcse-unsplit-edges,
-   -frac2-sticky-volatile-refs, -frac2-hazard-labels. Worse: spin = 0.0f before the normal
-   test (moves spin into $f20), `if (!bounce) ... else ...` (bnel form), -fno-schedule-insns.
-   Twin search (8 November): matched twin func_L00_0040A4A8 discards func_002A89A8's result
-   (`if (explode) func_002A89A8(...)`), so it has no spelling of the spin argument; its flags
-   (-frac2-gcse-unsplit-edges) and one-line if/call forms leave 2592 bytes. Diagnostic:
-   -fno-schedule-insns2 gives retail's bounce block exactly (daddu $a0,$s6 in the beqz slot) but
-   the join becomes a1, a2, mov.s, a0 (retail mov.s, a1, a2) and the rest breaks; so retail's
-   order there is the RTL order and sched2 ties decide it.
-   Dead ends from the earlier rounds (all with position/heading locals): a pointer variable
-   reused for the offset, -fno-gcse, groups around the copies. */
+/* func_L00_003ABEC0 (retail begins at 0x003ABEC8 in level 00; the catalogue keeps the old name).
+   Own unit, `-O2 -G0 -ffunction-sections -g`: -g gives the nop pair before each div.s, and
+   D_L00_001B1FB0 uses the `.sdata` macro form so its `la` stays out of the bounds checks' slots.
+   The out-of-arena test carries its own copy of the explosion code; jump2's cross-jumping
+   later points those branches at the copy after the bounce block, so at sched2 the bounce
+   join and the explosion are one block (retail's mov.s-first join and beqz slot). */
 
 #include "common.h"
 
@@ -65,7 +32,8 @@ extern unsigned char D_00139568[];
 extern char *D_0018C0B0;
 extern char D_00189EA0[];
 extern int func_002761F8(void *, void *, int, void *, void *);
-extern void func_L00_002E6EF8(void *, void *);
+/* func_L00_002E6EF8 in most levels; the callee differs in levels 08, 09, 19 and 30. */
+extern void ref_L00_003ABEC0_00(void *, void *);
 extern int func_00282978(void *);
 extern float func_00282C48(float);
 extern void func_00282CC0(void *, void *, void *);
@@ -224,7 +192,10 @@ void func_L00_003ABEC0(char *object)
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f
         || *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f
         || *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f) {
-        goto explode;
+        func_002ACAD0(object, D_L00_001B1FB0);
+        func_002FEE50(*(int *)(state + 0x50));
+        func_0029F338(object);
+        return;
     }
     func_L00_003ACC88(object, delta);
     {
@@ -237,7 +208,7 @@ void func_L00_003ABEC0(char *object)
         qcopy(trail[0], delta);
     }
     if (++*(unsigned char *)(state + 0x27) >= 4) {
-        func_L00_002E6EF8(func_L00_003ACCF8, object);
+        ref_L00_003ABEC0_00(func_L00_003ACCF8, object);
     }
     func_L00_003ACA60(object, start);
     qcopy(lead, object + 0x10);
@@ -312,7 +283,6 @@ checked:
         func_0032DA58(object, object + 0x10, normal, spin);
         func_L00_003AC8E8(object, up, owner);
     }
-explode:
     func_002ACAD0(object, D_L00_001B1FB0);
     func_002FEE50(*(int *)(state + 0x50));
     func_0029F338(object);

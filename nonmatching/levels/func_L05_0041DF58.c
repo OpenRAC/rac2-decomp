@@ -1,4 +1,13 @@
 /*
+ * 8 November 2026 (Sonnet round): best now 3516/3516 bytes, 2 swapped insns (0041E20C/10: retail
+ * addiu a1,0x1448 before daddu a0,sp at case 2's func_00115DA8 call); needs cflags line
+ * "-O2 -G8 -ffunction-sections -malign-loops=2" (else a .p2align nop). Case 2 below: body in a
+ * do { } while (0) group, label_y result in a local y, handle `text` (tests fold in jump1, so no old
+ * label; the LOOP_END note is the sched2 barrier and jump2 makes a new label, so case 1 no longer
+ * merges into case 0). Why: flow2 deletes label_y's mode test and second handle test but keeps the
+ * first (its fall block still holds the second), so label 447 survives to jump2. Tried: do-group
+ * starting at each statement (2-14 rows), two groups, handle colors (same), &global/fmt (not folded),
+ * handle (void *)textX2 in the group (3496), half local (3440); permuter 25 min from this C: no gain.
  * 8 November 2026 (re-measure): still 3496/3516, 0/1 places, same single 5-insn cross-jump.
  * From the jump2/sched2/greg dumps: jump2 sends case 0's and case 1's second-draw calls into
  * case 2's call (label before `ori a2`), then merges case 1's tail [mul.s, add.s, fix, a0=v0]
@@ -184,13 +193,16 @@ s32 func_L05_0041DF58(void) {
         break;
     }
     case 2: {
-        s32 textX2;
+        s32 textX2, y;
 
-        func_L05_00421B98(0, 1, 0, 1);
-        label = func_00288FB8(0x31d1);
-        func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
-        textX2 = D_L05_001B1440 - 60;
-        func_0027F5B8(textX2, label_y((void *)textX2, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
+        do {
+            func_L05_00421B98(0, 1, 0, 1);
+            label = func_00288FB8(0x31d1);
+            func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
+            textX2 = D_L05_001B1440 - 60;
+            y = label_y(text, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1);
+        } while (0);
+        func_0027F5B8(textX2, y, 0x80808080, text, 128);
         break;
     }
     case 3: {

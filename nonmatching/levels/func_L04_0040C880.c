@@ -1,3 +1,5 @@
+/* 8 November 2026 (Sonnet round, s6): 6 -> 4 rows with a per-draw local s1 for draw 58's sprite (C below updated; the permuter's gain was a fake float temp, same effect). Left: b/c swap at +0x198 and draw 58 ori/mov.s f12 swap. Permuter 2x25 min -j2 (base 135, then 75): no further gain. */
+/* 8 November 2026 (Sonnet round, s6): re-measured, still about 6 rows (b/c swap at +0x198, draw 58 daddu/mov.s and ori/mov.s swaps). Tried: c=a+30;b=c, b=j+30;c=b;d=j+45, draw 58 using fx instead of (float)j (worse). No gain. */
 /* 8 November 2026 (permuter, 35 min -j3, seeded from the C below): best score 75 (base 135), never 0. The one gain
 /* sol-high, USA v1.01. 8 November 2026: 1360/1360 bytes, 0/2 places, first mismatch +0x198
  * (was +0x8). Flags: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges in a -g8.c unit.
@@ -61,7 +63,7 @@ void func_L04_0040C880(unsigned char *m)
     int colors[5];
     unsigned char *p = *(unsigned char **)(m+0x68);
     int frame,i,j,right,a,b,c,d;
-    int sprite;
+    int sprite,s1;
     float angle, sine, sign, fx, fy;
     int one, top, off;
     if (m[0xbc]==3 || m[0xbc]==4 || m[0xbc]==1 || m[0xbc]==2) frame=150-*(int *)(p+0x394);
@@ -88,9 +90,9 @@ void func_L04_0040C880(unsigned char *m)
     for(;i<2;i++) {
         if(i==0) {j=10;right=31;sign=1.0f;} else {j=498;right=478;sign=-1.0f;}
         fx=(float)j;
-        sprite=func_00336D50((char *)D_L04_001A904C+off,58);
+        s1=func_00336D50((char *)D_L04_001A904C+off,58);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
-        func_00300A00(sprite,0x60442d00,(float)j,(float)top,sign,1.0f,0.0f);
+        func_00300A00(s1,0x60442d00,(float)j,(float)top,sign,1.0f,0.0f);
         sprite=func_00336D50((char *)D_L04_001A904C+off,59);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
         func_00300A00(sprite,0x55f0c070,(float)j,(float)top,sign,1.0f,0.0f);

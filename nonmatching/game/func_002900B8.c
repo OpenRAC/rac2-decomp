@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): re-measured 77 differing rows (-g8 unit, profile above). Moving the 1.0/0.0 set before/after label_y, a y local for call 2, literal 1.0f/0.0f in the case-0 compare and in edge+scale: no change or worse (b3 237). 25-minute permuter (-j2) best 375 -> 235 only via `D_001A9008 <= (long long)scale` (a changed compare, not honest); no honest gain. */
 /* 8 November 2026, round 2: 1388/1388 bytes, about 20 instructions differ. GPRs and case 1/2 are now exact:
  * case 1/2 passes literal 1, and `one` keeps retail's $s2 because the case-0 `top` call sits in a one-pass
  * do/while(0) group (loop weighting lifts `one` from 14/302 above the case-0 colour, 3/60); top reads

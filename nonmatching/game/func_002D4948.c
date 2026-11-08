@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): re-measured 1216/1220. A `j` loop index with `i = j;` copy in the body and a final `D_001ABA74 = j` gives 1200 bytes. 25 min permuter (-j2, base 1850): best 1105 is only an empty `do { } while (0);` before the break (not honest); nothing else. */
 /* 7 November 2026: still 1216/1220, US 0/28. The search is retail's except the $a3 index copy
  * (retail: a2 = a3 + 1; a3 = a2) and the exit test copied after the loop passes. Aligned diff: the
  * missing word is that copy; everything above +0x3F0 matches. -fcall-used-hi1 -fcall-used-lo1

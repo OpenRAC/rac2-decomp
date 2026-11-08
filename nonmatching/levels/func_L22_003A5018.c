@@ -1,3 +1,21 @@
+/* 8 November 2026, o7b follow-up (~22 check.py runs): count 1's 2 rows unchanged by every honest order of the colour
+ * load and the strlen argument: colour inside the draw call's argument list (also with `len =`), strlen through a
+ * pointer local (`char *t = text`), colour read again after the call (3012), `len = strlen(text); colour = ...` (5 rows:
+ * colour lands after the jal), colour `& 0xFFFFFFFF`, `(u64)colour`, a u64 style copy (same; a u64 style declared first
+ * 3032), textBuffer as either argument with `text` re-set before count 2 (same or 7). sched1 dump: colour 1024 and
+ * a0 = r84 1028 at clock 1, no notes on either; the source pseudo r84 stays live, so the register-weight tie-break
+ * cannot flip. */
+/* 8 November 2026, Sonnet round (o7b, ~45 check.py runs, two capped permuter runs). Gauges fixed: gauge 2 reads its
+ * height into a local before the second colour store (`height = ref_L22_003A5018_11; colours.d[1] = D_L22_001AF428;`
+ * then `y + height` in the call): gauge 1's addiu/sd tie and gauge 2's D_001A7340 order both go (permuter find,
+ * hand-cleaned). Body below: 3008/3008, 2 rows left, both count 1 (lw s0 colour vs daddu a0,text before strlen's jal).
+ * Count 1 cause (dumps -dS/-dR): sched1 block 39 issues colour (insn 1024) and a0 = text (1028) at clock 1, tie on
+ * priority, weight and dependents, LUID picks colour; sched2 keeps that order and reorg puts a0 in the slot. Retail
+ * needs a0 first. The permuter matched it only with dummy `ref_L22_003A5018_32++; ref_L22_003A5018_32--;` before the
+ * colour (a memory op that takes sched1's clock-1 memory slot; reload drops the no-op store): 0 rows, not landable.
+ * Not it: two-step forms (`t = x; t -= k`) on right/x/y/ratio/colour words (identical code), ref_32 in a local (3028),
+ * text assigned after value or after colour (7), separate len (4), colour u64/long (3016), unsigned (3028), short (3),
+ * textBuffer for strlen (same). */
 /* 8 November 2026 (m2z, caller-save angle): global.c:1516 tries caller-saves only when find_reg found no register (best_reg < 0), so CALLER_SAVE_PROFITABLE (4*calls < refs) never decides s-register versus call-clobbered while an s-register is free. cc1 -S on the retained C with and without -fno-caller-saves: identical body (0 lines differ). Uses s0-s7 and fp across 48 calls, but no pseudo takes a caller-save slot (no call-clobbered save/restore pairs); a source change that forced one would add save/restore code that retail lacks. Its 14 rows are scheduling (see round two). Angle closed; no check.py runs. */
 /* 8 November 2026, round two (6 check.py runs plus free cc1 -S scoring). Body: the same 14 rows, now
  * with plain MACRO_ADDR declarations in place of the `_base[0]` #define aliases (no-alias rule).
@@ -301,13 +319,14 @@ int func_L22_003A5018(void) {
     }
     {
         float ratio = *(float *)(ctl + 0x20) / (float)D_L22_001B2AA8;
-        int right, width;
+        int right, width, height;
         colours.d[0] = ref_L22_003A5018_04;
         width = ref_L22_003A5018_12;
         right = D_001A7340 - ref_L22_003A5018_09 - ref_L22_003A5018_07 - 4;
         colours.w[0] = (colours.w[1] & 0xFFFF00FF) | ((int)(ratio * 255.0f) << 8);
+        height = ref_L22_003A5018_11;
         colours.d[1] = D_L22_001AF428;
-        func_0027EAE8(right - (int)(ratio * (float)width), y, right, y + ref_L22_003A5018_11, 0xFFFFF1, &colours);
+        func_0027EAE8(right - (int)(ratio * (float)width), y, right, y + height, 0xFFFFF1, &colours);
     }
 
     {

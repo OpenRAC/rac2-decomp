@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, o6b): new best 40 rows (2076 bytes; intermediate store still deleted): in
 /* 8 November 2026 (round 12b, m3x, const base): D_001AB984 read into a local before the +=
  * (block top, or once before the second set_window_vertical and kept across the call in s0)
  * puts every memory read before store1, so flow2 deletes it again (2072). +0x6A0: on the const

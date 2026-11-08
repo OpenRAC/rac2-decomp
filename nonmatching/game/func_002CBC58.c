@@ -1,3 +1,21 @@
+/* 8 November 2026 (Sonnet round, arm push): retail's arm is beql page==X
+/* 8 November 2026 (Sonnet round): bounds loop solved; 2100/2100 bytes and
+ * one row left (the C below). A loop-body local "StateCBC58 *st =
+ * &D_001F2840;" with the page read after the D_001AA450[j] test
+ * ("pg = st->page;", then "if (panels && panels[j])", first statement via pg,
+ * the rest via st->page) gives the retail beqz s7 slot, the hoisted t2 and the
+ * retail preheader order: st's lo_sum is set before any loop jump, so loop.c
+ * may hoist it although it is used in several blocks. Same result as a comma
+ * form; st set before the loop swaps the preheader lui pair (7 rows). With
+ * "panels = 0;" in the D_0025A058 arm the only diff is that arm's delay slot
+ * (daddu s7 for the volatile D_001AB910 load: combine folds "lw ? 0 : 0" and
+ * drops the load). Without it, 47 rows (movz). Tried on this base, no gain:
+ * "(void)D_001AB910; panels = 0;" either order (cse1 deletes the zero: 47),
+ * empty arm plus "else panels = 0;" (47), "(panels = 0, !D_001AB910)" (47),
+ * "panels = 0;" in the arm and an else (2124 bytes). A capped permuter run
+ * from this C (score 200) only gained by adding a second volatile
+ * D_001AB910 read (160; rejected, not honest C).
+ */
 /* 8 November 2026 (round 3): the 8 extra bytes of the "panels = 0;" arm
  * form are not in the arm (there one word changes: daddu s7 replaces the dead
  * D_001AB910 load). They are the bounds loop: retail fills the beqz s7 slot
@@ -173,7 +191,7 @@ void func_002CBC58(int mode)
         } else if (D_001F2840.page == (void *)D_0025A190 && !D_001AB910) {
             func_0027C540(0); func_0029C340(); func_0027C660(); return;
         } else if (D_001F2840.page == (void *)D_0025A058 && !D_001AB910) {
-            /* The comparison has no further action in retail. */
+            panels = 0;
         }
     }
     func_002FC560(0x47,0x5360B);
@@ -186,12 +204,16 @@ void func_002CBC58(int mode)
     if ((D_00138180.flags&15)==15 && (D_00138180.pressed&15))
         func_0026FEB8(D_001AB920);
     for (j=0;j<14;j++) {
-        if (D_001AA450[j] && panels && panels[j]) {
-            panels[j]->x = D_001F2840.page->bounds[j].x - D_001F2840.page->bounds[j].width/2;
-            panels[j]->y = D_001F2840.page->bounds[j].y - D_001F2840.page->bounds[j].height/2;
-            panels[j]->width = D_001F2840.page->bounds[j].width;
-            panels[j]->height = D_001F2840.page->bounds[j].height;
-            if (panels[j] == &D_00259EE0) panels[j]->height=256;
+        StateCBC58 *st = &D_001F2840;
+        if (D_001AA450[j]) {
+            PageCBC58 *pg = st->page;
+            if (panels && panels[j]) {
+                panels[j]->x = pg->bounds[j].x - pg->bounds[j].width/2;
+                panels[j]->y = st->page->bounds[j].y - st->page->bounds[j].height/2;
+                panels[j]->width = st->page->bounds[j].width;
+                panels[j]->height = st->page->bounds[j].height;
+                if (panels[j] == &D_00259EE0) panels[j]->height=256;
+            }
         }
     }
     if ((D_00138180.flags&15)==15 && (D_00138180.pressed&15))

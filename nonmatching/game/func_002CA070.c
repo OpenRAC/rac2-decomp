@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, measured): the retained C gives 4 register rows in case 8 (page $a1/c $a2/upd $a3 against retail upd $a1/page $a2/c $a3). Statement orders (upd before page, a/b chained, next from page, a repeated upd store) leave 4 rows or worsen to 7. */
 /* 8 November 2026 (m2z, caller-save angle): global.c:1516 tries caller-saves only when find_reg found no register (best_reg < 0), so CALLER_SAVE_PROFITABLE (4*calls < refs) never decides s-register versus call-clobbered while an s-register is free. cc1 -S on the retained C with and without -fno-caller-saves: identical body (0 lines differ). Uses s0-s2 with s3-s7 free across 22 calls; the 7 rows are not decided by caller-saves. Angle closed; no check.py runs. */
 /* 7 November 2026 (opus, DrLegitamate): current master compiler, own unit -O2 -G16 -Wa,-G16.
  * This draft: 10 rows differ, all in case 8 (upd/page/c registers); everything else is relocations.

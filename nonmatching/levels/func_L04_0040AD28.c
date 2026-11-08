@@ -1,3 +1,13 @@
+/* 8 November 2026, Sonnet round (o1, ~75 cc1 compiles + one 1500 s permuter run), USA v1.01: one
+ * change, the colour from func_00283D38 now lives in the existing `count` local (no separate colour
+ * variable): input/colour regs ($s1/$s2) and count's $s2 now match retail; aligned harness 774 -> 792
+ * exact of 847, 3384/3388 bytes. Reusing `time` instead gives 779, `reward` 773, `x` 756.
+ * Measured, no gain: per-arm idx local for the time lookup gives retail's sll per arm and 3388 bytes
+ * but swaps the compare registers (781); plain or label_y rounding on the name row (789/790);
+ * CENTER(60) with hud_coord/center/fmt handles drops the dead daddu but swaps a0/a1 (790, 3380);
+ * y local or inline text_row for the 0x2fc5 rows (776). The 0x2fc5 rows' str copy is glued to the
+ * call (SCHED_GROUP); retail computes 210-shift in $v1 first, so retail has an extra value pseudo.
+ * Name row: sched1 puts gcse's hi copy (s7) before the lo_sum, so base ties to hi's $s0. */
 /* 8 November 2026, HUD-recipe rewrite (Claude Opus 5.5), USA v1.01, re-measured on master's
  * compiler: the 7 November body was 280 masked differences at 3360/3388 bytes; the body
  * below is 84 at 3384/3388 (same cc1 diff harness, relocations masked). Steps that paid:
@@ -144,7 +154,7 @@ int func_L04_0040AD28(void)
     unsigned char *p = *(unsigned char **)(m + 0x68);
     int center = (int)((float)D_001A7340 * 0.5f);
     float angle = 0.56217057f, tangent;
-    unsigned int color, tint;
+    unsigned int tint;
     unsigned char *input;
     int count, shift, reward, time, minutes, x, row;
     void *icon;
@@ -165,14 +175,14 @@ int func_L04_0040AD28(void)
     if (D_001A7B90) scale = 0.9f;
     func_00300A00(icon,0x55f0c070,centerf,py,1.0f,scale,0.0f);
     x = D_L04_001B2008 % 50;
-    color = func_00283D38(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
+    count = func_00283D38(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
     input = D_00138180;
     tint = 0x80f0f0f0;
-    if (!(*(int *)(input + 0x1a0) & 0x2000)) tint = color;
+    if (!(*(int *)(input + 0x1a0) & 0x2000)) tint = count;
     icon = func_00336D50(D_L04_001A904C+0x8710,0x4a);
     func_00300A00(icon,tint,259.0f,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, 1),1.0f,1.0f,0.0f);
     tint = 0x80f0f0f0;
-    if (!(*(int *)(input + 0x1a0) & 0x8000)) tint = color;
+    if (!(*(int *)(input + 0x1a0) & 0x8000)) tint = count;
     icon = func_00336D50(D_L04_001A904C+0x8710,0x4b);
     func_00300A00(icon,tint,251.0f,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, 1),1.0f,1.0f,0.0f);
     if (m[0x20] != 3) {

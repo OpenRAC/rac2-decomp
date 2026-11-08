@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): no gain, C below unchanged (944/964, 52 rows). Permuter 1500 s -j2 from this C: score 3610 -> 3280, only declaration/statement reorders, no $f20 or 0x30 frame. */
 /* 8 November 2026, round 14: no change (944/964, USA v1.01 0/1). Tried on the C below:
  * -fmove-all-movables, -fno-gcse (+/- -fno-sched-interblock), -fno-expensive-optimizations,
  * -ffast-math, -fno-cse-follow-jumps, -frac2-keep-block-order, -frac2-gcse-unsplit-edges,

@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): re-measured the round-3 body 1564/1572; 1 permuter run (1500 s, -j2) best score 1230 vs 1285, still 1564 bytes, no real row fixed, nothing adopted. */
 /* 8 November 2026: not a match. check.py: 1564/1572 bytes, 0/1 USA v1.01
  * placement; 26 of 393 instructions differ after alignment (2 November body:
  * 1596 bytes, 123 differ; the forbidden regen draft: 61). No always-true test.

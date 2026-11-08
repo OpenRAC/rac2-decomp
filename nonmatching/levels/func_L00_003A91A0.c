@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): re-measured 37 differ (unit L00_003A91A0-g8.c scratch); permuter -j2 25 min from this C: no score below base 575. Slot order (30) and strip-loop adds (6) unchanged. */
 /* Nonmatching C, updated 8 November 2026 (clean rewrite from retail asm); not a linked match.
  * Same family as func_L00_003F6308: identical opcodes, only data addresses and the 0x5CB/0xC04 id differ;
  * this body ports to the twin by renaming the globals (+0x1228) and the vertex table.

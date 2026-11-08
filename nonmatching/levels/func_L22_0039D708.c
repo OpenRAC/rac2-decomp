@@ -1,3 +1,19 @@
+/* Round eight, 8 November 2026 (Sonnet round); retained, not linked. Same
+ * profile. 16060/16068 bytes, 3971/4017 aligned, 3287 identical (round seven
+ * 3970 / 3283). Change: temp_v0_10 = temp_v0_9; temp_v0_10 -= 4; gives retail's
+ * slt v1 / addiu v0,v0,-4 in the delay slot (found by a permuter run).
+ * Findings: retail's 0x96-block var_s1 add is jump threading (jump.c
+ * thread_jumps): the block must end `var_s1 = temp_s6 + 0x360; if (spC8 ...)`
+ * like the join, but then gcse PRE hoists the add above the 0x3C test (frame
+ * 0x140, 16084). Case 8 written f(temp_s6 + 0xE0); var_fp_2 = temp_s6 + 0xE0;
+ * gives retail's copy shape but gcse cprop keeps the temp in s1 (3278). The
+ * arm-2 arg0 + 0x10 is PRE'd into both test blocks (retail computes it in the
+ * arm). Tried, no gain: 0x41C split stores (slt v1 right, two sh), nested if,
+ * s16 var_a2; hit load after the 0x98 store; D_L22_001B2AAC read back as the
+ * call argument; loop counter init before the game + 0x80 call; temp_v0_10
+ * folded into a decremented temp_v0_9 (16052, loses a loop hazard nop).
+ * Permuter (25 min) otherwise found only fake temporaries.
+ */
 /* Round seven, 8 November 2026; retained, not linked. Same profile as round
  * six (own unit, gcse on with -frac2-gcse-unsplit-edges). Fresh US check.py:
  * 16060/16068 bytes (2 short), 0/2 places. Opcode alignment: 3970 of 4017
@@ -818,7 +834,8 @@ void func_L22_0039D708(s8 *arg0) {
                 }
                 temp_a0_13 = M2C_FIELD(arg0, u16 *, 0x96);
                 temp_v0_9 = (s32) D_L22_001AF2F8 / 2;
-                temp_v0_10 = temp_v0_9 - 4;
+                temp_v0_10 = temp_v0_9;
+                temp_v0_10 -= 4;
                 if (temp_v0_9 < (s32) temp_a0_13) {
                     if ((func_002AEB60(arg0, 27.0f) != 0) && ((M2C_FIELD(arg0, u16 *, 0x34) ^ 1) & 1) && ((((s32) D_L22_001AF2F8 / 2) - 4) < (s32) M2C_FIELD(arg0, u16 *, 0x96))) {
                         func_002A8C28((s32) arg0, (s32) spCC, 0x90000, 25.0f, 100.0f, 0.0f, 0, 1, 0);

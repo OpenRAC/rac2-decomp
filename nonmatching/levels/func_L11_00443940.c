@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): ported the twin's fix: the loop draw's x in its own local `nv` makes draw 4 (0x4a) match fully; 924/924, only draw 3 (0x4b, 7 words at 00443B24-00443B40) differs. Draw 3 x split, 6 statement orders, c/fy splits and every partition of x over the four draws: no gain. See func_L02_003FDDE8 note. */
 /* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build gives retail's draws 3/4 order (+0x1E0, +0x25C): every other build is longer (988-1092 bytes) and neither ours nor retail there. Not a compiler-build difference. */
 /* 8 November 2026 (round 14): no gain, C below unchanged. Worked on the twin func_L02_003FDDE8 (same draws 3/4 problem); see its note for the sched1 trace (copy beats `one = 1` on register weight, x waits on fmac) and the ~55 forms measured there (lesson 43 plain rounding plus do-while colour, gcse on, separate x local, late text copy, label_y variants): none improved, so nothing was ported. */
 /* 8 November 2026 (round 13, USA v1.01, check.py only): best C below 924/924 bytes, 0/1 places, 18 differing words (was 20). label_y now in all four draws; in draws 3/4 `active` is a local `one` set to 1 right after each label call (per the owner ruling on a local holding 1, func_L01_002F1588). That removes the ghost $s6 of the literal 1 in the loop. Setting `one` once for the whole function, or once before `if (enabled)`, puts it in a saved register (928 bytes, 150+ words). Draw 3's rounded int is now right. Left: the label copy in draws 3/4 still issues before the x conversion. No gain (~12 runs): every order of one/c/x in draws 3 and 4 (18); x and label_y written as call arguments (904 bytes, 181 words; or 18). */
@@ -202,7 +203,7 @@ void func_L11_00443940(u8 *object, int enabled)
     u8 *state;
     int label, phase, i, one, entry;
     unsigned int color, c;
-    float x, fy, pulse, half, sc, z;
+    float nv, x, fy, pulse, half, sc, z;
     if (D_L11_001A904C == 0) return;
     func_L00_0037B7B0();
     entry = 0x8710;
@@ -242,9 +243,9 @@ void func_L11_00443940(u8 *object, int enabled)
             label = func_00336D50(D_L11_001A904C + 0x8710, 0x4a);
             one = 1;
             c = (((InputView *)D_00138180)->field1a0 & 0x2000) ? D_L11_001B1648 : color;
-            x = (float)D_L11_001B1630;
+            nv = (float)D_L11_001B1630;
             fy = (float)label_y((void *)label, (float)D_L11_001B1634, D_L11_001B3E04, 0.5f, one);
-            func_00300A00((char *)label, c, x, fy, D_L11_001B161C, 1.0f, 0.0f);
+            func_00300A00((char *)label, c, nv, fy, D_L11_001B161C, 1.0f, 0.0f);
             break;
         }
     }

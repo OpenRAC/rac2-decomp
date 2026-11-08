@@ -247,8 +247,7 @@ void func_L00_003AB6F0(void *unused, void *position)
 
 /* func_L00_003AB9C0 is defined in L00_003AB9C0-g8.c (the ring index is read through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L00_003ABEC0);
-
+/* func_L00_003ABEC0 is defined in L00_003ABEC0.c. */
 
 /* func_L00_003ACA60 is defined in L00_003ACA60-particles-g.c. */
 

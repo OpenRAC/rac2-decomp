@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): retained goto form re-measures 584/584, 73 rows; while-with-break variant 142 rows; one permuter run (1500 s) cut its score 2560 to 2345 but only via a fake inline index*16 helper and an early limit read (72 rows, no real gain). */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 584/584, 66 differences (timer hoisting, registers and switch setup). */
 /* 8 November 2026, round 13 (today's compiler: sticky volatile sets default,
  * mtc1 hazard fix): the retained goto form below re-measures 584/584, 0/2,

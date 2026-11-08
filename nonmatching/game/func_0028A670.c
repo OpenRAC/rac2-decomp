@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): re-measured 2 words (draw 2 0x8710 reload v0, retail a2); a separate `unsigned char active2 = one` for draw 2 gives 3 more words (s0/s1 swap), a separate `id2` for draw 2 gives 8 more. Not rerun in the permuter (round 4 covered it). */
 /* 8 November 2026 (0x8710 push): the v0/a2 choice is reload1's round robin (last_spill_reg). In the C below no GR reload
  * follows draw 1's fix (whose last reload is f1), so draw 2's 0x8710 reload wraps to v0. Passing `one` in draw 1 (spilled, so
  * the dead branch gets an a1 reload) gives a2 but then draw 2's fix scratch wraps to v0 (4 words); `one != 0` in draw 2 fixes

@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): best C below 964/964 bytes, draw 4 (0x4a) now fully matches (was 18 differing words, now draw 3 only, 8 words at 003FDFD0-003FDFEC): the loop draw's x goes in its own local `nv` (a second variable for a different value, no copy), which keeps x out of the draw-1/2 pseudo and issues the x conversion before the label copy. The same split for draw 3 loses draw 1's copy (944), as does any x/c/fy rename (partition of x over the four draws: best is this one), draw 3 statement order (6 orders), c3/f3 locals. Permuter 1500 s -j2: no gain (best 355 = this C). Same change ported to func_L11_00443940 with the same result. */
 /* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build gives retail's draws 3/4 order (+0x1E4, +0x318): every other build is longer (1028-1124 bytes) and neither ours nor retail in both clusters. Not a compiler-build difference. */
 /* 8 November 2026 (round 14, USA v1.01, check.py only, ~55 runs): no gain; C below unchanged (964/964, 17 differing words by an opcode-level count). sched1 trace (-fsched-verbose-3): in draws 3/4 the copy `label = $v0` ties `one = 1` on priority and wins on register weight (copy kills $v0, so weight 0 vs +1), then on luid; x (floatsisf from memory, fmac unit) ranks lowest and waits behind the y chain on fmac. So the copy issues beside or before the buttons load, $v0 is free, and buttons/hi get $a0/$v1 (draw 3) or $v0 (draw 4). No gain: lesson 43 (plain y rounding plus one-pass `do { c = ...; } while (0);`) in draw 3 (956 bytes, copy folded into $a0) or draw 4 (34 words), also with gcse on (159); gcse on with the C below (60); do-while around c or x in draw 3 (952, draw-1 copy lost) or c in draw 4 (25/26); a separate x local for draw 3 at function or block scope (944, draw-1 copy lost); x through `pulse` (no change); late `label = text` copy with a new text local (no change: cse substitutes text); `one = 1` before the label call (19); a label_y variant with handle tests first (944) or rounding after the tests (956/944; would need an owner ruling anyway); four local declaration orders (no change). */
 /* 8 November 2026 (round 13, USA v1.01, check.py only): best C below 964/964 bytes, 0/1 places, 18 differing words (was 20). label_y now in all four draws; in draws 3/4 `active` is a local `one` set to 1 right after each label call (per the owner ruling on a local holding 1, func_L01_002F1588). That removes the ghost $s6 of the literal 1 in the loop. Setting `one` once for the whole function, or once before `if (enabled)`, puts it in a saved register (928 bytes, 150+ words). Draw 3's rounded int is now right. Left: the label copy in draws 3/4 still issues before the x conversion. No gain (~12 runs): every order of one/c/x in draws 3 and 4 (18); x and label_y written as call arguments (904 bytes, 181 words; or 18). */
@@ -157,7 +158,7 @@ void func_L02_003FDDE8(u8 *object, int enabled)
     char *label;
     int phase, i, one, entry;
     unsigned int color, c;
-    float x, fy, pulse, half, sc, z;
+    float nv, x, fy, pulse, half, sc, z;
     HelpEntry *r;
 
     if (D_L02_001A904C == 0) return;
@@ -202,9 +203,9 @@ void func_L02_003FDDE8(u8 *object, int enabled)
             label = (char *)func_00336D50(D_L02_001A904C + 0x8710, 0x4a);
             one = 1;
             c = (D_00138180.buttons & 0x2000) ? D_L02_001B128C : color;
-            x = (float)D_L02_001B1274;
+            nv = (float)D_L02_001B1274;
             fy = (float)label_y(label, (float)D_L02_001B1278, D_L02_001B3E04, 0.5f, one);
-            func_00300A00(label, c, x, fy, D_L02_001B1260, 1.0f, 0.0f);
+            func_00300A00(label, c, nv, fy, D_L02_001B1260, 1.0f, 0.0f);
             break;
         }
     }

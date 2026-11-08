@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round): re-measured 740/740, 3 words (+0x224/+0x230/+0x238); permuter 25 min -j2: best 1170 (base 1225) is a fake-temporary B971Packet pointer, inadmissible. */
 /* 8 November 2026, region donors (v101/m8h): retail's corner-store window (+0x224..+0x238) has no matched opcode twin beyond 6 generic insns (L00_00395A88+0x128 uv stores, ascending order). Nothing to transcribe. */
 /* 8 November 2026, round 16 (twin func_L14_004308D0): unchanged, 3 real words. Twin-style UV loop
  * (separate u/v cursor steps) and twin vertex loop (j = 3..0, dst/mat pointers) give identical code;

@@ -1,3 +1,22 @@
+/* 8 November 2026, Sonnet round 3: retail never stores $a0/$s4 to the stack and passes no stack address
+/* 8 November 2026, Sonnet round 2: retail sets $s4 once (daddu $s4,$a0) and never reloads or recomputes
+/* 8 November 2026, Sonnet round: the C below is now really the clean retained source (int sprintf,
+ * void *memset, no `color = 0`, no `(void)&o`); 208 words differ (relocations ignored), 0 of 28.
+ * Both blockers are one cause, measured with -dG/-dR dumps:
+ *   1. Spill slots: reaching regs of gcse PRE are numbered in expression-hash order, hash =
+ *      (K + base regno + const) mod 711. Ours: base reg 84 (param o), self+0x604 hashes to 11 and
+ *      gets the first PRE slot; retail gives it the last. A base regno in 757..783 rotates the order to
+ *      retail's exactly; `(void)&o` works only because purge_addressof gives o a new pseudo there
+ *      (779 at the 0x131C block; moving it to just before hud_fade_start in the 0x1288 block also gives 3 words).
+ *   2. jal slot before func_00335F20: sched2 ties sw s5 (self+0x100 copy) and sw v1 (self+0x98 copy) on
+ *      priority and dependence count; INSN_LUID decides, i.e. the PRE hoist order = expression index
+ *      order. Late-region self+0x100 (0x1044 block) is indexed before self+0x98 (0x10D8 block) because the
+ *      early region is keyed on self (87) and the late one on o. With the parameter used directly
+ *      (no self copy) every use shares one key and the slot order becomes retail's (sw v1; jal; sw s5).
+ *   So retail has ONE base pseudo for early and late code, numbered 757..783. `&self`/`&o` with no copy
+ *   breaks PRE completely (988 words). No natural C found that makes that pseudo; permuter (timeout 1500, stopped after ~6 min) on the
+ *   3-word diagnostic seed found only junk (score 80 -> 70, reused `i` as a float zero).
+ */
 /* 6 November 2026 worker follow-up (measured on the 7 November checkout):
  * USA v1.01, boot + 27 levels; own unit, -O2 -G0 -ffunction-sections
  * -frac2-keep-float-pun-source. Retained rule-compliant C below: 6048/6048 bytes,
@@ -287,7 +306,7 @@ extern void func_00335F88(char *o, f32 x, f32 y, f32 z, f32 w);
 extern s32 *func_00335E20(char *o);
 extern s32 *func_00335E18(char *o);
 extern s32 *func_00335E10(char *o);
-extern void func_00115484(void *dst, s32 c, s32 n);
+extern void *func_00115484(void *dst, s32 c, s32 n);
 extern void func_003369A8(char *o, char *text, s32 arg);
 extern void func_00336A38(char *o, char *buf);
 extern void func_00336A30(char *o, s32 n);
@@ -297,7 +316,7 @@ extern s32 func_00336E40(s32 arg);
 extern f32 *func_00336DA8(s32 n, s32 a);
 extern void func_00335F20(char *o, f32 *v);
 extern void func_00335E68(char *o, s32 n);
-extern void func_00115DA8(char *buf, char *fmt, s32 n);
+extern int func_00115DA8(char *buf, char *fmt, ...);
 extern f32 func_00283B98(f32 a, f32 b);
 extern f32 func_00283180(f32 a);
 extern f32 func_00283198(f32 a);
@@ -356,7 +375,7 @@ void func_0034B2C8(char *o, char *font, s32 arg)
     char *self = o;
     char buf[16];
     s32 i;
-    s32 color = 0;
+    s32 color;
     f32 *v;
 
     *(s32 *)(self + 0x157C) = 0;
@@ -616,7 +635,6 @@ void func_0034B2C8(char *o, char *font, s32 arg)
     func_00349A70(self + 0x1288, 2, 0, 514.0f, 4.0f, 0.0f, 0.0f);
     func_00349A70(self + 0x1288, 2, 1, 498.0f, 10.0f, 0.0f, 0.0f);
 
-    (void)&o;
     func_00349970(self + 0x131C, arg);
     func_00349A60(self + 0x131C, 0, func_00335E20(self + 0x238));
     func_00349AA8(self + 0x131C, 0, 0xF0F0F0);
