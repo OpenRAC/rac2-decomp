@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 /* kputchar (libkernl.a:kprintf.o; config/datamine/ntsc-u-sdk-matches.tsv): wait until the SIO
    status register's busy bit (0x8000) is clear, write the character to the SIO data register
    and return it. Both accesses are real hardware registers. The store reaches the return's
@@ -5,8 +6,8 @@
    -Wa,--r5900-swap-branch-slots like the rest of kprintf.o (src/core/0011BF18.c); see
    docs/COMPILER-NOTES.md, "SDK objects". */
 int func_0011BEE0(int c) {
-    while (*(volatile unsigned int *)0x1000F130 & 0x8000)
+    while (SIO_ISR & 0x8000)
         ;
-    *(volatile unsigned char *)0x1000F180 = c;
+    SIO_TXFIFO = c;
     return c;
 }

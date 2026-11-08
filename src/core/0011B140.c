@@ -18,16 +18,16 @@ long func_0011B140(void)
     func_0011AF90(&flag, &result);
 
     old = func_0011F5E0();
-    *(volatile unsigned int *)0x1000F000 = 4;
+    I_STAT = 4;
     CpuSync();
     if (old) {
         func_0011F628();
     }
-    while ((*(volatile unsigned int *)0x1000F000 & 4) == 0 && flag == 0) {
+    while ((I_STAT & 4) == 0 && flag == 0) {
     }
 
     old = func_0011F5E0();
-    *(volatile unsigned int *)0x1000F000 = 4;
+    I_STAT = 4;
     CpuSync();
     if (old) {
         func_0011F628();
