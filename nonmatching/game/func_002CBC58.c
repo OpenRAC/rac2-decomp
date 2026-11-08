@@ -1,3 +1,39 @@
+/* 8 November 2026 (round 3): the 8 extra bytes of the "panels = 0;" arm
+ * form are not in the arm (there one word changes: daddu s7 replaces the dead
+ * D_001AB910 load). They are the bounds loop: retail fills the beqz s7 slot
+ * with the page load from before the branch; here the load comes after the
+ * panels[j] test, so reorg uses beql with a copied j++ (+4), and the shift
+ * adds a loop-alignment nop (+4). Reading the page between the
+ * D_001AA450[j] test and the panels test, e.g.
+ * "D_001AA450[j] && (pg = D_001F2840.page, panels) && panels[j]" with pg in
+ * the first statement, gives 2100 bytes and the retail slot. But loop no
+ * longer hoists the %lo(D_001F2840) addiu (t1/t2 swap, addiu in the loop), and
+ * the arm word stays wrong. Tried, no gain: "panels = 0;" before the read in
+ * the arm, "if (!D_001AB910) panels = 0; else panels = 0;", "panels = 0;"
+ * at the join (movz again), "continue" forms of the page read (the same
+ * hoisting loss), -fsched-spec-load(-dangerous) (sched1 uses one-block
+ * regions here).
+ */
+/* 8 November 2026 (later): crop clamp solved. Writing each axis as RAC1's
+ * pause renderer does but with its half-size computed just before its own
+ * subtraction (left=..; right-=left; clamp left; top=..; bottom-=top; clamp
+ * top; then "if (tw<right)" and "if (th<bottom)") gives retail's slt/movn/movz
+ * order and registers; the retained C below now has it (2100 bytes, about 49
+ * rows, all from the panels selection). With "panels = 0;" in the empty
+ * D_0025A058 arm as well, only about 5 rows remain (2108 bytes): that arm's
+ * delay slot (daddu s7 instead of the dead D_001AB910 load; combine folds the
+ * cmov "lw ? 0 : 0" and drops the volatile load), the bounds-loop page load in
+ * the beqz s7 delay slot, and one alignment nop.
+ * Tried, no gain: "panels = panels;" or "panels = page->panels;" in the arm
+ * (the second keeps the load but adds movn), "(panels = 0, !D_001AB910)" in
+ * the arm test (cse1 deletes it), uninitialised panels (2100 bytes, movn, no
+ * entry zero, s6/s7 swap: about 25 rows), state->page in the selection test
+ * (branch, no cmov), -frac2-keep-block-order, -frac2-gcse-unsplit-edges,
+ * -fsched-spec-load(-dangerous), and a comma page read in the bounds test.
+ * jump.c forms the selection cmov right after cse1, so gcse cprop always sees
+ * only the entry zero unless a second set reaches it; no set that leaves no
+ * code was found.
+ */
 /* 8 November 2026: still a near miss (retained C below unchanged: 2100/2100
  * bytes, 0/28; 55 aligned rows differ, mostly the s5/s6/s7 renaming).
  * Cause found: jump.c turns "if (page) panels = page->panels" into a
@@ -184,13 +220,14 @@ void func_002CBC58(int mode)
             tw=1<<lw; th=1<<lh; left=0; right=tw; top=0; bottom=th;
             if (result&2) { right=w; bottom=h; }
             else if (result&8) {
-                left=(right-w)/2; top=(bottom-h)/2;
+                left=(right-w)/2;
                 right-=left;
                 left=left > -1 ? left : 0;
+                top=(bottom-h)/2;
                 bottom-=top;
                 top=top > -1 ? top : 0;
-                if (right>tw) right=tw;
-                if (bottom>th) bottom=th;
+                if (tw<right) right=tw;
+                if (th<bottom) bottom=th;
             } else if (result&4) {
                 if (w<h) { left=right/2-w*right/(h*2); right-=left; }
                 else { top=bottom/2-h*bottom/(w*2); bottom-=top; }

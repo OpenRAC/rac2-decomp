@@ -36,6 +36,28 @@
  *   gives retail's 1572-byte size but 32 diffs.
  * - case 0: `impact = o + 0x10` before func_00282CC0 gives sp+0x10 s0 as
  *   retail, but impact then keeps s1 (29). s/hit/p as the temp: worse.
+ * Round 3 (8 November 2026), new body below: still 1564/1572 bytes, 0/1.
+ *   Aligned diff (difflib, relocations masked) 19 lines; the round-2 body
+ *   gives 30 on the same count. What changed:
+ * - `int one = 1;` plus a goto dispatch (`if (type == 0) goto c0; if (type ==
+ *   one) goto c1; goto def;`) inside an extra `{ }`: gives retail's early
+ *   `li v1,1` and the switch layout. Literal 1 loses the hoist; plain if/else
+ *   gives a bnez layout; without the extra braces the frame grows to 0x110.
+ * - D_L06_001B3778 declared __attribute__((sda)): its address becomes one
+ *   unsplit `la`, so case 1 gets retail's `lui s0; addiu s0,s0` and register
+ *   names. sda on 37A0 or off 3790 is worse (35, 36).
+ * Still different: case-0 o+0x10 kept in s1 for func_002761F8 (retail reloads
+ *   0x80); 3-operand mult; loop-head i<<1 copy; direction's mtc1.
+ * Tried this round, no gain: impact = o+0x10 before func_00282CC0 (30), a
+ *   named `opos` local (37); Trail/row-pointer/in-col-loop products all give
+ *   `mult; mflo` but the giv becomes (m+16)+(D+r) (28), a row-offset local
+ *   or row pointer outside the col loop with the product inside: same;
+ *   clamp as `x--; if`, `-= 1`, byte-offset store, do-while groups around the
+ *   clamp or resets (resets group: 1572 bytes but 31); `short *t` timer
+ *   pointer; -fno-cse-skip-blocks (61, but it does create the copy),
+ *   -fno-cse-follow-jumps (33); direction = 1.0f after the qcopy fixes the
+ *   mtc1 but swaps axis/offset s1/s2 (22); axis via a pointer local or
+ *   declared in the j loop: worse.
  */
 #include "common.h"
 extern short D_L06_001B3790[] __attribute__((sda));
@@ -65,7 +87,8 @@ typedef struct {
 } NotakCollision;
 extern NotakCollision D_L06_001BFC80;
 extern char D_L06_001C79C0[];
-extern int D_L06_001B3778[], D_L06_001B3760[];
+extern int D_L06_001B3778[] __attribute__((sda));
+extern int D_L06_001B3760[];
 extern void func_002A8C00(void *, char *, int, void *, float);
 extern int func_002761F8(void *, void *, int, void *, void *);
 extern int func_0031EBF8(float, void *, int, void *);
@@ -94,8 +117,13 @@ void func_L06_004587E8(char *o) {
     float direction;
     float size;
     int i;
-    switch (*(unsigned char *)(o + 0x20)) {
-    case 0: {
+    int one = 1;
+    int type = *(unsigned char *)(o + 0x20);
+    {
+    if (type == 0) goto c0;
+    if (type == one) goto c1;
+    goto def;
+    c0: {
         char collision[112];
         *(float *)(o + 0xF0) = func_00283B98(*(float *)(o + 0xF0), 0.104719773f);
         func_00282CC0(pos, o + 0x10, st);
@@ -124,9 +152,9 @@ void func_L06_004587E8(char *o) {
         }
     update_position:
         qcopy(o + 0x10, pos);
-        break;
+        goto def;
     }
-    case 1: {
+    c1: {
         index = D_L06_001B3778[*(int *)(st + 0x48)];
         if (index >= 0) {
             p = D_L06_001C79C0 + index * 32;
@@ -148,6 +176,7 @@ void func_L06_004587E8(char *o) {
         return;
     }
     }
+def:
     qcopy(pos, o + 0x10);
     {
         k = 0;

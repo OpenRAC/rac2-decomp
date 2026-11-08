@@ -1,3 +1,15 @@
+/* 8 November 2026, round 14: no change (944/964, USA v1.01 0/1). Tried on the C below:
+ * -fmove-all-movables, -fno-gcse (+/- -fno-sched-interblock), -fno-expensive-optimizations,
+ * -ffast-math, -fno-cse-follow-jumps, -frac2-keep-block-order, -frac2-gcse-unsplit-edges,
+ * -frac2-zero-ti-por, -fno-rerun-loop-opt, -fno-strength-reduce, -fno-thread-jumps: all give
+ * identical code (-fstrict-aliasing 940 bytes, worse). A named `rate = 15.0f` set at function
+ * entry or before the index test (with or without -fno-gcse, with a later rate/15.0f use) is
+ * folded the same way; a two-argument inline set_times(state, 15.0f, 12.8f) too. RTL dump:
+ * combine folds the 15.0 pseudo (reg 127) into the $f12 move. Diagnostic: passing 15.0f to
+ * both calls gives retail's $f20/0x30 frame, but with two mov.s reads (combine does not fold
+ * the second use either), so a removed second use does not explain retail's single read.
+ * No RAC1 twin (no shared constants/oclass set).
+ */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 944/964 bytes, 52 differences (retail keeps 15.0f in a saved $f20 with a 0x30 frame; no source form keeps it). */
 /* 7 November 2026, round 13: no better admissible C; the C below is unchanged
  * (944/964 bytes, USA v1.01 0/1, 52 real differences). Frame: 0x30 is only the

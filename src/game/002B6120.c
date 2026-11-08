@@ -220,7 +220,7 @@ void func_002B6480(void *packet, int unusedMode)
 
 
 
-INCLUDE_ASM("asm/game", func_002B6658);
+/* func_002B6658 is in 002B6120-g8.c (its list head is in small data). */
 
 extern char D_001A7248[] __attribute__((sda));
 extern void func_0011D620(void *, int, int, int, int, int, int, int, int);

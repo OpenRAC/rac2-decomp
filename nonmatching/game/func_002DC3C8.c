@@ -1,3 +1,4 @@
+/* 8 November 2026: no RAC1/RAC4 twin. ~/rac1-decomp/src and ~/rac4-decomp have no timed text-page state machine with these text ids, timers (180/240/300) or the 0x900 pad test; the open question stays the catalogue entry (+0 vs +8). */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: the catalogue entry address itself is in doubt (see the entry hypothesis below); this is a catalogue question, not C. */
 /* 3 November 2026: entry hypothesis remains held after a fresh US 28-placement
  * audit. The canonical name is absent from the PAL and US2 catalogues.

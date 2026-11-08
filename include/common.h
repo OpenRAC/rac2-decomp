@@ -69,4 +69,18 @@ static __inline__ void qcopy_nc(void *dst, const void *src) {
                          : : "r"(dst), "r"(src) : "$2");
 }
 
+/* Call an object's update hook fn(arg) when fn is not null. Same asm as current
+ * rac1-decomp's src/game/moby/mobyutil.c (update_visible_resident_objects), where the
+ * original also used inline asm: GCC 2.95 reorg leaves both delay slots (beq, jalr)
+ * empty only next to asm (reorg.c stop_search_p), as retail does.
+ * Allowed by owner ruling, 8 November 2026.
+ */
+static __inline__ void call_hook(void *fn, void *arg) {
+    int r;
+    __asm__ volatile("beq %1,$0,1f\n\tmove $4,%2\n\tjal $31,%1\n1:"
+                     : "=r"(r)
+                     : "r"(fn), "r"(arg)
+                     : "$4", "$31", "memory");
+}
+
 #endif /* COMMON_H */

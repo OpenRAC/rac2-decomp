@@ -1,3 +1,4 @@
+/* 8 November 2026: no RAC1/RAC4 twin. No RAC1 source uses this fade (12.8f, 0.034906592f) shape, and RAC1's common.h has the same 16-byte qzero contract, so it gives no precedent for the unaligned sq. */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: exact only with qzero(state + 8), whose sq address is 8 mod 16; the owner ruled out breaking common.h's 16-byte contract, so it stays a near miss. */
 /* func_L01_003BCEC8 (Oozla debris update). Tier opus-1 (Claude Opus 5.5), 29 October 2026.
  * Profile: -O2 -G8 -ffunction-sections (an L01_003BB9D0-g8.c unit: D_L01_001AFE30 is $gp).

@@ -1,6 +1,8 @@
 /* 8 November 2026, Claude Opus 5.5 (task v101/m3k), USA v1.01.
- * Best: 1452/1452 bytes, 0/28 places, about 45 differing instructions (was 82).
- * Profile: own unit, -O2 -G64 -Wa,-G64 -ffunction-sections -g.
+ * Best: 1452/1452 bytes, 0/28 places, 6 differing instructions (was 45).
+ * Profile: own unit, -O2 -G64 -Wa,-G64 -ffunction-sections -g
+ *   -Wa,--r5900-la-addend=sn (owner-allowed option), every D_001A9428 and
+ *   D_001A93D0 access through the _gp alias (C below).
  * New this round:
  * - 32x32 mask loop now exact: fresh block-scope i, j (the function-level i
  *   conflicted with $v0/$v1/$a0 from the earlier calls, so it could not take
@@ -39,7 +41,42 @@
  *   Forced on over 8906 units (all releases): la-only changes 1 matched unit
  *   (L00_003F9570-g8: retail `la D_L00_001B0A70+16` is $gp); la+lw/sw (SN
  *   rule) changes 18. Not landed.
- */
+ * 8 November 2026 (task v101/m8d, own unit with the option on its cflags
+ *   line): reproduced 9 differing instructions, then closed the prologue:
+ *   `int none = -1;` declared at function top and stored once at 0x238.
+ *   The pseudo spans calls, so reload rematerializes the li right before the
+ *   store; sched1 then keeps base addiu, `lw $4` in source order and sched2
+ *   ties give retail's addiu / lui+lw / li. Local `arg` copies, a `state`
+ *   base pointer, `slot` pointer, comma forms: all keep the wrong order
+ *   (the arg copy raises the load's priority). Using `none` for the final
+ *   loop's -1 stores too puts it in $23 (worse).
+ *   Left: (3) only, 6 instructions at 0x295274..0x295288. sched1 puts the
+ *   0x238 store first (reg weight -1 vs 0/+1 for the $a0/$a1 moves) and
+ *   sched2 keeps it (tie, LUID). Tried: result in a local and the 0x240
+ *   store first (same), 0x240 store before the call (regs change),
+ *   `state` base local, `dst` copy of scratch, scratch + 0x9A800 as the
+ *   argument (adds li/ori/addu). -fno-schedule-insns gives the right
+ *   prologue but changes registers everywhere (not pursued).
+ * 8 November 2026 (round 2, m8d): instrumented a scratch copy of haifa-sched
+ *   (prints priority/weight/dependents/LUID per ready insn). sched1 t=5: the
+ *   0x238 store, $a0 move and 0x240 store all p35 w0; the store wins on
+ *   LUID (it is not register weight). sched2 t=5: all p34, class 3; store
+ *   has 3 dependents (805 anti, the later `lw $2` and the func_0028B2B8
+ *   call_value, both anti via patch 0029's kept $2 use), $a0 move 3, $a1
+ *   move only 2 ($5 output, call). So $a1 can never outrank the store
+ *   while both are ready at t=5; retail needs the store not ready there.
+ *   Likely retail shape: the s1 base addiu scheduled after the call and
+ *   pulled into the delay slot from after. Tried (all same order): slot
+ *   pointer reused for 0x240 (regs change), a0/a1 locals, store inside the
+ *   call's argument (comma), result local + 0x240 store after the call.
+ * 8 November 2026 (round 3, m8d): retail sets s1 = s6+%lo(D_001C4FA0) in
+ *   the delay slot of jal func_002EED58: a plain address, not a load and
+ *   not the call result, so there is no honest way to make it depend on
+ *   the call ($17 and $22 are callee-saved; sched2 hoists it at p35).
+ *   Re-deriving the base after the call (`int *st = D_001C4FA0;` after the
+ *   result local) gives the same code. Base-from-result or re-read forms
+ *   would add a load or a dummy op (not allowed). Open: something that
+ *   lowers the store's sched2 dependents to 2 or raises the moves' priority. */
 #include "common.h"
 extern unsigned int func_00294EC8(int);
 extern int D_001C4FA0[];
@@ -58,9 +95,7 @@ typedef struct { float ax, bx, ay, by; } UiMapCoefficients;
 extern int D_00256028[][2];
 extern UiMapEndpoints D_00255C30[];
 extern UiMapCoefficients D_00255ED0[];
-extern UiMapEndpoints D_001A93D0[2] MACRO_ADDR;
 extern UiMapEndpoints D_001A93D0_gp[2] SDATA(D_001A93D0);
-extern UiMapCoefficients D_001A9428[2] MACRO_ADDR;
 extern UiMapCoefficients D_001A9428_gp[2] SDATA(D_001A9428);
 extern unsigned char D_001A7AF8[] MACRO_ADDR;
 extern char *D_001BAED0 __attribute__((nosda));
@@ -81,6 +116,7 @@ void func_00294F10(void)
     float u0, y0, v0, x1, u1, x0, y1, v1;
     char *scratch, *packed;
     int bytes;
+    int none = -1;
 
     D_001C4FA0[4] = 1;
     { int i; for (i = 0; i < 21; i++) {
@@ -88,7 +124,7 @@ void func_00294F10(void)
         ((float *)D_001C4FA0)[0xB4 / 4 + i] = 0.65f;
         D_001C4FA0[0x15C / 4 + i] = D_00256028[i][1];
     } }
-    D_001C4FA0[0x238 / 4] = -1;
+    D_001C4FA0[0x238 / 4] = none;
     func_00295C50(D_001A79F0_3[0]);
     { int i; for (i = 0; i < 21; i++) {
         float sx, sy;
@@ -110,19 +146,19 @@ void func_00294F10(void)
     { int i; for (i = 0; i < 2; i++) {
         float sx, sy;
         x0 = D_001A93D0_gp[i].x0;
-        y0 = D_001A93D0[i].y0;
-        x1 = D_001A93D0[i].x1;
-        y1 = D_001A93D0[i].y1;
-        u0 = D_001A93D0[i].u0;
-        v0 = D_001A93D0[i].v0;
-        u1 = D_001A93D0[i].u1;
-        v1 = D_001A93D0[i].v1;
+        y0 = D_001A93D0_gp[i].y0;
+        x1 = D_001A93D0_gp[i].x1;
+        y1 = D_001A93D0_gp[i].y1;
+        u0 = D_001A93D0_gp[i].u0;
+        v0 = D_001A93D0_gp[i].v0;
+        u1 = D_001A93D0_gp[i].u1;
+        v1 = D_001A93D0_gp[i].v1;
         sx = (u0 - u1) / (x0 - x1);
-        D_001A9428[i].bx = sx;
+        D_001A9428_gp[i].bx = sx;
         D_001A9428_gp[i].ax = u0 - sx * x0;
         sy = (v0 - v1) / (y0 - y1);
-        D_001A9428[i].by = sy;
-        D_001A9428[i].ay = v0 - sy * y0;
+        D_001A9428_gp[i].by = sy;
+        D_001A9428_gp[i].ay = v0 - sy * y0;
     } }
     if ((((MapToc *)D_0014B540_1)->files0[D_001C4FA0[0x230 / 4]].size != 0 && !D_001A7AF8[5])
         || (((MapToc *)D_0014B540_1)->files1[D_001C4FA0[0x230 / 4]].size != 0 && D_001A7AF8[5])) {

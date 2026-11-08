@@ -1,3 +1,4 @@
+/* 8 November 2026 (m8e): re-measured on master's compiler (sticky volatile default, mtc1 fix): unchanged, 60/60, 0/1, object in $v1 vs $a3 (4 words). New, still $v1: `register` parameter with `|=` flags. Sibling func_L22_00385F40 (s32 param, switch case 0) gives no new form; its object also takes $v1 by the same rule. Marker kept. */
 /* 7 November 2026, round 12 (follow-up to 6 November): 96 source variants,
  * no improvement; retained C is 60/60 bytes, 0/1 places in each of US, PAL
  * and US2 with default -O2 -G0 -ffunction-sections. Four real words differ:

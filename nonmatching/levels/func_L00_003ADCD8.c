@@ -1,3 +1,4 @@
+/* 8 November 2026: no RAC1/RAC4 twin. An lq/lq/sq/sq swap scan of both repos' asm finds only RAC1 func_L00_0024A798 (store_current_level_table_value, a different routine, not matched in C); RAC1's common.h has no swap helper either. */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss. Final state: exact only with a new quadword-swap (qswap) helper in common.h; the owner ruled that helper out, so it stays a near miss. */
 /* func_L00_003ADCD8 - 456 bytes. opus-1 (Claude Opus 5.5), task v2197, 3 November 2026.
  *

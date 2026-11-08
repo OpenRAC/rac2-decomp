@@ -1,3 +1,4 @@
+/* 8 November 2026: no RAC1/RAC4 twin found for the 10/11-bit delta unpack (0x3FF/0x7FF, sllv by 22, trapping add); the RAC2 body uses trapping add and $at, so no C transcription applies. */
 /* functional: medium. Written from the assembly, carrying the two parts reached by jumps: func_002A1378 (the fourth-short pass, below as stage B) and func_002A1490 (stage C), so one call does all three; the VU0 sqrt and float-to-int are plain float code (truncating), the pipelined loop of stage B is written per entry. */
 #include "common.h"
 

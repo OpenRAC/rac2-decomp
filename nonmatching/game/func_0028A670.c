@@ -1,47 +1,26 @@
-/* 8 November 2026 (REG_EQUIV round): local-alloc/regclass/reload1 equivalence code equals upstream 2.95.2 (update_equiv_regs, no_equiv, the REG_EQUIV REG_LIVE_LENGTH *= 2); SN 2.95.2 v2.73a gives the same REG_EQUIV notes, register stats and dispositions as ours here. Env probes (EE 991111 note test, MEM equiv for multi-block pseudos, no *= 2, replace in one block, move init in loops) leave 138 masked words; SN body equals ours. All-units sweep changes 197/602/3181/182/0 matched units. */
-/* func_0028A670. Opus 5.5 (v1961). Unit profile of src/game/00288D88.c: -O2 -G0 -ffunction-sections.
- * Best: 1192/1192 bytes, 0/28 USA v1.01 places, 151 of 298 cdiff rows differ, first mismatch +0xC.
- * This C keeps count/first/second in a local struct, which gives the exact size but not retail's
- * registers. Linked build not run. Needs CounterRow and D_001B1928 from src/game/00288D88.c.
- *
- * Measured over 16 comparisons plus allocator dumps; "reads as" marks inference from retail:
- * - Scalars count, first, second are closer in mechanism: the prologue matches and retail's
- *   0x30/0x34/0x38 slots come out, at 1200 bytes. The 8 extra bytes are case 2's first stores:
- *   sched1 splits `first = K` into lui and ori on the spilled pseudo, and each part stores.
- * - Retail's reload registers fit the last_spill_reg round-robin over v0,v1,a0,a1,a2,f1:
- *   count=1 v0; the case-1 constant a0 (v1 holds state); K1 a1; K2 a2; `lui v0` for the format's
- *   %hi; 0x8710 a2 twice; --count a0. This reads as: the constant 1 and the format %hi are
- *   spilled, rematerialized pseudos hoisted by loop.c, which needs savings * life >= 4 here.
- *   Only 0x8710 hoists in this C; no probe reproduces the format %hi in v0.
- * - Each fix_truncsfsi2 takes a GPR scratch, then f1. From f1 the next reload should be v0, yet
- *   the second 0x8710 and --count skip v0 and v1. Two more hidden reloads per Y conversion, or
- *   v0/v1 busy there, would explain it; neither is identified.
- * - `(int)(v * D_001B23A4 + 0.5f)` is the display-scale idiom of 002D3390.c and 002CE5D0-g8.c.
- *   Probe helper, used three times: `if (mode == 1) return (int)(v * S + 0.5f) + adjust;
- *   return (int)(v * S + 0.5f);`.
- *   With mode = count (1296 bytes): `1` hoists (savings 4), a0, a1 and a2 appear as in retail, yy
- *   takes s1, the widened color s0, and `daddu s0,s3` lands in the strlen delay slot as in retail.
- *   The arms do not merge, apparently because their fix insns clobber different GPRs.
- *   With mode = x, a saved register (1236 bytes): the arms cross-jump away, but `addiu v1,zero,1`
- *   stays behind at each site, Y's float moves to f1, 0x8710 becomes v0 and row moves to s3.
- *   No such mode is evidenced here and retail has no load for one, so neither is the source.
- *   Next: find what makes `1` movable and then disappears before reload, for example a test
- *   folded by cse2 plus its jump pass.
- * - Without that helper the widened color is hoisted by sched1 across the draw calls, so it gets
- *   s1 and yy s0. Its source position, `int` versus `long long`, and an X-variable copy all tie.
- * - Testing Y first (`y = (int)...; if (mode == 1) y += adjust;`) becomes a cmove at jump1, with
- *   no hoisted 1 and no effect on the output.
- * - The first store of case 2 is still unexplained: retail stores each color once from a1/a2.
- *   Loop-scope color variables are const-propagated by gcse (4 props, back to double stores).
- *   Function-scope ones with struct stores split, lose REG_EQUIV and take stack slots
- *   (1216 bytes). Unused copies of the colors or of 1 do not make them hoist.
- * - -fno-schedule-insns gives single stores but 1172 bytes. It loses retail's arm-local
- *   `mov.s f12,f20` and `lw v1,0(s2)` before `sw v0,0x38(sp)`, which reads as retail running sched1.
- * - Int returns for func_00300A00 and func_0027F980 change nothing.
- * - Source clue: the fade starts in cases 1 and 3 are their end colors & 0xFFFFFF, as in
- *   002B7E28-g8.c. Retail's saved registers are y s4, secondY s5, x s6, firstY s7, secondX fp;
- *   scalars give y s4, secondX s5, secondY s6, x s7, firstY fp, so secondX must rank last.
+/* 8 November 2026 (source round, v101 wasI): rewrite from 151 to ~11 differing words, same 1192 bytes,
+ * prologue, cases, saved registers and reload registers now as retail. What did it:
+ * - `for (i = 0; i < 2; i++)` with scalar first/second (loop reversal gives retail's count at 0x30).
+ * - hud_coord dead-test helper (002D2188-g8.c / 00326A10-g8.c idiom, owner-allowed) for the three
+ *   Y roundings, `value * scale` order: puts the arg moves after the rounding as retail.
+ * - `one = 1` at the loop top, passed as `active`: loop.c matches it with the case-1 compare
+ *   constant and hoists both, so the compare's 1 is a reload in a0 as retail.
+ * - `secondX = 0` first among the zero inits: secondX ranks last in global-alloc (fp), as retail.
+ * - `D_001B1928.rows[i].value` as the sprintf argument: its address insns sit between the format's
+ *   %hi and its use, so the %hi life reaches 4 and loop.c hoists it; the spilled %hi is
+ *   rematerialized in v0, which moves the 0x8710 reloads to a2 as retail.
+ * Left (sched2 ties): first draw `addiu a1,0xB2` vs `addu a0`/`lwc1 f20` order, and in both draws
+ * `daddu a0,v0` before `mtc1 x` instead of after its cvt. Cause: our fix_truncsfsi2 GPR scratch is
+ * v0 (round robin after the a2 reload; v0 free); retail's must be a1, which needs v0 busy at the
+ * fix. -fno-gcse gives a1 there but loses the %hi hoist. Literal 1 as `active` keeps the formal
+ * copy (fixes the second draw, 9 words with first two literal and third `one`), but its copy is
+ * set before the id copy so it takes a1, not v0. Tried without gain: label_y, the L05 hud_coord,
+ * mode-first test (not deleted), handle test, `one = 1` per draw, inline text helper, `half` local,
+ * nested text call, active-first parameter order.
  */
+/* 8 November 2026 (REG_EQUIV round): local-alloc/regclass/reload1 equivalence code equals upstream 2.95.2 (update_equiv_regs, no_equiv, the REG_EQUIV REG_LIVE_LENGTH *= 2); SN 2.95.2 v2.73a gives the same REG_EQUIV notes, register stats and dispositions as ours here. Env probes (EE 991111 note test, MEM equiv for multi-block pseudos, no *= 2, replace in one block, move init in loops) leave 138 masked words; SN body equals ours. All-units sweep changes 197/602/3181/182/0 matched units. */
+/* func_0028A670. Best C below (8 November 2026). Unit profile of src/game/00288D88.c: -O2 -G0
+ * -ffunction-sections. Needs CounterRow and D_001B1928 from src/game/00288D88.c. */
 #include "common.h"
 
 typedef struct { float value[7]; } CounterWidths;
@@ -56,36 +35,53 @@ extern int func_00336D50(unsigned char *, int);
 extern void func_00300A00(char *, int, float, float, float, float, float);
 extern void func_0027F980(int, int, unsigned long long, unsigned char *, int);
 
+/* The display mode word beside the HUD scale. */
+extern int D_001B23A0 __attribute__((sda));
+
+/* A HUD coordinate scaled for the display and rounded to a whole pixel; the display-mode test
+   has no effect on the result (as func_00326A10). */
+static __inline__ int hud_coord(float value, float scale, float half, int active)
+{
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+
+    if (result != 0 && D_001B23A0 == active)
+        scaled = 1.0f;
+    return result;
+}
+
 void func_0028A670(void)
 {
     char text[16];
     CounterWidths widths;
-    int firstX, secondX, firstY, x, secondY, y;
+    int firstX, y, secondY, x, firstY, secondX;
     unsigned int color;
     CounterRow *row;
-    struct { int count; unsigned int first, second; } draw;
+    int i;
+    unsigned int first, second;
     float fade, scale, width;
-    int len, yy;
+    int len;
+    int one, id;
 
-    row = D_001B1928.rows;
+    secondX = 0;
     color = 0;
     y = 0;
     secondY = 0;
     x = 0;
     firstY = 0;
-    secondX = 0;
     widths = *(CounterWidths *)D_001A8DE0;
     scale = 0.0f;
-    draw.first = 0;
-    draw.second = 0;
-    draw.count = 1;
-    do {
+    first = 0;
+    second = 0;
+    for (i = 0; i < 2; i++) {
+        row = &D_001B1928.rows[i];
         firstX = 0;
+        one = 1;
         switch (row->state) {
         case 1:
             fade = (float)row->age * 0.0714285746f;
-            draw.first = func_00283D38(0x00F0C070, 0x55F0C070, fade);
-            draw.second = func_00283D38(0x00442D00, 0x60442D00, fade);
+            first = func_00283D38(0x00F0C070, 0x55F0C070, fade);
+            second = func_00283D38(0x00442D00, 0x60442D00, fade);
             if (row->value < 0)
                 color = func_00283D38(0x001010F0, 0x801010F0, fade);
             else
@@ -103,8 +99,8 @@ void func_0028A670(void)
                 fade = (float)row->timer * 0.0714285746f;
             else
                 fade = 1.0f;
-            draw.first = 0x55F0C070;
-            draw.second = 0x60442D00;
+            first = 0x55F0C070;
+            second = 0x60442D00;
             if (row->value < 0)
                 color = func_00283D38(0x001010F0, 0x801010F0, fade);
             else
@@ -122,8 +118,8 @@ void func_0028A670(void)
                 fade = 1.0f;
             else
                 fade = 1.0f - ((float)row->timer - 7.0f) * 0.142857149f;
-            draw.first = func_00283D38(0x00F0C070, 0x55F0C070, fade);
-            draw.second = func_00283D38(0x00442D00, 0x60442D00, fade);
+            first = func_00283D38(0x00F0C070, 0x55F0C070, fade);
+            second = func_00283D38(0x00442D00, 0x60442D00, fade);
             if (row->value < 0)
                 color = func_00283D38(0x001010F0, 0x801010F0, fade);
             else
@@ -138,21 +134,18 @@ void func_0028A670(void)
             break;
         }
         if (firstX) {
-            func_00115DA8(text, D_001A8E00, row->value);
+            func_00115DA8(text, D_001A8E00, D_001B1928.rows[i].value);
             len = func_001157AC(text);
             if (len > 0) {
                 width = widths.value[len - 1];
-                func_00300A00((char *)func_00336D50(D_001A8CFC + 0x8710, 178), draw.first,
-                    (float)firstX, (float)(int)((float)firstY * D_001B23A4 + 0.5f), scale, scale, width);
-                func_00300A00((char *)func_00336D50(D_001A8CFC + 0x8710, 179), draw.second,
-                    (float)secondX, (float)(int)((float)secondY * D_001B23A4 + 0.5f), scale, scale, width);
-                {
-                    long long style = (int)color;
-                    yy = (int)((float)y * D_001B23A4 + 0.5f);
-                    func_0027F980(x, yy, style, (unsigned char *)text, func_001157AC(text));
-                }
+                id = func_00336D50(D_001A8CFC + 0x8710, 178);
+                func_00300A00((char *)id, first,
+                    (float)firstX, (float)hud_coord((float)firstY, D_001B23A4, 0.5f, one), scale, scale, width);
+                id = func_00336D50(D_001A8CFC + 0x8710, 179);
+                func_00300A00((char *)id, second,
+                    (float)secondX, (float)hud_coord((float)secondY, D_001B23A4, 0.5f, one), scale, scale, width);
+                func_0027F980(x, hud_coord((float)y, D_001B23A4, 0.5f, one), (int)color, (unsigned char *)text, func_001157AC(text));
             }
         }
-        row++;
-    } while (--draw.count >= 0);
+    }
 }

@@ -14,7 +14,7 @@ unsigned int func_L00_0032C638(unsigned int param_1)
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_0032CF60);
+/* func_L00_0032CF60 is in L00_0032CF60-g8.c (-G8 -g). */
 
 void func_L00_0032D100(int value, long address) {
     int *target = (int *)(int)address;

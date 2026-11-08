@@ -1,3 +1,21 @@
+/* 8 November 2026 (round 12b, m3x, const base): D_001AB984 read into a local before the +=
+ * (block top, or once before the second set_window_vertical and kept across the call in s0)
+ * puts every memory read before store1, so flow2 deletes it again (2072). +0x6A0: on the const
+ * base, so>>4 stays in v0 and the s[0] copy in a0 for: inline expression, unsigned short y,
+ * (unsigned short) top, so/top locals, LabelSO read, Win *p, one-pass groups around y, around the
+ * helper call, around the 0x20000 test, flag test hoisted into a local. Direct self-assignment
+ * win.s[0] = win.s[0] is dropped (retail keeps the lhu/sh). Not landed.
+ */
+/* 8 November 2026 (round 12, m3x): `extern const int D_001AB984` (legitimate: value 16, only
+ * read anywhere; a small const int lands in .sdata under -G8) with the %= span form (span read
+ * after the +=) keeps retail's intermediate store: 2076/2076 bytes without any group. But const
+ * drops the load's MEM_SCALAR_P (/f), so true_dependence pins the D load after the store in both
+ * sched1 and sched2; retail hoists it to the block start (beqz delay slot). Tail order differs,
+ * 43 differing rows against 41 for the plain form (same count method). Reasoning: flow2 keeps store1 only with a memory read
+ * between the stores; the only asymmetry between sched1 and sched2 alias checks is pseudo vs hard
+ * reg base values, and neither D (symbol vs argument base) nor win.s[7] (stack, never aliases)
+ * gets one. -fno-schedule-insns scrambles from +0x14. Not landed.
+ */
 /* 8 November 2026 (round 9, wccT): flow-TRAP_IF hypothesis falsified. Upstream gcc-2.95.2
  * flow.c mark_used_regs clears mem_set_list at TRAP_IF/UNSPEC_VOLATILE/volatile asm (Jeff Law,
  * 27 March 1999); EE 991111's Cygnus tree (merged to ~18 March 1999) lacks it; div_trap is the
