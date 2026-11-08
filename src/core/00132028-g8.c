@@ -32,7 +32,13 @@ extern int D_001A74C8 __attribute__((sda));                 /* CD read pending *
 extern SndCallback D_001A74D0 __attribute__((sda));         /* CD read callback */
 extern SndCallback D_001A74E0 __attribute__((sda));         /* return callback */
 extern long D_001A74E8 __attribute__((sda));                /* its argument */
-/* Callback data is shared with the asynchronous reply pump, as in RAC1 989snd. */
+/* The CD read callback's argument. No second context is known to write it: this pump
+   runs in its callers' thread (func_00132498's commit, d71286afe). The volatile is
+   kept only because the unit needs it: without it, or as an incomplete sda array
+   (D_001A74D8[0]), func_00132028 is 16 bytes short and matches 0 of 1 in USA v1.01,
+   PAL and v2.00 (the accesses become $gp-relative and retail's beql into this block
+   is lost). Measured 8 November 2026 with both set-side volatile rules, the EE tree's
+   and GCC 2.95's. */
 extern volatile long D_001A74D8 MACRO_ADDR;
 extern unsigned int D_001A7180 MACRO_ADDR;
 extern int D_001A7080[] MACRO_ADDR;                         /* reply buffer */

@@ -82,7 +82,7 @@ extern char * r1_D_L10_0015F050 MACRO_ADDR;
 extern char *r1_D_L10_0015F050 MACRO_ADDR;
 
 /* rac1-decomp src/overlays/shared/vendor_00299AF0.c: func_L10_002F6E10 */
-/* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay_vendor_002e3de8.c, FUN_L10_002f5a50. */
+/* Adapted from Lombyte (MIT) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay_vendor_002e3de8.c, FUN_L10_002f5a50. */
 /* rac1-decomp src/overlays/shared/rocket_and_path_camera.c: func_L00_004290C0 */
 /* Adapted from Lombyte's project (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay_vendor_002e3de8.c, FUN_L10_002f5a78. */
 int func_L00_004290C0(char *moby, char *unused);

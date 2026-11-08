@@ -37,14 +37,6 @@ void func_PAL_002E84A8(void *object, int index, int alternate)
  float *entry;
  int count1, count2, low, high;
  unsigned int color1, color2;
-#ifdef OPENRAC_HOSTGEN
- /* OpenRAC: the new record's colour and alpha now (+0x30, +0x38) are never set here: it is drawn once
-    with what the stack held, before func_002ED368 sets them. Retail's stack held 0x001A0000 and 0x001C0000
-    there at every spawn of a New Game flight, an alpha byte of 0, so that draw changes no pixel; the host's
-    held float bits, a puff of alpha up to 0xFD at the engine every tick. */
- effect.unknown = 0x001A0000;
- effect.unknown2 = 0x001C0000;
-#endif
  next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
  func_00283130(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
  func_00283130(second, next);

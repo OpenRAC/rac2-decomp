@@ -1106,24 +1106,6 @@ that loop.c skipped that loop: reload can rebuild a hoisted base. The next
 useful experiment is promotion of the real alpha-table base while preserving
 the strand index's shortened lifetime. No strict linked match is claimed.
 
-**7 November 2026, round 11 (retained near miss):** USA v1.01, retained C with
-`-O2 -G0 -ffunction-sections -fno-sched-interblock -fno-gcse`: adding
-`-frac2-mult-add-no-flatten` reduces 63 aligned instruction differences to 52
-(684/708 bytes, 0/27). Retail's inner-loop pointer starts all have that
-switch's unflattened `x*16 + (i*160 + (D - 16))` form. Retail is split-address
-code, so `-mno-split-addresses` (39 differences with a loop-2 `delta` pointer)
-is not its profile. The loop dump confirms that the outer loop's table and
-`160` invariants are hoisted but receive no hard register, so reload
-rematerializes them as in retail. The remaining saved-register base is the
-first inner loop's preheader copy of `D_L00_00240080` (REG_EQUIV, live 154,
-`$s7`). Retail loads that base afresh for every pointer start. No change came
-from `-G8`, `-fno-rerun-loop-opt`, `-fno-rerun-cse-after-loop`,
-`-fno-cse-follow-jumps`, `-fno-cse-skip-blocks`, `-fno-regmove`, `-fforce-addr`
-or `-fno-expensive-optimizations`. The full list is in the retained source.
-Round 12 retains an index-form first guard with `timer_offset` defined inside it,
-which reproduces retail's `sll $v1` / `daddu $s5,$v1` copy: 692/708 bytes, 47
-aligned differences, 564/708 bytes in aligned agreement.
-
 **Signature:** retail emits `lui $r,%hi(D)` + `lw`/`addiu` *inside* the loop body; cc1 hoists the address into a callee-saved register, so the loop loses an instruction, the 8-byte alignment `nop` before the label disappears, and the frame grows by two saves.
 
 **Measured:** `for` and `do/while` both fold. Those tested loop forms did not move the original attempts. Later source/profile remedies mean this is not a universal impossibility claim; wave 8 recorded the two observations below.
@@ -2817,17 +2799,6 @@ particular label spelling does not unblock the loop layout.
   three unwitnessed volatile globals gives 3,260/3,420 bytes, 0/1 USA v1.01;
   USA v2.00 and PAL have no canonical row. The older 3,312-byte cleanup still
   contained those diagnostics and is historical, not an admissible baseline.
-  7 November 2026 correction: that wrapper forwards its colour and text to the
-  matched `func_L05_00302CE8(..., u64 color, u8 *text, ...)`, and retail builds the
-  caller's `0x80F0F0F0` as a 64-bit constant (`ori`/`dsll`/`ori`), so `u64 color` and
-  `u8 *text` are the measured caller interface; the 32-bit spelling only fits the
-  forwarder's own bytes. The three volatile words are `D_L10_001B1390[1..3]`: retail
-  reads `[0]` through `$gp` and the others as unsplit sym+offset macro loads, and the
-  `0x1454`/`0x1460`/`0x146C` tables are rows of one `[4][3]` table at `0x1448`. With
-  one `MenuY(y, adjustment)` helper for every row (0.0f where there is none, so
-  `-ffast-math` folds the arms equal) the lawful draft reaches 3,440/3,420 bytes,
-  795 of 855 aligned instructions; only sched2 order after the vanished tests and one
-  missed tail merge remain (`nonmatching/levels/func_L10_004227A0.c`).
 - **A measured field model must cover the actual accesses.** The Maktar actor
   routine `func_L02_003D0408` uses a single volatile byte view at actor `+0x60`
   for all six retail reads, including the two snapshots before distance tests.
@@ -3827,7 +3798,7 @@ path indices all reproduce the existing 15,832-byte, 18-slot result. (Superseded
 4 November: `func_002B60B0` returns nothing, and the function now matches.) No new C match or native qualification;
 reopen with a measured scheduler/allocator input beyond these tied forms.
 
-| Spill-slot order, `func_L00_003E5BD8` | **Open, target identified 7 November** | 1108/1108, only 19 stack offsets differ. The eight spills are sp+16/48/64/80/84/208, object+192 and index+1, in gcse bucket order, with bucket = (14001 + regno + constant) % n. Retail's order needs n = 111 (max_cuid 220..223; the draft has 242, so 121) for the stack addresses. Forced to 111 buckets in a scratch cc1, with object read through a local copy and 15 or more extra pseudos before `index`, the draft is exact. Wanted: natural source about 20 insns lighter at gcse with the same final code. 65,536 combinations of 16 equivalent spellings did not reach it (see the draft's header). |
+| Spill-slot order, `func_L00_003E5BD8` | **Open, 1 November** | 1108/1108, only 19 stack offsets differ. A private cc1 overriding `expr_hash_table_size` shows the slots follow gcse's bucket order: 133 buckets gives 7 rows, no odd size from 101 to 501 gives 0, and declaration order has no effect. Three pseudos remain rotated, so retail differs in more than the table size. |
 | Weighted refs, `func_002FDBD8` | **Open, 1 November** | Global-alloc priority is `floor_log2(refs) * refs / live`, refs weighted by loop depth. With the shared `off` the colour block is exact but `n` falls to 15 refs; 16 would pass `direction`. One more read of `n` inside the loop is what is missing. |
 | Copy epilogue, `func_00335370` | **Qualified C, 25 October** | Default game profile plus the reviewed shared `qcopy`: 88 bytes, 28/28 per release, all 84 strict programs pass. Prior TI-only measurements are historical; source is `src/game/00335370-copy.c`. |
 
@@ -4895,29 +4866,3 @@ absence from a bounded static scan resolves arbitrary indirect control flow.
 Keep per-placement raw scans private and state their coverage. Useful C stays
 in `nonmatching/`; the old dummy-frame and unrelated guessed bodies were removed
 from `func_L03_0041B848` and `func_L00_00309DB0` rather than promoted.
-
-### func_002CA070: case 8's local-alloc order (USA v1.01, boot and 27 programs)
-
-Profile: own unit, `-O2 -G16 -ffunction-sections -Wa,-G16`, current master compiler. The retained
-draft in `nonmatching/game/func_002CA070.c` differs only in five case-8 registers. Retail's
-allocation needs init > 0x18 > upd > page > c in local-alloc priority. For that, sched1 must emit
-the init store before the upd and c stores. `rank_for_schedule` compares `INSN_REG_WEIGHT` before
-LUID, so the stores that end their value's life always win. Measured on 7 November 2026: 28
-single flags, all 15,120 store orders with the addresses in locals, and 100,000 random source
-forms. None got more than 3 of the 5 registers. Next useful experiment: a case-8 shape that gives
-the init or upd value one more reference without extra code, for example a different call or
-struct form. Statement order is exhausted.
-
-### F35 HUD icon body (func_L05_00421B98 and its three copies), 7 November 2026
-
-USA v1.01, `-O2 -G8 -ffunction-sections`, one body at L05/L10/L15/L25 (1,852 bytes each). The
-unused saved `$s2` is reproduced by the `scaled_coord` helper merged in `func_L11_004456A0` and
-`func_L02_003FF6E8` (commits 4bdf489e and dfdec300), but only with a single-test dead compare
-(`if (mode == active)`): L02's `result != 0 && mode == active` adds a second branch per draw,
-which ends cse's path and rematerialises every constant (1836 bytes). Best: 1848/1852, 0/1,
-prologue and frame exact. Remaining constraint, measured with `cc1 -dl -dg`: the dead mode
-load is block-local, so local-alloc gives it `$v0` before global-alloc places the sprite
-pseudo; retail's `mfc1 $a0` fix results and late `daddu $a0,$v0` need the sprite in `$v0` and
-the mode load out of it. Next experiment: a source shape where the sprite pseudo stays within
-one basic block or `$v0` is live at the mode load. Draft: `nonmatching/levels/func_L05_00421B98.c`.
-

@@ -171,7 +171,7 @@ void func_PAL_L03_002B8C28(void) {
 #undef HOP_SAVED
 
 /* rac1-decomp src/overlays/shared/camera_001FC308.c: func_L02_001FC308 */
-/* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay/camera/001fc008.c, FUN_L02_001fc008. */
+/* Adapted from Lombyte (MIT) for PAL by OpenRAC's tools/port.py: src/overlays/shared/gameplay/camera/001fc008.c, FUN_L02_001fc008. */
 /* Emits two particle groups scaled by the object's transformed basis length. */
 /* func_L03_00329EF0 is defined in L03_002AB5C8-region.c. */
 

@@ -125,12 +125,6 @@ void func_002B6958(int id, int mode, void *object, int volume)
     STATE->channel[1].crossfade = 0;
     STATE->channel[1].object = object;
     STATE->channel[1].slot = func_002E5A50(object);
-#ifdef OPENRAC_HOSTGEN
-    /* OpenRAC: func_002E5A50 returns 52 when no slot is free; retail then writes past the
-       52 rows. The port takes it as no slot. */
-    if (STATE->channel[1].slot >= 52)
-        STATE->channel[1].slot = -1;
-#endif
     if (STATE->channel[1].slot >= 0) {
         slot = STATE->channel[1].slot;
         sound = (SoundAnchor *)(D_00188660 + slot * 0x70);

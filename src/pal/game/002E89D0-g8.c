@@ -33,14 +33,6 @@ void func_PAL_002E89D0(void *object)
  char *o = object;
  unsigned long long next;
  unsigned int color;
-#ifdef OPENRAC_HOSTGEN
- /* OpenRAC: as in func_002E76C0, the new records' colour and alpha now (+0x30, +0x38) are drawn once as
-    the stack left them; retail's alpha byte 0 there, so that first draw changes no pixel. */
- effect.unknown = 0x001A0000;
- effect.unknown2 = 0x001C0000;
- spark.unknown = 0x001A0000;
- spark.unknown2 = 0x001C0000;
-#endif
  next = *(unsigned long long *)(*(char **)(o + 0x5c) + 0x10);
  func_00283130(first, *(unsigned long long *)(*(char **)(o + 0x58) + 0x10));
  func_00283130(second, next);

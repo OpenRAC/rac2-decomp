@@ -136,7 +136,7 @@ int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
 }
 
 /* libmpeg. func_001296A0 is rac1-decomp src/core/00125630.c func_00125880
-   (_getAllRefs) and func_00129DA8 is Lombyte (GPL-3.0) src/assembly/sdk/library/
+   (_getAllRefs) and func_00129DA8 is Lombyte (MIT) src/assembly/sdk/library/
    _getRef0.c; both keep RAC2's position relative to RAC1 (RAC2 = RAC1 + 0x3E20)
    at the same sizes. Every field offset below was re-measured against RAC2's
    own accesses, not inherited:
@@ -524,7 +524,7 @@ void func_0012B198(int arg0) {
 }
 
 /* rac1-decomp src/core/00125630.c: func_001273A0 */
-/* _waitBdecOut (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
+/* _waitBdecOut (libmpeg). Adapted from Lombyte (MIT) for PAL. */
 int func_0012B1C0(void *arg0) {
     MpegDec *d = arg0;
     int cb1[8];
