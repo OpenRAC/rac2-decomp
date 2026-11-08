@@ -10,9 +10,9 @@ reorg's forward delay-slot search goes on past the asm. GCC 2.95 uses `|=`.
 func_L00_002A9460 (412 bytes, 27 places) shows retail kept the flag: the search from its
 first call passes a volatile qcopy asm and stops, so `addiu $s1,$s1,%lo(D_00189E20)` fills the
 second call's slot instead. With this option the two mark_referenced_resources sites use `|=`.
-The mark_set_resources half of the same upstream change is not applied: forced on in every
-game unit it changes matched func_00132498 (0 of 1 places), while the referenced half alone
-changes only func_L00_002A9460's unit of 8,511.
+The referenced half alone changes only func_L00_002A9460's unit of 8,511. The
+mark_set_resources half of the same upstream change is the compiler's default
+(sticky_volatile_sets.py, -fno-rac2-sticky-volatile-sets to opt out).
 
 The option is off by default, enabled per unit in config/cflags.txt, and
 -fno-rac2-sticky-volatile-refs disables it again. tests/test_sticky_volatile_refs.py covers

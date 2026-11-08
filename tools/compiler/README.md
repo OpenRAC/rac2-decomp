@@ -239,6 +239,16 @@ default, enabled per unit in `config/cflags.txt`, and `-fno-rac2-sticky-volatile
 disables it; `tests/test_sticky_volatile_refs.py` covers the anchors, the default/disabled
 equality, the stopped search and a control without the asm.
 
+`sticky_volatile_sets.py` gives mark_set_resources (resource.c) the other half of the same GCC
+2.95 change (Mark Mitchell, 6 May 1999), and it is the default: `volatil` and `unch_memory`
+stay set at later stored MEMs (`|=`) instead of the EE tree's `=`. reorg's backward delay-slot
+search from a call then stops at a volatile store even when a plain store lies between it and
+earlier insns (func_L00_002A3B88, func_00131DE8: retail leaves the `jal` slot empty). With it,
+no matched function of `src/` changes. `-fno-rac2-sticky-volatile-sets` restores the EE
+tree's assignment per unit in `config/cflags.txt` (no unit needs it);
+`tests/test_sticky_volatile_sets.py` covers the anchors, the default, the explicit opt-out,
+that `-frac2-sticky-volatile-refs` alone does not empty the slot, and three controls.
+
 `frame_pointer_liveness.py` adds `-frac2-frame-pointer-liveness`: GCC 2.95's frame-pointer
 liveness after reload (John Wehle, 2 June 1999). flow.c's mark_regs_live_at_end, insn_dead_p,
 mark_set_1 and mark_used_regs and haifa-sched.c's attach_deaths treat the frame pointers as
@@ -336,6 +346,10 @@ the `-frac2-wide-saves-below` lines, so after `wide_saves_below.py`), and
 `keep_float_pun_source.py`, then `no_extra_increment_givs.py` (both on the
 `-frac2-no-static-chain-base` lines, so after `no_static_chain_base.py`). Each inserts right after
 its anchor, so swapping the two of a pair changes the sums but not the compiler.
+`sticky_volatile_sets.py` anchors on the `-frac2-no-static-chain-base` lines too and runs
+after `no_extra_increment_givs.py`. `resource.c` is changed by `sticky_volatile_refs.py`
+(mark_referenced_resources) and `sticky_volatile_sets.py` (mark_set_resources) at separate
+anchors, and its sum describes both.
 `keep_float_pun_source.py` also changes `cse.c`, after `keep_block_zero_copy.py`, and `combine.c`.
 `no_extra_increment_givs.py` also changes `loop.c`: its strength_reduce guard is at another place
 than `no_recombine_givs.py`'s edit, and the `loop.c` sum describes both.

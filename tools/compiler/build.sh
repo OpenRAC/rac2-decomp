@@ -89,21 +89,22 @@ python3 $T/mult_add_no_flatten.py gcc
 python3 $T/no_static_chain_base.py gcc
 python3 $T/keep_float_pun_source.py gcc
 python3 $T/no_extra_increment_givs.py gcc
+python3 $T/sticky_volatile_sets.py gcc
 sha256sum --check --quiet <<'SUMS'
 c949997ebc1ed001fc7d905723c8e9348f5c364db2b61bc4e84b9729b6a67f07  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-164d6771b6e89cda7b695e6ffd102b3439edece7a00bd835dcedd92960446d68  gcc/toplev.c
+7c7c49c322cdb93ccdc5da09044d23091d44a3de15922fe55908f71a4a0e8d9c  gcc/toplev.c
 fa211f12b39de727c033f57a16ab627572547901d9cf8d2a7aa2e5dd77949e9e  gcc/haifa-sched.c
 656c2b9546b5c38d96cfe25b02620cce02b625f5637ecad6386f0a4d89f3e0fe  gcc/reorg.c
-637804ba390348356d34525cd73926a53c86c2a6c5aa0771d6729f973d44ed30  gcc/flags.h
+2fed8663ae4c3f2381614f6e847f4a9a958d591f3a7f60a9b9d07125ca3ab6ed  gcc/flags.h
 feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
 efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
 17c1a41578b92c102dea8c189e1e7372e637662e690d5226c87a4122a32d1225  gas/config/tc-mips.c
 6d4c688bdf8517a1da1b35a04bb1e3b6137093a6224b3ed52666581e3a7bd557  gcc/reload1.c
 94489f80e8769d277c3cfd7c73a3d5ee3f8ce0af790f61ef3c575b593b3b4099  gcc/loop.c
 d210a06544c16ce97a326b878527df1ea6730074ce8507a55830615df2820242  gcc/cse.c
-8e2768736759358567dc26fe0379d8fbe8b6f5bc3d9dc35adeb573cb99eac63f  gcc/resource.c
+734dc911b2b3764dc532eb95e3ddc886a94f6c9289a9686080db5e99d2221cd8  gcc/resource.c
 23fccc683e52141c78256e75795be2b6573cc2be5683247c86379d416f213729  gcc/expmed.c
 cf87807db5f932724aaf0433323592a5eaa4eccfe58936ca5e3d3d395ca90e45  gcc/alias.c
 25c4bd0e51fcdbeb9d53ab1092adab542d9833576391c83da7f3fb53908fbb86  gcc/combine.c
@@ -166,6 +167,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_mult_add_no_flatten.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_static_chain_base.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_keep_float_pun_source.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_extra_increment_givs.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sticky_volatile_sets.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

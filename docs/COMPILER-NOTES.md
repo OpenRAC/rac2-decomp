@@ -199,6 +199,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Reduced giv start `x*16 + (i*400 + (D-16))`, not flattened | -frac2-mult-add-no-flatten | func_L20_0039F968 |
 | Copy of a zero set in the same block stays a register copy | -frac2-keep-block-zero-copy | func_002F7320 |
 | A volatile asm ends the forward delay-slot search past later loads | -frac2-sticky-volatile-refs | func_L00_002A9460 |
+| `jal` slot empty after a plain store and then a volatile store | Default (GCC 2.95's set-side rule); -fno-rac2-sticky-volatile-sets restores the EE tree's | func_L00_002A3B88, func_00131DE8 |
 | Branch slot setting `$fp` annulled (`bnel`), retail `bne`; no frame pointer | -frac2-frame-pointer-liveness | func_L07_0040EC08, func_L04_00414698 |
 | Callee saves issued at the top, retail has them among stores through `$v0` | -frac2-no-static-chain-base (with -frac2-frame-pointer-liveness) | func_002BA0E0 |
 | A word stored into a float read twice: `lui`/`ori $v0` after the previous call, one `mtc1` into a saved FPR, `mov.s` per read | -frac2-keep-float-pun-source, write `*(s32 *)&f = K` | func_00349D58 |
@@ -475,14 +476,15 @@ next ordinary load clears the flag and the search goes on to the addiu. Upstream
 2.95.3 use `|=` there. [sticky_volatile_refs.py](../tools/compiler/transformers/sticky_volatile_refs.py)
 adds `-frac2-sticky-volatile-refs`: the MEM and ASM_OPERANDS cases of
 mark_referenced_resources keep the flag set. Forced on in every game unit it changes none of
-8,510 others. The mark_set_resources half of the same upstream change is not applied: forced
-on it also changes matched func_00132498 (0 of 1 places).
-7 November 2026, round 9: the set-side `|=` alone (env probe in mark_set_resources) makes
+8,510 others. The mark_set_resources half of the same upstream change is the compiler's
+default since 8 November 2026 ("reorg: a volatile store stays marked" below).
+History, 7 November 2026, round 9: the set-side `|=` alone (env probe in mark_set_resources) makes
 func_00131DE8 match (1 of 1 in us, pal, us2) but, forced on in all 8,734 game units, changes only
 that unit and matched func_00132498 (1 -> 0 of 1): sched2 puts the hoisted
 `lui $s0,%hi(D_001A7578)` before the plain D_001A74D0 and volatile D_001A74D8 stores, and retail
 fills the `b` slot with it past the volatile store. func_00132498 reads no SIF field; dropping
-its volatile D_001A74D8 gives 0 of 1 with or without the rule. Not landed.
+its volatile D_001A74D8 gives 0 of 1 with or without the rule. Not landed. (Superseded: an sda
+array element form of that store matches with and without the rule; see below.)
 
 func_L07_0040EC08 (952 bytes, 1 place in each USA release) and func_L04_00414698 (6,032 bytes, 2
 places in each) differ from stock cc1 in one opcode each: retail fills a branch slot with a set of
@@ -1223,6 +1225,62 @@ rule, none of the 5,846 units under `src/` compiles differently and `func_0030E8
 both USA releases. The search stops at volatile asm alone: a plain store in that place keeps
 the dropped restore, which the test's `stored` control checks.
 
+### reorg: a volatile store stays marked
+
+[sticky_volatile_sets.py](../tools/compiler/transformers/sticky_volatile_sets.py) is the
+default: it is the real compiler's rule, so no file needs a switch for it, and
+`-fno-rac2-sticky-volatile-sets` restores the EE tree's rule for a unit (none uses it). The lead
+maintainer chose this shape on 8 November 2026. It supersedes the note of 11876eec6 (7 November)
+that the set-side rule should not land: that note rested on matched func_00132498, whose C then
+stored its callback argument through a volatile no second context writes, and that store now has
+a volatile-free form that matches with either rule.
+
+func_L00_002A3B88 (3,432 bytes, 27 places in USA v1.01) and func_00131DE8 (576 bytes, the boot
+of each of USA v1.01, PAL and v2.00) differ from the EE tree's rule in one `jal` slot each:
+retail leaves it empty, the EE tree fills it from before two stores (`daddu $s3,$zero,$zero`,
+the loop accumulator's clear, and `daddu $a2,$sp,...`). fill_simple_delay_slots searches back
+from the call and gathers what each insn it passes sets (mark_set_resources) and needs;
+resource_conflicts_p rejects every later candidate once `set.volatil` is on. Nearest the call is
+a volatile store (the EE timer 0 count clear; the IOP-written 0x001A7110 field), which turns the
+flag on, then a plain store (`sd` of D_001A7200; the request payload), which the EE tree's MEM
+case turns off again with `res->volatil = MEM_VOLATILE_P (x)`, so the register-only insn before
+them is taken. GCC 2.95's `|=` keeps it on and the search ends with the slot empty.
+
+The change is Mark Mitchell's of 6 May 1999 (gcc-2.95 gcc/ChangeLog 1363-1367: "resource.c
+(mark_referenced_resources): Make volatil monotonically increasing. (mark_set_resources):
+Likewise."). The ChangeLog names only `volatil`, but 2.95's MEM case of mark_set_resources has
+both lines as `|=`, `res->unch_memory |= RTX_UNCHANGING_P (x); res->volatil |= MEM_VOLATILE_P
+(x);` (gcc-core-2.95 resource.c 713-714; resource.c is byte-identical in 2.95, 2.95.1, 2.95.2
+and 2.95.3, SHA-256 4bc46d9aa1658a02f5d5178c0bdd888a10ba2fcd9cd7ec297ab5fcf2fad0c521), and the
+transformer applies both; no test or sweep here exercises `unch_memory`. 2.95 also changes the
+ASM_OPERANDS case of mark_set_resources to `|=` (2.95 line 753). That hunk is not applied: the
+case comes, with UNSPEC_VOLATILE, ASM_INPUT and TRAP_IF, from Mark Mitchell's change of 4 May 1999
+(gcc/ChangeLog 1406-1410), which the EE tree lacks, so there is nothing for it to change. The
+EE archive's compiler is dated 11 November 1999, but its resource.c has neither change, so the
+rule is inferred from retail's slots, not a recovered patch.
+
+Measured on 8 November 2026, with func_00132498 in its volatile-free form: stock cc1
+(upstream's recipe) and this cc1 give identical assembly for all 8,761 game-compiler units of
+`src/` in the three releases (12,125 functions; 144 SDK units use another compiler), and so
+does `-fno-rac2-sticky-volatile-sets`. Of the 1,029 drafts in `nonmatching/` that compile
+(-G0 or -G8), three change, all closer to retail: func_00131DE8's (572 to 576 of 576 bytes,
+15 to 0 differing words; 1 of 1 in us, pal and us2), the retained func_L00_002A3B88 draft
+(3,428 to 3,432 bytes, 556 to 4 words) and its port-only functional copy (3,420 to 3,424
+bytes, 808 to 722 words). The four words left in the retained draft are a `$v0`/`$v1` swap at
+0x002A3D7C: func_002C9C20 was declared `int`, and the call's unused `$v0` shifts local-alloc's
+fake lifetimes. Its true type is `void`: it has no return statement, and none of its callers
+reads `$v0` after the call, in C or in assembly, in any release (one call per program; in each
+the call's slot is a nop and the next instructions write `$v0` or call another function).
+
+The signature: retail's `jal` slot is a nop while the insns just before the call are a plain
+store and then a volatile store. A store retail lets into a slot past a volatile store is a
+store the rule cannot see as plain: func_00132498's argument, stored as the second element of an
+incomplete sda array (`D_001A74D0_1[1]`), is the length-2 `m` alternative and never a slot
+candidate (below). [tests/test_sticky_volatile_sets.py](../tests/test_sticky_volatile_sets.py)
+checks the transformer's anchors and authored controls: the empty slot by default, the filled
+slot with the opt-out, that `-frac2-sticky-volatile-refs` alone does not empty it, and three
+controls that no rule changes.
+
 ### SDK objects: the assembler fills the slots the compiler leaves
 
 [swap_branch_slots.py](../tools/compiler/transformers/swap_branch_slots.py) adds the opt-in
@@ -1270,8 +1328,9 @@ label still gets a `nop`.
 
 No compiler change: reorg.c, resource.c and jump.c in this tree are the 2.9-ee-991111b
 archive's apart from the documented RAC2 switches (the archive's reorg.c is stock GCC 2.95.2's
-plus Cygnus's `condjump_expect_p` prediction; its resource.c predates 2.95.2's volatile and
-`TRAP_IF` handling, and that is what retail used). When this cc1 and retail disagree about a
+plus Cygnus's `condjump_expect_p` prediction; its resource.c predates 2.95's volatile and
+`TRAP_IF` handling. Retail's compiler had at least the set-side volatile rule, now the default,
+and stopped at a division guard, see the sections above). When this cc1 and retail disagree about a
 slot that holds, or could hold, a global load, the cause so far has been the declaration, and
 the slot tells which one it was:
 
@@ -1919,6 +1978,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Static-chain alias seed | [test_no_static_chain_base.py](../tests/test_no_static_chain_base.py), [no_static_chain_base.c](../tests/fixtures/no_static_chain_base.c) |
 | Integer words stored into floats | [test_keep_float_pun_source.py](../tests/test_keep_float_pun_source.py), [keep_float_pun_source.c](../tests/fixtures/keep_float_pun_source.c) |
 | Extra biv increments | [test_no_extra_increment_givs.py](../tests/test_no_extra_increment_givs.py), [no_extra_increment_givs.c](../tests/fixtures/no_extra_increment_givs.c) |
+| Sticky volatile sets (default) | [test_sticky_volatile_sets.py](../tests/test_sticky_volatile_sets.py), [sticky_volatile_sets.c](../tests/fixtures/sticky_volatile_sets.c) |
 | Masks/sign seed | [test_dli_masks.py](../tests/test_dli_masks.py) |
 | Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
