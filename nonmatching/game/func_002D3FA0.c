@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0028EA58 is declared int but src/game/0028EA58-g8.c is void: corrected, unchanged (2464/2468 bytes, 480 masked unaligned rows before and after). */
 /* 8 November 2026, Sonnet round (o2): the two post-loop label_y calls take their own `active`
  * locals on2/on3 (= 1, set at the top, handle 0). Their dead mode tests go at flow2, so on2/on3
  * become ghosts s6+s7 and the loop pseudos now take s1-s5 as retail. Still 2464/2468 bytes; 23

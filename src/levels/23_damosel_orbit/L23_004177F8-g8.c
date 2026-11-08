@@ -1,86 +1,8 @@
-/* 8 November 2026, Sonnet round (o6): still 2 rows. Donor L16_00404A60 spelling (flags88 = flags88 | 5, its run order with the flag store first): 2-7 rows. Exhaustive search of all 5040 orders of f58/f54/f50/f5C/f60/flags88/f80 after f32C, f84 (direct cc1): best 2. f5C, flags88, f60, f58, f80 gives retail registers (0.4 $f7, 1.5708 $f3), but sched2 then moves f5C after f80 (4 rows); f58 early + f5C between f60 and f80: 3 rows. f80 = f60 - 1 degree (local or store read-back) is folded by cse to the same insn (5 rows). pitch/yaw local orders: best 2. Retail branch targets already match. 25-minute permuter run (-j2) on the 2-row C: best output (25 vs 60) has the 5 register rows. */
-/* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build gives retail's +0x5B4/+0x5B8 order: SN builds keep our exact order (2336 bytes); stock 991111/2.96 keep it modulo registers (2408-2420). Not a compiler-build difference. */
-/* 8 November 2026 (m3, round 3 permuter): 35-minute decomp-permuter run (-j3) on the Quad v[10] C. Best candidate only moves f5C after flags88 (f60, flags88, f5C, f80): still 2 rows (sw 0x88 / swc1 0x60 swapped), one of the 24 orders already measured. Nothing new. */
-/* 8 November 2026, region donor (v101/m8h): func_L16_00404A60 (L16_00403900-g8.c:206) writes the same f58/f5C/f60=1.5708/f80=1.5533 run with the 0x88 |= before it and gets li 1.5708 before li 1.5533. Tried flags88 |= 5 before f84 (with and without f58 after f50): 7 words (sw 0x88 goes first). Retained C stays at 2. */
-/* 8 November 2026, round 3: a 25-minute decomp-permuter run (-j4) on the 2-row pitch C found nothing better (best outputs 148-155 differing rows). */
-/* 8 November 2026, round 2: Quad v[10] is allowed by owner ruling of 8 November 2026 (retail's
- * frame reserves the unused slots), so 2 rows remain. Further tries (about 15 compiles):
- * function-scope yaw/pitch locals in 6 placements (pitch set before the f60 store: 2 rows;
- * yaw set before pitch: 5); reusing `health` for 1.5708 (`health = 1.57079649f; state->f60 =
- * health;` after flags88) gives retail's exact instruction and store order, but the pseudo
- * then has two deaths, so global-alloc places it in $f9 after local-alloc has used $f3: 26
- * register-only rows. One-pass groups around the health statements: 55-97 rows.
- */
-/* 8 November 2026: still no linked match. us: 2292/2292 bytes with Quad v[10], 0/1 places,
- * 2 rows; with the honest Quad v[2] below the frame is 0x80 against retail 0x100 (SP+0x20..0x9F
- * is never touched in retail; L09_002F8BA0-g8.c on master keeps unused frame vectors, but
- * that needs an owner ruling here). The #define origin/point aliases were removed (v[0], v[1]).
- * Store-order analysis from cc1 -dS/-dl dumps: sched1 keeps the f5C/f60/flags88/f80 stores in
- * source order, sched2 keeps them in sched1 order (LUID ties). Retail order (flags88 before
- * f60) lengthens the 1.5708 qty by one insn, so local-alloc ranks 0.4 (3 refs) above it:
- * 0.4 -> $f3, 1.5708 -> $f7 (5 rows). A local for 1.55334318 set before the f60 store
- * (block-scope or function-scope `pitch`) gives the retail registers and store order, but
- * its set then precedes the 1.5708 set, so sched2 emits li 1.55 before li 1.5708 (2 rows,
- * +0x540/+0x54C). Retail needs sched1: set 1.5708, set 1.55, ..., sw 0x88, f60, <one insn>,
- * f80. Tried without gain: flags88 at 8 other positions; hill-climbs over f32C..f80 (with and
- * without pitch) and over f17C..i188; a 0.4 local set at 4 places; f58/f60/f80 moved 11 ways;
- * do/while(0) groups around f60 (69-94 rows).
- */
-/* 4 November 2026: faithful retained C; no linked match.
- * Retain only the two actually used local vectors instead of the ten-vector diagnostic allocation.
- * us: 2292/2292 bytes, 0/1 places; us2: absent; pal: absent.
- * Profile: -O2 -G8 -ffunction-sections.
- * Reopen: Qualify genuine local-storage ownership and the flag/float store ordering without expanding the local array to manufacture a frame.
- * Earlier measurements below are historical, including any diagnostic-only
- * constructs they describe; those constructs are no longer active C.
- */
-/* Retained complete C reconstruction; not linked or counted.
- * Tier: Claude Opus 5.5 xhigh (v1979), 1 November 2026. Replaces the GPT-6.1 Sol draft
- * (frame 0x80, -G16), which this one is closer than.
- * Profile: -O2 -G8 -ffunction-sections (name the unit *-g8.c; no cflags line needed).
- * Best check.py: 2292/2292 bytes, 0/1 USA v1.01 places, "instruction at +0x5b4 differs";
- * 573 instructions against 573, of which 2 differ.
- *
- * What differs: +0x5B4 and +0x5B8 are swapped. Retail is sw $v0,0x88($s1) then
- * swc1 $f3,0x60($s1); this draft is the reverse.
- * Why: source order f5C, flags88, f60, f80 gives the retail store order, but then
- * local-alloc gives 0.4 $f3 and 1.5708 $f7, where retail has the opposite (5 instructions
- * differ, at 17D20, 17D40, 17DA8, 17DB0, 17DBC). This draft uses f5C, f60, flags88, f80.
- * local-alloc model, tested by that swap: qty priority is
- * floor_log2(refs) * refs / (death - birth), first fit. Retail needs r(1.5708) above
- * r(0.4) above r(1.55), so 1.5708 takes $f3 (health in $f3 is dead by then), and 0.4,
- * which is live with $f3..$f6, takes $f7. With refs 2, 3, 2 that needs a shorter life for
- * 1.5708 than for 1.55, so sched1 needs one more insn between stores 0x60 and 0x80 that
- * emits no code; otherwise sw 0x88 needs one more INSN_DEPEND in sched2 under the current
- * source order. Neither was found.
- *
- * NOT ACCEPTABLE AS IT STANDS, even with exact bytes: "Quad v[10]" produces retail's frame
- * 0x100 and keeps origin and point at SP+0 and SP+0x10, but v[2..9] are never used. No
- * retail access or callee was seen touching SP+0x20..0x9F, so this is padding that the
- * guide forbids unless a real use is found for that storage.
- *
- * Forms that were needed, and need review:
- * - D_L23_001B3820 as int[2], stored [1] then [0]: gives the retail first block (store,
- *   addiu $a1,1, store, sw $a1). Two plain ints put the addiu first. The higher priority
- *   of the array stores is inferred from the result, not read from a priority dump.
- * - if (D_L23_001B279C < D_L23_001B27A0) { for (; &D_L23_001B279C[i] < D_L23_001B27A0; i++)
- *   ... }: a real runtime test that repeats the for's first test. cse_set_around_loop
- *   merges the loop-top load only for a REG_LOOP_TEST_P table register, which only
- *   duplicate_loop_exit_test sets; the guard supplies the load.
- * - i = 0 before the stores, a fresh counter for the tail parts loop (a shared counter
- *   leaves a final value that CSE reuses for game->f1E0 = 10).
- * - f58 before f5C, f5D0 before f5C8, QI/HI 255 with colour first: sched1 ties go by
- *   priority, then REG_DEAD/set weight, then LUID.
- * Tried and rejected: -fstrict-aliasing (2284 bytes, hoists first-block loads);
- * extern const bounds (hoists the tail's D_27A0 load); func_002B60B0 returning int (moves
- * sw 0x88 into the call's delay slot); dead default stores to raise 1.5708's refs (not
- * compiled: by the priority figures it would land in $f0).
- * 4 November 2026: with func_002B60B0 declared void (its real contract) this draft is
- * 2 rows; as void * it was 4. All 24 orders of the f5C/f60/flags88/f80 stores: best 2
- * (four orders), none exact.
- * Release checks for us2/pal were not run. Required declarations follow.
- */
-
+/* func_L23_004177F8: boss set-up and per-frame refresh for Damosel orbit.
+ * Quad v[10] reproduces retail's 0x100 frame; v[2..9] are never touched (allowed by owner
+ * ruling of 8 November 2026, precedent L09_002F8BA0-g8.c).
+ * The state->health store after i188 sets local-alloc so that 0.4 takes $f7 and 1.5708 $f3,
+ * with sw 0x88 before swc1 0x60 as in retail. */
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
@@ -282,7 +204,7 @@ extern void func_L23_0041B9F0(L23Moby *);
 
 /* Initialize the encounter objects and refresh their shared presentation state. */
 void func_L23_004177F8(L23Moby *object) {
-    Quad v[2];
+    Quad v[10];
     L23Boss *state = object->vars;
     L23Moby *entity;
     L23Moby *scan;
@@ -331,7 +253,7 @@ void func_L23_004177F8(L23Moby *object) {
         state->i59C = 0;
         D_L23_001B36A8 = state->t230;
         state->b1B7 = 1;
-        func_001163A0(*(volatile unsigned int *)0x10000800);
+        func_001163A0(T1_COUNT);
         D_L23_001B374C = -1;
         D_L23_001B3754 = 0;
         state->i408 = 0;
@@ -401,12 +323,12 @@ void func_L23_004177F8(L23Moby *object) {
         object->flags |= 0x100;
         health = (float)state->h2F6;
         state->f17C = 0.15f;
-        state->health = health;
         state->maxHealth = state->h2F6;
         state->f170 = 0.5f;
         state->f174 = 0.5f;
         state->b150 = 20;
         state->i188 = -1;
+        state->health = health;
         D_L23_001B36FC = health * state->f328;
         {
             float share = health * state->f320 * 0.2f;
@@ -419,8 +341,8 @@ void func_L23_004177F8(L23Moby *object) {
         state->f54 = -7.0f;
         state->f50 = 7.0f;
         state->f5C = 0.4f;
-        state->f60 = 1.57079649f;
         state->flags88 |= 5;
+        state->f60 = 1.57079649f;
         state->f80 = 1.55334318f;
         func_002B60B0(object, 0.019444445f, 0.6333334f, 0.0017453295f, 0.20943955f);
         func_002A7750(object, 2, 0);

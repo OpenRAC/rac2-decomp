@@ -1,3 +1,4 @@
+/* 8 November 2026, Sonnet round (o9, ~6 check.py runs, one 1500 s permuter run: no gain over 130). Still 2 rows (count 1). Colour read before label_y's value, before text = textBuffer, or before the first sprintf: all 3028 bytes (frame 0x100). */
 /* 8 November 2026, o7b follow-up (~22 check.py runs): count 1's 2 rows unchanged by every honest order of the colour
  * load and the strlen argument: colour inside the draw call's argument list (also with `len =`), strlen through a
  * pointer local (`char *t = text`), colour read again after the call (3012), `len = strlen(text); colour = ...` (5 rows:

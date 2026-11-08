@@ -1,5 +1,5 @@
-/* 8 November 2026, Sonnet round 3: retail never stores $a0/$s4 to the stack and passes no stack address
-/* 8 November 2026, Sonnet round 2: retail sets $s4 once (daddu $s4,$a0) and never reloads or recomputes
+/* 8 November 2026, Sonnet round 3: retail never stores $a0/$s4 to the stack and passes no stack address */
+/* 8 November 2026, Sonnet round 2: retail sets $s4 once (daddu $s4,$a0) and never reloads or recomputes */
 /* 8 November 2026, Sonnet round: the C below is now really the clean retained source (int sprintf,
  * void *memset, no `color = 0`, no `(void)&o`); 208 words differ (relocations ignored), 0 of 28.
  * Both blockers are one cause, measured with -dG/-dR dumps:

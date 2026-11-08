@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_00300968 is declared (void *, f32, f32, s32, f32, f32) but src/game/00300618.c:305 is (char *, int flags, f32 x4): real-order calls (object, colour, x, y, ...) give 22 -> 26 masked rows (worse). Same result as func_L05_0041DF58. */
 /* 8 November 2026 (round 12, unit placement): no match, still the same 8 rows (the four 101 a0/t0
  * pairs). Retail places each trio member right after a matched HUD sibling and the 488-byte menu
  * func_L05_0041ED18 (L15: E1B0, EDF8, EFE0; L05: DF58, ED18, EF00). Measured in L15 by appending

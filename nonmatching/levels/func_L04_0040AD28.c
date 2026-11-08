@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_L04_0040A1D0 is declared int but src/levels/shared/L04_00402D90.c returns unsigned int: corrected, 3376/3388 bytes and 796 masked rows unchanged. */
 /* 8 November 2026, Sonnet round (o1, ~75 cc1 compiles + one 1500 s permuter run), USA v1.01: one
  * change, the colour from func_00283D38 now lives in the existing `count` local (no separate colour
  * variable): input/colour regs ($s1/$s2) and count's $s2 now match retail; aligned harness 774 -> 792

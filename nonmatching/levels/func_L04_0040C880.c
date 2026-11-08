@@ -1,6 +1,7 @@
+/* 8 November 2026 (Sonnet round, s14): no gain, 4 rows. Tried: b=a;b+=30;c=b, b=j+30;c=b, c=b=a+30, d=b+15, d before c=b, b/c declaration order, draw 58 colour in a local or x as fx: no change or worse (12-14 words). Permuter 1500 s -j2 (base 75): only gain 65 came from (frame-b) in the third arm, which changes the i==4 semantics, so rejected. cse makes the later-dying c canonical; no honest source makes b outlive c. */
 /* 8 November 2026 (Sonnet round, s6): 6 -> 4 rows with a per-draw local s1 for draw 58's sprite (C below updated; the permuter's gain was a fake float temp, same effect). Left: b/c swap at +0x198 and draw 58 ori/mov.s f12 swap. Permuter 2x25 min -j2 (base 135, then 75): no further gain. */
 /* 8 November 2026 (Sonnet round, s6): re-measured, still about 6 rows (b/c swap at +0x198, draw 58 daddu/mov.s and ori/mov.s swaps). Tried: c=a+30;b=c, b=j+30;c=b;d=j+45, draw 58 using fx instead of (float)j (worse). No gain. */
-/* 8 November 2026 (permuter, 35 min -j3, seeded from the C below): best score 75 (base 135), never 0. The one gain
+/* 8 November 2026 (permuter, 35 min -j3, seeded from the C below): best score 75 (base 135), never 0. The one gain */
 /* sol-high, USA v1.01. 8 November 2026: 1360/1360 bytes, 0/2 places, first mismatch +0x198
  * (was +0x8). Flags: -O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges in a -g8.c unit.
  * Fixed: hud_coord dead-test helper (owner ruling) gives retail's ghost callee-saved reg and the

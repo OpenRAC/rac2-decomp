@@ -1,3 +1,22 @@
+/* Sonnet round, 8 November 2026 (o11, after round eight); retained, not linked. Same
+ * profile. check.py US: 16060/16068 bytes, 0/2 places; 3970/4017 aligned,
+ * 3293 identical (round eight 3971 / 3287).
+ * Changes: nine L22 callees are declared void like their src definitions
+ * (func_L22_003A4938 void alone: +3; the rest +4); the switch-2 case-5 limit
+ * D_L22_001AF3EC is read before the 0x380 test (longer life, so it gets f1
+ * and the 0x3E0 field f0 like retail), the 0x3E0 field is read in the compare,
+ * and goto block_194 is the && form (same code).
+ * Lesson 46 checked: block_183 written per path cannot cross-jump here
+ * (jump.c find_cross_jump refuses volatile asm, so qzero_nc stays 6 copies;
+ * a C quadword zero gives por + sq); the 0x96 tail duplicated per arm, or the
+ * spC8 body copied into the 0x96 arm, does not merge (cse reuses the path
+ * record), 16132-16208. block_194 written twice: 16068 bytes but the call
+ * setup is wrong (3286). Tried, no gain: var_a2 as a two-step / block temp /
+ * if-set, a player local before the 0x430/0x3AC stores, the 0x41C compare
+ * spellings, hit inline in the two func_002A8D70 calls, path rows through
+ * PathD708 points, a named &scratch[0] pointer, temp_s2 = arg0 + 0x10.
+ * Permuter (25 min) found only a fake offset temporary.
+ */
 /* Round eight, 8 November 2026 (Sonnet round); retained, not linked. Same
  * profile. 16060/16068 bytes, 3971/4017 aligned, 3287 identical (round seven
  * 3970 / 3283). Change: temp_v0_10 = temp_v0_9; temp_v0_10 -= 4; gives retail's
@@ -334,18 +353,18 @@ extern int func_L22_003A61A8(void *);
 extern void func_L22_003B9128(void *, void *, int);
 extern void func_L22_003B9358(int);
 extern void * func_L22_003F85A0(void *, void *);
-extern s32 func_L22_003A15D0(s8 *);
-extern s32 func_L22_003A2160(s8 *);
+extern void func_L22_003A15D0(s8 *);
+extern void func_L22_003A2160(s8 *);
 extern s32 func_L22_003A2780(s8 *, s8 *, s128 *);
-extern s32 func_L22_003A2E50(s8 *, s32, s32, f32);
-extern s32 func_L22_003A3D50(s8 *);
+extern void func_L22_003A2E50(s8 *, s32, s32, f32);
+extern void func_L22_003A3D50(s8 *);
 extern s32 func_L22_003A4128(s8 *, s128 *);
-extern s32 func_L22_003A4490(s8 *);
-extern s32 func_L22_003A4938(s8 *);
-extern s32 func_L22_003A4CA8(s8 *);
-extern s32 func_L22_003A5BD8(s8 *, s32, s32);
-extern s32 func_L22_003A5F90(s8 *);
-extern s32 func_L22_003A6640(s32, s32, s32, f32);
+extern void func_L22_003A4490(s8 *);
+extern void func_L22_003A4938(s8 *);
+extern void func_L22_003A4CA8(s8 *);
+extern void func_L22_003A5BD8(s8 *, s32, s32);
+extern void func_L22_003A5F90(s8 *);
+extern void func_L22_003A6640(s32, s32, s32, f32);
 extern s32 D_00138324 __attribute__((nosda));
 extern s8 D_001395E6 __attribute__((nosda));
 extern unsigned char D_00189E20[];
@@ -454,7 +473,6 @@ void func_L22_0039D708(s8 *arg0) {
     u8 *base9;
     u8 *base10;
     f32 limit3EC;
-    f32 dist3E0;
     f32 frame;
     void *hit;
     s32 mode3A6;
@@ -1025,20 +1043,14 @@ block_184:
                 switch (temp_v0_4) {                /* switch 2 */
                 case 5:                             /* switch 2 */
                     if ((M2C_FIELD(temp_s6, s32 *, 0x464) == 0) || (M2C_FIELD(temp_s6, s16 *, 0x41E) != 2)) {
+                        limit3EC = D_L22_001AF3EC;
                         if (M2C_FIELD(temp_s6, s16 *, 0x380) != 0) {
                             func_00282978((s32) (temp_s6 + 0x380));
                         } else {
-                            limit3EC = D_L22_001AF3EC;
-                            dist3E0 = M2C_FIELD(temp_s6, f32 *, 0x3E0);
                             M2C_FIELD(temp_s6, s128 **, 0x3AC) = (s128 *) (D_00189E20 + 0x80);
-                            if (dist3E0 < limit3EC) {
-                                if (M2C_FIELD(temp_s6, s16 *, 0x41E) == 0) {
-                                    func_002A7750(arg0, 6, 0);
-                                } else {
-                                    goto block_194;
-                                }
+                            if ((M2C_FIELD(temp_s6, f32 *, 0x3E0) < limit3EC) && (M2C_FIELD(temp_s6, s16 *, 0x41E) == 0)) {
+                                func_002A7750(arg0, 6, 0);
                             } else {
-block_194:
                                 func_002A7750(arg0, 7, 0);
                             }
                         }

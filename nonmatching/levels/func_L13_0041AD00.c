@@ -20,7 +20,7 @@
  * with these reg numbers. 9-variable declaration orders (700 cc1 runs), -g,
  * -fno-gcse (1420 bytes), sticky-volatile, a Pkt pointer, a cnt idx pointer, i % 4
  * and joined/moved cnt tests all tie or lose. */
-/* 7 November 2026, round 13: no gain (79 words). In retail the row copy is allocated before
+/* 7 November 2026, round 13: no gain (79 words). In retail the row copy is allocated before */
 /* 7 November 2026, round 13: no gain (79 words). In retail the row copy is allocated before
  * the original in both loops (k loop: copy $s5, original $s6; i loop: copy $s0, original
  * $s5) and the uv pointer before the D pointer. The original always has more weighted refs

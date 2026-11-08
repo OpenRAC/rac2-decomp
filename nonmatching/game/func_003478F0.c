@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0026F7A0 is declared int(void *) but src/game/0026EA00.c is unsigned int(void). Unsigned return: 39 -> 39 rows. Calling it with no argument (as src declares) gives 106 rows: retail loads the argument, so the src definition is incomplete rather than this note being wrong. */
 /* 8 November 2026 (Sonnet round): rewrite from the note C with -fno-rerun-loop-opt (own cflags line, removed) re-measured 1452/1452, 35 real differing rows, all spill-slot order plus first-coordinate FPR numbers; 1 permuter run (1500 s, -j2) best score 390 vs 435 but 1448 bytes (worse), nothing adopted. */
 /* 8 November 2026 re-measure on master's compiler; retained near miss, not linked.
  * USA v1.01: unchanged, 1452/1452 bytes, 0/28 places, first difference +0x4c, same rows.

@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0028EA58 is declared int but src is void; func_L04_00417028 is declared (u8 *) but src is (void). Both corrected: 6020/5968 bytes and the masked row count unchanged. */
 /* 8 November 2026, Sonnet round (o8c, ~45 compiles): 230/457 -> 202/409 (masked/full, aligned diff), 6020/5968
  * bytes. Changes: ruler `i = 0` moved before the func_00282D30 call (retail sets i in that call's delay slot,
  * so i gets $s2 and hp now spills like retail's 0x124 slot); two wrong constants fixed (rank icon HC(17.0f),

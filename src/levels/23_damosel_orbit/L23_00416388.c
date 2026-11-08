@@ -10,7 +10,7 @@ typedef unsigned long long u64;
 
 /* func_L23_00416388 is matched in L23_00416388-boss-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L23_004177F8);
+/* func_L23_004177F8 is matched in L23_004177F8-g8.c. */
 
 extern void func_00282948(char *);
 

@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round s15): re-measured 2 words. New: per-draw pointer local (`b2 = D_001A8CFC; f(b2 + 0x8710, ..)`, in one or both draws, declared at top or in a block), `off = 0x8710` local, `half = 0.5f` local (4 words, fp consts move): no change / worse. 1500 s permuter run (-j2, seeded from the 2-word C): no improvement. */
 /* 8 November 2026 (Sonnet round): re-measured 2 words (draw 2 0x8710 reload v0, retail a2); a separate `unsigned char active2 = one` for draw 2 gives 3 more words (s0/s1 swap), a separate `id2` for draw 2 gives 8 more. Not rerun in the permuter (round 4 covered it). */
 /* 8 November 2026 (0x8710 push): the v0/a2 choice is reload1's round robin (last_spill_reg). In the C below no GR reload
  * follows draw 1's fix (whose last reload is f1), so draw 2's 0x8710 reload wraps to v0. Passing `one` in draw 1 (spilled, so

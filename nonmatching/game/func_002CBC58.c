@@ -1,4 +1,6 @@
-/* 8 November 2026 (Sonnet round, arm push): retail's arm is beql page==X
+/* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0026FEB8 is declared (void *) but src/game/0026EA00.c is (const char *format, ...): corrected, still 1 row. */
+/* 8 November 2026, Sonnet round (o9, ~25 check.py runs, one 1500 s permuter run from the 1-row C: no gain over 200). Still 1 row. Empty arm alone: arm bytes match retail but the selection turns movz (2092). Tried, no gain: lesson 46 full tail copy in the D_0025A058 arm with return (3716, no cross-jump), panels = 0 in the D_0025A498 arm with the D_0025A058 arm empty (2092), "if (!D_001AB910) panels = 0;" or "if (D_001AB910); else" nested under the page test, goto to a label at the tail call from the arm or the D_0025A498 arm, "if (!D_001AB91C) goto tail;" form (all 1 row). */
+/* 8 November 2026 (Sonnet round, arm push): retail's arm is beql page==X */
 /* 8 November 2026 (Sonnet round): bounds loop solved; 2100/2100 bytes and
  * one row left (the C below). A loop-body local "StateCBC58 *st =
  * &D_001F2840;" with the page read after the D_001AA450[j] test
