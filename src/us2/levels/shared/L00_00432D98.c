@@ -1,4 +1,6 @@
 #include "include_asm.h"
+extern unsigned char D_001A7B9E __attribute__((sda));
+extern unsigned char D_001A7BBA __attribute__((sda));
 
 extern void func_0033AB50(char *p);
 
@@ -82,7 +84,7 @@ extern int func_002E5E58 (int a, int b, int c);
 /* resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte */
 int func_US2_L00_00434600 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7B9E;
+  unsigned char *g = &D_001A7B9E;
   float *vec;
   int discarded;
 
@@ -165,7 +167,7 @@ extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
 int func_US2_L00_00434C98 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7BBA;
+  unsigned char *g = &D_001A7BBA;
   float *vec;
   int discarded;
 
@@ -197,7 +199,7 @@ char *func_US2_L00_00434DE8(char *object)
 
 int func_US2_L00_00434F48 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7BBA;
+  unsigned char *g = &D_001A7BBA;
   float *vec;
   int discarded;
 
@@ -229,7 +231,7 @@ char *func_US2_L00_00434FE0(char *object)
 
 int func_US2_L00_00435140 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7BBA;
+  unsigned char *g = &D_001A7BBA;
   float *vec;
   int discarded;
 

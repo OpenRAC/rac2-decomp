@@ -1,4 +1,5 @@
 #include "include_asm.h"
+extern unsigned char D_001A7B96 __attribute__((sda));
 typedef struct { int ids[2]; } SolTextPair;
 
 extern SolTextPair D_L00_001AE1A8;
@@ -141,7 +142,7 @@ char *func_0033D440(char *object)
 
 int func_0033D5A0 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7B96;
+  unsigned char *g = &D_001A7B96;
   float *vec;
   int discarded;
 
