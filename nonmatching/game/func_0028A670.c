@@ -1,3 +1,16 @@
+/* 8 November 2026 (source round, v101 wasJ): 11 -> 10 words, same 1192 bytes. Draw 1 now uses
+ * hud_coord2 (int value, mode read first: L08_0041D808-g8.c scaled_coord precedent); this fixes
+ * draw 1's `addiu a1,0xB2` order. Left: draw 1 fix output is v0 (mfc1 v0) and `daddu a0,v0` early;
+ * draw 2 `daddu a0,v0` early. Mechanism (greg dump): mode is now a global pseudo and its load is
+ * hoisted by sched1 above the id copy (r100=$2, lowest rank: priority 1), so mode conflicts with v0
+ * and takes v1; result (priority 3, allocated first) takes v0. Retail needs result v1 and v0 busy at
+ * the fix (scratch a1). result only avoids v0 when a block-local pseudo holds v0 in its life (the
+ * block-28 mode load of hud_coord), and then nothing holds v0 at the fix. Tried without gain:
+ * plain rounding (+do/while(0) forms: 23-55), mode read after scaled/result, hud_coord2 in draw 2
+ * (20), mode-first / mode-only / float tests (not deleted, 1200-1228 bytes), extra mode refs (not
+ * deleted), handle test of id before/after (10, copy still after the mode load), do/while(0) around
+ * the id call or the mode load (1196 bytes), nested text call, r = hud_coord2 temp (16).
+ */
 /* 8 November 2026 (source round, v101 wasI): rewrite from 151 to ~11 differing words, same 1192 bytes,
  * prologue, cases, saved registers and reload registers now as retail. What did it:
  * - `for (i = 0; i < 2; i++)` with scalar first/second (loop reversal gives retail's count at 0x30).
@@ -46,6 +59,17 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     int result = (int)scaled;
 
     if (result != 0 && D_001B23A0 == active)
+        scaled = 1.0f;
+    return result;
+}
+
+static __inline__ int hud_coord2(int value, float scale, float half, int active)
+{
+    int mode = D_001B23A0;
+    float scaled = (float)value * scale + half;
+    int result = (int)scaled;
+
+    if (result != 0 && mode == active)
         scaled = 1.0f;
     return result;
 }
@@ -140,7 +164,7 @@ void func_0028A670(void)
                 width = widths.value[len - 1];
                 id = func_00336D50(D_001A8CFC + 0x8710, 178);
                 func_00300A00((char *)id, first,
-                    (float)firstX, (float)hud_coord((float)firstY, D_001B23A4, 0.5f, one), scale, scale, width);
+                    (float)firstX, (float)hud_coord2(firstY, D_001B23A4, 0.5f, one), scale, scale, width);
                 id = func_00336D50(D_001A8CFC + 0x8710, 179);
                 func_00300A00((char *)id, second,
                     (float)secondX, (float)hud_coord((float)secondY, D_001B23A4, 0.5f, one), scale, scale, width);

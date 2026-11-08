@@ -15,6 +15,16 @@
  * to draw 59). Tried: helper for draws 58/59 (pair or single), label_y with sprite handle,
  * literal angle, one before angle/at start/after lookup, c-before-b declarations,
  * -fno-sched-interblock, -frac2-keep-block-order.
+  * 8 November 2026 (later): about 6 rows, first mismatch +0x198. (2) fixed: 0x8710 is a local
+ * `off` set with `i=0` just before the angle code (loop is `for(;i<2;i++)`); its live grows past
+ * the ghost's, so the ghost keeps s5 and off takes s6 in retail's order. (1) greg dump: with d
+ * between, b is 12 refs/36 live and c 12/38, so b takes a0; declaring c before b and setting b
+ * first in the i==4 arm (b,a,c,d) ties them and fixes every register, but that arm then emits b
+ * before a (also 6 rows, +0x17c). Still open: one more insn of b-live (or one less c-live) with
+ * arm order a,b,c,d. Tried today: one=1 after each hud_coord, do{}while(0) around the else-arm
+ * copies (loses the a=j copy), d=c+15, c=a+30, arm-2/arm-3 condition reorders, off before the
+ * colour loop or inside for(), draw 58 nested lookup / top first / fx after lookup / fx in
+ * 58-59, -frac2-keep-block-zero-copy, -fno-sched-interblock. (3) unchanged.
  */
 #include "common.h"
 typedef struct { int v[5]; } B1202Five;
@@ -52,7 +62,7 @@ void func_L04_0040C880(unsigned char *m)
     int frame,i,j,right,a,b,c,d;
     int sprite;
     float angle, sine, sign, fx, fy;
-    int one, top;
+    int one, top, off;
     if (m[0xbc]==3 || m[0xbc]==4 || m[0xbc]==1 || m[0xbc]==2) frame=150-*(int *)(p+0x394);
     else frame=D_L04_001A8FE8+150;
     if (!D_L04_001A904C) return;
@@ -65,6 +75,8 @@ void func_L04_0040C880(unsigned char *m)
         else if(frame>=c && frame<d) colors[i]=func_00283D38(start.v[i],end.v[i],(float)(frame-c)*0.06666667f);
         else if(frame>=d) colors[i]=end.v[i];
     }
+    i=0;
+    off=0x8710;
     angle=0.56217057f;
     sine=func_00283198(angle);
     sine=sine/func_00283180(angle);
@@ -72,16 +84,16 @@ void func_L04_0040C880(unsigned char *m)
     func_0027AB40();
 
     one=1;
-    for(i=0;i<2;i++) {
+    for(;i<2;i++) {
         if(i==0) {j=10;right=31;sign=1.0f;} else {j=498;right=478;sign=-1.0f;}
         fx=(float)j;
-        sprite=func_00336D50((char *)D_L04_001A904C+0x8710,58);
+        sprite=func_00336D50((char *)D_L04_001A904C+off,58);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
         func_00300A00(sprite,0x60442d00,(float)j,(float)top,sign,1.0f,0.0f);
-        sprite=func_00336D50((char *)D_L04_001A904C+0x8710,59);
+        sprite=func_00336D50((char *)D_L04_001A904C+off,59);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
         func_00300A00(sprite,0x55f0c070,(float)j,(float)top,sign,1.0f,0.0f);
-        sprite=func_00336D50((char *)D_L04_001A904C+0x8710,60);
+        sprite=func_00336D50((char *)D_L04_001A904C+off,60);
         func_00300A00(sprite,0x55f0c070,fx,(float)hud_coord(120.0f,D_L04_001B2D44,0.5f,one),sign,1.0f,0.0f);
         fy=(float)right;
         for(j=0;j<5;j++) {

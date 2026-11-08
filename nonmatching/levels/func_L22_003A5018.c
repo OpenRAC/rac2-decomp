@@ -1,3 +1,41 @@
+/* 8 November 2026, round two (6 check.py runs plus free cc1 -S scoring). Body: the same 14 rows, now
+ * with plain MACRO_ADDR declarations in place of the `_base[0]` #define aliases (no-alias rule).
+ * L23 sibling (func_L23_0041DA48, matched, so its compiled code is retail) against L22 retail:
+ * - Gauge 1: L23 issues addiu (counter+1) before sd d[1], as L22 retail does. The sched2 dumps
+ *   (-fsched-verbose-5) show both insns at the same priority. In L23 the addiu has 5 dependents,
+ *   because gauge 2's first fix uses t2 as its scratch register (clobber t2, then t3). Ours has
+ *   4, because both gauge 2 fixes use a2 as scratch. Reload picks a2 because sched1 sets
+ *   $6 = right after the fixes. 138 of 240 gauge 2 statement orders give the t2/t3 scratch
+ *   and fix gauge 1 (pp/073: no 0x5570 rows), but every one of them moves the a2 copy early and
+ *   breaks gauge 2 (251-256 vs 243 lines). No order gives both.
+ *   Gauge 1 statement order (2520 orders) and the L23 function-scope locals: no effect.
+ * - Gauge 2: L22 differs from L23 only in its denominator (int global D_L22_001B2AA8, lwc1 + cvt,
+ *   against L23's short field). Its D_001A7340 load comes after sd d[0], where L23 has it early.
+ *   No statement order or flag (-fno-sched-interblock, -fmove-all-movables, alias, cse and peephole
+ *   flags) reproduces this.
+ * - Count 1: colour and a0 = text tie at t=1 (priority 19, 3 dependents each). The smaller LUID
+ *   wins, so colour goes first. Count 2's handle as count 1's value, strlen's result or a global
+ *   gives worse code; as func_0027FB40's result it adds a `move s0,v0`.
+ */
+/* 8 November 2026 (~55 check.py runs, own -O2 -G8 -ffunction-sections -g unit). Body below: 3008/3008
+ * bytes, 0/2 places, 14 differing rows (was 23 by the same count: check.py --diff rows minus
+ * relocation-only ones), first difference +0x558.
+ * - Fixed: func_L00_0030CF60() is called after the `if (ref_31)` panel, not inside it (retail's
+ *   beqz skips to that jal; the L23 sibling has it outside too): -2 rows.
+ * - Fixed: saved registers (base copy s6 > ctl s7 > obj fp). Count 2's label_y handle is count 1's
+ *   colour (one shared `colour` local), so obj loses 2 refs: obj 5 refs now ranks below ctl
+ *   (regalloc: obj was 14/518 > ctl 12/565). All prologue/obj/ctl rows exact. Count 2's own colour
+ *   as handle also fixes the registers but lifts its colour load above the rounding (+4 rows);
+ *   sprintf's return as handle: 3012 bytes; scaled_coord (L23 form) for the counts: frame -0xE0.
+ * Left: (1) gauge 1: sd d[1] issues before addiu (ref_43 + 1): sched2 t=24 ready list ranks the
+ *   store (718) above the addiu (709). Per-gauge union locals (no slot reuse, -0x100 frame), L23
+ *   statement order, NOT_SDA on D_L22_001AF418/AF428/D_001A7340: no fix or worse.
+ *   (2) gauge 2: D_001A7340 load before the width mtc1/cvt (retail: after sd d[0]).
+ *   (3) count 1: colour load issued with a0 = text in the same cycle and picked first (LUID tie);
+ *   u64 colour (shorter chain), colour before the label, assignment inside the call, a t copy of
+ *   text, one/one2 as active: no change. The L23 sibling's compiled code has the same order as ours,
+ *   so this is L22-specific. const on ref_30 lets cse keep it across calls (frame -0x100).
+ */
 /* 7 November 2026, round two (~30 check.py runs; body below unchanged, 36 rows):
  * (1) Allocation, measured with tools/regalloc.py: base copy = pseudo 579 (4 refs/272), obj = 85, ctl = 86.
  *   Count 1 = ctl, count 2 = obj, box = obj gives obj 7/569 > ctl 6/526. One more loop-weighted ctl ref fixes
@@ -92,17 +130,12 @@
  */
 #include "common.h"
 
-extern u8 * D_L22_001A904C_base[] __asm__("D_L22_001A904C") __attribute__((sda));
-#define D_L22_001A904C D_L22_001A904C_base[0]
-extern int D_L22_001B2980_base[] __asm__("D_L22_001B2980") __attribute__((sda));
-#define D_L22_001B2980 D_L22_001B2980_base[0]
-extern float D_L22_001B2984_base[] __asm__("D_L22_001B2984") __attribute__((sda));
-#define D_L22_001B2984 D_L22_001B2984_base[0]
+extern u8 * D_L22_001A904C MACRO_ADDR;
+extern int D_L22_001B2980 MACRO_ADDR;
+extern float D_L22_001B2984 MACRO_ADDR;
 extern int D_0018B694 NOT_SDA;
-extern int D_L22_001B2AA8_base[] __asm__("D_L22_001B2AA8") __attribute__((sda));
-#define D_L22_001B2AA8 D_L22_001B2AA8_base[0]
-extern int D_001A7340_base[] __asm__("D_001A7340") __attribute__((sda));
-#define D_001A7340 D_001A7340_base[0]
+extern int D_L22_001B2AA8 MACRO_ADDR;
+extern int D_001A7340 MACRO_ADDR;
 typedef struct HudCounters {
     int unknown[2];
     int rightCount;
@@ -114,14 +147,10 @@ typedef struct HudCounters {
 extern HudCounters D_L22_001B1910 NOT_SDA;
 extern char D_L22_001AF4D8[] NOT_SDA;
 extern int D_L22_001B2AC8 MACRO_ADDR;
-extern int D_L22_001B2ACC_base[] __asm__("D_L22_001B2ACC") __attribute__((sda));
-#define D_L22_001B2ACC D_L22_001B2ACC_base[0]
-extern int D_L22_001B2AD0_base[] __asm__("D_L22_001B2AD0") __attribute__((sda));
-#define D_L22_001B2AD0 D_L22_001B2AD0_base[0]
-extern u64 D_L22_001AF418_base[] __asm__("D_L22_001AF418") __attribute__((sda));
-#define D_L22_001AF418 D_L22_001AF418_base[0]
-extern u64 D_L22_001AF428_base[] __asm__("D_L22_001AF428") __attribute__((sda));
-#define D_L22_001AF428 D_L22_001AF428_base[0]
+extern int D_L22_001B2ACC MACRO_ADDR;
+extern int D_L22_001B2AD0 MACRO_ADDR;
+extern u64 D_L22_001AF418 MACRO_ADDR;
+extern u64 D_L22_001AF428 MACRO_ADDR;
 extern u8 *ref_L22_003A5018_00 __attribute__((sda));
 extern float ref_L22_003A5018_01 __attribute__((sda)), ref_L22_003A5018_02 __attribute__((sda));
 extern u64 ref_L22_003A5018_03 __attribute__((sda)), ref_L22_003A5018_04 __attribute__((sda));
@@ -218,6 +247,7 @@ int func_L22_003A5018(void) {
     u8 *ctl = *(u8 **)(obj + 0x68);
     int y;
     int one, one2;
+    int colour;
     char *label, *hint;
 
     {
@@ -292,13 +322,13 @@ int func_L22_003A5018(void) {
     text = textBuffer;
     {
     int value = label_y(obj, (float)ref_L22_003A5018_33, D_L22_001B2984, 0.5f, 1);
-    int colour = ref_L22_003A5018_30;
+    colour = ref_L22_003A5018_30;
     func_0027FB40(ref_L22_003A5018_32, value, colour, text, func_001157AC(text));
     }
     func_00115DA8(text, D_L22_001AF4D8, D_L22_001B1910.rightCount);
     {
-    int value = label_y(obj, (float)ref_L22_003A5018_35, D_L22_001B2984, 0.5f, 1);
-    int colour = ref_L22_003A5018_30;
+    int value = label_y((void *)colour, (float)ref_L22_003A5018_35, D_L22_001B2984, 0.5f, 1);
+    colour = ref_L22_003A5018_30;
     func_0027FB40(ref_L22_003A5018_34, value, colour, text, func_001157AC(text));
     }
     if (D_L22_001B1910.leftIcons) {
@@ -334,7 +364,7 @@ int func_L22_003A5018(void) {
         label = func_00288FB8(0x9FC);
         hint = func_00288FB8(0x2F2C);
         func_0029B888(box, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);
-        func_L00_0030CF60();
     }
+    func_L00_0030CF60();
     return 1;
 }
