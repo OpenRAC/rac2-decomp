@@ -1,3 +1,40 @@
+/* 7 November 2026, round 12 (nominalsan, Opus 5.5): 10 more check.py runs. Retained C below now
+ * has the index-form first guard and timer_offset defined inside it (retail's `sll $v1` + `daddu
+ * $s5,$v1` copy). Unit flags -O2 -G0 -ffunction-sections -fno-sched-interblock -fno-gcse
+ * -frac2-mult-add-no-flatten: 692/708 bytes, 0/27 USA, 564/708 bytes in aligned agreement (was 560;
+ * 47 aligned differences, was 52). Worse: Vector-pointer arithmetic in the inner loops (448);
+ * loop-2 `d = delta` in the body (548) or at function scope (560); gcse with
+ * -frac2-gcse-unsplit-edges (484); -fno-rerun-loop-opt (248); plain `if (D_L00_001B2990[k])` in
+ * the draw loop (536). Tied: -fno-cse-follow-jumps, -fno-cse-skip-blocks, row-form qcopy dest.
+ * The middle block's D_L00_00240080 load is hoisted out of the outer loop and then reused by
+ * loop 2's pointer starts, so it wins $s6; retail keeps sp+0x10 there instead.
+ */
+/* 7 November 2026, round 11 (nominalsan, Opus 5.5): 21 check.py runs; retained C
+ * below unchanged. Measured by aligned diff (relocation immediates, $gp offsets and
+ * call targets masked), same unit flags as round 10: 63 differing instructions.
+ * - Adding -frac2-mult-add-no-flatten: 52 (684/708). Retail's inner-loop pointer
+ *   starts are all the unflattened x*16 + (i*160 + (D - 16)) form this switch
+ *   produces; keep it in any future unit for this function.
+ * - -mno-split-addresses plus `Vector *d = delta;` for the second loop: 39
+ *   (684/708), but retail is split-address code (draw-loop `lui $v0,0x24 ...
+ *   addiu $s4,$v0,0x80`; lui/addiu pairs scheduled apart), so this is not the profile.
+ * - Worse or tied on the split profile: -G8 (676 bytes, hoists more); the `d`
+ *   pointer (700 bytes); index-form first guard; timer_offset moved inside the guard
+ *   (gives retail's `sll $v1` + `daddu $s5,$v1` copy but scores 54); an in-loop
+ *   u32 timer-table base; -fno-rerun-loop-opt; -fno-rerun-cse-after-loop (hoists
+ *   the 160 constant and every base); -fno-cse-follow-jumps; -fno-cse-skip-blocks;
+ *   -fno-regmove; -fforce-addr; -fno-expensive-optimizations.
+ * Loop dump (tools/regalloc.py): loop.c hoists D_L00_001B2990, 160, D_L00_00240080
+ * and D_L00_001B29B0 out of the outer loop, but those pseudos get no hard register
+ * and are rematerialized as retail does. The one remaining saved-register base is
+ * the strand base that the first inner loop hoists into its own preheader (pseudo
+ * 125, REG_EQUIV D_L00_00240080, live 154, in $s7). Its uses are that loop's
+ * pointer starts and the D[i][0] madd. Retail loads that base afresh for every
+ * pointer start, including both of loop 2's (no sharing even inside one block).
+ * Next useful input: a source form in which loop 1's invariant strand base is not
+ * one pseudo shared by its pointer starts and the madd, on the split profile with
+ * -frac2-mult-add-no-flatten.
+ */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 684/708 bytes, 61 differences (outer-loop base hoisting and inner-pointer scheduling). */
 /* 6 November 2026, round 10: retained C is 684/708 bytes, 0/27 USA
  * places, own -O2 -G0 -ffunction-sections -fno-sched-interblock -fno-gcse unit.
@@ -126,9 +163,9 @@ void func_L00_003C48D0(u8 *object)
     float numerator, ratio;
     qcopy(anchor, *(u8 **)(object + 0x68) + 0x30);
     for (i = 0; i < 5; i = next) {
-        int timer_offset = i * 2;
         next = i + 1;
-        if (*(s16 *)((u8 *)D_L00_001B2990 + timer_offset)) {
+        if (D_L00_001B2990[i]) {
+            int timer_offset = i * 2;
             u32 values = (u32)D_L00_001B29A0;
             for (j = 1; j < 10; j++)
                 func_00282CF0(delta[j], D_L00_00240080[i][j], D_L00_00240080[i][j - 1]);

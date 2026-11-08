@@ -120,12 +120,13 @@ void func_L00_003B9CB8(Rac2Native_86f665335d9cb905_AnalysisOwner *owner)
     func_L00_003B9310(owner, owner->context_68);
 }
 
-extern void func_003182C0(void);
+extern void func_003182C0(char *);
 
-/* Calls the measured no-argument callee. */
-void func_L00_003BAAD0(void)
+/* Calls the measured callee with the object it was given. OpenRAC: the decompilation's
+   (void) left a0 unset; the console's a0 still held the moby, the host's held anything. */
+void func_L00_003BAAD0(char *self)
 {
-    func_003182C0();
+    func_003182C0(self);
 }
 
 /* Implemented in L00_003B9CB8-state-g8.c. */
