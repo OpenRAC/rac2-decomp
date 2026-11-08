@@ -7,12 +7,30 @@ source = path.read_text(encoding="utf-8")
 declaration = "static int rac2_mtc1_nop_ok PARAMS ((void));"
 assert source.count(declaration) == 1, "Expected the earlier no-argument helper"
 assert source.count("rac2_mtc1_nop_ok ())") == 2, "Expected both transfer-hazard sites"
+# gas empties both history slots in two ways. mips_no_prev_insn (md_begin, a section change,
+# .align, data) forgets the history: it also clears prev_insn_valid. append_insn empties both
+# slots after every unconditional branch (b, j, jal, jr) but then sets prev_insn_valid. The
+# exemption applies only to a forgotten history (prev_insn_valid clear): a section start, and
+# so, with -ffunction-sections (every game unit), in practice a function start. A function
+# start inside a section, after `j $31`, keeps the nop. Known limits, which cc1 never emits:
+# `b; .align 3; L: mtc1` and `b; .set noreorder; .set reorder; L: mtc1` forget the history and
+# stay exempt (tests/fixtures/mtc1_exemption.s).
+assert source.count("prev_insn_valid =") == 2, "Expected prev_insn_valid set in two places"
+for anchor in ("static int prev_insn_valid;\n",
+               "\t  if (pinfo & INSN_UNCOND_BRANCH_DELAY)\n\t    {\n"
+               "\t      prev_prev_insn.insn_mo = &dummy_opcode;\n"
+               "\t      prev_insn.insn_mo = &dummy_opcode;\n\t    }\n",
+               "      prev_insn_valid = 1;\n    }\n  else if (place == NULL)\n",
+               "  prev_insn_valid = 0;\n  prev_insn_is_delay_slot = 0;\n"):
+    assert source.count(anchor) == 1, ("Expected one history anchor", anchor[:40])
 source = source.replace(declaration, "static int rac2_mtc1_nop_ok PARAMS ((struct mips_cl_insn *ip));\n"
-                        "/* RAC2: the history was empty when prev_insn was appended. */\n"
+                        "/* RAC2: the history had been forgotten when prev_insn was appended. */\n"
                         "static int rac2_prev_after_clear;")
-# Record, as each instruction enters the history, whether both slots were empty before it
-# (the start of a function or section), not merely cleared behind a branch delay slot.
-CLEAR = ("(prev_insn.insn_mo == 0 || prev_insn.insn_mo == &dummy_opcode)\n"
+# Record, as each instruction enters the history, whether the history had been forgotten
+# before it: both slots empty and prev_insn_valid clear, not merely both slots emptied by a
+# branch delay slot or an unconditional branch.
+CLEAR = ("! prev_insn_valid\n"
+         "\t\t\t\t   && (prev_insn.insn_mo == 0 || prev_insn.insn_mo == &dummy_opcode)\n"
          "\t\t\t\t   && (prev_prev_insn.insn_mo == 0\n"
          "\t\t\t\t       || prev_prev_insn.insn_mo == &dummy_opcode);\n")
 for old, indent in (("\t  /* Update the previous insn information.  */\n"
@@ -28,8 +46,9 @@ assert comment >= 0 and source[comment:start].count("*/") == 1
 end = source.index("\n}\n", start) + 3
 replacement = '''
 /* Private compatibility restricted to measured producer/consumer roles, and
-   to an mtc1 appended to an empty history (function or section start).
-   History cleared by a branch delay slot keeps the nop. No game policy. */
+   to an mtc1 appended to a forgotten history (prev_insn_valid clear).
+   History cleared by a branch delay slot or emptied after an unconditional
+   branch keeps the nop. No game policy. */
 static int
 rac2_mtc1_nop_ok (ip)
      struct mips_cl_insn *ip;

@@ -1675,11 +1675,31 @@ occur within a function and is not a function-boundary detector.
 retain two measured cleared-history exemptions: a0 to f0 before cvt.s.w f0,f0,
 and zero to f0 before c.lt.s f12,f0. Eight first-transfer witnesses split four
 requiring a nop and four not. A distance-two producer rule failed `func_002A7878`.
-Both apply only to an mtc1 appended to an empty history (function or section
-start). The retail survey: no nop only at function entry (`f_002EF240` in 28 level
-programs, boot `0x00283CE0`, handwritten `0x00129218`/`2C0`/`368`); after a branch slot
-gas fills with a nop the a0 pair keeps it (`func_L00_002E2958`, 27 programs), and the
-zero pair keeps it at all 147 label sites. `tests/test_mtc1_exemption.py`.
+Both apply only to an mtc1 appended to a forgotten history (`prev_insn_valid` clear).
+`tests/test_mtc1_exemption.py`.
+
+gas empties both history slots in two ways. mips_no_prev_insn (md_begin, a section change,
+`.align`, data) forgets the history: it also clears `prev_insn_valid`. append_insn empties
+both slots after every unconditional branch (`b`, `j`, `jal`, `jr`), filled or not, but sets
+`prev_insn_valid`. A forgotten history is a section start, and every game unit is built with
+-ffunction-sections, so in practice it is a function start. `.ent`, `.end` and stabs do not
+forget it: a function start inside a section, after `j $31`, keeps the nop. Until 8 November
+2026 the exemption also applied behind an unconditional branch, so an mtc1 behind a `b` lost
+its nop. Two known limits stay exempt, because `.align` and `.set reorder` forget the history:
+`b; .align 3; L: mtc1` and `b; .set noreorder; .set reorder; L: mtc1`. cc1 emits neither (code
+labels get `.p2align`, which does not forget it); the fixture pins both.
+
+Retail census of both pairs, every program (boot and 27 levels) of us, pal and us2, by
+scanning the retail text for each pair with and without a nop between: the a0 pair has no
+nop only at the start of `func_00283CE0` (84 sites: the boot and its 27 level copies, such as
+us level 00 `0x002EF240`) and the zero pair only at the starts of the handwritten
+`func_00129218`/`2C0`/`368` (9). Every other site keeps the nop. Behind a `b`: zero pair 429
+sites with a filled slot (143 per release) and 27 with a nop slot
+(`b; nop; L: mtc1 $0,$f0; nop; c.lt.s`, `func_PAL_L00_003874B8`), a0 pair 6 with a filled
+slot. Behind a conditional branch: a0 pair 81 with a nop slot (`func_L00_002E2958`, 27 per
+release) and 56 filled, zero pair 16 filled. No site follows `j`, `jal` or `jr`. cc1 writes a
+noreorder `b` only with a filled slot (its template is `%*b`), so the unfilled `b` reaches gas
+in reorder mode.
 
 Ten original no-nop sites in `0x00283C28`, `0x002A677C`, `0x002E0408`,
 `0x002E0558` can also be reproduced with explicit instruction ordering; ISA

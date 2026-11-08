@@ -12,7 +12,10 @@ The retail code was built with GNU EE-GCC 2.9-ee-991111b. `build.sh` rebuilds it
   replacement text, in the order `build.sh` runs them. `u3_frame_order_on.py` and
   `u4_mtc1_helper.py` are two earlier steps the later ones build on.
   `restrict_mtc1_exemption.py` keeps gas's two measured `mtc1` hazard-nop exemptions only for
-  an `mtc1` that starts a function (empty history); `tests/test_mtc1_exemption.py`.
+  an `mtc1` appended to a forgotten history (`prev_insn_valid` clear: a section start, so with
+  -ffunction-sections in practice a function start), not one behind an unconditional branch,
+  after which gas empties its history slots without forgetting it;
+  `tests/test_mtc1_exemption.py`.
   `r5900_mfc1_interlock.py` drops gas's coprocessor-load `nop` after `mfc1` on the R5900,
   which interlocks it. `tidy_condjump_fallthru.py` lets flow delete a conditional jump to the
   next block, as GCC 2.95 does. `zero_ti_store_barrier.py` adds the opt-in
