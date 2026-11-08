@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 /* Kept separate so existing wrappers retain external call bindings. */
 typedef struct Timestamp_351578 {
     long pts;
@@ -33,8 +34,8 @@ static inline int ts_dist(int a, int size) {
 
 /* func_00351578(VideoBuffer_351578 *, Timestamp_351578 *) */
 int func_00351578(VideoBuffer_351578 *vb, Timestamp_351578 *ts) {
-    unsigned int madr = *(volatile unsigned int *)0x1000B410;
-    unsigned int top = *(volatile unsigned int *)0x10002020;
+    unsigned int madr = D4_MADR;
+    unsigned int top = IPU_BP;
     int bp = *(unsigned int *)((char *)vb + 0x38) & 0x7F;
     int size = vb->count << 11;
     int found = 0;

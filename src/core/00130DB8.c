@@ -1,3 +1,4 @@
+#include "ps2_hw.h"
 
 
 typedef int s32;
@@ -39,12 +40,12 @@ u32 func_00130DB8(s32 arg0) {
     result = 0;
     switch (arg0) {
     case 0:
-        while (*(volatile s32 *)0x10002010 < 0) {
+        while (((s32)IPU_CTRL) < 0) {
         }
         result = 0;
         break;
     case 1:
-        result = *(volatile u32 *)0x10002010 >> 31;
+        result = IPU_CTRL >> 31;
         break;
     default:
         break;

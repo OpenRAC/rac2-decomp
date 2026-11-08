@@ -132,22 +132,22 @@ void func_00130178(void *arg0) {
     *(int *)(s + 0x1B0) = 0;
     r = r1_func_0011D960();
 
-    *(volatile unsigned int *)0x1000F590 =
-        *(volatile unsigned int *)0x1000F520 | 0x10000;
-    *(volatile unsigned int *)0x1000B000 = 0;
-    *(volatile unsigned int *)0x1000B400 = 0;
-    *(volatile unsigned int *)0x1000D400 = 0;
-    *(volatile unsigned int *)0x1000F590 =
-        *(volatile unsigned int *)0x1000F520 & ~0x10000;
+    D_ENABLEW =
+        D_ENABLER | 0x10000;
+    D3_CHCR = 0;
+    D4_CHCR = 0;
+    D9_CHCR = 0;
+    D_ENABLEW =
+        D_ENABLER & ~0x10000;
 
     if (r != 0) {
         r1_func_0011D9A8();
     }
 
-    *(volatile unsigned int *)0x1000B020 = 0;
-    *(volatile unsigned int *)0x1000B420 = 0;
-    *(volatile unsigned int *)0x1000D420 = 0;
-    *(volatile unsigned int *)0x10002010 = 0x40000000;
+    D3_QWC = 0;
+    D4_QWC = 0;
+    D9_QWC = 0;
+    IPU_CTRL = 0x40000000;
     r1_func_0012CF98(0, 0);
 }
 

@@ -13,16 +13,16 @@ extern void func_00130AB0(unsigned int);
 /* rac1-decomp src/core/0012CC90.c: func_0012CD60 */
 void func_00130B80(unsigned int *env) {
     func_00130B18(1);
-    env[0] = *(volatile unsigned int *)0x1000B410;
-    env[1] = *(volatile unsigned int *)0x1000B430;
-    env[2] = *(volatile unsigned int *)0x1000B420;
-    env[3] = *(volatile unsigned int *)0x1000B400;
-    while ((*(volatile unsigned int *)0x10002010 & 0xF0) != 0) {
+    env[0] = D4_MADR;
+    env[1] = D4_TADR;
+    env[2] = D4_QWC;
+    env[3] = D4_CHCR;
+    while ((IPU_CTRL & 0xF0) != 0) {
     }
     func_00130AB0(0);
-    env[4] = *(volatile unsigned int *)0x1000B010;
-    env[5] = *(volatile unsigned int *)0x1000B020;
-    env[6] = *(volatile unsigned int *)0x1000B000;
-    env[7] = *(volatile unsigned int *)0x10002020;
-    env[8] = *(volatile unsigned int *)0x10002010;
+    env[4] = D3_MADR;
+    env[5] = D3_QWC;
+    env[6] = D3_CHCR;
+    env[7] = IPU_BP;
+    env[8] = IPU_CTRL;
 }

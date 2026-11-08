@@ -1,12 +1,6 @@
 #include "common.h"
 #include "structs.h"
 
-#define IPU_CTRL   ((volatile unsigned int *)0x10002010)
-
-#define IPU_BP     ((volatile unsigned int *)0x10002020)
-
-#define IPU_TOP    ((unsigned long *)0x10002030)
-
 /* func_0012C508 returns a short: its epilogue sign-extends $v0. */
 extern short func_0012C508(int, int);
 
@@ -25,8 +19,6 @@ typedef struct {
     unsigned char pad840[0x18];
     void *cbData;
 } MpegVdec;
-
-#define IPU_CMD  ((volatile unsigned long *)0x10002000)
 
 extern int func_0012C680(void *, int);
 
@@ -47,25 +39,25 @@ short func_0012C508(int arg0, int tbl) {
 
     i = 0;
     j = 0;
-    while ((*IPU_CTRL & 0x80004000) == 0x80000000) {
+    while ((IPU_CTRL & 0x80004000) == 0x80000000) {
         if (j++ > 5000) {
             r1_func_0012BCC8((int)d->cbData);
             j = 0;
         }
     }
     cmd = (tbl << 26) | 0x30000000;
-    *(volatile unsigned int *)IPU_CMD = cmd;
+    IPU_CMD = cmd;
     d->unk818 = r1_D_00132F70[(int)cmd >> 28];
-    r = *IPU_CMD;
+    r = IPU_CMD64;
     while (r < 0) {
         if (i++ > 5000) {
             r1_func_0012BCC8((int)d->cbData);
             i = 0;
         }
-        r = *IPU_CMD;
+        r = IPU_CMD64;
     }
-    bp = *IPU_BP;
-    top = *IPU_TOP;
+    bp = IPU_BP;
+    top = IPU_TOP;
     d->unk838 = top;
     if (top < 0) {
         d->unk83C = -(bp & 0x1F) & 0x1F;
@@ -94,15 +86,15 @@ int func_0012C680(void *arg, int count) {
         goto done;
     }
     counter = 0;
-    if ((*(volatile unsigned int *)0x10002010 & 0x80004000) == 0x80000000) {
+    if ((IPU_CTRL & 0x80004000) == 0x80000000) {
         do {
             if (counter++ >= 0x1389) {
                 r1_func_0012BCC8(*(void **)(ctx + 0x858));
                 counter = 0;
             }
-        } while ((*(volatile unsigned int *)0x10002010 & 0x80004000) == 0x80000000);
+        } while ((IPU_CTRL & 0x80004000) == 0x80000000);
     }
-    *(volatile unsigned int *)0x10002000 = 0x40000000;
+    IPU_CMD = 0x40000000;
     *(int *)(ctx + 0x818) = r1_D_00132F70[4];
     *(int *)(ctx + 0x838) = r1_func_00128638(ctx);
     *(int *)(ctx + 0x83C) = 0x20;
@@ -133,14 +125,14 @@ void func_0012C788(void *arg0, int arg1) {
     int counter = 0;
     unsigned int cmd;
 
-    while ((*(volatile int *)0x10002010 & 0x80004000) == 0x80000000) {
+    while ((((int)IPU_CTRL) & 0x80004000) == 0x80000000) {
         if (counter++ >= 0x1389) {
             r1_func_0012BCC8(*(int *)((char *)arg0 + 0x858));
             counter = 0;
         }
     }
     cmd = arg1 | 0x40000000;
-    *(volatile int *)0x10002000 = cmd;
+    IPU_CMD = cmd;
     *(int *)((char *)arg0 + 0x818) = r1_D_00132F70[cmd >> 28];
     *(int *)((char *)arg0 + 0x838) = r1_func_00128638(arg0);
     *(int *)((char *)arg0 + 0x83C) = 0x20;
@@ -165,7 +157,7 @@ int func_0012C878(void *arg0, int n) {
     unsigned int oldBits;
     unsigned int result;
 
-    while ((*(volatile int *)0x10002010 & 0x80004000) == 0x80000000) {
+    while ((((int)IPU_CTRL) & 0x80004000) == 0x80000000) {
         if (counter++ >= 0x1389) {
             r1_func_0012BCC8(*(int *)(s + 0x858));
             counter = 0;
@@ -173,7 +165,7 @@ int func_0012C878(void *arg0, int n) {
     }
 
     if (*(int *)(s + 0x818) != 0 || *(int *)(s + 0x83C) < n) {
-        *(volatile int *)0x10002000 = 0x40000000;
+        IPU_CMD = 0x40000000;
         *(int *)(s + 0x818) = r1_D_00132F70[4];
         *(int *)(s + 0x838) = r1_func_00128638(s);
     }
@@ -182,7 +174,7 @@ int func_0012C878(void *arg0, int n) {
     oldBits = *(unsigned int *)(s + 0x838);
     cmd = n | 0x40000000;
     idx = cmd >> 28;
-    *(volatile unsigned int *)0x10002000 = cmd;
+    IPU_CMD = cmd;
     result = oldBits >> (0x20 - n);
     *(int *)(s + 0x818) = r1_D_00132F70[idx];
     *(int *)(s + 0x838) = r1_func_00128638(s);

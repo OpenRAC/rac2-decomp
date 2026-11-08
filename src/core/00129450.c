@@ -21,24 +21,6 @@ extern void r1_func_0012BC78(int, void *);
 
 extern void r1_func_0012C468(void *, void *);
 
-#define IPU_CTRL   ((volatile unsigned int *)0x10002010)
-
-#define IPU_BP     ((volatile unsigned int *)0x10002020)
-
-#define IPU_TOP    ((unsigned long *)0x10002030)
-
-#define D3_CHCR    ((volatile unsigned int *)0x1000B400)
-
-#define D3_QWC     ((volatile unsigned int *)0x1000B420)
-
-#define D4_CHCR    ((volatile unsigned int *)0x1000B000)
-
-#define D4_QWC     ((volatile unsigned int *)0x1000B020)
-
-#define D_ENABLER  ((volatile unsigned int *)0x1000F520)
-
-#define D_ENABLEW  ((volatile unsigned int *)0x1000F590)
-
 extern int func_0012B1C0(void *);
 
 /* func_0012C508 returns a short: its epilogue sign-extends $v0. */
@@ -100,7 +82,7 @@ int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
     by = y * 16;
     bx = x * 16;
     if (intra) {
-        while ((*(volatile unsigned int *)0x1000D400 >> 8) & 1)
+        while ((D9_CHCR >> 8) & 1)
             ;
         d->e[d->unk810].unk138 = 0;
     } else {
@@ -111,7 +93,7 @@ int func_00129450(void *arg0, int mbAddr, int arg2, int mbType, int motionType,
         }
         r1_func_00125880((struct MpegDecoder *)d, bx, by, mbType, motionType,
                       pmv, mvfs, dmv);
-        while ((*(volatile unsigned int *)0x1000D400 >> 8) & 1)
+        while ((D9_CHCR >> 8) & 1)
             ;
         r1_func_0012A0F8(d);
         d->e[d->unk810].unk138 = 1;
@@ -537,16 +519,16 @@ int func_0012B1C0(void *arg0) {
 
     ret = 1;
     func_0012C3B0(d);
-    if (*D4_QWC != 0 && !(*IPU_CTRL & 0x4000)) {
+    if (D3_QWC != 0 && !(IPU_CTRL & 0x4000)) {
         do {
-            if (*D3_QWC == 0 && !(*D3_CHCR & 0x100)) {
+            if (D4_QWC == 0 && !(D4_CHCR & 0x100)) {
                 cb1[0] = 1;
                 r1_func_0012BC78((int)d->cbData, cb1);
             }
-        } while (*D4_QWC != 0 && !(*IPU_CTRL & 0x4000));
+        } while (D3_QWC != 0 && !(IPU_CTRL & 0x4000));
     }
-    bp = *IPU_BP;
-    top = *IPU_TOP;
+    bp = IPU_BP;
+    top = IPU_TOP;
     d->unk838 = top;
     if (top < 0) {
         rest = bp & 0x1F;
@@ -554,7 +536,7 @@ int func_0012B1C0(void *arg0) {
     } else {
         d->unk83C = 32;
     }
-    if (*IPU_CTRL & 0x4000) {
+    if (IPU_CTRL & 0x4000) {
         r1_func_0012C468(d, r1_D_00153888);
         cb2[0] = 2;
         r1_func_0012BC78((int)d->cbData, cb2);
@@ -562,14 +544,14 @@ int func_0012B1C0(void *arg0) {
         cb2[0] = 3;
         r1_func_0012BC78((int)d->cbData, cb2);
         intr = r1_func_0011D960();
-        *D_ENABLEW = *D_ENABLER | 0x10000;
-        *D4_CHCR = 0;
-        *D_ENABLEW = *D_ENABLER & ~0x10000;
+        D_ENABLEW = D_ENABLER | 0x10000;
+        D3_CHCR = 0;
+        D_ENABLEW = D_ENABLER & ~0x10000;
         if (intr) {
             r1_func_0011D9A8();
         }
         ret = 0;
-        *D4_QWC = 0;
+        D3_QWC = 0;
     }
     return ret;
 }
