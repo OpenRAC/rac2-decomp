@@ -1,3 +1,4 @@
+/* 7 November 2026 (round 9): -fcall-used-hi1/lo1/accum1 do not change the gcse PRE order here; no constant pseudo-number or cuid offset shared by the hash-order near misses fixes it (docs/COMPILER-NOTES.md, patch 0055). */
 /*
  * func_L20_0039BEC8 -- non-matching draft
  * Tier: Claude Opus 5.5, xhigh effort, task v2204 (opus-1).

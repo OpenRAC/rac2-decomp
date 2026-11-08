@@ -1,3 +1,28 @@
+/* Claude Opus 5.5, 8 November 2026; retained near miss (supersedes the header below).
+ * Current check: 1248/1248 bytes, 0/28 places; profile -O2 -G0 -ffunction-sections.
+ * Changes from the 29 October draft: qcopy_nc for the first snapshot (its destination is only
+ * read after later calls) lets reload reuse $a0 for self, as retail does; `angles[1] >
+ * limit[1]` gives retail's load order in the second clamp. Remaining: (1) the player-state
+ * test is `beqz -> player; b decay` where retail has `bnez -> decay; b player`; (2) at
+ * 0x002B48A4 retail reuses $v1 (work) for func_00283098's a1, we reload it; (3) the nine
+ * PRE address spills at 0xC8-0xE8 are in another order.
+ * (3) cause, from -dG/-dg dumps: the spills are gcse PRE reaching registers, made in hash
+ * bucket order ((regno + offset) mod N, N = insns/2 | 1; here N = 119, self = r84,
+ * sway = r85) and given slots in pseudo order. No N fits retail's slot order with
+ * sway = r85: the sway base in those addresses must be a pseudo of about r114-r128
+ * (made around the active path), and self about r112-r127 if N stays near 119. Inline
+ * helpers do not help (gcse cprop folds the parm copies back to r84/r85).
+ * Measured: -frac2-qcopy(-barrier) with plain TI copies ties (same three residues);
+ * `target || (player test)` with an inner target test gives retail's bnez/b pair but cse's
+ * jump threading puts the player block first and jump2 cross-jumps the two calls; an
+ * inline tail helper with an `active` flag keeps the flag test (285 diff lines).
+ * Round 2 (8 November 2026): every goto/if/else spelling of the player test either keeps
+ * `beqz -> player; b decay` or ends the tests with `b player` over the target block, and
+ * then jump.c's "if (foo) bar; else break;" swap (jump.c:1900; needs LABEL_NUSES == 1 on
+ * the target label and `b` to the next label) moves the target block first (95 lines).
+ * -fno-thread-jumps does not change that. A block-scoped or inline copy of sway does not
+ * give a later base pseudo, because gcse cprop puts r85 back before PRE.
+ */
 /* GPT-6.1 Sol high, 29 October 2026, task v0788; retained near miss.
  * Best current-toolchain check: 1252/1248 bytes, 0/28 USA v1.01 places.
  * Profile: -O2 -G0 -ffunction-sections, isolated source unit. No linked match.
@@ -94,7 +119,7 @@ void func_002B44C0(char *self, Sway_2B44C0 *sway, float *target)
     int i;
     int kick_axis;
 
-    qcopy(old_position, self + 0x10);
+    qcopy_nc(old_position, self + 0x10);
     qcopy(old_rotation, self + 0xF0);
     func_00115484(push, 0, 16);
     if (target != 0)
@@ -137,7 +162,7 @@ update:
         angles[0] = sway->limit[0];
     else if (angles[0] < -sway->limit[0])
         angles[0] = -sway->limit[0];
-    if (sway->limit[1] < angles[1])
+    if (angles[1] > sway->limit[1])
         angles[1] = sway->limit[1];
     else if (angles[1] < -sway->limit[1])
         angles[1] = -sway->limit[1];

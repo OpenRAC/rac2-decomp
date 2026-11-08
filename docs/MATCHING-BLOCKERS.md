@@ -182,7 +182,14 @@ without creating an owning allocation.
 The same investigation did not resolve `func_002B6658`, `func_L22_003D0840` or
 `func_L13_0041AB30`. True callback/SetState contracts, consumed one-pass groups
 and measured grid views remain short or allocate differently; their markers
-and near misses are retained. The second vector grid ends at the counter at
+and near misses are retained. For `func_L22_003D0840`, a 7 November 2026
+recheck of the default game profile gives 60/60 bytes and 0/1 places in each
+release: four object-register words use `$v1` instead of `$a3`. Setting state
+arguments before the test, copying the parameter after its first use, preloading
+flags, reusing real value lifetimes and grouping state reads/inline initializer
+operations (96 variants) did not improve it. See its retained source for the
+measured constraints; this is a near miss, with no linked-build claim.
+The second vector grid ends at the counter at
 +0x620 (three rows of four cells), so an owning four-row view is not justified.
 
 
@@ -378,6 +385,36 @@ candidate; do not classify it as handwritten based on difficulty.
 local flag copy retain the same core mismatch: retail's `bltzl`/`beqz`/`bnel`
 forms and delay-slot advance, plus the global-store and vtable register choices.
 The marker remains; this result does not support an `ASM_FUNC` classification.
+
+**7 November 2026, callback-origin follow-up:** the retained `-O2 -G8
+-ffunction-sections` baseline is now 144/148 bytes, 0/28 USA v1.01 places;
+the entry cache store already uses `v0`. The net missing word is in the
+callback sequence: retail has `beqz v1; nop; daddu a0,s0,zero; jalr v1;
+nop; lhu`, while C gives `beql v0; lhu; jalr v0; daddu a0,s0,zero; lhu`.
+Current RAC1's active `src/game/moby/mobyutil.c` implements its analogous
+`update_visible_resident_objects` hook with inline asm. Transcribing its
+surrounding char-pointer C and duplicate next assignments with a plain C
+callback ties the baseline exactly. Packed and unpacked five-field
+unsigned-short flag views keep 144 bytes and 0/28, adding `lw` versus retail
+`lhu` differences. These three new trials do not replace the retained C.
+The donor supports an origin hypothesis, not RAC2 byte-identity evidence
+or `ASM_FUNC` eligibility. Reopen with independent evidence for that hook's
+origin or a real dependency explaining both callback allocation and empty
+slots; no compiler/tool changes or linked builds were attempted.
+
+**6 November 2026 follow-up, checked 7 November:** sibling
+`func_L00_0032CF60` remains 256/260 bytes and 0/27 USA v1.01 places with
+`-O2 -G8 -ffunction-sections -g`. Fourteen new conditional-expression,
+branch/switch flags-join and nonempty operation-group forms emit the identical
+baseline instructions; duplicating the post-callback test/call grows to 284
+bytes without fixing dispatch. The callback still uses v0 instead of v1;
+`beql` steals the flags load, and `jalr` takes the argument move in its slot.
+Current RAC1's active `src/game/moby/mobyutil.c` donor,
+`update_visible_resident_objects`, uses local inline assembly at this dispatch.
+That method is excluded here; the donor comment alone does not establish
+handwritten origin. Keep the plain-C near miss and marker. A new experiment
+needs independent callback/compilation evidence rather than another flags join.
+No linked build was run in this worker.
 
 **28 October 2026 recheck:** `func_00282AB0`'s retained `-O2 -G0` candidate
 is 156/160 bytes and 0/28 in USA v1.01. The retail `add`/`addi` operations
@@ -3829,6 +3866,7 @@ attributed for provenance, not exclusive ownership.
 
 | Function / family | Status | Evidence and next action |
 | --- | --- | --- |
+| Weapon grid, `func_003478F0` | **Retained near miss, 6 November 2026** | USA v1.01, `-O2 -G8 -ffunction-sections -fno-rerun-loop-opt`: 1452/1452 bytes, 0/28 placements, first +0x4c, 39 real boot instruction rows versus the prior 82. Disabling the second loop pass repairs table-base setup, the ammo lookup and branch-edge scheduling; stride-first bar coordinates repair six operand rows. Pointer spill slots, row address formation and first-coordinate FPR allocation remain. Explicit pointer locals, row views/groups, coordinate groups and owner/FP interleavings do not improve further; the retained source details the controls. Reopen on a source/lifetime witness for these remaining allocation differences. No linked build run. |
 | List centring, `func_00348EC0` | **Retained near miss, 6 November 2026** | USA v1.01, `-O2 -G8 -ffunction-sections`: 644/644 bytes, 0/28 placements, 14 real instruction rows. Another 79 checks retain the same best: widened coordinates add instructions; the existing width/height record view gives 19-22 rows; reusing values across enabled/centring/draw blocks and count-guarded draw-loop forms do not improve it. The guarded `do` loop ties at 14. Height still uses v1 rather than v0, tuning/bias FPRs and conversion scheduling differ. Reopen on a source/lifetime witness for the extra GPR interference needed while spacing is live; candidate and detailed controls remain in `nonmatching/game/func_00348EC0.c`. No linked build run in this worker. |
 | `_fpadd_parts`, `func_00122800` | **Merged, #265** | 576 bytes, 1/1 boot placement with the SDK profile. The assembler's bounded positive shifted-mask rule reduced two constants from seven to three instructions each. Full 28-program strict build passed. |
 | `dpmul`, `func_00122B00` | **Merged, #267** | 680 bytes, 1/1 boot placement. Restoring the public fraction union restores the real alias dependence and the rounding `bnel`/store slot. Two sign-bit loads use the per-file unsigned assembler seed; the signed default remains unchanged. All 80 tests and 28 strict programs passed. |
@@ -4897,6 +4935,16 @@ open, so the row stays. Direct or nearby address-pair absence alone is not proof
   diagnostic return; narrowing the IMR or declaring the ignored result void is
   not a legitimate scheduling remedy. Its equal error-path variants are recorded
   in the retained source.
+  **6 November 2026 worker follow-up:** the retained SDK branch-slot profile
+  still gives 1676/1676 bytes, 0/1 in each US/US2/PAL boot; the first checker
+  failure is +0x3CC. US has 17 instruction-position differences after excluding
+  relocation values. Removing hardware volatile qualifiers shrinks the body to
+  1504 bytes and loses polling behavior; one-pass groups around the reset FIFO
+  transfer or contiguous cleanup stores give 1680 or 1888-1928 bytes. The best
+  source is unchanged. This worker's explicit prohibition of volatile in matched
+  C also excludes the retained MMIO representation from landing. No linked build
+  or match is claimed; an admissible polling form and new lifetime evidence are
+  needed before retrying.
 - `func_L00_0042A4E8`, `func_L00_0042A4F0` and `func_L00_0042A4F8` now have
   separate eight-byte rows and C bodies. In each release, 26 copies have a
   camera-table record naming all three entries; Boldan names each through

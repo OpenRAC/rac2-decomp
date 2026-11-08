@@ -240,6 +240,17 @@ setup is not simply one or the other everywhere and the flags stay per unit. Use
 only when a function's own loop.c dump shows the threshold is the blocker, and give
 the measured threshold in the commit.
 
+7 November 2026 (round 9): patch 0055 only flips `fixed_regs`; it does not change
+`FIRST_PSEUDO_REGISTER` or pseudo numbering, and gcse runs before loop.c, so it cannot
+explain the gcse PRE hash-order near misses. Measured on func_00281A08, func_L20_0039BEC8,
+func_L00_003E5BD8, func_0034CEA0 and func_L00_002EC970: the three flags leave four
+unchanged and add one word to func_0034CEA0. With a test cc1 that adds a constant to
+pseudo numbers in `hash_expr_1` (-90..200) or to `n_insns` in `alloc_expr_hash_table`
+(-240..240), no pseudo offset matches any of the five; cuid offsets match only
+func_00281A08 (-142,-140,-94,-92) and func_L00_002EC970 (20 values, none shared). On the
+full grid (pseudo -100..100 x cuid -240..240 step 2) the only shared point is +93/-142,
+and it leaves the other three unchanged, so no single pseudo/cuid offset explains them.
+
 ## Frames, calls and ABI
 
 ### Object extent and stack allocation

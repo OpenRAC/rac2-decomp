@@ -1,3 +1,21 @@
+/* 7 November 2026, round 14: 656/656 bytes, 0/1 places; masked aligned diff 21 -> 15 rows.
+ * (1) D_L03_001B0160 declared `extern struct MenuCoordinate D_L03_001B0160[] __attribute__((sda));`
+ * (incomplete sda array, COMPILER-NOTES "tied absolute macro form"): the .y walk is now retail's
+ * lui s6/addiu s6 pair and the key copy uses lui v0/addiu a2 with v1/a0, as retail. The y read is
+ * plain D_L03_001B0160[i].y (no py pointer; same score) through screen_coord(mode, value, offset),
+ * the sibling helper shape (L10_004239A0-g8.c). (2) Both title draws pass a literal 0.0f as z, no z
+ * local: draw 1 is now exact. Left (15): draw 2's lui a1 issued before the f12 load; i = 0, the
+ * constant 1 and the buffer address stay after the key copy (retail: i = 0 in the jal slot, s7 and
+ * the buffer between lui v0 and addiu a2); i and the buffer swap s3/s4. The swap is global-alloc
+ * priority: i 9 refs over ~108-114 live insns vs the buffer 7 refs over ~54 (needs i <= 102 or one
+ * more in-loop ref of i). Measured, no better: L10-style plain calls with label_y as an argument
+ * (20 with sda: draw 1 exact, draw 2 and the preheader cross the call); groups around the tail,
+ * the loop or each draw (24-48); every x/c/d placement in draw 2 (15 floor); all orders of the
+ * py/keys/buffer/i declarations and `int i = 0` (no change or 652 bytes); unsigned i, char buffer,
+ * buffer pointer local, keys pointer walk, shift/label/x outside the loop, while loop, `+ i` for
+ * `+ 1`, second i == 1 test (680/644 bytes); -fno-sched-interblock, -fmove-all-movables,
+ * -frac2-hazard-labels (tie), -fno-gcse/-fno-rerun-loop-opt/-fno-strength-reduce (worse).
+ */
 /* 7 November 2026, label_y sweep: both title rows now use the accepted HUD label idiom,
  * row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1); (definition above the
  * function, mode D_L03_001B3280). Same -O2 -G0 profile, 656/656 bytes, 0/1 places; sweep-harness
@@ -119,7 +137,7 @@ extern float D_L03_001B014C SDATA(D_L03_001B014C);
 extern float D_L03_001B0150 SDATA(D_L03_001B0150);
 extern float D_L03_001B0154 SDATA(D_L03_001B0154);
 extern float D_L03_001B0158 SDATA(D_L03_001B0158);
-extern struct MenuCoordinate D_L03_001B0160[];
+extern struct MenuCoordinate D_L03_001B0160[] __attribute__((sda));
 extern struct MenuCoordinate D_L03_001B0160_gp[] SDATA(D_L03_001B0160);
 extern int D_L03_001B0140 SDATA(D_L03_001B0140);
 extern int D_L03_001B3280 __attribute__((sda));
@@ -134,19 +152,6 @@ extern int func_00283CF0(float);
 extern int func_0027FB40(int, int, unsigned long, unsigned char *, int);
 extern int func_L00_00443DF8(char *);
 extern int func_L00_00443E18(char *);
-
-static __inline__ int menu_round(float value)
-{
-    return (int)(value * D_L03_001B3284 + 0.5f);
-}
-
-static __inline__ int menu_screen_y(float value, float offset)
-{
-    float y = value * D_L03_001B3284 + 0.5f;
-    if (D_L03_001B3280 == 1)
-        return (int)(y + offset);
-    return (int)y;
-}
 
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
@@ -165,12 +170,21 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int screen_coord(int mode, float value, float offset)
+{
+    float scaled = value * D_L03_001B3284 + 0.5f;
+
+    if (mode == 1)
+        return (int)(scaled + offset);
+    return (int)scaled;
+}
+
 int func_L03_003C7018(void)
 {
     if (D_L03_001A904C) {
         {
             char *title;
-            float row, x, c, d, z;
+            float row, x, c, d;
 
             do {
                 title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc6);
@@ -178,13 +192,12 @@ int func_L03_003C7018(void)
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
-                z = 0.0f;
             } while (0);
-            func_00300A00(title, 0x60442d00, x, row, c, d, z);
+            func_00300A00(title, 0x60442d00, x, row, c, d, 0.0f);
         }
         do {
             char *title;
-            float row, x, c, d, z;
+            float row, x, c, d;
 
             do {
                 title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
@@ -192,12 +205,10 @@ int func_L03_003C7018(void)
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
-                z = 0.0f;
             } while (0);
-            func_00300A00(title, 0x55f0c070, x, row, c, d, z);
+            func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
         } while (0);
         {
-            float *py = &D_L03_001B0160[0].y;
             int keys[4] = {11599,12116,12769,12770};
             unsigned char buffer[128];
             int i;
@@ -212,7 +223,7 @@ int func_L03_003C7018(void)
                     func_00115DA8((char *)buffer, D_L03_001B0198, label);
                 }
                 x = func_00283CF0(D_L03_001B0160_gp[i].x);
-                func_0027FB40(x, func_00283CF0((float)menu_screen_y(py[i * 2], (float)shift)), 0x80808080UL, buffer, 0x80);
+                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift)), 0x80808080UL, buffer, 0x80);
             }
         }
         if (D_001A7A7C[0]) {

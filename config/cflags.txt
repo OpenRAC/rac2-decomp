@@ -4213,3 +4213,6 @@ src/levels/30_insomniac_museum/L30_0040B9D8-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L00_002AE388-blend-g8.c	-O2 -G8 -ffunction-sections -fcall-used-hi1 -fcall-used-lo1 -fcall-used-accum1
 src/levels/shared/L00_002EC970-beam.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por
 src/pal/levels/shared/L00_003874B8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-gcse-unsplit-edges
+src/levels/shared/L05_0037A5F8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
+src/game/0032EB28-turret-g8.c	-O2 -G8 -ffunction-sections -ffast-math
+src/levels/shared/L02_0032E508.c	-O2 -G0 -ffunction-sections -g

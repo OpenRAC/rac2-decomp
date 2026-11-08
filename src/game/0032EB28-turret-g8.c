@@ -1,30 +1,10 @@
-/* 4 November 2026: faithful retained C; no linked match.
- * Remove the unused leading two-vector padding; the remaining complete vectors and call arguments are unchanged.
- * us: 2072/2084 bytes, 0/28 places; us2: absent; pal: absent.
- * Profile: -O2 -G8 -ffunction-sections -ffast-math.
- * Reopen: Find a genuine owner/callee use explaining retail's leading stack space and the effect-store lifetime; no dummy local may recreate the frame.
- * Earlier measurements below are historical, including any diagnostic-only
- * constructs they describe; those constructs are no longer active C.
- */
-/*
- * func_0032F598 -- NONMATCHING (tier: Claude Opus 5.5, task v2070).
- * Best: 2084/2084 bytes, 0/28 places; 6 rows differ, but ONLY with the
- * forbidden unused leading local `V598 pad[2]` (retail frame 0x1A0 has 32
- * unreferenced bytes at sp+0x00..0x1F; without it the frame is 0x180 and
- * every local sits 0x20 lower). No legitimate source of those bytes found
- * (first-declared object; slots: hit 0x20, origin 0x30, params 0x40,
- * angles 0x50, matrix 0x60, work[8] 0x90 with work[6..7] unused, count 0x110
- * via ADDRESSOF at the end).
- * Remaining diff: the effect's `sw zero,0x2C` is scheduled before the
- * f24 stores (retail: last); int and float 0 forms behave the same.
- * Found here: each barrel written out with plain &work[] (gcse PRE copies
- * give retail's s2/s1, tails cross-jump); velocity set before its call;
- * block-scoped `slot` for D_00188660+i*0x70 (addu order, bne); MACRO_ADDR
- * on D_001A8BD0 (charge argument order).
- * Built in src/game/0032EB28-math-g8.c (-O2 -G8 -ffast-math); needs the
- * declarations below.
- */
 #include "common.h"
+
+/* func_0032F598 is a unit of its own (-O2 -G8 -ffast-math). The aim vectors live in
+   pts[4]: pts[2] is the hit point and pts[3] the origin; pts[0] and pts[1] are never
+   touched and only reproduce retail's 0x1A0 frame (oversized local array, allowed by
+   owner ruling, 8 November 2026). The effect's 0x3C store is written last so the
+   scheduler emits retail's store order. */
 typedef union { int q __attribute__((mode(TI))); float f[4]; } V598;
 typedef struct __attribute__((packed, aligned(4))) { u64 a; u32 b; } P598;
 extern P598 D_001B0988;
@@ -48,25 +28,25 @@ extern void func_002FDF40(void *,void *,void *,float,float,float,float,void *);
 #define B598(p,o) (*(unsigned char *)((p)+(o)))
 void func_0032F598(char *obj)
 {
-    V598 hit, origin;
+    V598 pts[4]; /* [2] hit point, [3] origin; [0], [1] unused frame space */
     P598 params;
     V598 angles, matrix[3], work[8];
     int output;
     char *rec=*(char **)(obj+0x68);
     char *target,*effect,*other;
     float a,b,old1,old2;
-    func_0029FCC0(obj,0,&origin);
+    func_0029FCC0(obj,0,&pts[3]);
     params=D_001B0988;
-    target=func_002AF580(&origin,obj+0xC0,6.2831855f,6.2831855f,&output,0,0,0,10.0f,0.0f,0.0f,0,&params);
+    target=func_002AF580(&pts[3],obj+0xC0,6.2831855f,6.2831855f,&output,0,0,0,10.0f,0.0f,0.0f,0,&params);
     if (!(D_00138180.buttons.flags[0]&0x40)) {
         if (target) {
-            qcopy(&hit,target+0x10);
+            qcopy(&pts[2],target+0x10);
             other=func_002AB1F0(target);
             if (other) {
                 func_00282D30(&angles,target+0xE0,F598(other,0x10));
-                func_00282CC0(&hit,&angles,target+0x10);
+                func_00282CC0(&pts[2],&angles,target+0x10);
             }
-            func_00282CF0(rec+0x20,&hit,&origin);
+            func_00282CF0(rec+0x20,&pts[2],&pts[3]);
             func_00282F20(rec+0x20,rec+0x20,1.0f);
             func_002836E8(matrix,obj+0xC0);
             func_00283098(rec+0x20,rec+0x20,matrix);
@@ -100,8 +80,9 @@ void func_0032F598(char *obj)
     F598(effect,0x30)=-7.83249f;
     F598(effect,0x34)=1.9025599238414737e-12f;
     F598(effect,0x38)=10014.4f;
-    F598(effect,0x3C)=1.0f; F598(effect,0xC)=1.0f;
+    F598(effect,0xC)=1.0f;
     F598(effect,0x20)=1.0f; F598(effect,0x24)=1.0f; F598(effect,0x28)=1.0f; I598(effect,0x2C)=0;
+    F598(effect,0x3C)=1.0f;
     if (D_00138180.buttons.flags[0]&0x80) {
         a=1.0f-func_002A7790((func_00283180(D_001B0994)+1.0f)*0.5f)*0.5f;
         b=1.0f-func_002A7790((func_00283180(D_001B0998)+1.0f)*0.5f)*0.5f;
@@ -115,7 +96,7 @@ void func_0032F598(char *obj)
             func_0029FCC0(obj,2,&work[0]);
             func_0029FC20(obj,2,&work[4]);
             if (target) {
-                func_00282CF0(&work[1],&hit,&work[0]);
+                func_00282CF0(&work[1],&pts[2],&work[0]);
                 func_00282F20(&work[1],&work[1],0.25f);
             } else func_00282F20(&work[1],&work[4],0.25f);
             func_002E5CF8(6,0,obj);
@@ -125,7 +106,7 @@ void func_0032F598(char *obj)
             func_0029FCC0(obj,1,&work[0]);
             func_0029FC20(obj,1,&work[1]);
             if (target) {
-                func_00282CF0(&work[5],&hit,&work[0]);
+                func_00282CF0(&work[5],&pts[2],&work[0]);
                 func_00282F20(&work[5],&work[5],0.25f);
             } else func_00282F20(&work[5],&work[1],0.25f);
             func_002E5CF8(6,0,obj);

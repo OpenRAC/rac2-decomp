@@ -187,7 +187,7 @@ extern char D_001ADA38[] __attribute__((sda));
 
 
 
-INCLUDE_ASM("asm/game", func_0032F598);
+/* func_0032F598 is defined in 0032EB28-turret-g8.c. */
 
 
 /* func_0032FEA8 uses small data in 0032EB28-g8.c. */

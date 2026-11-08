@@ -1,3 +1,4 @@
+/* 7 November 2026 (round 9): -fcall-used-hi1/lo1/accum1 do not change the gcse PRE order here; no constant pseudo-number or cuid offset shared by the hash-order near misses fixes it (docs/COMPILER-NOTES.md, patch 0055). */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 980/980, 5 words (step+1 and &matrix[3] spill slots swapped by gcse PRE hash order). No EE GCC build reproduces retail's slots; the expression set before gcse must differ. */
 /* 7 November 2026 (round 13): 980/980 bytes, 0/7 places, remaining diff is exactly five
  * words swapping spill slots 0x964 and 0x96C (&matrix[3] at 0x964 vs retail 0x96C;

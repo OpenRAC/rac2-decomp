@@ -1,3 +1,27 @@
+/* 8 November 2026, round 3: a 25-minute decomp-permuter run (-j4) on the 2-row pitch C found nothing better (best outputs 148-155 differing rows). */
+/* 8 November 2026, round 2: Quad v[10] is allowed by owner ruling of 8 November 2026 (retail's
+ * frame reserves the unused slots), so 2 rows remain. Further tries (about 15 compiles):
+ * function-scope yaw/pitch locals in 6 placements (pitch set before the f60 store: 2 rows;
+ * yaw set before pitch: 5); reusing `health` for 1.5708 (`health = 1.57079649f; state->f60 =
+ * health;` after flags88) gives retail's exact instruction and store order, but the pseudo
+ * then has two deaths, so global-alloc places it in $f9 after local-alloc has used $f3: 26
+ * register-only rows. One-pass groups around the health statements: 55-97 rows.
+ */
+/* 8 November 2026: still no linked match. us: 2292/2292 bytes with Quad v[10], 0/1 places,
+ * 2 rows; with the honest Quad v[2] below the frame is 0x80 against retail 0x100 (SP+0x20..0x9F
+ * is never touched in retail; L09_002F8BA0-g8.c on master keeps unused frame vectors, but
+ * that needs an owner ruling here). The #define origin/point aliases were removed (v[0], v[1]).
+ * Store-order analysis from cc1 -dS/-dl dumps: sched1 keeps the f5C/f60/flags88/f80 stores in
+ * source order, sched2 keeps them in sched1 order (LUID ties). Retail order (flags88 before
+ * f60) lengthens the 1.5708 qty by one insn, so local-alloc ranks 0.4 (3 refs) above it:
+ * 0.4 -> $f3, 1.5708 -> $f7 (5 rows). A local for 1.55334318 set before the f60 store
+ * (block-scope or function-scope `pitch`) gives the retail registers and store order, but
+ * its set then precedes the 1.5708 set, so sched2 emits li 1.55 before li 1.5708 (2 rows,
+ * +0x540/+0x54C). Retail needs sched1: set 1.5708, set 1.55, ..., sw 0x88, f60, <one insn>,
+ * f80. Tried without gain: flags88 at 8 other positions; hill-climbs over f32C..f80 (with and
+ * without pitch) and over f17C..i188; a 0.4 local set at 4 places; f58/f60/f80 moved 11 ways;
+ * do/while(0) groups around f60 (69-94 rows).
+ */
 /* 4 November 2026: faithful retained C; no linked match.
  * Retain only the two actually used local vectors instead of the ten-vector diagnostic allocation.
  * us: 2292/2292 bytes, 0/1 places; us2: absent; pal: absent.
@@ -255,8 +279,6 @@ extern void func_L23_0041B9F0(L23Moby *);
 /* Initialize the encounter objects and refresh their shared presentation state. */
 void func_L23_004177F8(L23Moby *object) {
     Quad v[2];
-#define origin v[0]
-#define point v[1]
     L23Boss *state = object->vars;
     L23Moby *entity;
     L23Moby *scan;
@@ -311,10 +333,10 @@ void func_L23_004177F8(L23Moby *object) {
         state->i408 = 0;
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 3; j++) {
-                qzero(&origin);
+                qzero(&v[0]);
                 D_L23_00259320[i][j] = 0;
                 D_L23_00259380[i][j] = 0;
-                qcopy(&D_L23_002593E0[i][j], &origin);
+                qcopy(&D_L23_002593E0[i][j], &v[0]);
             }
         }
         for (i = 0; i < 4; i++) D_L23_001B3790[i] = 0;
@@ -333,7 +355,7 @@ void func_L23_004177F8(L23Moby *object) {
                 if (id == 0x7E5) {
                     D_L23_00259560[n++] = entity;
                 } else if (id == 0x27D) {
-                    qcopy(&origin, &entity->pos);
+                    qcopy(&v[0], &entity->pos);
                     qcopy(D_00189E20 + 0x80, &entity->pos);
                 } else if (id == 0xF7E) {
                     state->parts[m++] = entity;
@@ -354,20 +376,20 @@ void func_L23_004177F8(L23Moby *object) {
                 }
         }
         }
-        func_00282CF0(&origin, &origin, D_00189E20 + 0xB0);
-        D_L23_001B36A4 = func_00282DF0(&origin);
-        point = 0;
-        ((float *)&point)[0] = 500.0f;
-        ((float *)&point)[1] = 500.0f;
-        ((float *)&point)[2] = 430.0f;
-        func_L23_00418650(&point, 0.0f);
-        qcopy(&D_L23_001B3760, &point);
-        point = 0;
-        ((float *)&point)[0] = 500.0f;
-        ((float *)&point)[1] = 500.0f;
-        ((float *)&point)[2] = 552.0f;
-        func_L23_00418650(&point, 0.0f);
-        qcopy(&D_L23_001B3770, &point);
+        func_00282CF0(&v[0], &v[0], D_00189E20 + 0xB0);
+        D_L23_001B36A4 = func_00282DF0(&v[0]);
+        v[1] = 0;
+        ((float *)&v[1])[0] = 500.0f;
+        ((float *)&v[1])[1] = 500.0f;
+        ((float *)&v[1])[2] = 430.0f;
+        func_L23_00418650(&v[1], 0.0f);
+        qcopy(&D_L23_001B3760, &v[1]);
+        v[1] = 0;
+        ((float *)&v[1])[0] = 500.0f;
+        ((float *)&v[1])[1] = 500.0f;
+        ((float *)&v[1])[2] = 552.0f;
+        func_L23_00418650(&v[1], 0.0f);
+        qcopy(&D_L23_001B3770, &v[1]);
         qcopy(&object->pos, &D_L23_001B13F0);
         func_L23_00418650(&object->pos, D_L23_001B14D0);
         object->colour = 255;

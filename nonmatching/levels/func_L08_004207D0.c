@@ -1,3 +1,17 @@
+/* 7 November 2026, round two: 1156/1156 bytes (size now right), 0/2 placements; 48 -> 28 masked
+ * aligned rows (check.py --diff, own metric; the 51 below is another harness). Body below. Fixes: color is an s64 local set
+ * from the (s32) value before the texture call (retail's `daddu s0,s0,zero` sign-extend, the 4
+ * missing bytes); `scale *= D_L08_001B1B9C` right after the divide; indexed list loop `cursor[i]`
+ * (retail's `lw v0; beqz v0; daddu s2,v0` copy). Left: second in s2 (retail s3; the shared active-1
+ * pseudo takes s3 in ours), anchor y f22 (retail f20), loop x/y/size f20/f22/f21 (retail f22/f20/f21),
+ * the loop's 0.5 is a fresh lui/mtc1 (retail `mov.s f23,f24` copy of the top 0.5), and the final
+ * block issues `sll alpha` first (retail: y chain, then lw D_1BA8/sll/or, alpha copied to a0).
+ * Tried: label_y on the loop y (handle object/cursor): final block order exact, but the hoisted
+ * active-1 takes a ghost s7 (52); a do/while(0) group around x/y: right order (29) but its
+ * LOOP_BEG aligns the loop-continue label (.p2align 3, +1 nop), -malign-loops=2 loses retail's
+ * other alignment; donor-style `base = 0x8710; one = 1; half = 0.5f` (with/without -fno-gcse),
+ * separate anchor y, var reuse for scale/size, statement orders, call-as-argument: no gain;
+ * -fno-schedule-insns 141, -fno-sched-interblock/-fno-sched-spec/-fno-rerun-loop-opt no gain. */
 /* 7 November 2026, label_y sweep: the three sprite ys use label_y(first/second/third, ...), the anchor y label_y(object, ...): 141 -> 51 differences, 1144 -> 1152/1156 bytes (loop y with label_y: worse, alpha 68, state 75). The body below is the retained C with that change (label_y is
  * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
  * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
@@ -62,9 +76,10 @@ void func_L08_004207D0(u8 *object)
     u8 *state, *entry, *anchor;
     char *first, *second, *third;
     u16 *cursor;
+    s32 i;
     f32 y, distance, scale, size, x;
     s32 alpha;
-    s32 color;
+    s64 color;
     u64 texture;
     func_L08_00300090();
     func_L08_00300100();
@@ -84,16 +99,17 @@ void func_L08_004207D0(u8 *object)
     if (!anchor) return;
     cursor = D_L08_001FB660[anchor[0x21]];
     if (!cursor) return;
+    i = 0;
     do {
-        entry = D_L08_001B29DC + ((*cursor & 0x7FFF) << 8);
+        entry = D_L08_001B29DC + ((cursor[i] & 0x7FFF) << 8);
         if (!entry || entry[0x20] == 0xFE || entry[0x20] == 0xFD || *(s16 *)(entry + 0xAA) == 0x96A) return;
         distance = func_00282E48(object + 0x10, entry + 0x10);
         if (distance <= D_L08_001B1BA4) {
             scale = distance / D_L08_001B1BA4;
+            scale *= D_L08_001B1B9C;
             euler.q = 0;
             euler.f[2] = 1.5707964f;
             func_002833F0(rotation, &euler);
-            scale *= D_L08_001B1B9C;
             func_00282CF0(&difference, entry + 0x10, object + 0x10);
             func_00282F20(&difference, &difference, scale);
             func_002836E8(inverse, D_L08_001B9D30);
@@ -105,9 +121,9 @@ void func_L08_004207D0(u8 *object)
             else if (size < 0.0f) size = 0.0f;
             x = difference.f[0] + D_L08_001B1B84;
             y = (f32)(s32)((D_L08_001B1B88 - difference.f[1]) * D_L08_001B3244 + 0.5f);
-            color = D_L08_001B1BA8 | ((u32)alpha << 24);
+            color = (s32)(D_L08_001B1BA8 | ((u32)alpha << 24));
             texture = func_0027C878(D_L08_001B1BA0);
-            func_L05_003008C0(x, y, size, size, 0, 0, D_L08_001B1B94, D_L08_001B1B98, (u64)(s64)color, texture);
+            func_L05_003008C0(x, y, size, size, 0, 0, D_L08_001B1B94, D_L08_001B1B98, color, texture);
         }
-    } while ((s16)*cursor++ >= 0);
+    } while ((s16)cursor[i++] >= 0);
 }

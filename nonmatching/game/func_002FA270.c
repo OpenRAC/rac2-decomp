@@ -1,3 +1,25 @@
+/* 8 November 2026 (round 9, rank_for_schedule): base 1552/1552, 20 differing words (retained C, recorded flags). rank_for_schedule is identical in GCC 2.95/2.95.2/2.95.3 and EE 991111/991111b; SN 2.95.2 v2.73a makes the same tie choice where its output is comparable. Env probes (sched1/sched2/both): reg weight swapped/clamped/dropped/after class/positive-or-negative only, class dropped/reversed, dependent count reversed/dropped/data-only/clamped, LUID reversed, INSN_UID ties, no birthing boost: none improves any of the nine cluster targets; forced on, every variant changes 6-7124 of 8761 matched units. Hypothesis falsified. */
+/* 7 November 2026: retained near miss, not linked. USA v1.01 check.py: 1552/1552 bytes,
+ * 0/28 places; 16 real rows left (was 21), all in the block before the first func_0028EA58.
+ * Fixed this round:
+ *   - First D_00239BA0 lookup as (IconInfo *)((char *)D_00239BA0 + idx * 224): addu v0,v0,s2.
+ *   - alpha1 <<= 24; alpha0 <<= 24; before the color stores: sll s1,s1,24 in place, or t2,s1,s5.
+ *   - x = y + (D_001AD3C4 + b) as a temp for the first call: retail's (y+(C4+2))+D8 grouping and
+ *     every register now match (t1 for D_001A7B90, v1 for the mfc1).
+ *   - draw_icon(tex, x, y, size, colors) helper (w == h at all three calls): same code, kept.
+ * Remaining (sched2 order only): retail loads D_001AD3D0 before the scale D_001B2280, clamps
+ *   before the D_001AD3C4 load, and loads D_001A7B90 before C4+2. -fsched-verbose-5 shows
+ *   prio(D0) == prio(scale) == 56 (scale wins on dependents 6 vs 4) and C4 50 vs movz 49. The C4
+ *   chain is lifted by insn 698 (fix_truncsfsi2 for h), whose hidden SI scratch clobber is $4:
+ *   it gets an output dep on the D8 load and an anti dep on x+D8. That scratch comes from
+ *   reload's round-robin (last_spill_reg) and is not visible in the asm.
+ * Tried without effect (all 16): statement order of clamps/shifts/stores/x (all legal orders
+ *   sampled), temps for sy/h, helper body order and parameter order, scalar scale, x forms,
+ *   separate colors stores, flags -frac2-hazard-labels/-fno-sched-interblock/-fsched-spec-load/
+ *   -frac2-sticky-volatile-refs. Worse: clamp swap (19), -fno-gcse (30), scale*value (25/34),
+ *   -fno-schedule-insns(2) (size), dead-test hud_h helper (1576 bytes), x reused (1544 bytes).
+ * Next idea: earlier code shape that changes reload's scratch rotation for insn 698.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 1552/1552 bytes, 0/28 placements; first difference 0x2b4.
  * Profile: -O2 -G8 -ffunction-sections.
@@ -73,9 +95,14 @@ extern int D_001AD3C8 __attribute__((sda));
 extern int D_001AD3D0 __attribute__((sda));
 extern int D_001AD3D8 __attribute__((sda));
 extern int D_001AD3BC __attribute__((sda));
+static __inline__ void draw_icon(int tex, int x, int y, int size, unsigned int *colors)
+{
+    func_0028EA58(tex, x, screen_y(y), size, (int)((float)size * D_001B2280[0] + 0.5f), colors);
+}
+
 void func_002FA270(void)
 {
-    int pulse;
+    int pulse, x;
     int left, b;
     int i, index, y, icon, overlay, kind, special, alpha0, alpha1;
     unsigned int color, colors[4];
@@ -96,7 +123,7 @@ void func_002FA270(void)
     do {
         index = i + D_0021F240.selected;
         if (index >= 0 && index < *(int *)((char *)&D_0021F240+0x740)) {
-            icon = func_0028E588(D_00239BA0[D_00139568[D_0021F240.rows.ammo[index].id]].icon,0);
+            icon = func_0028E588(((IconInfo *)((char *)D_00239BA0 + D_00139568[D_0021F240.rows.ammo[index].id] * 224))->icon,0);
             overlay = func_0028E588(0xeaa3,D_0021F240.rows.ammo[index].frame);
             special = 0;
             kind = D_00239BA0[D_00139568[D_0021F240.rows.ammo[index].id]].color;
@@ -112,12 +139,15 @@ void func_002FA270(void)
             alpha1 = 128 - (int)(distance * 0.75);
             if (alpha0 < 0) alpha0 = 0;
             if (alpha1 < 0) alpha1 = 0;
-            colors[3] = colors[1] = (alpha1<<24)|color;
-            colors[2] = colors[0] = (alpha0<<24)|color;
-            func_0028EA58(icon,y+(D_001AD3C4+b)+D_001AD3D8,screen_y(D_001AD3C0+D_001AD3CC),D_001AD3D0,(int)((float)D_001AD3D0 * D_001B2280[0]+0.5f),colors);
-            func_0028EA58(overlay,y+(D_001AD3C4+b),screen_y(D_001AD3C0-D_001AD3C8),D_001AD3C8,(int)((float)D_001AD3C8 * D_001B2280[0]+0.5f),colors);
+            alpha1 <<= 24;
+            alpha0 <<= 24;
+            colors[3] = colors[1] = alpha1|color;
+            colors[2] = colors[0] = alpha0|color;
+            x = y+(D_001AD3C4+b);
+            draw_icon(icon,x+D_001AD3D8,D_001AD3C0+D_001AD3CC,D_001AD3D0,colors);
+            draw_icon(overlay,y+(D_001AD3C4+b),D_001AD3C0-D_001AD3C8,D_001AD3C8,colors);
             icon = func_0028E588(0xeaa3,3);
-            func_0028EA58(icon,y+(D_001AD3C4+b),screen_y((D_001AD3C0-D_001AD3C8)+D_001AD3BC),D_001AD3C8,(int)((float)D_001AD3C8 * D_001B2280[0]+0.5f),colors);
+            draw_icon(icon,y+(D_001AD3C4+b),(D_001AD3C0-D_001AD3C8)+D_001AD3BC,D_001AD3C8,colors);
         }
         i++;
         y += 56;

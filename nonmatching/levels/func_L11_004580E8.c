@@ -1,3 +1,15 @@
+/* 8 November 2026: measured again (USA, 2476/2476 bytes, 0/1 at +0xC8): 15 rows in two places.
+ * Fixed the loop preheader: `float scale=45000;` beside life/mode/alpha (used as lifetime*scale)
+ * gives 45000 a longer life, so loop pass 1 hoists it ahead of 1.0 (it was "not desirable").
+ * Still open: case 0 (gravity/0.1 in $f0/$f1: local-alloc priority; a 1500-step statement-order
+ * hill-climb and do/while(0) groups did not fix it) and case 5 (the 0x160 store wins sched1 by
+ * register weight; a turn() helper, statement expressions, locals, a group did not move it).
+ * Round 2 (same day), no change: case 0 hill-climb from the all-registers-right order, 0.1 or
+ * gravity as literal/named/late local (sched1 issues all constant loads before the stores, so
+ * 0.1's life stays 20 insns vs gravity's 10); case 5 with K3/K4 as locals set before the store,
+ * a copied angle local, a ternary store, a comma store in the last argument. A store after the
+ * call cannot reach the delay slot (reorg will not move a store across a call).
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the pointer return of func_0032C700 and the typed scheduler callback.
  * The shared scratch covers 48 bytes, including all three vectors.
@@ -110,9 +122,10 @@ void func_L11_004580E8(char *p) {
     f=func_00283CE0(D_L11_001B1F84);
     {
     int life=120,mode=2,alpha=127;
+    float scale=45000;
     Particle *particle=func_002BDCE8(scratch.v.b,n,0.025f,1,1,axis,0x80808080,0,
       ({float lifetime=(float)*(s16 *)(q+0x16C)/f;
-        lifetime*45000+5000;}));
+        lifetime*scale+5000;}));
     if(particle) {ParticleAttributes *attributes;particle->lifetime=life;attributes=&particle->attributes;attributes->mode=mode;attributes->alpha=alpha;attributes->duration=(u8)particle->lifetime;}
     }
    }

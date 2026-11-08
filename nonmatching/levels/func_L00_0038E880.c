@@ -1,47 +1,30 @@
-/* 2 November 2026: retained 1944/1952 bytes, 0/27 US placements with the current default game compiler. Correct the ignored pointer returns of func_00308600 and func_002BF728, and the integer return of func_002E5DA0, from their current matched definitions. Evaluate the random lifetime before the second weapon-table read, as retail does; this fixes that call/read ordering without a barrier. Channel halving through a shared unsigned local expands to 1980 bytes and is not retained. Remaining: colour packing/spills, height-plus-half hoisting and register allocation. No complete match. */
-/* 1 November 2026 (closer a3): 93 words, 1944/1952 with a pointer local for the second table read (no madd). The
- * colours: `int r = 96;` as the only variable with literal g, b, a gives retail's first loop exactly (hoisted
- * 0x167F6000 and 0x7F6000, ori 0x60 in the body), 1932 bytes until the rest fits. Retail's second loop: 0x7F006000 and
- * 0x7F0000 rematerialised and or'd into spill slot 0xC4, then ori 0x60; 0x30 and 0x3F3000 hoisted (BurstColor's
- * grouping). fp = 0 before the first loop has no use in the output: reload_cse may have dropped it. height + half stays
- * in the loop in retail (threshold). Texture base stays in the loop too. Unsolved: the second colour's two parts. */
-/* 1 November 2026: with compiler/block-move-quad, tmpl = D_L00_002A26A0 gives retail's lq/sq copy and the
- * prologue: 1944/1952, 105 aligned words (ld/sd and 386 words without that compiler). Left: a madd at the
- * second table read (retail: mult, addu of the low part, lbu 4), the TI zero's register (t1, a1 in retail),
- * the tail lq in t1 (retail's %hi is live in t0 there), the spill slots 0xC4/0xCC. Needs that compiler. */
-/* GPT-6.1 Sol high, v1294, USA v1.01, default game -O2 -G0 -ffunction-sections.
- * Reconstructed candidate: 1952 compiled bytes / 1952 retail bytes, 0/27 places.
- * Size equality only: check.py first reports instruction mismatch at +0x14.
- * All declarations needed to compile this standalone unit are included below.
- *
- * This replaces the old inspection-only note with the complete four-loop body.
- * The six alleged unsupported MMI words are ordinary por zero materializations;
- * neither they nor the aligned transfers establish handwritten-assembly evidence.
- *
- * Remaining constraints:
- * - Retail's 80-byte aggregate copy uses paired lq/sq with t0/t1. Plain aggregate
- *   assignment, including an explicitly aligned(16) type, used ld/sd instead.
- *   The retained explicit quadword loop recovers its operations and iteration
- *   count, but uses v0/v1, another end register, and a different store schedule.
- * - The incoming velocity and first counter occupy s6/s5 rather than s5/s6.
- *   Distinct loop scopes recover the other incoming normal/object registers;
- *   moving only the first counter to function scope leaves the output unchanged.
- * - Retail keeps height + 0.5 inside the 100-particle loop; a named half constant
- *   hoists the sum here. Literal 0.5 instead gave 1948 bytes, with fewer saved FPRs.
- * - Color-channel locals expose partial packing and loop invariants, but their
- *   shared subexpressions differ. Literal colors and inline packing folded too
- *   early; sharing halved channels across the two loops worsened size to 2008.
- * - -g was measured on the earlier explicit-copy candidate (1932 bytes); it did
- *   not resolve transfer scheduling and introduced zero-materialization nops.
- *
- * Next: recover the original template-copy lowering and color-local lifetimes;
- * retain truthful call interfaces. In particular, func_002A8A20's caller consumes
- * f0, although its currently matched wrapper elsewhere is declared void.
- * The 0x3E6EEEF0 random bound is 14 * (1.0f / 60), not 14.0f / 60.0f.
- * No linked build or match is claimed. The original INCLUDE_ASM is restored.
- */
+/* 8 November 2026 (round 3): the RAC1 twin (~/rac1-decomp mine_bomb_and_debris.c, the gz/wz splash block) writes
+ * the channels as int locals set at declaration plus "int delay = 0;" as the splash's third argument, and notes
+ * that this local orders five cached-address stack slots through the GCSE table size. Transcribed here (short
+ * channels, delay replaces the ca = 0 trick): opcodes still all match (full diff 13 words), cse1 insn count 457,
+ * the two spill slots stay swapped. No float rounding or colour clamp here for the dead-test helper idiom. */
+/* 8 November 2026 (round 2): max_cuid at gcse is the insn count after cse1 (465 here, so 233 buckets); a match
+ * needs 504-507. Measured forms (cse1 insn count): named temps for nested call results, x = x + 1 vs +=,
+ * nested if vs &&, scale split, data assigned late, loops counting up: all 465-466. A pos = object + 0x10
+ * pointer: 460. Inline wrappers lower the count: weapon-row helper 449, func_00282F20 445, func_00282CC0 453,
+ * func_002A7820 457, func_002A7878 345 (and that one changes the code). No plausible form found that adds insns. */
+/* 8 November 2026: 1952/1952 bytes, 0/27 US placements; every opcode now matches. The only difference left is
+ * two spill slots that trade places: the &shard and &random address pseudos get 0xC8 and 0xCC, and retail has
+ * 0xCC and 0xC8 (8 sw/lw words). reload hands out slots in pseudo-number order, and both pseudos come from gcse
+ * PRE (expressions 23 and 38), numbered in hash-bucket order. (plus vfp 128) hashes to 14158 and (plus vfp 144)
+ * to 14174, so the order only flips when the table has 253, 289 or 295 buckets (max_cuid 504-507, 576-579 or
+ * 588-591); this source gives 233. What closed the opcodes (the matched sibling func_L00_003AE900 in
+ * L00_003AE900-g8.c supplied the idioms):
+ * cr/cg/cb channel variables with c1/c2/c partial products and (cb / 2) halving; half = 0.5f inside the loop;
+ * a camera pointer local for the shake store (as in func_L00_0037E898); the weapon read written as
+ * idx * 224 + base; func_002BCB00 declared (void *, void *, int, int, float, ...), an equivalent EE-ABI form
+ * that donor uses; short channels (orders the loop-2 constants); ca = 0 set inside loop 1 and used second in the
+ * halved colour, which gives retail's dead fp = 0 (combine's USE keeps the shortest-lived channel). Tried and
+ * dropped: a pointer local for &random (54 diffs), an inline func_002A7878 wrapper (217 buckets, 1976 bytes),
+ * -fno-gcse / -fno-rerun-cse-after-loop / -fno-strength-reduce (slots unchanged or worse). No complete match. */
+/* Earlier notes (1-2 November 2026, 1944/1952): lq/sq template copy, ignored returns of func_00308600 and
+ * func_002BF728, the integer return of func_002E5DA0, and 14 * (1.0f / 60) for the random bound. */
 #include "common.h"
-
 typedef int BurstQuad __attribute__((mode(TI)));
 typedef union { BurstQuad q; float f[4]; } BurstVector;
 typedef struct { BurstQuad q[5]; } BurstTemplate __attribute__((aligned(16)));
@@ -75,14 +58,9 @@ extern float func_00283180(float);
 extern float func_00283198(float);
 extern void *func_L00_0033AA40(void *, void *, unsigned int, float, float, int, float, int, int);
 extern int func_L00_0031C998(int, int, float);
-extern void *func_002BCB00(float, void *, void *, int, int, int, int, int, int, int);
+extern void *func_002BCB00(void *, void *, int, int, float, int, int, int, int, int);
 extern void *func_00312B70(void *, void *, int, void *);
 extern void func_0029F338(void *);
-
-static __inline__ unsigned int BurstColor(unsigned int r, unsigned int g, unsigned int b, unsigned int a)
-{
-    return r | (g << 8) | (b << 16) | (a << 24);
-}
 
 void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
 {
@@ -93,7 +71,7 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
     BurstWeapon *w;
 
     tmpl = D_L00_002A26A0;
-    scale = 1.0f + func_00283CE0(D_L00_00262570[D_00139568[12]].enabled != 0);
+    scale = 1.0f + func_00283CE0(((BurstWeapon *)(D_00139568[12] * 224 + (int)D_L00_00262570))->enabled != 0);
     func_00282D30(velocity, velocity, scale);
     func_00282CF0(&delta, D_L00_001B8DC0, object + 0x10);
     distance = func_00282DF0(&delta);
@@ -135,23 +113,30 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
     data[0] = 0;
     object[0xBC] = 0;
     func_002E5DA0(22, 0, object, 0);
+    {
+    short cr = 0x60;
+    short cg = 0x60;
+    short cb = 0x7F;
+    int delay = 0;
+    int c;
+
     random.q = *(BurstQuad *)(object + 0x10);
     random.f[2] += 3.5f;
     height = func_002A89A8(&random, 0, 0.5f);
     ground = func_002A8A20(&random);
     if (height != ground && height - ground < 1.2f) {
-        int r = 96, g = 96, b = 127, a = 22;
-        float half = 0.5f;
         {
             int i;
-            for (i = 99; i >= 0; --i) {
-                float radius, angle;
+            for (i = 0; i < 100; i++) {
+                float radius, angle, half;
+                int c1, c2;
                 point.q = 0;
                 point.f[0] = func_002A7878(-0.012500001f, 0.012500001f);
                 point.f[1] = func_002A7878(-0.012500001f, 0.012500001f);
                 point.f[2] = func_002A7878(4.0f / 60.0f, 14.0f * (1.0f / 60.0f));
                 drift.q = point.q;
                 radius = func_002A7878(0.0f, 0.35f);
+                half = 0.5f;
                 angle = func_002A7940();
                 point.f[0] = func_00283180(angle) * radius;
                 point.f[1] = func_00283198(angle) * radius;
@@ -160,17 +145,20 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
                 radius *= 8.0f / 60.0f;
                 point.f[2] = height + half;
                 drift.f[2] -= radius;
-                func_L00_0033AA40(&point, &drift, 0, func_002A7878(0.25f, 1.0f), height,
-                (r | (g << 8) | (b << 16) | (a << 24)), 1.0f / 180.0f, (r | (g << 8) | (b << 16)), 1);
+                c1 = (0x16 << 24) | (cb << 16) | (cg << 8);
+                c2 = (cb << 16) | (cg << 8);
+                func_L00_0033AA40(&point, &drift, delay, func_002A7878(0.25f, 1.0f), height,
+                c1 | cr, 1.0f / 180.0f, c2 | cr, 1);
             }
         }
+        c = (0x7F << 24) | (cb << 16) | (cg << 8);
         {
             int i;
-            for (i = 19; i >= 0; --i) {
+            for (i = 0; i < 20; i++) {
                 int color1, color2;
                 float life;
-                color1 = func_L00_0031C998(BurstColor(0, 0, 0, 127), (r | (g << 8) | (b << 16) | (127 << 24)), func_002A7878(0.25f, 1.0f));
-                color2 = func_L00_0031C998(0, BurstColor(48, 48, 63, 0), func_002A7878(0.5f, 1.0f));
+                color1 = func_L00_0031C998(0x7F000000, c | cr, func_002A7878(0.25f, 1.0f));
+                color2 = func_L00_0031C998(0, ((cb / 2) << 16) | ((cg / 2) << 8) | (cr / 2), func_002A7878(0.5f, 1.0f));
                 point.f[0] = func_002A7878(-3.0f, 3.0f);
                 point.f[1] = func_002A7878(-3.0f, 3.0f);
                 point.f[2] = func_002A7878(4.0f / 60.0f, 14.0f * (1.0f / 60.0f));
@@ -179,15 +167,19 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
                 drift.q = *(BurstQuad *)(object + 0x10);
                 drift.f[2] = height;
                 life = func_002A7878(31500.001953125f, 52500.0f);
-                func_002BCB00(life, &drift, &point, color1, color2, func_002A7820(90, 150),
+                func_002BCB00(&drift, &point, color1, color2, life, func_002A7820(90, 150),
                 1, *D_L00_001FE940.texture, -1, 0);
             }
         }
     }
-    if (distance < 20.0f)
-    D_L00_001B8C80.shake = 0.4f - distance * 0.0175f;
-    else
-    D_L00_001B8C80.shake = 0.050000011920928955f;
+    }
+    {
+        BurstCamera *camera = &D_L00_001B8C80;
+        if (distance < 20.0f)
+            camera->shake = 0.4f - distance * 0.0175f;
+        else
+            camera->shake = 0.050000011920928955f;
+    }
     D_L00_001B8C80.duration = 25;
     D_L00_001B8C80.timer = 0;
     func_00312B70(&tmpl, object + 0x10, 0, 0);

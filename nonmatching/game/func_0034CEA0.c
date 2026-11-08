@@ -1,3 +1,4 @@
+/* 7 November 2026 (round 9): -fcall-used-hi1/lo1/accum1 do not change the gcse PRE order here; no constant pseudo-number or cuid offset shared by the hash-order near misses fixes it (docs/COMPILER-NOTES.md, patch 0055). */
 /* 2026-11-03 w02 faithful-contract review, US object checks only.
  * Profile: -O2 -G8 -ffunction-sections -ffast-math.
  * Current check.py: 3328/3316 bytes,0/28 places.

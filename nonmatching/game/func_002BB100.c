@@ -1,3 +1,31 @@
+/* 8 November 2026, round 3 (gap A only, 12 checks, best body unchanged): no plain form
+ * makes $s0 live at the else target. Tried: function-scope `n = D_001BAFC0` before the if
+ * (+0x8, 53 diffs); inverted `if (!(flags&1) || !call) copy; else {...}` (1680 bytes);
+ * `hit = 0; if (flags&1) hit = call; if (hit)` (1688); else arm as qcopy() (1692; the asm
+ * needs a register base, retail uses 0x10(s5)); unit flags -frac2-qcopy(+barrier) (1696),
+ * -frac2-hazard-labels, -frac2-sticky-volatile-refs, -fno-sched-interblock, -g (all 5).
+ * Retail never reads $s0 after the join, so no real value can be live there.
+ */
+/* 8 November 2026, round 2 (Claude Opus 5.5, v101/m1k): gap (B) CLOSED with the
+ * allowed dead-test helper frac_byte below (one `if (result != 0) scaled = scale;`
+ * on a dead float, hud_coord shape) for fractional[0] only: 65535 -> f21, 255 -> f20
+ * as retail. Now 1684/1684, 0/28, first rejection +0xA4, only the 5 positions of
+ * gap (A) remain (beqz slot after func_002761F8: retail addiu a0, ours lui s0).
+ * (A) is not reachable with the dead-float shape: flow2 deletes that test, so $s0
+ * is never live at the else target; it needs a test that survives flow2 on a value
+ * in $s0 (only the uninitialised-variable form found, forbidden).
+ * Inside src/game/002B7E28.c write `typedef TI Quad_BB100;`.
+ */
+/* 8 November 2026, Claude Opus 5.5 (task v101/m1k): body below unchanged, still
+ * 1684/1684 bytes, 0/28 places, first rejection +0xA4, 14 real positions. 8 checks:
+ * - (A) nested `if (flags&1) { if (call) {...} else copy; } else copy;`: no change
+ *   (jump2 cross-jumps the copies, but flow2 already saw $s0 dead).
+ * - (A) reorg: the lwc1s are refused by may_trap_p, not liveness; only $s0 liveness at
+ *   the else target can stop the lui, so the slot needs a register read flow2 sees.
+ * - (B) do/while(0) groups around the 255 uses, the 65535 uses, or both (nested):
+ *   1676/1688/1676 bytes, the loop notes pin the constant loads late. Worse.
+ * Local-alloc priorities (refs*log2(refs)/length): 65535 = 8/16 beats 255 = 10/42.
+ */
 /* Claude Opus 5.5 (xhigh), task v2092; USA v1.01, default game profile.
  * Body below unchanged (legal best, recompiled here): 1684/1684 bytes, 0/28 places,
  * first rejection +0xA4, 14 real positions differ. Both remaining differences are
@@ -88,6 +116,17 @@ extern float D_001BAFC0[];
 #define PF(p,o) (*(float *)((char *)(p)+(o)))
 #define PI(p,o) (*(int *)((char *)(p)+(o)))
 #define PB(p,o) (*(u8 *)((char *)(p)+(o)))
+/* frac0 with a dead result test (dead-test rounding helper, allowed by owner ruling,
+ * precedent src/game/002D2188-g8.c). */
+static __inline__ int frac_byte(float value, float scale)
+{
+    float scaled = value * scale;
+    int result = func_00283CF0(scaled);
+
+    if (result != 0)
+        scaled = scale;
+    return result;
+}
 void func_002BB100(Particle_BB100 *p)
 {
     float next[4] __attribute__((aligned(16)));
@@ -125,7 +164,7 @@ void func_002BB100(Particle_BB100 *p)
         if(g<cfg->colorMin[1]) {g=cfg->colorMin[1];if(cfg->flags&0x20)q->direction^=32;}
         if(b>cfg->colorMax[2]) {b=cfg->colorMax[2];if(cfg->flags&0x400)q->direction^=64;}
         if(b<cfg->colorMin[2]) {b=cfg->colorMin[2];if(cfg->flags&0x40)q->direction^=64;}
-        q->fractional[0]=func_00283CF0(r*65535.0f);
+        q->fractional[0]=frac_byte(r,65535.0f);
         q->fractional[1]=func_00283CF0(g*65535.0f);
         q->fractional[2]=func_00283CF0(b*65535.0f);
         ri=func_00283CF0(r*255.0f);

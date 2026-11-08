@@ -1,186 +1,174 @@
-/* Nonmatching C: Build the three ring layers and submit the surface and ribbon draw packets.
- * Tested profile: -O2 -G8 -ffunction-sections.
- * Measured US size: 1400 bytes; retail: 1524 bytes.
- * Placement checks: US, US2 and PAL: 0/27 each.
- * Remaining: Ring cursor spills, loop addressing, floating-point scheduling and pointer allocation differ.
- * Reopen with independent ring and packet cursor lifetimes; preserve all three twenty-vector rings, the complete frame and packet, and unsigned color shifts.
+/* Nonmatching C, updated 8 November 2026 (clean rewrite from retail asm); not a linked match.
+ * Same family as func_L00_003A91A0: identical opcodes, only data addresses and the 0x5CB/0xC04 id differ;
+ * this body ports to the twin by renaming the globals (+0x1228) and the vertex table.
+ * Profile: -O2 -G8 -ffunction-sections; place it in the unit's -g8.c sibling (the plain unit is -G0).
+ * 1524/1524 bytes; tools/check.py 0 of 27; about 56 of 381 instructions differ.
+ * Reached: frame, loop shapes, the second ring loop's strength reduction (its outer counter must be
+ * the first loop's inner counter: otherwise gcse PRE hoists counter+1 and kills the biv), float
+ * registers and store order of the ribbon loop.
+ * Remaining: (1) spill-slot order 0x4BC-0x4D8: retail spills {0x30, 0x490, ring+1, 0x4A0} in an
+ * earlier reload round than {0x10, 0xC0, 0x20, 0xD0}; here all eight go in one round (slots follow
+ * the PRE regno order, which follows the expression hash order). (2) combine merges the
+ * func_00283CF0 return copy into the `sll 24`, so the shift sticks to the call; retail keeps the
+ * copy and shifts into $v1 later. (3) the two strip loops build origin[j+1] as fp+(i*0x60+0x10)
+ * instead of (fp+i*0x60)+0x10.
+ * Tried without gain: -fno-gcse (1576 bytes), -fmove-all-movables, -fno-schedule-insns, -fno-sched-interblock,
+ * j from 1 in the strip loops, a cursor pointer, narrow alpha types, do/while(0) groups around the shift.
+ * 8 November 2026 round (no gain, still about 56 differ): origin[j+1] as (&rings[i])->origin[j+1],
+ * (origin+1)[j], a byte-offset row pointer (all unchanged), a BeamRing *r local (1504 bytes), a second
+ * counter from 1 (1568 bytes); return value kept apart: alpha as char/short/long/float, an inline
+ * colour helper (value or pointer argument), primary computed after the uv stores, hill-climbs over the
+ * sec3/sec4 prologue order. Combine still merges the return copy into the sll every time.
  */
 #include "common.h"
 
-typedef unsigned int QuadWord __attribute__((mode(TI)));
-typedef union { QuadWord word; float v[4]; } Vector;
-typedef struct { Vector row[3]; Vector position; } Frame;
-typedef struct { unsigned char pad[0x70]; long f70, f78, f80, f88; } QuadPacket;
-typedef struct {
-    Vector vertex[4];
-    unsigned int color[4];
-    float uv[4][2];
-    long f70, f78, f80, flags;
-} RenderPacket;
+typedef float BeamVector[4] __attribute__((aligned(16)));
+typedef struct { BeamVector point[4]; u32 color[4]; float uv[4][2]; long a,b,c,d; } BeamQuad;
+typedef struct { BeamVector origin[3], basis[2]; short enabled, timer; float phase, phase2, rate; } BeamRing;
+extern float D_L00_001B0984 __attribute__((sda));
+extern float D_L00_001B097C __attribute__((sda));
+extern float D_L00_001B0980 __attribute__((sda));
 
-extern Vector D_L00_001B8DC0;
-extern void func_00281DE8(QuadPacket *, int, int, int);
-extern void func_00282CF0(Vector *, const Vector *, const Vector *);
-extern void func_00282CC0(Vector *, const Vector *, const Vector *);
-extern void func_00282DD8(Vector *, const Vector *, const Vector *);
-extern void func_00282F20(Vector *, const Vector *, float);
-extern void func_00282D30(Vector *, const Vector *, float);
-extern void func_002830C0(Vector *, const Vector *, const Frame *);
-extern void func_00280B90(RenderPacket *, void *, int);
+extern float D_L00_001B09A0 __attribute__((sda));
+extern float D_L00_001B09B0 __attribute__((sda));
+extern u32 D_L00_001B09B4 __attribute__((sda));
+extern int D_L00_001B09BC __attribute__((sda));
+extern float D_L00_001B09C0 __attribute__((sda));
+extern float D_L00_001B09CC __attribute__((sda));
+extern int D_L00_001B0994 __attribute__((sda));
+extern int D_L00_001B09AC __attribute__((sda));
 
-typedef struct {
-    Vector center[3];
-    Vector direction[2];
-    short active, lifetime;
-    float phase, ribbon_phase, fade;
-} RingEffect;
-
+extern u32 D_L00_001B098C __attribute__((sda));
+extern u32 D_L00_001B0990 __attribute__((sda));
+extern u32 D_L00_001B09A8 __attribute__((sda));
+extern u32 D_L00_001B09A4 __attribute__((sda));
+extern u32 D_L00_001B09B8 __attribute__((sda));
+extern BeamVector D_L00_0029F0D0[];
+extern BeamVector D_L00_001B8DC0;
 extern char *func_L00_0032A088(int, int);
 extern int *func_L00_0032A0B8(int, int);
+extern void func_00281DE8(void *, int, int, int);
+extern void func_00282DD8(void *, void *, void *);
 extern int func_00283CF0(float);
-extern Vector D_L00_0029F0D0[20];
-extern float D_L00_001B097C __attribute__((sda)), D_L00_001B0980 __attribute__((sda)), D_L00_001B0984 __attribute__((sda));
-extern unsigned int D_L00_001B098C __attribute__((sda)), D_L00_001B0990 __attribute__((sda));
-extern int D_L00_001B0994 __attribute__((sda));
-extern float D_L00_001B09A0 __attribute__((sda));
-extern unsigned int D_L00_001B09A4 __attribute__((sda)), D_L00_001B09A8 __attribute__((sda));
-extern int D_L00_001B09AC __attribute__((sda));
-extern float D_L00_001B09B0 __attribute__((sda));
-extern unsigned int D_L00_001B09B4 __attribute__((sda)), D_L00_001B09B8 __attribute__((sda));
-extern int D_L00_001B09BC __attribute__((sda));
+extern void func_00282D30(void *, void *, float);
+extern void func_002830C0(void *, void *, void *);
+extern void func_00280B90(void *, void *, int);
+extern void func_00282CF0(void *, void *, void *);
+extern void func_00282CC0(void *, void *, void *);
+extern void func_00282F20(void *, void *, float);
 
-void func_L00_003F6308(char *object)
+
+void func_L00_003F6308(unsigned char *object)
 {
-    RenderPacket packet;
-    Frame frame;
-    Vector rings[3][20];
-    Vector temporary, side;
-    int effect_index, layer, segment, next, count;
-    char *state = *(char **)(object + 0x68);
-    char *base;
-    RingEffect *effects, *effect;
-    unsigned int color, edge;
-    float fade, u, v, v_next, phase;
+    BeamQuad quad;
+    BeamVector matrix[4];
+    BeamVector vertices[3][20];
+    BeamVector temp, side;
+    unsigned char *vars = *(unsigned char **)(object + 0x68);
+    char *base = func_L00_0032A088(0xc04, *(short *)(vars + 0x1a));
+    BeamRing *rings = (BeamRing *)(base + *func_L00_0032A0B8(0xc04, *(short *)(vars + 0x1a)));
+    int ring, row, j;
+    u32 primary, col, alpha;
+    float side_u, fade, phase, u, next, phase2;
 
-    effect_index = 0;
-    base = func_L00_0032A088(0xc04, *(short *)(state + 0x1a));
-    effects = (RingEffect *)(base + *func_L00_0032A0B8(0xc04, *(short *)(state + 0x1a)));
-    func_00281DE8((QuadPacket *)&packet, 0x15, 0, 0x80);
-    do {
-        effect = &effects[effect_index];
-        if (effect->active != 0) {
-            qcopy(&frame.row[0], &effect->direction[0]);
-            qcopy(&frame.row[2], &effect->direction[1]);
-            func_00282DD8(&frame.row[1], &frame.row[0], &frame.row[2]);
-            fade = (float)effect->lifetime * effect->fade;
-            color = ((u32)func_00283CF0(fade * (float)D_L00_001B0994) << 24) | D_L00_001B098C;
-            packet.color[0] = color;
-            packet.color[1] = color;
-            packet.color[2] = color;
-            packet.color[3] = color;
-            for (layer = 0; layer < 3; ++layer) {
-                Vector *circle = D_L00_0029F0D0;
-                Vector *output = rings[layer];
-                qcopy(&frame.position, &effect->center[layer]);
-                count = 19;
-                do {
-                    func_00282D30(&temporary, circle, D_L00_001B0984);
-                    ++circle;
-                    --count;
-                    func_002830C0(output, &temporary, &frame);
-                    ++output;
-                } while (count >= 0);
-            }
-            u = effect->phase;
-            edge = D_L00_001B0990;
-            for (layer = 0; layer < 2; ++layer) {
-                v = 0.0f;
-                for (segment = 0; segment < 20; ++segment) {
-                    next = (segment + 1) % 20;
-                    qcopy(&packet.vertex[0], &rings[layer + 1][segment]);
-                    qcopy(&packet.vertex[1], &rings[layer + 1][next]);
-                    qcopy(&packet.vertex[2], &rings[layer][segment]);
-                    qcopy(&packet.vertex[3], &rings[layer][next]);
-                    v_next = v + D_L00_001B0980;
-                    packet.uv[0][0] = u;
-                    packet.uv[0][1] = v;
-                    packet.uv[1][0] = u;
-                    packet.uv[1][1] = v_next;
-                    packet.uv[2][0] = u + D_L00_001B097C;
-                    packet.uv[2][1] = v;
-                    packet.uv[3][0] = packet.uv[2][0];
-                    packet.uv[3][1] = v_next;
-                    packet.color[2] = edge;
-                    packet.color[3] = edge;
-                    func_00280B90(&packet, 0, 0);
-                    v = v_next;
-                }
-                edge = color;
-            }
-            func_00281DE8((QuadPacket *)&packet, 0xe, 1, 0x80);
-            color = ((u32)func_00283CF0(fade * (float)D_L00_001B09AC) << 24) | D_L00_001B09A8;
-            edge = D_L00_001B09A4;
-            packet.uv[0][0] = 0.0f;
-            packet.uv[0][1] = 0.0f;
-            packet.uv[1][0] = 0.0f;
-            packet.uv[2][1] = 0.0f;
-            packet.uv[3][0] = 0.5f;
-            packet.uv[2][0] = 0.5f;
-            packet.color[0] = color;
-            packet.color[1] = color;
-            packet.color[2] = color;
-            packet.color[3] = color;
-            packet.uv[1][1] = 1.0f;
-            packet.uv[3][1] = 1.0f;
-            func_00282CF0(&temporary, &D_L00_001B8DC0, &effect->center[0]);
-            func_00282DD8(&frame.row[1], &frame.row[0], &temporary);
-            func_00282F20(&side, &frame.row[1], D_L00_001B09A0);
-            for (layer = 0; layer < 2; ++layer) {
-                func_00282CC0(&packet.vertex[0], &effect->center[layer + 1], &side);
-                func_00282CF0(&packet.vertex[1], &effect->center[layer + 1], &side);
-                func_00282CC0(&packet.vertex[2], &effect->center[layer], &side);
-                func_00282CF0(&packet.vertex[3], &effect->center[layer], &side);
-                packet.color[2] = edge;
-                packet.color[3] = edge;
-                func_00280B90(&packet, 0, 0);
-                packet.uv[0][0] = packet.uv[2][0];
-                packet.uv[3][0] = 3.0f;
-                packet.uv[1][0] = packet.uv[2][0];
-                packet.uv[2][0] = 3.0f;
-                edge = color;
-            }
-            func_00281DE8((QuadPacket *)&packet, 0x17, 1, 0x80);
-            color = ((u32)func_00283CF0(fade * (float)D_L00_001B09BC) << 24) | D_L00_001B09B8;
-            edge = D_L00_001B09B4;
-            phase = effect->ribbon_phase;
-            packet.uv[0][0] = 0.0f;
-            packet.uv[0][1] = 0.0f;
-            packet.uv[1][0] = 0.0f;
-            packet.uv[2][1] = 0.0f;
-            packet.uv[2][0] = phase + 0.5f;
-            packet.color[0] = color;
-            packet.color[1] = color;
-            packet.color[2] = color;
-            packet.color[3] = color;
-            packet.uv[1][1] = 1.0f;
-            packet.uv[3][0] = packet.uv[2][0];
-            packet.uv[3][1] = 1.0f;
-            func_00282F20(&side, &frame.row[1], D_L00_001B09B0);
-            for (layer = 0; layer < 2; ++layer) {
-                func_00282CC0(&packet.vertex[0], &effect->center[layer + 1], &side);
-                func_00282CF0(&packet.vertex[1], &effect->center[layer + 1], &side);
-                func_00282CC0(&packet.vertex[2], &effect->center[layer], &side);
-                func_00282CF0(&packet.vertex[3], &effect->center[layer], &side);
-                packet.color[2] = edge;
-                packet.color[3] = edge;
-                func_00280B90(&packet, 0, 0);
-                packet.uv[3][0] = phase + 3.0f;
-                packet.uv[0][0] = packet.uv[2][0];
-                packet.uv[1][0] = packet.uv[2][0];
-                edge = color;
-                packet.uv[2][0] = packet.uv[3][0];
+    func_00281DE8(&quad, 21, 0, 128);
+    for (ring = 0; ring < 3; ring++) {
+        if (rings[ring].enabled == 0) continue;
+        qcopy(matrix[0], rings[ring].basis[0]);
+        qcopy(matrix[2], rings[ring].basis[1]);
+        func_00282DD8(matrix[1], matrix[0], matrix[2]);
+        fade = (float)rings[ring].timer * rings[ring].rate;
+        alpha = func_00283CF0(fade * (float)D_L00_001B0994);
+        col = D_L00_001B098C;
+        primary = (alpha << 24) | col;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
+        for (row = 0; row < 3; row++) {
+            qcopy(matrix[3], rings[ring].origin[row]);
+            for (j = 0; j < 20; j++) {
+                func_00282D30(temp, D_L00_0029F0D0[j], D_L00_001B0984);
+                func_002830C0(vertices[row][j], temp, matrix);
             }
         }
-        ++effect_index;
-    } while (effect_index < 3);
+        phase = rings[ring].phase;
+        col = D_L00_001B0990;
+        for (j = 1; j < 3; j++) {
+            u = 0;
+            for (row = 0; row < 20; row++) {
+                qcopy(quad.point[0], vertices[j][row]);
+                qcopy(quad.point[1], vertices[j][(row + 1) % 20]);
+                qcopy(quad.point[2], vertices[j - 1][row]);
+                qcopy(quad.point[3], vertices[j - 1][(row + 1) % 20]);
+                next = u + D_L00_001B0980;
+                side_u = phase + D_L00_001B097C;
+                quad.color[3] = quad.color[2] = col;
+                quad.uv[0][0] = phase;
+                quad.uv[0][1] = u;
+                quad.uv[1][0] = phase;
+                quad.uv[1][1] = next;
+                quad.uv[2][0] = side_u;
+                quad.uv[2][1] = u;
+                quad.uv[3][0] = side_u;
+                quad.uv[3][1] = next;
+                u = next;
+                func_00280B90(&quad, 0, 0);
+            }
+            col = primary;
+        }
+        func_00281DE8(&quad, 14, 1, 128);
+        alpha = func_00283CF0(fade * (float)D_L00_001B09AC);
+        col = D_L00_001B09A8;
+        quad.uv[0][0] = 0;
+        quad.uv[0][1] = 0;
+        quad.uv[1][0] = 0;
+        quad.uv[1][1] = 1;
+        quad.uv[2][1] = 0;
+        quad.uv[3][1] = 1;
+        primary = (alpha << 24) | col;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
+        quad.uv[3][0] = 0.5f;
+        quad.uv[2][0] = 0.5f;
+        col = D_L00_001B09A4;
+        func_00282CF0(temp, &D_L00_001B8DC0, rings[ring].origin[0]);
+        func_00282DD8(matrix[1], matrix[0], temp);
+        func_00282F20(side, matrix[1], D_L00_001B09A0);
+        for (j = 0; j < 2; j++) {
+            func_00282CC0(quad.point[0], rings[ring].origin[j + 1], side);
+            func_00282CF0(quad.point[1], rings[ring].origin[j + 1], side);
+            func_00282CC0(quad.point[2], rings[ring].origin[j], side);
+            func_00282CF0(quad.point[3], rings[ring].origin[j], side);
+            quad.color[3] = quad.color[2] = col;
+            func_00280B90(&quad, 0, 0);
+            col = primary;
+            quad.uv[0][0] = quad.uv[1][0] = quad.uv[2][0];
+            quad.uv[2][0] = quad.uv[3][0] = 3.0f;
+        }
+        func_00281DE8(&quad, 23, 1, 128);
+        alpha = func_00283CF0(fade * (float)D_L00_001B09BC);
+        col = D_L00_001B09B8;
+        primary = (alpha << 24) | col;
+        quad.uv[2][0] = 1;
+        quad.uv[3][0] = 1;
+        quad.color[0] = quad.color[1] = quad.color[2] = quad.color[3] = primary;
+        quad.uv[0][0] = 0;
+        quad.uv[0][1] = 0;
+        quad.uv[1][0] = 0;
+        quad.uv[1][1] = 1;
+        quad.uv[2][1] = 0;
+        quad.uv[3][1] = 1;
+        phase2 = rings[ring].phase2;
+        quad.uv[2][0] = quad.uv[3][0] = phase2 + 0.5f;
+        col = D_L00_001B09B4;
+        func_00282F20(side, matrix[1], D_L00_001B09B0);
+        for (j = 0; j < 2; j++) {
+            func_00282CC0(quad.point[0], rings[ring].origin[j + 1], side);
+            func_00282CF0(quad.point[1], rings[ring].origin[j + 1], side);
+            func_00282CC0(quad.point[2], rings[ring].origin[j], side);
+            func_00282CF0(quad.point[3], rings[ring].origin[j], side);
+            quad.color[3] = quad.color[2] = col;
+            func_00280B90(&quad, 0, 0);
+            col = primary;
+            quad.uv[0][0] = quad.uv[1][0] = quad.uv[2][0];
+            quad.uv[2][0] = quad.uv[3][0] = phase2 + 3.0f;
+        }
+    }
 }

@@ -1,3 +1,12 @@
+/* 7 November 2026: still 1216/1220, US 0/28. The search is retail's except the $a3 index copy
+ * (retail: a2 = a3 + 1; a3 = a2) and the exit test copied after the loop passes. Aligned diff: the
+ * missing word is that copy; everything above +0x3F0 matches. -fcall-used-hi1 -fcall-used-lo1
+ * -fcall-used-accum1 (loop hoisting threshold 64): byte-identical output, retail's invariants are
+ * already hoisted, so this is not a hoisting miss. Also no change: while/do-while/`&&` exit forms,
+ * an inline match helper, a do/while(0) group on the init or the increment. Worse: a local index
+ * stored after or inside the loop (1200-1204), a do/while(0) around the match test (1196), an
+ * if/return-1 helper (1236). Only the always-false guard restores the copy (then +0xD0 v0/v1).
+ */
 /* 4 November 2026 source audit: removed the always-false preset-search guard.
  * The previous controlled result below is historical and cannot qualify this
  * revised draft. Production remains assembly; no linked or native credit.

@@ -1,3 +1,4 @@
+/* 8 November 2026 (round 9, rank_for_schedule): base 752/752, 3 differing words (retained C, recorded flags). rank_for_schedule is identical in GCC 2.95/2.95.2/2.95.3 and EE 991111/991111b; SN 2.95.2 v2.73a makes the same tie choice where its output is comparable. Env probes (sched1/sched2/both): reg weight swapped/clamped/dropped/after class/positive-or-negative only, class dropped/reversed, dependent count reversed/dropped/data-only/clamped, LUID reversed, INSN_UID ties, no birthing boost: none improves any of the nine cluster targets; forced on, every variant changes 6-7124 of 8761 matched units. Hypothesis falsified. */
 /* 6 November 2026, Codex follow-up to round 14 (accepted label_y precedent):
  * Best retained source: 752/752 bytes, 0/8 USA v1.01 places, THREE real words.
  * Same own-unit profile: -O2 -G8 -fno-expensive-optimizations

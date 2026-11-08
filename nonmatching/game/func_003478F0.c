@@ -1,3 +1,24 @@
+/* 6 November 2026 follow-up; retained near miss, not linked.
+ * USA v1.01: 1452/1452 bytes, 0/28 places, first difference +0x4c.
+ * Profile: -O2 -G8 -ffunction-sections -fno-rerun-loop-opt.
+ * 39 real differing instruction rows in the boot, versus 82 for the previous
+ * retained C/profile; relocation immediate fields are excluded from that count.
+ * Disabling the second loop pass fixes the owned-weapon table setup, final
+ * ammo lookup (including mult/addu instead of mtlo/madd), branch delay slots,
+ * final layout-record copies and the row-loop tail register. Writing bar
+ * coordinates as stride*index+base fixes six operand-register differences.
+ * Separate first-coordinate scalar reads improve one further instruction.
+ * Remaining: pointer spill slots, row table-address formation/scheduling and
+ * first-coordinate FPR allocation. The bar coordinate block now agrees.
+ * New controls: independent first-coordinate scalar-load permutations;
+ * explicit owner-relative pointer locals (all together and individually);
+ * table-base groups and record/halfword row views; explicit next-row and
+ * do-loop forms; meaningful coordinate groups; owner/FP argument interleaving;
+ * scheduling/CSE/loop flags. None beats this candidate. Groups shorten the
+ * body, explicit background/frame locals give 1444 bytes, and owner/FP
+ * interleavings tie. No dead stores, wrappers or extra memory reads were added.
+ * No linked build run. Earlier measurements below are historical.
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 1452/1452 bytes, 0/28 placements; first difference 0x4c.
  * Profile: -O2 -G8 -ffunction-sections.
@@ -58,10 +79,12 @@ void func_003478F0(char *o)
    for(col=0;col<4;col++,id+=5) {
 
     { int *color=((int *)func_00335E20(o+0x3b4));
-      float x=D_L00_001AE758*(float)col+(float)D_L00_001AE750;
-      float y=D_L00_001AE75C*(float)row+(float)D_L00_001AE754;
+      float xb=(float)D_L00_001AE750;
+      float yb=(float)D_L00_001AE754;
+      float ys=D_L00_001AE75C;
+      float xs=D_L00_001AE758;
       *color=0x60241700;
-      func_00335E38(o+0x3b4,x+(*(float **)(o+0x498))[0],y+(*(float **)(o+0x498))[1],0.0f,0.0f);
+      func_00335E38(o+0x3b4,(xs*(float)col+xb)+(*(float **)(o+0x498))[0],(ys*(float)row+yb)+(*(float **)(o+0x498))[1],0.0f,0.0f);
     }
     *((int *)func_00335E20(o+0x98))=0x30f0c070;
     *((int *)func_00335E20((o+0x3b4)))=0x60241700;
@@ -81,7 +104,7 @@ void func_003478F0(char *o)
       func_00336B90((o+0x1c8),weapons[slots[*id]].max);
       func_00336B98((o+0x1c8),D_00139868[*id]>>5);
 
-      func_00335E38((o+0x1c8),(float)(base.x+stride.x*col)+(*(float **)(o+0x498))[0],(float)(base.y+stride.y*row)+(*(float **)(o+0x498))[1],0.0f,0.0f);
+      func_00335E38((o+0x1c8),(float)(stride.x*col+base.x)+(*(float **)(o+0x498))[0],(float)(stride.y*row+base.y)+(*(float **)(o+0x498))[1],0.0f,0.0f);
       func_00335E68((o+0x1c8),1);
       a=0;b=0;color=0;
       func_00336F20(*id,&a,&b,&color);func_00336498((o+0x1c8),a,b);

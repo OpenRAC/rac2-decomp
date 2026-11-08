@@ -1,3 +1,19 @@
+/* 8 November 2026: still a near miss (retained C below unchanged: 2100/2100
+ * bytes, 0/28; 55 aligned rows differ, mostly the s5/s6/s7 renaming).
+ * Cause found: jump.c turns "if (page) panels = page->panels" into a
+ * conditional move with the old value of panels (reg_set_last stops at the
+ * first label), then gcse cprop puts the entry 0 into it (movz). cprop skips
+ * when panels has a second reaching set. "panels = 0;" in the empty
+ * D_0025A058 arm gives 11 aligned rows (entry zero, movn and registers all
+ * match) but the arm's own cmov folds and drops the dead D_001AB910 load
+ * (2108 bytes). Left: that slot, the bounds-loop page load in the delay slot
+ * of the panels test, one alignment nop, and the crop-clamp slt order.
+ * Tried, no gain: ternary (44 rows), "panels = 0;" just before the if (44),
+ * "panels = 0;" in the D_0025A498 arm (deleted by cse1), do/while(0) around
+ * the selection (64), state->page in the test or arm (52), -fno-gcse (2072
+ * bytes), -fsched-spec-load (no change), all 24 clamp orders and if-form
+ * clamps (best 11). D_001AB910 stays volatile as in matched 002C7748-g8.c.
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain func_002A0380 as int and func_002FC3C0 with its 64-bit mask.
  * The repaired source still fails all 28 USA places at +0x14.

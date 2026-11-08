@@ -1,3 +1,4 @@
+/* 8 November 2026 (REG_EQUIV round): local-alloc/regclass/reload1 equivalence code equals upstream 2.95.2 (update_equiv_regs, no_equiv, the REG_EQUIV REG_LIVE_LENGTH *= 2); SN 2.95.2 v2.73a gives the same REG_EQUIV notes, register stats and dispositions as ours here. Env probes (EE 991111 note test, MEM equiv for multi-block pseudos, no *= 2, replace in one block, move init in loops) leave 138 masked words; SN body equals ours. All-units sweep changes 197/602/3181/182/0 matched units. */
 /* func_0028A670. Opus 5.5 (v1961). Unit profile of src/game/00288D88.c: -O2 -G0 -ffunction-sections.
  * Best: 1192/1192 bytes, 0/28 USA v1.01 places, 151 of 298 cdiff rows differ, first mismatch +0xC.
  * This C keeps count/first/second in a local struct, which gives the exact size but not retail's

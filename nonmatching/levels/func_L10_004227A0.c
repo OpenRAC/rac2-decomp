@@ -1,3 +1,21 @@
+/* 8 November 2026 (round 9, rank_for_schedule): base 3420/3420, 8 differing words (retained C, recorded flags). rank_for_schedule is identical in GCC 2.95/2.95.2/2.95.3 and EE 991111/991111b; SN 2.95.2 v2.73a makes the same tie choice where its output is comparable. Env probes (sched1/sched2/both): reg weight swapped/clamped/dropped/after class/positive-or-negative only, class dropped/reversed, dependent count reversed/dropped/data-only/clamped, LUID reversed, INSN_UID ties, no birthing boost: none improves any of the nine cluster targets; forced on, every variant changes 6-7124 of 8761 matched units. Hypothesis falsified. */
+/* Round four, 7 November 2026 (USA v1.01): no match; the C below (8 rows) is unchanged.
+ * The four 101 rows come from sched1 weights: a0=x has weight 1 while x stays live to the 242
+ * handle test, so t0=len (weight 0) goes first and a0 ends up in the jal slot. In sched2/reorg,
+ * the last plain move goes into the slot.
+ * The 242 row's real values: everything computed before sprintf has to survive that call (an extra
+ * s-register move). Values already live there (x, the $s3 = 1, $f20) either keep x alive or fold.
+ * So the only candidate is sprintf's result:
+ * - With label_y, the mode load is local and takes $2 first, so the result's pseudo (global, it
+ *   spans the test blocks) gets $3: a dead `move $3,$2`, plus sprintf's a0/a1 swap (3432).
+ * - label_y with the mode test moved after the handle tests (a form needing a ruling): no move,
+ *   no swap, the 101 rows match. But the three 242 rows swap $f0/$f1 (value/scale), because the
+ *   mode load no longer sits between the scale load and the mul: 837/855, 6 rows.
+ * - Mode load first and test last: no move, but the swap returns and $f0/$f1 stay wrong (831).
+ *   Tests first, then mode/FP: 3432. Named `written` versus an inline call: same.
+ * Retail likely has label_y with sprintf's result as the handle and P in $2. That needs the
+ * P = v0 copy to come after the mode load in sched1, which no source form here produced.
+ */
 /* Round three, 7 November 2026 (USA v1.01): 3420/3420 bytes, 847/855 aligned, 8 rows left.
  * The C below replaces the earlier draft and scores the same in L05/L15 (their notes).
  * - MenuSpriteY (MenuY plus label_y's two dead handle tests, allowed by owner ruling) for the

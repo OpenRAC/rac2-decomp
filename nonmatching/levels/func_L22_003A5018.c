@@ -1,3 +1,35 @@
+/* 7 November 2026, round two (~30 check.py runs; body below unchanged, 36 rows):
+ * (1) Allocation, measured with tools/regalloc.py: base copy = pseudo 579 (4 refs/272), obj = 85, ctl = 86.
+ *   Count 1 = ctl, count 2 = obj, box = obj gives obj 7/569 > ctl 6/526. One more loop-weighted ctl ref fixes
+ *   it: `case 2: func_00288FB8(0x1241); do { func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); } while (0);`
+ *   gives retail's s6/s7/fp, but the group adds a nop in the switch arm (3012 bytes). Same nop with the whole
+ *   arm grouped or only the lh grouped. Groups on the ctl load at entry (57 rows) or on either gauge ratio
+ *   (size change), or on the icon ifs (to add base refs), are worse. No handle gives a working count 1 barrier
+ *   without touching obj/ctl: constants fold (text, &D_L22_001B1910, the format string, one2), and
+ *   func_00115DA8's result keeps a dead `daddu v1,v0` (3012 bytes).
+ * (2) Gauges: sched2 dump shows gauge 1 picks sd d[1] (insn 718) before `ref_43 + 1` (709) in the same cycle,
+ *   while retail pairs the addiu with `or`. Statement order and line joins have no effect.
+ * (3) Count 1: sched1 and sched2 ready lists pick the colour load (LUID 1056) before `a0 = text` (1058). Colour
+ *   as a direct argument, a separate len statement, colour first, func_001157AC(textBuffer) or one shared colour
+ *   variable all give the same output.
+ */
+/* 7 November 2026, rounding pass (unit -O2 -G8 -ffunction-sections -g, own -g8.c file): 78 -> 36 masked
+ * rows, 3008/3008 bytes, 0/2 places, first difference +0xC. Every rounding is now label_y or screen_coord:
+ * - Y1/Y3 -> screen_coord(D_L22_001B2980, value, 1.0f / 3.0f), the L15_0042E1B0 shape: 62 -> 42
+ *   (icon 2/4 argument order and the sprite 9/10 joins now exact).
+ * - Box width -> label_y(handle, 320.0f, ref_06, 0.5f, 1) (value/scale this way round puts 320 in f2):
+ *   the barrier after the rounding and the box/label s0/s1 are exact (42 -> 38).
+ * - Gauge sprites 7/8: label_y(sprite, ...) with the func_0028E588 result as handle (38 -> 36).
+ * Left: (1) allocation. Retail wants base-hi copy of D_L22_001B1910 (pseudo 579, 4 refs/272) > ctl
+ *   > obj; here obj 7/518 > ctl 6/565 (s7/fp swapped). Each label_y handle adds 2 refs; no obj/ctl
+ *   handle mix gives base > ctl > obj. Count 1 handle `text` (or a neutral box handle) fixes every
+ *   register (first difference +0x558, 37-38 rows) but folds that label_y's tests, losing its barrier
+ *   (colour load rises above the rounding). (void *)ref_31 as box handle folds too (inside if (ref_31));
+ *   global reloads / ctl+K / x-coordinate handles change the size.
+ * (2) Gauge 1: addiu (ref_43 + 1) issues after the d[1]/w[1] stores; gauge 2: D_001A7340 loads before
+ *   the width cvt. Statement order and line joins in both blocks give identical output.
+ * (3) Count 1: colour (ref_30) load before the func_001157AC call instead of in its delay slot.
+ * ~105 check.py runs. Body below is the 36-row form. */
 /* 7 November 2026, label_y sweep: Y0 is label_y(ctl, ...) for the two gauge sprites and label_y(obj, ...) for the two count texts: 123 -> 78 differences, 3008/3008 bytes (text as handle: 3012 bytes; Y1/Y3 keep their real mode tests). The body below is the retained C with that change (label_y is
  * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
  * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
@@ -150,19 +182,6 @@ extern void func_002802E0(void *, int, int, int, int, int, int, int, int);
 extern void func_0029B888(void *, unsigned int, char *, int, int, int, int, char *, int, int);
 extern void func_L00_0030CF60(void);
 
-/* Screen-space coordinates use the active video mode's vertical scale. */
-static __inline__ int Y3(float y) {
-    if (D_L22_001B2980 == 1)
-        return (int)(y + 3.0f);
-    return (int)y;
-}
-static __inline__ int Y1(float y) {
-    if (D_L22_001B2980 == 1)
-        return (int)(y + 1.0f);
-    return (int)y;
-}
-#define Y0(y) label_y(ctl, (float)(y), D_L22_001B2984, 0.5f, 1)
-
 extern int D_L22_001B2980;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
@@ -181,6 +200,15 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int screen_coord(int mode, float value, float offset)
+{
+    float scaled = value * D_L22_001B2984 + 0.5f;
+
+    if (mode == 1)
+        return (int)(scaled + offset);
+    return (int)scaled;
+}
+
 int func_L22_003A5018(void) {
     char textBuffer[64];
     char *text;
@@ -194,43 +222,39 @@ int func_L22_003A5018(void) {
 
     {
         void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
-        float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
-        sy = (float)Y3(sy);
+        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
         func_00300A00(sprite, 0x60442D00, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
         void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
-        float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
-        sy = (float)Y3(sy);
+        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
         func_00300A00(sprite, 0x60241700, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
         void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
-        float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
-        sy = (float)Y3(sy);
+        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
         func_00300A00(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
         void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
-        float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
-        sy = (float)Y3(sy);
+        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
         func_00300A00(sprite, 0x60442D00, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
         void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
-        float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
-        sy = (float)Y3(sy);
+        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
         func_00300A00(sprite, 0x60241700, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
         void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
-        float sy = ref_L22_003A5018_02 * D_L22_001B2984 + 0.5f;
-        sy = (float)Y3(sy);
+        float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
         func_00300A00(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     one = 1;
-    func_0028EA58((void *)(u32)func_0028E588(0xEAA4, one), ref_L22_003A5018_14, Y0(ref_L22_003A5018_15), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42);
-    func_0028EA58((void *)(u32)func_0028E588(0xEAA4, 0), ref_L22_003A5018_18, Y0(ref_L22_003A5018_19), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42);
+    { void *sprite = (void *)(u32)func_0028E588(0xEAA4, one);
+    func_0028EA58(sprite, ref_L22_003A5018_14, label_y(sprite, (float)ref_L22_003A5018_15, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42); }
+    { void *sprite = (void *)(u32)func_0028E588(0xEAA4, 0);
+    func_0028EA58(sprite, ref_L22_003A5018_18, label_y(sprite, (float)ref_L22_003A5018_19, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42); }
 
     {
         float ratio = (float)D_0018B694 / (float)*(short *)(ctl + 0x324);
@@ -257,13 +281,11 @@ int func_L22_003A5018(void) {
 
     {
         void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
-        float sy = (float)ref_L22_003A5018_23 * D_L22_001B2984 + 0.5f;
-        func_0028EA58(sprite, ref_L22_003A5018_22, Y1(sy), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
+        func_0028EA58(sprite, ref_L22_003A5018_22, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_23, 1.0f), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
     }
     {
         void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
-        float sy = (float)ref_L22_003A5018_27 * D_L22_001B2984 + 0.5f;
-        func_0028EA58(sprite, ref_L22_003A5018_26, Y1(sy), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
+        func_0028EA58(sprite, ref_L22_003A5018_26, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
     }
     one2 = 1;
     func_00115DA8(textBuffer, D_L22_001AF4D8, D_L22_001B1910.leftCount);
@@ -281,25 +303,21 @@ int func_L22_003A5018(void) {
     }
     if (D_L22_001B1910.leftIcons) {
         void *sprite = (void *)(u32)func_0028E588(0xEAA5, one2);
-        float sy = (float)ref_L22_003A5018_37 * D_L22_001B2984 + 0.5f;
-        func_0028EA58(sprite, ref_L22_003A5018_36, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        func_0028EA58(sprite, ref_L22_003A5018_36, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.leftIcons >= 2) {
         void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
         int x = ref_L22_003A5018_36 + ref_L22_003A5018_44;
-        float sy = (float)ref_L22_003A5018_37 * D_L22_001B2984 + 0.5f;
-        func_0028EA58(sprite, x, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        func_0028EA58(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons) {
         void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
-        float sy = (float)ref_L22_003A5018_39 * D_L22_001B2984 + 0.5f;
-        func_0028EA58(sprite, ref_L22_003A5018_38, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        func_0028EA58(sprite, ref_L22_003A5018_38, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons >= 2) {
         void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
         int x = ref_L22_003A5018_38 - ref_L22_003A5018_44;
-        float sy = (float)ref_L22_003A5018_39 * D_L22_001B2984 + 0.5f;
-        func_0028EA58(sprite, x, Y1(sy), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        func_0028EA58(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B2AC8 != -1 && obj[0x95] != 10) {
         switch (D_L22_001B2AC8) {
@@ -312,7 +330,7 @@ int func_L22_003A5018(void) {
         if (D_L22_001B2AD0 <= 0) D_L22_001B2AC8 = -1;
     }
     if (ref_L22_003A5018_31) {
-        func_002802E0(box, 240, 480, 44, 468, 256, (int)(ref_L22_003A5018_06 * 320.0f + 0.5f), 16, 3);
+        func_002802E0(box, 240, 480, 44, 468, 256, label_y(ctl, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);
         label = func_00288FB8(0x9FC);
         hint = func_00288FB8(0x2F2C);
         func_0029B888(box, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);

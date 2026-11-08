@@ -1,14 +1,41 @@
-/* 2 November 2026: lawful retained reconstruction, not a match.
- * Removed the older draft's always-true regen test and unreachable else arm.
- * Those branches were invented to influence compiler PRE/loop behavior; they
- * do not describe runtime state and cannot support matching credit. The
- * unconditional timer/alpha reset and trail regeneration remain explicit.
- * Current check.py: 1596/1572 bytes, 0/1 USA v1.01 placement. The old
- * 1564/1572-byte measurement depended on the diagnostic and does not qualify
- * this source. Scratch collision[112] remains an inferred capacity;
- * the owner-hit position copy, null-hit emission and real state reloads are
- * preserved. Reopen matching work with evidence for the genuine original
- * loop/control-flow and local lifetimes. No linked match is claimed.
+/* 8 November 2026: not a match. check.py: 1564/1572 bytes, 0/1 USA v1.01
+ * placement; 26 of 393 instructions differ after alignment (2 November body:
+ * 1596 bytes, 123 differ; the forbidden regen draft: 61). No always-true test.
+ * What changed, and why:
+ * - `int count = 6;` bounds the regeneration loop. cse1 cannot fold the entry
+ *   test `0 < count` (other block), so gcse sees a loop that may be skipped and
+ *   does not hoist sp+0x10/sp+0x20 into the default arm; the final cprop then
+ *   folds the test. This is what the old regen test did.
+ * - All scalars at function scope with `i` declared last: i's pseudo number
+ *   moves the i+1 PRE expression after o+0x10 in hash order, so the spill slots
+ *   match (o+0x10 at 0x80, i+1 at 0x84).
+ * - collision[112] is local to case 0 and velocity/axis to the loop body; the
+ *   compiler shares their slots (0xF0 frame, as retail).
+ * - `direction = 1.0f` before the row qcopy shortens the axis live range, so
+ *   axis takes s1 and the segment offset s2 (as retail).
+ * - impact = point only in the else arm gives retail's beql.
+ * - func_002C2210's last two parameters as (float, int): same registers,
+ *   fixes the tail argument order.
+ * Still different: (1) retail sets `li v1,1` at +4 for the case-1 compare
+ *   (a 1-valued `first` loop start fixes it but breaks the axis/offset pair);
+ *   (2) case 0 keeps o+0x10 in s0 for func_002761F8, retail reloads 0x80 and
+ *   gives sp+0x10 s0; (3) case 1 register names at +0x1D8; (4) `mult` vs
+ *   `mult zero; mflo` in the clear loop; (5) loop head: retail `sll v0,s1,1`
+ *   plus a copy `daddu a0,v0,zero` for the alpha index; (6) direction's mtc1
+ *   now lands before the row qcopy (retail: after it).
+ * Tried and worse: scan written as a for loop (56), `first` on the clear loop
+ *   (51), -fno-gcse (92). Needs its own unit (prototype clash with
+ *   L06_00458138.c); default flags.
+ * Round 2 (8 November 2026), body unchanged (still best, 26):
+ * - mult: `mult zero; mflo` appears only when st->0x48 * 0x180 is written
+ *   inside the col loop (loop.c moves it twice); the giv tree then becomes
+ *   (m+16)+(D+r) instead of retail's ((m+r)+D)+16 (28). Separate product
+ *   locals, operand order and unsigned all keep the 3-operand mult.
+ * - i<<1 copy: a timer pointer, an index local or a group around the clamp
+ *   do not create it. Grouping the two resets (`do { t=2; a=64; } while (0)`)
+ *   gives retail's 1572-byte size but 32 diffs.
+ * - case 0: `impact = o + 0x10` before func_00282CC0 gives sp+0x10 s0 as
+ *   retail, but impact then keeps s1 (29). s/hit/p as the temp: worse.
  */
 #include "common.h"
 extern short D_L06_001B3790[] __attribute__((sda));
@@ -26,7 +53,7 @@ extern void func_00282F20(char *, char *, float);
 extern int func_002A77E0(int);
 extern void func_002ACEC0(void *, void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
-extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, int, float);
+extern char *func_002C2210(void *, int, float, float, unsigned int, int, int, void *, float, int);
 extern void func_002A7750(char *, int, int);
 extern float func_002A7878(float, float);
 extern void func_00350388(char *);
@@ -55,32 +82,40 @@ extern void func_L06_00458F30(char *);
 void func_L06_004587E8(char *o) {
     float pos[4];
     typedef union { NotakQuad q; float f[4]; } Vec;
-    union { char collision[112]; struct { Vec velocity, axis; } vectors; } scratch;
     char *st = *(char **)(o + 0x68);
-    int i, j, sign, snd;
+    char *hit;
+    float *impact;
+    char *s;
+    int snd, index, row, col;
+    char *p;
+    int off, k, j, sign;
+    int count = 6;
     typedef NotakQuad Trail[6][4];
     float direction;
     float size;
+    int i;
     switch (*(unsigned char *)(o + 0x20)) {
-    case 0:
+    case 0: {
+        char collision[112];
         *(float *)(o + 0xF0) = func_00283B98(*(float *)(o + 0xF0), 0.104719773f);
         func_00282CC0(pos, o + 0x10, st);
-        func_002A8C00(scratch.collision, o, 1, st, *(float *)(st + 0x40));
-        *(unsigned short *)(scratch.collision + 0x1A) = *(unsigned short *)(o + 0xAA);
-        if (func_002761F8(o + 0x10, pos, 0, o, scratch.collision) ||
+        func_002A8C00(collision, o, 1, st, *(float *)(st + 0x40));
+        *(unsigned short *)(collision + 0x1A) = *(unsigned short *)(o + 0xAA);
+        if (func_002761F8(o + 0x10, pos, 0, o, collision) ||
             func_0031EBF8(0.3f, o + 0x10, 0, o) || func_00282948(st + 0x38)) {
-            char *hit = D_L06_001BFC80.hit;
-            float *impact = D_L06_001BFC80.point;
+            hit = D_L06_001BFC80.hit;
             if (hit) {
                 if (hit == *(char **)(st + 0x3C)) goto update_position;
                 if (*(short *)(hit + 0xAA) != 0x4E)
                     func_002A8C28(o, o + 0x10, 0x10001, 0, 1, 0, 0.5f, *(float *)(st + 0x40), 1.0f);
                 impact = (float *)(o + 0x10);
+            } else {
+                impact = D_L06_001BFC80.point;
             }
             func_L06_00459828(impact, 20);
             snd = *(int *)(st + 0x4C);
             if (snd != -1) {
-                char *s = D_00188660 + snd * 0x70;
+                s = D_00188660 + snd * 0x70;
                 if (*(char **)(s + 0x88) == o && *(unsigned char *)(s + 0x74)) func_002E59F8(snd);
             }
             *(int *)(st + 0x4C) = -1;
@@ -90,18 +125,18 @@ void func_L06_004587E8(char *o) {
     update_position:
         qcopy(o + 0x10, pos);
         break;
+    }
     case 1: {
-        int index, row, col;
         index = D_L06_001B3778[*(int *)(st + 0x48)];
         if (index >= 0) {
-            char *p = D_L06_001C79C0 + index * 32;
+            p = D_L06_001C79C0 + index * 32;
             *(float *)(p + 0x1C) -= 0.166666672f;
             if (!(*(float *)(p + 0x1C) <= 0)) return;
             func_00291450(D_L06_001B3778[*(int *)(st + 0x48)]);
             D_L06_001B3778[*(int *)(st + 0x48)] = -1;
             D_L06_001B3760[*(int *)(st + 0x48)] = 0;
             for (row = 0; row < 6; row++) {
-                int off = *(int *)(st + 0x48) * 0x180 + (row << 6);
+                off = *(int *)(st + 0x48) * 0x180 + (row << 6);
                 for (col = 1; col < 4; col++)
                     qzero_nc(&((NotakQuad *)(D_L06_0025FFC0 + off))[col]);
             }
@@ -115,7 +150,7 @@ void func_L06_004587E8(char *o) {
     }
     qcopy(pos, o + 0x10);
     {
-        int k = 0;
+        k = 0;
         if (D_L06_001B3790[k]) goto scanned;
     next:
         k++;
@@ -125,19 +160,20 @@ void func_L06_004587E8(char *o) {
         }
     scanned:;
     }
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < count; i++) {
+        Vec velocity, axis;
         if (--D_L06_001B3790[i] < 0) D_L06_001B3790[i] = 0;
         D_L06_001B3790[i] = 2;
         D_L06_001B37A0[i] = 64;
-        func_002A7988(scratch.vectors.velocity.f, 0.2f, 0.2f);
-        if (func_00282DF0(scratch.vectors.velocity.f) > 0.2f) func_00282F20((char *)scratch.vectors.velocity.f, (char *)scratch.vectors.velocity.f, 0.2f);
-        qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][0], pos);
+        func_002A7988(velocity.f, 0.2f, 0.2f);
+        if (func_00282DF0(velocity.f) > 0.2f) func_00282F20((char *)velocity.f, (char *)velocity.f, 0.2f);
         direction = 1.0f;
+        qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][0], pos);
         for (j = 1; j < 4; j++) {
-            func_00282CF0(scratch.vectors.axis.f, (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1]), (float *)D_L06_001B9840);
-            func_002ACEC0(scratch.vectors.velocity.f, scratch.vectors.velocity.f, scratch.vectors.axis.f, func_002A7878(0.17453295f, 0.7853982448577881f) * direction);
+            func_00282CF0(axis.f, (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1]), (float *)D_L06_001B9840);
+            func_002ACEC0(velocity.f, velocity.f, axis.f, func_002A7878(0.17453295f, 0.7853982448577881f) * direction);
             direction = -direction;
-            func_00282CC0(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1], scratch.vectors.velocity.f);
+            func_00282CC0(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j], &((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1], velocity.f);
         }
     }
     if (!func_002A77E0(2)) {

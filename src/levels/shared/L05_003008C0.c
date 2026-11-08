@@ -221,7 +221,6 @@ void func_L05_00379F68(void) {
 
 /* func_L05_0037A218 is defined in L05_0037A218-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L05_0037A5F8);
 
 typedef struct L05Slot40 {
     int state;      /* 0x00 */

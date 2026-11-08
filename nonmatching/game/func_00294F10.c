@@ -1,22 +1,44 @@
-/* Claude Opus 5.5 (xhigh), task v2065 (from v2058's partial unit), USA v1.01.
- * Best: 1452/1452 bytes, 0/28 places. Profile: -O2 -G64 -Wa,-G64
- * -ffunction-sections -g (own unit; -G0 -g gave the same size before the
- * resource fixes). Exact from the TOC test through the end except the
- * func_0029D4D0 setup: per-arm `size << 7` lets jump2 cross-jump the arms'
- * shared sll (retail a0 temp); the two later sizes are separate scoped locals
- * (local-alloc single-death rule -> s0, 7 saved GPRs like retail); the else
- * tail lists [0x28/4] last because sched1 pulls the store carrying the base's
- * REG_DEAD forward. Loop 2 reads x0 and writes ax through SDATA aliases only
- * (all-alias gives the exact body but gp at every offset; canonical-only adds
- * two lui).
- * Remaining: (1) prologue: retail loads func_00295C50's argument before
- * v0 = -1; (2) coefficient loops: FPR choice for x0/y0/v0 (ours f5/f6/f7,
- * retail f7/f5/f6) and loop-2 load/store order (retail bx, ax, by, ay); (3)
- * retail computes &D_001A95B8 into s2 and does the arg moves before the
- * [0x238/4] store, ahead of func_0029D4D0 (ours sets s2 after the call);
- * (4) 32x32 mask loop: 256.0f before 15.5f, i in v1 with i+1 copied back,
- * address i*4 + j/8 + (D_001C4FA0 + 0x1B0) in that order, one nop fewer.
- * All declarations needed by this standalone draft are included. Not linked.
+/* 8 November 2026, Claude Opus 5.5 (task v101/m3k), USA v1.01.
+ * Best: 1452/1452 bytes, 0/28 places, about 45 differing instructions (was 82).
+ * Profile: own unit, -O2 -G64 -Wa,-G64 -ffunction-sections -g.
+ * New this round:
+ * - 32x32 mask loop now exact: fresh block-scope i, j (the function-level i
+ *   conflicted with $v0/$v1/$a0 from the earlier calls, so it could not take
+ *   $v1), index `j / 8 + (i << 2)`, and the two constants as locals
+ *   `limit = 256.0f, center = 15.5f` (gives retail's 256-first hoist order).
+ *   The i+1 copy in $a3 then appears without any extra source.
+ * - Both coefficient loops become exact (register choice and loop-2 order)
+ *   when the ax store uses the canonical D_001A9428 instead of the
+ *   D_001A9428_gp alias. Cause: alias.c base_alias_check says "differing
+ *   symbols never alias", so the alias store floats free of the bx/by/ay
+ *   stores; retail keeps them in source order (bx, ax, by, ay). But the
+ *   canonical form makes ax's pointer setup lui+addiu (1456 bytes). Retail's
+ *   offset-0 $gp / offset lui mix fits an assembler that uses lui whenever
+ *   `la` has an addend (the comment in gas tc-mips.c load_address says so;
+ *   the code there does not). So this is a toolchain blocker, not a source
+ *   one. Below keeps the alias (right size).
+ * - Float declaration order matters for global-alloc ties (45 vs 49).
+ * Still different:
+ *   (1) prologue: retail lui/lw of func_00295C50's arg before v0 = -1.
+ *       Load into a local: the load moves ahead of the base addiu as well.
+ *       nosda scalar splits lui into another register.
+ *   (2) the coefficient loops (see above).
+ *   (3) func_0029D4D0 setup: sched2 priorities tie (all 34). The 0x238 store
+ *       has 3 dependents like the $a0 move and a lower LUID, so it is picked
+ *       first. Retail picks the a0/a1 moves first, then the store, then
+ *       s2 = &D_001A95B8 before the jal. Moving the 0x240 store, a `file`
+ *       local, or reusing `packed` for the name does not help (the last two
+ *       add a saved register).
+ * 8 November 2026 (assembler check): our gas matches EE binutils as shipped
+ *   (SCE 991111 as.exe also keeps $gp for `la sym+off`). SN ps2eeas (-G64)
+ *   uses lui for any nonzero addend, la and lw/sw alike. Env probe in gas
+ *   load_address/M_LA_AB: la+addend -> lui, with every D_001A9428/D_001A93D0
+ *   access through the _gp alias: both coefficient loops exact, 45 -> 9
+ *   differing instructions (only (1) and (3) left). The canonical name does
+ *   not help: ASTRA P20 makes offset-0 `la` lui (.extern comes after use).
+ *   Forced on over 8906 units (all releases): la-only changes 1 matched unit
+ *   (L00_003F9570-g8: retail `la D_L00_001B0A70+16` is $gp); la+lw/sw (SN
+ *   rule) changes 18. Not landed.
  */
 #include "common.h"
 extern unsigned int func_00294EC8(int);
@@ -31,7 +53,6 @@ typedef struct {
     MapFile files1[28]; /* 0x15D0 */
 } MapToc;
 extern char D_0014B540_1[];
-#define TOC ((MapToc *)D_0014B540_1)
 typedef struct { float x0, y0, x1, y1, u0, v0, u1, v1; } UiMapEndpoints;
 typedef struct { float ax, bx, ay, by; } UiMapCoefficients;
 extern int D_00256028[][2];
@@ -42,7 +63,6 @@ extern UiMapEndpoints D_001A93D0_gp[2] SDATA(D_001A93D0);
 extern UiMapCoefficients D_001A9428[2] MACRO_ADDR;
 extern UiMapCoefficients D_001A9428_gp[2] SDATA(D_001A9428);
 extern unsigned char D_001A7AF8[] MACRO_ADDR;
-#define OWNED5 D_001A7AF8[5]
 extern char *D_001BAED0 __attribute__((nosda));
 extern char D_001A95A0[], D_001A95B8[];
 extern unsigned char D_0018D278[];
@@ -57,8 +77,8 @@ extern void func_00297400(u8 *, u8 *, short *);
 
 void func_00294F10(void)
 {
-    int i, j;
-    float x0, y0, x1, y1, u0, v0, u1, v1;
+    int i;
+    float u0, y0, v0, x1, u1, x0, y1, v1;
     char *scratch, *packed;
     int bytes;
 
@@ -98,26 +118,26 @@ void func_00294F10(void)
         u1 = D_001A93D0[i].u1;
         v1 = D_001A93D0[i].v1;
         sx = (u0 - u1) / (x0 - x1);
-        sy = (v0 - v1) / (y0 - y1);
         D_001A9428[i].bx = sx;
         D_001A9428_gp[i].ax = u0 - sx * x0;
+        sy = (v0 - v1) / (y0 - y1);
         D_001A9428[i].by = sy;
         D_001A9428[i].ay = v0 - sy * y0;
     } }
-    if ((TOC->files0[D_001C4FA0[0x230 / 4]].size != 0 && !OWNED5)
-        || (TOC->files1[D_001C4FA0[0x230 / 4]].size != 0 && OWNED5)) {
+    if ((((MapToc *)D_0014B540_1)->files0[D_001C4FA0[0x230 / 4]].size != 0 && !D_001A7AF8[5])
+        || (((MapToc *)D_0014B540_1)->files1[D_001C4FA0[0x230 / 4]].size != 0 && D_001A7AF8[5])) {
         D_001C4FA0[0x28 / 4] = 1;
-        if (OWNED5)
-            bytes = TOC->files1[D_001C4FA0[0x230 / 4]].size << 7;
+        if (D_001A7AF8[5])
+            bytes = ((MapToc *)D_0014B540_1)->files1[D_001C4FA0[0x230 / 4]].size << 7;
         else
-            bytes = TOC->files0[D_001C4FA0[0x230 / 4]].size << 7;
+            bytes = ((MapToc *)D_0014B540_1)->files0[D_001C4FA0[0x230 / 4]].size << 7;
         scratch = D_001BAED0;
         packed = scratch + 0x9A800;
-        if (OWNED5) {
-            func_002B7C80(packed, TOC->files1[D_001C4FA0[0x230 / 4]].sector + TOC->base, TOC->files1[D_001C4FA0[0x230 / 4]].size);
+        if (D_001A7AF8[5]) {
+            func_002B7C80(packed, ((MapToc *)D_0014B540_1)->files1[D_001C4FA0[0x230 / 4]].sector + ((MapToc *)D_0014B540_1)->base, ((MapToc *)D_0014B540_1)->files1[D_001C4FA0[0x230 / 4]].size);
             D_001C4FA0[0x23C / 4] = 1;
         } else {
-            func_002B7C80(packed, TOC->files0[D_001C4FA0[0x230 / 4]].sector + TOC->base, TOC->files0[D_001C4FA0[0x230 / 4]].size);
+            func_002B7C80(packed, ((MapToc *)D_0014B540_1)->files0[D_001C4FA0[0x230 / 4]].sector + ((MapToc *)D_0014B540_1)->base, ((MapToc *)D_0014B540_1)->files0[D_001C4FA0[0x230 / 4]].size);
             D_001C4FA0[0x23C / 4] = 0;
         }
         D_001C4FA0[0x238 / 4] = func_002EED58(packed, bytes, 0x3C00, D_001A95A0);
@@ -146,13 +166,17 @@ void func_00294F10(void)
             func_00297730((char *)D_001C4FA0[3], D_0018D278 + (D_001C4FA0[0x230 / 4] << 11), D_001C4FA0[5]);
         else
             func_00297400((u8 *)D_001C4FA0[3], (u8 *)D_001C4FA0[0], (short *)D_001C4FA0[1]);
-        for (i = 0; i < 32; i++) {
-            float dy = 15.5f - (float)i;
-            float dy2 = dy * dy;
-            for (j = 0; j < 32; j++) {
-                float dx = 15.5f - (float)j;
-                if (dx * dx + dy2 > 256.0f)
-                    ((u8 *)D_001C4FA0)[0x1B0 + i * 4 + j / 8] |= 1 << (j % 8);
+        {
+            int i, j;
+            float limit = 256.0f, center = 15.5f;
+            for (i = 0; i < 32; i++) {
+                float dy = center - (float)i;
+                float dy2 = dy * dy;
+                for (j = 0; j < 32; j++) {
+                    float dx = center - (float)j;
+                    if (dx * dx + dy2 > limit)
+                        ((u8 *)D_001C4FA0 + 0x1B0)[j / 8 + (i << 2)] |= 1 << (j % 8);
+                }
             }
         }
     } else {

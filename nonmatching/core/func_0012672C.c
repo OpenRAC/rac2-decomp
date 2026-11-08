@@ -1,3 +1,18 @@
+/* 6 November 2026 follow-up: best source unchanged, SDK profile below.
+ * Rechecked USA v1.01, USA v2.00 and PAL: 1676/1676 bytes, 0/1 places
+ * each, first checker failure +0x3CC. USA has 17 differing instruction
+ * positions after excluding relocated address values (including register
+ * differences in relocated instructions); equal size is not a match.
+ * New probes: removing every volatile qualifier produces 1504 bytes and
+ * loses the MMIO polling behavior. A one-pass group around the reset FIFO
+ * transfer produces 1680 bytes. Ten contiguous one-pass groupings of the
+ * four ordered error-cleanup stores produce 1888-1928 bytes, all worse.
+ * No MMIO operations were reordered and no interfaces were narrowed.
+ * The retained hardware-volatile source is ineligible under the worker's
+ * explicit no-volatile-in-matched-C rule; it remains a near miss only.
+ * Need an admissible polling representation and independent cleanup/reset
+ * lifetime evidence before another attempt. No build or match claimed.
+ */
 /* Complete StoreImage executor reconstruction, 3 November 2026; not linked.
  * Profile: sdk -O2 -G2 -ffunction-sections -Wa,--r5900-swap-branch-slots,
  * in its own source unit. US/US2/PAL: 1676/1676 bytes, 0/1 each; the checker

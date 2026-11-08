@@ -1,3 +1,30 @@
+/* 8 November 2026 (round 9, wccT): flow-TRAP_IF hypothesis falsified. Upstream gcc-2.95.2
+ * flow.c mark_used_regs clears mem_set_list at TRAP_IF/UNSPEC_VOLATILE/volatile asm (Jeff Law,
+ * 27 March 1999); EE 991111's Cygnus tree (merged to ~18 March 1999) lacks it; div_trap is the
+ * same separate trap_if insn in both. Backported env-gated: this function's tail becomes retail's
+ * (div; sw v0,0x3C(s1); beql; mfhi; sw), first diff stays +0x6A0. All-units sweep: 7 of 8761
+ * matched units change for the worse (L22_002BF1B0/L23_002C38B0 us/pal/us2, PAL L18_0043A56C
+ * gain a store before a div guard that retail drops). SN cc1 under wine on a reduced pair:
+ * 2.95.2/2.95.3 keep both stores, SN 2.9-ee-991111 drops both, so retail's flow is 991111's and
+ * this store needs another cause. Not landed.
+ */
+/* 8 November 2026: retained reconstruction, not linked or counted.
+ * Tail: the source is RAC1's span-first form (span computed into a local, then
+ * += and %=; RAC1 matches it 100%). As a diagnostic, RAC1's local SN ee-gcc
+ * 2.95.2 and 2.95.3 cc1 (under wine, nothing added to the repo) keep retail's
+ * intermediate `sw v0,0x3C(s1)` between div and the guard with exactly this C, in
+ * a reduced test and in this whole function. This tree's flow2 deletes it: its
+ * flow.c mark_used_regs does not treat TRAP_IF as using memory (GCC 3 clears
+ * mem_set_list there), so store1 -> trap_if -> store2 looks dead. Closing it
+ * needs a compiler transformer; no source form can, and none was added.
+ * Remaining source differences (identical under SN, so real): +0x6A0..+0x6EC the
+ * so>>4 chain takes v0 and the s[0] copy a0 (retail reverse); +0x73C..+0x780
+ * allocation/order of the second set_window_vertical. A do/while(0) group around
+ * that second call (below) cuts the region's rows 31 -> 24 (D in a0, s[7] in v1
+ * like retail), but adds a word: 2076/2076, 38 aligned rows differ (without the
+ * group: 2072, 36). Tried without effect for +0x6A0: helper store order, param
+ * types, y split/rewritten, so/top locals, groups around the so load, top or y.
+ */
 /* 5 November 2026: retained reconstruction, not linked or counted.
  * Retain the actual func_0029DB28 and func_00289FC8 interfaces.
  * A consistent volatile scroll-field experiment preserved the two tail stores and reached 2076 bytes, but changed earlier branch slots and still failed 0/28 USA places at +0x25C.
@@ -283,11 +310,12 @@ int func_002CC6B0(unsigned char *w) {
         func_0027F110();
     }
     if (*(int *)(w + 0x30) & 0x400) {
-        set_window_vertical(&win, win.s[0], win.s[5] + (win.s[7] + *(int *)&D_001AB984 * 3));
+        do { set_window_vertical(&win, win.s[0], win.s[5] + (win.s[7] + *(int *)&D_001AB984 * 3)); } while (0);
         DRAW(colour, text);
         if (*(int *)(w + 0x30) & 0x400) {
+            int span = (win.s[7] + *(int *)&D_001AB984 * 3) << 4;
             ((LabelSO *)w)->so += (D_00138320[0] & 0xF) == 0xF ? 10 : 3;
-            ((LabelSO *)w)->so %= (win.s[7] + *(int *)&D_001AB984 * 3) << 4;
+            ((LabelSO *)w)->so %= span;
         }
     }
     func_0027C660();

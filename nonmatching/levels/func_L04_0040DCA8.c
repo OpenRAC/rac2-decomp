@@ -1,3 +1,11 @@
+/* 8 November 2026: decomp-permuter, corner block only, 20 min -j4: best 1175 (base 1225) uses fake int temporaries and is 39 words off in check.py; no admissible gain, still 3 words. */
+/* 8 November 2026, round 15: unchanged, 3 real words. sched1 dump: 0.3 and -1.0 const loads
+ * are memory-typed (t23/t24), the four TImode const-0 clears are alu-typed, so t25 is
+ * issue-bound and only four stores fit t26-t30. No float rounding here, so label_y/hud_coord
+ * do not apply. New negatives: 0.3f*skew operand order; named h before the clears;
+ * do/while groups around the early stores, around c0.w alone or c2.z alone (all reshuffle
+ * s-register allocation and loop inits); a TI zero copy with -frac2-keep-block-zero-copy
+ * (cse still folds the clears to const 0). */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 740/740, 3 words with the owner-allowed shared scratch type (0x1D0 frame matches; c2.z/c3.z/c2.y store order: sched1 has five free memory slots after the last call and only four stores that may fill them). */
 /* 7 November 2026, round 14: unchanged, 3 real words (c2.z/c3.z/c2.y at +0x224/+0x230/
  * +0x238). The 64-byte scratch type is now allowed (owner ruling: shared with the matched

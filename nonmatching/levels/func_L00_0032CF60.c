@@ -1,3 +1,16 @@
+/* 6 November 2026 follow-up (Codex, checked 7 November): retained plain C,
+ * -O2 -G8 -ffunction-sections -g, 256/260 bytes, 0/27 USA v1.01 places.
+ * New hypothesis: merge the callback and post-call flags test through conditional
+ * expressions or branch-local flags to change REG_DEAD liveness at the join.
+ * Fourteen forms (conditional flags/predicate expressions, branch/switch joins
+ * with short/int flags, six nonempty operation groups) emit the exact baseline
+ * instruction sequence. Duplicating the post-call test/call grows to 284 bytes
+ * without fixing dispatch. Both callback loads still use v0 instead of v1;
+ * beql steals the flags load and jalr fills its slot with the a0 move.
+ * Current RAC1's active mobyutil.c donor uses local inline asm for this dispatch;
+ * that is inadmissible here and is not independent handwritten-origin evidence.
+ * No new permitted source remedy found; preserve the body and marker.
+ */
 /* 6 November 2026 (round 11, w-c5): not matched; see func_002B6658 round-11 note. The same control-flow forms (if/else arms each calling, goto to a shared call, do/while(0) group over call + 0x4 test) compiled with -g give the identical filled `jal v1; move a0` and a v0 callback; no C form puts a surviving label, jump or trap_if between the a0 move and the call. */
 /* 6 November 2026 (round 10, w-c5): not matched; see func_002B6658 round-10 note. Retail (0x32D008) also tests v0 in the bnel, so the s0-vs-v0 sibling lead gives no source form; the jalr slot still needs a reorg stopper no C form here produces. */
 /* 6 November 2026 (round 9, w-cc): not matched, no flag; see func_002B6658 round-9 note. A volatile callback member is ruled out by retail itself (the lw is stolen into bnel). Matched func_L00_002D5940 has the same pre-reorg shape with a v0 callback and a filled slot, so no reorg or allocation rule keyed on this shape can be landed. */

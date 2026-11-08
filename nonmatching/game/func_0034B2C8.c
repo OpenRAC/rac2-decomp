@@ -216,6 +216,7 @@
  *      register higher there), but its set still folds to li.s $at and is hoisted to the
  *      block start (1317 vs 1449 aligned with spill slots treated as equal).
  */
+/* 8 November 2026 (REG_EQUIV round): equivalence code equals upstream 2.95.2; SN 2.95.2 v2.73a has the same REG_EQUIV notes and dispositions (only spill slot order differs). Probes (991111 note test, multi-block MEM equiv, no *= 2, one-block replace, move in loops): 435/435/517/435/435 masked words, sweep 197/602/3181/182/0 matched units changed. */
 #include "common.h"
 
 typedef union {

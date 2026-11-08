@@ -1,3 +1,17 @@
+/* 8 November 2026 (round 9, rank_for_schedule): base 3436/3436, 32 differing words (retained C, recorded flags). rank_for_schedule is identical in GCC 2.95/2.95.2/2.95.3 and EE 991111/991111b; SN 2.95.2 v2.73a makes the same tie choice where its output is comparable. Env probes (sched1/sched2/both): reg weight swapped/clamped/dropped/after class/positive-or-negative only, class dropped/reversed, dependent count reversed/dropped/data-only/clamped, LUID reversed, INSN_UID ties, no birthing boost: none improves any of the nine cluster targets; forced on, every variant changes 6-7124 of 8761 matched units. Hypothesis falsified. */
+/* 7 November 2026 (opus, 16 check.py runs): still 3436/3436 bytes, 32 masked rows, no change to the C below.
+ * The sched2 dump confirms the cases 9-11 rows need a barrier between the 0.5 load and mul.s: a single
+ * block cannot leave $sp+0x310 idle for two cycles. What was ruled out:
+ * - Dead mode-test rounding helpers (owner-allowed idiom), test before the multiply (46 rows) or label_y
+ *   verbatim after it (42-45 rows): the test splits blocks in sched1 only; flow2 drops it before sched2,
+ *   and as a block boundary it makes reload rematerialise 100.0f and 0.5f after the split.
+ * - Nonempty do { k = 100.0f; n = 3; sc = D_001B23A4; h = 0.5f; } while (0): 3444 bytes. final.c aligns
+ *   the first CODE_LABEL after NOTE_INSN_LOOP_BEG, and every label after the needed barrier in cases 9
+ *   and 10 sits at 4 mod 8, so any loop group pads. -malign-loops=2 removes that pad but breaks case 2's
+ *   real loops (3420 bytes).
+ * - Remaining sched2 barriers (haifa-sched.c sched_analyze): volatile asm/unspec_volatile (forbidden),
+ *   calls, EH/setjmp notes; none fits without an extra instruction.
+ */
 /* Current retained result, 1 November 2026: 3436/3436 bytes, not exact. Restore func_0027FAA8's integer
  * return and the 64-bit colour argument of func_0028F410. The remaining panel-call scheduling still
  * differs.

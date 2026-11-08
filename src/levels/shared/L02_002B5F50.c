@@ -192,7 +192,7 @@ int func_L02_0032E3B0(void *object, float *target, int index) {
     return count;
 }
 
-INCLUDE_ASM("asm/levels", func_L02_0032E508);
+/* func_L02_0032E508 is matched in its own unit, src/levels/shared/L02_0032E508.c (-g). */
 
 int func_L02_0032E998(float *position, float *target, float *heading, struct RouteNode *nodes, int count, int *sourceNode, int *targetNode, float override, float margin) {
     unsigned char visited[256];

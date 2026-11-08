@@ -1,3 +1,23 @@
+/* 6 November 2026 follow-up (rac2-a1-cx; replayed 7 November): not matched.
+ * Profile: -O2 -G8 -ffunction-sections; USA v1.01, 144/148 bytes, 0/28.
+ * The missing word is in the callback sequence: retail has beqz v1; nop;
+ * daddu a0,s0,zero; jalr v1; nop; lhu flags. Baseline has beql v0;
+ * lhu flags; jalr v0; daddu a0,s0,zero; lhu flags. The entry cache store
+ * already uses v0 correctly; only callback allocation/slot handling remain.
+ * New donor inspection: current RAC1 src/game/moby/mobyutil.c,
+ * update_visible_resident_objects (active config/text.objects input), uses
+ * inline asm for this exact null-test/callback pattern. Its surrounding
+ * char-pointer C with duplicated next assignments, translated to plain C
+ * callbacks here, ties baseline instruction-for-instruction (144/148, 0/28).
+ * This donor is a lead, not proof of RAC2's original source or ASM_FUNC
+ * eligibility; no forbidden asm was copied into the candidate.
+ * A real five-field unsigned-short flags view, packed and unpacked, also
+ * gives 144/148, 0/28, retaining callback differences and worsening flags
+ * accesses from lhu to lw. Neither replaces the simpler baseline below.
+ * Four check.py runs total (baseline plus three new trials); no build run.
+ * Next useful evidence: independently establish the origin of the callback
+ * sequence, or a real C dependency explaining both v1 and the empty slots.
+ */
 /* 6 November 2026 (round 11, w-c5): not matched. Control-flow forms tested against the fixed retail flow: if/else arms that each call, both-arm callback loads, goto to a shared call, goto around the call, `?:` argument, switch on the flag, switch on `update != 0`, for(;;)/while + break, do/while(0) around call + 0x4 test, do/while with a condition after the call. All cross-jump or simplify back to `move a0; jal v1` (slot filled, callback v0); the switch on `update != 0` gives v1 but adds a compare. By construction no C form works: expand emits the a0 move adjacent to the call, and a label there survives only with a jump to it; retail has no branch to 0x2B66AC/0x2B66B0, no division (trap_if), no asm. Retail also leaves the beqz slot empty, so the daddu was unavailable to both slots there. -flive-range: no change. */
 /* 6 November 2026 (round 10, w-c5): not matched. Retail tests v0 (flags & 0x40) in the bnel, not a long-lived value; the sibling-shape lead does not apply. Flags read once into a local (f = t->flags reused) and an early `update = 0` keep v0 and the filled slot. Our reorg (fill_simple_delay_slots backward scan, plus the RAC2 trap_if stop) can only leave the jalr empty at a label, jump, SEQUENCE, asm or trap_if between the a0 move and the call; an unused user label before the call is deleted by jump. v1 needs a non-call-crossing allocno born after func_002A05A8 that conflicts with the callback and prefers v0 (regs_someone_prefers); only t (call-crossing, pruned) exists. */
 /* 6 November 2026 (round 9, w-cc): not matched, no flag. Source: a `void (*volatile vfunc)` member drops the bnel steal (retail steals the lw, so the retail load is not volatile); a `const` callback local is identical (v0, filled slot). Compiler rule: falsified by comparison, not built. Our cc1 output for matched func_L00_002D5940 has the identical pre-reorg shape (beql slot steals `lw $2,100`, label, `beq $2`, `move $4`, `jal $31,$2`) and retail fills that slot with v0, so any reorg rule that empties this jalr slot, or any allocation rule keyed on this shape that gives v1, changes a matched unit. */
