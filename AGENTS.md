@@ -187,7 +187,10 @@ each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
   slot or allocation in ordinary data, even when measured in retail, and not on a local,
   a jump table or a per-unit cast of a global other units read plainly. A retail reload
   is evidence of a missing cause such as a struct member, type or alias, not of a
-  qualifier.
+  qualifier. Name what is volatile: a register or a block is declared once, in a shared
+  header (`T0_COUNT` in `include/common.h`), or as the named, typed extern of the block,
+  and matched C uses that name, never a cast on a bare address such as
+  `*(volatile u32 *)0x10000800`.
 - **Addresses.** Code and data in a program image are always symbols, never numbers.
   Hardware registers and the scratchpad have no symbol: write them as integer constants,
   named in a shared header once known.
