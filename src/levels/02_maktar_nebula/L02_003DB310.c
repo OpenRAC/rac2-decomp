@@ -305,7 +305,7 @@ done:
 
 /* func_L02_003E79F8 is defined in L02_003DB310-g8.c (it reads its weights through $gp). */
 
-INCLUDE_ASM("asm/levels", func_L02_003E7B58);
+/* func_L02_003E7B58 moved to L02_003E7B58.c */
 
 /* func_L02_003E7F28 is defined in L02_003DB310-g8.c (it reads D_L02_001B0A60 through $gp). */
 

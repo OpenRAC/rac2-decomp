@@ -1,3 +1,4 @@
+/* 8 November 2026 (gcse table size): the five EE cc1 builds here (ours, 991111a, 991111-01, 991111b-r4, SN 2.95.2 273a) give the same PRE table size on this source, so the sizing rule is shared. Forced sizes 11..401: no size gives 0 (best 133: 8 diffs, 111: 15; ours 121: 20), so the table size alone does not close it. */
 /* 7 November 2026 (opus, DrLegitamate): the spill slots are fully explained.
  * The eight spilled loop invariants are sp+16, sp+48, sp+64, sp+80, sp+84, sp+208, object+192
  * and index+1. Their slots follow gcse's expression-table bucket order, with bucket =

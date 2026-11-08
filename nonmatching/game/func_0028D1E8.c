@@ -1,3 +1,35 @@
+/* 8 November 2026, round 2: 3060/3056 bytes (one word long), 0/28 places, aligned diff 37 words
+ * (round 1: 56). The 0x8710 offset is now four sources, as retail: a literal for draws 1-10 (cse
+ * gives $s0), and locals b1, b2, b3 initialised at their declaration for the two 134 draws and the
+ * selected-slot draw. Initialised in the entry block they are separate pseudos; local-alloc moves
+ * each single-use init to its use, so b3 becomes retail's exact lw/ori/addu. The label pointer reuses
+ * selectedAvailable (retail keeps both in $s1), which fixes the $s0/$s1 swap. Still open: retail sets
+ * b1/b2 in $s1/$s2 after the first call; here their inits move next to the draws ($a0, D in $v0).
+ * Putting the two 134 draws in a do/while(0) group stops that move (loop depth), and b1/b2 then get
+ * $s1/$s2, but set in the entry block (41 words). Inits written in the draws block are merged by cse.
+ * Also open: 0.5/208.0 are set before the first call (retail: after), the post-loop beql (retail
+ * beqz with lw 0x74 in the slot) and the tail 0.5 placement.
+ */
+/* 8 November 2026 re-measure on the new master compiler; retained near miss, not linked.
+ * USA v1.01 check.py (-O2 -G8 -ffunction-sections, as src/game/0028D1E8-g8.c): 3044/3056 bytes,
+ * 0/28 places; aligned diff 56 words (was 179 for the 4 November draft). No RAC1/RAC4 twin found
+ * (0033F030-radial-g8.c is the widget version of the same menu, not a code twin).
+ * Fixed this round: D_001B189E..18A4 read as D_001B189C[1..4] of one sda block (offset reads have
+ * length 2, so the switch-case loads and the 0x2F35 test stop filling delay slots, as retail);
+ * colour stores written [0..3] so gcc emits retail's [3],[0],[1],[2]; available colour as if/else
+ * of the four stores (cross-jumped, retail's beql form instead of movn); `special` merged into
+ * `previous` (retail keeps both in $s0); a block-local k for the bracket index; the alpha product
+ * in its own float; packed colours passed without the u32 zero-extension (retail has none).
+ * Remaining: retail loads 0x8710 three times for the background draws ($s0 for draws 1-10, $s1
+ * and $s2 set early for the two 134 draws) and again into $a0 in the selected-slot block; this C
+ * keeps one pseudo, which also leaves `previous` in $s1 and selectedAvailable in $s0 (swapped).
+ * A dead display-mode test in draws 10-12 reproduces the three cse breaks (the selected-slot load
+ * becomes retail's exact lw/ori/addu) but its constants stay in $a0 and the frame grows (3112
+ * bytes); do/while(0) groups, -fmove-all-movables, -g, -fno-gcse, -fno-expensive-optimizations,
+ * -mno-split-addresses and -G0 do not split the constant. Also open: the post-loop test fills an
+ * annulled slot from the target (retail: beqz with lw 0x74 from the fall-through) and the tail's
+ * 0.5 is set before the first func_00283D38 call (retail: after).
+ */
 /* 4 November 2026 actual-contract review; retained near miss, not linked.
  * USA v1.01 check.py: 3020/3056 bytes, 0/28 placements; first difference size mismatch.
  * Profile: -O2 -G8 -ffunction-sections.
@@ -25,10 +57,6 @@ typedef struct { int icon, frame; int rest[5]; } RadialItem;
 extern RadialPositions D_001A8E30;
 extern RadialLabels D_001A8E70;
 extern short D_001B189C[] __attribute__((sda));
-extern short D_001B189E[] __attribute__((sda));
-extern short D_001B18A0[] __attribute__((sda));
-extern short D_001B18A2[] __attribute__((sda));
-extern short D_001B18A4[] __attribute__((sda));
 extern int D_001B18D0;
 extern RadialItem **D_001B18D4;
 extern int D_001A8D48 __attribute__((sda));
@@ -56,13 +84,13 @@ static __inline__ void draw_background(char *tex, int color, float x, float y, f
 
 int func_0028D1E8(unsigned char *o)
 {
-    int total = D_001B18A4[0] + D_001B18A0[0] + D_001B18A2[0];
+    int total = D_001B189C[4] + D_001B189C[2] + D_001B189C[3];
     RadialPositions positions = D_001A8E30;
     int colors[4], colors2[4];
     float open, text, angle;
     float one, zero, minus;
-    int i, selectedAvailable, x, y, frame, special, available, color, previous;
-    char *label;
+    int b1 = 0x8710, b2 = 0x8710, b3 = 0x8710;
+    int i, selectedAvailable, x, y, frame, available, color, previous;
     unsigned char *fade = o + 0x70;
     open = func_00283CE0(o[0x70]) / func_00283CE0(8);
     if (open > 1.0f) open = 1.0f;
@@ -83,16 +111,18 @@ int func_0028D1E8(unsigned char *o)
     draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 15), 0x60442D00, 129.0f, 208.0f, one, one, zero);
     draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, one, one, zero);
     draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, 129.0f, 208.0f, minus, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, 129.0f, 208.0f, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, 129.0f, 208.0f, minus, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + b1, 134), 0x55F0C070, 129.0f, 208.0f, one, one, zero);
+    draw_background((char *)func_00336D50(D_001A8CFC + b2, 134), 0x55F0C070, 129.0f, 208.0f, minus, one, zero);
     if (*(int *)(o+0x74) >= 0) {
         colors[0] = func_002A9588(0x80442D00,0x80FFDE8D,25,0,0);
         previous = *(int *)(o+0x74)-1;
         if (previous < 0) previous = 7;
-        draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 16), colors[0], 129.0f, 208.0f, one, one, (float)previous);
-        i = *(int *)(o+0x74);
-        func_0028FC48(positions.xy[i][0],(int)((float)positions.xy[i][1]*D_001B23A4+0.5f),
-            positions.xy[i][0]+33,(int)((float)(positions.xy[i][1]+7)*D_001B23A4+0.5f),colors[0],0);
+        draw_background((char *)func_00336D50(D_001A8CFC + b3, 16), colors[0], 129.0f, 208.0f, one, one, (float)previous);
+        {
+            int k = *(int *)(o+0x74);
+            func_0028FC48(positions.xy[k][0],(int)((float)positions.xy[k][1]*D_001B23A4+0.5f),
+                positions.xy[k][0]+33,(int)((float)(positions.xy[k][1]+7)*D_001B23A4+0.5f),colors[0],0);
+        }
     }
     selectedAvailable = 0;
     for (i=0;i<D_001B18D0;i++) {
@@ -101,67 +131,70 @@ int func_0028D1E8(unsigned char *o)
         y = (int)(func_00283198(angle)*75.0f)+192;
         if (!D_001B18D4[D_001A8D48][i].icon) continue;
         frame = D_001B18D4[D_001A8D48][i].frame;
-        special = 0;
-        if (frame == 6 && !D_001B189E[0]) frame = 7;
+        previous = 0;
+        if (frame == 6 && !D_001B189C[1]) frame = 7;
         available = 0;
         switch (frame) {
         case 2:
             if (D_001B189C[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
-                colors[2]=colors[1]=colors[0]=colors[3]=0x6000FF00;
-                available=1; special=1;
+                colors[3]=colors[2]=colors[1]=colors[0]=0x6000FF00;
+                available=1; previous=1;
             }
             break;
         case 3:
             if (D_001B189C[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
-                colors[2]=colors[1]=colors[0]=colors[3]=0x6029A1FF;
-                special=1; available=1;
+                colors[3]=colors[2]=colors[1]=colors[0]=0x6029A1FF;
+                previous=1; available=1;
             }
             break;
         case 0:
             if (D_001B189C[0] && total < D_001B189C[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
-                colors[2]=colors[1]=colors[0]=colors[3]=0x600000FF;
-                special=1; available=1;
+                colors[3]=colors[2]=colors[1]=colors[0]=0x600000FF;
+                previous=1; available=1;
             }
             break;
         case 1:
             if (D_001B189C[0] && total < D_001B189C[0]) {
                 if (i == *(int *)(o+0x74)) selectedAvailable=1;
-                colors[2]=colors[1]=colors[0]=colors[3]=0x60FF0000;
-                special=1; available=1;
+                colors[3]=colors[2]=colors[1]=colors[0]=0x60FF0000;
+                previous=1; available=1;
             }
             break;
         case 6: case 7:
-            if (D_001B18A0[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (D_001B189C[2]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         case 4:
-            if (D_001B18A2[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (D_001B189C[3]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         case 8:
-            if (D_001B18A4[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
+            if (D_001B189C[4]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         case 9:
             if (D_001B189C[0]) { if (i == *(int *)(o+0x74)) selectedAvailable=1; available=1; }
             break;
         }
-        if (special) func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,10),x+2,y+2,28,26,colors);
-        color = available ? 0x80FFDE8D : 0x40808080;
-        colors2[2]=colors2[1]=colors2[0]=colors2[3]=color;
+        if (previous) func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,10),x+2,y+2,28,26,colors);
+        if (available) {
+            colors2[3]=colors2[2]=colors2[1]=colors2[0]=0x80FFDE8D;
+        } else {
+            colors2[3]=colors2[2]=colors2[1]=colors2[0]=0x40808080;
+        }
         func_0028EA58(func_0028E588(D_001B18D4[D_001A8D48][i].icon,frame),x,y,30,28,colors2);
     }
     if (selectedAvailable && *(int *)(o+0x74)>=0 && *(int *)(o+0x74)<8) {
         RadialLabels labels=D_001A8E70;
         int id=labels.ids[*(int *)(o+0x74)];
-        if (id==0x2F34 && D_001B189E[0]) id=0x2F35;
-        label=((char *)func_00288FB8(id));
-        if (label && func_001157AC(label)) {
-            text *= open;
-            color=func_00283D38(0x00E0C0A0,0x80E0C0A0,text);
-            previous=func_00283D38(0,0x80000000,text);
-            func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),(u64)(u32)previous,label,-1);
-            func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),(u64)(u32)color,label,-1);
+        if (id==0x2F34 && D_001B189C[1]) id=0x2F35;
+        selectedAvailable=func_00288FB8(id);
+        if (selectedAvailable && func_001157AC((char *)selectedAvailable)) {
+            float alpha = text * open;
+            color=func_00283D38(0x00E0C0A0,0x80E0C0A0,alpha);
+            previous=func_00283D38(0,0x80000000,alpha);
+            func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,(char *)selectedAvailable,-1);
+            func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,(char *)selectedAvailable,-1);
         }
     }
     return *(int *)(o+0x58);

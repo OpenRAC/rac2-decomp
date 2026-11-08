@@ -232,8 +232,6 @@ ASM_FUNC("asm/game", func_00281214);
 /* Original assembly: RAC1 overlays/shared/glint_effects.c, func_L00_001FDE48. */
 ASM_FUNC("asm/game", func_00281810);
 
-INCLUDE_ASM("asm/game", func_00281A08);
-
 
 /* The draw packet's texture state and its flags.
 

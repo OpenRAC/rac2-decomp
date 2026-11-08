@@ -1,3 +1,43 @@
+/* 8 November 2026, round 2: body below is 3564/3552 bytes (was 3592), 0/1, 105 masked words
+ * (the count is higher because of register renames; the shape is closer). Where the round-1 40
+ * bytes went: 4 words were the 0x8710 rematerialization at each arm's first label, 6 were box
+ * address copies and extra 3s.
+ * - Plain y rounding (no helper) per box, as in func_L02_003FE250: no gain here (91 -> 102-148);
+ *   this function's copy-across-call comes from gcse PRE inserting each box address after its
+ *   call, not from cprop.
+ * - Box address locals: p70 set before box 2's chains, p90/pF0 set right before their calls
+ *   (scan of 3^6 placements): box 1 now builds $a0 directly; 91 -> 83 at 3584 bytes.
+ * - `ofs = 0x8710;` at the start of each arm, used by every label: retail's `ori $s3,0x8710`
+ *   at label 1 and all labels share it (-4 words, 3564 bytes). This is borderline (a local
+ *   holding a constant only to set allocation); it needs an owner ruling before any landing.
+ * - Left (12 bytes): p70/pF0 keep $s5/$fp (retail rematerializes them and saves ghosts
+ *   $s4/$s6, which looks like reload evicting them), p90 is in $s3 instead of retail's copy to
+ *   $s5, there is an extra 0.5f reload in box 2, and the 3/0x8710 registers are renamed.
+ */
+/* 8 November 2026, HUD-recipe pass (re-measured on master's compiler): profile now plain
+ * -O2 -G8 -ffunction-sections (one config/cflags.txt line, -g8 unit). check.py: 3592/3552 bytes,
+ * 0/1. Aligned diff with relocations masked: 91 of 888 words (the 7 November label_y body at
+ * this profile: 214; at -fno-schedule-insns: 222). Body below.
+ * Measured:
+ * - hud_coord (dead-test helper, owner ruling) on the box coordinates plus one-pass groups
+ *   (`do { y = t; } while (0)`) give retail's chain order (x, y, h, then the arguments) and
+ *   retail's constant-3 grouping: one pseudo for boxes 1-4, a fresh li for box 5, one for box 6
+ *   and the mode test (set at box 3). The mix per coordinate came from a hill-climb over
+ *   {plain, t-copy, group, hud_coord, grouped hud_coord}; uniform forms score 99-200.
+ * - Rect *p90/pB0 locals for the two boxes the three timed arms reuse: 99 -> 91.
+ * - Left (all allocation, 10 extra words): (1) gcse inserts each box address after the box's
+ *   call and cse2 turns that into a copy of the argument pseudo, so the argument pseudo crosses
+ *   the call and takes $s0 (`addiu $s0,$sp,0x50; daddu $a0,$s0`); retail builds $a0 directly
+ *   and keeps only &r90/&rB0 (copies to $s5/$s7, rest rematerialized). (2) The 0x8710 sprite
+ *   base: cse1 groups each arm's labels under the first label's pseudo (as retail), but cse2's
+ *   10-branch windows make the second label's pseudo canonical, so label 1 rematerializes into
+ *   $a0 and the group lives in $s3/$s4 from label 2 (retail: `ori $s3` at label 1). Label_y
+ *   variants with 1-2 tests fix (2) but break the label scheduling. (3) Callee-saved roles
+ *   shift with these ($s1/$s3 for the 3s, ghosts $s4/$s6 not reproduced).
+ * - No effect / worse: switch for the outer dispatch (+20), -fno-schedule-insns, -fno-gcse,
+ *   -fno-rerun-cse-after-loop, -fno-cse-skip-blocks/-follow-jumps, -fno-expensive-optimizations,
+ *   -fno-sched-interblock, -fmove-all-movables, `one = 1` label active, separate x local.
+ */
 /* 7 November 2026, label_y sweep: LBL's sprite y is label_y(ls, (f32)(yv), D_L02_001B3E04, 0.5f, 1), mode D_L02_001B3E00 (accepted HUD label idiom, definition above the function). Same profile (-fno-schedule-insns): 3568/3552 bytes (was 3560), sweep-harness masked aligned diff 509 -> 341; plain -O2 -G8 -ffunction-sections gives 310. Still far: size off by 16. */
 /* Claude Opus 5.5 (xhigh), task v1870, 31 October 2026.
  * Near miss, USA v1.01 level 02: 3560/3552 bytes, 0 of 1 places match; frame 0x180 and the
@@ -128,7 +168,7 @@ extern s32 func_00115DA8(char *, char *, ...);
 
 
 #define LBL(id, c, xv, yv, a1, a2, a3) { \
-        char *ls = func_00336D50(D_L02_001A904C[0] + 0x8710, id); \
+        char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); \
         s32 ly = label_y(ls, (f32)(yv), D_L02_001B3E04, 0.5f, 1); \
         func_00300A00(ls, c, xv, ly, a1, a2, a3); }
 #define TITLE() \
@@ -169,6 +209,23 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int hud_coord(float value, float scale, float half)
+{
+    int mode = D_L02_001B3E00;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    int copy;
+
+    if (mode == 1)
+        scaled = scale;
+    if (result != 0)
+        scaled = scale;
+    copy = result;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L02_003FE8B8(u8 *moby)
 {
     char buf[0x40];
@@ -178,12 +235,16 @@ void func_L02_003FE8B8(u8 *moby)
     Rect rB0;
     Rect rD0;
     Rect rF0;
+    Rect *p70;
+    Rect *p90;
+    Rect *pF0;
     u8 *data;
     u8 *obj;
     u8 *pv;
     f32 save;
     s32 sum;
     s32 i;
+    s32 ofs;
     s32 n;
     f32 t;
     s32 x, y, h;
@@ -194,64 +255,71 @@ void func_L02_003FE8B8(u8 *moby)
     }
     func_L00_0037B7B0();
     data = *(u8 **)(moby + 0x68);
-    t = (f32)D_L02_001B13E0 * D_L02_001B3E04 + 0.5f; x = t;
-    t = (f32)D_L02_001B13E4[0] * D_L02_001B3E04 + 0.5f; y = t;
-    t = (f32)D_L02_001B13DC * D_L02_001B3E04 + 0.5f; h = t;
+    x = hud_coord((f32)D_L02_001B13E0, D_L02_001B3E04, 0.5f);
+    y = hud_coord((f32)D_L02_001B13E4[0], D_L02_001B3E04, 0.5f);
+    h = hud_coord((f32)D_L02_001B13DC, D_L02_001B3E04, 0.5f);
     func_002802E0(&r50, x, y, D_L02_001B13E8[0], D_L02_001B13EC[0], D_L02_001B13D8, h, 0, 3);
-    t = (f32)D_L02_001B13C8 * D_L02_001B3E04 + 0.5f; x = t;
+    p70 = &r70;
+    x = hud_coord((f32)D_L02_001B13C8, D_L02_001B3E04, 0.5f);
     t = (f32)D_L02_001B13CC[0] * D_L02_001B3E04 + 0.5f; y = t;
-    t = (f32)D_L02_001B13C4 * D_L02_001B3E04 + 0.5f; h = t;
-    func_002802E0(&r70, x, y, D_L02_001B13D0[0], D_L02_001B13D4[0], D_L02_001B13C0, h, 0, 3);
+    do { h = hud_coord((f32)D_L02_001B13C4, D_L02_001B3E04, 0.5f); } while (0);
+    func_002802E0(p70, x, y, D_L02_001B13D0[0], D_L02_001B13D4[0], D_L02_001B13C0, h, 0, 3);
     t = (f32)D_L02_001B1380 * D_L02_001B3E04 + 0.5f; x = t;
-    t = (f32)D_L02_001B1384[0] * D_L02_001B3E04 + 0.5f; y = t;
-    t = (f32)D_L02_001B137C * D_L02_001B3E04 + 0.5f; h = t;
-    func_002802E0(&r90, x, y, D_L02_001B1388[0], D_L02_001B138C[0], D_L02_001B1378, h, 0, 3);
+    do { t = (f32)D_L02_001B1384[0] * D_L02_001B3E04 + 0.5f; y = t; } while (0);
+    t = (f32)D_L02_001B137C * D_L02_001B3E04 + 0.5f; do { h = t; } while (0);
+    p90 = &r90;
+    func_002802E0(p90, x, y, D_L02_001B1388[0], D_L02_001B138C[0], D_L02_001B1378, h, 0, 3);
     t = (f32)D_L02_001B1368 * D_L02_001B3E04 + 0.5f; x = t;
-    t = (f32)D_L02_001B136C[0] * D_L02_001B3E04 + 0.5f; y = t;
-    t = (f32)D_L02_001B1360 * D_L02_001B3E04 + 0.5f; h = t;
+    do { t = (f32)D_L02_001B136C[0] * D_L02_001B3E04 + 0.5f; y = t; } while (0);
+    do { h = hud_coord((f32)D_L02_001B1360, D_L02_001B3E04, 0.5f); } while (0);
     func_002802E0(&rB0, x, y, D_L02_001B1370[0], D_L02_001B1374[0], D_L02_001B135C, h, 0, 3);
-    t = (f32)D_L02_001B13B0 * D_L02_001B3E04 + 0.5f; x = t;
-    t = (f32)D_L02_001B13B4[0] * D_L02_001B3E04 + 0.5f; y = t;
-    t = (f32)D_L02_001B13AC * D_L02_001B3E04 + 0.5f; h = t;
-    func_002802E0(&rF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, h, 0, 3);
-    t = (f32)D_L02_001B1398 * D_L02_001B3E04 + 0.5f; x = t;
-    t = (f32)D_L02_001B139C[0] * D_L02_001B3E04 + 0.5f; y = t;
-    t = (f32)D_L02_001B1394 * D_L02_001B3E04 + 0.5f; h = t;
+    x = hud_coord((f32)D_L02_001B13B0, D_L02_001B3E04, 0.5f);
+    do { t = (f32)D_L02_001B13B4[0] * D_L02_001B3E04 + 0.5f; y = t; } while (0);
+    h = hud_coord((f32)D_L02_001B13AC, D_L02_001B3E04, 0.5f);
+    pF0 = &rF0;
+    func_002802E0(pF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, h, 0, 3);
+    do { x = hud_coord((f32)D_L02_001B1398, D_L02_001B3E04, 0.5f); } while (0);
+    do { t = (f32)D_L02_001B139C[0] * D_L02_001B3E04 + 0.5f; y = t; } while (0);
+    h = hud_coord((f32)D_L02_001B1394, D_L02_001B3E04, 0.5f);
     func_002802E0(&rD0, x, y, D_L02_001B13A0[0], D_L02_001B13A4[0], D_L02_001B1390, h, 0, 3);
     save = ((HudRenderState *)D_L02_001BEA00)->text_scale;
     ((HudRenderState *)D_L02_001BEA00)->text_scale = 0.62f;
     func_0027AB40();
     if (*(s16 *)(data + 0x120) == 3) {
+        ofs = 0x8710;
         TITLE();
         sprintf_n(buf, D_L02_001B1428, 0x1E - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(func_00280270, &r90);
+        DRAWBUF(func_00280270, p90);
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
         LABEL();
         SUM();
         func_00115DA8(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(func_00280270, &r50);
-        DRAW(func_00280190, &r70, func_00288FB8(0x2F61));
+        DRAW(func_00280190, p70, func_00288FB8(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 5) {
+        ofs = 0x8710;
         TITLE();
         sprintf_n(buf, D_L02_001B1428, 0x3C - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(func_00280270, &r90);
+        DRAWBUF(func_00280270, p90);
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
         LABEL();
         SUM();
         func_00115DA8(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(func_00280270, &r50);
-        DRAW(func_00280190, &r70, func_00288FB8(0x2F61));
+        DRAW(func_00280190, p70, func_00288FB8(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 0xC) {
+        ofs = 0x8710;
         TITLE();
         n = 120 - *(s32 *)(data + 0xD4) / 60;
         func_00115DA8(buf, D_L02_001B1428, n);
         if (n >= 100) {
-            DRAWBUF(func_00280190, &r90);
+            DRAWBUF(func_00280190, p90);
         } else {
-            DRAWBUF(func_00280270, &r90);
+            DRAWBUF(func_00280270, p90);
         }
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
     } else {
+        ofs = 0x8710;
         if (*(u8 **)(data + 0xD0) != 0) {
             LABEL();
             LABEL50();
@@ -272,7 +340,7 @@ void func_L02_003FE8B8(u8 *moby)
         LBL(0x4E, D_L02_001B1424, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f);
         LBL(0x4F, D_L02_001B1420, D_L02_001B1418, D_L02_001B141C, -1.0f, D_L02_001B1404, 0.0f);
         func_00115DA8(buf, D_L02_001B1430, *(s16 *)(data + 0x122) + 1, *D_L02_001B1190[*(s16 *)(data + 0x120)]);
-        DRAWBUF(func_00280270, &rF0);
+        DRAWBUF(func_00280270, pF0);
         DRAW(func_00280190, &rD0, func_00288FB8(0x2F60));
     }
     func_002FC560(0x47, 0x5360B);

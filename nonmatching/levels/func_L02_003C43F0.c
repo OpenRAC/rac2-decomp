@@ -1,3 +1,14 @@
+/* 8 November 2026 (round 10, ~42 check.py runs, master compiler): retained C still 752/752, 3 words (+0x1A8/+0x1AC/+0x1B4).
+ * sched1 dump (-dS -fsched-verbose): in draw 4's block the f15 move (f15 = s) carries s's REG_DEAD, so its register
+ * weight is 0 and it ties the f16 move (zero dies, weight 0); the lower LUID (f15) wins, and the ori ends in the delay
+ * slot. Retail's order (f16, ori, f15) needs the f15 move to keep weight 1 (source live on, or a constant), yet still be
+ * `mov.s $f15,$f14`: reload_cse_simplify_set rewrites only constant/memory sources, and only while f20 = 1.0 is known
+ * (no CODE_LABEL since its set), so a live source can never come out as f14.
+ * Shown: menu_coord2 comparing `scaled != s` (or `one`) keeps s/one live: order becomes f16, ori, f15 as retail, but cse
+ * folds the `s = one` copy, so f14/f15 both read $f20 and the f14 move goes late (7 words).
+ * No gain: technique (a) plain fourth rounding (22), plus a colour do-while(0) (58), group around the rounding (69);
+ * args (one, 1.0f) (60-83), `s = 1.0f` or a fresh `u` copy with (u, 1.0f) (60-65: lui/mtc1, f20 unknown after labels);
+ * (s, s, 0.0f) (6); draws 2-4 plain y + colour groups + draw-4 (one, 1.0f) (80: k/zero f21/f22 swap, late daddu a0). */
 /* 8 November 2026 (round 9, rank_for_schedule): base 752/752, 3 differing words (retained C, recorded flags). rank_for_schedule is identical in GCC 2.95/2.95.2/2.95.3 and EE 991111/991111b; SN 2.95.2 v2.73a makes the same tie choice where its output is comparable. Env probes (sched1/sched2/both): reg weight swapped/clamped/dropped/after class/positive-or-negative only, class dropped/reversed, dependent count reversed/dropped/data-only/clamped, LUID reversed, INSN_UID ties, no birthing boost: none improves any of the nine cluster targets; forced on, every variant changes 6-7124 of 8761 matched units. Hypothesis falsified. */
 /* 6 November 2026, Codex follow-up to round 14 (accepted label_y precedent):
  * Best retained source: 752/752 bytes, 0/8 USA v1.01 places, THREE real words.

@@ -826,6 +826,7 @@ src/levels/shared/L18_002E42F8-flags-g8.c	-O2 -G8 -ffunction-sections
 src/game/002C7620.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/10_hrugis_cloud/L10_004177E8.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/19_grelbin/L19_002C44F8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
+src/game/00281A08-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/levels/04_barlow/L04_002E7C08-state-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/levels/08_tabora/L08_002D2ED8-state-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
 src/levels/09_dobbo/L09_002C3580-state-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier
@@ -3111,6 +3112,7 @@ src/levels/shared/L04_004135B8-g8.c	-O2 -G8 -g -ffunction-sections -frac2-hazard
 src/levels/shared/L00_003B63D8-counter-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
 src/levels/shared/L03_003E4680-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/core/0012646C-store.c	sdk -O2 -G2 -ffunction-sections
+src/core/0012672C-exec.c	sdk -O2 -G2 -ffunction-sections -Wa,--r5900-swap-branch-slots
 src/game/002CC528-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/01_oozla/L01_003D1A48-g8.c	-O2 -G8 -ffunction-sections -g
 src/game/002FC8D0-preview.c	-O2 -G0 -ffunction-sections -g
@@ -4216,3 +4218,4 @@ src/pal/levels/shared/L00_003874B8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/levels/shared/L05_0037A5F8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/game/0032EB28-turret-g8.c	-O2 -G8 -ffunction-sections -ffast-math
 src/levels/shared/L02_0032E508.c	-O2 -G0 -ffunction-sections -g
+src/levels/02_maktar_nebula/L02_003E7B58-g8.c	-O2 -G8 -ffunction-sections

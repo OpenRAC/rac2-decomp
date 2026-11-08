@@ -1,4 +1,31 @@
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 584/584, 66 differences (timer hoisting, registers and switch setup). */
+/* 8 November 2026, round 13 (today's compiler: sticky volatile sets default,
+ * mtc1 hazard fix): the retained goto form below re-measures 584/584, 0/2,
+ * first difference +0x9C; LCS 99 of 146 retail words. The "timer" is a local
+ * (flags & 0x40 ? -1 : 2), not an EE timer register, so ps2_hw.h does not
+ * apply; -fno-rac2-sticky-volatile-sets changes nothing.
+ * Mechanism found (dumps): retail's loop.c saw an UNROTATED outer loop.
+ * jump1's duplicate_loop_exit_test refuses an exit test that contains a
+ * CODE_LABEL, CALL or LOOP_CONT; then loop.c scans from the exit test, its
+ * conditional jump sets maybe_never, and only single-block invariants move
+ * (timer << 16). The post-loop jump_optimize (JUMP_AFTER_REGSCAN, toplev.c
+ * before cse2) then duplicates the test, giving retail's rotated shape.
+ * Control (NOT landable, invented always-true flag): `int ok = 1;` and
+ * `for (index = 0; (ok || stride) && index < *(int *)polygon; index += stride)`
+ * on the plain for form: 592 bytes, LCS 123/146, frame/slots 0x30-0x3C,
+ * in-loop 1.2f/sp+0x20/flags reloads, case-4 digit block all retail.
+ * Left in the control: timer << 16 lands before the pre-test (retail after;
+ * so retail's test was copied before loop.c ran, which contradicts the
+ * control: needs a label at the rotated body top instead), and retail's
+ * case-1 constant 1 is set before the scale call in $s1 (a pseudo equal to
+ * 1 live across the call, which cse then uses for the case compare).
+ * Also tried, no gain: timer computed inside the body (cmove folded in
+ * jump1), `if (index >= n) continue;` at the top (threaded away), an explicit
+ * `if (0 < n)` guard around the control (second blez kept), a do-while with
+ * an inner `if (index < n)` (568 bytes), TImode point copy with -frac2-qcopy
+ * (600 bytes, 1 still in $v0). 31 check.py runs. Reopen on a real construct
+ * that leaves a label in the exit test (or at the body top) until loop.
+ */
 /* 6 November 2026, round 12: 584/584 bytes, 0/2 USA v1.01 placements,
  * default game -O2 -G0 -ffunction-sections; first difference +0x9C.
  * 66 unequal instruction words after masking only relocation fields, down

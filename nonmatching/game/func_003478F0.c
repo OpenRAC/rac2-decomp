@@ -1,3 +1,25 @@
+/* 8 November 2026 re-measure on master's compiler; retained near miss, not linked.
+ * USA v1.01: unchanged, 1452/1452 bytes, 0/28 places, first difference +0x4c, same rows.
+ * New finding: the spill-slot order is gcse's PRE reaching-reg order, which is
+ * hash-bucket order ((14029 + regno + const) mod 163 for o+K; o is reg 84).
+ * Retail's slots (o+0x98, o+0x2a0, row+1, o+0x210, o+0x17c, o+0xe4, o+0x258,
+ * o+0x3b4) need the row counter's pseudo at 104..121, so row+1 lands after
+ * o+0x2a0. Declaring the per-cell scalars (colour pointers, layout floats,
+ * table pointers, four pos pointers) at the top of the if-block, row and col
+ * last, gives row reg 104 and retail's order for the first six with the code
+ * unchanged. o+0x258 and o+0x3b4 still come first: no odd bucket count with
+ * o = reg 84 puts them last, so retail must give them slots later (reload
+ * spill or caller-save area). Row address: retail is la sym then +6; every
+ * index form tried here (row<<2, row*4, row*4+col, plain ids) folds sym+6
+ * into the HIGH/LO_SUM. Not improved overall, so the C below is kept.
+ * Round 2 (same day, func_00281A08 named-local idiom): plain locals take spill
+ * slots in declaration order ahead of PRE registers. Post-loop locals (o+0x2a0,
+ * next = row + 1, o+0x210, o+0x17c, o+0xe4) with loop expressions kept: 1452
+ * bytes, slots in declaration order, but retail's colour constant and the two
+ * o+0x98 copies sit between row and o+0x2a0, so they must be locals too; any
+ * local used inside the loop (colour, o+0x98, o+0x3b4) takes a callee-saved
+ * register and shrinks the body to 1436/1444. o+0x258/o+0x3b4 last fits PRE.
+ */
 /* 6 November 2026 follow-up; retained near miss, not linked.
  * USA v1.01: 1452/1452 bytes, 0/28 places, first difference +0x4c.
  * Profile: -O2 -G8 -ffunction-sections -fno-rerun-loop-opt.

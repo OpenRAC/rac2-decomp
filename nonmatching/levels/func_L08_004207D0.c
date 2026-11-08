@@ -1,3 +1,22 @@
+/* 8 November 2026, cse path probe (USA v1.01): PATHLENGTH is 10 in our cse.c, the EE 991111 source and
+ * upstream 2.95.2 alike, and SN 2.95.2 (273a) and all three 991111 cc1 builds also load the loop 0.5 fresh
+ * (`li.s $f23,0.5`, no copy) on this C. An env-gated cc1 with PATHLENGTH 13+ gives the copy: 5 -> 2 words
+ * (mov.s lands in the beqz slot, retail has `daddu s2,v0` there); 13/14/16/20/32/64 all 2. Forced on over
+ * all 8775 units: 47 matched units change code (PL 13 and 64 alike), so the hypothesis is falsified. */
+/* 8 November 2026, round three (USA v1.01, check.py only, master compiler): best C below 1156/1156
+ * bytes, 0/2 places, first difference at +0x24c; 5 differing words, all the loop preheader's 0.5
+ * (retail `mov.s f23,f24` copy, here `lui/mtc1 f23`, which also moves one addiu/lui). Was 28 rows.
+ * Fixes: loop y via hud_coord (L05_0037A5F8-g8.c form, allowed by owner ruling of 8 November 2026)
+ * gives the alpha copy in $a0 and the final block order with no ghost saved register; the scale
+ * written into `y` (as the L05 twin) fixes every loop FP register (size f21, y f20, x f22) and the
+ * anchor y f20; the second sprite's label_y handle is `first` (second now in $s3).
+ * label_y with `one = 1` after the alpha call is also ghost-free (one row worse: mfc1 $v1).
+ * Left: cse2 makes the copy only when its path from the function start reaches the preheader.
+ * cse.c PATHLENGTH is 10 (at most 9 skipped blocks); the four top labels skip 12 dead-test blocks.
+ * A plain anchor y (9 skips) gives the copy but breaks the anchor's schedule (13 words); a plain
+ * sprite is worse (38-70). Every label_y/hud_coord mix keeps 12 skips; none gives the copy.
+ * No gain: one/i/declaration orders, other handles, -fno-gcse, -fno-rerun-loop-opt (D_9D30 lui not
+ * hoisted, s6 ghost). */
 /* 7 November 2026, round two: 1156/1156 bytes (size now right), 0/2 placements; 48 -> 28 masked
  * aligned rows (check.py --diff, own metric; the 51 below is another harness). Body below. Fixes: color is an s64 local set
  * from the (s32) value before the texture call (retail's `daddu s0,s0,zero` sign-extend, the 4
@@ -69,6 +88,23 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int hud_coord(float value, float scale, float half)
+{
+    int mode = D_L08_001B3240;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    int copy;
+
+    if (mode == 1)
+        scaled = scale;
+    if (result != 0)
+        scaled = scale;
+    copy = result;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 void func_L08_004207D0(u8 *object)
 {
     Vector difference, euler;
@@ -77,7 +113,7 @@ void func_L08_004207D0(u8 *object)
     char *first, *second, *third;
     u16 *cursor;
     s32 i;
-    f32 y, distance, scale, size, x;
+    f32 y, distance, size, x;
     s32 alpha;
     s64 color;
     u64 texture;
@@ -88,7 +124,7 @@ void func_L08_004207D0(u8 *object)
     second = func_00336D50(D_L08_001A904C + 0x8710, 0xBB);
     third = func_00336D50(D_L08_001A904C + 0x8710, 0xBC);
     func_00300A00(first, 0x60442D00, D_L08_001B1B84 + 4.0f, (f32)label_y(first, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
-    func_00300A00(second, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(second, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
+    func_00300A00(second, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(first, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
     func_00300A00(third, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(third, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
     y = (f32)label_y(object, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
     texture = func_0027C878(D_L08_001B1BA0);
@@ -105,13 +141,13 @@ void func_L08_004207D0(u8 *object)
         if (!entry || entry[0x20] == 0xFE || entry[0x20] == 0xFD || *(s16 *)(entry + 0xAA) == 0x96A) return;
         distance = func_00282E48(object + 0x10, entry + 0x10);
         if (distance <= D_L08_001B1BA4) {
-            scale = distance / D_L08_001B1BA4;
-            scale *= D_L08_001B1B9C;
+            y = distance / D_L08_001B1BA4;
+            y *= D_L08_001B1B9C;
             euler.q = 0;
             euler.f[2] = 1.5707964f;
             func_002833F0(rotation, &euler);
             func_00282CF0(&difference, entry + 0x10, object + 0x10);
-            func_00282F20(&difference, &difference, scale);
+            func_00282F20(&difference, &difference, y);
             func_002836E8(inverse, D_L08_001B9D30);
             func_00283098(&difference, &difference, inverse);
             func_00283098(&difference, &difference, rotation);
@@ -120,7 +156,7 @@ void func_L08_004207D0(u8 *object)
             if (size > D_L08_001B1B8C + D_L08_001B1B8C) size = D_L08_001B1B8C + D_L08_001B1B8C;
             else if (size < 0.0f) size = 0.0f;
             x = difference.f[0] + D_L08_001B1B84;
-            y = (f32)(s32)((D_L08_001B1B88 - difference.f[1]) * D_L08_001B3244 + 0.5f);
+            y = (f32)hud_coord(D_L08_001B1B88 - difference.f[1], D_L08_001B3244, 0.5f);
             color = (s32)(D_L08_001B1BA8 | ((u32)alpha << 24));
             texture = func_0027C878(D_L08_001B1BA0);
             func_L05_003008C0(x, y, size, size, 0, 0, D_L08_001B1B94, D_L08_001B1B98, color, texture);

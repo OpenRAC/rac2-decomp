@@ -1,3 +1,19 @@
+/* 8 November 2026, round 15 (master compiler, ~28 check.py runs): 656/656 bytes, 0/1 places; aligned
+ * masked diff 16 -> 15 rows. Profile now -O2 -G0 -ffunction-sections -Wa,--r5900-la-addend=sn (own
+ * unit): one SDATA declaration of D_L03_001B0160 gives retail's mixed forms (.x walk addiu s5,$gp; .y
+ * walk lui/addiu s6 of D+4), so the second gp name is gone. `one = 1` set after the draw-2 call inside
+ * its group and used for both loop compares puts the 1 in s7 (literal 1 with this profile: 16 rows).
+ * Left: draw 2's lui a1 order, i = 0 in the jal slot, the key copy after i/1/buffer, i/buffer s3/s4 swap.
+ * Analysis: retail's order fits a sched1-only barrier between the draw-2 call and the loop preheader
+ * (a branch that jump2 removes before sched2): sched2 then lets i = 0 (lowest luid, no call dependence)
+ * fill the stall before the jal and puts 1/buffer before the copy. The do-while group is a barrier in
+ * both passes (loop notes); no group lets sched1 hoist the s6 init and 1 over the call (30 rows).
+ * Measured, no better: no outer group (30); i = 0 at the end of either draw-2 group, with or without
+ * `for (i = 0` (102-107: movables and .x/.y givs not reduced); dead tests on title after the call or
+ * after i = 0 (30-34; title kept in s0); `one` as label_y's active in one or both draws (46/65);
+ * do-while groups around the i == 1 if/else (97) or the label lookup (33: lifts keys walk, not i);
+ * plain title rounding without label_y (44); -fno-schedule-insns (99).
+ */
 /* 7 November 2026, round 14: 656/656 bytes, 0/1 places; masked aligned diff 21 -> 15 rows.
  * (1) D_L03_001B0160 declared `extern struct MenuCoordinate D_L03_001B0160[] __attribute__((sda));`
  * (incomplete sda array, COMPILER-NOTES "tied absolute macro form"): the .y walk is now retail's
@@ -137,8 +153,7 @@ extern float D_L03_001B014C SDATA(D_L03_001B014C);
 extern float D_L03_001B0150 SDATA(D_L03_001B0150);
 extern float D_L03_001B0154 SDATA(D_L03_001B0154);
 extern float D_L03_001B0158 SDATA(D_L03_001B0158);
-extern struct MenuCoordinate D_L03_001B0160[] __attribute__((sda));
-extern struct MenuCoordinate D_L03_001B0160_gp[] SDATA(D_L03_001B0160);
+extern struct MenuCoordinate D_L03_001B0160[] SDATA(D_L03_001B0160);
 extern int D_L03_001B0140 SDATA(D_L03_001B0140);
 extern int D_L03_001B3280 __attribute__((sda));
 extern float D_L03_001B3284 __attribute__((sda));
@@ -170,11 +185,11 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-static __inline__ int screen_coord(int mode, float value, float offset)
+static __inline__ int screen_coord(int mode, float value, float offset, int one)
 {
     float scaled = value * D_L03_001B3284 + 0.5f;
 
-    if (mode == 1)
+    if (mode == one)
         return (int)(scaled + offset);
     return (int)scaled;
 }
@@ -182,6 +197,8 @@ static __inline__ int screen_coord(int mode, float value, float offset)
 int func_L03_003C7018(void)
 {
     if (D_L03_001A904C) {
+        int one;
+
         {
             char *title;
             float row, x, c, d;
@@ -207,23 +224,25 @@ int func_L03_003C7018(void)
                 d = D_L03_001B0158;
             } while (0);
             func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+            one = 1;
         } while (0);
         {
             int keys[4] = {11599,12116,12769,12770};
             unsigned char buffer[128];
             int i;
-            for (i = 0; i < 4; i++) {
+            i = 0;
+            for (; i < 4; i++) {
                 int shift = 5;
                 int x;
                 unsigned char *label = func_00288FB8(keys[i]);
-                if (i == 1) {
+                if (i == one) {
                     func_00115DA8((char *)buffer, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
                     func_00115DA8((char *)buffer, D_L03_001B0198, label);
                 }
-                x = func_00283CF0(D_L03_001B0160_gp[i].x);
-                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift)), 0x80808080UL, buffer, 0x80);
+                x = func_00283CF0(D_L03_001B0160[i].x);
+                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buffer, 0x80);
             }
         }
         if (D_001A7A7C[0]) {

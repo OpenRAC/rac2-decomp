@@ -1,3 +1,36 @@
+/* 8 November 2026, round 2: the second loop gets its own column variable x2 (x only in the first
+ * loop). Retail's y3 then takes s1 before x, so loop 1 is exact apart from s4/s5 and loop 2 apart
+ * from x2/base (s1/s2) and s4/s5: 55 masked rows (was 71), still 2464/2468 bytes with -fno-gcse.
+ * Ghost saved registers: `one` is ghost s4 and the post-loop handle y2 keeps y2 in s5. With `one`
+ * at only <= 8 label_y calls the ghost drops to s6/s7 but other rows get worse (61-69). A handle with
+ * no set at all (an uninitialised local, NOT landable) gives ghosts s6+s7 and 49 rows, so retail's
+ * post-loop handles are values whose set is deleted after allocation. Tried without gain:
+ * -fmove-all-movables (with or without -fno-gcse: hoists 0x14 out of both loops, 84-86 rows),
+ * h = y1/y2/y3 copies as handles (cse follows jumps and merges them), handle = a D_001A7340 load
+ * or color copy made before the loops (load not deleted, 2472 bytes), (void *)one / color / text /
+ * y3 handles, separate i/index in loop 2, hud_coord on rectangles 2-4 or text. Loops hold no
+ * label_y and no float constants, and retail rebuilds the table base in each loop preheader. */
+/* 8 November 2026, HUD recipe pass: build as its own unit src/game/002D3FA0-g8.c with
+ * `-O2 -G8 -ffunction-sections -fno-gcse` (config/cflags.txt line). 2464/2468 bytes, 0/28, frame
+ * 0xA0 and saved set s0-s7 + f20-f22 now as retail (fp still missing). Aligned masked diff: 71
+ * unmatched rows (the 7 November label_y form scores 254 on the same counter). What closed it:
+ * - each sprite draw passes the func_00336D50 call directly as the first argument (no `t =`):
+ *   retail's copy to $a2 then the 7344/7340 loads in $v0/$v1, all four sprite blocks exact;
+ * - sprite y through hud_coord (result as handle), rectangles/textures/text through label_y with
+ *   color as handle, `active` the local `one` (= 1) at every call;
+ * - y1/y2/y3 as separate locals per text draw (retail mfc1 straight into the saved register);
+ * - the sprintf call with both func_00288FB8 calls inline (format address held in a saved reg);
+ * - -fno-gcse keeps `one` a ghost saved register (only s4 here) and fixes the rectangle copies.
+ * Left: retail has three ghost saved registers (s6, s7, fp, all live across both loops, so they
+ * are values made before the loops and only read by the post-loop label_y tests); here one ghost
+ * (s4) and the post-loop handle y2 holds s5, so loop pseudos land on s1/s2/s6/s7 instead of
+ * s1-s5 (x and the table base swap s1/s2). Color: retail `s0 = s2; t0 = s0; s2 = s0` at the
+ * first rectangle (color dies there, its 64-bit copy lives on); here the copy is remade at the
+ * third rectangle. One texture block moves `a0 = v0` early. Tried this round without gain:
+ * -fmove-all-movables (2476 bytes), -fno-schedule-insns, -fno-sched-interblock, plain extern
+ * globals (no change), u64/long color (2504 bytes), several `one`-like locals (cse merges them
+ * without -fno-gcse), first-sprite pointer or loop variables as the post-loop handle, hud_coord
+ * on rectangles/text. */
 /* 7 November 2026, label_y sweep: every y rounding goes through label_y (the four centred sprite ys with handle t, every rectangle/text y with handle (void *)color). Same profile: 2460/2468 bytes (was 2428), masked aligned-diff rows 547 -> 174 (m1d h.py count). Retail still saves two more GPRs (s7, fp) and orders the sprite y conversion before the move of t. */
 /* 2 November 2026: retained nonmatching C; no linked matching credit.
  * Profile: -O2 -G8 -ffunction-sections.
@@ -100,51 +133,56 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int hud_coord(float value, float scale, float half, int active)
+{
+    int mode = D_001B23A0;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    int copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (result != 0)
+        scaled = scale;
+    copy = result;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 int func_002D3FA0(void)
 {
     MenuCorners corners = D_001ABA78;
     char text[32];
     int color = func_002A9588(0x60241700, 0x55F0C070, 30, 0, 0);
-    int x, index, i;
+    int x, x2, index, i;
     char *first, *second;
     int t;
+    int y1, y2, y3;
+    int one = 1;
     float px, py;
     func_0027C540(0);
-    t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD0);
-    px = (float)(D_001A7340[0] / 2);
-    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
-    func_00300A00(t, 0x60442D00, px, py, 1.0f, 1.0f, 0.0f);
-    t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD1);
-    px = (float)(D_001A7340[0] / 2);
-    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
-    func_00300A00(t, 0x60241700, px, py, 1.0f, 1.0f, 0.0f);
-    t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD2);
-    px = (float)(D_001A7340[0] / 2);
-    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
-    func_00300A00(t, 0x55F0C070, px, py, 1.0f, 1.0f, 0.0f);
-    t = func_00336D50(D_001A8CFC[0] + 0x8710, 0XD3);
-    px = (float)(D_001A7340[0] / 2);
-    py = (float)label_y((void *)t, (float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, 1);
-    func_00300A00(t, 0x55F0C070, px, py, 1.0f, 1.0f, 0.0f);
-    func_0028FC48(228, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, 1), 230, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, 1), color, 0);
-    func_0028FC48(286, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, 1), 288, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, 1), color, 0);
-    func_0028FC48(228, label_y((void *)color, 325.0f, D_001B23A4[0], 0.5f, 1), 288, label_y((void *)color, 327.0f, D_001B23A4[0], 0.5f, 1), color, 0);
-    func_0028FC48(228, label_y((void *)color, 386.0f, D_001B23A4[0], 0.5f, 1), 288, label_y((void *)color, 388.0f, D_001B23A4[0], 0.5f, 1), color, 0);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, 1), 192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, 1), -192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, 1), 192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, 1), -192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, 1), &corners);
-    func_0028E868(func_0028E588(0xEAA8, 1), 402, label_y((void *)color, 50.0f, D_001B23A4[0], 0.5f, 1), 89, label_y((void *)color, 115.0f, D_001B23A4[0], 0.5f, 1), 64);
-    x = label_y((void *)color, 116.0f, D_001B23A4[0], 0.5f, 1);
-    func_0027FB40(445, x, 0x80F0F0F0ULL, func_00288FB8(0x3212), -1);
-    x = label_y((void *)color, 134.0f, D_001B23A4[0], 0.5f, 1);
-    func_0027FB40(445, x, 0x80F0F0F0ULL, func_00288FB8(0x3213), -1);
-    first = func_00288FB8(0x3213);
-    second = func_00288FB8(0x2D55);
-    func_00115DA8(text, D_001AB998, first, second);
-    func_0027FAA8(159, label_y((void *)color, 18.0f, D_001B23A4[0], 0.5f, 1), 0x80F0F0F0ULL, text, -1);
-    x = label_y((void *)color, 187.0f, D_001B23A4[0], 0.5f, 1);
-    func_0027FAA8(445, x, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
+    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD0), 0x60442D00, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    func_0028FC48(228, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one), 230, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one), color, 0);
+    func_0028FC48(286, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one), color, 0);
+    func_0028FC48(228, label_y((void *)color, 325.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 327.0f, D_001B23A4[0], 0.5f, one), color, 0);
+    func_0028FC48(228, label_y((void *)color, 386.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 388.0f, D_001B23A4[0], 0.5f, one), color, 0);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, one), 192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, one), -192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, one), 192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
+    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, one), -192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
+    func_0028E868(func_0028E588(0xEAA8, 1), 402, label_y((void *)color, 50.0f, D_001B23A4[0], 0.5f, one), 89, label_y((void *)color, 115.0f, D_001B23A4[0], 0.5f, one), 64);
+    y1 = label_y((void *)color, 116.0f, D_001B23A4[0], 0.5f, one);
+    func_0027FB40(445, y1, 0x80F0F0F0ULL, func_00288FB8(0x3212), -1);
+    y2 = label_y((void *)color, 134.0f, D_001B23A4[0], 0.5f, one);
+    func_0027FB40(445, y2, 0x80F0F0F0ULL, func_00288FB8(0x3213), -1);
+    func_00115DA8(text, D_001AB998, func_00288FB8(0x3213), func_00288FB8(0x2D55));
+    func_0027FAA8(159, label_y((void *)color, 18.0f, D_001B23A4[0], 0.5f, one), 0x80F0F0F0ULL, text, -1);
+    y3 = label_y((void *)color, 187.0f, D_001B23A4[0], 0.5f, one);
+    func_0027FAA8(445, y3, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
         index = D_001ABA74 - i;
@@ -161,7 +199,7 @@ int func_002D3FA0(void)
         }
         x -= 56;
     }
-    x = 291;
+    x2 = 291;
     for (i = 1; i < 12; i++) {
         index = D_001ABA74 + i;
         if (index >= 0 && index < 12) {
@@ -173,12 +211,12 @@ int func_002D3FA0(void)
             }
             if (index >= 12)
                 continue;
-            func_002D3D88(index, x);
+            func_002D3D88(index, x2);
         }
-        x += 56;
+        x2 += 56;
     }
     func_0027C660();
-    func_002FC620(30, 385, label_y((void *)color, 50.0f, D_001B23A4[0], 0.5f, 1), label_y((void *)color, 213.0f, D_001B23A4[0], 0.5f, 1));
+    func_002FC620(30, 385, label_y((void *)y2, 50.0f, D_001B23A4[0], 0.5f, one), label_y((void *)y2, 213.0f, D_001B23A4[0], 0.5f, one));
     func_002A0250();
     func_002A01C8();
     func_002A01F0();

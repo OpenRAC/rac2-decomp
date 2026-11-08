@@ -1,4 +1,24 @@
-/* 7 November 2026, label_y sweep: the two icon ys use label_y(icon, 200.0f, ...) and CENTER uses label_y(str_, ...): 319 -> 281 differences, 3360/3388 bytes (TEXT and ROW with label_y: no gain). The body below is the retained C with that change (label_y is
+/* 8 November 2026, HUD-recipe rewrite (Claude Opus 5.5), USA v1.01, re-measured on master's
+ * compiler: the 7 November body was 280 masked differences at 3360/3388 bytes; the body
+ * below is 84 at 3384/3388 (same cc1 diff harness, relocations masked). Steps that paid:
+ * - hud_coord (dead-test helper, owner ruling 8 November 2026) on every ROW and the name row:
+ *   280 -> 211; label_y(str_) on every TEXT row: -> 150.
+ * - time / 60 % 60 written in each sprintf call and the < 10 test (no minutes local): retail's
+ *   three dead li 60 come back, 3356 -> 3380 bytes; per-arm times pointer: -> 126 / 90.
+ * - per-draw string locals (label in each flags arm, fmt, str in both reward branches): -> 92.
+ * - CENTER's handle: buffer is a constant address, so label_y(buffer) folds its tests and
+ *   loses the block boundary (li.s 286.0 hoisted above the 0x2f72 call). Using sprintf's
+ *   return as the handle puts 286.0 after the mfc1 as retail: -> 84 (it leaves one dead
+ *   daddu $a0,$v0; a global handle gives 3388 bytes but an extra lw).
+ * - Title select: lang loaded in both arms, then {first; second} / {second; first} order
+ *   gives retail's beqz delay-slot lw and $a0/$v1; one 2-insn order difference left.
+ * Still open: the first icon's 1.0 (retail: direct $f14, new 1.0 in $f20 at the second icon;
+ * here one $f20 pseudo for both, width/rot locals no help); the 283 sprites' mfc1 $a1 vs $v1
+ * and input/colour $s1/$s2 swap; table base $s2 / flags pointer $s3 / count $s2 in retail vs
+ * $s0/$s0/$s3 here (cascades into the name row, count, reward); time vs 60 ($s2/$s1 swapped);
+ * the time lookup's sll is cross-jumped into the join (retail keeps one sll per arm).
+ * Profile: own unit src/levels/shared/L04_0040AD28-g8.c, -O2 -G8 -ffunction-sections -g. */
+/* 7 November 2026, label_y sweep: the two icon ys use label_y(icon, 200.0f, ...) and CENTER uses label_y(str_, ...): 319 -> 281 differences, 3360/3388 bytes (TEXT and ROW with label_y: no gain). That body (since replaced by the 8 November one above) was the retained C with that change (label_y is
  * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
  * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
 /* opus-1 (Claude Opus 5.5, xhigh) retained attempt, 31 October 2026, USA v1.01.
@@ -78,7 +98,6 @@ extern int func_0027FBD8(int, int, unsigned long, char *, int);
 extern void func_0027F5B8(int, int, unsigned long, char *, int);
 extern int func_L04_0040A1D0(int);
 extern void func_002FC560(int, unsigned long);
-static __inline__ int Yt(float v) { return (int)(v * D_L04_001B2D44 + 0.5f); }
 extern int D_L04_001B2D40;
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
@@ -97,9 +116,25 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-#define Y(v) Yt((float)(v))
+static __inline__ int hud_coord(float value, float scale, float half)
+{
+    int mode = D_L04_001B2D40;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    int copy;
+
+    if (mode == 1)
+        scaled = scale;
+    if (result != 0)
+        scaled = scale;
+    copy = result;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+#define Y(v) hud_coord((float)(v), D_L04_001B2D44, 0.5f)
 #define YS(v) Y(v)
-#define TEXT(x,y,s) { char *str_ = (s); int row_ = Y(y); int len_ = func_001157AC(str_); func_0027FAA8(x,row_,0x80f0f0f0UL,str_,len_); }
+#define TEXT(x,y,s) { char *str_ = (s); int row_ = label_y(str_, (float)(y), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FAA8(x,row_,0x80f0f0f0UL,str_,len_); }
 #define CENTER(y,s) { char *str_ = (s); int row_ = label_y(str_, (float)(y), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FBD8(center,row_,0x80f0f0f0UL,str_,len_); }
 #define ROW(x,id) { int row_ = Y(286); char *str_ = func_00288FB8(id); func_0027F5B8(x,row_,0x80f0f0f0UL,str_,-1); }
 int func_L04_0040AD28(void)
@@ -112,7 +147,6 @@ int func_L04_0040AD28(void)
     unsigned int color, tint;
     unsigned char *input;
     int count, shift, reward, time, minutes, x, row;
-    char *str;
     void *icon;
     float scale, centerf, py;
     tangent = func_00283198(angle);
@@ -124,7 +158,7 @@ int func_L04_0040AD28(void)
     py = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     scale = 0.92f;
     if (D_001A7B90) scale = 0.9f;
-    func_00300A00(icon,0x60442d00,centerf,py,1.0f,scale,0.0f);
+    func_00300A00(icon,0x60442d00,centerf,py,1.0f,scale,(float)0);
     icon = func_00336D50(D_L04_001A904C + 0x8710,0x44);
     py = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     scale = 0.92f;
@@ -135,72 +169,72 @@ int func_L04_0040AD28(void)
     input = D_00138180;
     tint = 0x80f0f0f0;
     if (!(*(int *)(input + 0x1a0) & 0x2000)) tint = color;
-    func_00300A00(func_00336D50(D_L04_001A904C+0x8710,0x4a),tint,259.0f,YS(283),1.0f,1.0f,0.0f);
+    icon = func_00336D50(D_L04_001A904C+0x8710,0x4a);
+    func_00300A00(icon,tint,259.0f,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, 1),1.0f,1.0f,0.0f);
     tint = 0x80f0f0f0;
     if (!(*(int *)(input + 0x1a0) & 0x8000)) tint = color;
-    func_00300A00(func_00336D50(D_L04_001A904C+0x8710,0x4b),tint,251.0f,YS(283),1.0f,1.0f,0.0f);
+    icon = func_00336D50(D_L04_001A904C+0x8710,0x4b);
+    func_00300A00(icon,tint,251.0f,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, 1),1.0f,1.0f,0.0f);
     if (m[0x20] != 3) {
         float projection_angle = *(float *)(p+0x28c)*0.008726647f;
         float sine = func_00283198(projection_angle);
         D_L04_001BDB80[44] = sine / func_00283180(projection_angle);
         func_0027AB40();
     }
-    func_00115DA8(buffer,func_00288FB8(0x2f72),D_L04_001B0904+1);
-    CENTER(60,buffer);
+    { int n_ = func_00115DA8(buffer,func_00288FB8(0x2f72),D_L04_001B0904+1); int row_ = label_y((void *)n_, 60.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FBD8(center,row_,0x80f0f0f0UL,buffer,len_); }
     ROW(119,0x2f40);
     ROW(356,0x2f41);
     ROW(181,0x2f3f);
     ROW(279,0x2f42);
-    TEXT(center,110,func_00288FB8(D_L04_002C63C0[D_L04_001B0904].name));
+    { char *str_ = func_00288FB8(D_L04_002C63C0[D_L04_001B0904].name); int row_ = Y(110); int len_ = func_001157AC(str_); func_0027FAA8(center,row_,0x80f0f0f0UL,str_,len_); }
     shift = D_001A79F0 == 11 ? 10 : 5;
     count = func_L04_0040A1D0(D_L04_001B0904);
     if ((D_L04_002C63C0[D_L04_001B0904].flags & 0x10000000) ||
         (D_L04_001B0904 > 0 && func_L04_0040A1D0(D_L04_001B0904-1)>0)) {
-        int first, second;
-        if (D_L04_002C63C0[D_L04_001B0904].flags & 4) { first=0x2f7a; second=0x2f9a; }
-        else { first=0x2f79; second=0x2f99; }
-        if (D_001A79F0_1 != 11) second = first;
+        int first, second, lang;
+        if (D_L04_002C63C0[D_L04_001B0904].flags & 4) { lang = D_001A79F0_1; first=0x2f7a; second=0x2f9a; }
+        else { lang = D_001A79F0_1; second=0x2f99; first=0x2f79; }
+        if (lang != 11) second = first;
         TEXT(center,150-shift,func_00288FB8(second));
-        if (D_L04_002C63C0[D_L04_001B0904].flags&1) str=func_00288FB8(0x2f7c);
-        else str=func_00288FB8(0x2f7b);
-        TEXT(center,170-shift,str);
+        { char *label; if (D_L04_002C63C0[D_L04_001B0904].flags&1) label=func_00288FB8(0x2f7c);
+        else label=func_00288FB8(0x2f7b);
+        TEXT(center,170-shift,label); }
         if (D_001A79F0==11) {
-            if (D_L04_002C63C0[D_L04_001B0904].flags&16) str=func_00288FB8(0x2f9b);
-            else str=func_00288FB8(0x2f9c);
-            TEXT(center,190-shift,str);
+            { char *label; if (D_L04_002C63C0[D_L04_001B0904].flags&16) label=func_00288FB8(0x2f9b);
+            else label=func_00288FB8(0x2f9c);
+            TEXT(center,190-shift,label); }
             if(D_L04_002C63C0[D_L04_001B0904].flags&2) TEXT(center,210-shift,func_00288FB8(0x2fc5))
         } else if(D_L04_002C63C0[D_L04_001B0904].flags&2) TEXT(center,190-shift,func_00288FB8(0x2fc5))
         if(count>=3) count=2;
         if(D_L04_002C63C0[D_L04_001B0904].rewards[count]) {
             char *fmt = D_L04_001B0940;
-            str=func_00288FB8(0x2f7d);
+            char *str = func_00288FB8(0x2f7d);
             { unsigned char boost = D_001A7A0A;
             reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
             if(boost) reward*=10; }
             func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0x2f5e));
         } else { char *fmt = D_L04_001B0950; func_00115DA8(buffer,fmt,func_00288FB8(0x2f7d)); }
         TEXT(center,shift+210,buffer);
-        time = D_001A79F0==4 ? D_001A7368[D_L04_001B0904] : D_001A737C[D_L04_001B0904];
+        { int *times; if (D_001A79F0==4) { times = D_001A7368; time = times[D_L04_001B0904]; } else { times = D_001A737C; time = times[D_L04_001B0904]; } }
         x = 0;
         if(time) {
-            minutes = time / 60 % 60;
             x = 110;
-            if (minutes < 10) func_00115DA8(buffer,D_L04_001B0958,func_00288FB8(0x31c8),time/3600%60,minutes,time/6%10);
-            else func_00115DA8(buffer,D_L04_001B0968,func_00288FB8(0x31c8),time/3600%60,minutes,time/6%10);
+            if (time / 60 % 60 < 10) func_00115DA8(buffer,D_L04_001B0958,func_00288FB8(0x31c8),time/3600%60,time/60%60,time/6%10);
+            else func_00115DA8(buffer,D_L04_001B0968,func_00288FB8(0x31c8),time/3600%60,time/60%60,time/6%10);
             { int col = center+46; TEXT(col,shift+230,buffer); }
         }
             { int col = center-x;
-            str=func_00288FB8(0x2f7e);
-            func_00115DA8(buffer,str,func_L04_0040A1D0(D_L04_001B0904));
+            char *fmt = func_00288FB8(0x2f7e);
+            func_00115DA8(buffer,fmt,func_L04_0040A1D0(D_L04_001B0904));
             TEXT(col,shift+230,buffer); }
     } else {
             char *fmt;
             CENTER(150,func_00288FB8(0x2f73));
             fmt = D_L04_001B0940;
-            str=func_00288FB8(0x2f7d);
+            { char *str = func_00288FB8(0x2f7d);
             reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
             if(D_001A7A0A) reward*=10;
-            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0x2f5e));
+            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0x2f5e)); }
             TEXT(center,shift+210,buffer);
     }
     func_002FC560(71,0x5360b);

@@ -1,3 +1,24 @@
+/* 8 November 2026, re-measured on master's compiler (sticky-volatile default, mtc1 fix):
+ * unchanged, 1376/1376, 0/27 USA, 46 positions; check.py first difference +0x3F0.
+ * Mechanism of the last loop, from cc1 dumps (-dj -dG -dL): expand_end_loop rotates
+ * the exists/10/9/D_001A7AF8 tests to the bottom. Retail needs (1) direct beq for 10/9,
+ * (2) NO exit-test copy at jump1, so cse1 follows the bottom test's branch into the body
+ * (single-use top label) and keeps 0xE0/table base in one pseudo (s3/s2) across the call,
+ * (3) the entry copy made later by the post-loop JUMP_AFTER_REGSCAN pass.
+ * duplicate_loop_exit_test refuses only on a CODE_LABEL, call, LOOP_BEG/CONT note or
+ * more than 30 insns (LOOP_TEST_THRESHOLD is 30, not 20). This draft's skip merges give
+ * the labels (2)+(3) but xori for 10/9. Plain `if(!exists) continue; if(i==10) continue;
+ * if(i==9) continue;` (or the && form) gives retail's exact branch layout but only 20
+ * insns, so jump1 copies the test and 0xE0/base are rematerialized (1368 bytes).
+ * `do { k = *p; } while(0);` before the exists test blocks jump1, keeps s2/s3 and puts
+ * 10/14 in a2 as retail, but its loop notes also block the post-loop copy (1332 bytes).
+ * Value forms (`use = a && b && c`, `if(!skip && i==10) skip=1`, else-if chains, switch,
+ * inline listed() helper) give movn/movz, range checks or lose the rotation.
+ * D_001A7AF8 without MACRO_ADDR cross-jumps into the entry copy. Indexed
+ * D_00139568[i] gives a loop.c giv with retail's fresh lui but hoists 0xE0/14/12.
+ * Next: a referenced label inside the rotated region that cse1/jump2 thread away
+ * before the post-loop jump, with 10/9 still expanded as branch compares.
+ */
 /* 6 November 2026, Codex loop-shape follow-up: 1376/1376 bytes, 0/27 USA places,
  * -O2 -G8 -ffunction-sections in an isolated shared -g8.c unit. check.py reports
  * "instruction at +0x3f0 differs" at every place; 46 instruction positions differ

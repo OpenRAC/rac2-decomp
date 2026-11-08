@@ -1,3 +1,6 @@
+/* 8 November 2026 (named-local round 2): the C below is that best form (6 words: entry $a0/$a1 swap and the loop-2 sp+0x90 rematerialisation; its slot order is retail's). The entry registers are reload registers for the two address sets, not incoming arguments, and pr's explicit set always comes before the PRE insertion of &shard: data/pr set order, pr set before or after the tmpl copy (after it folds pr back) do not change that. Loop 2: pr as either argument of func_00282F20 alone (7-8 words), as func_002BF728's argument (9-12), in both calls (hard register, 70+), a block-local copy (folded), pr set right before loop 2 or after loop 1 with or without loop uses (8-71), pr->q store (1960 bytes): none loads it from 0xC8. */
+/* 8 November 2026 (named-local slot order, the func_00281A08 technique): `int c;` moved to the top and `BurstVector *pr = &random;` declared right after it, with pr used only in the two calls after loop 2, gives retail's slot order (data 0xC0, c 0xC4, &random 0xC8, &shard 0xCC). Two residues remain (6 words): pr's set comes first, so &random takes $a0 and &shard $a1 at entry (retail the reverse), and loop 2 rematerializes sp+0x90 into $s0 instead of loading it from 0xC8. Using pr in loop 2 (directly or via a block-local copy) gives pr a hard register (1940-1960 bytes); setting pr later (after the tmpl copy, after loop 1/2) folds it back into the PRE register; a named &shard pointer changes size. */
+/* 8 November 2026 (gcse table size): the five EE cc1 builds here (ours, 991111a, 991111-01, 991111b-r4, SN 2.95.2 273a) give the same PRE table size on this source, so the sizing rule is shared. Forced sizes 11..401: 0 diffs at 17-119 (12 sizes), 161, 177, 253, 289, 295, 373, 383. Only the insn count right after RTL expand (507, before jump1) gives 253; it misses the other targets, and no metric (cuid, max uid, all/non-note insns, +notes, +labels, max_reg_num, counts after jump/cse) over 1-4 fits more than one target. */
 /* 8 November 2026 (round 3): the RAC1 twin (~/rac1-decomp mine_bomb_and_debris.c, the gz/wz splash block) writes
  * the channels as int locals set at declaration plus "int delay = 0;" as the splash's third argument, and notes
  * that this local orders five cached-address stack slots through the GCSE table size. Transcribed here (short
@@ -68,6 +71,8 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
     BurstTemplate tmpl;
     BurstVector delta, projected, shard, random, drift, point;
     float scale, distance, height, ground;
+    int c;
+    BurstVector *pr = &random;
     BurstWeapon *w;
 
     tmpl = D_L00_002A26A0;
@@ -118,12 +123,11 @@ void func_L00_0038E880(char *object, BurstVector *velocity, BurstVector *normal)
     short cg = 0x60;
     short cb = 0x7F;
     int delay = 0;
-    int c;
 
     random.q = *(BurstQuad *)(object + 0x10);
     random.f[2] += 3.5f;
-    height = func_002A89A8(&random, 0, 0.5f);
-    ground = func_002A8A20(&random);
+    height = func_002A89A8(pr, 0, 0.5f);
+    ground = func_002A8A20(pr);
     if (height != ground && height - ground < 1.2f) {
         {
             int i;

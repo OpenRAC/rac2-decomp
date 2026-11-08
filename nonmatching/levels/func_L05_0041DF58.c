@@ -1,4 +1,25 @@
 /*
+ * 8 November 2026 (re-measure): still 3496/3516, 0/1 places, same single 5-insn cross-jump.
+ * From the jump2/sched2/greg dumps: jump2 sends case 0's and case 1's second-draw calls into
+ * case 2's call (label before `ori a2`), then merges case 1's tail [mul.s, add.s, fix, a0=v0]
+ * into case 0's (4 insns >= the minimum 2). All seven label_y blocks except case 2 get mode in
+ * a0 (local-alloc's fake lifetime: mode's load sits right after the float that frees v1) and
+ * fix scratch v1 (reload takes the first free call-used reg); case 2 gets mode v1, scratch v0.
+ * So a different scratch would need mode in v1, but then x's copy preference gives it a0
+ * (visible `addiu a0`, as in case 2). Tried, no change: a `y2` local for the case 1 label_y
+ * result; case 0's second draw with its own block-local x; handle passed as the expression
+ * (void *)(D_L05_001B1428 - 80). Handle `text`: tests fold away (3544). `active` 2: 3520 (fix
+ * result goes to v1 plus a move to a1). Open: which RTL difference kept retail's two tails apart.
+ * 8 November 2026 (round 2): the L10 donor's switch is a different shape (score/object calls),
+ * so it gives no evidence for these tails. Cause found in the EE gcc jump.c: cross-jumping only
+ * walks jump_chain for a label whose uid is < max_uid (a label that existed before jump2).
+ * Here case 0's call merges into case 2's call at case 2's handle-test label (code_label 447, right
+ * before `ori a2`). That label existed before jump2, so case 1 then finds case 0's jump on its
+ * chain and merges. In retail the label before case 2's `ori a2` must have been new (made by
+ * jump2), so no chain search happened; the C has to stop that label from directly preceding
+ * a2. Tried with no change: case 2 with no scope block, or with a function-level x; case 0 in its
+ * own block with its own x. Case 2 handle 0 or `text` folds the tests: no merges, 3528, 858 rows.
+ *
  * 7 November 2026 (donor port): best check.py, USA v1.01 (level 05): 3496/3516 bytes, 0/1 places.
  * Ported from matched func_L10_00421790 (src/levels/10_hrugis_cloud/L10_00421790-g8.c, same
  * routine, label_y idiom, default -g8 flags). Build as its own unit

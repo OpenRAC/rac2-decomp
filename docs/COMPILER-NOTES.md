@@ -251,6 +251,17 @@ func_00281A08 (-142,-140,-94,-92) and func_L00_002EC970 (20 values, none shared)
 full grid (pseudo -100..100 x cuid -240..240 step 2) the only shared point is +93/-142,
 and it leaves the other three unchanged, so no single pseudo/cuid offset explains them.
 
+8 November 2026: `alloc_expr_hash_table` sizes the PRE table as `max_cuid / 2 | 1` (at least 11).
+On the same input, the five EE cc1 builds in hand (this tree, 991111a, 991111-01,
+991111b-r4 and SN 2.95.2 273a) print the same table size in their `-dG` dumps, so they
+share the rule. A test cc1 that forced every odd size 11..401 gives 0 diffs for
+func_L00_0038E880 at 20 sizes, func_L13_0041AD00 at 49/103/137/147/181 and func_00281A08 at
+23/47; func_L00_003E5BD8 (best 8) and func_002B44C0 (best 21) never reach 0. No size base
+fits two targets: max_cuid, get_max_uid(), all or non-NOTE insns, cuid plus notes, labels or
+blocks, max_reg_num(), or the real-insn count after expand, jump1, cse1 or dead-insn removal,
+each over 1-4, or a prime size. Forced on all 8775 game units, the expand-time count changes
+170 units, get_max_uid() 142, non-NOTE insns 188 and prime sizes 87, so none is safe.
+
 ## Frames, calls and ABI
 
 ### Object extent and stack allocation

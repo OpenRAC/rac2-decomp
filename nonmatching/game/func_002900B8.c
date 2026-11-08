@@ -1,3 +1,24 @@
+/* 8 November 2026, round 2: 1388/1388 bytes, about 20 instructions differ. GPRs and case 1/2 are now exact:
+ * case 1/2 passes literal 1, and `one` keeps retail's $s2 because the case-0 `top` call sits in a one-pass
+ * do/while(0) group (loop weighting lifts `one` from 14/302 above the case-0 colour, 3/60); top reads
+ * D_001B23A4[0] directly. Left: 1.0/0.0 swapped in $f21/$f22 (1.0 has 9 refs/178 insns, 0.0 has 4/66, so 1.0 goes
+ * first; retail needs a conflict or fewer 1.0 refs); text call 2 is mov $f14,$f22 / mov $f15,$f14 in retail;
+ * the 128 multiply reads the copy $f3, not $f2 (no top/128 argument mix fixed it); case-0 second-loop temps
+ * f0/f1/f2 swapped; the colour-2 copy and the D_001A9008 load swap at 0x2D0 (the group's loop note).
+ * Tried with no gain: moving `one = 1` (sched hoists it anyway), swapping the zero/scale declarations,
+ * grouping the other helpers or call statements (worse or 1396 bytes), dropping `edge` in case 0. */
+/* 8 November 2026, dead-test helper sweep: now 1388/1388 bytes, same six saved GPRs and six FPRs, case order right.
+ * Profile: own -g8 unit, -O2 -G8 -fno-expensive-optimizations -ffunction-sections -frac2-keep-block-order.
+ * What closed the gap: hud_coord (label_y with the rounded result as handle, owner ruling 8 November 2026) on
+ * every case rounding (top, 128, 285); `one`, a local holding 1, as `active` everywhere (gives retail's ghost
+ * $s2 in the text phase); `s = D_001B23A4[0]` for top and the 128 result written back into s (gives retail's
+ * mov.s $f3,$f2 copy for the 285 rounding); an `edge` local for lower-step and upper+step (retail's $f0 temp);
+ * (float)top written out in case 0 instead of a `limit` variable (fixes the case-0 loop registers).
+ * Left (~25 instructions): text call 2 is mov $f14,$f22 / mov $f15,$f14 in retail (cse picked the pseudo here);
+ * 1.0/0.0 sit in $f21/$f22 swapped; the 128 multiply reads the copy $f3 instead of $f2 (both cases); f0/f1/f2
+ * temps in the case-0 second loop. Case 1/2 is exact with literal 1 for `active` there, but then `one` loses
+ * $s2 to 0x8710 (priority 14/302 vs case-0 colour), so this draft keeps `one` in case 1/2.
+ * -fno-gcse breaks size (1376). Mode-test-last helper order and the && helper made it worse. */
 /* 7 November 2026, label_y sweep: both 206.0f label ys go through label_y (handle: the sprite; the second sprite now in `text`), the bars unchanged. Same profile (-O2 -G8 -fno-expensive-optimizations): still 1364/1388 bytes, but masked aligned-diff rows 392 -> 336 (m1d h.py count; not a check.py figure). The size gap and case layout remain. */
 /* Closer C3, 1 November 2026: the profile below is wrong. Retail has sched1 on: -O2 -G8 -fno-expensive-optimizations
  * -ffunction-sections. 206.0f, 0x8710, 0.5f are call-crossing pseudos and float up over the calls as in retail; literal args go
@@ -40,7 +61,7 @@
  *   in places (mfc1 $a1 for lower, mfc1 $a0 in the second loop).
  * Declarations: the -G8 sibling already declares func_002900B8 as int (callback interface).
  */
-#include "include_asm.h"
+#include "common.h"
 
 extern int D_001A9000 __attribute__((sda));
 extern int D_001A9004 __attribute__((sda));
@@ -91,6 +112,23 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int hud_coord(float value, float scale, float half, int active)
+{
+    int mode = D_001B23A0;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    int copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (result != 0)
+        scaled = scale;
+    copy = result;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 int func_002900B8(void)
 {
     float saved;
@@ -101,8 +139,12 @@ int func_002900B8(void)
     char *text;
     int first;
     int second;
+    int one;
+    float half;
 
     if (D_001A8CFC[0] != 0 && D_00254E78.active == 0 && D_00254E78.unk24 == -1) {
+        one = 1;
+        half = 0.5f;
         saved = D_001B9040.opacity;
         D_001B9040.opacity = 0.62f;
         func_0027AB40();
@@ -110,15 +152,15 @@ int func_002900B8(void)
         first = func_00283D38(0x442D00, 0x60442D00, pulse);
         second = func_00283D38(0xF0C070, 0x55F0C070, pulse);
         text = func_00336D50(D_001A8CFC[0] + 0x8710, 0xA6);
-        y = (float)label_y(text, 206.0f, D_001B23A4[0], 0.5f, 1);
+        y = (float)label_y(text, 206.0f, D_001B23A4[0], half, one);
         scale = 1.0f;
         zero = 0.0f;
         func_00300A00(text, first, 484.0f, y, scale, scale, zero);
         text = func_00336D50(D_001A8CFC[0] + 0x8710, 0xA7);
-        func_00300A00(text, second, 484.0f, (float)label_y(text, 206.0f, D_001B23A4[0], 0.5f, 1), 1.0f, 1.0f, 0.0f);
+        func_00300A00(text, second, 484.0f, (float)label_y(text, 206.0f, D_001B23A4[0], half, one), 1.0f, 1.0f, 0.0f);
         switch (D_001A9004) {
         case 0:
-            if (0.0f <= D_001A9008 && D_001A9008 <= 1.0f) {
+            if (zero <= D_001A9008 && D_001A9008 <= scale) {
                 int color1;
                 int color2;
                 int top;
@@ -126,34 +168,38 @@ int func_002900B8(void)
                 float step;
                 float lower;
                 float upper;
-                float limit;
+                float edge;
+                float s;
 
                 color1 = func_00283D38(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
                 color2 = func_00283D38(D_001A9010 & 0xFFFFFF, D_001A9010, pulse);
-                top = (int)((float)(285 - (int)((1.0f - D_001A9008) * 157.0f)) * D_001B23A4[0] + 0.5f);
-                step = (float)(int)(D_001B23A4[0] * 128.0f + 0.5f) * 0.25f;
-                lower = (float)(int)(D_001B23A4[0] * 285.0f + 0.5f);
-                upper = lower - step + 1.0f;
+                do {
+                    top = hud_coord((float)(285 - (int)((scale - D_001A9008) * 157.0f)), D_001B23A4[0], half, one);
+                } while (0);
+                s = (float)hud_coord(128.0f, D_001B23A4[0], half, one);
+                step = s * 0.25f;
+                lower = (float)hud_coord(285.0f, D_001B23A4[0], half, one);
+                edge = lower - step;
+                upper = edge + scale;
                 for (i = 0; i < 5; i++) {
-                    limit = (float)top;
-                    if (upper <= limit)
-                        upper = limit;
+                                        if (upper <= (float)top)
+                        upper = (float)top;
                     func_0027DE50((int)upper, (int)lower, 477, 489, color1);
                     lower -= step;
                     upper -= step;
-                    if (lower <= limit)
+                    if (lower <= (float)top)
                         break;
                 }
-                upper = (float)(int)(D_001B23A4[0] * 128.0f + 0.5f);
-                lower = upper + step - 1.0f;
+                upper = (float)hud_coord(128.0f, D_001B23A4[0], 0.5f, one);
+                edge = upper + step;
+                lower = edge - 1.0f;
                 for (i = 0; i < 5; i++) {
-                    limit = (float)top;
-                    if (limit <= lower)
-                        lower = limit;
+                                        if ((float)top <= lower)
+                        lower = (float)top;
                     func_0027DE50((int)upper, (int)lower, 476, 488, color2);
                     upper += step;
                     lower += step;
-                    if (limit <= upper)
+                    if ((float)top <= upper)
                         break;
                 }
             }
@@ -167,12 +213,17 @@ int func_002900B8(void)
             float lower;
             float upper;
             float limit;
+            float s;
+            float edge;
 
             color = func_00283D38(D_001A900C & 0xFFFFFF, D_001A900C, pulse);
-            top = (int)((float)(285 - (int)((1.0f - D_001A9008) * 157.0f)) * D_001B23A4[0] + 0.5f);
-            step = (float)(int)(D_001B23A4[0] * 128.0f + 0.5f) * 0.25f;
-            lower = (float)(int)(D_001B23A4[0] * 285.0f + 0.5f);
-            upper = lower - step + 1.0f;
+            s = D_001B23A4[0];
+            top = hud_coord((float)(285 - (int)((1.0f - D_001A9008) * 157.0f)), s, 0.5f, 1);
+            s = (float)hud_coord(128.0f, D_001B23A4[0], 0.5f, 1);
+            step = s * 0.25f;
+            lower = (float)hud_coord(285.0f, D_001B23A4[0], 0.5f, 1);
+            edge = lower - step;
+            upper = edge + 1.0f;
             for (i = 0; i < 5; i++) {
                 limit = (float)top;
                 if (upper <= limit)

@@ -1,3 +1,23 @@
+/* 8 November 2026 re-measure (today's compiler: set-side sticky volatile default,
+ * mtc1 hazard-nop fix): this C in its own -g8 unit with -frac2-zero-ti-por gives
+ * 2112/2128 bytes, frame 0x1A0 vs 0x150; the gap is not 2 instructions but ~400
+ * aligned-diff lines (retail 50 lui vs 37, 4 madd vs 1, 1 caller-save sq vs 9).
+ * Cause found in the -dL dump: loop.c converts the inner loop's first `out++`
+ * into a giv ("Increment of biv converted to giv"), so `out` steps by 2 and every
+ * output address gets a second 24-byte-step giv kept in caller-saved registers
+ * across both quaternion calls. Retail keeps two +1 increments of out (s7) and
+ * single givs stepped by 12 after each, so retail had no conversion: per
+ * loop.c that needs a jump between the two increments (out is live after the
+ * loop). A test jump between them (if (i == 100) break; diagnostic only) gives
+ * 2128 bytes but still frame 0x190. Retail also keeps &rotation2/&inverse2 in
+ * pseudos spilled at 0x98/0x9C, set before the FIRST ring loop.
+ * MACRO_ADDR on all six tables: 2392 bytes, 0x1F0; on one table only:
+ * 00270AE0 2120, 0026ECE0 2304, 002700E0 2160, 00270D60 2152, 0026FBE0 2112,
+ * 00270CE0 2088 bytes, none below 0x1A0. No RAC1/RAC4 donor (searched the
+ * angle 0.2026834, 0x53001, 0xFF9000000260 and the 148-vertex batch loop).
+ * Next: find source that puts a real branch between the two out++ (or out as
+ * a non-biv with pointer bivs) and the early &rotation2/&inverse2 pseudos.
+ */
 /* GPT-6.1 Sol (high), worker v1347, USA v1.01.
  * Profile: -O2 -G8 -ffunction-sections -frac2-zero-ti-por.
  * Best size: 2120/2128 bytes, 0/4 places. Not a verified behavioral match.

@@ -1,3 +1,5 @@
+/* 8 November 2026 (named-local slot order, the func_00281A08 technique): not tried here; besides the nine PRE slots this function keeps two non-slot residues (the beqz/b player test and the $v1 reuse), so a slot fix alone cannot match it. The technique only moves a value earlier than the PRE registers (see func_L00_0038E880). */
+/* 8 November 2026 (gcse table size): the five EE cc1 builds here (ours, 991111a, 991111-01, 991111b-r4, SN 2.95.2 273a) give the same PRE table size on this source, so the sizing rule is shared. Forced sizes 11..401: no size gives 0 (best 43: 21 diffs; ours 119: 42), so the table size alone does not close it. */
 /* Claude Opus 5.5, 8 November 2026; retained near miss (supersedes the header below).
  * Current check: 1248/1248 bytes, 0/28 places; profile -O2 -G0 -ffunction-sections.
  * Changes from the 29 October draft: qcopy_nc for the first snapshot (its destination is only

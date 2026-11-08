@@ -1,3 +1,50 @@
+/* 8 November 2026, round 4 (~16 check.py runs, body unchanged, 8 differences, 3736 bytes).
+ * ahead: the -dg dump shows the blez reload (insn 2422) takes $v0, which li $v0,3 then clobbers, so the
+ * slti reloads it into $a0. Retail's single lw $a0 means reload avoided $v0/$v1 there, which happens
+ * when pseudos given $v0/$v1 are live across that blez. No source form found: a local copy of ahead
+ * (cse propagates it back, 8; set before fy, 20), the copy from an addressed ahead (still spilled, two
+ * loads, 23), ahead != 0 or >= 1 (8), a local for D_L04_001B0A24 (17). 175 row: combine merges the
+ * fix into the a1 argument move after the group's LOOP_END note, so daddu $a2,$s1 can go above it;
+ * splitting the float sum into the group, or adding a colour group (s64), changes nothing (8). */
+/* 8 November 2026, round 3 (~28 check.py runs): body below replaced, 16 -> 8 differences, 3736/3732
+ * bytes. The loop rows round y plainly inside a one-pass group: `do { yy = (s32)(fy * scale + 0.5f); }
+ * while (0);` before the 175 call, which brings back retail's daddu $a2,$s1 / sd $a2,0x58 for the
+ * colour, and before the 220 call. The 220 row now uses plain D_L04_001B2D44 (the truthful form: lui
+ * in normal code, $gp in delay slots; no _gp alias) and row++ comes after that call. The 4 extra bytes
+ * are ahead, still loaded twice (lw $v0, then lw $a0, where retail uses one lw $a0).
+ * Left: that reload; in the 175 row daddu $a2,$s1 goes one slot before the cvt; in the 220 row li $a0,0xDC
+ * comes before lw row. No gain: a colour group (s32 or s64, before or after the y group), or row++
+ * inside or after the y group before the call (10); a copy of ahead in a group (87); a local for
+ * D_L04_001B0A24 (17); testing ahead >= 2 first (15). */
+/* 8 November 2026, round 2 (x-175 row only, ~15 check.py runs, body unchanged, still 16):
+ * from cc1 -dG/-dt/-df/-dS dumps. gcse PRE does not treat insn 1355 (r431 = sign_extend color,
+ * at the 175 call) as available out of its block: it inserts r876 = sign_extend color at the END of
+ * that block, after the call ("PRE/HOIST: end of bb 110"). cse2 makes that r876 = r431, so r431 lives
+ * across the 175 call; sched1 then hoists 1355 and the copy above the fetch and sprintf calls.
+ * Retail's daddu $a2,$s1 / sd $a2,0x58 before the jal looks like PRE's copy right after the
+ * original (r431 in $a2, crossing no call, so it waits for the previous call; r876 spilled).
+ * Tried, no gain: (s64)(int)color; an s32 colour local set just before the call (16) or also used
+ * on the 220 row (59); a u64 colour local set before the call and for the constants after the loop
+ * (47: it gets $s6 and the 6 loses its hoist); do { 175 call } while (0) (81); colour declared
+ * in the loop; -frac2-gcse-unsplit-edges (16). Every matched caller uses the u64 colour prototype. */
+/* 8 November 2026, HUD-recipe rewrite (Claude Opus 5.5), USA v1.01, re-measured on master's
+ * compiler: the 7 November body was 86 masked differences (difflib over check.py --diff,
+ * relocations masked), the body below is 16, both 3732/3732 bytes; first difference +0x938.
+ * Steps that paid: `continue` (not goto next) for the rank > 10, y < 128 and y > bottom - 10
+ * exits, so retail's branches go straight to the loop test (47 -> 37); hud_coord on the
+ * fbottom row and both after-loop rows (37 -> 16); TEXT rows as {str; x_ = D_001A7340 / 2;
+ * row_ = label_y((void *)x_, ...); len_} on the 32, 65 and 106 rows (x_ as handle gives x $s0,
+ * y $s1, str $s2 as retail; str or sprintf's return as handle swaps them or leaves a dead
+ * daddu); 65 (D_L04_001B093C) row computes y before its string; time / 60 % 60 in every use.
+ * No gain: hud_coord or label_y on the two loop rows (any dead test in the loop hoists a 1 and
+ * loses retail's hoisted 6 in $fp), s64 colour, a colour local per draw, a copy of ahead,
+ * -fno-sched-interblock, -frac2-sticky-volatile-refs, -fno-gcse (115).
+ * Still open, one cause: retail sets P = (s64)color (extendsidi2) at the 175 call, reloads it
+ * through $a2 (daddu $a2,$s1; sd $a2,0x58) and its reload round-robin then gives ahead's blez
+ * reload $a0, which the slti inherits. Here sched1 hoists the extension above the fetch calls
+ * (color dies there), reload stores $s1 directly, ahead is reloaded into $v0 and then again
+ * into $a0: one extra lw that the D_L04_001B2D44_gp alias on the loop's 220 row hides (plain
+ * D_L04_001B2D44 there is the truthful form: 15 differences, 3736 bytes). */
 /* 7 November 2026, label_y sweep: the sprite ys use label_y(sprite, ...), the 32/65-row texts label_y(str, ...), the bottom row label_y(text, fbottom, ...): 217 -> 135 differences, 3732/3732 bytes, first difference +0x178 -> +0x2DC (label_y(text) on the 65/106 rows: worse). The body below is the retained C with that change (label_y is
  * the accepted HUD label idiom, definition as in src/levels/15_gorn/L15_00431590-g8.c). Counts are
  * masked aligned instruction differences from a cc1 -S diff harness, not check.py rows. */
@@ -109,6 +156,23 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int hud_coord(float value, float scale, float half)
+{
+    int mode = D_L04_001B2D40;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    int copy;
+
+    if (mode == 1)
+        scaled = scale;
+    if (result != 0)
+        scaled = scale;
+    copy = result;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
 s32 func_L04_00411298(void) {
     char text[64];
     u8 *object = D_L04_001B0914;
@@ -159,18 +223,16 @@ tick:
         func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
         sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x38);
         func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 194.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, 0.0f);
-        str = func_00288FB8(0x2F93);
-        func_0027FAA8(D_001A7340 / 2, label_y(str, 32.0f, D_L04_001B2D44, 0.5f, 1), 0x80F0F0F0ULL, str, func_001157AC(str));
+        { char *str_ = func_00288FB8(0x2F93); int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 32.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, len_); }
         if (D_L04_001B093C > 0) {
-            func_0027FAA8(D_001A7340 / 2, label_y(str, 65.0f, D_L04_001B2D44_gp, 0.5f, 1), 0x80F0F0F0ULL, func_00288FB8(0x1233), -1);
+            { int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44_gp, 0.5f, 1); char *str_ = func_00288FB8(0x1233); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, str_, -1); }
             D_L04_001B093C--;
         } else if (D_L04_002C63C0[D_L04_001B090C].times[lap - 1]) {
             s32 recordTime;
             char *recordFormat = func_00288FB8(0x2FC6);
             recordTime = D_L04_002C63C0[D_L04_001B090C].times[lap - 1];
             if (D_001A7A0A) recordTime *= 10;
-            func_00115DA8(text, recordFormat, recordTime);
-            func_0027FAA8(D_001A7340 / 2, (s32)(D_L04_001B2D44 * 65.0f + 0.5f), 0x80F0F0F0ULL, text, func_001157AC(text));
+            { int n_ = func_00115DA8(text, recordFormat, recordTime); int x_ = D_001A7340 / 2; int row_ = label_y((void *)x_, 65.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(text); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, text, len_); }
         }
     }
     bottom = 315 - (s32)D_L04_001B0A34;
@@ -183,10 +245,10 @@ tick:
     func_00300A00(sprite, 0x60442D00, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
     sprite = func_00336D50(D_L04_001A904C + 0x8710, 0x46);
     func_00300A00(sprite, 0x55F0C070, (f32)(D_001A7340 / 2), (f32)label_y(sprite, 196.0f, D_L04_001B2D44, 0.5f, 1), 0.92f, D_001A7B90 ? 0.9f : 0.92f, alpha);
-    func_00115DA8(text, D_L04_001B0A40, func_00288FB8(0x2F7F),
+    { int x_, row_, len_; func_00115DA8(text, D_L04_001B0A40, func_00288FB8(0x2F7F),
         func_00288FB8(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), func_00288FB8(0x2F80));
-    func_0027FAA8(D_001A7340 / 2, (s32)(D_L04_001B2D44 * 106.0f + 0.5f), 0x80F0F0F0ULL, text, func_001157AC(text));
-    func_0027F5B8(339, label_y(text, fbottom, D_L04_001B2D44, 0.5f, 1), 0x80F0F0F0ULL, func_00288FB8(0x2F42), -1);
+      x_ = D_001A7340 / 2; row_ = label_y((void *)x_, 106.0f, D_L04_001B2D44, 0.5f, 1); len_ = func_001157AC(text); func_0027FAA8(x_, row_, 0x80F0F0F0ULL, text, len_); }
+    { int row_ = hud_coord(fbottom, D_L04_001B2D44, 0.5f); char *str_ = func_00288FB8(0x2F42); func_0027F5B8(339, row_, 0x80F0F0F0ULL, str_, -1); }
     y = 138;
     ahead = 0;
     racer = *(u8 **)(state + 0x39C);
@@ -206,17 +268,17 @@ tick:
         } else if (*(s16 *)(racer + 0xAA) == 0xB2D) {
             u8 *rs = *(u8 **)(racer + 0x68);
             rank = *(u8 *)(rs + 0xA2);
-            racer = *(u8 **)(rs + 0x1A4);
             time = *(s32 *)(rs + 0x1A0);
-            if (rank > 10) goto next;
+            racer = *(u8 **)(rs + 0x1A4);
+            if (rank > 10) continue;
             if (*(s32 *)(state + 0x320) < rank) {
                 s32 projected = D_L04_001A8FE8_gp + D_L04_001B08F8;
                 if (projected < time) { D_L04_001B0A38 = 0; ahead++; }
                 if (time == projected) func_002E5CF8(22, 17, object);
             }
         }
-        if (y < 128) { if (rank <= 10) row++; goto next; }
-        if (y > bottom - 10) goto next;
+        if (y < 128) { if (rank <= 10) row++; continue; }
+        if (y > bottom - 10) continue;
         if (rank == *(s32 *)(state + 0x320)) { color2 = 0x8000C0C0; color1 = 0x8000C0C0; }
         else { color2 = 0x80F0F0F0; color1 = 0xF0F0F0; }
         if (y < 138) {
@@ -229,33 +291,30 @@ tick:
         else { color = color2; }
         fy = (f32)y;
         func_00115DA8(text, D_L04_001B0A50, func_00288FB8(D_L04_002CA1E0[rank - 1]), func_00288FB8(0x2F81));
-        func_0027FB40(175, (s32)(fy * D_L04_001B2D44 + 0.5f), (s64)color, text, -1);
+        { s32 yy; do { yy = (s32)(fy * D_L04_001B2D44 + 0.5f); } while (0); func_0027FB40(175, yy, (s64)color, text, -1); }
         if (ahead > 0) {
             if (D_L04_001B0A24 == 3 || ahead >= 2) func_00115DA8(text, D_L04_001B0A58, func_00288FB8(0x2FB0));
             else if (D_L04_001B0A24 == 2) func_00115DA8(text, D_L04_001B0A70, func_00288FB8(0x2FB0));
             else if (D_L04_001B0A24 == 1) func_00115DA8(text, D_L04_001B0A88, func_00288FB8(0x2FB0));
             else func_00115DA8(text, D_L04_001B0A98, func_00288FB8(0x2FB0));
         } else {
-            s32 seconds = time / 60 % 60;
-            if (seconds < 10)
-                func_00115DA8(text, D_L04_001B0AA8, func_00288FB8(0x2F83), time / 216000, time / 3600 % 60, seconds, time / 6 % 10);
+            if (time / 60 % 60 < 10)
+                func_00115DA8(text, D_L04_001B0AA8, func_00288FB8(0x2F83), time / 216000, time / 3600 % 60, time / 60 % 60, time / 6 % 10);
             else
-                func_00115DA8(text, D_L04_001B0AC0, func_00288FB8(0x2F83), time / 216000, time / 3600 % 60, seconds, time / 6 % 10);
+                func_00115DA8(text, D_L04_001B0AC0, func_00288FB8(0x2F83), time / 216000, time / 3600 % 60, time / 60 % 60, time / 6 % 10);
         }
-        row++;
-        func_0027F5B8(220, (s32)(fy * D_L04_001B2D44_gp + 0.5f), (s64)color, text, -1);
-next:
+        { s32 yy; do { yy = (s32)(fy * D_L04_001B2D44 + 0.5f); } while (0); func_0027F5B8(220, yy, (s64)color, text, -1); row++; }
         if (row >= 10) break;
     }
     if (*(s32 *)(state + 0x320) > 10 && !D_L04_001B0A28 && !playerSeen) {
         func_00115DA8(text, D_L04_001B0A50, func_00288FB8(D_L04_002CA1E0[*(s32 *)(state + 0x320) - 1]), func_00288FB8(0x2F81));
         y += 15;
-        func_0027FB40(175, (s32)((f32)y * D_L04_001B2D44 + 0.5f), 0x8000C0C0ULL, text, -1);
+        { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); func_0027FB40(175, row_, 0x8000C0C0ULL, text, -1); }
         if (D_L04_001A8FE8 / 60 % 60 < 10)
             func_00115DA8(text, D_L04_001B0AA8, func_00288FB8(0x2F83), D_L04_001A8FE8 / 216000, D_L04_001A8FE8 / 3600 % 60, D_L04_001A8FE8 / 60 % 60, D_L04_001A8FE8 / 6 % 10);
         else
             func_00115DA8(text, D_L04_001B0AC0, func_00288FB8(0x2F83), D_L04_001A8FE8 / 216000, D_L04_001A8FE8 / 3600 % 60, D_L04_001A8FE8 / 60 % 60, D_L04_001A8FE8 / 6 % 10);
-        func_0027F5B8(220, (s32)((f32)y * D_L04_001B2D44 + 0.5f), 0x8000C0C0ULL, text, -1);
+        { int row_ = hud_coord((f32)y, D_L04_001B2D44, 0.5f); func_0027F5B8(220, row_, 0x8000C0C0ULL, text, -1); }
     }
     if (*(u8 *)(object + 0x20) != 3) {
         f32 angle;

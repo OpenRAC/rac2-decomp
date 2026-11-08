@@ -1,3 +1,5 @@
+/* 8 November 2026 (round 13, USA v1.01, check.py only): best C below 924/924 bytes, 0/1 places, 18 differing words (was 20). label_y now in all four draws; in draws 3/4 `active` is a local `one` set to 1 right after each label call (per the owner ruling on a local holding 1, func_L01_002F1588). That removes the ghost $s6 of the literal 1 in the loop. Setting `one` once for the whole function, or once before `if (enabled)`, puts it in a saved register (928 bytes, 150+ words). Draw 3's rounded int is now right. Left: the label copy in draws 3/4 still issues before the x conversion. No gain (~12 runs): every order of one/c/x in draws 3 and 4 (18); x and label_y written as call arguments (904 bytes, 181 words; or 18). */
+/* 8 November 2026 (round 12, USA v1.01, check.py only): best C below 924/924 bytes, 0/1 places, 20 differing words (was 24 with the round-14 C, same count). Pair check: L02_003FDDE8 and L11_00443940 are the same routine (opcode diff: L02 has one extra saved register and the i == 8 entry test). label_y (master L15_00431590-g8.c form, label as handle, literal 1) in draws 1/2 fixes them fully: the label copy now lands in $a2 as in retail. label_y inside the loop (0x4a draw) hoists its constant 1 into a ghost $s6 (928 bytes, loop.c movable), so draws 3/4 use hud_coord (L05_0037A5F8-g8.c form); scaled_coord there gives the same rows. Left: draws 3/4 only. sched1 order here is y, scale, half, hi, field, COPY, mul, alt, andi, mode, movz, x; retail's registers need x issued before the copy (copy after andi), so $v0 stays busy and field/int take $v1, hi $a0. No gain (~45 runs): c/x/y orders with both helpers (19-27), handle = c, label_y with handle tests first (parked form, 19), if/else and split colour forms (19-40), separate late label variable (916 bytes), `label = text` copy before the helper (19), c reused for the field (int right, field in $a1, 21 words). Flags: -O2 -G8 -ffunction-sections -fno-rerun-loop-opt -fno-gcse. */
 /* 8 November 2026 (round 9, rank_for_schedule): base 924/924, 21 differing words (retained C, recorded flags). rank_for_schedule is identical in GCC 2.95/2.95.2/2.95.3 and EE 991111/991111b; SN 2.95.2 v2.73a makes the same tie choice where its output is comparable. Env probes (sched1/sched2/both): reg weight swapped/clamped/dropped/after class/positive-or-negative only, class dropped/reversed, dependent count reversed/dropped/data-only/clamped, LUID reversed, INSN_UID ties, no birthing boost: none improves any of the nine cluster targets; forced on, every variant changes 6-7124 of 8761 matched units. Hypothesis falsified. */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 924/924, 23 differences with the owner-allowed dead-test helper (label copy issued before the rounding fix in the 0x4b/0x4a draws, as in func_L02_003FDDE8). */
 /* 7 November 2026, round 14, USA v1.01, check.py only (~75 runs): dead-test helper now
@@ -153,7 +155,6 @@ extern unsigned char D_00139568[], D_001395B8[];
 extern unsigned char D_L11_00279BA0[];
 /* The class pointer table is addressed through gp. */
 extern int *D_L11_001B14F8[] SDATA(D_L11_001B14F8);
-#define TABLE D_L11_001B14F8
 extern void func_L00_0037B7B0(void);
 extern int func_00336D50(u8 *, int);
 extern void func_00300A00(char *, int, float, float, float, float, float);
@@ -175,21 +176,23 @@ extern unsigned int D_L11_001B1648 __attribute__((sda));
 
 extern int D_L11_001B3E00;
 
-/* dead-test helper allowed by owner ruling (master precedent: src/game/002D2188-g8.c) */
-static __inline__ float scaled_coord(int value, float scale, float half, int active)
+/* label_y: dead-test HUD helper allowed by owner ruling (7 November 2026; precedent
+   src/levels/15_gorn/L15_00431590-g8.c); `one` as active per the func_L01_002F1588 ruling. */
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
     int mode = D_L11_001B3E00;
-    float scaled = (float)value * scale;
-    float h;
-    int result;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
 
-    h = half;
-    scaled = scaled + h;
-    result = (int)scaled;
-
-    if (result != 0 && mode == active)
-        scaled = 1.0f;
-    return (float)result;
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
 }
 
 void func_L11_00443940(u8 *object, int enabled)
@@ -203,16 +206,16 @@ void func_L11_00443940(u8 *object, int enabled)
     entry = 0x8710;
     state = *(u8 **)(object + 0x68);
     half = 0.5f;
-    one = 1;
+
     label = func_00336D50(D_L11_001A904C + entry, 0x49);
     x = (float)D_L11_001B1620;
-    fy = scaled_coord(D_L11_001B1624, D_L11_001B3E04, half, one);
+    fy = (float)label_y((void *)label, (float)D_L11_001B1624, D_L11_001B3E04, half, 1);
     sc = 1.0f;
     z = 0.0f;
     func_00300A00((char *)label, D_L11_001B163C, x, fy, D_L11_001B161C, sc, z);
     label = func_00336D50(D_L11_001A904C + entry, 0x48);
     x = (float)D_L11_001B1620;
-    fy = scaled_coord(D_L11_001B1624, D_L11_001B3E04, half, one);
+    fy = (float)label_y((void *)label, (float)D_L11_001B1624, D_L11_001B3E04, half, 1);
     func_00300A00((char *)label, D_L11_001B1638, x, fy, D_L11_001B161C, sc, z);
     phase = D_L11_001B30C8 % 50;
     if (phase >= 25) pulse = sc - (float)(phase - 25) * 0.04f;
@@ -221,22 +224,24 @@ void func_L11_00443940(u8 *object, int enabled)
     if (enabled) {
         if (*(short *)(state + 0x1e8) != 0) {
             label = func_00336D50(D_L11_001A904C + 0x8710, 0x4b);
+            one = 1;
             c = (((InputView *)D_00138180)->field1a0 & 0x8000) ? D_L11_001B1644 : color;
             x = (float)D_L11_001B1628;
-            fy = scaled_coord(D_L11_001B162C, D_L11_001B3E04, 0.5f, 1);
+            fy = (float)label_y((void *)label, (float)D_L11_001B162C, D_L11_001B3E04, 0.5f, one);
             func_00300A00((char *)label, c, x, fy, D_L11_001B161C, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x1e8) + 1; i < 13; i++) {
-            if (!D_001395B8[func_L11_0043E108(TABLE[i][2])]) continue;
+            if (!D_001395B8[func_L11_0043E108(D_L11_001B14F8[i][2])]) continue;
             if (i >= 11 && !func_00288D58()) continue;
             if (i == 8) {
                 MenuRecord *choice = (MenuRecord *)(D_L11_00279BA0 + D_00139568[0x1e] * 0xe0);
                 if (!choice->enabled) continue;
             }
             label = func_00336D50(D_L11_001A904C + 0x8710, 0x4a);
+            one = 1;
             c = (((InputView *)D_00138180)->field1a0 & 0x2000) ? D_L11_001B1648 : color;
             x = (float)D_L11_001B1630;
-            fy = scaled_coord(D_L11_001B1634, D_L11_001B3E04, 0.5f, 1);
+            fy = (float)label_y((void *)label, (float)D_L11_001B1634, D_L11_001B3E04, 0.5f, one);
             func_00300A00((char *)label, c, x, fy, D_L11_001B161C, 1.0f, 0.0f);
             break;
         }

@@ -1,3 +1,5 @@
+/* 8 November 2026 (round 13, USA v1.01, check.py only): best C below 964/964 bytes, 0/1 places, 18 differing words (was 20). label_y now in all four draws; in draws 3/4 `active` is a local `one` set to 1 right after each label call (per the owner ruling on a local holding 1, func_L01_002F1588). That removes the ghost $s6 of the literal 1 in the loop. Setting `one` once for the whole function, or once before `if (enabled)`, puts it in a saved register (928 bytes, 150+ words). Draw 3's rounded int is now right. Left: the label copy in draws 3/4 still issues before the x conversion. No gain (~12 runs): every order of one/c/x in draws 3 and 4 (18); x and label_y written as call arguments (904 bytes, 181 words; or 18). */
+/* 8 November 2026 (round 12, USA v1.01, check.py only): best C below 964/964 bytes, 0/1 places, 20 differing words (was 28 with the round-14 C, same count). Pair check: L02_003FDDE8 and L11_00443940 are the same routine (opcode diff: L02 has one extra saved register and the i == 8 entry test). label_y (master L15_00431590-g8.c form, label as handle, literal 1) in draws 1/2 fixes them fully: the label copy now lands in $a2 as in retail. label_y inside the loop (0x4a draw) hoists its constant 1 into a ghost $s6 (928 bytes, loop.c movable), so draws 3/4 use hud_coord (L05_0037A5F8-g8.c form); scaled_coord there gives the same rows. Left: draws 3/4 only. sched1 order here is y, scale, half, hi, field, COPY, mul, alt, andi, mode, movz, x; retail's registers need x issued before the copy (copy after andi), so $v0 stays busy and field/int take $v1, hi $a0. No gain (~45 runs): c/x/y orders with both helpers (19-27), handle = c, label_y with handle tests first (parked form, 19), if/else and split colour forms (19-40), separate late label variable (916 bytes), `label = text` copy before the helper (19), c reused for the field (int right, field in $a1, 21 words). Flags: -O2 -G8 -ffunction-sections -fno-rerun-loop-opt -fno-gcse. */
 /* 8 November 2026 (round 9, rank_for_schedule): base 964/964, 25 differing words (retained C, recorded flags). rank_for_schedule is identical in GCC 2.95/2.95.2/2.95.3 and EE 991111/991111b; SN 2.95.2 v2.73a makes the same tie choice where its output is comparable. Env probes (sched1/sched2/both): reg weight swapped/clamped/dropped/after class/positive-or-negative only, class dropped/reversed, dependent count reversed/dropped/data-only/clamped, LUID reversed, INSN_UID ties, no birthing boost: none improves any of the nine cluster targets; forced on, every variant changes 6-7124 of 8761 matched units. Hypothesis falsified. */
 /* 7 November 2026: released from the medium-tier reservation (#152) as a documented near miss after its final round. Final state: 964/964, 26 rows with the owner-allowed helper (label copy from v0 scheduled early in draws 3/4). */
 /* 7 November 2026, round 14: the dead-test helper is allowed by owner ruling (master
@@ -128,22 +130,23 @@ extern unsigned int D_L02_001B128C __attribute__((sda));
 
 extern int D_L02_001B3E00;
 
-static __inline__ float scaled_coord(int value, float scale, float half, int active)
+/* label_y: dead-test HUD helper allowed by owner ruling (7 November 2026; precedent
+   src/levels/15_gorn/L15_00431590-g8.c); `one` as active per the func_L01_002F1588 ruling. */
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {
     int mode = D_L02_001B3E00;
-    float scaled = (float)value * scale;
-    float h;
-    int result;
-    float coord;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
 
-    h = half;
-    scaled = scaled + h;
-    result = (int)scaled;
-    coord = (float)result;
-
-    if (result != 0 && mode == active)
-        scaled = 1.0f;
-    return coord;
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
 }
 
 void func_L02_003FDDE8(u8 *object, int enabled)
@@ -151,7 +154,7 @@ void func_L02_003FDDE8(u8 *object, int enabled)
     u8 *state;
     char *label;
     int phase, i, one, entry;
-    unsigned int color, c, field;
+    unsigned int color, c;
     float x, fy, pulse, half, sc, z;
     HelpEntry *r;
 
@@ -160,16 +163,15 @@ void func_L02_003FDDE8(u8 *object, int enabled)
     entry = 0x8710;
     state = *(u8 **)(object + 0x68);
     half = 0.5f;
-    one = 1;
     label = (char *)func_00336D50(D_L02_001A904C + entry, 0x49);
     x = (float)D_L02_001B1264;
-    fy = scaled_coord(D_L02_001B1268, D_L02_001B3E04, half, one);
+    fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, 1);
     sc = 1.0f;
     z = 0.0f;
     func_00300A00(label, D_L02_001B1280, x, fy, D_L02_001B1260, sc, z);
     label = (char *)func_00336D50(D_L02_001A904C + entry, 0x48);
     x = (float)D_L02_001B1264;
-    fy = scaled_coord(D_L02_001B1268, D_L02_001B3E04, half, one);
+    fy = (float)label_y(label, (float)D_L02_001B1268, D_L02_001B3E04, half, 1);
     func_00300A00(label, D_L02_001B127C, x, fy, D_L02_001B1260, sc, z);
     phase = D_L02_001B30C8 % 50;
     if (phase >= 25) pulse = sc - (float)(phase - 25) * 0.04f;
@@ -178,9 +180,10 @@ void func_L02_003FDDE8(u8 *object, int enabled)
     if (enabled) {
         if (*(short *)(state + 0x118) != 0) {
             label = (char *)func_00336D50(D_L02_001A904C + 0x8710, 0x4b);
+            one = 1;
             x = (float)D_L02_001B126C;
             if (D_00138180.buttons & 0x8000) c = D_L02_001B1288; else c = color;
-            fy = scaled_coord(D_L02_001B1270, D_L02_001B3E04, 0.5f, 1);
+            fy = (float)label_y(label, (float)D_L02_001B1270, D_L02_001B3E04, 0.5f, one);
             func_00300A00(label, c, x, fy, D_L02_001B1260, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x118) + 1; i < 14; i++) {
@@ -195,11 +198,10 @@ void func_L02_003FDDE8(u8 *object, int enabled)
                 if (r->available == 0) continue;
             }
             label = (char *)func_00336D50(D_L02_001A904C + 0x8710, 0x4a);
-            field = D_00138180.buttons;
-            c = field;
-            c = (c & 0x2000) ? D_L02_001B128C : color;
+            one = 1;
+            c = (D_00138180.buttons & 0x2000) ? D_L02_001B128C : color;
             x = (float)D_L02_001B1274;
-            fy = scaled_coord(D_L02_001B1278, D_L02_001B3E04, 0.5f, 1);
+            fy = (float)label_y(label, (float)D_L02_001B1278, D_L02_001B3E04, 0.5f, one);
             func_00300A00(label, c, x, fy, D_L02_001B1260, 1.0f, 0.0f);
             break;
         }

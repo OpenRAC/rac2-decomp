@@ -100,7 +100,6 @@ int func_001265B0(GsLoadImage *src, void *dst) {
     return 0;
 }
 
-INCLUDE_ASM("asm/core", func_0012672C);
 
 extern int r1_func_00119328(int);
 extern int r1_func_00118AA0(int, int);

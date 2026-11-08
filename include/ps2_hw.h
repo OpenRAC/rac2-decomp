@@ -25,12 +25,22 @@ typedef unsigned int ps2_u128 __attribute__((mode(TI), aligned(16)));
 #define IPU_BP       (*(volatile unsigned int *)0x10002020)
 #define IPU_IN_FIFO  (*(volatile ps2_u128 *)0x10007010)
 
+/* GIF */
+#define GIF_CTRL (*(volatile unsigned int *)0x10003000)
+
+/* VIF1 */
+#define VIF1_STAT  (*(volatile unsigned int *)0x10003C00)
+#define VIF1_FBRST (*(volatile unsigned int *)0x10003C10)
+#define VIF1_FIFO  (*(volatile ps2_u128 *)0x10005000)
+
 /* DMA channel 0 (VIF0) */
 #define D0_CHCR (*(volatile unsigned int *)0x10008000)
 #define D0_QWC  (*(volatile unsigned int *)0x10008020)
 #define D0_TADR (*(volatile unsigned int *)0x10008030)
 /* DMA channel 1 (VIF1) */
 #define D1_CHCR (*(volatile unsigned int *)0x10009000)
+#define D1_MADR (*(volatile unsigned int *)0x10009010)
+#define D1_QWC  (*(volatile unsigned int *)0x10009020)
 #define D1_TADR (*(volatile unsigned int *)0x10009030)
 /* DMA channel 2 (GIF) */
 #define D2_CHCR (*(volatile unsigned int *)0x1000A000)
@@ -85,5 +95,6 @@ typedef unsigned int ps2_u128 __attribute__((mode(TI), aligned(16)));
 #define GS_EXTWRITE (*(volatile unsigned long *)0x120000D0)
 #define GS_BGCOLOR  (*(volatile unsigned long *)0x120000E0)
 #define GS_CSR      (*(volatile unsigned long *)0x12001000)
+#define GS_BUSDIR   (*(volatile unsigned long *)0x12001040)
 
 #endif
