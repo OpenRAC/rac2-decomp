@@ -71,7 +71,9 @@ ASM_FUNC("asm/game", func_002A0F48);
 /* Original assembly: lqc2/vmove VU0 ops and trapping addi; the compiler cannot emit them. */
 ASM_FUNC("asm/game", func_002A10E8);
 
-INCLUDE_ASM("asm/game", func_002A1130);
+/* Original assembly: trapping add with $at as a working register, and it leaves by jumps into
+   its neighbours; the compiler cannot emit it (marked by owner decision, 8 November 2026). */
+ASM_FUNC("asm/game", func_002A1130);
 
 /* Original assembly: VU0 lqc2/sqc2 ops and trapping addi/add with $at as a working register; the compiler cannot emit them. */
 ASM_FUNC("asm/game", func_002A1378);
