@@ -1,3 +1,12 @@
+/* 8 November 2026, Sonnet round 4 (o20): C below unchanged, 208-210 words. Inline helpers holding the body from
+ * 0xF1C/0x10D8/0x11F4/0x1288/0x131C/0x13B0/0x144C onward (called with self or o) or the whole body: 1041-1461 words
+ * (they change FP-constant allocation); one-block helpers, late `{ char *hud = o; }` scopes, (self, off) and
+ * char ** helper forms: no gain. Only an address of o renames the base: `*&o + 0x1D0` in the 0x1288 block's
+ * func_00335E10 call gives 5 words (all spill slots right; left: sw $s5 swap + one addiu), still a no-op steering
+ * form. Lesson-48 single-statement move sweep (+-5 lines, all simple statements): nothing below 210.
+ * Permuter (timeout 1500, -j2, seed = C below): best 50 words only by turning `*(s32 *)(self + 0x1568) = -1`
+ * into a byte store (changed semantics); with the s32 store restored it is back to 209. A mid-function
+ * `hud = self;` copy swept over every statement position: 209 at best. */
 /* 8 November 2026, Sonnet round 3: retail never stores $a0/$s4 to the stack and passes no stack address */
 /* 8 November 2026, Sonnet round 2: retail sets $s4 once (daddu $s4,$a0) and never reloads or recomputes */
 /* 8 November 2026, Sonnet round: the C below is now really the clean retained source (int sprintf,

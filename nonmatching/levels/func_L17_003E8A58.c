@@ -1,3 +1,4 @@
+/* 8 November 2026 (Sonnet round, s28): lesson 49 (inline the 11 constant-only vf locals: vf7C/8C/9C/88/B8/84/120/13C/A0/30 and vf118; kept the real ones, vf11C shares the $gp load): 948/964 bytes, rows 228 -> 207 (score.py), still no $f20/0x30 frame; C below is this better body. Per-local toggles all tried; permuter not rerun. */
 /* 8 November 2026 (Sonnet round): no gain, C below unchanged (944/964, 52 rows). Permuter 1500 s -j2 from this C: score 3610 -> 3280, only declaration/statement reorders, no $f20 or 0x30 frame. */
 /* 8 November 2026, round 14: no change (944/964, USA v1.01 0/1). Tried on the C below:
  * -fmove-all-movables, -fno-gcse (+/- -fno-sched-interblock), -fno-expensive-optimizations,
@@ -202,25 +203,14 @@ void func_L17_003E8A58(char *object)
         state->f6E8=0;state->f6EC=0;state->f6C0.f[3]=F(object,0xf8);
         state->f48=func_00283CF0(15.0f);state->f4A=func_00283CF0(12.8f);
         state->f70=14;state->f71=13;state->f76=8;state->f29=1;state->f75=7;state->f77=9;
-        vf7C=0.333333343f;
-        vf8C=0.00138888892f;
         vf700=(float)state->f34;
-        vf118=D_L17_001B0E48;
         vf94=D_L17_001B0E40+0.1f;
-        vf9C=0.4f;
-        vf88=0.00833333377f;
-        vfB8=0.01f;
         vf90=D_L17_001B0E40;
         vf14C=state->f684;
-        vf84=0.00416666688f;
-        vf120=1.308997035f;
         vf80=D_L17_001B0F38*0.016666668f;
-        vf13C=0.01111111138f;
-        vfA0=40.0f;
-        vf30=1.0f;
         vf11C=D_L17_001B0E48;
         state->fD3=12;
-        state->f84=vf84;
+        state->f84=0.00416666688f;
         state->fCC=7;
         state->fA8=3;
         state->f94=vf94;
@@ -228,26 +218,26 @@ void func_L17_003E8A58(char *object)
         state->fCD=20;
         state->fD5=1;
         state->f14C=vf14C;
-        state->f7C=vf7C;
-        state->fA0=vfA0;
+        state->f7C=0.333333343f;
+        state->fA0=40.0f;
         state->f80=vf80;
         state->fD2=6;
-        state->f8C=vf8C;
-        state->f88=vf88;
-        state->f9C=vf9C;
+        state->f8C=0.00138888892f;
+        state->f88=0.00833333377f;
+        state->f9C=0.4f;
         state->fCF=9;
         state->f700=vf700;
         state->f26=60;
-        state->fB8=vfB8;
+        state->fB8=0.01f;
         state->f90=vf90;
         state->f11C=vf11C;
-        state->f13C=vf13C;
+        state->f13C=0.01111111138f;
         state->f98=0;
-        state->f120=vf120;
+        state->f120=1.308997035f;
         state->f148|=16;
         state->f28=3;
-        state->f30=vf30;
-        state->f118=vf118;
+        state->f30=1.0f;
+        state->f118=D_L17_001B0E48;
         if(state->f680==-1 || state->f684==-1) {func_0029F338(object);return;}
         if((unsigned)(state->f6B8+1)<2) func_002A7750(object,3,0);else func_002A7750(object,1,5);
         state->f730=1;state->f720=state->f744;

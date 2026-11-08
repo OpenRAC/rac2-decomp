@@ -1,3 +1,12 @@
+/* 8 November 2026, Sonnet round (o17): 3048/3056 bytes, 0/28 places, aligned diff 7 words (was 24).
+ * New: draw 1's constants and draw go in a do/while(0) group after its lookup (scale/half/one/zero,
+ * the draw, then minus), so the loop note keeps 208.0/0.5 after the call as retail; the tail's two
+ * func_00283D38 calls and two text draws go in one group after alpha, which keeps its 0.5 after the
+ * first call in $f21. Left: retail's $s1/$s2 copies of 0x8710 (cse2 merges any equal constant in one
+ * block; b1/b2 inits inside or outside groups, dead-test helper all fail) and draw 1's
+ * `daddu a0,v0` / `lui a1` order. Statement-move sweep (single moves, 720 group orders, constant
+ * placements) found nothing better; one capped permuter run seeded from this C: no honest gain.
+ */
 /* 8 November 2026, Sonnet round: 3048/3056 bytes, 0/28 places, aligned diff 24 words (was 37). New:
  * `sel = *(int *)(o+0x74)` read before the post-loop test gives retail's beqz with the lw in its slot;
  * 129.0f/208.0f written inside draw_background and plain 0x8710 literals for the two 134 draws
@@ -89,9 +98,9 @@ extern int func_001157AC(char *);
 extern int func_00283D38(int,int,float);
 extern int func_0027FAA8(int,int,u64,char *,int);
 
-static __inline__ void draw_background(char *tex, int color, float sx, float sy, float rot)
+static __inline__ void draw_background(char *tex, int color, float sx, float sy, float rot, float scale, float half)
 {
-    func_00300A00(tex, color, 129.0f, (float)(int)(D_001B23A4 * 208.0f + 0.5f), sx, sy, rot);
+    func_00300A00(tex, color, 129.0f, (float)(int)(D_001B23A4 * scale + half), sx, sy, rot);
 }
 
 int func_0028D1E8(unsigned char *o)
@@ -100,7 +109,8 @@ int func_0028D1E8(unsigned char *o)
     RadialPositions positions = D_001A8E30;
     int colors[4], colors2[4];
     float open, text, angle;
-    float one, zero, minus;
+    float one, zero, minus, scale, half;
+    char *tex;
     int b3 = 0x8710;
     int sel;
     char *label;
@@ -112,26 +122,42 @@ int func_0028D1E8(unsigned char *o)
     text = func_00283CE0(fade[1]) / func_00283CE0(8);
     if (text > 1.0f) text = 1.0f;
     else if (text < 0.0f) text = 0.0f;
-    one = 1.0f;
-    zero = 0.0f;
-    minus = -1.0f;
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 8), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 9), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 10), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 11), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 12), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 13), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 14), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 15), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 7), 0x60442D00, minus, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, one, one, zero);
-    draw_background((char *)func_00336D50(D_001A8CFC + 0x8710, 134), 0x55F0C070, minus, one, zero);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 8);
+    do {
+        scale = 208.0f;
+        half = 0.5f;
+        one = 1.0f;
+        zero = 0.0f;
+        draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+        minus = -1.0f;
+    } while (0);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 9);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 10);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 11);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 12);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 13);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 14);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 15);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 7);
+    draw_background(tex, 0x60442D00, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 7);
+    draw_background(tex, 0x60442D00, minus, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 134);
+    draw_background(tex, 0x55F0C070, one, one, zero, scale, half);
+    tex = (char *)func_00336D50(D_001A8CFC + 0x8710, 134);
+    draw_background(tex, 0x55F0C070, minus, one, zero, scale, half);
     if (*(int *)(o+0x74) >= 0) {
         colors[0] = func_002A9588(0x80442D00,0x80FFDE8D,25,0,0);
         previous = *(int *)(o+0x74)-1;
         if (previous < 0) previous = 7;
-        draw_background((char *)func_00336D50(D_001A8CFC + b3, 16), colors[0], one, one, (float)previous);
+        draw_background((char *)func_00336D50(D_001A8CFC + b3, 16), colors[0], one, one, (float)previous, scale, half);
         {
             int k = *(int *)(o+0x74);
             func_0028FC48(positions.xy[k][0],(int)((float)positions.xy[k][1]*D_001B23A4+0.5f),
@@ -206,10 +232,12 @@ int func_0028D1E8(unsigned char *o)
         label=(char *)func_00288FB8(id);
         if (label && func_001157AC(label)) {
             float alpha = text * open;
-            color=func_00283D38(0x00E0C0A0,0x80E0C0A0,alpha);
-            previous=func_00283D38(0,0x80000000,alpha);
-            func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,label,-1);
-            func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,label,-1);
+            do {
+                color=func_00283D38(0x00E0C0A0,0x80E0C0A0,alpha);
+                previous=func_00283D38(0,0x80000000,alpha);
+                func_0027FAA8(128,(int)(D_001B23A4*200.0f+0.5f),previous,label,-1);
+                func_0027FAA8(129,(int)(D_001B23A4*201.0f+0.5f),color,label,-1);
+            } while (0);
         }
     }
     return *(int *)(o+0x58);
