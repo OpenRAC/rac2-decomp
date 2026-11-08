@@ -1,4 +1,5 @@
 #include "include_asm.h"
+extern unsigned char D_001A7C1E __attribute__((sda));
 
 
 extern void func_PAL_0033CF78(void *, char *, char *, char *);
@@ -241,7 +242,7 @@ extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
 int func_PAL_0033F470 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7C1E;
+  unsigned char *g = &D_001A7C1E;
   float *vec;
   int discarded;
 

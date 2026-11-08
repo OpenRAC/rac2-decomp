@@ -1,4 +1,5 @@
 #include "include_asm.h"
+extern unsigned char D_001A7B96 __attribute__((sda));
 
 extern void func_0033AE18(unsigned char *owner, int value);
 
@@ -139,7 +140,7 @@ char *func_L00_00432D70(char *object)
 /* resets a sub-object, applies a two-float transform, and when bit 6 of flags is set and an int field is zero calls a mode setter and toggles a global byte */
 int func_L00_00432ED0 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7B96;
+  unsigned char *g = &D_001A7B96;
   float *vec;
   int discarded;
 

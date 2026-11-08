@@ -1,4 +1,6 @@
 #include "include_asm.h"
+extern unsigned char D_001A7B9E __attribute__((sda));
+extern unsigned char D_001A7BBA __attribute__((sda));
 
 
 extern void Ffb202470_FUN_0033AB50(char *p);
@@ -195,7 +197,7 @@ extern int F5979c03f_FUN_002E5E58 (int a, int b, int c);
 
 int func_US2_0033E5E8 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7B9E;
+  unsigned char *g = &D_001A7B9E;
   float *vec;
   int discarded;
 
@@ -256,7 +258,7 @@ char *func_US2_0033EB20(char *object)
 
 int func_US2_0033EC80 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7BBA;
+  unsigned char *g = &D_001A7BBA;
   float *vec;
   int discarded;
 
@@ -289,7 +291,7 @@ char *func_US2_0033EDD0(char *object)
 
 int func_US2_0033EF30 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7BBA;
+  unsigned char *g = &D_001A7BBA;
   float *vec;
   int discarded;
 
@@ -321,7 +323,7 @@ char *func_US2_0033EFC8(char *object)
 
 int func_US2_0033F128 (char *object, int flags)
 {
-  volatile unsigned char *g = (volatile unsigned char *) 0x1A7BBA;
+  unsigned char *g = &D_001A7BBA;
   float *vec;
   int discarded;
 
