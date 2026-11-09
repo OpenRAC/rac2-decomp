@@ -1,3 +1,5 @@
+/* 9 November 2026 (o69): still 11 rows (body unchanged). Sched dumps: sched1 issues the case-0 float stores in source (luid) order and sched2 keeps it, so the 0x54 swap is a source-order effect, not a dependence (retail stores 0.1 from a fresh li.s, swc1, base $s3). With retail's store order fixed (tenth=0.1f named, 4 int stores + 0x170/|=0x14 movable) hill-climbs (~4k compiles) reach 15 rows: only gravity/0.1 swap $f1/$f0 (gravity born last dies first, so it is allocated first and takes $f0). Local-alloc model: retail needs gravity born before the 0x160 store (overlapping the product) or 0.1 born at least 7 insns after gravity, while limit < 1.134 < .75 < .5 < .3 lifetimes stay ordered. Case 5 sched1: store 819 depends only on the t load (816), chosen at t=4 over $f14/$f15 by weight -1. Search stopped by a full /tmp. */
+/* 9 November 2026 (o64): 15 -> 11 rows (USA 2476/2476, 0/1, first diff now +0x128; check.py --diff 101 -> 97 rows). Case 0 is now register-exact: local-alloc gives gravity $f1 only when its life overlaps the 0x160 product and 0.1 has the shortest life (modelled from the .lreg births/deaths); a statement-order hill-climb (~16k compiles, 0x24/0x130 int stores interleaved, six named constants, 0.1 inline) reaches it with the 0x54 store issued second instead of last (2 rows). Body below is that C. No order found with retail store order AND registers; do/while(0) groups in case 0 cost 20-1000 rows. Case 5 (9 rows) unchanged: groups around the store/args (combine sinks the products and constants into the $f12-$f15 moves after the barrier), statement-expression barrier in the last arg, duplicated per-path tails, ternary negation, K3/K4 locals: 15-23. Every -frac2-* switch in cflags.txt: no change (qcopy 35). Permuter 1500 s: only size-changing outputs. */
 /* 9 November 2026 (o38, PRE slot order): not spill-slot blocked. Only one PRE copy spills (fp+48, reg 402, S=295), so no slot order to fix; the 15 rows are case 0 FPR allocation and case 5 sched1 order. */
 /* 8 November 2026 (Sonnet round o28, lesson 49): re-measured 2476/2476, 0/1 at +0xC8, 15 rows. Locals audited (speed..minimum, t, f each one register in retail; no fake locals). Case 0: retail's register pattern needs the gravity load to overlap the 0x160 product's life (f0) so gravity takes f1 and 0.1 later takes f0; all 5040 declaration orders (gravity as a local, retail store order), 4000 random declaration x store orders, the product held in a local and stored at each of 10 places, and one-statement-per-line (-g notes): none below 15. Case 5: the store wins sched1 (ready at t=4 with priority equal to the $f14/$f15 loads, register weight -1); a store whose value is computed in the same block (permuter: unconditional -f) goes last, as retail, but no honest source does it: comma store in each of the 5 arguments, pointer local for q+0x160, K*(t+t) orders, k1-k4 locals, f*=K, ternary, early return: all 15-20. Permuter 1500 s: nothing honest. */
 /* 8 November 2026: measured again (USA, 2476/2476 bytes, 0/1 at +0xC8): 15 rows in two places.
@@ -98,17 +100,16 @@ void func_L11_004580E8(char *p) {
  switch(*(u8 *)(p+0x20)) {
  case 0: {
   *(u8 *)(q+0x148)=func_00283CF0(15);*(u8 *)(q+0x14A)=func_00283CF0(4);
+  {float speed, max, damping, turn, gravity, limit;
   *(float *)(q+0x160)=func_002A7878(-*(float *)(q+0x160),*(float *)(q+0x160))*0.017453294f;
-  {float speed=0.3f, max=0.75f, damping=0.5f;
-  float turn=1.134464144706726f, limit=0.523598849773407f, minimum=0.1f;
-  *(u8 *)(p+0x30)=128;*(u8 *)(q+0x128)=3;
-  *(float *)(q+0x4C)=0.0027777778450399637f;
-  *(float *)(q+0x20)=speed;*(float *)(q+0x28)=max;*(float *)(q+0x2C)=damping;
-  *(float *)(q+0x30)=turn;*(float *)(q+0x50)=limit;*(float *)(q+0x54)=minimum;
+  *(u8 *)(p+0x30)=128;*(int *)(q+0x24)=0;
+  speed=0.3f;max=0.75f;damping=0.5f;turn=1.134464144706726f;gravity=0.0027777778450399637f;limit=0.523598849773407f;
+  *(u8 *)(q+0x128)=3;*(int *)(q+0x130)=0;
+  *(float *)(q+0x4C)=gravity;*(float *)(q+0x54)=0.1f;
+  *(float *)(q+0x28)=max;*(float *)(q+0x2C)=damping;*(float *)(q+0x30)=turn;*(float *)(q+0x50)=limit;*(float *)(q+0x20)=speed;
+  *(int *)(q+0x58)|=0x14;*(float *)(p+0x2C)*=D_L11_001B1F88;*(int *)(q+0x170)=-1;
+  *(u16 *)(p+0x34)=(*(u16 *)(p+0x34)&0xEFFF)|0x41;*(int *)(p+0x98)=0;
   }
-  *(int *)(q+0x58)|=0x14;*(int *)(q+0x24)=0;*(int *)(q+0x130)=0;
-  *(float *)(p+0x2C)*=D_L11_001B1F88;*(int *)(q+0x170)=-1;
-  *(int *)(p+0x98)=0;*(u16 *)(p+0x34)=(*(u16 *)(p+0x34)&0xEFFF)|0x41;
   func_002A7750(p,1,-1);return;
  }
  case 2:case 3:
