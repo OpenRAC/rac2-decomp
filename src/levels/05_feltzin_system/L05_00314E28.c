@@ -877,7 +877,7 @@ void func_L05_0041D1B0(char *p)
 
 INCLUDE_ASM("asm/levels", func_L05_0041DF58);
 
-INCLUDE_ASM("asm/levels", func_L05_0041EF00);
+/* func_L05_0041EF00 is defined in L05_0041EF00-g8.c. */
 
 /* func_L05_0041FC60 is built with -G8: see L05_00314E28-g8.c. */
 
