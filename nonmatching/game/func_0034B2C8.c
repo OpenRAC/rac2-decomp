@@ -1,3 +1,5 @@
+/* 9 November 2026 (o52, real check.py): the s40 "3 words" was a masked scorer (spill offsets hidden) against a base without the switch; the C below already used -frac2-keep-float-pun-source. Own unit, -O2 -G0 (the file's normal -G) + that switch: 6048/6048 bytes, 209 words differ unmasked (206 are spill-slot offsets off by one slot: self+0x604 copy gets slot 0x2C, retail 0xA0; plus the sw $s5/jal swap), 0 of 28. Each of the 57 switches in config/cflags.txt added on top, unmasked: none below 209 (most 209, others worse or wrong size). */
+/* 9 November 2026 (switch sweep s40): -frac2-keep-float-pun-source on the -O2 -G0 profile: size 6028 -> 6048 (matches), 3 differing words (sw/jal order near 0x34B75C); unaligned size before. No other switch or pair does better. */
 /* 8 November 2026, Sonnet round 4 (o20): C below unchanged, 208-210 words. Inline helpers holding the body from
  * 0xF1C/0x10D8/0x11F4/0x1288/0x131C/0x13B0/0x144C onward (called with self or o) or the whole body: 1041-1461 words
  * (they change FP-constant allocation); one-block helpers, late `{ char *hud = o; }` scopes, (self, off) and

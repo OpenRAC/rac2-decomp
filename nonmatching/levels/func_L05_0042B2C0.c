@@ -1,3 +1,4 @@
+/* 9 November 2026 (o50): new body, same flags (-frac2-no-extra-increment-givs -fno-rerun-loop-opt): 533/532 insns, frame 0x150, 190 opcode-only diff rows (o47 body 248; 457 positional rows). Found: retail's reloads come from writing the store and the reload with different address forms (array-form store `D_L05_0026ECE0[out][k] = ...`, reload through a row pointer `w`/`t = D_L05_0026ECE0[out]`): this gives the row-head x/y/z reload and the inner-loop x+y reloads (inner second half now as retail: x via the ECE0 giv, y via the out*12 giv). A separate pointer `r` for the row-head first entry (p had 3 sets, so alias.c gave it no base and its stores blocked the AE0 loads) lets sched1 hoist the AE0[0] loads like retail. Scripted lesson-48 sweep (every legal single move, greedy): 00E0[out][1] before [0] (row head and inner), FBE0[out] before the 00E0 pair in the seam, CE0[0] before D60[0][1] in the ring init, base = 0 before remaining = 320. Left: seam has 2 madds where retail has 4 (retail copy target and AE0 reload are two separate madd pointers that cse did not merge, plus a reload of 00E0[out][1] for D60); row head lacks the 00E0[out][1] reload; &radial is in fp (retail: caller-saved a3 with sq/lq) and CE0's giv takes the sq/lq; tail still takes ECE0 from ECE0+4; first/k/v placement unchanged by any source position (sweep). Moving `AE0[0].v[3] = 0` after D60[0][0] gives 186 ops but 531 insns. Tried: float (*pos)[3] row-array pointer (permuter idea; 505 insns, 0x140), pointer copy target in the seam (523 insns), multi-set q for 00E0 (no change). Permuter 1500 s from the r-pointer body: best only with a fake copy of first, the pos pointer (0x140/0x160) or a store moved into the inner loop (changes behaviour). */
 /* 9 November 2026 (o47): size fixed. Same flags as o46. The row loop is a real for loop again, with `first = out + 1;` near its top and `out = first;` (a register copy) after the first strip entry: `out` is then no biv of the row loop, so no per-row givs, and the row loop keeps retail's per-row mult/madd and rematerialised luis (o46's goto form lost 43 insns of them; `out = first + 1` folds to out+2 and brings the givs back). Pointer `p = D_L05_0026ECE0[out]` for the row-head first entry and both seam entries, `q = ...[first]` for the seam copy, give retail's madd forms; `ring = D_L05_00270AE0` after the delta call puts &AE0 early like retail; inner first half in retail store order (ECE0, FBE0, 00E0). This body: 533/532 insns, frame 0x150 (retail), row-loop bnel and inner/row/tail branch positions as retail, 450 differing rows / 248 opcode-only (o46 body: 462/272 at 489 insns). Left: sched1 hoists `first`, `k = 29` and `v` over calls where retail keeps them one call later; spill slots 0x8C-0xA0 permuted (retail: rot2 copy, first, first*4, rot2, inv2, row); tail loop gets ECE0 from an earlier ECE0+4 register. Tried: v = startV at the row top (delay slot as retail, but 529 insns), first placed after the rotation calls (no change), seam store orders, -fno-schedule-insns (worse). Permuter 1500 s seeded from this structure: best 541 insns (244 ops but 503 rows), nothing better. */
 /* 9 November 2026 (o46): with -frac2-no-extra-increment-givs (cflags precedent 00284268.c) the inner loop keeps retail's two `out++` (no biv-to-giv conversion); adding -fno-rerun-loop-opt gives frame 0x150 on the old body. This body (flags -O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-no-extra-increment-givs -fno-rerun-loop-opt) is closer in structure: first ring loop counted down (k = 29..0, bgez, body ops identical to retail); row loop as `goto row_top` (retail does not strength-reduce `out` per row: per-row mult/madd, rematerialised luis); tail `while (1) { ...; if (remaining > 0) {...} else break; }` gives retail's blez/b ending; nextV = startV + stepU before the row loop gives retail's f27; inner first half reading CE0 first and writing ECE0 through `p` gives retail's 66/67-insn inner loop with CE0 strength-reduced, the separate out*12 giv for the y store and the x reload. Now 489 insns (1956/2128 bytes), frame 0x140, 462 differing rows / 272 opcode-only (old body under the same scorer: 504 / 332). Left: loop counter i lands in a caller-saved reg (sq/lq) where retail puts &radial; y reload missing; row-head address/madd forms. Tried: rotation2/inverse2 pointer locals, literal 31 after the inner loop, store reorders in the second half, -fno-gcse/-fno-rerun-cse-after-loop. Permuter 1500 s: only semantic-changing candidates. */
 /* 9 November 2026 (o41, fresh rewrite from retail asm): retail frame 0x150 = 8 quads 0x00-0x7F (unit, center, delta, radial, rotation, inverse, rotation2, inverse2), 9 word spills 0x80-0xA0, one caller-save quad 0xB0 (&radial), regs 0xC0; ours had 5 caller-save quads + 2 extra spill words. This body (for loops, chained z store in the inner loop) gives 2112/2128, frame 0x190 (was 0x1A0), 501 check rows (old body 518); the same without the chained z gives 2120 bytes, 481 rows, 0x1A0. Cause traced in loop.c: the inner loop's two out++ get "biv increment converted to giv" (first pass; second pass converts the reduced givs too) unless loop_has_volatile, a jump between, or a not-always-executed increment; retail has neither conversion. Volatile color read in the loop: no conversion, 0x160, but 495 insns (not landable). Single out+=2 with [out+1]: 0x160, 485 insns. Retail also rematerialises outer-loop invariant addresses (50 lui) and its tail loop ends blez/b (no form of for(;;)/while/do with break reproduced it). Permuter 1500 s: only a fake-temp/dead-store gain. */
@@ -62,7 +63,7 @@ extern void ref_L05_0042B2C0_07(int, void *, void *, void *, int);
 void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
  float advance, float radius, float stepU, float stepV, float startV, float startU)
 {
-    float *p, *q;
+    float *p, *q, *r, *w, *t;
     VBC *ring;
     VBC unit, center, delta, radial, rotation, inverse, rotation2, inverse2;
     float u, v, nextU, nextV;
@@ -83,8 +84,8 @@ void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
 
     ref_L05_0042B2C0_02(&ring[0], &center, &radial);
     D_L05_00270D60[0][0] = u;
-    D_L05_00270D60[0][1] = startV;
     D_L05_00270CE0[0] = color;
+    D_L05_00270D60[0][1] = startV;
     v = startV + stepU;
     for (i = 1, k = 29; k >= 0; k--, i++) {
         ref_L05_0042B2C0_03(&radial, &rotation, &radial);
@@ -114,10 +115,10 @@ void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
             color &= 0xFFFFFF;
         v = startV;
 
-        p = D_L05_0026ECE0[out];
-        p[0] = D_L05_00270AE0[0].v[0];
-        p[1] = D_L05_00270AE0[0].v[1];
-        p[2] = D_L05_00270AE0[0].v[2];
+        r = D_L05_0026ECE0[out];
+        r[0] = D_L05_00270AE0[0].v[0];
+        r[1] = D_L05_00270AE0[0].v[1];
+        r[2] = D_L05_00270AE0[0].v[2];
         D_L05_002700E0[out][0] = D_L05_00270D60[0][0];
         D_L05_002700E0[out][1] = D_L05_00270D60[0][1];
         D_L05_0026FBE0[out] = D_L05_00270CE0[0];
@@ -125,12 +126,13 @@ void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
         D_L05_0026ECE0[out][0] = center.v[0] + radial.v[0];
         D_L05_0026ECE0[out][1] = center.v[1] + radial.v[1];
         D_L05_0026ECE0[out][2] = center.v[2] + radial.v[2];
-        D_L05_002700E0[out][0] = u;
         D_L05_002700E0[out][1] = v;
+        D_L05_002700E0[out][0] = u;
         D_L05_0026FBE0[out] = color;
-        D_L05_00270AE0[0].v[0] = D_L05_0026ECE0[out][0];
-        D_L05_00270AE0[0].v[1] = D_L05_0026ECE0[out][1];
-        D_L05_00270AE0[0].v[2] = D_L05_0026ECE0[out][2];
+        w = D_L05_0026ECE0[out];
+        D_L05_00270AE0[0].v[0] = w[0];
+        D_L05_00270AE0[0].v[1] = w[1];
+        D_L05_00270AE0[0].v[2] = w[2];
         D_L05_00270AE0[0].v[3] = 0;
         D_L05_00270D60[0][0] = u;
         D_L05_00270D60[0][1] = D_L05_002700E0[out][1];
@@ -152,11 +154,12 @@ void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
             ref_L05_0042B2C0_03(&radial, &radial, &inverse2);
             D_L05_0026ECE0[out][0] = center.v[0] + radial.v[0];
             D_L05_0026ECE0[out][1] = center.v[1] + radial.v[1];
-            D_L05_002700E0[out][0] = u;
             D_L05_002700E0[out][1] = v;
+            D_L05_002700E0[out][0] = u;
             D_L05_0026FBE0[out] = color;
-            D_L05_00270AE0[i].v[0] = D_L05_0026ECE0[out][0];
-            D_L05_00270AE0[i].v[1] = D_L05_0026ECE0[out][1];
+            t = D_L05_0026ECE0[out];
+            D_L05_00270AE0[i].v[0] = t[0];
+            D_L05_00270AE0[i].v[1] = t[1];
             D_L05_00270AE0[i].v[2] = D_L05_0026ECE0[out][2] = center.v[2] + radial.v[2];
             D_L05_00270AE0[i].v[3] = 0;
             D_L05_00270D60[i][0] = u;
@@ -170,24 +173,24 @@ void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
         p[0] = D_L05_00270AE0[i].v[0];
         p[1] = D_L05_00270AE0[i].v[1];
         p[2] = D_L05_00270AE0[i].v[2];
+        D_L05_0026FBE0[out] = D_L05_00270CE0[i];
         D_L05_002700E0[out][0] = D_L05_00270D60[i][0];
         D_L05_002700E0[out][1] = D_L05_00270D60[i][1];
-        D_L05_0026FBE0[out] = D_L05_00270CE0[i];
         out++;
         D_L05_002700E0[out][0] = u;
         D_L05_002700E0[out][1] = v;
-        p = D_L05_0026ECE0[out];
         q = D_L05_0026ECE0[first];
-        p[0] = q[0];
-        p[1] = q[1];
-        p[2] = q[2];
+        D_L05_0026ECE0[out][0] = q[0];
+        D_L05_0026ECE0[out][1] = q[1];
+        D_L05_0026ECE0[out][2] = q[2];
         D_L05_0026FBE0[out] = D_L05_0026FBE0[first];
         D_L05_00270D60[i][0] = u;
         D_L05_00270D60[i][1] = D_L05_002700E0[out][1];
         D_L05_00270CE0[i] = D_L05_0026FBE0[first];
-        D_L05_00270AE0[i].v[0] = D_L05_0026ECE0[out][0];
-        D_L05_00270AE0[i].v[1] = D_L05_0026ECE0[out][1];
-        D_L05_00270AE0[i].v[2] = D_L05_0026ECE0[out][2];
+        t = D_L05_0026ECE0[out];
+        D_L05_00270AE0[i].v[0] = t[0];
+        D_L05_00270AE0[i].v[1] = t[1];
+        D_L05_00270AE0[i].v[2] = t[2];
         D_L05_00270AE0[i].v[3] = 0;
         out++;
         u = nextU;
@@ -201,8 +204,8 @@ void func_L05_0042B2C0(VBC *origin, VBC *axis, int texture, unsigned color,
     ref_L05_0042B2C0_05(0x47, 0x53001);
     ref_L05_0042B2C0_05(0x4A, 0);
     ref_L05_0042B2C0_06();
-    remaining = 320;
     base = 0;
+    remaining = 320;
     while (1) {
         n = remaining < 149 ? remaining : 148;
         ref_L05_0042B2C0_07(n, D_L05_0026ECE0[base], &D_L05_0026FBE0[base], D_L05_002700E0[base], 1);
