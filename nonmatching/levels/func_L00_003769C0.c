@@ -1,3 +1,10 @@
+/* 9 November 2026 (Opus round o103): 1216/1216, 0/27, 13 differing words, one register rotation. Nonempty form of the
+ * probe: `do { do { j=0; } while(0); top: ... } while(0);` (j=0 moved into the inner group) gives retail's size, the
+ * loop note and the bne slot; only the search registers rotate: j a1/tbl a2/wanted a3 vs retail a3/a1/a2. Deciding
+ * value (regalloc.py): j's depth-weighted refs go 11 -> 13, priority 39/22 = 1.77 beats tbl 27/16 = 1.69 and wanted
+ * 3/2 = 1.5; retail needs j <= 1.5 (refs <= 11 at live 22, or live >= 27). Declaration order: no change (not a tie).
+ * Worse: wanted computed in the inner group (97-100), `color = 0xf0f0b0` as the group body (1224 bytes),
+ * `do { j=0; } while(0); top:` with no outer group (1220). */
 /* 8 November 2026 (nominalsan, Opus 5.5): compiles to 1212 bytes (retail 1216), 0/27 USA, default flags.
  * Aligned with relocations masked, 303 of retail's 304 instructions agree: retail fills the backward bne's
  * delay slot with `lui v0,%hi(wanted base)` from the loop top, this C with the colour `addu`.

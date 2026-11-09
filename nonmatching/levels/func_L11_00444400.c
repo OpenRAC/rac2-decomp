@@ -1,3 +1,4 @@
+/* 9 November 2026 (round o104): body below is new: 4632/4684 bytes, 0/1, profile now -O2 -G8 -ffunction-sections (sched1 ON; with -fno-schedule-insns the same body is 4648, 779 aligned). Masked-word LCS (relocs masked): 874 of 1171 retail words aligned (old body: 325 on the same scorer). Changes, from twin func_L02_003FE8B8 and owner-allowed HUD idioms: hud_coord (dead mode/result tests, owner ruling) for every box x/y/h and label_y (ls as handle) for every label y, `half = 0.5f;` after func_L00_0037B7B0, a block-scoped `s32 ofs = 0x8710;` per arm (7 blocks, as retail's 7 `ori ...,0x8710` sets). Result: box chains, the 0.5/-1/0 registers ($f20/$f21/$f22) and the arm-5 TITLE/sprintf rows are retail's. Measured (dumps): an int-arg scaled_coord on label y converts f32->int->f32 (+432 B); a single `mode == active` test leaves no jump at sched2 (no boundary), `result != 0 && ...` gives the boundary but LABEL_NUSES 2 ends cse's path (3/0x8710 fresh per box/label). `one` local as active and h inside the call: no change. Left: &r50 PRE copy kept in $fp/$s0 (retail rematerializes `addiu $a0,$sp,0x50`), constant 3 in $s4 plus a fresh $v0 in box 1 (retail $s1 boxes 1-4, fresh in 5/6), format-hi copy `daddu $fp,$s0` in arm 5, and arm-5/8 cross-jump starting one call later (13 words short). */
 /* 5 November 2026, two-agent pass:
  * - Boundary: with func_L02_003FE768's one-pass conversion groups (allowed by COMPILER-NOTES'
  *   source methods; that function now matches) on the box x/y/h and the label y, every call's
@@ -177,11 +178,8 @@ extern int func_00336D50(s32, s32);
 extern s32 func_001157AC(char *);
 extern s32 func_00115DA8(char *, char *, ...);
 
-#define Scale(v) ((s32)((f32)(v) * D_L11_001B3E04 + 0.5f))
-#define LBL(id, c, xv, yv, a1, a2, a3) { \
-        char *ls = ((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, id)); \
-        s32 ly = Scale(yv); \
-        func_00300A00(ls, c, xv, ly, a1, a2, a3); }
+extern s32 D_L11_001B3E00;
+#define LBL(id, c, xv, yv, a1, a2, a3) { char *ls = (char *)func_00336D50(D_L11_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y(ls, (yv), D_L11_001B3E04, half, 1), a1, a2, a3); }
 #define TITLE() \
         LBL(0x4C, D_L11_001B17E4, D_L11_001B17D0, D_L11_001B17D4, -1.0f, D_L11_001B17C4, 0.0f); \
         LBL(0x4D, D_L11_001B17E0, D_L11_001B17D0, D_L11_001B17D4, -1.0f, D_L11_001B17C4, 0.0f)
@@ -202,10 +200,44 @@ extern s32 func_00115DA8(char *, char *, ...);
             { s32 c = D_L11_001B1718; s32 n = func_001157AC(buf); fn((r), c, buf, n); }
 #define sprintf_n func_00115DA8
 #define BOX(r, X, Y, C, D, E, H) \
-    t = (f32)X * D_L11_001B3E04 + 0.5f; x = t; \
-    t = (f32)Y[0] * D_L11_001B3E04 + 0.5f; y = t; \
-    t = (f32)H * D_L11_001B3E04 + 0.5f; h = t; \
+    x = hud_coord((f32)X, D_L11_001B3E04, half); \
+    y = hud_coord((f32)Y[0], D_L11_001B3E04, half); \
+    h = hud_coord((f32)H, D_L11_001B3E04, half); \
     func_002802E0(r, x, y, C[0], D[0], E, h, 0, 3)
+
+static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L11_001B3E00;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = scale;
+    copy = handle;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
+
+static __inline__ int hud_coord(float value, float scale, float half)
+{
+    int mode = D_L11_001B3E00;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    int copy;
+
+    if (mode == 1)
+        scaled = scale;
+    if (result != 0)
+        scaled = scale;
+    copy = result;
+    if (copy != 0)
+        scaled = half;
+    return result;
+}
 
 void func_L11_00444400(u8 *moby)
 {
@@ -224,14 +256,15 @@ void func_L11_00444400(u8 *moby)
     s32 i;
     s32 n;
     s32 tm;
-    f32 t;
     s32 x, y, h;
     char *str;
+    f32 half;
 
     if (D_L11_001A904C[0] == 0) {
         return;
     }
     func_L00_0037B7B0();
+    half = 0.5f;
     data = *(u8 **)(moby + 0x68);
     BOX(&r50, D_L11_001B17A0, D_L11_001B17A4, D_L11_001B17A8, D_L11_001B17AC, D_L11_001B1798, D_L11_001B179C);
     BOX(&r70, D_L11_001B1788, D_L11_001B178C, D_L11_001B1790, D_L11_001B1794, D_L11_001B1780, D_L11_001B1784);
@@ -243,6 +276,7 @@ void func_L11_00444400(u8 *moby)
     ((HudRenderState *)D_L11_001BEDC0)->text_scale = 0.62f;
     func_0027AB40();
     if (*(s16 *)(data + 0x1F0) == 5) {
+        s32 ofs = 0x8710;
         TITLE();
         sprintf_n(buf, D_L11_001B17E8, 0x5A - *(s32 *)(data + 0x188) / 60);
         DRAWBUF(func_00280270, &r90);
@@ -253,6 +287,7 @@ void func_L11_00444400(u8 *moby)
         DRAWBUF(func_00280270, &r50);
         DRAW(func_00280190, &r70, ((char *)func_00288FB8(0x2F61)));
     } else if (*(s16 *)(data + 0x1F0) == 9) {
+        s32 ofs = 0x8710;
         TITLE();
         tm = *(s32 *)(data + 0x188);
         sprintf_n(buf, D_L11_001B17F0, 2 - tm / 3600, 0x3B - tm / 60 % 60);
@@ -262,8 +297,9 @@ void func_L11_00444400(u8 *moby)
         LABEL50();
         pv = *(u8 **)(*(u8 **)(data + 0x180) + 0x68);
         func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-        func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+        func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
     } else if (*(s16 *)(data + 0x1F0) == 8) {
+        s32 ofs = 0x8710;
         TITLE();
         sprintf_n(buf, D_L11_001B17E8, 0x3C - *(s32 *)(data + 0x188) / 60);
         DRAWBUF(func_00280270, &r90);
@@ -274,6 +310,7 @@ void func_L11_00444400(u8 *moby)
         DRAWBUF(func_00280270, &r50);
         DRAW(func_00280190, &r70, ((char *)func_00288FB8(0x2F61)));
     } else if (*(s16 *)(data + 0x1F0) == 0xC) {
+        s32 ofs = 0x8710;
         TITLE();
         n = 100 - *(s32 *)(data + 0x188) / 60;
         sprintf_n(buf, D_L11_001B17E8, n);
@@ -284,6 +321,7 @@ void func_L11_00444400(u8 *moby)
         }
         DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         if (moby[0xBC] != 0) {
+            s32 ofs = 0x8710;
             LABEL();
             SUM();
             if (moby[0xBC] < 2) {
@@ -297,6 +335,7 @@ void func_L11_00444400(u8 *moby)
         }
     } else {
         if (*(u8 **)(data + 0x180) != 0) {
+            s32 ofs = 0x8710;
             LABEL();
             LABEL50();
             obj = *(u8 **)(data + 0x180);
@@ -304,19 +343,22 @@ void func_L11_00444400(u8 *moby)
             case 0xB3A:
                 pv = *(u8 **)(obj + 0x68);
                 func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
+                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
                 break;
             case 0xD4A:
                 pv = *(u8 **)(obj + 0x68);
                 if (*(f32 *)(pv + 0x20) > 0.0f) {
                     func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
                 }
-                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + 0x8710, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
                 break;
             }
         }
-        LBL(0x4E, D_L11_001B17E4, D_L11_001B17D8, D_L11_001B17DC, -1.0f, D_L11_001B17C4, 0.0f);
-        LBL(0x4F, D_L11_001B17E0, D_L11_001B17D8, D_L11_001B17DC, -1.0f, D_L11_001B17C4, 0.0f);
+        {
+            s32 ofs = 0x8710;
+            LBL(0x4E, D_L11_001B17E4, D_L11_001B17D8, D_L11_001B17DC, -1.0f, D_L11_001B17C4, 0.0f);
+            LBL(0x4F, D_L11_001B17E0, D_L11_001B17D8, D_L11_001B17DC, -1.0f, D_L11_001B17C4, 0.0f);
+        }
         if (*(s16 *)(data + 0x1F0) == 0xA) {
             sprintf_n(buf, D_L11_001B17F8, *(s16 *)(data + 0x1F2) + 1);
         } else {
