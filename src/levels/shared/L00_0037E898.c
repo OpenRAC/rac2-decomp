@@ -877,4 +877,4 @@ void func_L00_0038DE70(char *object, char *direction, char *axis)
     func_00312B70(&packet,object+0x10,0,0);
 }
 
-INCLUDE_ASM("asm/levels", func_L00_0038E880);
+/* func_L00_0038E880 is defined in L00_0038E880-g8.c. */
