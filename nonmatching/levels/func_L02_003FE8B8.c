@@ -1,3 +1,5 @@
+/* 9 November 2026 (round o56): body below is now 38 masked aligned differences at 3552/3552 (was 43; check.py 3552 bytes, 0/1; unaligned word count 57 vs 48 for the o55 body, which is the previous body with one = 1 before box 2, k2/k3 before the box-5/6 calls). Changes: plain &r90 (p90 local removed, as rB0/rD0), box forms re-climbed (box-2 h t-form in do-while, box-4 h grouped hud_coord, box-6 h inline), TITLE/LABEL take the 0x4D active as a macro argument: LABEL 0x4D active one in arms 3/5 and literal 1 in the else arm, LABEL 0x4C active k2, both 0x51 actives k3, 0x4E/0x4F literal 1; k3 = 1 after box-5 x, k2 = 1 before the box-5 call. Found: retail $s6 is saved but never used, so it holds a set-once 1 local whose insns die after reload; with one only in the else LABEL and k2 in arms 3/5 the o55 body gets rB0 $s7 and the 0x1428 high $fp as retail, but the rD0 copy then takes $fp (needs a second fp holder live box6->else; cse folds every later 1-local into the earlier one). Measured, no gain: per-arm one locals/sets (8 forms), k2/k3 at every top-level position (29x29), active hill-climb + 30k random samples on the o55 body (floor 43) and 25k on this body (38), fmt = D_L02_001B1428 local before the switch (+10..+12, -4/-12 bytes), p90 set after the call. Permuter (o56, 1500 s): 2160 -> 2040 only via a pointer to D_L02_001B1414 (fake, rejected). */
+/* 9 November 2026 (round o55): body below is now 3552/3552 (right size, was 3560), 43 masked aligned differences; best by count is 27/3560 (the o44 variant plus `s32 k2, k3;` with `k2 = 1;` just before the box-2 call as the 0x51 actives, `k3 = 1;` just before the box-6 call as the 0x4E active, 0x4D TITLE active literal 1, 0x4F active one). Change: two more set-once 1 locals (owner ruling on 1-valued actives): `k2 = 1;` before the box-5 call and `k3 = 1;` before the box-6 call, used as the 0x4E/0x4F actives, 0x51/TITLE 0x4D actives literal 1, box-5 y in t-form. Both forms fix box 6: rD0 copy gets no register and the else arm rebuilds `addiu $a0,$sp,0xD0` as retail. Found: flow2 keeps every $fp set ($fp is live at every block end), so a dead const-1 pseudo in $fp stays visible (27 form: `addiu $fp,$zero,1`), while those in $s4/$s6/$s7 vanish as ghosts; retail has no $fp set before arms 3/5, so its hidden $fp holder cannot be a const pseudo. Left in the 3552 form: `one` takes $s7 before the rB0 copy, so the rB0 copy gets $fp and the 0x1428 hi $s6 (retail $s7/$fp), box-4 h scheduled late, box-3 p90 copy order, label colour-before-x, else $v1/$v0. Measured, no gain: 32k one/k2 placements x active mixes, 13k k2+k3 pairs per body, 30k one/k2/k3 position triples x 8 active sets, a `three` and second `tri2` local for the box stores and the == 3 test (20k, neutral), a fourth 1 local, box-form hill-climbs from both forms (local optima). */
 /* 9 November 2026 (round o51): body below unchanged (3560/3552, 41; o44 variant 29/3568). Found (-dG -dS -dl -dg): all five frame-address PRE copies are inserted at the end of the block that holds the killing call, and cse2 rewrites each to a copy of the call's arg pseudo when both share an extended block. rF0's copy (end of bb 55, block ends right after the box-5 call) is moved above that call by sched1, so the arg goes straight to $a0 and the copy (no hard reg) is deleted. rD0's copy (insn 2801, end of bb 61 after func_0027AB40) only rises to just after the box-6 call, so the arg pseudo crosses it in $s1. Then global gives 2801 $fp: the 0x1428 hi reaching reg 1034 holds $fp but does not conflict, and every other s reg conflicts (allocation order 1032 1034 1033 1035 1031 1030). Retail's $fp holds only the 0x1428 base (arms 3/5). Its ghost $s4/$s6 are REG_EQUIV const-1 pseudos (`one` and label_y actives) that reload rematerialized, so the hidden $fp holder in retail is most likely another such constant pseudo live from bb 61 to the else arm. Measured, no gain: every -frac2-* switch in config/cflags.txt alone on both bodies (all identical: 29/3568, 41/3560); do-while groups around the box-6 call, the save, the 0.62 store and func_0027AB40 (44-77); an hs pointer block and a t = 0.62f form (41); a second set-once 1 local at five places for the 0x51/0x4E/0x4F actives (45-62; the b2 placement gives retail's else-arm `addiu $a0,$sp,0xD0` but swaps the $s7/$fp roles); `one` or half on 0x4E/0x4F (43-62; half plus literal 1 gives 3552 at 50 but keeps 0.5 in $f20, where retail rebuilds it). One 1500 s permuter run from this body: best 4575 vs 5140, only through held pointers (&D_L02_001B1410, data+0x120, data+0xD4), rejected. */
 /* 9 November 2026 (round o48): body below is now 3560/3552 (was 3568), 41 masked aligned differences (the o44 body, 29 at 3568, is this body with box-4 h as `do { t = ...; h = t; } while (0);` and box-5 x as `t = ...; x = t;`). Change: box-4 h plain t-form (no do-while barrier) and box-5 x as a plain hud_coord statement (block break right after the box-4 call) -> box 4 now `addiu $a0,$sp,0xB0` + `daddu $s7,$a0` before the call as retail, and the stray nop goes. Cost: box-4 h is scheduled after the a3/t0 loads, and the second 3 moves from box 3 to box 5. Left (8 bytes): box 6 rD0 PRE reg (gcse copy at end of bb 61, REG_EQUIV sp+0xD0) gets $fp because $fp (0x1428 base, arms 3/5 only) is free on its range; retail leaves it unallocated and rematerializes `addiu $a0,$sp,0xD0` in the else arm, so retail had something else live in $fp across box 6..else (not found). Box 3: plain &r90 with a block break after its call puts the copy before the call but the arg takes $v0 and the copy $s6 (43-49); p90 keeps `addiu $s5` + `move $a0`. Measured: exhaustive box-4/box-5-x forms (4096), box-5 y/h + box-6 forms (32768: 3552 only at 62 diffs by merging box 6 into one block, rD0 copy still there), box 3 x/y/h + box-4 x with plain &r90 (4096, best 3560/68), size-first hill-climb from this body (local optimum). One 1500 s permuter run from this body: best 4570 vs 5140 only through held pointers (`new_var = &rB0`, `data + 0x120`, `data + 0xD0`), rejected. */
 /* 9 November 2026 (round o44): body below is now the plain-address form at 3568/3552, 29 masked aligned differences (was 3560/33; p3 form 31). Found: the &r70/&rF0 extra copies come from sched1, not gcse. PRE inserts the arm copy at the end of the box block, cse2 turns it into a copy of the box-2 arg pseudo, and a do { } while (0) LOOP_BEG/END note between that call and the block end is a sched barrier, so the copy stays after the next call and the arg pseudo crosses calls in $s0/$fp. Fix: box-3 x as a plain hud_coord statement (block break right after the box-2 call) and box-6 x without its do-while -> box 2 and box 5 now `addiu $a0,$sp,0x70/0xF0` as retail; hill-climb of the other coordinates -> 29 (box-4 h and box-6 h grouped as do { t = ...; h = t; }, box-5 x plain t-form). Left: rB0 and rD0 now take the same late-copy pattern (box 4: $s0 then $s7 after the call, retail copies $s7 before it; box 6: $s1/$fp), the label colour-before-x order, else-arm $v1 vs $v0. Measured, no gain: no-loop-barrier hill-climbs (best 55-68), box-5 x/y forms for rB0 (33-96), a `three` local at box 3 (30, fake local). One 1500 s permuter run from this body: best 27/3568 only through a held `f32 *new_var = &D_L02_001B1410;` (a fake pointer to a global, rejected); earlier bests were a statement before `case 0x9F8:` (never executed). */
@@ -195,12 +197,12 @@ extern s32 func_00115DA8(char *, char *, ...);
 
 #define LBL0(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
 #define LBLB(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); f32 xx = xv; func_00300A00(ls, c, xx, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
-#define TITLE() \
+#define TITLE(A) \
         LBL0(0x4C, D_L02_001B1424, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f, half, 1); \
-        LBL0(0x4D, D_L02_001B1420, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f, half, one)
-#define LABEL() \
-        LBL0(0x4C, D_L02_001B1424, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, 1); \
-        LBLB(0x4D, D_L02_001B1420, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, one)
+        LBL0(0x4D, D_L02_001B1420, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f, half, A)
+#define LABEL(A) \
+        LBL0(0x4C, D_L02_001B1424, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, k2); \
+        LBLB(0x4D, D_L02_001B1420, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, A)
 #define LABEL50() \
         LBL0(0x50, D_L02_001B1420, D_L02_001B13FC, D_L02_001B1400, D_L02_001B1404, 1.0f, 0.0f, half, 1)
 #define SUM() \
@@ -273,6 +275,8 @@ void func_L02_003FE8B8(u8 *moby)
     f32 t;
     f32 half;
     s32 one;
+    s32 k2;
+    s32 k3;
     s32 x, y, h;
     char *str;
 
@@ -288,77 +292,77 @@ void func_L02_003FE8B8(u8 *moby)
     func_002802E0(&r50, x, y, D_L02_001B13E8[0], D_L02_001B13EC[0], D_L02_001B13D8, h, 0, 3);
     x = hud_coord((f32)D_L02_001B13C8, D_L02_001B3E04, half);
     t = (f32)D_L02_001B13CC[0] * D_L02_001B3E04 + half; y = t;
-    do { h = hud_coord((f32)D_L02_001B13C4, D_L02_001B3E04, half); } while (0);
+    do { t = (f32)D_L02_001B13C4 * D_L02_001B3E04 + half; h = t; } while (0);
     one = 1;
     func_002802E0(&r70, x, y, D_L02_001B13D0[0], D_L02_001B13D4[0], D_L02_001B13C0, h, 0, 3);
     x = hud_coord((f32)D_L02_001B1380, D_L02_001B3E04, half);
     do { t = (f32)D_L02_001B1384[0] * D_L02_001B3E04 + half; y = t; } while (0);
     t = (f32)D_L02_001B137C * D_L02_001B3E04 + half; do { h = t; } while (0);
-    p90 = &r90;
-    func_002802E0(p90, x, y, D_L02_001B1388[0], D_L02_001B138C[0], D_L02_001B1378, h, 0, 3);
+    func_002802E0(&r90, x, y, D_L02_001B1388[0], D_L02_001B138C[0], D_L02_001B1378, h, 0, 3);
     t = (f32)D_L02_001B1368 * D_L02_001B3E04 + half; x = t;
     do { t = (f32)D_L02_001B136C[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    t = (f32)D_L02_001B1360 * D_L02_001B3E04 + half; h = t;
+    do { h = hud_coord((f32)D_L02_001B1360, D_L02_001B3E04, half); } while (0);
     func_002802E0(&rB0, x, y, D_L02_001B1370[0], D_L02_001B1374[0], D_L02_001B135C, h, 0, 3);
     x = hud_coord((f32)D_L02_001B13B0, D_L02_001B3E04, half);
-    do { y = hud_coord((f32)D_L02_001B13B4[0], D_L02_001B3E04, half); } while (0);
+    k3 = 1;
+    do { t = (f32)D_L02_001B13B4[0] * D_L02_001B3E04 + half; y = t; } while (0);
+    k2 = 1;
     func_002802E0(&rF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, hud_coord((f32)D_L02_001B13AC, D_L02_001B3E04, half), 0, 3);
     x = hud_coord((f32)D_L02_001B1398, D_L02_001B3E04, half);
-    do { t = (f32)D_L02_001B139C[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    do { t = (f32)D_L02_001B1394 * D_L02_001B3E04 + half; h = t; } while (0);
-    func_002802E0(&rD0, x, y, D_L02_001B13A0[0], D_L02_001B13A4[0], D_L02_001B1390, h, 0, 3);
+    y = hud_coord((f32)D_L02_001B139C[0], D_L02_001B3E04, half);
+    func_002802E0(&rD0, x, y, D_L02_001B13A0[0], D_L02_001B13A4[0], D_L02_001B1390, hud_coord((f32)D_L02_001B1394, D_L02_001B3E04, half), 0, 3);
     save = ((HudRenderState *)D_L02_001BEA00)->text_scale;
     ((HudRenderState *)D_L02_001BEA00)->text_scale = 0.62f;
     func_0027AB40();
     if (*(s16 *)(data + 0x120) == 3) {
         s32 ofs = 0x8710;
-        TITLE();
+        TITLE(1);
         sprintf_n(buf, D_L02_001B1428, 0x1E - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(func_00280270, p90);
+        DRAWBUF(func_00280270, &r90);
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
-        LABEL();
+        LABEL(one);
         SUM();
         func_00115DA8(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(func_00280270, &r50);
         DRAW(func_00280190, &r70, func_00288FB8(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 5) {
         s32 ofs = 0x8710;
-        TITLE();
+        TITLE(1);
         sprintf_n(buf, D_L02_001B1428, 0x3C - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(func_00280270, p90);
+        DRAWBUF(func_00280270, &r90);
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
-        LABEL();
+        LABEL(one);
         SUM();
         func_00115DA8(buf, D_L02_001B1428, 15 * *(s16 *)(data + 0x122) + sum - *(s32 *)(data + 0x60));
         DRAWBUF(func_00280270, &r50);
         DRAW(func_00280190, &r70, func_00288FB8(0x2F61));
     } else if (*(s16 *)(data + 0x120) == 0xC) {
         s32 ofs = 0x8710;
-        TITLE();
+        TITLE(1);
         n = 120 - *(s32 *)(data + 0xD4) / 60;
         func_00115DA8(buf, D_L02_001B1428, n);
         if (n >= 100) {
-            DRAWBUF(func_00280190, p90);
+            DRAWBUF(func_00280190, &r90);
         } else {
-            DRAWBUF(func_00280270, p90);
+            DRAWBUF(func_00280270, &r90);
         }
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
     } else {
         if (*(u8 **)(data + 0xD0) != 0) {
             s32 ofs = 0x8710;
-            LABEL();
+            LABEL(1);
             LABEL50();
             obj = *(u8 **)(data + 0xD0);
             switch (*(s16 *)(obj + 0xAA)) {
             case 0x9F8:
                 pv = *(u8 **)(obj + 0x68);
                 func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-                LBL0(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 2.0f, half, one);
+                LBL0(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 2.0f, half, k3);
                 break;
             case 0xA44:
                 pv = *(u8 **)(obj + 0x68);
                 func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-                LBL0(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 1.0f, half, one);
+                LBL0(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 1.0f, half, k3);
                 break;
             }
         }
