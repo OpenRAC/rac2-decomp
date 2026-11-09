@@ -1,3 +1,4 @@
+/* 9 November 2026 (o89, cse1 path rule, cc1 harness ~30 compiles, -O2 -G8 -ffunction-sections -fno-strength-reduce): 5980 -> 5964/5968 bytes, positional rows 1147 -> 761, aligned rows (regs+imm masked) 143 -> 100, full 496 -> 460. Mechanism: cse_end_of_basic_block follows at most 9 skip-around branches (PATHLENGTH 10), and a LOOP_END note ends a path only on fall-through. (1) The 0x360 block: &vF0 for the second func_0027EAE8 call (V926) was cse1-shared with the first call (V796), 8 branches apart, so PRE inserted the copy at the clamp block end (s5 = s0 in the bc1f slot). Writing the three CLAMP01 do/while(0) clamps as two plain ifs gives retail: v0 = sp+0xF0, t1 = v0, fp-copy = v0 before the call, bc1tl clamps, f21/f22 roles right. (2) 0x8710 one row late: the else arm (0x30 row) is first cse1-processed by the path that starts after J1293 (row 0x3F label_y), 8 branches + J1482 TAKEN, so it sees 0x40 row reg 452, not 433; cse2 then makes 452 head (later REGNO_LAST_UID) for 0x40 onward. Retail needs <= 8 branches from the start after HC(98) to J1482 (now 9: 3 label_y rows x 3). label_y2 (owner-allowed) on row 0x41 fixes the sharing (s1 from row 0x3F) but merges that row into one sched block (rounding interleaved with the call setup, ~6 rows); on 0x3F/0x40 worse. Still open: rank colour (retail s0 = (n20-1)<<2 shared with the D_L04_002CA1E0 index, off = 12 / s0 by branch; k-index if/else forms all give movz, 5948), &vF0 copy in s5 not fp and scheduled after a3 (a3 takes the jal slot in retail), hp s7 vs 0x124 spill, 0x35 row col birth order (own c35 local: worse, 5956). No gain: -fno-sched-interblock, block-local Vec *pc = &vF0 (126). */
 /* 9 November 2026 (label_y2 sweep (owner ruling 2026-11-09, Sonnet s46): all 6 label_y sites, both one-test forms, singles/pairs/all, with and without -fno-strength-reduce: base 225 aligned rows (5980/5968) stays best (singles 225-285); no gain. */
 /* 9 November 2026 (o38, PRE slot order): slot order not PRE-caused. Spilled PRE copies fp+0x70, fp+0x104, fp+0x108 (S=757) already take retail's order (0x120, then 0x128/0x12C in retail); the shift is hp getting s7 instead of slot 0x124 (allocation), plus the 5980/5968 size. */
 /* 8 November 2026 (Sonnet round o22, cc1 harness, ~115 compiles + one 1500 s permuter run): 112/259 -> 106/260 (masked/full), 5980/5968 bytes. Steps: mv = v90 set inside the draw block and a plain rounding for the marker y (no label_y branches there), so loop.c hoists &v90 to s3 right before the marker loop like retail; one2 kept as the active of the post-loop label_y so h still spills to 0x10C (q1 118/266); locals declared pa, pb, arr, hp and pa = p + 0x494 before pb (arr/pa/pb now spill to retail 0x11C/0x114/0x118; 110/261); rank colour as c = *(n20 < 4 ? &B.v[n20 - 1] : &B.v[3]) (one load, branch; 109/264); both tan stores as { float q = ...; u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; } (retail lui early, addiu + 0xB0 offset; 106/260). Still open: hp gets s7 instead of spilling to 0x124, so &sy/&sy2 sit at 0x124/0x128 (retail 0x128/0x12C); &vF0 gets s5 not fp; &D_L04_001B31A0 still hoisted to s2 (float[]/struct/&D_L04_001B3190[0x10] forms no help); rank colour offsets (retail selects (n20-1)*4 vs 12 by branch; every index/offset ternary gives movz); 0x8710 reg starts one sprite row late (permuter only found fake temps there). No gain: statement-move sweeps (K=4) on t1 and the final C, shared char *s (s1 not s3), inline h + 0x10 (128), mv at loop top (PRE hoists again). */
@@ -211,6 +212,17 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+static __inline__ int label_y2(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L04_001B2D40;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = half;
+    return result;
+}
 
 static __inline__ int hud_coord(float value, float scale, float half)
 {
@@ -245,6 +257,7 @@ static __inline__ int hud_coord_a(float value, float scale, float half, int acti
     return result;
 }
 #define HC(k) hud_coord((k), D_L04_001B2D44, 0.5f)
+#define LY2(hd, k) label_y2((void *)(hd), (k), D_L04_001B2D44, 0.5f, 1)
 #define LY(hd, k) label_y((void *)(hd), (k), D_L04_001B2D44, 0.5f, 1)
 
 s32 func_L04_00417308(void)
@@ -332,7 +345,8 @@ s32 func_L04_00417308(void)
             }
             func_0028EA58(func_0028E588(0x7568, idx), 0x3E, HC(17.0f), 0x28, HC(35.0f), &vF0);
             fr = (float)I(p, 0x364) / (float)C.v[I(p, 0x360)];
-            CLAMP01(fr);
+            if (fr > 1.0f) fr = 1.0f;
+            if (fr < 0.0f) fr = 0.0f;
             func_0027EAE8(0x6F, HC(28.0f), (int)(fr * 91.0f) + 0x6F, HC(41.0f), 0xFFFFF0, &vF0);
         }
         n33 = I(p, 0x33C);
@@ -357,7 +371,8 @@ s32 func_L04_00417308(void)
             fb = (float)I(p, 0x278) / (float)I(p, 0x650);
         else
             fb = (float)I(p, 0x338) * 0.004166667f;
-        CLAMP01(fb);
+        if (fb > 1.0f) fb = 1.0f;
+        if (fb < 0.0f) fb = 0.0f;
         vF0.i[0] = 0x603F00B2;
         vF0.i[1] = 0x603F00B2;
         vF0.i[2] = 0x603F00B2;
@@ -367,7 +382,7 @@ s32 func_L04_00417308(void)
         }
         { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3F); func_00300A00(spr, 0x60442D00, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x40); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x41); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x41); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY2(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         if (D_001A79F0 == 4)
             { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x42); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         else
@@ -429,7 +444,8 @@ s32 func_L04_00417308(void)
                 fr = (420.0f - (float)sy) * 0.06666667f;
             else
                 fr = 1.0f;
-            CLAMP01(fr);
+            if (fr > 1.0f) fr = 1.0f;
+            if (fr < 0.0f) fr = 0.0f;
             col = func_00283D38(0x10F0C070, 0x25F0C070, fr);
             func_0028FC48(sy, hud_coord(21.0f, D_L04_001B2D44, half), sy + 1, hud_coord(55.0f, D_L04_001B2D44, half), col, 0);
         }

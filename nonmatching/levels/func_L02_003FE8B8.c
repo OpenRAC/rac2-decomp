@@ -1,3 +1,5 @@
+/* 9 November 2026 (round o94): body below unchanged (check.py 3552/3552, 0/1; 32 masked aligned differences). Colour-before-x at each group's first label, measured (-dS -dR -fsched-verbose-6): sched2 block 26 ends at the NEXT label's label_y mode branch, so x ($f12, deps call/next ls call/end) and colour ($a1, deps call/$a1=0x4D/end) tie at prio 17, 3 deps, class 3 vs the preceding mtc1 $f22, and LUID (load_register_parameters order a0,a1,f12) picks $a1. Retail also has $f15 losing to $a1 here, so retail's advantage is $f12-specific (not a longer block: then $f15 would also win, as at the second label). Tried, no gain: x/colour as locals after label_y (`yy = label_y(...); xx = xv;`, combine folds them back: 32), x local before label_y on the first label (loads early, 38/44), plain rounding on the second label (longer block: $f12 first, but alloc shifts: 41-128), an L08-style `sprite(id, col, x, int y, ...)` inline wrapper (col/x load before label_y: 65-123). */
+/* 9 November 2026 (round o91): body below is now 32 masked aligned differences at 3552/3552 (was 38). Change: a label_y variant `label_y4` (mode test BEFORE the (int) rounding, every dead test stores to `value`) on the three else-arm labels 0x50/0x51/0x51. Found (-dl -dg): the label_y mode load is a local pseudo that local-alloc gives $v0 and it is live across the fix, so the result took $v1; with the test before the rounding the mode dies first and the result takes $v0 as retail (all six else rows fixed). NEEDS AN OWNER RULING on label_y4 before landing. Measured, no gain: label_y4/label_y3/xx-local forms on the TITLE/LABEL/0x4E/0x4F sites (63-mix sweep, best 34), 64 active mixes (1/one/k2/k3) on 0x50/0x51 (32 floor), y-then-x local label forms. Label colour-before-x (rows 239/339/402/501/564/680/805): sched1 and sched2 tie on prio 17, 3 dependents each (colour: call, next $a1=id, call; x: call, next call, call), so LUID decides and load_register_parameters emits $a1 before $f12; no source lever found. */
 /* 9 November 2026 (label_y2 sweep (owner ruling 2026-11-09, Sonnet s46): the 3 label_y sites (macros), both one-test forms, singles/pairs/all, unit flags -frac2-gcse-unsplit-edges -frac2-keep-block-order and -fno-schedule-insns: base 84 (3552) stays best (singles 84-391); no gain. */
 /* 9 November 2026 (round o58): body below unchanged (3552/3552, 38 masked aligned differences). Measured: one/k2/k3 as u8, s16 or u16 (16 forms): identical code, cse folds them anyway. LABEL 0x4C active literal 1 with k2 removed: rB0 copy takes $s7 as retail, but the inline active pseudos of TITLE 0x4D and the arm-3/5 LABEL then take $fp and stay visible (`li $fp,1` twice, 3568/40); all 32 1/one mixes on that form: best 40. Found: flow2 has $fp ($30) live at every block end, so a const-1 ghost in $fp can never vanish; the hidden $fp holder in retail (which keeps the rD0/rF0 PRE copies, insns 2836/2833 at the ends of bb 67/49, unallocated) is therefore not a constant pseudo. Retail's ghost $s4/$s6 have no visible set at all (no li, no move); $fp is set only by `daddu $fp,$s0` (0x1428 high) in arms 3/5. Else-arm $v1/$v0 (LABEL 0x50 and both 0x51): the label_y `mode` load (D_L02_001B3E00) is scheduled before the fix and holds $v0 until the dead test, so the result takes $v1; hud_coord for y, or a helper that loads mode after the result, change nothing. Permuter (o58, 1500 s): 2160 -> 1905 only through `new_var = &D_L02_001B1410` (fake held pointer, rejected). */
 /* 9 November 2026 (round o56): body below is now 38 masked aligned differences at 3552/3552 (was 43; check.py 3552 bytes, 0/1; unaligned word count 57 vs 48 for the o55 body, which is the previous body with one = 1 before box 2, k2/k3 before the box-5/6 calls). Changes: plain &r90 (p90 local removed, as rB0/rD0), box forms re-climbed (box-2 h t-form in do-while, box-4 h grouped hud_coord, box-6 h inline), TITLE/LABEL take the 0x4D active as a macro argument: LABEL 0x4D active one in arms 3/5 and literal 1 in the else arm, LABEL 0x4C active k2, both 0x51 actives k3, 0x4E/0x4F literal 1; k3 = 1 after box-5 x, k2 = 1 before the box-5 call. Found: retail $s6 is saved but never used, so it holds a set-once 1 local whose insns die after reload; with one only in the else LABEL and k2 in arms 3/5 the o55 body gets rB0 $s7 and the 0x1428 high $fp as retail, but the rD0 copy then takes $fp (needs a second fp holder live box6->else; cse folds every later 1-local into the earlier one). Measured, no gain: per-arm one locals/sets (8 forms), k2/k3 at every top-level position (29x29), active hill-climb + 30k random samples on the o55 body (floor 43) and 25k on this body (38), fmt = D_L02_001B1428 local before the switch (+10..+12, -4/-12 bytes), p90 set after the call. Permuter (o56, 1500 s): 2160 -> 2040 only via a pointer to D_L02_001B1414 (fake, rejected). */
@@ -198,6 +200,7 @@ extern s32 func_00115DA8(char *, char *, ...);
 
 
 #define LBL0(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
+#define LBL4(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y4(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
 #define LBLB(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); f32 xx = xv; func_00300A00(ls, c, xx, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
 #define TITLE(A) \
         LBL0(0x4C, D_L02_001B1424, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f, half, 1); \
@@ -206,7 +209,7 @@ extern s32 func_00115DA8(char *, char *, ...);
         LBL0(0x4C, D_L02_001B1424, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, k2); \
         LBLB(0x4D, D_L02_001B1420, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, A)
 #define LABEL50() \
-        LBL0(0x50, D_L02_001B1420, D_L02_001B13FC, D_L02_001B1400, D_L02_001B1404, 1.0f, 0.0f, half, 1)
+        LBL4(0x50, D_L02_001B1420, D_L02_001B13FC, D_L02_001B1400, D_L02_001B1404, 1.0f, 0.0f, half, 1)
 #define SUM() \
             sum = 0; \
             for (obj = data + 0x90, i = 5; i >= 0; i--, obj += 4) { \
@@ -234,6 +237,21 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     copy = handle;
     if (copy != 0)
         scaled = half;
+    return result;
+}
+
+/* label_y4: label_y with the mode test before the rounding and dead stores to value (new form, needs an owner ruling). */
+static __inline__ int label_y4(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L02_001B3E00;
+    float scaled = value * scale + half;
+    int result;
+    void *copy;
+    if (mode == active) value = scale;
+    result = (int)scaled;
+    if (handle != 0) value = scale;
+    copy = handle;
+    if (copy != 0) value = half;
     return result;
 }
 
@@ -359,12 +377,12 @@ void func_L02_003FE8B8(u8 *moby)
             case 0x9F8:
                 pv = *(u8 **)(obj + 0x68);
                 func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-                LBL0(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 2.0f, half, k3);
+                LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 2.0f, half, k3);
                 break;
             case 0xA44:
                 pv = *(u8 **)(obj + 0x68);
                 func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-                LBL0(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 1.0f, half, k3);
+                LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 1.0f, half, k3);
                 break;
             }
         }
