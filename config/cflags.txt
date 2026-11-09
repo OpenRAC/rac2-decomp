@@ -4279,3 +4279,5 @@ src/us2/levels/23_damosel_orbit/L23_0041EF48-cc.c	-O2 -G16 -Wa,-G16 -ffunction-s
 src/levels/shared/L04_00402D90-hud-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/game/00294BC8-map-setup-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g -Wa,--r5900-la-addend=sn
 src/levels/02_maktar_nebula/L02_003FE8B8-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
+src/levels/02_maktar_nebula/L02_003FDDE8-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
+src/levels/11_joba/L11_00443940-g8.c	-O2 -G8 -ffunction-sections -fno-gcse

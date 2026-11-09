@@ -921,7 +921,7 @@ void func_L02_003FD070(char *a0) {
 /* func_L02_003FD7C8 is defined in L02_003F5430-g8.c ($gp accesses). */
 
 
-INCLUDE_ASM("asm/levels", func_L02_003FDDE8);
+/* func_L02_003FDDE8 is in L02_003FDDE8-g8.c. */
 
 /* Maps a value below 14 to an id (0x2F48 to 0x2F51, 0x2F6E and 0x3240 to 0x3242, in no regular
    order); any other value gives 0x2F48. The dispatch reads the level's own jump table (fourteen

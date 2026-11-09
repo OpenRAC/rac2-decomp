@@ -1,3 +1,4 @@
+/* 9 November 2026 (o126, L11/L02 idioms): 19 -> 13 masked positions (656/656, check.py us 0/1). New in the C below: a set-once `buf = buffer;` (owner: set-once constant locals) used only by the first sprintf fixes the i/buffer s3/s4 swap (sweep of 1-2 pointer locals x use sets x 6 orders, 120 variants; 13 is the floor). Left: buffer addiu after the key copy (sched2 c31: movstr prio 2 beats the addiu prio 1), the first sprintf rematerialises addiu a0,sp,0x10, and draw 2's ori/f15 (sched2 c25 picks ori beside f14; the LOOP_END before cvt is the barrier head). Interleaved func_00300A00(char *, float, int, ...) prototype: no change in either draw (prototype kept as src). Groups moved in draw 2 (23-37), colour as set-once local (19), label_y/label_y2 swaps (13-22), all 12 -frac2-* switches + -fno-sched-interblock: no change. */
 /* 9 November 2026 (o86, dump-driven): 656/656, 21 -> 19 masked positions (65 rows). sched2: retail's i = 0 jal slot
  * and s7 = 1 after the call need no loop note between the draw-2 call and i = 0 and a LOOP_BEG before one = 1; a
  * LOOP_END before the for's entry test ends the cse1 block (cse.c:8596), the i<4 test survives gcse, PRE stops
@@ -283,12 +284,14 @@ int func_L03_003C7018(void)
         {
             int keys[4] = {11599,12116,12769,12770};
             unsigned char buffer[128];
+            unsigned char *buf;
+            buf = buffer;
             do {
                 int shift = 5;
                 int x;
                 unsigned char *label = func_00288FB8(keys[i]);
                 if (i == one) {
-                    func_00115DA8((char *)buffer, D_L03_001B0190, label, D_L03_001B0140 + 1);
+                    func_00115DA8((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
                     func_00115DA8((char *)buffer, D_L03_001B0198, label);

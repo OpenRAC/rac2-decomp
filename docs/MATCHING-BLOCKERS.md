@@ -639,7 +639,12 @@ Removing it gives 904 bytes; 67 new candidates using only real-operation
 one-pass groups in the helper and draw setup give 904–928 bytes without
 improvement. Reopen with an evidenced rounding-helper/control-flow shape that
 retains the label copies without a dead test. The retained source and trial
-history are in `nonmatching/levels/func_L11_00443940.c`; no linked build ran.
+history were in `nonmatching/levels/func_L11_00443940.c`; no linked build ran.
+**Update, 9 November 2026:** now matched, with its twin `func_L02_003FDDE8`, in
+`src/levels/11_joba/L11_00443940-g8.c` and `src/levels/02_maktar_nebula/L02_003FDDE8-g8.c`
+(`-O2 -G8 -ffunction-sections -fno-gcse`), 1 place in each release. The owner allowed the
+dead-test `label_y` helper, set-once constant locals and the x-before-colour argument order of
+`func_00300A00`. The measurements above are kept as history.
 
 **6 November 2026, Smolg fighter initializer (retained):**
 `func_L17_003E8A58` is 944/964 bytes, USA v1.01 0/1 and v2.00 0/1;

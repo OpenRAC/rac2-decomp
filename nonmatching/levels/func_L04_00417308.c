@@ -1,3 +1,4 @@
+/* 9 November 2026 (o127, global-alloc order of the top values, cc1 harness ~45 compiles, -O2 -G8 -ffunction-sections): masked 90 -> 90, full 493 -> 427, 5956 -> 5964/5968 bytes; no match. Retail's top x s0 / y s1 / one s2 / s s3 / p s4 now matches: global-alloc order must be x > y > one > s > p (pri = floor_log2(refs)*refs/len). (1) `one` is the rank-row n20 reused (owner: reusing a dead local): `n20 = 1` for the h[0xBC] test and the 0x76C store, so one pseudo holds 1 and n20 (retail s2 in both places); merged refs 13/248 = 1572. (2) Rank row LY handle s -> n20 inside its group (n20 +4 refs, s 9 -> 5 refs). (3) Row-1 group `do { s = ...; x = ...; y = LY(x, 118.0f); } while (0);` (y 3750 > s; row 1 0x228-0x298 now matches, and the 0x210/0x224 a0/a1 swap goes). (4) Groups around the h[0xBC] test and the 0x76C store: n20 19 refs = 3040 > s 3000 (6/40). The +8 bytes are two LOOP_BEG alignment nops (0xF4, 0x2C4) from (4); without (4) n20 2786 < s and s/n20 swap (s2/s3, masked 86 full 443). Same-size alternatives: (1)-(3) with only x/y in the row-1 group (s set outside: s 5/41 = 2439): right regs, 5956, masked 96 full 431 (the s copy goes above the 118.0f load); clamp group instead of (4): right regs, 5956, masked 99 (rank colour becomes bnez/ no off CSE). Still open: hp keeps s7 (retail spills to 0x124), ruler f20/f22 + mov.s, &vF0 s5 vs fp, the D_L04_001B31A4 slot. Body below is (1)-(4). */
 /* 9 November 2026 (o124, L11/L02 HUD idioms, cc1 harness ~14 compiles, -O2 -G8 -ffunction-sections): masked 94 -> 90, full 454 -> 493, 5956/5968 bytes; no match. (1) func_00300A00 now (void *, float x, int col, float y, ...) like the matched L11/L02 panels (same a0/f12/a1/f13 registers): masked 92, full 452. (2) D_L04_001B31A0 is a small sized object, not char[]: retail loads it as lwc1 $f12,0x31A0($at) (gas macro of an unsplit l.s, which GCC emits only for a <= 8-byte extern at -G8) and passes it as lui/addiu pairs per call (la macro). Declared extern float D_L04_001B31A0 and passed as &D_L04_001B31A0: gcse PRE no longer copies its high part (was expr 175, inserted at bb 188), so the s1/s2 hoists are gone and the ruler i gets s2 like retail. Full got worse because that hoisted pseudo used to fill s2 ahead of p; now p (pseudo 97, prio 1675) gets s3, retail s4. Retail needs one more high-priority pseudo in s3 before p: retail top is x s0, y s1, one s2, s s3 (mine x s0, s s1, y s2, one s4; one prio 631, s 6750, y 2500). Still open: hp in s7 (retail spills to 0x124), &vF0 s5 vs fp, ruler f20/f22 half/zero swap (o98 mechanism), D_L04_001B31A4 load now in the func_00283248 jal slot via $gp (retail: lui $at before the jal, obj copy in the slot). No change: one = 1 set just before the first test, one as active of the 0x2F95 row label_y, -frac2-frame-pointer-liveness, -frac2-sticky-volatile-refs. Worse: hp inline h + 0x10 (110/462, 5964 bytes; h+0x10 spills to 0x124 but too late), pa/pb inline (106), arr inline (103). Body below is (1)+(2). */
 /* 9 November 2026 (Sonnet round s55, lesson 54 return-type audit): func_0028EA58 declared void (its src/game/0028EA58-g8.c definition; no caller uses a result) instead of int: 5956/5968 bytes unchanged, differing rows 983 -> 981 in the unmasked tools/check.py listing (the $s5/$t1/$a3 moves at 0x417874-0x417880 now match except 0x417878 $s5 vs $fp); no match. Other callees (func_00336D50 s32, func_0027FBD8 int) agree with src. Body keeps the corrected prototype. */
 /* 9 November 2026 (o98, cc1 harness ~50 compiles, real profile): best C unchanged (5956/5968, masked 96 / full 458). The 12 missing bytes are 3 insns, all in the ruler preheader 0xCE0-0xD60: hp spill (retail reloads 0x10C, addiu, sw 0x124: +2 vs my addiu s7) and the ruler-half copy mov.s $f23,$f20 at retail 0xCF8 (+1); no other region differs in count. Mechanism of the copy: cse1 turns `half = 0.5f` into a copy of label_y3's half param (pseudo 596, set in the sprintf row, same cse block through the 3 boxes); gcse COPY-PROPs half -> 596 into the ruler loop (insns 2547/2558) and CONST-PROPs the copy, so 596 lives through the ruler, cannot take f20, gets f22, zero gets f23, copy vanishes. A LOOP_END between box 3 and half (do-group around `i = 0`) cuts cse1: 596 -> f20 and zero -> f22 like retail, but half becomes li.s $f24 (0x3D888889 takes f23; reload_cse leaves the li.s), masked 151. Single-statement groups at lines 309/311-315/317-326 of the body: 94-162 masked, none gives the copy (group around func_00283388(m): 94/456 but 5964). half moved earlier (before boxes or call): 103; second half = 0.5f removed: 5948/96/456 (marker half then shares f22, wrong); literal 0.5f in the ruler: li.s kept inside the loop (no hoist), 105. */
@@ -296,7 +297,6 @@ s32 func_L04_00417308(void)
     u8 *pa, *pb, *arr, *hp;
     float fr, fs, fm, fe, f21, fa, fd;
     int n33, n20, ne, i, col, idx, v, va, v3, vy;
-    int one = 1;
     int j;
     int one2;
     float half;
@@ -305,8 +305,9 @@ s32 func_L04_00417308(void)
     Vec *mv;
     char *s;
 
-    if (h[0xBC] == one)
-        func_L04_00416E38();
+    n20 = 1;
+    do { if (h[0xBC] == n20)
+        func_L04_00416E38(); } while (0);
     if (D_L04_001B091C > 0) {
         func_L04_00417028(h);
         func_00282948(&D_L04_001B091C);
@@ -318,12 +319,12 @@ s32 func_L04_00417308(void)
                       (float)(D_001A7340 - 0xAF));
         {
             int x, y, len;
-            s = func_00288FB8(0x2F95); x = D_001A7340 / 2; y = LY(x, 118.0f); len = func_001157AC(s);
+            do { s = func_00288FB8(0x2F95); x = D_001A7340 / 2; y = LY(x, 118.0f); } while (0); len = func_001157AC(s);
             func_0027FBD8(x, y, 0x700000E4, s, len);
         }
         if (I(p, 0x76C) == 0) {
             OwnerContext *context = &D_001A63A8;
-            I(p, 0x76C) = one;
+            do { I(p, 0x76C) = n20; } while (0);
             if ((context->active != 0 || context->kind != -1) && (u16)(context->state - 6) >= 2)
                 context->state = 5;
         }
@@ -416,7 +417,7 @@ s32 func_L04_00417308(void)
             int y;
             int c;
             s = func_00288FB8(D_L04_002CA1E0[n20 - 1]);
-            do { y = LY(s, 24.0f); } while (0);
+            do { y = LY(n20, 24.0f); } while (0);
             c = B.v[n20 < 4 ? n20 - 1 : 3];
             func_0027F5B8(x, y, c, s, -1);
         }

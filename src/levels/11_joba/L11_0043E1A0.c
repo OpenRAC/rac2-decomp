@@ -789,7 +789,7 @@ void func_L11_00442C80(u8 *object) {
 
 /* func_L11_00443498 is in L11_00443498-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_00443940);
+/* func_L11_00443940 is in L11_00443940-g8.c. */
 
 /* maps the class index to its measured identifier */
 extern u32 D_L11_002BB0E0[];
