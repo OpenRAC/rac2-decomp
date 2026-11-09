@@ -1,3 +1,4 @@
+/* 9 November 2026 (o121, set-once constant locals ruling, local cc1 scorer): 0xE, 0x30003, 0x47, the two 64-bit header words, 0x4410/0x106 and 0x8000 (one shared, k/k2 for subtract/add, or k/k2/k3 per use; s32/int/long) as set-once locals at block top, at the use, as initialisers, and at every random position before the use in the final block (~13k compiles): floor stays 6 rows (retained C); with 0x106 literal or set late the 0xE/0x30003/0x8000 registers match but 0x106 still issues early (7 rows). No check.py run. */
 /* 9 November 2026 (Codex coordinate-dataflow controls): USA v1.01, game
  * -O2 -G8 -ffunction-sections. Rechecked retained C: 680/680 bytes, 0/28
  * placements, six real differing rows (+0x1C8/+0x200 clusters). Compiled and

@@ -1,3 +1,4 @@
+/* 9 November 2026 (o121, set-once constant locals ruling): separate locals per use with store-matched types (u8/u16/s16/int/unsigned for QI 255, HI 255, 0x100), as function-scope initialiser, block declaration, block top or at the use, x all 6 store orders (29,478 compiles, local cc1 scorer): every 255 local of any type is merged by cse (484 bytes); best 488-byte form is still 4 rows (0x100 local, as o114). No check.py run. */
 /* 9 November 2026, full-width field and defaults-record follow-up:
  * Game -O2 -G0 -ffunction-sections -g, unchanged compiler/assembler.
  * Checked 132 new C variants in the build container. Full-width bit-fields
