@@ -66,3 +66,24 @@ finish:
     }
     return result;
 }
+
+/* func_PAL_002D5FF0, the PAL copy of func_002D53F0: a centred text draw at y = 329 less a word
+   reached through $gp (-G8), with text id 0xB60 where USA draws 0x2D4F at a scaled y. */
+extern int D_001ABB8C __attribute__((sda));
+extern void func_0027C540(long);
+extern void func_0027C660(void);
+extern void func_PAL_0029CEC8(void);
+extern char *func_00288FB8(int);
+extern void func_0027F980(int, int, unsigned long long, unsigned char *, int);
+
+int func_PAL_002D5FF0(void)
+{
+    int y;
+
+    func_0027C540(0);
+    func_PAL_0029CEC8();
+    y = 329 - D_001ABB8C;
+    func_0027F980(0x1C7, y, 0x80F0F0F0ULL, (unsigned char *)func_00288FB8(0xB60), -1);
+    func_0027C660();
+    return 0;
+}
