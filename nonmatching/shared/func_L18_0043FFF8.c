@@ -1,3 +1,4 @@
+/* 9 November 2026 (o109): still 5 rows (0/3). Lesson 54: func_L09_003364E0 is defined (char *, int, float, u32, float, int); the C below now uses that prototype: identical code. sched1 deps explain the tie: each constant's dependents are {231 block end, 58 qcopy asm (sets_all), own store}; each store's are {231, 80 = sched_before_next_call anti dep (value pseudo crosses no call), 58}. QI-before-256 needs prio(st30) > prio(st34), which also puts st30 first; so only key 5 can split them, and that needs a 4th dependent (another use of the QI pseudo, or a load overlapping 0x34 before the qcopy) that retail does not have. Tried *(u8 *) (no /s), QI-first source order, signed char -1 / short forms: same or worse order. */
 /* 9 November 2026 (o75, dump-driven): deciding pass sched1 (.sched, block after `if (object)`). Constants 35 (HI 256), 40 (QI 255), 45 (HI 255) tie on every key: prio 44, weight 1, class 3, 3 dependents each ({231, 58 qcopy, own store}); stores 37/42/47 tie too (prio 43, weight 0, deps {231,80,58}), so LUID decides both and the constant order equals the store order. Retail's regs (QI a0, 256 v0, HI v1) and its slot `li a0` need sched1 order QI, 256, HI, st34, st30, st32: local-alloc then gives 256 len 2, HI 3, QI 4 (retail's order), and reorg takes the first insn (QI) for the beqz slot. That needs the QI constant ahead of its own store's LUID rank (a 4th dependent on st34 or QI const, or weight 0 on QI const); no plain store gives it. Every scalar 255 local is promoted to SI and cse's wider-mode lookup merges the HI 255 (484 bytes). Checked here: -frac2-qcopy, qcopy-barrier, zero-ti-por, keep-block-order, -fno-sched-interblock, qcopy_nc on either copy: same order; -fno-schedule-insns worse. */
 /* 9 November 2026, typed-header follow-up: a complete measured object view
  * (state, update/draw distances, flags, state pointer, rotation fields) gives
@@ -42,7 +43,7 @@
 extern void *func_0029EFD0(int);
 extern float func_00283248(float, float);
 extern float func_00282E20(void *);
-extern char *func_L09_003364E0(char *, int, unsigned int, int, float, float);
+extern char *func_L09_003364E0(char *, int, float, unsigned int, float, int);
 extern void func_00282DD8(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
 extern float func_00282DF0(void *);
@@ -67,7 +68,7 @@ char *func_L18_0043FFF8(void *position, char *owner, float *direction,
         *(float *)(object + 0xf8) = func_00283248(direction[0], direction[1]);
         angle = func_00282E20(direction);
         *(float *)(object + 0xf4) = -func_00283248(angle, direction[2]);
-        *(char **)(state + 0x30) = func_L09_003364E0(object, -1, 0xf0208080, 0x60, 0.1f, 0.01f);
+        *(char **)(state + 0x30) = func_L09_003364E0(object, -1, 0.1f, 0xf0208080, 0.01f, 0x60);
         *(float *)(state + 0x1c) = y;
         qcopy(object + 0xc0, state);
         func_00282DD8(object + 0xd0, object + 0xc0, D_0018A0E0);
