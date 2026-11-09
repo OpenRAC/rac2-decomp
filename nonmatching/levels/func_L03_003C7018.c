@@ -1,3 +1,12 @@
+/* 9 November 2026 (o86, dump-driven): 656/656, 21 -> 19 masked positions (65 rows). sched2: retail's i = 0 jal slot
+ * and s7 = 1 after the call need no loop note between the draw-2 call and i = 0 and a LOOP_BEG before one = 1; a
+ * LOOP_END before the for's entry test ends the cse1 block (cse.c:8596), the i<4 test survives gcse, PRE stops
+ * hoisting buffer/walks (116 rows). Body: draw 2 ungrouped, `i = 0;` then `do { one = 1; } while (0);`, loop as
+ * do { ...; i++; } while (i < 4) (no entry test). Left: (1) buffer addiu after the key copy: lui v0 is the barrier head
+ * after the group's LOOP_END; one group around one = 1 AND the loop puts it right (one = 1 head) but doubles loop
+ * refs: shift 9/32 beats x 6/19 (floor_log2) and i 13/114 < buffer 11/53 (25 positions). (2) i/buffer s3/s4:
+ * global-alloc i 9/114 = .237 < buffer 7/52 = .269; retail needs i in (.269, keyptr 7/49 = .286): len <= 100 or 10 refs
+ * at len <= 111. (3) draw-2 ori/f15 sched2 cycle order. 6 check.py runs. */
 /* 9 November 2026, Codex follow-up: 45 new C variants compiled and checked in the
  * existing rac2-gnu container, game -O2 -G0 -ffunction-sections with
  * -Wa,--r5900-la-addend=sn; USA v1.01, one Endako placement. Baseline remains
@@ -239,6 +248,7 @@ int func_L03_003C7018(void)
 {
     if (D_L03_001A904C) {
         int one;
+        int i;
 
         {
             char *title;
@@ -253,7 +263,7 @@ int func_L03_003C7018(void)
             } while (0);
             func_00300A00(title, 0x60442d00, x, row, c, d, 0.0f);
         }
-        do {
+        {
             char *title;
             float row, x, c, d;
 
@@ -265,14 +275,15 @@ int func_L03_003C7018(void)
                 d = D_L03_001B0158;
             } while (0);
             func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+        }
+        i = 0;
+        do {
             one = 1;
         } while (0);
         {
             int keys[4] = {11599,12116,12769,12770};
             unsigned char buffer[128];
-            int i;
-            i = 0;
-            for (; i < 4; i++) {
+            do {
                 int shift = 5;
                 int x;
                 unsigned char *label = func_00288FB8(keys[i]);
@@ -284,7 +295,8 @@ int func_L03_003C7018(void)
                 }
                 x = func_00283CF0(D_L03_001B0160[i].x);
                 func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buffer, 0x80);
-            }
+                i++;
+            } while (i < 4);
         }
         if (D_001A7A7C[0]) {
             func_L00_00443DF8((char *)D_L03_001A904C + 0x36f28);

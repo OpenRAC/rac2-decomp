@@ -1,3 +1,4 @@
+/* 9 November 2026 (o84, dump-driven): 40 -> 36 rows (2076 bytes, own row count, same in an int-helper build). Region +0x6A0 was local-alloc: y chain (lw 3C/sra/subu tied, 6 refs, pri 12/14) beat flags (lw 30/and tied, 8/10) and the s[0] copy (2/8), so y took v0. Fix: y built in the dead multi-block local id (`id = w->3C; id >>= 4; id = a21 - id;`, id is a0 in retail's 0x100/0x1000 arms) goes to global-alloc -> a0, and `g = w->30 & 0x20000; if (g)` (dead local g) leaves the copy alone in local-alloc -> v0, flags -> v1: retail's registers, no other row changed. Left: (1) sched2 issues li s0 (1250, ready at t=1, no deps) beside lw 3C; retail issues it at t=4, so retail's lui had a dependence ours lacks (not found); (2) region 2 is inside the do-while(0) group whose loop notes stop the arg moves interleaving, so the s[5] sum stays short-lived (a0, not t2); removing the group interleaves but gives 2072 bytes/53 rows; (3) flow2 div-guard store unchanged. */
 /* 9 November 2026 (Sonnet round, o29, lesson 49): retail reads win.s[0], s[5], s[7] with lhu in both set_window_vertical blocks; helper parameters `unsigned short top, unsigned short anchor` give exactly that lhu/sh (41 rows, 24 mnemonic diffs against 40/28 for int parameters); what is left is local-alloc order (y in v0 not a0, s[5] sum not in t2: retail stores after the argument moves) and the flow2 div-guard store. Store order, parameter order, y inline/short/unsigned short, anchor-sum spellings and no do-while do not change it (41-62). 25-min permuter from the unsigned-short C: best 55 rows (fake 0x20000 local). Native-oriented variant block kept; best stays the C below. */
 /* 8 November 2026 (Sonnet round, o13): set_window_vertical with int parameters gives 40 rows (was 41; own rdump count); swapped parameter order/store order, local top, self-assignment, no do-while, anchor local, += forms do not help (40-84). Lesson-48 move sweep (302 moves, depth 5) finds nothing under 40; 25-min permuter from the int-parameter C found only formatting/fake temporaries. Div-guard store remains the compiler flow2 issue. */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0027FC70 4th parameter is declared long but src/game/0027F128-fpw-g8.c has int len: corrected, 41 -> 41 rows, no change. */
@@ -122,7 +123,7 @@ extern void func_0027ECC8(int, int, int, int, int);
 #define TEXT(id) func_00288FB8(id)
 #define DRAW(c,t) func_0027FC70(&win,c,t,-1,tex,glyphs)
 static inline int translated_edge(int extent, int origin) { return extent + origin; }
-static inline void set_window_vertical(Win *p, int top, int anchor) { p->s[5] = anchor; p->s[0] = top; }
+static inline void set_window_vertical(Win *p, unsigned short top, unsigned short anchor) { p->s[5] = anchor; p->s[0] = top; }
 int func_002CC6B0(unsigned char *w) {
     char buf[0x40];
     int id;
@@ -320,11 +321,12 @@ int func_002CC6B0(unsigned char *w) {
         *(int *)(w + 0x3C) = 0;
     }
 
-    {
-        int y = a21 - (*(int *)(w + 0x3C) >> 4);
-        set_window_vertical(&win, win.s[0], y);
-    }
-    if (*(int *)(w + 0x30) & 0x20000) {
+    id = *(int *)(w + 0x3C);
+    id >>= 4;
+    id = a21 - id;
+    set_window_vertical(&win, win.s[0], id);
+    g = *(int *)(w + 0x30) & 0x20000;
+    if (g) {
         func_0027F120();
     }
     DRAW(colour, text);
