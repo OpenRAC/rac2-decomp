@@ -17,7 +17,7 @@ typedef union F32Bits {
 
 extern Rec_003A2D58 *D_L22_001FE940[];
 
-INCLUDE_ASM("asm/levels", func_L22_0039D708);
+/* func_L22_0039D708 is defined in L22_0039D708-main-g8.c. */
 
 /* func_L22_003A15D0 is defined in L22_003A15D0-g8.c. */
 

@@ -1,3 +1,4 @@
+/* 9 November 2026 (Sonnet round o42): case 11 improved, o26 scorer 22 -> 14 rows (3436/3436). The C below now writes case 11 as do { k = 100.0f; sc = D_001B23A4; h = 0.5f; } while (0); pb = &box; n = 3; enabled = 1; call(pb, ..., (int)(sc * k + h), 0x10, n): the LOOP_END note is the sched2 barrier (haifa sched_analyze), it lands on pb = &box, and the next label (0x2865E8) is already 0 mod 8, so no pad. Only a0/sw order is left in case 11 (sched1 puts a0 = pb before the stack store; retail has the store first). Cases 9/10 cannot use this: this cc1 (final.c shorten_branches) aligns the first CODE_LABEL after any LOOP_BEG with no LOOP_END stop, and their next labels are 4 mod 8 (pad, 861 bytes, measured). Also tried: n=3/enabled/pb orders, pb in the loop (861), enabled in the loop, n = enabled + 2, float f temp: none better. Permuter (stopped early, about 25 min, -j2) seeded from this C: best 690 vs 750, only by adding an empty do { } while (0) (banned, rejected). */
 /* 9 November 2026 (Sonnet round o26, lesson 49): re-measured 3436/3436, 32 rows. Locals audit: every local in cases 9-11 holds one retail register across its uses (a $s1, b $s0, c $a2, enabled $s0, &box $s2/$s5), so no fake or missing locals; remaining rows are still only the cases 9-11 setup barrier. New: a shared `left = 0xF0` argument variable (permuter idea, cases 9-11 or 9-10): no change. Permuter 1500 s -j2 on case 9 only: 1045 vs 1210, only via reusing another case's variable (rejected). */
 /* 8 November 2026 (Sonnet round, lesson 48 sweep o14): every movable single-line statement (calls joined to one line, 688 variants) moved 1-6 places within its block, then 3320 pairs of the best moves: none beats the base (still 3436/3436, 32 rows). */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0028E640 is declared int (src: u64), func_0027C878 int (src: TextureBits = unsigned long), func_0027FC70 5th parameter int (src: u64). All three corrected together: 33 -> 33 rows. (Correcting only func_0027C878 gives 204: the other widths must follow.) */
@@ -461,11 +462,18 @@ void func_002859C8(void)
         break;
     }
     case 11: {
-        int enabled = 1;
+        int enabled;
         char *a;
+        float k, sc, h;
+        int n;
+        MenuBox *pb;
 
-        func_002802E0(&box, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
-                      (int)(D_001B23A4 * 100.0f + 0.5f), 0x10, 3);
+        do { k = 100.0f; sc = D_001B23A4; h = 0.5f; } while (0);
+        pb = &box;
+        n = 3;
+        enabled = 1;
+        func_002802E0(pb, 0xF0, 0x1E0, 0x60, 0x1A0, 0x100,
+                      (int)(sc * k + h), 0x10, n);
         switch (D_001BAC80.f58) {
         case 0:
             break;

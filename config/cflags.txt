@@ -4223,3 +4223,4 @@ src/levels/shared/L00_0032CF60-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L00_003C48D0-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/levels/shared/L08_004207D0-g8.c	-O2 -G8 -ffunction-sections -g -frac2-zero-ti-por
 src/levels/shared/L00_003ABEC0.c	-O2 -G0 -ffunction-sections -g
+src/levels/shared/L22_0039D708-main-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-keep-block-order -frac2-gcse-unsplit-edges -frac2-sticky-volatile-refs -frac2-hazard-labels
