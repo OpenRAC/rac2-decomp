@@ -1,3 +1,4 @@
+/* 9 November 2026 (o38, PRE slot order): the 0x30/0x34 swap IS gcse PRE bucket order: spills y+yStep (plus reg reg, hash 14669+y+s) and row+1 (14030+r), S=163; retail needs row+1 first. Fixed by declaring row and y in a block around the row loop (regs 153/154): row+1 now bucket 2, slots match retail, 84 -> 81 aligned rows (sp +0x10 shifted); C below updated. Other S that would also work: 155/157/169-175. Still blocked by the 0x10 frame gap, madd, movz, s5/s6. */
 /* 9 November 2026 (Sonnet round 3, lessons 42-49): re-measured 1480/1484, 69 rows differ once sp offsets are ignored (208 raw). Retail has `mult; addu` with D_00239BA0 base in its own reg; madd goes away only with a two-statement `entry = D_00239BA0; entry += D_00139568[record[3]];` (state block) and a block-local `icon = D_00239BA0; icon += ...` (icon site), but both shift gcse/preheader allocation (row+1/y+step spills lost, 73-197 rows, 1472-1488 bytes), so not kept; one-expression spellings (cast, char* base, tbl local, ctx local, raw unsigned-int sum) all still madd. Purchased fallback: 5 spellings (if, &&, ?: with state/0, state=0 first) identical movz. Permuting the five global loads (119 orders) changes nothing. s5/s6: retail state has 13 refs, hoisted y+height 9 (ours swapped counts), so not a ref-count tie. Frame 0xA0/0xB0 untouched (no honest 16-byte local found). */
 /* 8 November 2026 (Sonnet round 2, lesson 49): removed fake locals `key` (retail reloads record[3] from the halfword each time) and `entry` for the icon lookup (written as D_00239BA0[D_00139568[record[3]]].icon); now 1480/1484 bytes (was 1472), 208 differing rows (251 before; no pad[4] needed any more). Also tried: gap/areaWidth/areaHeight as expressions (worse, 284), texture inlined into the call (same), bottom as one local set per row (261, worse), `y += yStep, row++` (-2). Left: s5/s6 state/bottom swap, spill slots 0x30/0x34 order, madd (mtlo/madd) where retail has mult+addu for D_00239BA0 indexing (every spelling of the index expression gives madd), purchased movz vs movn. */
 /* 8 November 2026 (Sonnet round): rewrite from retail asm and Ghidra reproduces the same C; unchanged 1472/1484, 51 lines. With a diagnostic int pad[4] the 0xB0 frame and all stack offsets match; 1 -O2 -G8 permuter run (1500 s, -j2) best 1480/1484 (worse), none cleanable. Purchased-state spelling 'state==0 && purchased' still gives movz, not movn. */
@@ -86,7 +87,7 @@ int func_002D9008(char *object)
     int active = *(char **)(D_001F2840.owner + 0xE8) == object;
     int xStart, xStep, yStart, yStep;
     int width, height, areaWidth, areaHeight, gap;
-    int index, row, column, x, y, state;
+    int index, column, x, state;
     int texture;
     unsigned long colour, pulse;
     GridItem *entry;
@@ -120,6 +121,8 @@ int func_002D9008(char *object)
         yStart = (areaHeight - height) >> 1;
     }
     index = 0;
+    {
+    int row, y;
     for (row = 0, y = yStart; row < *(int *)(object + 0x40); y += yStep, row++) {
         x = xStart;
         for (column = 0; column < *(int *)(object + 0x44); column++) {
@@ -158,6 +161,7 @@ int func_002D9008(char *object)
             record += 5;
             x += xStep;
         }
+    }
     }
     func_0027C660();
     return 2;

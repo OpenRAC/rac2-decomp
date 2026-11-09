@@ -1,3 +1,5 @@
+/* 9 November 2026 (round o34): 29 -> 27 masked aligned rows (617 words): the second post-loop label_y takes handle `(void *)i` (i is 12+ after loop 2), which puts `li a0,30` after both roundings as retail. Measured without gain: every late (after rectangle 1) handle as cB/cC/one/on2/on3/0/ya/yb/&corners/text, per call and as suffixes (35-143; A then moves to s1 or a set survives); random local declaration order (150, all 29); moving each statement 1-3 lines (best 29); x/for-init/unsigned range forms in loop 1; post-loop y locals; permuter 1500 s (best 46). Left: C in s1 and text in s3 (A live through the late color handles), fp save (flow2 never deletes a set of the hard fp, so retail fp pseudo had no set before reload), loop-1 lui v1 and align nop. */
+/* 9 November 2026 (round o32): 45 -> 29 masked aligned rows (617 words): rectangle 1 takes its y values in locals ya/yb, then `cB = color` (unsigned long) and `cC = cB` after the call, rectangles 1/4 pass cB and 2/3 cC (retail's B/C copy order now exact); loop 2 reuses the dead `color` as its column (permuter find, as func_002FA270's dead-local reuse), fixing the x2/base swap. Left: C in s1 not s2 and text in s3 not s2 (A stays live through the later (void *)color handles; handles one/0/cB/cC/unsigned-long handle variants all worse, 47-139), fp save, loop-1 lui v1 and nop, li a0,30 order. */
 /* 8 November 2026 (Sonnet round o28, lesson 49): re-measured 2464/2468. Retail's color copies are three values: A (call result, s2) -> B = A (s0, made just before rectangle 1) -> C = B (s2, jal delay slot); rectangles 1 and 4 pass B, 2 and 3 pass C, so A dies at rectangle 1. A second local `int color2 = color;` after rectangle 1 used by rectangles 2-3 (permuter find, hand-cleaned) gives the right length (617 words) and the copy chain, but with `(void *)color` handles A stays live and C lands in s1 (same masked row count, 45 -> 45-47); handles on color2 or an unsigned long copy cost 8-30 rows. Still missing: fp save, copy order, text pointer s2. */
 /* 8 November 2026 (Sonnet round, lesson 48 sweep o14): every movable single-line statement (460 variants, 1-6 places within its block) and 10206 pairs of the near-best moves (local cc1, -fno-gcse): none beats the base (still 2464/2468). */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_0028EA58 is declared int but src/game/0028EA58-g8.c is void: corrected, unchanged (2464/2468 bytes, 480 masked unaligned rows before and after). */
@@ -137,7 +139,6 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     float scaled = value * scale + half;
     int result = (int)scaled;
     void *copy;
-
     if (mode == active)
         scaled = scale;
     if (handle != 0)
@@ -147,14 +148,12 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
         scaled = half;
     return result;
 }
-
 static __inline__ int hud_coord(float value, float scale, float half, int active)
 {
     int mode = D_001B23A0;
     float scaled = value * scale + half;
     int result = (int)scaled;
     int copy;
-
     if (mode == active)
         scaled = scale;
     if (result != 0)
@@ -164,28 +163,34 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
         scaled = half;
     return result;
 }
-
 int func_002D3FA0(void)
 {
     MenuCorners corners = D_001ABA78;
     char text[32];
     int color = func_002A9588(0x60241700, 0x55F0C070, 30, 0, 0);
-    int x, x2, index, i;
+    int x, index, i;
     char *first, *second;
     int t;
     int y1, y2, y3;
     int on2 = 1, on3 = 1;
     int one = 1;
+    int ya, yb;
+    unsigned long cB;
+    unsigned long cC;
     float px, py;
     func_0027C540(0);
     func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD0), 0x60442D00, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
     func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
     func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
     func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    func_0028FC48(228, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one), 230, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one), color, 0);
-    func_0028FC48(286, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one), color, 0);
-    func_0028FC48(228, label_y((void *)color, 325.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 327.0f, D_001B23A4[0], 0.5f, one), color, 0);
-    func_0028FC48(228, label_y((void *)color, 386.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 388.0f, D_001B23A4[0], 0.5f, one), color, 0);
+    ya = label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one);
+    yb = label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one);
+    cB = color;
+    func_0028FC48(228, ya, 230, yb, cB, 0);
+    cC = cB;
+    func_0028FC48(286, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one), cC, 0);
+    func_0028FC48(228, label_y((void *)color, 325.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 327.0f, D_001B23A4[0], 0.5f, one), cC, 0);
+    func_0028FC48(228, label_y((void *)color, 386.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 388.0f, D_001B23A4[0], 0.5f, one), cB, 0);
     func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, one), 192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
     func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, one), -192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
     func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, one), 192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
@@ -215,7 +220,7 @@ int func_002D3FA0(void)
         }
         x -= 56;
     }
-    x2 = 291;
+    color = 291;
     for (i = 1; i < 12; i++) {
         index = D_001ABA74 + i;
         if (index >= 0 && index < 12) {
@@ -227,12 +232,12 @@ int func_002D3FA0(void)
             }
             if (index >= 12)
                 continue;
-            func_002D3D88(index, x2);
+            func_002D3D88(index, color);
         }
-        x2 += 56;
+        color += 56;
     }
     func_0027C660();
-    func_002FC620(30, 385, label_y((void *)0, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)0, 213.0f, D_001B23A4[0], 0.5f, on3));
+    func_002FC620(30, 385, label_y((void *)0, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
     func_002A0250();
     func_002A01C8();
     func_002A01F0();
