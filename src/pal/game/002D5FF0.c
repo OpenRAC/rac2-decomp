@@ -1,7 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002D5FF0);
-
 /* func_PAL_002D6058, the PAL copy of func_002D5480: the same C, where the object offset 0x3BE08
    becomes 0x3C210 and the callees are PAL's own. */
 extern char *D_001A8CFC[] __attribute__((sda));
