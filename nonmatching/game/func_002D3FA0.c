@@ -1,3 +1,4 @@
+/* 9 November 2026 (round o57): 27 -> 6 masked rows, size now right (2468 bytes) with -O2 -G8 -ffunction-sections -fno-gcse -frac2-frame-pointer-liveness. The switch lets flow2 delete a dead set of $fp, so a third ghost forms: the first post-loop call is label_y2 (label_y with ONE handle test; NEEDS AN OWNER RULING) whose handle is the result r of the last func_0027FAA8. That gives the s6/s7/fp ghosts, drops the loop-1 nop, and the used result frees $v0 for loop 1's lui (a REG_UNUSED call result keeps v0 from the next insn in local-alloc). Plain label_y with that handle keeps `daddu s6,v0`. Left: C in s1 (retail s2) and text in s3 (retail s2): A stays live through the late (void *)color handles. Measured without gain: late handles as cB/cC (int or unsigned long: truncation or copies), t = func_0028E588 result, call results r of FB40/FAA8/sprintf (v1 copies), hud_coord per call, 0, text, y2, ya; `color = cB` reassignment; copy-chain order; permuter 1500 s. */
 /* 9 November 2026 (switch sweep s40): -frac2-frame-pointer-liveness (+ -fno-expensive-optimizations): size 2476 -> 2468 matches, 194 differing rows; still far. */
 /* 9 November 2026 (round o34): 29 -> 27 masked aligned rows (617 words): the second post-loop label_y takes handle `(void *)i` (i is 12+ after loop 2), which puts `li a0,30` after both roundings as retail. Measured without gain: every late (after rectangle 1) handle as cB/cC/one/on2/on3/0/ya/yb/&corners/text, per call and as suffixes (35-143; A then moves to s1 or a set survives); random local declaration order (150, all 29); moving each statement 1-3 lines (best 29); x/for-init/unsigned range forms in loop 1; post-loop y locals; permuter 1500 s (best 46). Left: C in s1 and text in s3 (A live through the late color handles), fp save (flow2 never deletes a set of the hard fp, so retail fp pseudo had no set before reload), loop-1 lui v1 and align nop. */
 /* 9 November 2026 (round o32): 45 -> 29 masked aligned rows (617 words): rectangle 1 takes its y values in locals ya/yb, then `cB = color` (unsigned long) and `cC = cB` after the call, rectangles 1/4 pass cB and 2/3 cC (retail's B/C copy order now exact); loop 2 reuses the dead `color` as its column (permuter find, as func_002FA270's dead-local reuse), fixing the x2/base swap. Left: C in s1 not s2 and text in s3 not s2 (A stays live through the later (void *)color handles; handles one/0/cB/cC/unsigned-long handle variants all worse, 47-139), fp save, loop-1 lui v1 and nop, li a0,30 order. */
@@ -149,6 +150,17 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
         scaled = half;
     return result;
 }
+static __inline__ int label_y2(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_001B23A0;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = half;
+    return result;
+}
 static __inline__ int hud_coord(float value, float scale, float half, int active)
 {
     int mode = D_001B23A0;
@@ -171,7 +183,7 @@ int func_002D3FA0(void)
     int color = func_002A9588(0x60241700, 0x55F0C070, 30, 0, 0);
     int x, index, i;
     char *first, *second;
-    int t;
+    int t, r;
     int y1, y2, y3;
     int on2 = 1, on3 = 1;
     int one = 1;
@@ -204,7 +216,7 @@ int func_002D3FA0(void)
     func_00115DA8(text, D_001AB998, func_00288FB8(0x3213), func_00288FB8(0x2D55));
     func_0027FAA8(159, label_y((void *)color, 18.0f, D_001B23A4[0], 0.5f, one), 0x80F0F0F0ULL, text, -1);
     y3 = label_y((void *)color, 187.0f, D_001B23A4[0], 0.5f, one);
-    func_0027FAA8(445, y3, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
+    r = func_0027FAA8(445, y3, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
         index = D_001ABA74 - i;
@@ -238,7 +250,7 @@ int func_002D3FA0(void)
         color += 56;
     }
     func_0027C660();
-    func_002FC620(30, 385, label_y((void *)0, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
+    func_002FC620(30, 385, label_y2((void *)r, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
     func_002A0250();
     func_002A01C8();
     func_002A01F0();
