@@ -967,7 +967,7 @@ dflt:
 
 /* func_L02_003FE250 is in L02_003FE250-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_003FE8B8);
+/* func_L02_003FE8B8 is in L02_003FE8B8-g8.c. */
 
 
 /* func_L02_003FF9A0 is defined in L02_003F5430-g8.c ($gp accesses). */
