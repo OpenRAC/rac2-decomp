@@ -1,3 +1,4 @@
+/* 9 November 2026 (Sonnet round, s48): see nonmatching/levels/func_L06_004587E8.c: best C still 1564/1572, 19 aligned diffs; switch pairs, do-while(0) barriers, mult spellings all no gain. */
 /* functional: medium. Near-miss draft of retail size with the same frame: differences are allocation and scheduling, with some block order; paths the captured calls never take are unproven. */
 /* opus-1 (xhigh), v2041: NOT A MATCH. Best check.py result, default flags
  * (-O2 -G0 -ffunction-sections): 1564/1572 bytes, 0/1 USA places; 84 of 393

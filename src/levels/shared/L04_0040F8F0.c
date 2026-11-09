@@ -310,8 +310,7 @@ void func_L04_00410F10(u8 *arg0) {
     }
 }
 
-
-INCLUDE_ASM("asm/levels", func_L04_00411298);
+/* func_L04_00411298 is defined in L04_0040F8F0-hud-g8.c. */
 
 typedef struct RankState {
     u8 pad0[0xA2];
