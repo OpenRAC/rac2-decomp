@@ -1,3 +1,4 @@
+/* 9 November 2026 (o143, set-once constant lever): forced-S sweep of the s31 base (max_cuid 268, 135 buckets): S=129 gives 8 rows, S=161 9, every other odd S 125..181 18-30. Set-once constant locals only add insns (+1 each), and S=161 would need +54, so the lever does not reach it; no C change. */
 /* 9 November 2026 (Codex, inline-helper/lifetime follow-up): 311 new C
  * variants checked with game -O2 -G8 -ffunction-sections: 255 combinations
  * of matrix/direction/normal/rotation/fade/depth/scale helpers, 7 object-copy

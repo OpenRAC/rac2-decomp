@@ -1,3 +1,12 @@
+/* 9 November 2026 (o144, 1 check.py run + local scorer): spill slots are already right with the C below (check.py: only
+ * +0x494..0x49C differ), so no max_cuid/S lever is needed. Deciding key, from -dS/-dR dumps: sched1 AND sched2 tie the
+ * two PRE copy stores (4334 self+0x100 via s5, 4340 self+0x98 via v1) on priority, reg weight (both kill their source),
+ * class and dependents (13 each: 11 calls + s5's `i = 0` anti-dep vs v1's next write), so LUID = PRE insertion order =
+ * expr index decides: (763)+0x100 is first hashed at the 0x1044 block (idx 82) before (763)+0x98 at 0x10D8 (idx 84).
+ * Retail's order (sw v1; sw s5; jal) then lets reorg put sw s5 in the slot and `i = 0` (s5) after the call. bb0 stays
+ * keyed on self (87) because o is MEM(ADDRESSOF) at cse1 and cprop is global-only; nonempty do-while(0) groups at the
+ * top leave no label (99 words), any o use in bb0 is a fresh pseudo (764, 209 words), o in the last statements: 2/209.
+ * Needs a bb boundary between `self = o` and the 0x98/0x100 setup, which retail's straight-line entry does not have. */
 /* 9 November 2026 (o99, 7 check.py runs): C below = owner-ruled char ** helper. Only the first fade store goes through
  * hud_ammo_fade_lo(&o) (o+0x1288 -> 0x1288($s4), as retail); the +4 store stays on self+0x1288 via a char * helper, so
  * every PRE expression is still shared. check.py -O2 -G0 + keep-float-pun-source: 6048/6048, only 3 words differ

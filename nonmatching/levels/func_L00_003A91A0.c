@@ -1,3 +1,4 @@
+/* 9 November 2026 (o143, set-once constant lever): forced S 173..211 on the s10 base (max_cuid 346) never gets below 23 rows (S=183; 24 at 185/201/207). The slot order needs the second reload round described below, not a bucket count, so adding constant-local insns cannot close it; no C change. */
 /* 9 November 2026 follow-up: retained body replays at 1524/1524 bytes, 0/27 places
  * in each of USA v1.01, v2.00 and PAL, using game -O2 -G8 -ffunction-sections.
  * Excluding relocation immediate bits, 33 instruction words differ: 27 spill-slot

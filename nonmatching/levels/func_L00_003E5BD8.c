@@ -1,3 +1,4 @@
+/* 9 November 2026 (o143, set-once constant lever): not applied. Each set-once constant local read in a loop adds one insn at gcse, but this body needs S=111 (about 20 fewer insns, notes below); no larger S reaches 0 (forced 11..401). */
 /* 9 November 2026 (Codex, structured views and inline helpers): 249 new C
  * variants compiled in the existing container with -O2 -G8 -ffunction-sections
  * -ffast-math. All 122 object/data/table/workspace variants produce complete
