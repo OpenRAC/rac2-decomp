@@ -1,3 +1,4 @@
+/* 9 November 2026 (round o70): 6 rows/2468 -> 1 row/2476 (check.py 0/28, temporary unit; local scorer 1 retail row). C below is new: loop 2 reuses the loop-1 column `x` (x = 291; x += 56): merged x (14 refs) ranks below y3 (0.21-0.239 vs 0.222) and conflicts with it, so y3 s1, x and loop-2 column s2, base2 s1, and A/C/text s2 as retail; `x = 235;` after the r = func_0027FAA8(445, ...) call; y3 in a group `do { y3 = label_y((void *)e, ...); } while (0);`, whose loop notes keep the dead copy test of e to sched2, so x/i/s5 land in retail's delay slots; cC = cB before the rect-1 call (no effect alone). Left: row 228 (rect 2 passes B: cse make_regs_eqv keeps cB canonical because cC does not outlive cB; a later (void *)cC use costs a truncation), plus 2 extra words: `daddu v1,v0` copy of e (label_y's copy test) and the loop-1 align nop that follows from it. Handles without the copy (label_y2/label_y3 e, text, 0, &corners, y1/y2, call result passed directly, e set inside the group, second = 288FB8 split, explicit i = 0) give 2468 bytes but x lands after the 288FB8 call and i in the FAA8 slot (4 rows); uninitialised handles give 1 row/2468 (not allowed). Measured without gain: col2 as color (A prio 0.1385 > base2 0.125), ghosts one/one2 as col2, do-while around cC = cB (loop notes break f20-f22), dead-test L padding (dead tests do not count in L). */
 /* 9 November 2026 (round o67): body unchanged (6 rows); new 9-row form (2476 bytes) gets C, text, A, B and 0x8710 all as retail. Recipe (from o60's y.c): every handle after rectangle 1 non-A, ya/yb via hud_coord (A refs drop to 2, so A is allocated after `one`), y1/y2/text-18 hud_coord, y3 label_y((void *)e) with e = text-18 FAA8 result, active on3 for text-18/y3; loop-2 column its own dead local yb. global.c then: `one` (ghost, sprites..y2) takes s1, A s2 (s0 excluded by 0x8710), C s2, text s2. Left: rect 2 passes B (row 228), loop-2 column/base s1/s2 swap (column 7 refs/82 insns outranks base 5/80; reusing color as column fixes it but gives A 9 refs/194 = prio 0.139 > `one` 0.112 and loop-2 base 0.125, so A takes s1: A needs prio < 0.125, e.g. 8 refs), v1 copy of e (row 446), loop-1 nop + 8 bytes. Priority = floor_log2(refs)*refs/live_length, refs weighted by loop depth (read with -dl: "Register N used R times across L insns"). Permuter seeded from y.c interrupted (disk full). */
 /* 9 November 2026 (round o60): still 6 masked rows, 2468 bytes (check.py 0/28 in a temporary unit). func_0028EA58 now declared void as in src (no code change). Why C/text miss s2: global.c picks the first used, conflict-free saved reg, so A (pseudo color) only avoids s1 when it is live across the local-alloc s0/s1 uses near sprintf/y3; that same life blocks C and text. Measured: with every late handle non-A (rect hud_coord, EA58/E868 handle t, y1 hud_coord: these are free, still 6 with A live), A and C share s1 and text gets s2 (15-17); color reassigned to the FAA8 result as y3 label_y2 handle gives A s2 and text s2 but C s1 (25). Scripted: uniform and per-call handles (color/cB/cC/int cB,cC/long/0/one/on2/on3/ya/yb/&corners/t/call results/text/y1/y2, label_y vs label_y2, hud_coord), 3 coordinate descents per space, full cartesian of the last three handles (1728), split active locals (no effect: one2 is not used), color handles on sprites/post-loop (no effect); permuter 1500 s (best 10). Next: something conflicting with C that prefers s1 (regs_someone_prefers) or keeps s1 out of regs_used_so_far until C is allocated. */
 /* 9 November 2026 (round o57): 27 -> 6 masked rows, size now right (2468 bytes) with -O2 -G8 -ffunction-sections -fno-gcse -frac2-frame-pointer-liveness. The switch lets flow2 delete a dead set of $fp, so a third ghost forms: the first post-loop call is label_y2 (label_y with ONE handle test; NEEDS AN OWNER RULING) whose handle is the result r of the last func_0027FAA8. That gives the s6/s7/fp ghosts, drops the loop-1 nop, and the used result frees $v0 for loop 1's lui (a REG_UNUSED call result keeps v0 from the next insn in local-alloc). Plain label_y with that handle keeps `daddu s6,v0`. Left: C in s1 (retail s2) and text in s3 (retail s2): A stays live through the late (void *)color handles. Measured without gain: late handles as cB/cC (int or unsigned long: truncation or copies), t = func_0028E588 result, call results r of FB40/FAA8/sprintf (v1 copies), hud_coord per call, 0, text, y2, ya; `color = cB` reassignment; copy-chain order; permuter 1500 s. */
@@ -185,10 +186,12 @@ int func_002D3FA0(void)
     int color = func_002A9588(0x60241700, 0x55F0C070, 30, 0, 0);
     int x, index, i;
     char *first, *second;
-    int t, r;
+    int t, r, e;
     int y1, y2, y3;
     int on2 = 1, on3 = 1;
     int one = 1;
+    int one2 = 1;
+    int one3 = 1;
     int ya, yb;
     unsigned long cB;
     unsigned long cC;
@@ -198,26 +201,28 @@ int func_002D3FA0(void)
     func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
     func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
     func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    ya = label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one);
-    yb = label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one);
+    ya = hud_coord(326.0f, D_001B23A4[0], 0.5f, one);
+    yb = hud_coord(387.0f, D_001B23A4[0], 0.5f, one);
     cB = color;
-    func_0028FC48(228, ya, 230, yb, cB, 0);
     cC = cB;
-    func_0028FC48(286, label_y((void *)color, 326.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 387.0f, D_001B23A4[0], 0.5f, one), cC, 0);
-    func_0028FC48(228, label_y((void *)color, 325.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 327.0f, D_001B23A4[0], 0.5f, one), cC, 0);
-    func_0028FC48(228, label_y((void *)color, 386.0f, D_001B23A4[0], 0.5f, one), 288, label_y((void *)color, 388.0f, D_001B23A4[0], 0.5f, one), cB, 0);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, one), 192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 36.0f, D_001B23A4[0], 0.5f, one), -192, label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 16, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, one), 192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
-    func_0028EA58(func_0028E588(0xEAA8, 0), 400, label_y((void *)color, 228.0f, D_001B23A4[0], 0.5f, one), -192, -label_y((void *)color, 96.0f, D_001B23A4[0], 0.5f, one), &corners);
-    func_0028E868(func_0028E588(0xEAA8, 1), 402, label_y((void *)color, 50.0f, D_001B23A4[0], 0.5f, one), 89, label_y((void *)color, 115.0f, D_001B23A4[0], 0.5f, one), 64);
-    y1 = label_y((void *)color, 116.0f, D_001B23A4[0], 0.5f, one);
-    func_0027FB40(445, y1, 0x80F0F0F0ULL, func_00288FB8(0x3212), -1);
-    y2 = label_y((void *)color, 134.0f, D_001B23A4[0], 0.5f, one);
-    func_0027FB40(445, y2, 0x80F0F0F0ULL, func_00288FB8(0x3213), -1);
-    func_00115DA8(text, D_001AB998, func_00288FB8(0x3213), func_00288FB8(0x2D55));
-    func_0027FAA8(159, label_y((void *)color, 18.0f, D_001B23A4[0], 0.5f, one), 0x80F0F0F0ULL, text, -1);
-    y3 = label_y((void *)color, 187.0f, D_001B23A4[0], 0.5f, one);
+    func_0028FC48(228, ya, 230, yb, cB, 0);
+    func_0028FC48(286, hud_coord(326.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord(387.0f, D_001B23A4[0], 0.5f, one), cC, 0);
+    func_0028FC48(228, hud_coord(325.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord(327.0f, D_001B23A4[0], 0.5f, one), cC, 0);
+    func_0028FC48(228, hud_coord(386.0f, D_001B23A4[0], 0.5f, one2), 288, hud_coord(388.0f, D_001B23A4[0], 0.5f, one2), cB, 0);
+    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 16, label_y((void *)t, 36.0f, D_001B23A4[0], 0.5f, one2), 192, label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 400, label_y((void *)t, 36.0f, D_001B23A4[0], 0.5f, one2), -192, label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 16, label_y((void *)t, 228.0f, D_001B23A4[0], 0.5f, one2), 192, -label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 400, label_y((void *)t, 228.0f, D_001B23A4[0], 0.5f, one2), -192, -label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    t = func_0028E588(0xEAA8, 1); func_0028E868(t, 402, label_y((void *)t, 50.0f, D_001B23A4[0], 0.5f, one2), 89, label_y((void *)t, 115.0f, D_001B23A4[0], 0.5f, one2), 64);
+    y1 = hud_coord(116.0f, D_001B23A4[0], 0.5f, one2);
+    e = func_0027FB40(445, y1, 0x80F0F0F0ULL, func_00288FB8(0x3212), -1);
+    y2 = hud_coord(134.0f, D_001B23A4[0], 0.5f, one2);
+    e = func_0027FB40(445, y2, 0x80F0F0F0ULL, func_00288FB8(0x3213), -1);
+    e = func_00115DA8(text, D_001AB998, func_00288FB8(0x3213), func_00288FB8(0x2D55));
+    e = func_0027FAA8(159, hud_coord(18.0f, D_001B23A4[0], 0.5f, on3), 0x80F0F0F0ULL, text, -1);
+    do {
+    y3 = label_y((void *)e, 187.0f, D_001B23A4[0], 0.5f, on3);
+    } while (0);
     r = func_0027FAA8(445, y3, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
@@ -235,7 +240,7 @@ int func_002D3FA0(void)
         }
         x -= 56;
     }
-    color = 291;
+    x = 291;
     for (i = 1; i < 12; i++) {
         index = D_001ABA74 + i;
         if (index >= 0 && index < 12) {
@@ -247,9 +252,9 @@ int func_002D3FA0(void)
             }
             if (index >= 12)
                 continue;
-            func_002D3D88(index, color);
+            func_002D3D88(index, x);
         }
-        color += 56;
+        x += 56;
     }
     func_0027C660();
     func_002FC620(30, 385, label_y2((void *)r, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));

@@ -327,7 +327,7 @@ void func_L00_003ADA30(char *moby)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L00_003ADCD8);
+/* func_L00_003ADCD8 is defined in L00_003ADCD8-g8.c. */
 
 
 /* func_L00_003ADEA0 is defined in L00_003A8E28-g8.c. */

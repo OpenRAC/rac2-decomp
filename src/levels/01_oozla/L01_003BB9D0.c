@@ -113,7 +113,7 @@ void func_L01_003BDF28(char *a0)
 
 /* func_L01_003BCA38 is in L01_003BCA38.c. */
 
-INCLUDE_ASM("asm/levels", func_L01_003BCEC8);
+/* func_L01_003BCEC8 is in L01_003BB9D0-g8.c. */
 
 
 /* func_L01_003BD410 */

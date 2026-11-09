@@ -333,6 +333,8 @@ ordinary object pointers, not vector values. Hardware alignment behavior does
 not make those out-of-bounds C objects valid. A complete object and a truthful
 lowering must be established before reopening it; no handwritten-assembly
 classification follows merely from this failed reconstruction.
+**9 November 2026:** matched in `src/levels/shared/L00_003ADCD8-g8.c` with a unit-private
+inline-asm 16-byte swap helper, allowed by owner ruling.
 
 **29 October 2026 cross-release integration:** `func_L15_00434D28` passed its
 local PAL check but failed strict linking because its direct in-unit call needed
