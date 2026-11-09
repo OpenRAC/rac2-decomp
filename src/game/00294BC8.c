@@ -216,7 +216,7 @@ u32 func_00294EC8(s32 index) {
     return previous;
 }
 
-INCLUDE_ASM("asm/game", func_00294F10);
+/* func_00294F10 is defined in 00294BC8-map-setup-g64.c. */
 
 /* shared native body of family 9306cc1f965a5c85 */
 int func_00295680(int arg)

@@ -4277,3 +4277,4 @@ src/us2/levels/shared/L08_003CF3E8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2
 src/us2/levels/25_wupash_nebula/L25_0040E7A8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/23_damosel_orbit/L23_0041EF48-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g
 src/levels/shared/L04_00402D90-hud-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/game/00294BC8-map-setup-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g -Wa,--r5900-la-addend=sn

@@ -1,66 +1,14 @@
-/* 9 November 2026 (round o100, today's HUD idioms, ~330 local cc1 scores): label_y4 is new here. Group form: label_y3/label_y4 on case 2's y with handles text/(void *)textX2/label (y4 or other handles: 12-20 bytes off), and y3/y4 on each of the other 9 label_y calls: best stays 2 rows. Label-before-ori-a2 form (no group, label_y((void *)textX2)): y2/y3/y4 on the 7 textX draws, singles and pairs (157 variants): no 3516; best 8 bytes off (case 0/1 tails still merge, or y3 swaps v0/v1 in case 1). Groups with start 0-4 and end after label_y or after the call, with and without -malign-loops=2: none below 2. The format strings take exactly the args passed, so idiom (c) does not apply. */
-/* 9 November 2026 (round o71b, tails): retail's case 0 and case 1 second-draw tails are byte-identical from mul.s (mul.s f0,f0,f1; add.s f0,f0,f20; cvt.w.s f1,f0; mfc1 a1,f1; b 0041E25C; daddu a0,v0); the only visible difference is earlier (lw 0x2450(gp)/addiu -0x3C vs lw 0x2438(gp)/addiu -0x50). So at jump2 they differed only invisibly: the fix_truncsfsi2 SI scratch clobber (ours v1 in both; case 2 v0) or where sched2 put a0=v0 before reorg moved it to the slot. On the label-before-ori-a2 form (no group, label_y((void *)textX2) in case 2): a local `one = 1` as active in case 1 (top/before/both draws) folds to 1, 3496; label_y/label_y2/label_y3 mixes on the case 0 and case 1 second draws: 3484-3504 bytes, no match. */
-/* 9 November 2026 (round o71, sched dumps): the 2 rows are a sched2 rank_for_schedule tie at t=7 (priority 21 and class 3 for all three; sched1 leaves LUID order a1 lo_sum (410) < a2=v0 (412) < a0=sp (408) by reg weight). Forward-dep counts: a0 4 {next call, LOOP_END barrier via its sp use, textX2's a0 set, sprintf call}, a1 3 {next call, fix->a1, call}, a2 3 {next call, ori a2, call}; retail's a1,a0,a2 needs a1 >= a0 > a2, impossible while ori a2 is in the same sched2 block (a1 is always 3, a2 at least 3; a second do-group after the sprintf gives a1,a2,a0, 14 rows). Measured: with a label before ori a2 during sched2 (no group, label_y((void *)textX2), its first handle jump survives flow2) the counts become a1 2, a0 2, a2 1 and case 2 gives retail's order exactly, but that old label is reused by jump2's cross-jump, so its jump_chain merges case 1 into case 0 (3496). flow2 deletes zero-use labels, so retail's label must be kept through sched2 and still be new at jump2, or case 0/1 tails must differ in RTL at jump2 (fix scratch). Helpers label_y/label_y2/label_y3 x handles textX2/label/text/D_L05_001B1440 x {no group, group, group ending after sprintf}: nothing below 2 rows. */
-/* 9 November 2026 (Sonnet round s45): label_y2 on each of the 10 calls, pairs and sets: base 2 rows, best tie (call 5) or 20+. No gain. */
-/* 9 November 2026 (Sonnet round, s43, lesson 52): scripted do { real_op; } while (0) sweep over every 1-3 consecutive simple statements in the function (all positions) plus all disjoint pairs of groups, masked and unmasked scores, and every -frac2-* switch (single and pairs) on the unit: best stays 2 rows; no group or switch improves it. */
-/* 8 November 2026, Sonnet round (o24, lesson 49): re-measured 2 rows (local cc1). Case 2 locals checked against retail (label v0->a2, textX2 straight to a0, y in a1: all real). Label call inlined into the sprintf (one case 723, all cases 743), textX2 inline (848), fmt local (729), obj local, buf = text local, &text[0]: all 2 or worse. */
-/* 8 November 2026, Sonnet round (o12, lesson 48 sweep): scripted local-cc1 sweep of every simple statement (incl. label_y's) moved up/down 1..6 lines, also across do-group edges (540+216 variants), plus 964 pairs of neutral moves: none below 2 rows. */
-/* 8 November 2026, Sonnet round (o10): still 2 rows. sched2 -dR deps at the 0041E20C tie (after lw a3): a0=sp has 4 forward deps (call, textX2's a0 output, LOOP_END barrier via its sp use, next call), a1 lo_sum 3, a2 3; ranks tie on priority/class, so dep count picks a0. Retail needs count(a1) >= count(a0) > count(a2). Group ending before label_y or before textX2 (3 forms) or no group: 883 bytes; textX2 after label_y: 8 rows; label inline / &text[0]: no gain. 25-minute permuter (-j2): nothing below base. */
-/* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_002ED578 is declared void but src/game/002ED578.c returns int: corrected, 5 -> 9 rows (worse). func_00300968 is declared (void *, f32, f32, s32, f32, f32) but src/game/00300618.c:305 is (char *, int flags, f32 x4): calls reordered to (object, colour, x, y, 1.0f, 0.0f) give 2 -> 18 rows (argument set-up order changes). The matched sibling L05_00420360-g8.c carries the same extern spelling as this note. */
-/*
- * 8 November 2026 (Sonnet round): best now 3516/3516 bytes, 2 swapped insns (0041E20C/10: retail
- * addiu a1,0x1448 before daddu a0,sp at case 2's func_00115DA8 call); needs cflags line
- * "-O2 -G8 -ffunction-sections -malign-loops=2" (else a .p2align nop). Case 2 below: body in a
- * do { } while (0) group, label_y result in a local y, handle `text` (tests fold in jump1, so no old
- * label; the LOOP_END note is the sched2 barrier and jump2 makes a new label, so case 1 no longer
- * merges into case 0). Why: flow2 deletes label_y's mode test and second handle test but keeps the
- * first (its fall block still holds the second), so label 447 survives to jump2. Tried: do-group
- * starting at each statement (2-14 rows), two groups, handle colors (same), &global/fmt (not folded),
- * handle (void *)textX2 in the group (3496), half local (3440); permuter 25 min from this C: no gain.
- * 8 November 2026 (re-measure): still 3496/3516, 0/1 places, same single 5-insn cross-jump.
- * From the jump2/sched2/greg dumps: jump2 sends case 0's and case 1's second-draw calls into
- * case 2's call (label before `ori a2`), then merges case 1's tail [mul.s, add.s, fix, a0=v0]
- * into case 0's (4 insns >= the minimum 2). All seven label_y blocks except case 2 get mode in
- * a0 (local-alloc's fake lifetime: mode's load sits right after the float that frees v1) and
- * fix scratch v1 (reload takes the first free call-used reg); case 2 gets mode v1, scratch v0.
- * So a different scratch would need mode in v1, but then x's copy preference gives it a0
- * (visible `addiu a0`, as in case 2). Tried, no change: a `y2` local for the case 1 label_y
- * result; case 0's second draw with its own block-local x; handle passed as the expression
- * (void *)(D_L05_001B1428 - 80). Handle `text`: tests fold away (3544). `active` 2: 3520 (fix
- * result goes to v1 plus a move to a1). Open: which RTL difference kept retail's two tails apart.
- * 8 November 2026 (round 2): the L10 donor's switch is a different shape (score/object calls),
- * so it gives no evidence for these tails. Cause found in the EE gcc jump.c: cross-jumping only
- * walks jump_chain for a label whose uid is < max_uid (a label that existed before jump2).
- * Here case 0's call merges into case 2's call at case 2's handle-test label (code_label 447, right
- * before `ori a2`). That label existed before jump2, so case 1 then finds case 0's jump on its
- * chain and merges. In retail the label before case 2's `ori a2` must have been new (made by
- * jump2), so no chain search happened; the C has to stop that label from directly preceding
- * a2. Tried with no change: case 2 with no scope block, or with a function-level x; case 0 in its
- * own block with its own x. Case 2 handle 0 or `text` folds the tests: no merges, 3528, 858 rows.
- *
- * 7 November 2026 (donor port): best check.py, USA v1.01 (level 05): 3496/3516 bytes, 0/1 places.
- * Ported from matched func_L10_00421790 (src/levels/10_hrugis_cloud/L10_00421790-g8.c, same
- * routine, label_y idiom, default -g8 flags). Build as its own unit
- * src/levels/05_feltzin_system/L05_0041DF58-g8.c (no cflags line) and replace the INCLUDE_ASM in
- * L05_00314E28.c with a pointer comment.
- * Aligned diff (mnemonic+registers, relocations masked): 874 of 879 retail rows line up; the only
- * difference is 0041E1C8..0041E1E0, the tail of case 1's second draw. Retail keeps
- * `addiu v0,v0,-0x50; mul.s; add.s; cvt.w.s; mfc1 a1; b .L0041E25C; daddu a0,v0`; this C
- * cross-jumps those five insns into case 0's identical tail (`b` back 0x44 insns).
- * Why (from the compiler source, jump.c): after sched2 the cross-jump pass sends case 0's and case 1's
- * final calls into case 2's call at the old label_y label before `ori a2`, so both jumps share that
- * label's jump_chain and case 1 then merges with case 0. Retail does not, so their patterns differed
- * at that point. The only invisible field is fix_truncsfsi2's SI scratch (v1 in both here, because
- * mode sits in a0 and x in v0); mode in v1 for one draw would give scratch a0 and stop the merge.
- * A diagnostic `active` 2 in case 1's second draw stops the merge (not landable).
- * Tried with no change (still 6 rows): `half` local or literal in cases 0/1, textX vs textX2 in
- * either draw, an inline x expression, a `fmt` local in case 0/1, a `row` local for the y value,
- * label_y with mode read after result. Plain y (no label_y) in case 2: 33 rows.
- * Needed and kept: case 2 uses its own textX2 (x straight into a0); cases 1 and 3 use `half` and
- * textX2 for the second draw (fixes the a3/a0 order at 0041E14C and 0041E2EC).
- * Older drafts (task v1866, 31 October 2026: 3520/3516, 667/880 masked rows) are superseded.
- */
 #include "common.h"
+
+/* func_L05_0041DF58 (DrawFeltzinMissionHud): the Feltzin System mission HUD. The mission text for
+   the current stage, the ship's health and ammo bars, the weapon icons and the three corner sprites.
+   Ported from the matched func_L10_00421790 (L10_00421790-g8.c), the same routine for Hrugis Cloud.
+
+   Every text and sprite label y goes through label_y, the HUD label idiom (dead-test helper, allowed
+   by owner ruling). Case 1's second label passes the stage global, which is 1 in that case, as
+   `active` (a value holding 1, as allowed by owner ruling): with the literal 1, both of case 0's and
+   case 1's identical second-draw tails reach jump2 with equal RTL and are cross-jumped into one;
+   retail keeps them apart. */
 
 typedef struct { u8 bytes[16]; } Block;
 
@@ -198,20 +146,18 @@ s32 func_L05_0041DF58(void) {
         label = func_00288FB8(0x2f83);
         func_00115DA8(text, D_L05_001B1450, label, a, b, c);
         textX2 = D_L05_001B1428 - 80;
-        func_0027F5B8(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, 1), 0x80808080, text, 128);
+        /* active is the switch value, 1 in this case (allowed by owner ruling, 2026-11-09). */
+        func_0027F5B8(textX2, label_y((void *)textX2, D_L05_001B142C - 8, D_L05_001B2D84, half, D_L05_001B1360), 0x80808080, text, 128);
         break;
     }
     case 2: {
-        s32 textX2, y;
+        s32 textX2;
 
-        do {
-            func_L05_00421B98(0, 1, 0, 1);
-            label = func_00288FB8(0x31d1);
-            func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
-            textX2 = D_L05_001B1440 - 60;
-            y = label_y(text, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1);
-        } while (0);
-        func_0027F5B8(textX2, y, 0x80808080, text, 128);
+        func_L05_00421B98(0, 1, 0, 1);
+        label = func_00288FB8(0x31d1);
+        func_00115DA8(text, D_L05_001B1448, label, D_L05_00221D10.objectives);
+        textX2 = D_L05_001B1440 - 60;
+        func_0027F5B8(textX2, label_y((void *)textX2, D_L05_001B1444 - 8, D_L05_001B2D84, 0.5f, 1), 0x80808080, text, 128);
         break;
     }
     case 3: {
