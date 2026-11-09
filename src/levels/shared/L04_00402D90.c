@@ -479,8 +479,6 @@ void func_L04_0040C0C0(L04Quad *position, L04Quad *direction, int count, int mod
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L04_0040C880);
-
 extern void func_L04_0040D148();
 
 extern void func_L04_0040CE30();

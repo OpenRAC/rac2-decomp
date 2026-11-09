@@ -843,6 +843,7 @@
 #define UpdateVisibilityBitmap           func_0027A288
 #define UpdateBeamLinkEmitter            func_L09_003F04D0
 #define DrawMapScreen                    func_002D6F38
+#define DrawGrelbinBeamEffect            func_L19_00417F88
 #define UpdateBreakablePickupSpawner     func_L19_004203F0
 #define PlacePointWithPolarJitterFlat    func_L11_0043ACB0
 #define LayOutVerletChain                func_L11_00438248
@@ -910,6 +911,7 @@
 #define FollowWaypointPath               func_L23_004186D0
 #define DestroyCrate                     func_003120C8
 #define DrawHrugisRibbon                 func_L10_0039DA48
+#define DrawMenuItemGrid                 func_002D9008
 #define UpdateMenuChoiceListWidgets      func_003489E8
 #define UpdateHeroHeldObject             func_L00_002D5940
 #define UpdateItemPurchaseConfirmation   func_L00_00373F48

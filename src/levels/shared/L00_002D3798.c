@@ -815,8 +815,6 @@ int func_L00_002D5E30(int *a0, int *a1, int *a2) {
     *a1 = sum;
 }
 
-INCLUDE_ASM("asm/levels", func_L00_002D5EB8);
-
 extern int D_001A7908 __attribute__((sda));
 extern char *D_L00_001B8E10;
 extern unsigned char D_00189E20[];

@@ -446,8 +446,6 @@ void func_002D8EC0(char *source, short *row, int first, int second, int x, int y
 }
 
 
-INCLUDE_ASM("asm/game", func_002D9008);
-
 #define NOT_SDA __attribute__((section(".data")))
 
 extern unsigned char r1_D_001414F4 NOT_SDA;
