@@ -47,7 +47,7 @@ void func_L06_0036F728(s32 a0, s32 a1) {
         D_L06_00139A28[v1].fieldC = a1;
 }
 
-INCLUDE_ASM("asm/levels", func_L06_00382608);
+/* func_L06_00382608 is defined in L06_00382608.c. */
 
 extern float func_00282E48(char *, char *);
 extern float func_00282C48(float);

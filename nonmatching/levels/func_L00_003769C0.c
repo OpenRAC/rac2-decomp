@@ -1,3 +1,10 @@
+/* 9 November 2026 (Opus round o108): 1216/1216, 0/27, 5 differing words (C below): `do { j=0; top: ...` with no inner
+ * group keeps retail's code and tbl a1; only j a2/wanted a3 swap (retail a3/a2). j 12 refs/22 = 1.64 > wanted 6/8 = 1.5.
+ * Live lengths follow the scheduled code, so only refs can move: retail needs j=0 at depth 2 (11 refs, tie, wanted lower
+ * pseudo). `if (*wanted != key) { j++; goto top; }` makes j live 24 (search regs exact) but adds one insn to colour and
+ * idx (80/171 > 33/71: s2/s3 swap, 14 words). Worse: j=0 before a group starting with `top` (1204), constant locals
+ * (stride/field/size) in an inner group (1208-1220), tbl local (hoisted), groups around the key load or wanted (1228),
+ * group after `off` (1220), colour reset before the label call (ori scheduled early), duplicated `b<<=24` (1236). */
 /* 9 November 2026 (Opus round o103): 1216/1216, 0/27, 13 differing words, one register rotation. Nonempty form of the
  * probe: `do { do { j=0; } while(0); top: ... } while(0);` (j=0 moved into the inner group) gives retail's size, the
  * loop note and the bne slot; only the search registers rotate: j a1/tbl a2/wanted a3 vs retail a3/a1/a2. Deciding
@@ -109,9 +116,9 @@ void func_L00_003769C0(void)
             int *wanted;    /* declared before j: equal allocation priorities go to the lower pseudo */
             int j;
 
+            do {
             j=0;
         top:
-            do {
                 off=j*8;
                 key=*(int *)((char *)D_L00_0028E9F0+off);
                 if(key) {
