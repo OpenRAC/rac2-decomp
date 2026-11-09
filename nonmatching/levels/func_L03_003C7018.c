@@ -1,3 +1,4 @@
+/* 9 November 2026 (Sonnet round s45, owner ruling 2026-11-09): label_y2 (label_y with ONE handle test, allowed) on the second title draw only: quick scorer 23 -> 21 rows (68 -> 66 unmasked words), no match. First call 30, both 28; the other one-test forms tie. Body below carries it. */
 /* 8 November 2026 (Sonnet round s33, lesson 49): x/c/d are fake but inlining them in draw 2 (no group) gives the same 23 quick-scorer rows; a `zero` local for both draws 150; shift declared after label/split 23; one = 1 after the group 23; for (i = 0 ...) 23. No change from the retained C. */
 /* 8 November 2026 (Sonnet round s23): fresh C from retail asm (plain round_y helper, early return, plain for, no groups) is 668 bytes / 153 rows (vs retained 23 on the quick scorer): the early-return form hoists the key copy above the draws and the 0.5f lands in $f22; plain calls lose the group barriers. A scripted lesson-48 sweep (every single statement moved 1..3 places inside same-indent runs, 58 variants) found no variant below the retained C (best tie). Retained C unchanged. */
 /* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build reproduces retail in any of the 5 clusters: SN builds give our exact 656-byte order in all; stock 991111 differs only in cluster 1 (not retail either); 2.96 is 652 bytes. Not a compiler-build difference. */
@@ -187,6 +188,18 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
         scaled = half;
     return result;
 }
+static __inline__ int label_y2(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L03_001B3280;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = half;
+    return result;
+}
 
 static __inline__ int screen_coord(int mode, float value, float offset, int one)
 {
@@ -221,7 +234,7 @@ int func_L03_003C7018(void)
 
             do {
                 title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
-                row = (float)label_y(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
+                row = (float)label_y2(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;

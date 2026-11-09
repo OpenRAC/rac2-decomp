@@ -1,3 +1,6 @@
+/* 9 November 2026 (round o63, label_y3 per owner ruling, L05 measured, ~230 local compiles): still 5 rows; C below unchanged. label_y3 (label_y with the mode test after both handle tests, mode read at top) at the 242 sites with case 0 kept: (void *)n in cases 1-3 gives 14 rows (sprintf a0/a1 swap returns AND the 242 row $f0/$f1 swap stays); best handle mix buf/buf 10 (f swap only); all 27 dead-assignment RHS mixes (scale/half/value) unchanged; mode read after the multiply, between the handle tests, or inline at the test: 10-22 rows (read between the tests with buf fixes the f rows but adds sprintf + 3 strlen-call rows). So the f0/f1 rows are right only when the mode test comes first (label_y/label_y2), and sprintf only when no mode load is early; label_y3 does not join the two. */
+/* 9 November 2026 (round o62, L05 measured, applies to L15, ~700 local compiles): still 5 rows; C below unchanged. Found the mechanisms: (1) sprintf a0/a1/a2 order is a sched2 tie on dependent counts: without a block end after the 242 row, a0=sp gets extra dependents (the strlen a0 set, the two calls, the block-end branch) and goes first; (2) final.c gives the first CODE_LABEL after any NOTE_INSN_LOOP_BEG 8-byte alignment, so a do-while starting at the sprintf (which does fix the sprintf rows in every case: label_y2(n) + `do { n = sprintf(...); row = label_y2(n, 242...); } while (0);` leaves only nops) pads before case 1 else label (retail row 469, odd) and case 3 MenuY tail (row 701, odd); groups starting earlier (index block / reward*=10 test, so the even join label 432/666 is inside) keep size but move the lbu/index rows and do not fix sprintf (the loop note must sit at the 432/666 block start). So retail had no loop there. Also measured: 242 handles r, headerX, blink, color, remainder (size changes), the 101/131 call results and lens (extra move), the 131 row (3 rows per case: 131 a1/t1 order), D_L05_001A904C (same as n); a two-handle-test helper without mode test fixes sprintf and 101 in cases 1-3 but swaps the 242 row f0/f1 (local-alloc: the mode load between the scale load and mul is what gives retail regs; 13 helper/expression variants unchanged), 10 rows. */
+/* 9 November 2026 (round o61, label_y2 sweep, L15 measured): 8 -> 5 masked rows, 3420 bytes, C below (this level's text ids 0x2FEF..0x2FF7). Mechanism: the 101 rows' a0/t0 order is a sched1 reg-weight tie, right only when x dies at the 101 call, so no later label may use x as handle; the sprintf args and the 242 row are right only when a sched2 block boundary sits after the 242 row (the x handle's surviving dead jump gives it). Case 0 matched: `do { sprintf(buf, ...); row = label_y(buf, 242, ...); } while (0);` (buf folds the tests; the loop notes end the block). Cases 1-2 (tail-merged): label_y2((void *)n) with n = sprintf result: 101 rows right, sprintf a0/a1/a2 order left (3 rows; flow2 deletes both jumps). Case 3: kept label_y((void *)x) (2 rows: 101 a0/t0). Scripted all per-site helper x handle combos (label_y/label_y2; x, n, reward, buf, text, r, the 131 row value, fmt, a one=1 local; MenuSpriteY on the 101 rows; 1300+ compiles): the 131 row value as handle fixes 101+sprintf but breaks the 131 row (same weight tie); label_y(n) adds `move $3,$2` (mode load takes v0); reward conflicts with the 242 row in s0; one/buf/reward-in-case-0 fold. The case-0 do-while in cases 1-3 adds a .p2align nop each and, with buf, puts 0.5f in f21. No -frac2-* switch changes the rows. */
 /* 8 November 2026 (Sonnet round o19, L05 measured): still 8 rows. New: case 0 with a 242 handle helper that has no mode test before the handle tests (`if (h) s = scale; copy = h; if (copy) s = half;` then the mode test last) and sprintf's result `n` as the handle fixes that case's 101 rows and leaves no `move $3,$2` and no sprintf a0/a1 swap; only the 242 row's $f0/$f1 swap is left (value/scale, local-alloc: no mode load between scale and mul): net 2 rows fixed, 5 added in that case. A one-test or no-copy helper keeps the sprintf swap (the jump to the next label is deleted before sched2, so the row joins the sprintf block); buf/global handles fold or add a load. Not changed by: len/x/row locals, if/else MenuY expansion, two-step adds, do-while(0), scale/value/half/one locals, all mode-test orders, scale*value. Permuter (25 min, case 0 region, seeded from this): no improvement (base 150, only ties). */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_00300968 is declared (void *, f32, f32, s32, f32, f32) but src/game/00300618.c:305 is (char *, int flags, f32 x4): real-order calls (object, colour, x, y, ...) give 22 -> 26 masked rows (worse). Same result as func_L05_0041DF58. */
 /* 8 November 2026 (compiler matrix, scratch only): retained C compiled with 10 EE cc1 builds at the same flags (-frac2-* dropped for non-local builds), our as: local 991111; decomp.me 2.9-ee-991111a, 991111-01, 991111b (= SN SDK 2.4's 991111); Sony 2.96-ee-001003-1; SN 2.95.2 v2.73a/v2.74, 2.95.3 v1.07/v1.14/v1.36 (no 990721 build available). No build gives retail's 101 a0/t0 registers: stock 991111 and SN v2.73a/v2.74 keep our choice (3428 bytes); SN 2.95.3 (3500) and 2.96 (3348) change registers but not to retail's. Not a compiler-build difference. */
@@ -94,9 +97,25 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+/* label_y2: label_y with only one of its two dead handle tests (allowed by owner ruling,
+   9 November 2026; definition as in nonmatching/game/func_002D3FA0.c). */
+static __inline__ int label_y2(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L15_001B2E80;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+
+    if (mode == active)
+        scaled = scale;
+    if (handle != 0)
+        scaled = half;
+    return result;
+}
+
 s32 func_L15_0042EFE0(void) {
     char buf[128];
     f32 center, pulse, imageY;
+    s32 n;
     s32 r, remainder, color, blink, x, headerX, reward;
     char *text;
 
@@ -128,12 +147,12 @@ s32 func_L15_0042EFE0(void) {
     x = func_00283CF0(center);
     switch (D_L15_001B15C8) {
     case 0:
-        text = func_00288FB8(0x2FE2);
+        text = func_00288FB8(0x2FF4);
         {
             s32 row = MenuY(101.0f, -2.0f);
             func_0027FB40(x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
         }
-        text = func_00288FB8(0x2FE7);
+        text = func_00288FB8(0x2FEF);
         {
             s32 len;
             s32 row;
@@ -148,11 +167,13 @@ s32 func_L15_0042EFE0(void) {
         }
         if (D_001A7A0A) reward *= 10;
         if (reward) {
-        func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
         {
             s32 len;
             s32 row;
-            row = label_y((void *)x, 242.0f, D_L15_001B2E84, 0.5f, 1);
+            do {
+                func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
+                row = label_y(buf, 242.0f, D_L15_001B2E84, 0.5f, 1);
+            } while (0);
             len = func_001157AC(buf);
             func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
         }
@@ -161,12 +182,12 @@ s32 func_L15_0042EFE0(void) {
         break;
     case 1:
         if (D_L15_001B1520_gp[0]) {
-            text = func_00288FB8(0x2FE3);
+            text = func_00288FB8(0x2FF5);
             {
                 s32 row = MenuY(101.0f, -2.0f);
                 func_0027FAA8(x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
-            text = func_00288FB8(0x2FE8);
+            text = func_00288FB8(0x2FF0);
             {
                 s32 len;
                 s32 row;
@@ -180,11 +201,11 @@ s32 func_L15_0042EFE0(void) {
                 reward = D_L15_001B15E4[index];
             }
             if (D_001A7A0A) reward *= 10;
-            func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
+            n = func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
             {
                 s32 len;
                 s32 row;
-                row = label_y((void *)x, 242.0f, D_L15_001B2E84, 0.5f, 1);
+                row = label_y2((void *)n, 242.0f, D_L15_001B2E84, 0.5f, 1);
                 len = func_001157AC(buf);
                 func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
@@ -202,12 +223,12 @@ s32 func_L15_0042EFE0(void) {
         break;
     case 2:
         if (D_L15_001B1520_gp[0] && D_L15_001B1520[1]) {
-            text = func_00288FB8(0x2FE5);
+            text = func_00288FB8(0x2FF6);
             {
                 s32 row = MenuY(101.0f, -2.0f);
                 func_0027FB40(x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
-            text = func_00288FB8(0x2FE9);
+            text = func_00288FB8(0x2FF1);
             {
                 s32 len;
                 s32 row;
@@ -221,11 +242,11 @@ s32 func_L15_0042EFE0(void) {
                 reward = D_L15_001B15F0[index];
             }
             if (D_001A7A0A) reward *= 10;
-            func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
+            n = func_00115DA8(buf, func_00288FB8(0x2FE0), reward);
             {
                 s32 len;
                 s32 row;
-                row = label_y((void *)x, 242.0f, D_L15_001B2E84, 0.5f, 1);
+                row = label_y2((void *)n, 242.0f, D_L15_001B2E84, 0.5f, 1);
                 len = func_001157AC(buf);
                 func_L05_00303000(117, row, 280, 400, 0x80F0F0F0ULL, (u8 *)buf, len);
             }
@@ -243,12 +264,12 @@ s32 func_L15_0042EFE0(void) {
         break;
     case 3:
         if (D_L15_001B1520_gp[0] && D_L15_001B1520[1] && D_L15_001B1520[2]) {
-            text = func_00288FB8(0x2FE6);
+            text = func_00288FB8(0x2FF7);
             {
                 s32 row = MenuY(101.0f, -2.0f);
                 func_0027FB40(x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
-            text = func_00288FB8(0x2FEB);
+            text = func_00288FB8(0x2FF2);
             {
                 s32 len;
                 s32 row;
