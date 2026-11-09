@@ -1,3 +1,4 @@
+/* 9 November 2026 (o124, L11/L02 HUD idioms, cc1 harness ~14 compiles, -O2 -G8 -ffunction-sections): masked 94 -> 90, full 454 -> 493, 5956/5968 bytes; no match. (1) func_00300A00 now (void *, float x, int col, float y, ...) like the matched L11/L02 panels (same a0/f12/a1/f13 registers): masked 92, full 452. (2) D_L04_001B31A0 is a small sized object, not char[]: retail loads it as lwc1 $f12,0x31A0($at) (gas macro of an unsplit l.s, which GCC emits only for a <= 8-byte extern at -G8) and passes it as lui/addiu pairs per call (la macro). Declared extern float D_L04_001B31A0 and passed as &D_L04_001B31A0: gcse PRE no longer copies its high part (was expr 175, inserted at bb 188), so the s1/s2 hoists are gone and the ruler i gets s2 like retail. Full got worse because that hoisted pseudo used to fill s2 ahead of p; now p (pseudo 97, prio 1675) gets s3, retail s4. Retail needs one more high-priority pseudo in s3 before p: retail top is x s0, y s1, one s2, s s3 (mine x s0, s s1, y s2, one s4; one prio 631, s 6750, y 2500). Still open: hp in s7 (retail spills to 0x124), &vF0 s5 vs fp, ruler f20/f22 half/zero swap (o98 mechanism), D_L04_001B31A4 load now in the func_00283248 jal slot via $gp (retail: lui $at before the jal, obj copy in the slot). No change: one = 1 set just before the first test, one as active of the 0x2F95 row label_y, -frac2-frame-pointer-liveness, -frac2-sticky-volatile-refs. Worse: hp inline h + 0x10 (110/462, 5964 bytes; h+0x10 spills to 0x124 but too late), pa/pb inline (106), arr inline (103). Body below is (1)+(2). */
 /* 9 November 2026 (Sonnet round s55, lesson 54 return-type audit): func_0028EA58 declared void (its src/game/0028EA58-g8.c definition; no caller uses a result) instead of int: 5956/5968 bytes unchanged, differing rows 983 -> 981 in the unmasked tools/check.py listing (the $s5/$t1/$a3 moves at 0x417874-0x417880 now match except 0x417878 $s5 vs $fp); no match. Other callees (func_00336D50 s32, func_0027FBD8 int) agree with src. Body keeps the corrected prototype. */
 /* 9 November 2026 (o98, cc1 harness ~50 compiles, real profile): best C unchanged (5956/5968, masked 96 / full 458). The 12 missing bytes are 3 insns, all in the ruler preheader 0xCE0-0xD60: hp spill (retail reloads 0x10C, addiu, sw 0x124: +2 vs my addiu s7) and the ruler-half copy mov.s $f23,$f20 at retail 0xCF8 (+1); no other region differs in count. Mechanism of the copy: cse1 turns `half = 0.5f` into a copy of label_y3's half param (pseudo 596, set in the sprintf row, same cse block through the 3 boxes); gcse COPY-PROPs half -> 596 into the ruler loop (insns 2547/2558) and CONST-PROPs the copy, so 596 lives through the ruler, cannot take f20, gets f22, zero gets f23, copy vanishes. A LOOP_END between box 3 and half (do-group around `i = 0`) cuts cse1: 596 -> f20 and zero -> f22 like retail, but half becomes li.s $f24 (0x3D888889 takes f23; reload_cse leaves the li.s), masked 151. Single-statement groups at lines 309/311-315/317-326 of the body: 94-162 masked, none gives the copy (group around func_00283388(m): 94/456 but 5964). half moved earlier (before boxes or call): 103; second half = 0.5f removed: 5948/96/456 (marker half then shares f22, wrong); literal 0.5f in the ruler: li.s kept inside the loop (no hoist), 105. */
 /* 9 November 2026 (o95, real profile -O2 -G8 -ffunction-sections from the -g8 default; -fno-strength-reduce changes nothing here, same 5964/100/460 with or without; tools/check.py confirmed): aligned rows masked 100 -> 96, full 460 -> 458, 5956/5968 bytes. (1) Rank colour now retail's branch form (beqz, slot 12, fallthrough copy of the shared (n20-1)<<2, then sp add and lw 0x10): written as c = B.v[n20 < 4 ? n20 - 1 : 3] (fold puts *4 into the arms) with y = LY(s, 24.0f) inside a do-while(0) group. Mechanism: without the group the cse1 path from the n20 block reaches the then-arm, makes it a copy of the D_L04_002CA1E0 index reg, and jump-after-cse turns it into movz; the group's LOOP_END ends the cse1 path on fall-through, so the arm stays 2 insns through every pre-reload jump pass and is shared later. (2) One char *s shared by the 0x2F95 text row and the rank row (back to 5964 with (1); s goes to a callee-saved reg like retail s3). (3) sprintf row as label_y3((void *)r, 71.0f, ...): drops the dead move a0 = v0 retail lacks; the -8 bytes are that copy plus a loop-label alignment nop that came with it (k1 = (1)+(2) alone: 5964, 98/460). Still open: the s copy is scheduled before the 24.0f load (retail after: the group's LOOP_BEG is a sched barrier there), register names in the rank block (mine n20 s0 / off s2 / x s3, retail s2 / s0 / s5), &D_L04_001B31A0 hoist, hp spill, 0x8710 row. No gain: offset-form ternaries/if-else without the group (movz), group around the call or the ternary or call+LY (107-109), LY(buf)/LY(0x1D5) handles (100), label_y2 on the sprintf row (96 but full 466). */
@@ -141,7 +142,7 @@ extern s32 D_001A79F0;
 extern s32 D_L04_001A904C;
 extern float D_L04_001B2D44;
 extern char D_L04_001B3190[];
-extern char D_L04_001B31A0[];
+extern float D_L04_001B31A0;
 extern float D_L04_001B31A4;
 extern float D_L04_001B31D0;
 extern char D_L04_001BDB80[];
@@ -185,7 +186,7 @@ extern f32 func_002AAA00(void *, float, float, float, float, void *, int);
 extern int func_002B6D28(void);
 extern int func_002E5CF8(int, int, void *);
 extern void func_002FC560(unsigned int, unsigned long long);
-extern void func_00300A00(void *, int, float, float, float, float, float);
+extern void func_00300A00(void *, float, int, float, float, float, float);
 extern void func_00300AA8(void *, float, float, int, float, void *);
 extern s32 func_00336D50(void *, int);
 extern void func_L04_0040C880(u8 *);
@@ -346,8 +347,8 @@ s32 func_L04_00417308(void)
     if (D_L04_001A904C != 0) {
         { float q = func_00283198(0.56217057f) / func_00283180(0.56217057f); u8 *cam = D_L04_001BDB80; F(cam, 0xB0) = q; }
         func_0027AB40();
-        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2D); func_00300A00(spr, 0x60442D00, 10.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2E); func_00300A00(spr, 0x55F0C070, 10.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2D); func_00300A00(spr, 10.0f, 0x60442D00, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x2E); func_00300A00(spr, 10.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         if (I(p, 0x360) != 0) {
             float fr;
             va = A.v[I(p, 0x360) - 1];
@@ -379,7 +380,7 @@ s32 func_L04_00417308(void)
             if (D_L04_001B0B74 > 0)
                 D_L04_001B0B74 = D_L04_001B0B74 - 1;
             col = func_00283D38(0x603F00B2, 0x800000FF, (float)D_L04_001B0B74 * 0.022222223f);
-            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x35); func_00300A00(spr, col, 11.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, (float)D_L04_001B0B70); }
+            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x35); func_00300A00(spr, 11.0f, col, (float)LY(spr, 10.0f), 1.0f, 1.0f, (float)D_L04_001B0B70); }
         } else {
             D_L04_001B0B70 = 0;
         }
@@ -398,15 +399,15 @@ s32 func_L04_00417308(void)
         func_0027EAE8(0x1A, LY(&vF0, (float)(0x62 - (int)(fb * 74.0f))), 0x26, HC(98.0f), 0xFFFFF0,
                       &vF0);
         }
-        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3F); func_00300A00(spr, 0x60442D00, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x40); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
-        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x41); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY2(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3F); func_00300A00(spr, 498.0f, 0x60442D00, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x40); func_00300A00(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+        { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x41); func_00300A00(spr, 498.0f, 0x55F0C070, (float)LY2(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         if (D_001A79F0 == 4)
-            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x42); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x42); func_00300A00(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         else
-            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x30); func_00300A00(spr, 0x55F0C070, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x30); func_00300A00(spr, 498.0f, 0x55F0C070, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         if (D_001A79F0 == 4 && (D_L04_002C63C0[D_L04_001B090C].flags & 4))
-            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x43); func_00300A00(spr, 0x60FFDE8D, 498.0f, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
+            { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x43); func_00300A00(spr, 498.0f, 0x60FFDE8D, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
         n20 = I(p, 0x320);
         if ((u32)(n20 - 1) >= 0x14)
             n20 = 0x14;
@@ -426,7 +427,7 @@ s32 func_L04_00417308(void)
             func_0027FB40(0x1D5, y, 0x60F0F0F0, buf, len);
         }
         func_00283388(m);
-        func_00283698(m, D_L04_001B31A0);
+        func_00283698(m, &D_L04_001B31A0);
         func_0028FC48(0x157, HC(36.0f), 0x1AB, HC(37.0f), 0x25F0C070, 0);
         func_0028FC48(0x151, HC(28.0f), 0x1AB, HC(29.0f), 0x25F0C070, 0);
         func_0028FC48(0x160, HC(45.0f), 0x1AB, HC(46.0f), 0x25F0C070, 0);
@@ -435,10 +436,10 @@ s32 func_L04_00417308(void)
         hp = h + 0x10;
         func_002830C0(&vE0, &vD0, m);
         arr = p + 0x1E4;
-        fd = func_00282DB0(&vE0, D_L04_001B31A0);
+        fd = func_00282DB0(&vE0, &D_L04_001B31A0);
         pa = p + 0x494;
         pb = p + 0x498;
-        func_00282D30(&vD0, D_L04_001B31A0, fd);
+        func_00282D30(&vD0, &D_L04_001B31A0, fd);
         func_00282CD8(&vF0, &vE0, &vD0);
         func_002AA2E8(&D_L04_001B31D0, vE0.f[0] * -1.25f, 0.050000004f);
         half = 0.5f;
@@ -477,7 +478,7 @@ s32 func_L04_00417308(void)
             fs = -1.0f;
         sy3 = (int)(fs * 13.0f) + 0x24;
         obj = (u8 *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3E);
-        f21 = func_00283248(*(float *)D_L04_001B31A0, D_L04_001B31A4);
+        f21 = func_00283248(D_L04_001B31A0, D_L04_001B31A4);
         j = 0;
         one2 = 1;
         tenth = 0.1f;
