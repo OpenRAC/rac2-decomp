@@ -1,3 +1,4 @@
+/* 9 November 2026 (o138): re-measured 60/60, 0/1 US, object $v1 vs $a3 (4 words). The 9 Nov owner rulings (set-once constant locals, dead-local reuse, (void *) handles, bank interleave) add no new input here: constant/copy locals are folded by cse/gcse cprop before global-alloc (rounds 4-12), the callee takes only GPR args, and the retained (o97) find_reg model still needs v1 in pseudo 84's conflicts or prefs. No new C. */
 /* 9 November 2026 (Codex, aggregate lifetime probe): 48 new C variants
  * compiled and checked against the USA placement with build.compile_c and
  * Placement.derive in rac2-gnu, default -O2 -G0 -ffunction-sections; no match.

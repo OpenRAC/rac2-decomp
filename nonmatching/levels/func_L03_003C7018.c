@@ -1,3 +1,5 @@
+/* 9 November 2026 (o142): retained C re-confirmed with tools/check.py (temp unit, us 0/1, 2 positions). Mechanism refined from the sched2 dump: the barrier is sched1 block 10's first pick (cvt.s.w, prio 8; the loop notes sit between blocks, block 10 starts at label_y2's join), and retail's order f12,lui | f14 | f15,ori | mov.s,i=0 means at t25 sched2 must pick i=0 (prio 5) over ori (prio 6 = 1 + call 5, call and i=0 both feed only the one=1 barrier), with reorg then taking i=0 into the jal slot. Measured, all still 2: every placement of row-conversion/x/c/d/colour in inner group, between groups or inline as call arguments (3^5 = 243 variants); col-last/col-mid bank-preserving prototype orders (3); sharing title/x/row/c/d locals between both draws (9). A float-returning helper converting before label_y2's tests moves the barrier to the f12 load: 6 (f12, f14, lui, f15, mov.s, ori). Next: a real consumer of i (or a priority >= 6 path) inside the call block, so i=0 outranks ori. */
+/* 9 November 2026 (o130, dump-driven): 13 -> 2 masked positions (656/656). (1) sched2 tie movstr prio 2 vs buffer addiu prio 1 came from the one=1 group's LOOP_END landing on the keys `lui v0` (barrier, so addiu depends on it). Fix: draw-2 call and `i = 0;` in their own group nested in an outer group around the whole draw 2 (two LOOP_ENDs land on `one = 1`, which is now the only barrier; its >>3 note penalty also stops sched1 boosting the fp=%hi(0198) birth, so lui fp comes last). (2) `buf = buffer;` used for ALL three uses (no remat; i 11/116 < keyptr 14/49). Left: draw-2 ori/f15: sched2 barrier is the cvt.s.w f13 (first insn of the sched1 block after label_y2's join), so lui is ready at t24 and ori at t25 beside f14; retail needs the barrier on the f12 load with the cvt before the notes. Tried: x/c/d order and placement in G1 (16), colour local x4 places, label_y/y2/y3/y4/y4b per draw (25), 7 one/two-test forms, float-returning helper, i=0 placement, 19 switches, half local, permuter 1500 s. */
 /* 9 November 2026 (o126, L11/L02 idioms): 19 -> 13 masked positions (656/656, check.py us 0/1). New in the C below: a set-once `buf = buffer;` (owner: set-once constant locals) used only by the first sprintf fixes the i/buffer s3/s4 swap (sweep of 1-2 pointer locals x use sets x 6 orders, 120 variants; 13 is the floor). Left: buffer addiu after the key copy (sched2 c31: movstr prio 2 beats the addiu prio 1), the first sprintf rematerialises addiu a0,sp,0x10, and draw 2's ori/f15 (sched2 c25 picks ori beside f14; the LOOP_END before cvt is the barrier head). Interleaved func_00300A00(char *, float, int, ...) prototype: no change in either draw (prototype kept as src). Groups moved in draw 2 (23-37), colour as set-once local (19), label_y/label_y2 swaps (13-22), all 12 -frac2-* switches + -fno-sched-interblock: no change. */
 /* 9 November 2026 (o86, dump-driven): 656/656, 21 -> 19 masked positions (65 rows). sched2: retail's i = 0 jal slot
  * and s7 = 1 after the call need no loop note between the draw-2 call and i = 0 and a LOOP_BEG before one = 1; a
@@ -269,18 +271,20 @@ int func_L03_003C7018(void)
             float row, x, c, d;
 
             do {
+            do {
                 title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
                 row = (float)label_y2(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
-            func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+            do {
+                func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+                i = 0;
+            } while (0);
+            } while (0);
         }
-        i = 0;
-        do {
-            one = 1;
-        } while (0);
+        one = 1;
         {
             int keys[4] = {11599,12116,12769,12770};
             unsigned char buffer[128];
@@ -294,10 +298,10 @@ int func_L03_003C7018(void)
                     func_00115DA8((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
-                    func_00115DA8((char *)buffer, D_L03_001B0198, label);
+                    func_00115DA8((char *)buf, D_L03_001B0198, label);
                 }
                 x = func_00283CF0(D_L03_001B0160[i].x);
-                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buffer, 0x80);
+                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
                 i++;
             } while (i < 4);
         }

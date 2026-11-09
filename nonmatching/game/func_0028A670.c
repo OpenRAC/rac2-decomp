@@ -1,3 +1,4 @@
+/* 9 November 2026 (o132, HUD-panel recipe of L02_003FDDE8/L11_00443940): func_00300A00 declared (char *, float x, int colour, float y, ...) (bank-preserving): object byte-identical (2 words). With it, the active grid (draws 1/2/3 each one/active/act2(set before draw 1 or 2)/1, ~70 local cc1 scores) and `active = one` at every position from the switch to draw 3: best stays 2. Dump: draw-2 fix_truncsfsi2 scratch follows reload round robin from the draw-2 0x8710 reload (a2 -> f1 -> v0); retail needs a v0 reload between them (draw 1 gets one from the $LC0 address of `active = one`), and no placement gives both draws theirs. Body unchanged. */
 /* 9 November 2026 (Codex): 147 new C variants under -O2 -G0 -ffunction-sections;
  * 64 helper active-type/predicate-promotion combinations and 83 bank-preserving call
  * interleavings beyond the baseline. All 84 interleaving layouts emit the same target

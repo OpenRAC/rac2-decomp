@@ -1,3 +1,4 @@
+/* 9 November 2026 (dump round o135, owner ruling on set-once value locals): re-measured in an own -O2 -G0 unit (the host file lacks common.h): 1248/1248, first diff +0x94; 63 diff lines = 2 player-test words, 1 $v1 reuse and the nine PRE spill slots (C8..E8) at every use. -dG: 119 buckets, 93 entries, reaching regs 324..343, self r84, sway r85. gcse.c hash_scan_set/cprop: a set-once copy `obj = self` (or of sway) is recorded and propagated back to r84/r85 wherever available (cse1 already folds it inside an EBB); keeping it distinct would cost a real copy insn retail lacks. So the new ruling cannot give the later base pseudos (self ~98..110, sway ~114..128 with S=111) that o76 derived. No C change. */
 /* 9 November 2026 (Codex follow-up): 96 distinct new C variants compiled and
  * compared to USA v1.01 boot: object pointer/member views, 31 vector-union
  * combinations, vector field arrays, full inline active/update/transform helpers,
