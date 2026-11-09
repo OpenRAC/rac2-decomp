@@ -547,7 +547,6 @@ void func_L02_00412808(u8 *a0) {
 
 /* func_L02_004129D0 is defined in L02_004129D0.c. */
 
-INCLUDE_ASM("asm/levels", func_L02_00412D50);
 
 /* func_L02_00413730 is defined in L02_00413730-g8.c. */
 

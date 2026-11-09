@@ -39,8 +39,6 @@ void func_L19_00417A00(char *a0)
 
 /* func_L19_00417CA0 is defined in L19_003E9400-effects-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L19_00417F88);
-
 typedef int TI128 __attribute__((mode(TI)));
 typedef float V[4] __attribute__((aligned(16)));
 typedef struct {
@@ -66,6 +64,95 @@ extern float func_002A7940(void);
 extern void func_00281EB8(void *, int, int, int, float, float, float);
 extern int func_002761F8(void *, void *, int, void *, void *);
 extern long func_0027C878(int);
+
+void func_L19_00417F88(char *o)
+{
+    V matrix[4], origin, tmp, jitter, end;
+    Quad q;
+    V other, factor, impact, ray, corner;
+    /* The named constants below are real arguments (each is what retail passes), but they also steer:
+     * declared before d, they bring d to a later pseudo, so the gcse bucket of d + 0x2c0 follows &origin's
+     * and settles a 173/173 global-alloc tie between $s6 and $s7. Written as literals, the function is one
+     * register swap short (the same lever as 0030A348-tether-g8.c and 0032EB28-probe-g8.c). */
+    int i, hit, texture, tag, mode;
+    int part = 0, sprite = 0x31, layer = 1, mask = 2, flags = 0;
+    float inner, outer;
+    char *d = *(char **)(o + 0x68);
+
+    func_0029FC20(o, part, matrix);
+    qcopy(origin, matrix[3]);
+    inner = 0.25f;
+    outer = 0.45f;
+    func_00282F20(tmp, matrix, inner);
+    func_00282CC0(origin, origin, tmp);
+    origin[2] += 1;
+
+    func_002A7988(jitter, inner, outer);
+    func_00282CC0(end, jitter, origin);
+    func_00281EB8(origin, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, func_002A7940());
+    func_00281EB8(origin, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, func_002A7940());
+    func_002A7988(jitter, inner, outer);
+    func_00282CC0(end, jitter, origin);
+    func_00281EB8(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, func_002A7940());
+    func_00281EB8(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, func_002A7940());
+    func_002A7988(jitter, inner, outer);
+    func_00282CC0(end, jitter, origin);
+    func_00281EB8(end, sprite, 0x60804020, layer, *(float *)(d + 0x228) * 2, 0.08f, func_002A7940());
+    func_00281EB8(end, sprite, 0x80808080, layer, *(float *)(d + 0x228) * 1.5f, 0.08f, func_002A7940());
+
+    func_00282CF0(ray, d + 0x2e0, origin);
+    func_00282F20(ray, ray, *(float *)(d + 0x238) * 60);
+    func_00282CC0(ray, ray, origin);
+    hit = func_002761F8(origin, ray, mask, o, flags);
+    if (hit) {
+        qcopy_nc(impact, D_L19_001BFEA0);
+    } else {
+        qcopy_nc(impact, ray);
+    }
+
+    factor[0] = 0;
+    factor[1] = 0;
+    factor[2] = 1;
+    factor[3] = 1;
+    func_00282CF0(jitter, origin, D_L19_001B9A40);
+    func_00282CF0(other, impact, D_L19_001B9A40);
+    func_00282F20(jitter, jitter, 1);
+    func_00282F20(other, other, 1);
+    func_00282DD8(jitter, jitter, factor);
+    func_00282F20(jitter, jitter, *(float *)(d + 0x234) * 2);
+    func_00282DD8(other, other, factor);
+    func_00282F20(other, other, *(float *)(d + 0x234) * 2);
+
+    texture = 14;
+    q.texture = func_0027C878(texture);
+    q.state = 0xff9000000260L;
+    q.flags = 0x8000000048L;
+    q.zero = 0;
+    q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x80804020;
+    for (i = 0; i < 4; i++) {
+        q.uv[i].u = D_L19_001B1C08[i].u;
+        q.uv[i].v = D_L19_001B1C08[i].v;
+    }
+
+    func_00282CF0(corner, origin, jitter);
+    *(TI128 *)q.p[0] = *(TI128 *)corner;
+    func_00282CC0(corner, origin, jitter);
+    *(TI128 *)q.p[1] = *(TI128 *)corner;
+    func_00282CF0(corner, impact, other);
+    *(TI128 *)q.p[2] = *(TI128 *)corner;
+    tag = 0;
+    mode = 0;
+    func_00282CC0(corner, impact, other);
+    *(TI128 *)q.p[3] = *(TI128 *)corner;
+    func_00280B90(&q, tag, mode);
+
+    func_00282F20(jitter, jitter, *(float *)(d + 0x234) * 1.5f);
+    func_00282F20(other, other, *(float *)(d + 0x234) * 1.5f);
+    q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x80806060;
+    func_00280B90(&q, tag, mode);
+    qcopy(d + 0x2c0, impact);
+}
+
 /* func_L19_0041B078 is defined in L19_0041B078-g8.c. */
 
 /* func_L19_0041BFD0 is defined in L19_0041BFD0-g8.c. */

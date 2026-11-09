@@ -14,5 +14,3 @@ int func_PAL_00299520(void) {
     return value != 0;
 }
 
-
-INCLUDE_ASM("asm/pal/game", func_PAL_00299538);

@@ -30,10 +30,6 @@ void func_US2_00348BF8(char *object, void *data)
     *(int *)(object + 0xCC) = -1;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_003492A8);
-
-INCLUDE_ASM("asm/us2/game", func_US2_003492B0);
-
 
 typedef int s32;
 typedef unsigned char u8;
@@ -105,11 +101,3 @@ char *func_US2_00349200(char *a0)
 
 
 
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E50);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E58);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E60);
-
-INCLUDE_ASM("asm/us2/game", func_US2_00348E68);

@@ -20,10 +20,6 @@ u8 *func_PAL_00345268(u8 *a0) {
     return a0;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00345618);
-
-INCLUDE_ASM("asm/pal/game", func_PAL_00345620);
-
 
 extern int func_00336E40(void *);
 extern int *func_00336DA8(int, int);

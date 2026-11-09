@@ -49,5 +49,3 @@ void func_PAL_00338770(char *o)
     func_PAL_0027FB48(x, y, color, *(char **)(o + 64), width, *(float *)(scale), texture,
             *(char **)(o + 52));
 }
-
-INCLUDE_ASM("asm/pal/game", func_PAL_003388E8);
