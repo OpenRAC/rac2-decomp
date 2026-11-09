@@ -57,5 +57,3 @@ void func_US2_003378A0(char *o)
     texture = func_US2_0027CED8(*(int *)(o + 56));
     func_US2_0027FCB0(x, y, color, *(u8 **)(o + 64), width, *scale, texture, *(u8 **)(o + 52));
 }
-
-INCLUDE_ASM("asm/us2/game", func_US2_00337A38);

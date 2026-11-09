@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002EBA30);
 
 typedef struct { char pad[0x30]; int selected; char gap[0x3C]; int destination; } State2EB158;
 extern State2EB158 D_001B8840;

@@ -10,8 +10,6 @@ unsigned int func_PAL_0034EC30(unsigned char *owner)
     return *(unsigned int *)address & 0xff000000u;
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_0034F060);
-
 
 extern void func_00336920(char *, int, int);
 

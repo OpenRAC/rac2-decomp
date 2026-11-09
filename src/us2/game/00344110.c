@@ -20,10 +20,6 @@ u8 *func_US2_00344110(u8 *a0) {
     return a0;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_003444C0);
-
-INCLUDE_ASM("asm/us2/game", func_US2_003444C8);
-
 
 extern int func_00336E40(void *);
 extern int *func_00336DA8(int, int);

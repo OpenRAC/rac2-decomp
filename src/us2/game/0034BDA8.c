@@ -10,8 +10,6 @@ unsigned int func_US2_0034D7A8(unsigned char *owner)
     return *(unsigned int *)address & 0xff000000u;
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_0034DBD8);
-
 
 extern void func_00336920(char *, int, int);
 
