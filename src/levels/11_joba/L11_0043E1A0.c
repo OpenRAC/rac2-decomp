@@ -837,7 +837,7 @@ def:
     return 0x2F66;
 }
 
-INCLUDE_ASM("asm/levels", func_L11_00443D78);
+/* func_L11_00443D78 is in L11_00443D78-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L11_00444400);
 

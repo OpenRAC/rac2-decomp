@@ -1,3 +1,4 @@
+/* 9 November 2026 (o78, dump round): deciding pass global-alloc allocno_compare (global.c:794). .lreg on the flat C: obj r84 13/94 = .415, p r85 7/47 = .298, stride r87 5/70 = .143, base r86 5/72 = .139 (base/stride lengths doubled by REG_EQUIV, local-alloc.c:855; base set at insn 28 after stride at 25 yet 2 longer). Retail needs pri(base) > pri(stride) > pri(p): base needs 8 refs at length 72, or 6 refs with no REG_EQUIV doubling and length <= 35; per call base, stride and p each gain one ref, so no single-depth group or statement order flips it. No new compiles beyond the dump. */
 /* 9 November 2026 (Codex): 48 compiled/checked source forms (47 beyond the baseline):
  * all four bank-preserving FP argument positions for the append helper, crossed
  * with byte/halfword-array/typed-struct state views and s32/u32/s16/u16 strides.

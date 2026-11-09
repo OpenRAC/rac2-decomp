@@ -965,7 +965,7 @@ dflt:
     return 0x2F48;
 }
 
-INCLUDE_ASM("asm/levels", func_L02_003FE250);
+/* func_L02_003FE250 is in L02_003FE250-g8.c. */
 
 INCLUDE_ASM("asm/levels", func_L02_003FE8B8);
 

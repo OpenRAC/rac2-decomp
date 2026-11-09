@@ -1,3 +1,5 @@
+/* 9 November 2026 (o75 follow-up): making reg 307 die at draw 58 by giving draw 59 another source: draw 59 x = fx (226 masked diff lines vs 8 base), = (float)(i==0?10:498) (224), draw 58 x = fx (18): all worse. Retail has one mov.s f20,f22 copy feeding both draws, so both $f12 moves read one pseudo and draw 58's cannot die there. */
+/* 9 November 2026 (o75, dump-driven): 4 -> 2 rows (C below). Row 1 (b/c at +0x198) was cse make_regs_eqv: c became qty_first_reg because LAST_UID(c) > LAST_UID(b), so `c=b` swapped; `d=a+45` before `c=b` stops the swap, then global-alloc needs pri(c) >= pri(b) (was c 12 refs/38 live vs b 12/36); declaring c before b plus `do{c=156;}while(0)` in the i==4 arm gives c 13/38 (1.026 > 1.0), all regs right; the group's .p2align 3 lands on 8-aligned +0x190, no nop. Row 2 (draw 58 ori/mov.s f12): sched1 tie at t=3, 1010 (ori) vs 466 (f12=307): prio 18/18, weight 1/1 (307 lives to draw 59; in draw 59 its REG_DEAD gives 525 weight 0 and retail order), class 3/3, dependents 3/3 ({476,485,502} vs {476,487,502}), LUID 1010 < 466 (arg order). Needs 466 weight 0 or a 4th dependent; no honest source found. */
 /* 9 November 2026 (Sonnet s50, lesson 53): no gain, 4 rows. Tried: `half=0.5f` before each of the 3 hud_coord rows (all 7 subsets) and at loop top, `one=1` at loop top / before each row / after fx / before fy, literal 1 in each subset of the 3 calls: equal (52 masked) or worse (59-330). */
 /* 9 November 2026 (Sonnet round s44, lesson 52): scripted a nonempty do { real_op; } while (0) group around every 1-3 consecutive statements of the body (328 variants, each also with -frac2-sticky-volatile-refs, -frac2-hazard-labels and both): no variant scored below base (same diff rows, masked and unmasked); the switches alone change nothing here. */
 /* 8 November 2026 (Sonnet round, s26, lesson 49): audited every local vs retail (b=$a1/c=$a0 copy, fx f22/(float)j f20 copy, s1/sprite per draw, off/s6, right/s1); 4 rows unchanged. Tried: c written as its own expression (c=a+30 with b=a+30, j+30, either order), all 7 declaration orders of a..d, i==4 arm statement orders and swapped arms, `c=b=a+30`, `b=c=j+30` (5), sprite 58 inline in the call (27), fx instead of (float)j (14), top inline (14). Best stays 4. */
@@ -67,7 +69,7 @@ void func_L04_0040C880(unsigned char *m)
     B1202Five end = D_L04_001B09F8;
     int colors[5];
     unsigned char *p = *(unsigned char **)(m+0x68);
-    int frame,i,j,right,a,b,c,d;
+    int frame,i,j,right,a,c,b,d;
     int sprite,s1;
     float angle, sine, sign, fx, fy;
     int one, top, off;
@@ -75,8 +77,8 @@ void func_L04_0040C880(unsigned char *m)
     else frame=D_L04_001A8FE8+150;
     if (!D_L04_001A904C) return;
     for(i=0;i<5;i++) {
-        if(i==4) { a=120;b=149;c=156;d=171; }
-        else { j=i*30; a=j;b=a+30;c=b;d=a+45; }
+        if(i==4) { a=120;b=149;do{c=156;}while(0);d=171; }
+        else { j=i*30; a=j;b=a+30;d=a+45;c=b; }
         colors[i]=0;
         if(frame>=a && frame<b) colors[i]=func_00283D38(0,start.v[i],(float)(frame-a)*0.033333335f);
         else if(frame>=b && frame<c && b!=c) colors[i]=start.v[i];
