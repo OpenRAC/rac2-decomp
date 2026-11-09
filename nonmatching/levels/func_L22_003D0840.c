@@ -1,3 +1,12 @@
+/* 9 November 2026 (o97, dump-driven, cc1 -dl -dg on the retained C, 0 check.py runs): only global allocno is the object
+ * pseudo 84 (5 refs/9 insns, conflicts v0 a0 a1 a2); locals 86/88/90 all take v0. find_reg pass 1 (global.c ~1376)
+ * walks v0 (conflict), v1 (free, in regs_used_so_far as call-used, and regs_someone_prefers empty) -> v1. Retail's a3
+ * needs ONE of: (a) v1 in hard_reg_conflicts[84] (a local in v1 live with the object), (b) v1 in regs_someone_prefers
+ * (a lower-priority conflicting global preferring v1), (c) an a3 preference for 84 (set_preference also counts LOCAL
+ * pseudos via reg_renumber, so a copy to/from a local that got a3). Fitting retail with no extra insns: a block-1 local
+ * Q = object in v1 used as the call argument while the object still lives to the sh; then a0=v1 is a reload_cse no-op
+ * and Q's set dies in flow2. The asm probe `self = object; asm("" : "+r"(self))` puts Q in a0 (copy suggestion), so the
+ * object stays v1: Q only lands in v1 if a0 is busy during Q's life, which nothing in this body does. No new spelling. */
 /* 9 November 2026 (Codex, flag-construction lifetime probe): 52 new C
  * variants compiled and checked with the default game profile in rac2-gnu;
  * 0/1 USA places for every variant. The retained baseline was also checked

@@ -1,3 +1,4 @@
+/* 9 November 2026 (round o100, today's HUD idioms, ~260 local cc1 scores, -fno-gcse): draw 1-4 helpers label_y/y2/y3/y4 (up to 2 changed) x active one/1: best stays 9 rows. Draw 3: all 24 orders of one/x/c/fy x 4 helpers x active (192): 9. Draw 3 handle (void *)c/(void *)color: 9, others worse. do-group over 1-3 draw-3 statements with label_y/y3/y4: +12 bytes (with -malign-loops=2 the loop label loses its alignment). No fix for the twin either. */
 /* 9 November 2026 (Codex, 69 new C variants, USA v1.01): baseline remains
  * 964/964 bytes, 0/1 places, nine relocation-masked instruction differences at
  * +0x1E4..+0x204, under game -O2 -G8 -ffunction-sections -fno-gcse.

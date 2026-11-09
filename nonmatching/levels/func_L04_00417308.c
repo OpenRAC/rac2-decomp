@@ -1,3 +1,5 @@
+/* 9 November 2026 (o98, cc1 harness ~50 compiles, real profile): best C unchanged (5956/5968, masked 96 / full 458). The 12 missing bytes are 3 insns, all in the ruler preheader 0xCE0-0xD60: hp spill (retail reloads 0x10C, addiu, sw 0x124: +2 vs my addiu s7) and the ruler-half copy mov.s $f23,$f20 at retail 0xCF8 (+1); no other region differs in count. Mechanism of the copy: cse1 turns `half = 0.5f` into a copy of label_y3's half param (pseudo 596, set in the sprintf row, same cse block through the 3 boxes); gcse COPY-PROPs half -> 596 into the ruler loop (insns 2547/2558) and CONST-PROPs the copy, so 596 lives through the ruler, cannot take f20, gets f22, zero gets f23, copy vanishes. A LOOP_END between box 3 and half (do-group around `i = 0`) cuts cse1: 596 -> f20 and zero -> f22 like retail, but half becomes li.s $f24 (0x3D888889 takes f23; reload_cse leaves the li.s), masked 151. Single-statement groups at lines 309/311-315/317-326 of the body: 94-162 masked, none gives the copy (group around func_00283388(m): 94/456 but 5964). half moved earlier (before boxes or call): 103; second half = 0.5f removed: 5948/96/456 (marker half then shares f22, wrong); literal 0.5f in the ruler: li.s kept inside the loop (no hoist), 105. */
+/* 9 November 2026 (o95, real profile -O2 -G8 -ffunction-sections from the -g8 default; -fno-strength-reduce changes nothing here, same 5964/100/460 with or without; tools/check.py confirmed): aligned rows masked 100 -> 96, full 460 -> 458, 5956/5968 bytes. (1) Rank colour now retail's branch form (beqz, slot 12, fallthrough copy of the shared (n20-1)<<2, then sp add and lw 0x10): written as c = B.v[n20 < 4 ? n20 - 1 : 3] (fold puts *4 into the arms) with y = LY(s, 24.0f) inside a do-while(0) group. Mechanism: without the group the cse1 path from the n20 block reaches the then-arm, makes it a copy of the D_L04_002CA1E0 index reg, and jump-after-cse turns it into movz; the group's LOOP_END ends the cse1 path on fall-through, so the arm stays 2 insns through every pre-reload jump pass and is shared later. (2) One char *s shared by the 0x2F95 text row and the rank row (back to 5964 with (1); s goes to a callee-saved reg like retail s3). (3) sprintf row as label_y3((void *)r, 71.0f, ...): drops the dead move a0 = v0 retail lacks; the -8 bytes are that copy plus a loop-label alignment nop that came with it (k1 = (1)+(2) alone: 5964, 98/460). Still open: the s copy is scheduled before the 24.0f load (retail after: the group's LOOP_BEG is a sched barrier there), register names in the rank block (mine n20 s0 / off s2 / x s3, retail s2 / s0 / s5), &D_L04_001B31A0 hoist, hp spill, 0x8710 row. No gain: offset-form ternaries/if-else without the group (movz), group around the call or the ternary or call+LY (107-109), LY(buf)/LY(0x1D5) handles (100), label_y2 on the sprintf row (96 but full 466). */
 /* 9 November 2026 (o89, cse1 path rule, cc1 harness ~30 compiles, -O2 -G8 -ffunction-sections -fno-strength-reduce): 5980 -> 5964/5968 bytes, positional rows 1147 -> 761, aligned rows (regs+imm masked) 143 -> 100, full 496 -> 460. Mechanism: cse_end_of_basic_block follows at most 9 skip-around branches (PATHLENGTH 10), and a LOOP_END note ends a path only on fall-through. (1) The 0x360 block: &vF0 for the second func_0027EAE8 call (V926) was cse1-shared with the first call (V796), 8 branches apart, so PRE inserted the copy at the clamp block end (s5 = s0 in the bc1f slot). Writing the three CLAMP01 do/while(0) clamps as two plain ifs gives retail: v0 = sp+0xF0, t1 = v0, fp-copy = v0 before the call, bc1tl clamps, f21/f22 roles right. (2) 0x8710 one row late: the else arm (0x30 row) is first cse1-processed by the path that starts after J1293 (row 0x3F label_y), 8 branches + J1482 TAKEN, so it sees 0x40 row reg 452, not 433; cse2 then makes 452 head (later REGNO_LAST_UID) for 0x40 onward. Retail needs <= 8 branches from the start after HC(98) to J1482 (now 9: 3 label_y rows x 3). label_y2 (owner-allowed) on row 0x41 fixes the sharing (s1 from row 0x3F) but merges that row into one sched block (rounding interleaved with the call setup, ~6 rows); on 0x3F/0x40 worse. Still open: rank colour (retail s0 = (n20-1)<<2 shared with the D_L04_002CA1E0 index, off = 12 / s0 by branch; k-index if/else forms all give movz, 5948), &vF0 copy in s5 not fp and scheduled after a3 (a3 takes the jal slot in retail), hp s7 vs 0x124 spill, 0x35 row col birth order (own c35 local: worse, 5956). No gain: -fno-sched-interblock, block-local Vec *pc = &vF0 (126). */
 /* 9 November 2026 (label_y2 sweep (owner ruling 2026-11-09, Sonnet s46): all 6 label_y sites, both one-test forms, singles/pairs/all, with and without -fno-strength-reduce: base 225 aligned rows (5980/5968) stays best (singles 225-285); no gain. */
 /* 9 November 2026 (o38, PRE slot order): slot order not PRE-caused. Spilled PRE copies fp+0x70, fp+0x104, fp+0x108 (S=757) already take retail's order (0x120, then 0x128/0x12C in retail); the shift is hp getting s7 instead of slot 0x124 (allocation), plus the 5980/5968 size. */
@@ -224,6 +226,19 @@ static __inline__ int label_y2(void *handle, float value, float scale, float hal
     return result;
 }
 
+static __inline__ int label_y3(void *handle, float value, float scale, float half, int active)
+{
+    int mode = D_L04_001B2D40;
+    float scaled = value * scale + half;
+    int result = (int)scaled;
+    void *copy;
+    if (handle != 0) scaled = scale;
+    copy = handle;
+    if (copy != 0) scaled = half;
+    if (mode == active) scaled = scale;
+    return result;
+}
+
 static __inline__ int hud_coord(float value, float scale, float half)
 {
     int mode = D_L04_001B2D40;
@@ -286,6 +301,7 @@ s32 func_L04_00417308(void)
     float tenth;
     int mcol;
     Vec *mv;
+    char *s;
 
     if (h[0xBC] == one)
         func_L04_00416E38();
@@ -299,7 +315,8 @@ s32 func_L04_00417308(void)
         func_0029B658(0x60, 0x55F0C070, (float)HC(112.0f), (float)HC(142.0f), 175.0f,
                       (float)(D_001A7340 - 0xAF));
         {
-            char *s = func_00288FB8(0x2F95); int x = D_001A7340 / 2; int y = LY(x, 118.0f); int len = func_001157AC(s);
+            int x, y, len;
+            s = func_00288FB8(0x2F95); x = D_001A7340 / 2; y = LY(x, 118.0f); len = func_001157AC(s);
             func_0027FBD8(x, y, 0x700000E4, s, len);
         }
         if (I(p, 0x76C) == 0) {
@@ -394,15 +411,16 @@ s32 func_L04_00417308(void)
             n20 = 0x14;
         {
             int x = n20 >= 0xA ? 0x11D : 0x123;
-            char *s = func_00288FB8(D_L04_002CA1E0[n20 - 1]);
-            int y = LY(s, 24.0f);
+            int y;
             int c;
-            c = *(n20 < 4 ? &B.v[n20 - 1] : &B.v[3]);
+            s = func_00288FB8(D_L04_002CA1E0[n20 - 1]);
+            do { y = LY(s, 24.0f); } while (0);
+            c = B.v[n20 < 4 ? n20 - 1 : 3];
             func_0027F5B8(x, y, c, s, -1);
         }
         {
             int r = func_00115DA8(buf, D_L04_001B0B90, D_L04_001A8FE4 + 1, 3);
-            int y = LY(r, 71.0f);
+            int y = label_y3((void *)r, 71.0f, D_L04_001B2D44, 0.5f, 1);
             int len = func_001157AC(buf);
             func_0027FB40(0x1D5, y, 0x60F0F0F0, buf, len);
         }

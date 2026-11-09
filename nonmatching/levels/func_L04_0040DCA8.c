@@ -1,3 +1,4 @@
+/* 9 November 2026 (round o100, 60 local cc1 scores): no label_y here, so only idiom (b) applies. do-group over every 1-3 corner statements: +8 bytes (alignment nop before the vertex loop); one group from each statement through the vertex loop: +4..+12 bytes or 45-47 words. No gain, still 3 words. */
 /* 9 November 2026: corner ownership/type trial, no gain. Current master retained C
  * reproduced 740/740 bytes, frame 0x1D0, 0/6 USA v1.01 with default game G0.
  * Named x/y/z/w fields (anonymous/named struct), passing the complete corner

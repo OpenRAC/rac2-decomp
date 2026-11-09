@@ -1,3 +1,23 @@
+/* 9 November 2026 (o99, 7 check.py runs): C below = owner-ruled char ** helper. Only the first fade store goes through
+ * hud_ammo_fade_lo(&o) (o+0x1288 -> 0x1288($s4), as retail); the +4 store stays on self+0x1288 via a char * helper, so
+ * every PRE expression is still shared. check.py -O2 -G0 + keep-float-pun-source: 6048/6048, only 3 words differ
+ * (+0x494..0x49C: ours sw s5,0x48; sw v1,0x30; jal / retail sw v1; jal; sw s5). Full-block helper: 6020 bytes; helper on
+ * the 0x1D0 or 0x1288 call args: arg loses its PRE reload (deref copy is set in the same block, gcse cprop is global only).
+ * Swap = sched2 tie: both spill stores prio 54, 13 dependents each, LUID = PRE insertion order = expr index (0x100 first
+ * seen in 0x1044 block before 0x98 in 0x10D8; bb0 is keyed on self 87, so no early occurrence). 52 cflags switches and
+ * a +-6 statement-move sweep (local cc1): none fixes it. */
+/* 9 November 2026 (o97, -dG dump, local cc1 spill scorer, 0 check.py runs): the shifted slots ARE gcse PRE reaching
+ * regs (not reload order): 38 PRE'd exprs, S=711 buckets; expr 65 (reg 84)+1540 hashes to bucket 11 -> reaching reg 895
+ * -> first slot 0x2C; retail needs it last (bucket 681..710, after (84)+76 at 680). Exhaustive check: base 84 or 87 with
+ * ANY odd S in 301..1599 never gives retail's order, so no max_cuid/insn-count lever exists; only base regno 757..783
+ * (with S=711) fits, i.e. one base pseudo created in the 0x1288 block (pseudos 752..788 there). Natural sources of such a
+ * pseudo before gcse: ADDRESSOF (gen_mem_addressof, function.c:2861, new reg at the point &x is expanded; purge runs after
+ * cse1, toplev.c:4016). Measured: `static inline char *hud_part(char **o, s32 off) { return *o + off; }` used as
+ * func_00335E10(hud_part(&o, 0x1D0)) in the 0x1288 block = `*&o` result (spill rows: only the sw $s5/sw $v1 swap and a
+ * missing `lw $a0,0x64` PRE reload: that call's own arg is no longer cse1-shared). Without the `self = o` copy any &o or
+ * &self breaks PRE (each ref becomes a fresh pseudo, 931 buckets, 3 PRE). Retail = one renamed base for early AND late
+ * code with PRE intact: not reachable by addressof in this compiler; inline-integrate renumbering is the only other
+ * pre-gcse pseudo source. No retained-C change. */
 /* 9 November 2026 (o52, real check.py): the s40 "3 words" was a masked scorer (spill offsets hidden) against a base without the switch; the C below already used -frac2-keep-float-pun-source. Own unit, -O2 -G0 (the file's normal -G) + that switch: 6048/6048 bytes, 209 words differ unmasked (206 are spill-slot offsets off by one slot: self+0x604 copy gets slot 0x2C, retail 0xA0; plus the sw $s5/jal swap), 0 of 28. Each of the 57 switches in config/cflags.txt added on top, unmasked: none below 209 (most 209, others worse or wrong size). */
 /* 9 November 2026 (switch sweep s40): -frac2-keep-float-pun-source on the -O2 -G0 profile: size 6028 -> 6048 (matches), 3 differing words (sw/jal order near 0x34B75C); unaligned size before. No other switch or pair does better. */
 /* 8 November 2026, Sonnet round 4 (o20): C below unchanged, 208-210 words. Inline helpers holding the body from
@@ -380,6 +400,19 @@ static inline void hud_clear_0C_34B2C8(char *o)
     *(s32 *)(o + 0xC) = 0;
 }
 
+static inline void hud_fade_hi_34B2C8(char *o, f32 hi)
+{
+    *(f32 *)(o + 0x4) = hi;
+}
+
+/* helper takes &o so the 0x1288 block uses a fresh base pseudo, as retail's PRE slot order shows; allowed by owner ruling (2026-11-09) */
+static inline void hud_ammo_fade_lo_34B2C8(char **pobj, f32 lo)
+{
+    char *o = *pobj;
+
+    *(f32 *)(o + 0x1288) = lo;
+}
+
 /* The ammo/bolt HUD setup: initialises the HUD's text, sprite and fade widgets. */
 void func_0034B2C8(char *o, char *font, s32 arg)
 {
@@ -641,7 +674,8 @@ void func_0034B2C8(char *o, char *font, s32 arg)
     func_00349A60(self + 0x1288, 1, func_00335E18(self + 0x1D0));
     func_00349A70(self + 0x1288, 1, 0, 1.2f, 1.2f, 0.0f, 0.0f);
     func_00349A70(self + 0x1288, 1, 1, 1.0f, 1.0f, 0.0f, 0.0f);
-    hud_fade_start_34B2C8(self + 0x1288, 0.0f, 3.0f);
+    hud_ammo_fade_lo_34B2C8(&o, 0.0f);
+    hud_fade_hi_34B2C8(self + 0x1288, 3.0f);
     func_00349A60(self + 0x1288, 2, func_00335E10(self + 0x1D0));
     func_00349A70(self + 0x1288, 2, 0, 514.0f, 4.0f, 0.0f, 0.0f);
     func_00349A70(self + 0x1288, 2, 1, 498.0f, 10.0f, 0.0f, 0.0f);

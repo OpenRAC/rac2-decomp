@@ -1,3 +1,4 @@
+/* 9 November 2026 (round o100, today's HUD idioms, 56 local cc1 scores): draws 1 and 4 y helper over menu_coord, a menu_coord with the mode test before the rounding, label_y/y2/y3/y4 with handle id, with draw 4 as `s, s` or `one, one`: best stays 3 rows (menu_coord on both); label_y3 6, the others 7-38. The f15/f16 tie is in the argument block after the dead test, so the mode value's death does not reach it. */
 /* 9 November 2026 (Codex, 62 new C variants): same compiler/profile as below,
  * USA v1.01. Tested all 20 nondefault integer/FP argument interleavings of
  * func_00300A00 at all four draws, preserving order and widths within each
