@@ -508,7 +508,7 @@ void func_L00_00374B78(void) {
 
 
 
-INCLUDE_ASM("asm/levels", func_L00_003769C0);
+/* func_L00_003769C0 is defined in L00_003769C0.c. */
 
 
 

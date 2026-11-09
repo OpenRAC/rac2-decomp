@@ -1497,8 +1497,8 @@ fixed scalar cannot alias a varying array element, so the load is hoisted or mov
 Where retail reloads, declare the global as an array and read `[0]`: `D_L00_001B2B58[0][i] = 0` keeps
 the reload and the integer index in `func_L00_003E4BF0`, and the cursor `D_001B22A8[0]` stays behind
 the `t[]` stores in retained `func_00285030`, with no fence. An integer index that survives inside a
-loop means no loop notes: loop.c reduces every `for` or `do` form, a `goto` loop keeps it (retained
-`func_L00_003769C0`).
+loop means no loop notes: loop.c reduces every `for` or `do` form, a `goto` loop keeps it (`func_L00_003769C0`,
+matched 9 November 2026).
 
 The section-8 record copy in retained `func_L00_00300618` is another source-level
 case. A `do` loop turns its four cursor advances into address induction variables;

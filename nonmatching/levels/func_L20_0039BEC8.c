@@ -1,3 +1,4 @@
+/* 9 November 2026 (o148): loop 3 now `float width = -(i > 1 ? B4 : 7C);` passing width: the neg.s $f12,$f0 register is fixed (27 -> 24 rows, all 24 PRE spill-slot offsets; check.py us/pal/us2 0/1, +0x8c). Forced S=129 then leaves only the obj+16 slot swap (5 rows). Slot model: only S=129 (max_cuid 256..259; ours 269) with the obj+16 base pseudo R in 113..128 or 242..257 gives retail order (S=161 swaps sp+64/sp+208, fixed hashes). A late `char *base = object;` block after loop 1 gives R=150; loop-1 pointer locals pos/cp/odd reach R=134 but reshuffle the giv registers, and only adding `Pair *uv` reaches 128, which changes size (310/314). cse1 already deletes redundant address insns, so these spellings do not lower max_cuid; no honest -11 insn route found. */
 /* 9 November 2026 (o143, set-once constant lever): forced-S sweep of the s31 base (max_cuid 268, 135 buckets): S=129 gives 8 rows, S=161 9, every other odd S 125..181 18-30. Set-once constant locals only add insns (+1 each), and S=161 would need +54, so the lever does not reach it; no C change. */
 /* 9 November 2026 (Codex, inline-helper/lifetime follow-up): 311 new C
  * variants checked with game -O2 -G8 -ffunction-sections: 255 combinations
@@ -138,8 +139,8 @@ void func_L20_0039BEC8(void *arg)
     {
         int i;
         for (i = 0; i < 4; i++) {
-            float width = i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C;
-            func_00282F20(&packet.position[i], &tangent, -width);
+            float width = -(i > 1 ? D_L20_001AECB4 : D_L20_001AEC7C);
+            func_00282F20(&packet.position[i], &tangent, width);
             if ((i & 1) == 0) packet.position[i].f[2] = D_L20_001AEC78;
             else packet.position[i].f[2] = 0.0f;
         }
