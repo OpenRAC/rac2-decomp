@@ -1,3 +1,4 @@
+/* 9 November 2026 (Sonnet round, o66): body below = s49 form (product written in the col loop, no off) + `direction = 1.0f` moved after the row qcopy; profile -O2 -G8 -ffunction-sections -g -frac2-mult-add-no-flatten: 1572/1572, 19 aligned diffs (was 25): mtc1/qcopy block now exact; left: axis/offset s2/s1 swap in the j loop (5 rows), case-0 s0/s1 + 0x80 reload + swc1/daddu order (6), i<<1 copy at 458B44/CB4 (6). i<<1 copy mechanism: retail's comes from gcse (cse1 did not cross the clamp): -fno-cse-skip-blocks plus a `short *t = &D_L06_001B3790[i]` clamp/reset pointer gives retail's exact sll/la/addu/daddu copy rows, but also splits velocity's sp+0x10 (64 diffs); case 0 has the same pattern (retail: all o+0x10 uses are the gcse PRE reg, ours a cse local 105). No gain: direction placements (loop top, before velocity, for-init, set-once fone local, do-while groups), axis/j/direction decl positions, timer/alpha store moves, velocity pointer local, -fno-cse-follow-jumps; permuter 1500 s: no real row fixed. */
 /* 9 November 2026 (Sonnet round, s49): FOUND the mult form: `mult $zero,a,b; mflo` is mulsi3_mult3_r5900 alt 1/3 (product pseudo in LO); it comes with the product written inside the col loop (`qzero_nc(&((NotakQuad *)(D + st48 * 0x180 + (row << 6)))[col])`, no `off` local) PLUS unit switch -frac2-mult-add-no-flatten (keeps ((m+r)+D)+16 giv tree): size 1564 -> 1572, mult/mflo/nop rows match, ~18 real aligned diffs left (s0/s1 swap at &collision vs o+0x10 + 0x80 reload, i<<1 copy at 458B44/CB4, direction mtc1 place, qcopy mult sched). hazard-labels/sticky/keep-block-order/gcse-unsplit/qcopy on top: no change (18). Not adopted: still no match. */
 /* 9 November 2026 (Sonnet round, s48): re-measured 1564/1572, 19 aligned diffs (retail has `mult $zero,..; mflo` + nop, ours the 3-operand mult: -8 bytes; also s0/s1 swap for &collision vs o+0x10, scheduling at the D_L06_001B3790 loop and direction=1.0f). All single and pair switches (every -frac2-* in cflags + -fno-gcse/-fno-cse-follow-jumps/-fno-rerun-loop-opt): none fixes the mult form (-fno-cse-follow-jumps: 1572 bytes, still mult 3-op, 139 rows); do-while(0) groups of 1-3 statements around every simple statement: no gain; mult spellings (operand order, *384, unsigned, hoisted base local), collision decl position, direction=1.0f placement: no gain. Fix-size idea left: find what makes the product pseudo live in LO. */
 /* 9 November 2026 (switch sweep s40): -fno-cse-follow-jumps: size 1564 -> 1572 matches, 139 differing rows; still far. */
@@ -116,7 +117,7 @@ void func_L06_004587E8(char *o) {
     char *s;
     int snd, index, row, col;
     char *p;
-    int off, k, j, sign;
+    int k, j, sign;
     int count = 6;
     typedef NotakQuad Trail[6][4];
     float direction;
@@ -169,9 +170,8 @@ void func_L06_004587E8(char *o) {
             D_L06_001B3778[*(int *)(st + 0x48)] = -1;
             D_L06_001B3760[*(int *)(st + 0x48)] = 0;
             for (row = 0; row < 6; row++) {
-                off = *(int *)(st + 0x48) * 0x180 + (row << 6);
                 for (col = 1; col < 4; col++)
-                    qzero_nc(&((NotakQuad *)(D_L06_0025FFC0 + off))[col]);
+                    qzero_nc(&((NotakQuad *)(D_L06_0025FFC0 + *(int *)(st + 0x48) * 0x180 + (row << 6)))[col]);
             }
             func_00350388(o);
             return;
@@ -201,8 +201,8 @@ def:
         D_L06_001B37A0[i] = 64;
         func_002A7988(velocity.f, 0.2f, 0.2f);
         if (func_00282DF0(velocity.f) > 0.2f) func_00282F20((char *)velocity.f, (char *)velocity.f, 0.2f);
-        direction = 1.0f;
         qcopy(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][0], pos);
+        direction = 1.0f;
         for (j = 1; j < 4; j++) {
             func_00282CF0(axis.f, (float *)(&((Trail *)D_L06_0025FFC0)[*(int *)(st + 0x48)][i][j - 1]), (float *)D_L06_001B9840);
             func_002ACEC0(velocity.f, velocity.f, axis.f, func_002A7878(0.17453295f, 0.7853982448577881f) * direction);

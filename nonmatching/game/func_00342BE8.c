@@ -1,3 +1,17 @@
+/* 9 November 2026, EE call-contract audit: the retained alpha declaration is
+ * a bank-preserving argument interleaving permitted by AGENTS.md and
+ * docs/COMPILER-NOTES.md, not an omitted/reordered physical argument. Both
+ * forms pass object/limit in a0/a1 and low/current/high/scale in f12..f15,
+ * with no stack arguments and the same int return. This supersedes the
+ * historical "false prototype" classification below; it does not establish
+ * a portable native C interface across units.
+ * Container checks of all five limit positions after the object give 900 B:
+ * after 0..3 floats, four differing words (+0x15C/+0x16C/+0x230/+0x234);
+ * after four floats, the retained two-store difference (+0x230/+0x234).
+ * The retained body was rechecked in USA v1.01, PAL and USA v2.00:
+ * tools/check.py --diff reports 0/28 in each. No linked build was run.
+ * No statement-order or compiler-flag sweep was repeated.
+ */
 /* 9 November 2026 (Sonnet round s42, lesson 52): scripted `do { real_op; } while (0)` groups around 1-3 consecutive statements at every position (54 singles + 101 pairs, best 23, pairs of the near-base ones) and every -frac2-* switch / -freduce-all-givs on the unit: nothing below the base 2 words (best only ties, most groups far worse); no switch changes it. */
 /* 8 November 2026 (Sonnet round s16, lesson 48, scripted local cc1 scorer): every single-statement/block move across the whole loop body, the pre-loop low/high, the colour stores vs the clip block, and all clip-store permutations (~870 compiles): none went below 2 words. */
 /* 8 November 2026 (Sonnet round, prototype audit, lesson 47): func_003427C0 is declared (char *, float x4, int) but src/game/003427B0-fade.c:8 is (void *, int, float x4). Real prototype with calls (object, D_001AE1D4, low, y, high, D_001AE1D0): 4 rows vs 2 with the false one (same as round 11c, re-measured: 7 vs 5 on a masked row count). Not applied; the retained C keeps the old spelling, so this is not a clean match. Other callees agree. */

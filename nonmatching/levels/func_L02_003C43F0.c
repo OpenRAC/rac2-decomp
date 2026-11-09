@@ -1,3 +1,16 @@
+/* 9 November 2026 (Codex, 62 new C variants): same compiler/profile as below,
+ * USA v1.01. Tested all 20 nondefault integer/FP argument interleavings of
+ * func_00300A00 at all four draws, preserving order and widths within each
+ * EE argument bank. Four tie three words; the others worsen scheduling or
+ * allocation. New inline-wrapper control: 21 parameter interleavings each
+ * with the fourth draw's y passed as float, or passed as int and converted
+ * inside the wrapper (42 variants). Every wrapper inlines to the baseline
+ * 752-byte body, with the same three real differences. Moving the conversion
+ * across an inline call boundary does not change the dying scale argument.
+ * Trial objects checked with Placement.derive against level 02; final
+ * tools/check.py --diff recheck: 0 of 8 places match, first difference +0x1A8.
+ * Retained C unchanged; no linked build or alternate-release match claimed.
+ */
 /* 9 November 2026 (Sonnet round s45): label_y2 / one-test variants on the final 373.0f label: 3 -> 14 rows. No gain. */
 /* 9 November 2026 (Sonnet round, s43, lesson 52): scripted do { real_op; } while (0) sweep over every 1-3 consecutive simple statements in the function (all positions) plus all disjoint pairs of groups, masked and unmasked scores, and every -frac2-* switch (single and pairs) on the unit: best stays 3 rows; no group or switch improves it. */
 /* 9 November 2026 (o53, sched dumps -dS -fsched-verbose-6): still 752/752, 3 rows. Brief's wording was off: both set f14=f20 at +0x198; the diff is f16, ori, jal, f15=f14 (retail) vs f15, f16, jal, ori. reorg fills the jal slot with the last insn before it, so this is sched order. sched2 ranks after reload only by priority, dep count, LUID, so it keeps sched1's order; in sched1 the f15 move (s dies) and the f16 move tie on priority and reg weight, and the lower LUID (f15, argument order) wins. Retail needs f15's source to stay live (weight +1) while still reading f14. That matches the round-12/s25 explanation; no new spelling to test. */

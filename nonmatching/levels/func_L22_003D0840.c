@@ -1,3 +1,28 @@
+/* 9 November 2026 (Codex, flag-construction lifetime probe): 52 new C
+ * variants compiled and checked with the default game profile in rac2-gnu;
+ * 0/1 USA places for every variant. The retained baseline was also checked
+ * through tools/check.py with source_of redirected here, without editing src:
+ * 60/60 bytes, 0/1 places in US, PAL and US2, same four v1/a3 words.
+ *
+ * New variants: 24 two-stage bit-0/bit-6 combinations of OR, XOR of missing
+ * bits, addition of missing bits, De Morgan and subtraction of present bits;
+ * six whole-mask versions; twelve local union/bitfield versions (unsigned
+ * char/short/int containers, both assignment orders, =1 versus |=1); four
+ * direct halfword-bitfield versions; six local halfword/byte-union versions.
+ * The callback and three-argument void SetState contracts stay unchanged.
+ *
+ * New constraint: missing-bit arithmetic CAN naturally give the object a3.
+ * For example f ^= (~f & 65) and f += (~f & 65) give 68/60 bytes; applying
+ * one such operation after f |= 1 gives 72/60. These allocate a second real
+ * flag temporary but retain its extra operations. No variant both removes
+ * that temporary's operations and preserves a3. The 19 new 60-byte variants
+ * still use v1; bitfield |= may also grow the stack frame to 0x20 despite
+ * keeping the instruction count. Byte-union updates are 72 or 84 bytes.
+ * Overall new sizes: 19x60, 1x64, 3x68, 16x72, 2x76, 3x80, 8x84.
+ * No improvement retained. Reopen with evidence for a real value lifetime
+ * whose operations vanish after allocation, rather than another flag syntax
+ * that folds before allocation. No linked-build or C-progress claim.
+ */
 /* 9 November 2026 (Sonnet round s34): systematic grid (param s32/u32/s16/void*/
 /* 8 November 2026 (Sonnet round): rewrite from retail asm re-measured 60/60, 0/1, object still $v1 vs $a3. Seven new wordings (state byte in a local, `t = x; t |= 0x41` two-step, u16 named local, `*p |= 0x41`, call with a local k, cast-to-int store) all still $v1. One decomp-permuter run (1500 s, -j2) only tied the base (score 25); its candidates use an uninitialised a3, so none kept. */
 /* 8 November 2026 (Sonnet round): rewrite from retail asm gives the same 60/60, 0/1, $v1 vs $a3; 3 more wordings (4-param signature, flag/halfword in locals, int-returning callee) unchanged; one permuter run (1500 s, -j2) found nothing under base score 20. */

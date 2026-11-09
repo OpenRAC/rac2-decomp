@@ -1,3 +1,28 @@
+/* 9 November 2026, Codex follow-up: 45 new C variants compiled and checked in the
+ * existing rac2-gnu container, game -O2 -G0 -ffunction-sections with
+ * -Wa,--r5900-la-addend=sn; USA v1.01, one Endako placement. Baseline remains
+ * 656/656 bytes, 21 differing instruction positions with relocation fields
+ * masked; tools/check.py: "03_endako: instruction at +0xf0 differs", 0/1.
+ * Tested five local-data shapes (plain, key-record wrapper, 2x2 key table,
+ * buffer-record wrapper, const keys plus buffer wrapper) against eight loop
+ * forms (signed <4, !=4, <=3, do/while, unsigned !=4, long !=4, explicit break,
+ * increment by one), excluding the baseline: 39 variants. Record wrappers
+ * and const keys tie; !=4/do/while/explicit-break forms give 25 positions;
+ * long indices give 688 bytes, and the 2x2 table gives 680-732 bytes.
+ * Six integer-parameter orders of an inline real formatting helper all give
+ * 668 bytes. None improves the retained source. These are instruction-position
+ * counts, not the historical aligned-diff row counts. The draw-2 argument
+ * order, loop preheader and i/buffer register roles still need an independently
+ * supported source/scheduling witness. No linked build; marker stays assembly.
+ */
+/* 9 November 2026, Codex lifetime controls: current compiler, -O2 -G0
+ * -ffunction-sections -Wa,--r5900-la-addend=sn; 656/656 bytes, USA 0/1,
+ * first difference +0xF0, 21 word-aligned differences masking only relocation
+ * fields (includes s3/s4 uses). Earlier index initialization, index assignment
+ * after draw 2 inside its outer group, and moving keys/buffer/index before the
+ * headings give 664 bytes. Do-while traversal and const local keys emit the
+ * baseline size and difference count. Retained body unchanged; no linked build.
+ */
 /* 9 November 2026 (Sonnet round s45, owner ruling 2026-11-09): label_y2 (label_y with ONE handle test, allowed) on the second title draw only: quick scorer 23 -> 21 rows (68 -> 66 unmasked words), no match. First call 30, both 28; the other one-test forms tie. Body below carries it. */
 /* 8 November 2026 (Sonnet round s33, lesson 49): x/c/d are fake but inlining them in draw 2 (no group) gives the same 23 quick-scorer rows; a `zero` local for both draws 150; shift declared after label/split 23; one = 1 after the group 23; for (i = 0 ...) 23. No change from the retained C. */
 /* 8 November 2026 (Sonnet round s23): fresh C from retail asm (plain round_y helper, early return, plain for, no groups) is 668 bytes / 153 rows (vs retained 23 on the quick scorer): the early-return form hoists the key copy above the draws and the 0.5f lands in $f22; plain calls lose the group barriers. A scripted lesson-48 sweep (every single statement moved 1..3 places inside same-indent runs, 58 variants) found no variant below the retained C (best tie). Retained C unchanged. */

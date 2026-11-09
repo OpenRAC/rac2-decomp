@@ -1,3 +1,30 @@
+/* 9 November 2026 (Codex): 48 compiled/checked source forms (47 beyond the baseline):
+ * all four bank-preserving FP argument positions for the append helper, crossed
+ * with byte/halfword-array/typed-struct state views and s32/u32/s16/u16 strides.
+ * No improvement with game -O2 -G0 -ffunction-sections -fno-schedule-insns:
+ * 32-bit strides give 412 bytes and 12/16/18 differing instruction words;
+ * narrowed strides with a full-width query result give 416 bytes.
+ * Standard tools/check.py --diff confirms the baseline and each FP position:
+ * 0/1 USA placements. Baseline has TWELVE, not eleven, real differences:
+ * +0x6C changes addiu's destination s3 -> s1 under its LO16 relocation and
+ * must be counted along with the eleven non-relocated register differences.
+ * The executable body below is unchanged; no linked build or match claimed.
+ */
+/* 9 November 2026 (Codex, typed-state/helper lifetime follow-up): retained flat
+ * form rechecked at 412/412 bytes, 0/1 USA v1.01 places; 11 real instruction
+ * differences remain from p=s1/base=s3 versus retail p=s3/base=s1.
+ * Six new candidates: unsigned stride, s16 index pointer and typed state member
+ * each produce identical check.py disassembly to the flat baseline. Extracting
+ * just the three append calls, initialization plus appends, or the complete
+ * case-0 call sequence into static inline helpers each produces 400/412 bytes:
+ * the saved f20 zero disappears and the frame shrinks to 0x30. None improves
+ * allocation. Profile: own unit, -O2 -G0 -ffunction-sections
+ * -fno-schedule-insns, current origin/master 2d1e7dc8 compiler.
+ * Helpers used the actual table/stride/index inputs and preserved all accesses
+ * and calls. No source or flags retained in src; no linked build was run.
+ * Reopen with new evidence for base/stride versus state-pointer lifetimes;
+ * these typed views and helper boundaries do not supply it.
+ */
 /* 8 November 2026 (Sonnet round s33, lesson 49): locals checked against retail (n=0x150 s2 and base s1 are real; index/k fake). Dropping `index` 15 rows, dropping `k` (literal 0x150 in case 1) 15, no tbl local 91, no p local 96, case 2 without tbl 17; statement-move sweep of the whole body (+-3) never beat the retained flat form (12 rows on the quick scorer, same p s1 / base s3 swap). */
 /* 8 November 2026 (Sonnet round, about 10 check.py runs): flat C re-measured 412/412, 0/1, 11 rows (p s1 / base s3 swap) in its own unit with -fno-schedule-insns. New wordings all still 11 rows: base assigned before/after index and n; named char * base local for the three calls; p assigned after the switch; state pointer read inline in case 0 (57 rows). One decomp-permuter run (1500 s, -j2, base score 60) found score 25, but its candidate sets `tbl = p` before the switch as a stand-in temporary, so it is not kept. */
 /* 8 November 2026 (Sonnet round): flat C re-measured 412/412, 0/1; one permuter run (1500 s, -j2) only tied the base score (60), no better candidate. */

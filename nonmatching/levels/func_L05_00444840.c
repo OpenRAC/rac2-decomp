@@ -1,3 +1,12 @@
+/* 9 November 2026, coordinate-local lifetime probe: USA v1.01, same
+ * -O2 -G8 -ffunction-sections -freduce-all-givs profile. Baseline check.py
+ * logic, with scratch source selection: 0/4 places, first mismatch +0x124.
+ * Reusing either consumed target coordinate as the first scan's index or
+ * range produces 744 bytes rather than 736 (four variants). An unsigned int
+ * index retains the baseline; unsigned short remains 736 but changes more
+ * instructions; short and long produce 744. Nine compiles including baseline;
+ * no improvement, no linked build. Retained C and marker unchanged.
+ */
 /* 9 November 2026 (Sonnet round s42, lesson 52): scripted `do { real_op; } while (0)` groups around 1-3 consecutive statements at every position (23 singles + 194 pairs, pairs of the near-base ones) and every -frac2-* switch / -freduce-all-givs on the unit: nothing below the base 2 rows (best only ties, most groups far worse); no switch changes it. */
 /* 8 November 2026 (Sonnet round s17, lesson 48 sweep): scripted statement/declaration moves (1..4 positions inside each block, ident/call-dependence filter, 32 singles + pairs of the near-base ones, ~100 compiles): nothing below the base 2 rows (best only ties). */
 /* 8 November 2026 (Sonnet round s12): re-measured 736/736, 2 rows. Plain for-loops (continue/break, scan loops as for) give 812 bytes (scan loops get loop-optimised), so the goto/do-while(0) scan form stays; permuter 25 min -j2 from the retained C: only ties at 20. */

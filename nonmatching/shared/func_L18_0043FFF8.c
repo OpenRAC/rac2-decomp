@@ -1,3 +1,13 @@
+/* 9 November 2026, typed-header follow-up: a complete measured object view
+ * (state, update/draw distances, flags, state pointer, rotation fields) gives
+ * the same five flag words at 488 bytes. An inline three-field initializer
+ * with u8/s16/u16 parameters merges the two 255 constants: 484/488 bytes.
+ * A static const three-field defaults record retains memory loads: 496/488.
+ * Baseline RTL keeps separate QI 255 and HI 255 through cse2; sched1 orders
+ * HI 256, QI 255, HI 255, rather than retail's QI 255, HI 256, HI 255.
+ * Baseline rechecked in the build container: 0/3 places in us, pal and us2.
+ * No linked build; original reconstruction and assembly marker retained.
+ */
 /* 9 November 2026 (Sonnet round s44, lesson 52): scripted a nonempty do { real_op; } while (0) group around every 1-3 consecutive statements of the body (436 variants, each also with -frac2-sticky-volatile-refs, -frac2-hazard-labels and both): no variant scored below base (same diff rows, masked and unmasked); the switches alone change nothing here. */
 /* 8 November 2026 (Sonnet round s33, lesson 49): `angle` is a fake local (retail passes f0/f12 straight on): removing it for the 0xf4 store is identical (5 rows); removing it for the divide gives 480 bytes (lost nops before div.s). `lifetime` is real (v0 across the 0x24 store). Same five constant/store rows; struct local still banned. */
 /* 8 November 2026, twin search: transcribing matched twin func_L09_003AE8C8 (its unit flags -O2 -G8 -ffunction-sections -g; state loaded first, byte 255 then signed short 256) adds nothing: the twin has no halfword 255 at 0x32, and its retail stores the byte first. All six orders of the three header stores in that spelling give 5 rows or more (best 0x34, 0x30, 0x32: byte constant still lands in $v0, not $a0); one-pass groups around each store and an int 255 local give 5 rows or worse. */

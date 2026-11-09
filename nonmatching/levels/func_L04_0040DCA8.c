@@ -1,3 +1,12 @@
+/* 9 November 2026: corner ownership/type trial, no gain. Current master retained C
+ * reproduced 740/740 bytes, frame 0x1D0, 0/6 USA v1.01 with default game G0.
+ * Named x/y/z/w fields (anonymous/named struct), passing the complete corner
+ * instead of its field struct, and two owning coordinate-pair fields emit the
+ * same instructions as float f[4]. Only +0x224/+0x230/+0x238 differ, as before.
+ * Field alias/dependency shape alone does not recover the missing sched1 slot.
+ * Reopen on a new, evidenced pre-reload operation/dependency; no store-order
+ * search or compiler/flag sweep was repeated. Marker restored; no linked match.
+ */
 /* 9 November 2026 (Sonnet s50, lesson 53): no gain, 3 words. No integer `active` literal here; tried `half = 0.5f` local (in the UV loop, before it, subtract-only, add-only) and a `one` local for the 1.0f/-1/1 corner values and the two 1.0f scale args: equal or worse (22 -> 22/43/95/173 masked). */
 /* 8 November 2026 (Sonnet round s25, lesson 49 audit): re-measured 3 words. tmp[2] as two scalars 119 words, named h (kept value) 105, UV +0.5f folded into the expression 108, a kept -1 local 3 (no change). Retail's corner stores differ only at +0x224/+0x230/+0x238 (0x148 store early, 0x144 late). No gain. */
 /* 8 November 2026 (Sonnet round s16, lesson 48, scripted scorer): every single corner store/clear moved to every slot between the packet setup and the vertex loop, packet state/colour/uv stores moved across the call window, and all pairwise corner-block moves (~800 compiles): none below 3 words. */

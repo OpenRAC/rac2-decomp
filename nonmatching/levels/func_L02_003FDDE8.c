@@ -1,3 +1,19 @@
+/* 9 November 2026 (Codex, 69 new C variants, USA v1.01): baseline remains
+ * 964/964 bytes, 0/1 places, nine relocation-masked instruction differences at
+ * +0x1E4..+0x204, under game -O2 -G8 -ffunction-sections -fno-gcse.
+ * Checked 20 integer/FP argument interleavings of the real draw interface,
+ * preserving order and widths within each register bank; 21 inline-wrapper
+ * interleavings each with float x and with int x converted inside the helper;
+ * three contiguous layout-block views (flat, coordinate pairs, coordinate array);
+ * and four eight-byte coordinate-pair views (each pair separately and all three).
+ * All used build.compile_c and Placement.derive (equal-size candidates), with
+ * relocation opcode/register bits included in the comparison. The call forms
+ * give 964 bytes and 9/13/16 differences; the full layout blocks grow to 1036
+ * bytes, while each pair view exactly ties baseline. No new source retained.
+ * Next: independently evidenced draw-3 x/label lifetime or original helper
+ * structure; neither ABI interleaving nor coordinate MEM_IN_STRUCT_P closes it.
+ * No linked build or alternate-release check was run; INCLUDE_ASM stays in src.
+ */
 /* 9 November 2026 (Sonnet round s45): label_y2 (one handle test) per call, pairs, all 4 calls: base 9 rows, best single 14 (call 3), pairs 25+. No gain. */
 /* 9 November 2026 (Sonnet round, s43, lesson 52): scripted do { real_op; } while (0) sweep over every 1-3 consecutive simple statements in the function (all positions) plus all disjoint pairs of groups, masked and unmasked scores, and every -frac2-* switch (single and pairs) on the unit: best stays 9 rows; twin func_L11_00443940 not re-run (same C shape); no group or switch improves it. */
 /* 9 November 2026 (o53, sched1 -fsched-verbose-6, ~8 check.py runs): still 964/964, 9 rows. Retail at +0x1E4: lui a0; lw v1 (buttons); x cvt; mul; lw a1; andi; daddu a2 (label copy); movz. Ours: label copy before mul, x cvt last, buttons in a0 rather than v1. In sched1 block 16 every leaf depends on the mode-test branch 284, so x (250), the label copy (243) and one=1 (246) all get priority 2. At t=7 the copy wins on reg weight ($2 dies: 0 vs +1) and LUID. x only issues at t=12 behind the fy chain (281-283, priority 8-2) on fmac. The longer buttons life (255..257 spans 243/281/576) puts it after the lui pseudo in local-alloc, so it gets a0. Retail needs x to rank above the copy, i.e. x needs an in-block consumer or the copy a lower rank. No C here does that. Tried: x inline in the call or after fy (x stays in the call block, no interblock hoist: 16/8 rows); x before one=1; c as default+if; buttons into a local (944 bytes); draw-3 sc/z (956); half for 0.5f (936); literal 1 for one (9); label_y with copy=handle first (9) or mode test last (944). C unchanged. */

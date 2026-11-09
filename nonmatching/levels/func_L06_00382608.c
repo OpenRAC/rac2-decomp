@@ -1,3 +1,30 @@
+/* 9 November 2026, owner-override follow-up: 155 distinct new C variants
+ * compiled and compared at both USA v1.01 placements, default game G0.
+ * Baseline remains 584/584 bytes, 66 unequal instruction words (only
+ * relocation fields masked), first difference +0x9C, 0/2 placements.
+ * Typed route fields combined with vector aggregates, duration types and
+ * loop-entry groups: 40 variants, 564-616 bytes, best ties baseline.
+ * A real glyph local initialized before scale/copy/switch and reused by
+ * drawing cases: 60 variants, 572-596 bytes, best 70 unequal words.
+ * Duplicated final copies on selected case tails with shared increments:
+ * 28 variants, 596-632 bytes. Materialized loop predicates, inline count
+ * predicates and statement-expression predicates with body groups:
+ * 27 variants, 596-604 bytes. Neither family restores the timer-only hoist.
+ * Existing source retained; no linked build or matching credit. Reopen on
+ * evidenced loop-entry source that preserves the selective invariant motion.
+ */
+/* 9 November 2026: default game G0 profile, USA v1.01, retained source
+ * reconfirmed at 584/584 bytes, 0/2 places, first difference +0x9C,
+ * 66 unequal instruction words with only object relocation fields masked.
+ * New exit-test hypothesis: a GNU statement expression grouping the actual
+ * polygon-count read in do-while(0) restores timer-only hoisting, but keeps
+ * an entry jump to the bottom test: 584 bytes, 76 unequal words, 0/2.
+ * Grouping the comparison instead produces identical code. Adding a direct
+ * preguard gives 596 bytes; grouped steps and bottom-condition variants give
+ * 588-600 bytes without improving the match. Thirteen new source variants;
+ * retained body unchanged, no linked build. Next: explain how retail removes
+ * that entry jump while preserving the selective invariant motion.
+ */
 /* 9 November 2026 (Sonnet round s34): lesson 49 on the goto form (63 rows on score.py): dropping fake 'vector' (point and D_L06_001B9A90 directly) 69, only the D_ copy 63 (tie), only the point copy 69, plus timer inline 104. Retained C unchanged. */
 /* 8 November 2026 (Sonnet round s23): fresh plain `for (index = 0; index < *(int *)polygon; index += stride)` rewrite from asm with locals inline: 604 bytes / 138 rows (retained goto form 584 / 63 on the quick scorer): the rotated plain loop re-hoists flags/1.2f and grows the frame. Scripted lesson-48 sweep (single-statement moves 1..3 places, ~35 variants) on the goto form: best tie at 63, others worse. Retained C unchanged. */
 /* 8 November 2026 (Sonnet round): retained goto form re-measures 584/584, 73 rows; while-with-break variant 142 rows; one permuter run (1500 s) cut its score 2560 to 2345 but only via a fake inline index*16 helper and an early limit read (72 rows, no real gain). */

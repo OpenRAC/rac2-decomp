@@ -1,3 +1,15 @@
+/* 9 November 2026 (Codex aggregate-construction controls): USA v1.01, game
+ * -O2 -G8 -ffunction-sections. Retained source rechecks at 680/680 bytes,
+ * 0/28 places, six real differing rows, first +0x1C8. New hypothesis: construct
+ * the adjacent 0xE/0x30003 packet words as a real two-long aggregate to change
+ * scalar lifetimes without artificial dependencies. Inline struct-return/copy
+ * gives 708 bytes; automatic aggregate initialization with copy or individual
+ * member stores gives 700; member assignments with copy or individual stores
+ * give 692. All five controls are 0/28 and are discarded. No gain over retained
+ * C; no linked or secondary-release check run. Reopen with evidence for a
+ * source form that delays the coordinate constant without materializing a
+ * stack aggregate or disturbing the state-address/0x106 schedule.
+ */
 /* 9 November 2026 (Sonnet round s34): lesson 49 on the retained C: w/w2 as literals at the stores 15 rows (6 base), w only 15, w2 only 7, both declared early or before the call 6 (tie), w2 inside the block 25, one s (no s2) 157. No row improves; retained C unchanged (680/680, 6 rows). */
 /* 8 November 2026 (Sonnet round s23): scripted lesson-48 sweep (every single-statement move 1..3 places within same-indent runs, ~70 variants) on the retained C: none below 6 rows (best tie); retained C unchanged. A fresh C had already been measured by earlier rounds (see below). */
 /* 8 November 2026 (Sonnet round 2): clean rewrite from asm/Ghidra (typed DrawState, u32 *D_001B22A8 pointer global, results used directly) is worse: the pointer global keeps its lui in s0 across the body and the one-expression tex reorders the prologue (0/28 places, far more rows); retail needs the reload-each-use MACRO_ADDR array. Permuter 25 min -j2 from the retained C: only candidate (225 -> 160) uses a fake temp (t[new_var = 3]), rejected. */
