@@ -1,3 +1,18 @@
+/* 9 November 2026 (Codex follow-up): 96 distinct new C variants compiled and
+ * compared to USA v1.01 boot: object pointer/member views, 31 vector-union
+ * combinations, vector field arrays, full inline active/update/transform helpers,
+ * scalar-field/array cursors and ABI-preserving roll-call interleavings. No
+ * improvement: retained body is 1248/1248 bytes, 42 relocation-masked differing
+ * words (36 spill-offset words and six branch/reload/scheduling words). Update
+ * helper and typed vector views tie; active helper gives 49 words, separate field
+ * cursors 89 or more; byte cursor loop gives 1060-1076 bytes with wider differences.
+ * Transform helper is not inlined at this profile (1184-byte caller), not a match.
+ * Corrected func_002AD0B0 to the signed32 return of its matched definition, with
+ * an explicit pointer cast at the call site; complete object text is unchanged.
+ * tools/check.py: USA 0/28 and v2.00 0/28; PAL has no catalogue identity.
+ * No linked build run. Remaining constraints and next experiment are unchanged:
+ * natural pre-gcse count/base-pseudo lifetimes plus player-branch and work reuse.
+ */
 /* 9 November 2026 (dump round o76): slot order decided by gcse PRE bucket walk. Retail slots C8..E8 = self+192, fp+80, fp+96, self+16, sway+16, fp+144, sway+32, fp+160, fp+64. The frame-address order alone (fp+80<96<144<160<64 cyclic) needs a multiple of S in 14095..14110; with all nine (bucket=(14029+R+K)%S, ties by expr index) only S=111 (<=201) fits: max_cuid 220-223 (ours 236-239, S=119), self base pseudo = 98..110 and sway base = 114..128 (mod 111; ours r84/r85). Natural if/else instead of gotos: S stays 119, 1232 bytes. Body unchanged, 5 rows. */
 /* 9 November 2026 (Sonnet round s44, lesson 52): scripted a nonempty do { real_op; } while (0) group around every 1-3 consecutive statements of the body (408 variants, each also with -frac2-sticky-volatile-refs, -frac2-hazard-labels and both): no variant scored below base (same diff rows, masked and unmasked); the switches alone change nothing here. */
 /* 8 November 2026 (Sonnet round 2, lesson 49): re-measured 5 differing rows of 312 (1248/1248). Named locals for self+0x10, self+0xC0, &sway->offset/rotation (each alone and all 31 combinations) are far worse (272-301 rows): the PRE address pseudos must stay compiler-made. Statement-move sweep (lines of the update/clamp/tail code, +-3) found no row below 5. No change. */

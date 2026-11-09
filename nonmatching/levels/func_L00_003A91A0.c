@@ -1,3 +1,22 @@
+/* 9 November 2026 follow-up: retained body replays at 1524/1524 bytes, 0/27 places
+ * in each of USA v1.01, v2.00 and PAL, using game -O2 -G8 -ffunction-sections.
+ * Excluding relocation immediate bits, 33 instruction words differ: 27 spill-slot
+ * references and six strip-loop address operations. This supersedes the older
+ * 37/56-word counts below; the retained C body is unchanged.
+ * Checked 197 compiling source variants: 40 nonempty one-pass regions (eight
+ * operation ranges, depths 1/2/3/4/6), 63 combinations of named loop bounds and
+ * the object type id, 15 combinations of vector-bearing record views, 63 counter
+ * type combinations, and 16 next-origin address forms. None improves 33 words.
+ * Record views all tie. Named bounds give 1504-1532 bytes and usually change
+ * strength reduction; only ring_count/object_type combinations tie. Unsigned
+ * ring/row counters retain the frame but add one/three operand differences;
+ * wider counters change allocation. Fourteen next-origin forms tie, while the
+ * explicitly shifted next index and unsigned-long index give 1568 bytes.
+ * The existing 173-bucket PRE ordering and all-at-once spills reproduce. Reopen
+ * on an evidenced source lifetime that separates the spill rounds and a GIV
+ * form that constructs the ring base before adding the next-origin offset.
+ * No linked build was run; the INCLUDE_ASM marker remains in src/.
+ */
 /* 9 November 2026 (o96, dump-driven, -dG -dg -dl): 33 rows, all slot order. PRE regs (S=173): 412 fp+0x10, 413 fp+0xC0, 414 fp+0x20, 415 fp+0xD0, 416 fp+0x30, 418 ring+1, 419 fp+0x490, 422 fp+0x4A0; all spilled by global in one alter_reg round (no "now on stack" in .greg). Retail puts {0x10,0xC0,0x20,0xD0} after the other four, so they must be numbered later or evicted by reload. Eviction via caller-save is ruled out: refs/calls crossed are 12/21 (412, 414) and 5/2 (413, 415), and CALLER_SAVE_PROFITABLE needs refs > 4*calls. The F/G swap (ring+1 vs 0x490) alone gains 0 rows: it needs ring reg 131..145 at S=173. C below unchanged. */
 /* 9 November 2026 (o38, PRE slot order): partly PRE. Slots here = spilled PRE regs in bucket order (S=173, max_cuid 344-347): 0x10,0xC0,0x20,0xD0,0x30,ring+1,0x490,0x4A0. Retail: 0x30,0x490,ring+1,0x4A0 then 0x10,0xC0,0x20,0xD0 (second group = S=173 bucket order, so PRE regs evicted later by reload, not one bucket order: no S 101-499 fits all eight). Group 1 needs ring reg 130..146 at S=173, or 106..111 at S=177, 94..99 at S=179. `{ int ring; ...}` block gives ring reg 107 (code unchanged, 33 rows); S stays 173 under 4 spellings (alpha <<= 24 split, uv store split, (&rings[ring])->phase). */
 /* 8 November 2026 (Sonnet round, lesson 49/48): re-measured; every local checked against retail (all real or already expressions); dropping col/side_u, origin[] as byte-offset exprs (+0x10 folded first), and a statement-move sweep (+-2 over the loop prologue, 18 stmts) gave no row below base; only slot order and strip-loop adds remain. */

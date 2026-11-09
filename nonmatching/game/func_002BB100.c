@@ -1,3 +1,18 @@
+/* 9 November 2026 (Codex follow-up): 112 fresh C variants compiled and checked
+ * against the USA v1.01 boot with the default game profile, in the full source
+ * unit: 64 combinations of forward/backward/do-while three-float copies and
+ * three-float structure assignments; 24 inlined reflection helpers preserving
+ * all external calls; 24 permutations of one aligned scratch record's four
+ * vector members. None improves the retained five differing instruction words.
+ * Copy variants: 1684..1756 bytes, best 30 words; helpers: 1680/1696 bytes;
+ * scratch records: 1684/1688 bytes, original member order is byte-identical.
+ * Nineteen additional address-declaration controls (including MACRO_ADDR) give
+ * no improvement; MACRO_ADDR on the normal alone gives 1688 bytes.
+ * Fresh tools/check.py func_002BB100 --diff: 0/28, first rejection +0xA4.
+ * All five remaining words are +0x9C..+0xB0. No linked build was run; production
+ * source restored byte for byte. Next useful input remains an independently
+ * evidenced reflection expression or liveness cause for the branch target.
+ */
 /* 9 November 2026 (dump round o76): deciding pass is reorg fill_slots_from_thread on the beqz fall-through (sched2 order f0, lui s0, f1, addiu s0, f2, a0 = retail's). lui s0 (insn 84) is taken because opposite_needed = flow2 global_live_at_start of bb 3 (else target) = {1,19,20,21,29,30} lacks 16; retail needs 16 in that set (4 must stay out). Ruled out the other route: a0 first in the then-block is impossible (sched2 key 1: prio(a0)=10 < loads 15; all regions single-block, no interblock), and the forward scan in fill_simple_delay_slots needs target==0. No legal C found that makes s0 live at bb 3; body unchanged, 5 rows. */
 /* 9 November 2026 (Sonnet round s44, lesson 52): scripted a nonempty do { real_op; } while (0) group around every 1-3 consecutive statements of the body (468 variants, each also with -frac2-sticky-volatile-refs, -frac2-hazard-labels and both): no variant scored below base (same diff rows, masked and unmasked); the switches alone change nothing here. */
 /* 8 November 2026 (Sonnet round, lesson 49): re-measured 5 differing instructions (gap A only); x,y,z and the separate cfg local rewritten as expressions: unchanged. Ghidra shows flags reloaded at the end of both arms, matching ours; still needs $s0 live at the else target. */

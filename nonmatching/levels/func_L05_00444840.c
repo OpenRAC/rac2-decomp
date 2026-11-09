@@ -1,3 +1,19 @@
+/* 9 November 2026, Codex scan-control follow-up: 48 new C variants compiled
+ * and checked at all four USA v1.01 places with the current game compiler,
+ * -O2 -G8 -ffunction-sections -freduce-all-givs. Tested cached rule-class
+ * values, row pointers and candidate-class values; switch/if sentinel
+ * dispatch; found-arm break versus a continue label; and zero/preincrement
+ * index initialization inside/outside the one-pass group. Sizes 720-748;
+ * best new variant 736 bytes, 31 aligned non-relocation differences.
+ * The preincrement form fixes +0x124/+0x128 but retains i = -1 followed by
+ * a separate increment at scan entry, displacing the scan; it is worse.
+ * Retained C unchanged: 736 bytes, two words at +0x124/+0x128. Rechecked
+ * using check.py's compile/placement path with scratch source selection:
+ * USA v1.01, USA v2.00 and PAL each 0/4, first mismatch +0x124. No linked
+ * build run and no C match claimed. Next useful input remains a genuine
+ * lifetime that distinguishes the second projection's y-pointer argument
+ * without changing the indexed scans or the callee's physical interface.
+ */
 /* 9 November 2026 (o112, L06_00382608 set-once-constant lever, local cc1 scorer -freduce-all-givs, ~230 compiles): set-once int locals for the second func_L05_00444D60 call's 0 (a3) and the first call's 0, range 40, i/j 0, the 16 arg, kind 5, state 20 and the scan -1 (`none`, separately and shared), at every statement position: best stays 2 rows (a1/a2 at +0x124); `none = -1` before the loop takes s7 and gives 31 (retail hoists -1 into s5 itself). Constants cannot give a2 a dying source; tie unchanged. */
 /* 9 November 2026 (o74 follow-up, check.py, row counts incl. relocation rows; base 26): weight-0 a2 candidates: `int target[2]; int *py = &target[1];` passed as (&target[0], py) 183; `p = target;` passed as (p, p + 1), reads p[0]/p[1] 56; scalars with `int *px = &target_x, *py = &target_y;` at declaration 183; `py = &target_y;` just before the call 28 (slots swap, a1 still before a2). None gives a2 first. */
 /* 9 November 2026 (o74, -dS -dR -fsched-verbose-6, retained C re-measured 736/736, 2 rows at +0x124/+0x128): the a1/a2 order is fixed in sched1 block 18 and kept by sched2 on LUID. Sched1: insn 180 (a1=sp+8) and 182 (a2=sp+12) tie on every rank_for_schedule key: priority 18/18 (1 + call 186 at 17), INSN_REG_WEIGHT 1/1 (no REG_DEAD on either), class 3/3, dependents 7/7 (588 231 222 216 203 197 186); LUID 180<182 wins. Sched2 (LUIDs from sched1 output): same 18/18, class 3/3, dependents 7/7, LUID. Flip needs 182 weight 0 (a pseudo dying at the a2 set) or an extra $6 dependent before call 197; `int target[2]` (&target[0], &target[1]) tested: 56 rows (frame changes). Not retained. */

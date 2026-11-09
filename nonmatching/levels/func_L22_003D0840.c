@@ -1,3 +1,21 @@
+/* 9 November 2026 (Codex, aggregate lifetime probe): 48 new C variants
+ * compiled and checked against the USA placement with build.compile_c and
+ * Placement.derive in rac2-gnu, default -O2 -G0 -ffunction-sections; no match.
+ * A local Update aggregate held the object and its flags: four flag types
+ * (u16/u32/u64/s32), both member orders, three preparation forms (field
+ * assignments, inline aggregate return, inline output pointer), and aggregate
+ * declaration/object initialization before versus after the state test.
+ * Flags were read only inside the zero-state arm; the callback and void
+ * three-argument state setter interfaces were preserved.
+ * Sizes: 20x92, 16x88, 2x180, 2x172, 4x176, 4x168 bytes (retail: 60).
+ * Passing the aggregate by value retains stack copies even after inlining;
+ * aggregate-return preparation adds further copies. No improvement retained.
+ * The baseline was rechecked through tools/check.py with source_of redirected
+ * here: 60/60 bytes, 0/1 places in US, PAL and US2, same four v1/a3 words.
+ * Reopen with a scalar lifetime that survives CSE and disappears after
+ * allocation; aggregate-by-value helpers do not supply it. Marker unchanged;
+ * no linked build or C-progress claim. Trial sources/logs remain in work/.
+ */
 /* 9 November 2026 (o97, dump-driven, cc1 -dl -dg on the retained C, 0 check.py runs): only global allocno is the object
  * pseudo 84 (5 refs/9 insns, conflicts v0 a0 a1 a2); locals 86/88/90 all take v0. find_reg pass 1 (global.c ~1376)
  * walks v0 (conflict), v1 (free, in regs_used_so_far as call-used, and regs_someone_prefers empty) -> v1. Retail's a3

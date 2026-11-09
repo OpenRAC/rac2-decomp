@@ -1,3 +1,22 @@
+/* 9 November 2026, Codex unrolling/filter follow-up: 72 distinct new C variants,
+ * 120 compiler trials, no improvement; retained body unchanged. Replayed the current
+ * draft at 948/964 bytes, 0/1 USA v1.01 and 0/1 USA v2.00 placements; PAL absent.
+ * Profile: game -O2 -G8 -ffunction-sections -frac2-qcopy.
+ * New hypothesis: unroll a two-element timer initialization loop so its float
+ * induction value loses a cross-call use late enough to retain the saved register.
+ * Forty conditional-rate/loop/group forms with -funroll-loops give 948 or 956 bytes,
+ * no saved $f20. Eight further carried-rate forms, each under four unrolling/CSE
+ * profiles and three fast-math controls, give 948 or 972 bytes. The form using a
+ * temporary call result, conditional destination and t -= 2.2f does save $f20,
+ * but also saves $f21 for 2.2f and retains sub.s before the second conversion.
+ * It is a live cross-call value, not retail's single-read saved constant;
+ * neither -ffast-math nor disabling GCSE or post-loop CSE removes the subtraction.
+ * Twenty-four nullable-hit filters (including switch and inline helper forms)
+ * give 948-960 bytes and regress overall against the retained draft. No redundant
+ * hit test was added. Do not reopen on these two-element unrolling/filter shapes
+ * without a new lifetime or optimization hypothesis. No linked build was run;
+ * the INCLUDE_ASM marker and original flags were restored.
+ */
 /* 9 November 2026 (o96, dump-driven): frame 0x30 = only the $f20 save at 0x20 (no other local/spill in retail; ours 948/964, 219 rows by sc.py). The 15.0 pseudo needs REG_N_CALLS_CROSSED > 0 at flow, but in every source order where the f48 call is first nothing crosses a call before the mov.s, and cse1/gcse/cse2 fold any later use before flow. Tested: rate set before a qcopy() helper (volatile asm WITH clobbers is a PARALLEL, cse keeps the 15.0 equivalence) plus a later (short)(rate*4.0f) use: cse still folds to li 60, li.s $f12, 940 bytes. Route left: a cross-call use that dies only after flow (combine/reload/flow2) in honest C; none found. C below unchanged. */
 /* 8 November 2026 (Sonnet round, s28): lesson 49 (inline the 11 constant-only vf locals: vf7C/8C/9C/88/B8/84/120/13C/A0/30 and vf118; kept the real ones, vf11C shares the $gp load): 948/964 bytes, rows 228 -> 207 (score.py), still no $f20/0x30 frame; C below is this better body. Per-local toggles all tried; permuter not rerun. */
 /* 8 November 2026 (Sonnet round): no gain, C below unchanged (944/964, 52 rows). Permuter 1500 s -j2 from this C: score 3610 -> 3280, only declaration/statement reorders, no $f20 or 0x30 frame. */

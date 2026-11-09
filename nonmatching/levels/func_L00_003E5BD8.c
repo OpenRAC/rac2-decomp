@@ -1,3 +1,17 @@
+/* 9 November 2026 (Codex, structured views and inline helpers): 249 new C
+ * variants compiled in the existing container with -O2 -G8 -ffunction-sections
+ * -ffast-math. All 122 object/data/table/workspace variants produce complete
+ * objects identical to this draft: member views, data unions and aggregate
+ * stack workspaces do not change PRE's 121 buckets. Of 127 combinations of
+ * seven inline operation groups, 15 retain 1108 bytes and the same 19 offsets;
+ * eight retain 1108 bytes with 26 differences; the others change size. Some
+ * helpers reduce the table to 119 or 117 buckets, but change the final code.
+ * A no-dump compile produces the same complete object as -dG. Placement.derive
+ * rejects all 81 US/US2/PAL places at +0x4c, each with 19 nonrelocated word
+ * differences. No linked build: the source remains nonmatching. These views
+ * and helper boundaries do not supply the needed pre-GCSE reduction; investigate
+ * another source operation shape rather than more layout-only combinations.
+ */
 /* 9 November 2026 (o81, PRE slot solve): fresh -dG dump: 121 buckets, max_cuid 242 (insns at gcse), spilled PRE regs in bucket order sp+16(10) object+192(27) sp+48(42) sp+64(58) sp+80(74) sp+84(78) index+1(79) sp+208(81). Retail order object+192, sp+80, sp+84, sp+208, index+1, sp+16, sp+48, sp+64: brute force over S 11..599 and object/index pseudos 80..260 finds only S=111 (max_cuid 220..223, need 19..22 fewer insns) with the object+192 base pseudo >= 98 (ours 84); then 217/235/239. Not a small change; no C tried. */
 /* 9 November 2026 (Sonnet round, s48): re-measured 1108/1108, 0 masked / 19 unmasked rows (stack slots only). Switch singles and pairs (same list): only -fno-gcse and -fno-rerun-loop-opt change it, both far worse (916/208). do-while(0) groups of 1-3 statements (108 variants): none better. Set-once `float one = 1.0f` local (retail keeps 1.0f in $f22) used for matrix[0][0], matrix[1][1] and the two 1.0f args: 36-47 rows, worse; only the two args: 36. */
 /* 8 November 2026 (Sonnet round, lesson 49 + declaration sweep): re-measured 1108/1108, 20 differing words, all stack offsets. Inlining vertex_index/uv_index (1124 bytes, 217 words) or data (1100 bytes) breaks the code, so those locals are real. `char *object = object_` copy (before q or after the arrays), a block around the loop: 20 words (tie). Every single declaration move among matrix/normal/center/edge1/edge2/index/data: no gain. Permuter (-j2, 1500 s): only junk (undefined new_var/inline_fn). */

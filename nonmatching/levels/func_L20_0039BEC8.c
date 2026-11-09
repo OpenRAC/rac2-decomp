@@ -1,3 +1,18 @@
+/* 9 November 2026 (Codex, inline-helper/lifetime follow-up): 311 new C
+ * variants checked with game -O2 -G8 -ffunction-sections: 255 combinations
+ * of matrix/direction/normal/rotation/fade/depth/scale helpers, 7 object-copy
+ * placements within loop 1, 1 typed object prefix, 8 negative-scale helpers,
+ * and 40 complete-loop helper/order/counter forms. None beats the retained
+ * 1252-byte, 27-word baseline (relocation immediate bits excluded). A normal
+ * helper gives 51 words; direction or rotation helpers shorten to 1244;
+ * complete loop-1/2 helpers give 1236/1244 and 1220 respectively. Object-copy
+ * placements and the typed prefix tie; moving width selection inside a
+ * negative-scale helper gives 1252/31 or 1256/126. The closest complete
+ * loop-3 helper gives 1252/28. Rechecked the retained body with check.py in
+ * USA v1.01, v2.00 and PAL: each 0/1, first +0x8c. No linked build run.
+ * Reopen on a source shape that preserves indexed-loop reloads while changing
+ * PRE expression order/count, rather than these equivalent helper wrappers.
+ */
 /* 9 November 2026 (o81, PRE slot solve): fresh -dG dump: 135 buckets, 268 insns at gcse (266 at addressof + jump if-conversion cmov setup). Retail slot order sp+304, sp+64, sp+208, sp+80, sp+84, sp+256, obj+16, sp+272, sp+288 (ours sp+288 first, obj+16 before sp+256). Over S 11..799 only S=129 works (max_cuid 256..259, need 9..12 fewer insns) and the obj+16 base pseudo (PRE copy at end of bb 5, after loop 1) must be 113..127, 242..256 or 371..385 (ours 85). In our numbering 113..127 is the middle of loop 1 and a late declaration lands at ~149, so the base cannot move there by declaration order; not a small change, no C tried. */
 /* 9 November 2026 (Sonnet round, s48): re-measured 1252/1252, 3 masked / 27 unmasked rows (all PRE spill-slot order). Every -frac2-* and -fno-gcse/-fno-cse-follow-jumps/-fno-rerun-loop-opt singly and in pairs: none better (qcopy, -fno-gcse break size; zero-ti-barrier 55). do-while(0) groups of 1-3 statements around each simple statement (116 variants): none better. */
 /* 8 November 2026 (Sonnet round, lesson 49 + declaration sweep): re-measured 1252/1252, 28 differing words. Locals checked: object/arg copy (writing ((char *)arg) everywhere is byte-identical, pseudo numbers do not move), width as expression (204/123 words, worse), vars set later (300, worse), negw temp (28, tie). Every single declaration move among packet/matrix/rotated/direction/tangent/normal/vars/color: no gain. Permuter (-j2, 1500 s) only junk (undefined helpers). Still the PRE slot order plus the loop-3 neg.s register. */

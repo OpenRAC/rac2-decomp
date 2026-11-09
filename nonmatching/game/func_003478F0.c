@@ -1,3 +1,19 @@
+/* 9 November 2026 (Codex follow-up, USA v1.01): 233 distinct new C
+ * variants plus repeated controls compiled with the unchanged game compiler,
+ * -O2 -G8 -ffunction-sections -fno-rerun-loop-opt. No improvement; body retained.
+ * 64 intermediate-expression variants (product/sum locals, declaration versus
+ * assignment, arithmetic before/after the real colour store) give 1452 bytes,
+ * 35 differing rows. 32 layout-type variants (integer/float pair members,
+ * integer conversion locals, coefficient pointers, sum order) and 12 typed
+ * owner-component views give 33 or 35 rows. 128 mutable-coordinate variants
+ * (coefficient products, reused base/stride locals, axis order, position local,
+ * arithmetic before/after the store) give 33..36 rows. All preserve the reads,
+ * writes and call contracts; none supplies the missing scheduler dependence.
+ * check.py --diff on the retained body: 0/28 places, first +0x4c; 1452/1452
+ * bytes, 33 real differing rows, 14 after ignoring stack-slot offsets.
+ * Pair/member spelling alone does not resolve the first-coordinate allocation;
+ * reopen with a measured dependency or lifetime witness. No linked build run.
+ */
 /* 9 November 2026 (o84, dump-driven, local-alloc for the first-coordinate FPRs): insn `f13 = ysum + p[1]` gives BOTH inputs a qty_phys_sugg of f13 (combine_regs with a hard output never ties), so the higher QTY_CMP_PRI wins f13. p[1] (reg 122): 2 refs over 2 insns = 0.5. With `ys*(float)row + yb` (retail's operand order: mul.s f13,f13,f22; add.s f13,f13,f2) ys/ys*row/sum tie into one qty of 6 refs, pri 12/life; it wins only if life <= 12 insns (tie goes to the lower qty), i.e. ys loaded at sched1 position >= 4. sched1 gives plain float loads prio 28 vs 27 for the int->float loads (90/93 vs 83/87), so ys is always issued 1st or 2nd (chain life 16 -> 0.375): all 24 declaration orders with the tied form keep p[1] in f13. Retail's ys-last order needs ys's sched1 priority below 27; no C found. Body C unchanged (14 rows). */
 /* 9 November 2026 (o38, PRE slot order): partly PRE. Spilled PRE copies 372..385 (S=163, max_cuid 324-327) give slots o+0x258, o+0x3b4, o+0x98, row+1, o+0x2a0, o+0x210, o+0x17c, o+0xe4. Retail's first six are bucket order with row+1 after o+0x2a0 (row reg 104..121 at S=163, or reg 86 at S=169/171/173 = max_cuid 336-347). o+0x258/o+0x3b4 last fits no S and no base reg 81-99 (exhaustive, S 51-799): retail gave them hard regs in global and reload evicted them (slots after all alter_reg slots). Not fixable by bucket order alone. */
 /* 9 November 2026 (Sonnet round 3, lesson 42/49 sweeps): no gain. Exact-row measure (slot offsets counted) 33; post-loop locals in slot order (o+0x258, o+0x210, o+0x17c, o+0x2a0) 29 exact but 29 slot-blind (worse than 14); `ids=(short*)ref+3; id=ids+(row<<2)*5` gives the separate la then +6 form but 17 slot-blind rows and moves spill slots; operand order of the first coordinate y (P1+(yb+ys*row)) 17 vs 18; all 24 float-local declaration orders and expression/local masks of xb,yb,xs,ys: no change in FPR numbers (load order is yb,ys,xb,xs against retail yb,xs,xb,ys). Body C unchanged (14 rows). */

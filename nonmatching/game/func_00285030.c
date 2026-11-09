@@ -1,3 +1,17 @@
+/* 9 November 2026 (Codex coordinate-dataflow controls): USA v1.01, game
+ * -O2 -G8 -ffunction-sections. Rechecked retained C: 680/680 bytes, 0/28
+ * placements, six real differing rows (+0x1C8/+0x200 clusters). Compiled and
+ * checked 48 new valid variants: 24 combinations of scaled/negated dimensions,
+ * explicit/opposite corners, unscaled offsets or long dimensions, placed at
+ * either coordinate/store boundary, with early or literal 0x106; plus all 24
+ * parameter orders of an inline rectangle emitter. They produce 664-676 bytes;
+ * sharing dimension values changes loads/arithmetic and the complete tail,
+ * rather than adding the missing early ALU operation. Twelve additional trials
+ * failed C89 declaration placement and are excluded from the count. None
+ * improves the six-row retained C. No linked or secondary-release build run.
+ * Next: establish a real additional early scalar operation that preserves the
+ * retail dimension reloads and state-address/0x106 ordering.
+ */
 /* 9 November 2026 (o102, dump-driven): 6 rows unchanged. Deciding pass is local-alloc's INSN_SCHEDULING fake lifetime (local-alloc.c ~1412: qty_birth-2 / qty_death+2), not sched keys. sched1 block 3 has exactly 7 ALU slots in cycles 1-5 (283 288 293 272 298 303 la 275), so 0x8000 (r181, insn 327) issues in cycle 6 right after the 0xE store (290). Priority r181 = 2*4/42 -> 1904 beats r171 (0xE) = 1*2/16 -> 1250, so r181 takes a2 first and r171's fake death covers r181's birth: 0xE -> t0, 0x30003 -> t2. Retail needs >= 1 insn between 290 and 327 (an 8th ALU insn of prio > 19 in cycles 1-6) or pri(r171) > pri(r181). t[6] = 0x106 literal (or w2 set at the store) supplies that insn: 0xE/0x30003/0x8000 regs become exact (7 rows) but the 0x106 pseudo issues in cycle 5 beside the 282 store (v0/v1 death), so fake lifetime gives it t2 and la slips to cycle 6. Tried (local cc1 scorer): 13 -frac2/-fsched switches on both forms (no change), single-statement moves 1..3 in the final block of the 0x106-literal form (none < 7), w2 declared at block top (20), `k = 0x8000` local set beside w/w2 (138: 3 uses, update_equiv_regs does not sink it, lands in $fp). Callee prototypes checked (282A88 void, 125F20 int). */
 /* 9 November 2026 (Codex aggregate-construction controls): USA v1.01, game
  * -O2 -G8 -ffunction-sections. Retained source rechecks at 680/680 bytes,

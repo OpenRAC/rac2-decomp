@@ -1,3 +1,4 @@
+/* 9 November 2026 (round o115): body below is new: check.py 4684/4684 (exact size), 0/1, first difference +0x134; 7 differing rows in place (AL2 aligned 6; o107 body 63 on the same scorer). Changes: (1) func_00300A00 prototype `(char *, f32, s32, f32, ...)` with the x before the colour at every call (same register banks a0/a1 and f12-f16, AGENTS.md interleave rule): load_register_parameters now emits $f12 before $a1, fixing the ~14 label calls (63 -> 13); twin func_L02_003FE8B8 with the same change: 49 -> 33 on this scorer. (2) arm 9: `s32 hh = 2 - tm / 3600; s32 m = 0x3B - tm / 60 % 60;` before the sprintf fixes the 60/2/59 constant order (13 -> 8). (3) one `Rect *pr = &r90` local (retail holds &r90 in $s5 across every use; lesson 49) set just before the box-3 call and used in all arms: no PRE copy, exact size; declared last and `k2 = 1` moved before the box-6 call so global-alloc gives pr $s5 (pr priority 2*7/394 above `one`'s 3*10/1096 otherwise took $s4). Left (dumps): box 3 `addiu $s5,$sp,0x90; move $a0,$s5` vs retail `addiu $a0; move $s5,$a0` (pr's set is a sched1 birth, max priority, before the h fix; retail's shape is gcse's PRE copy form, which needs the occurrence available at a block end before the call); box 2 `addiu $a0,$sp,0x70` last (sched2 dep on the h fix and the `one` ghost set). Hill-climbs over 18 box forms x set-once positions, and all pairs of near-best single moves: no gain. */
 /* 9 November 2026 (round o107): body below is new: 4692/4684 bytes, 0/1; masked LCS 1136 of 1171 retail words aligned, 74 rows (o104 body: 869/593 on the same scorer). Changes: set-once `one`/k2/k3 = 1 locals as label_y actives (ghost saved regs $s4/$s6/$s7, as twin func_L02_003FE8B8): fmt high now rematerialized, moby in $s3, and the arm-5/8 cross-jump starts at retail's call (the 13 missing words); twin box forms (t-forms and do-groups per box; box-6 y in a do-group) give $s1 = 3 for boxes 1-4 and fresh 3 in 5/6; switch with case 0xD4A first (retail block order); label_y4 for the 0x50 labels; block-local `f32 half = 0.5f;` in the mode-12 inner block and the 0x4E/0x4F block (retail reloads 0.5 into $f22 there); SUM loop init `obj = data + 0x100, i = 7`. With box-6 y = hud_coord instead the size is exact (4684) at 84 rows. Left (dump-measured): (1) &r90: gcse PRE inserts its reaching reg after the box-3 call (the call kills the $1-based frame expression) and sched1 cannot hoist the copy above the call past box 4's do-group loop notes, so &r90 sits in $s0 and is copied to $s5 later (+1 word, then an alignment nop before the arm-5 SUM loop = the +8 bytes); box-4 forms without notes fix the copy but break the box chains/constant-3 path. (2) a1/f12 order at ~14 label calls (~50 rows): sched1 and sched2 tie on every key (prio 17, weight +1, 3 deps each) and LUID picks $a1 because load_register_parameters emits arg moves in order; MEM args are not precomputed; xx/yy/cc temporaries get combined back. (3) arm-9 constants 2/59/60 order (10 rows), box-2 `addiu $a0,$sp,0x70` order (3 rows). Sweeps (local scorer): active values per call site x set positions, box coordinate forms (18 slots), all -frac2 switches (no change). Permuter 1500 s (seeded from this body): 5950 -> 5755 only via an assignment inside a call argument (`new_var = D_L11_001B17C8` as the 0x4D label x), a fake temporary, rejected. */
 /* 9 November 2026 (round o104): body below is new: 4632/4684 bytes, 0/1, profile now -O2 -G8 -ffunction-sections (sched1 ON; with -fno-schedule-insns the same body is 4648, 779 aligned). Masked-word LCS (relocs masked): 874 of 1171 retail words aligned (old body: 325 on the same scorer). Changes, from twin func_L02_003FE8B8 and owner-allowed HUD idioms: hud_coord (dead mode/result tests, owner ruling) for every box x/y/h and label_y (ls as handle) for every label y, `half = 0.5f;` after func_L00_0037B7B0, a block-scoped `s32 ofs = 0x8710;` per arm (7 blocks, as retail's 7 `ori ...,0x8710` sets). Result: box chains, the 0.5/-1/0 registers ($f20/$f21/$f22) and the arm-5 TITLE/sprintf rows are retail's. Measured (dumps): an int-arg scaled_coord on label y converts f32->int->f32 (+432 B); a single `mode == active` test leaves no jump at sched2 (no boundary), `result != 0 && ...` gives the boundary but LABEL_NUSES 2 ends cse's path (3/0x8710 fresh per box/label). `one` local as active and h inside the call: no change. Left: &r50 PRE copy kept in $fp/$s0 (retail rematerializes `addiu $a0,$sp,0x50`), constant 3 in $s4 plus a fresh $v0 in box 1 (retail $s1 boxes 1-4, fresh in 5/6), format-hi copy `daddu $fp,$s0` in arm 5, and arm-5/8 cross-jump starting one call later (13 words short). */
 /* 5 November 2026, two-agent pass:
@@ -173,15 +174,15 @@ extern f32 func_00283CE0(s32);
 extern int func_00288FB8(s32);
 extern void func_002FC560(u32, u64);
 extern void func_L00_0037B7B0(void);
-extern void func_00300A00(char *, s32, f32, f32, f32, f32, f32);
+extern void func_00300A00(char *, f32, s32, f32, f32, f32, f32);
 extern void func_L02_003FE768(f32);
 extern int func_00336D50(s32, s32);
 extern s32 func_001157AC(char *);
 extern s32 func_00115DA8(char *, char *, ...);
 
 extern s32 D_L11_001B3E00;
-#define LBL(id, c, xv, yv, a1, a2, a3, A) { char *ls = (char *)func_00336D50(D_L11_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y(ls, (yv), D_L11_001B3E04, half, A), a1, a2, a3); }
-#define LBL4(id, c, xv, yv, a1, a2, a3, A) { char *ls = (char *)func_00336D50(D_L11_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y4(ls, (yv), D_L11_001B3E04, half, A), a1, a2, a3); }
+#define LBL(id, c, xv, yv, a1, a2, a3, A) { char *ls = (char *)func_00336D50(D_L11_001A904C[0] + ofs, id); func_00300A00(ls, xv, c, (f32)label_y(ls, (yv), D_L11_001B3E04, half, A), a1, a2, a3); }
+#define LBL4(id, c, xv, yv, a1, a2, a3, A) { char *ls = (char *)func_00336D50(D_L11_001A904C[0] + ofs, id); func_00300A00(ls, xv, c, (f32)label_y4(ls, (yv), D_L11_001B3E04, half, A), a1, a2, a3); }
 #define TITLE(A2, A) \
         LBL(0x4C, D_L11_001B17E4, D_L11_001B17D0, D_L11_001B17D4, -1.0f, D_L11_001B17C4, 0.0f, A2); \
         LBL(0x4D, D_L11_001B17E0, D_L11_001B17D0, D_L11_001B17D4, -1.0f, D_L11_001B17C4, 0.0f, A)
@@ -280,6 +281,7 @@ void func_L11_00444400(u8 *moby)
     s32 one;
     s32 k2;
     s32 k3;
+    Rect *pr;
 
     if (D_L11_001A904C[0] == 0) {
         return;
@@ -299,7 +301,8 @@ void func_L11_00444400(u8 *moby)
     x = hud_coord((f32)D_L11_001B1740, D_L11_001B3E04, half);
     do { t = (f32)D_L11_001B1744[0] * D_L11_001B3E04 + half; y = t; } while (0);
     t = (f32)D_L11_001B173C * D_L11_001B3E04 + half; do { h = t; } while (0);
-    func_002802E0(&r90, x, y, D_L11_001B1748[0], D_L11_001B174C[0], D_L11_001B1738, h, 0, 3);
+    pr = &r90;
+    func_002802E0(pr, x, y, D_L11_001B1748[0], D_L11_001B174C[0], D_L11_001B1738, h, 0, 3);
     t = (f32)D_L11_001B1728 * D_L11_001B3E04 + half; x = t;
     do { t = (f32)D_L11_001B172C[0] * D_L11_001B3E04 + half; y = t; } while (0);
     do { h = hud_coord((f32)D_L11_001B1720, D_L11_001B3E04, half); } while (0);
@@ -310,8 +313,8 @@ void func_L11_00444400(u8 *moby)
     func_002802E0(&rF0, x, y, D_L11_001B1778[0], D_L11_001B177C[0], D_L11_001B1768, hud_coord((f32)D_L11_001B176C, D_L11_001B3E04, half), 0, 3);
     x = hud_coord((f32)D_L11_001B1758, D_L11_001B3E04, half);
     do { t = (f32)D_L11_001B175C[0] * D_L11_001B3E04 + half; y = t; } while (0);
-    func_002802E0(&rD0, x, y, D_L11_001B1760[0], D_L11_001B1764[0], D_L11_001B1750, hud_coord((f32)D_L11_001B1754, D_L11_001B3E04, half), 0, 3);
     k2 = 1;
+    func_002802E0(&rD0, x, y, D_L11_001B1760[0], D_L11_001B1764[0], D_L11_001B1750, hud_coord((f32)D_L11_001B1754, D_L11_001B3E04, half), 0, 3);
     save = ((HudRenderState *)D_L11_001BEDC0)->text_scale;
     ((HudRenderState *)D_L11_001BEDC0)->text_scale = 0.62f;
     func_0027AB40();
@@ -319,7 +322,7 @@ void func_L11_00444400(u8 *moby)
         s32 ofs = 0x8710;
         TITLE(1, 1);
         sprintf_n(buf, D_L11_001B17E8, 0x5A - *(s32 *)(data + 0x188) / 60);
-        DRAWBUF(func_00280270, &r90);
+        DRAWBUF(func_00280270, pr);
         DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         LABEL(k3, one);
         SUM();
@@ -330,19 +333,19 @@ void func_L11_00444400(u8 *moby)
         s32 ofs = 0x8710;
         TITLE(1, 1);
         tm = *(s32 *)(data + 0x188);
-        sprintf_n(buf, D_L11_001B17F0, 2 - tm / 3600, 0x3B - tm / 60 % 60);
-        DRAWBUF(func_00280200, &r90);
+        { s32 hh = 2 - tm / 3600; s32 m = 0x3B - tm / 60 % 60; sprintf_n(buf, D_L11_001B17F0, hh, m); }
+        DRAWBUF(func_00280200, pr);
         DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         LABEL(k2, k3);
         LABEL50(1);
         pv = *(u8 **)(*(u8 **)(data + 0x180) + 0x68);
         func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-        func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+        func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
     } else if (*(s16 *)(data + 0x1F0) == 8) {
         s32 ofs = 0x8710;
         TITLE(1, 1);
         sprintf_n(buf, D_L11_001B17E8, 0x3C - *(s32 *)(data + 0x188) / 60);
-        DRAWBUF(func_00280270, &r90);
+        DRAWBUF(func_00280270, pr);
         DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         LABEL(k2, one);
         SUM();
@@ -355,9 +358,9 @@ void func_L11_00444400(u8 *moby)
         n = 100 - *(s32 *)(data + 0x188) / 60;
         sprintf_n(buf, D_L11_001B17E8, n);
         if (n >= 100) {
-            DRAWBUF(func_00280190, &r90);
+            DRAWBUF(func_00280190, pr);
         } else {
-            DRAWBUF(func_00280270, &r90);
+            DRAWBUF(func_00280270, pr);
         }
         DRAW(func_00280190, &rB0, ((char *)func_00288FB8(0x2F63)));
         if (moby[0xBC] != 0) {
@@ -385,12 +388,12 @@ void func_L11_00444400(u8 *moby)
                 if (*(f32 *)(pv + 0x20) > 0.0f) {
                     func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
                 }
-                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
+                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
                 break;
             case 0xB3A:
                 pv = *(u8 **)(obj + 0x68);
                 func_L02_003FE768(*(f32 *)(pv + 0x20) / func_00283CE0(*(s16 *)(pv + 0x24)));
-                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B0, D_L11_001B17B4, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
+                func_00300A00(((char *)func_00336D50(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
                 break;
             }
         }
