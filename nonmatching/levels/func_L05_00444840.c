@@ -1,3 +1,4 @@
+/* 9 November 2026 (o122, owner ruling: set-once constant locals): re-measured 736/736, a2 one slot late (local scorer). a2 is &target_y (sp+12), not a constant, so no set-once constant can give it a dying source; o112 already swept the a3 0 and every other literal. Not rerun. */
 /* 9 November 2026, Codex scan-control follow-up: 48 new C variants compiled
  * and checked at all four USA v1.01 places with the current game compiler,
  * -O2 -G8 -ffunction-sections -freduce-all-givs. Tested cached rule-class

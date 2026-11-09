@@ -1,3 +1,5 @@
+/* 9 November 2026 (round o119): body below is new: 3552/3552 (exact size, sc.py cc1 harness), AL2 aligned 8 (o116 body 15), 35 rows in place. Ported from twin func_L11_00444400 (o117): box 2 as `x = hud_coord; do { y = hud_coord } while (0); h = hud_coord;`, set-once `three = 3` before the box-1 call for boxes 1-4, `three2 = 3` for box 6 and the `== three2` mode test, `three3 = 3` for box 5 (fresh `li $v0,3` as retail), both set right after the box-2 call, `one = 1` moved before the box-6 call (fixes the 0x1428 high $fp, rB0 $s7, the visible `li $fp,1`). Left: three2 set early in $fp (retail `li $s3,3` in the box-3 call slot) and box 3 `addiu $s5`/`move $a0,$s5`. Variant (same edits, `three2 = 3` just before the box-3 call): 3552, 15 rows in place, every instruction retail's except a register permutation (three2 $s7, rB0 copy $fp, 0x1428 $s7) and box 3: -dl/-dg shows k3 (7 refs/376, prio 372) is allocated before three2 (3/220, 136) and takes $s3; k3 -> one at the 2.0f site gives three2 $s3 but frees $fp for the rD0 PRE copy (3560, the copy was what k3 blocked); k3 kept at one site only (prio 68): 3560, AL2 7, k3 visible as `li $fp,1`. Measured, no gain: three2/three3 all 26x26 positions, one/k2/k3/three set-once hill-climbs (by AL2 and by rows in place), k3 inside the else arm (cse folds it), per-arm `one`, `do { three2 = 3; } while (0)` and a do-group box-6 call (20-55). */
+/* 9 November 2026 (round o116): body below is new: check.py 3552/3552 (exact size), 0/1, first difference +0x134; 16 differing rows in place (o115 sc.py AL2 15; the o94 body 49 on the same scorer, 78 rows in place). Changes, ported from twin func_L11_00444400 (o115): (1) func_00300A00 declared `(char *, f32, s32, f32, ...)` with x before the colour (same a0/a1 and f12-f16 banks, AGENTS.md interleave rule): 49 -> 33; (2) LABEL 0x4D back to plain LBL0 (the `f32 xx = xv` LBLB form now loads $f12 early): 33 -> 21, every label row fixed; (3) `Rect *pr = &r90` declared last, set before the box-3 call, used in all arms: pr gets $s5 as retail (no $s0 copy); (4) `k2 = 1` moved to just after the box-2 h group and `one = 1` to just after the box-3 call: rB0 copy now $s7 as retail -> 15. Left (dumps): box 2 `addiu $a0,$sp,0x70` scheduled last (twin has the same row); box 3 `addiu $s5,$sp,0x90; move $a0,$s5` vs retail `addiu $a0; move $s5,$a0`; retail `li $s3,3` in the box-3 call slot (a second 3 pseudo used by box 6 and the == 3 mode test; box 5 rebuilds 3 in $v0) where here `one` shows as `li $fp,1` and the box-5/6/mode 3 is one $s1 pseudo set at box 5; 0x1428 high in $s4 (retail $fp): -dg priorities one 3 refs/672 = 0.0045 < 0x1428 high 4/668 = 0.012, so the 0x1428 reg is placed first. Measured, no gain (all 15 or worse): one/k2/k3 at every top-level position, 17-site active mix descent (1/one/k2/k3), box-form hill-climb (5 forms x 18 coordinates + in-call h), lesson-48 single moves +-5, all 5040 declaration orders of t/half/one/k2/k3/pr/str, TITLE(one) for more refs on one (25), a set-once `three` local for box 6 and the mode test (cse folds boxes 4/5 into it: 20-85, would need a ruling), pr set inside or after the call (same code). */
 /* 9 November 2026 (round o94): body below unchanged (check.py 3552/3552, 0/1; 32 masked aligned differences). Colour-before-x at each group's first label, measured (-dS -dR -fsched-verbose-6): sched2 block 26 ends at the NEXT label's label_y mode branch, so x ($f12, deps call/next ls call/end) and colour ($a1, deps call/$a1=0x4D/end) tie at prio 17, 3 deps, class 3 vs the preceding mtc1 $f22, and LUID (load_register_parameters order a0,a1,f12) picks $a1. Retail also has $f15 losing to $a1 here, so retail's advantage is $f12-specific (not a longer block: then $f15 would also win, as at the second label). Tried, no gain: x/colour as locals after label_y (`yy = label_y(...); xx = xv;`, combine folds them back: 32), x local before label_y on the first label (loads early, 38/44), plain rounding on the second label (longer block: $f12 first, but alloc shifts: 41-128), an L08-style `sprite(id, col, x, int y, ...)` inline wrapper (col/x load before label_y: 65-123). */
 /* 9 November 2026 (round o91): body below is now 32 masked aligned differences at 3552/3552 (was 38). Change: a label_y variant `label_y4` (mode test BEFORE the (int) rounding, every dead test stores to `value`) on the three else-arm labels 0x50/0x51/0x51. Found (-dl -dg): the label_y mode load is a local pseudo that local-alloc gives $v0 and it is live across the fix, so the result took $v1; with the test before the rounding the mode dies first and the result takes $v0 as retail (all six else rows fixed). NEEDS AN OWNER RULING on label_y4 before landing. Measured, no gain: label_y4/label_y3/xx-local forms on the TITLE/LABEL/0x4E/0x4F sites (63-mix sweep, best 34), 64 active mixes (1/one/k2/k3) on 0x50/0x51 (32 floor), y-then-x local label forms. Label colour-before-x (rows 239/339/402/501/564/680/805): sched1 and sched2 tie on prio 17, 3 dependents each (colour: call, next $a1=id, call; x: call, next call, call), so LUID decides and load_register_parameters emits $a1 before $f12; no source lever found. */
 /* 9 November 2026 (label_y2 sweep (owner ruling 2026-11-09, Sonnet s46): the 3 label_y sites (macros), both one-test forms, singles/pairs/all, unit flags -frac2-gcse-unsplit-edges -frac2-keep-block-order and -fno-schedule-insns: base 84 (3552) stays best (singles 84-391); no gain. */
@@ -190,7 +192,7 @@ extern f32 func_00283CE0(s32);
 extern char *func_00288FB8(s32);
 extern void func_002FC560(u32, u64);
 extern void func_L00_0037B7B0(void);
-extern void func_00300A00(char *, s32, f32, f32, f32, f32, f32);
+extern void func_00300A00(char *, f32, s32, f32, f32, f32, f32);
 extern void func_L02_003FE768(f32);
 extern char *func_00336D50(s32, s32);
 extern s32 func_001157AC(char *);
@@ -199,15 +201,15 @@ extern s32 func_00115DA8(char *, char *, ...);
 #define Scale(v) ((s32)((f32)(v) * D_L02_001B3E04 + 0.5f))
 
 
-#define LBL0(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
-#define LBL4(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, c, xv, (f32)label_y4(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
-#define LBLB(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); f32 xx = xv; func_00300A00(ls, c, xx, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
+#define LBL0(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, xv, c, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
+#define LBL4(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); func_00300A00(ls, xv, c, (f32)label_y4(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
+#define LBLB(id, c, xv, yv, a1, a2, a3, H, A) { char *ls = func_00336D50(D_L02_001A904C[0] + ofs, id); f32 xx = xv; func_00300A00(ls, xx, c, (f32)label_y(ls, (f32)(yv), D_L02_001B3E04, H, A), a1, a2, a3); }
 #define TITLE(A) \
         LBL0(0x4C, D_L02_001B1424, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f, half, 1); \
         LBL0(0x4D, D_L02_001B1420, D_L02_001B1410, D_L02_001B1414, -1.0f, D_L02_001B1404, 0.0f, half, A)
 #define LABEL(A) \
         LBL0(0x4C, D_L02_001B1424, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, k2); \
-        LBLB(0x4D, D_L02_001B1420, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, A)
+        LBL0(0x4D, D_L02_001B1420, D_L02_001B1408, D_L02_001B140C, D_L02_001B1404, 1.0f, 0.0f, half, A)
 #define LABEL50() \
         LBL4(0x50, D_L02_001B1420, D_L02_001B13FC, D_L02_001B1400, D_L02_001B1404, 1.0f, 0.0f, half, 1)
 #define SUM() \
@@ -281,10 +283,6 @@ void func_L02_003FE8B8(u8 *moby)
     Rect rB0;
     Rect rD0;
     Rect rF0;
-    Rect *p50;
-    Rect *p90;
-    Rect *pB0;
-    Rect *pD0;
     u8 *data;
     u8 *obj;
     u8 *pv;
@@ -299,6 +297,10 @@ void func_L02_003FE8B8(u8 *moby)
     s32 k3;
     s32 x, y, h;
     char *str;
+    Rect *pr;
+    s32 three;
+    s32 three2;
+    s32 three3;
 
     if (D_L02_001A904C[0] == 0) {
         return;
@@ -309,36 +311,40 @@ void func_L02_003FE8B8(u8 *moby)
     x = hud_coord((f32)D_L02_001B13E0, D_L02_001B3E04, half);
     y = hud_coord((f32)D_L02_001B13E4[0], D_L02_001B3E04, half);
     h = hud_coord((f32)D_L02_001B13DC, D_L02_001B3E04, half);
-    func_002802E0(&r50, x, y, D_L02_001B13E8[0], D_L02_001B13EC[0], D_L02_001B13D8, h, 0, 3);
+    three = 3;
+    func_002802E0(&r50, x, y, D_L02_001B13E8[0], D_L02_001B13EC[0], D_L02_001B13D8, h, 0, three);
     x = hud_coord((f32)D_L02_001B13C8, D_L02_001B3E04, half);
-    t = (f32)D_L02_001B13CC[0] * D_L02_001B3E04 + half; y = t;
-    do { t = (f32)D_L02_001B13C4 * D_L02_001B3E04 + half; h = t; } while (0);
-    one = 1;
-    func_002802E0(&r70, x, y, D_L02_001B13D0[0], D_L02_001B13D4[0], D_L02_001B13C0, h, 0, 3);
+    do { y = hud_coord((f32)D_L02_001B13CC[0], D_L02_001B3E04, half); } while (0);
+    h = hud_coord((f32)D_L02_001B13C4, D_L02_001B3E04, half);
+    k2 = 1;
+    func_002802E0(&r70, x, y, D_L02_001B13D0[0], D_L02_001B13D4[0], D_L02_001B13C0, h, 0, three);
+    three2 = 3;
+    three3 = 3;
     x = hud_coord((f32)D_L02_001B1380, D_L02_001B3E04, half);
     do { t = (f32)D_L02_001B1384[0] * D_L02_001B3E04 + half; y = t; } while (0);
     t = (f32)D_L02_001B137C * D_L02_001B3E04 + half; do { h = t; } while (0);
-    func_002802E0(&r90, x, y, D_L02_001B1388[0], D_L02_001B138C[0], D_L02_001B1378, h, 0, 3);
+    pr = &r90;
+    func_002802E0(pr, x, y, D_L02_001B1388[0], D_L02_001B138C[0], D_L02_001B1378, h, 0, three);
     t = (f32)D_L02_001B1368 * D_L02_001B3E04 + half; x = t;
     do { t = (f32)D_L02_001B136C[0] * D_L02_001B3E04 + half; y = t; } while (0);
     do { h = hud_coord((f32)D_L02_001B1360, D_L02_001B3E04, half); } while (0);
-    func_002802E0(&rB0, x, y, D_L02_001B1370[0], D_L02_001B1374[0], D_L02_001B135C, h, 0, 3);
+    func_002802E0(&rB0, x, y, D_L02_001B1370[0], D_L02_001B1374[0], D_L02_001B135C, h, 0, three);
     x = hud_coord((f32)D_L02_001B13B0, D_L02_001B3E04, half);
     k3 = 1;
     do { t = (f32)D_L02_001B13B4[0] * D_L02_001B3E04 + half; y = t; } while (0);
-    k2 = 1;
-    func_002802E0(&rF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, hud_coord((f32)D_L02_001B13AC, D_L02_001B3E04, half), 0, 3);
+    func_002802E0(&rF0, x, y, D_L02_001B13B8[0], D_L02_001B13BC[0], D_L02_001B13A8, hud_coord((f32)D_L02_001B13AC, D_L02_001B3E04, half), 0, three3);
     x = hud_coord((f32)D_L02_001B1398, D_L02_001B3E04, half);
     y = hud_coord((f32)D_L02_001B139C[0], D_L02_001B3E04, half);
-    func_002802E0(&rD0, x, y, D_L02_001B13A0[0], D_L02_001B13A4[0], D_L02_001B1390, hud_coord((f32)D_L02_001B1394, D_L02_001B3E04, half), 0, 3);
+    one = 1;
+    func_002802E0(&rD0, x, y, D_L02_001B13A0[0], D_L02_001B13A4[0], D_L02_001B1390, hud_coord((f32)D_L02_001B1394, D_L02_001B3E04, half), 0, three2);
     save = ((HudRenderState *)D_L02_001BEA00)->text_scale;
     ((HudRenderState *)D_L02_001BEA00)->text_scale = 0.62f;
     func_0027AB40();
-    if (*(s16 *)(data + 0x120) == 3) {
+    if (*(s16 *)(data + 0x120) == three2) {
         s32 ofs = 0x8710;
         TITLE(1);
         sprintf_n(buf, D_L02_001B1428, 0x1E - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(func_00280270, &r90);
+        DRAWBUF(func_00280270, pr);
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
         LABEL(one);
         SUM();
@@ -349,7 +355,7 @@ void func_L02_003FE8B8(u8 *moby)
         s32 ofs = 0x8710;
         TITLE(1);
         sprintf_n(buf, D_L02_001B1428, 0x3C - *(s32 *)(data + 0xD4) / 60);
-        DRAWBUF(func_00280270, &r90);
+        DRAWBUF(func_00280270, pr);
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
         LABEL(one);
         SUM();
@@ -362,9 +368,9 @@ void func_L02_003FE8B8(u8 *moby)
         n = 120 - *(s32 *)(data + 0xD4) / 60;
         func_00115DA8(buf, D_L02_001B1428, n);
         if (n >= 100) {
-            DRAWBUF(func_00280190, &r90);
+            DRAWBUF(func_00280190, pr);
         } else {
-            DRAWBUF(func_00280270, &r90);
+            DRAWBUF(func_00280270, pr);
         }
         DRAW(func_00280190, &rB0, func_00288FB8(0x2F63));
     } else {

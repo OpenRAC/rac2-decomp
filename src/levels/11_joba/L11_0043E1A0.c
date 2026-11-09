@@ -839,7 +839,7 @@ def:
 
 /* func_L11_00443D78 is in L11_00443D78-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_00444400);
+/* func_L11_00444400 is in L11_00444400-g8.c. */
 
 /* func_L11_004456A0 is in L11_004456A0-g8.c. */
 
