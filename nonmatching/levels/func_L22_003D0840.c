@@ -1,3 +1,20 @@
+/* 9 November 2026 (Codex, branch-selected missing-mask probe): 48 new C
+ * variants compiled in rac2-gnu with -O2 -G0 -ffunction-sections and checked
+ * against the USA level-22 extent using build.compile_c/Placement.derive.
+ * Hypothesis: a selector and flag value could overlap during allocation,
+ * then branch simplification could remove the selector and leave object in a3.
+ * Six case orders x two selectors (f & 65, compacted bits 0/6) x four forms
+ * (local result, per-arm store, per-arm store/call, inline scalar-return helper).
+ * Each case sets only the missing bits; the callback and three-argument void
+ * state setter keep their actual interfaces, and flags are read only in state 0.
+ * All 48 fail the size check: 6x112, 2x120, 2x124, 8x128, 6x132, 2x140,
+ * 8x144, 8x148, 6x156 bytes. The switch selection survives optimization;
+ * it does not collapse to the retail OR. No improved C retained.
+ * tools/check.py, with source_of redirected to this retained file, still gives
+ * 60/60 bytes, 0/1 places in US, PAL and US2: four v1/a3 differences.
+ * No linked build or match claim; src retains INCLUDE_ASM. Reopen with a
+ * scalar lifetime that disappears after allocation without retained dispatch.
+ */
 /* 9 November 2026 (o138): re-measured 60/60, 0/1 US, object $v1 vs $a3 (4 words). The 9 Nov owner rulings (set-once constant locals, dead-local reuse, (void *) handles, bank interleave) add no new input here: constant/copy locals are folded by cse/gcse cprop before global-alloc (rounds 4-12), the callee takes only GPR args, and the retained (o97) find_reg model still needs v1 in pseudo 84's conflicts or prefs. No new C. */
 /* 9 November 2026 (Codex, aggregate lifetime probe): 48 new C variants
  * compiled and checked against the USA placement with build.compile_c and

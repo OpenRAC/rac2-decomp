@@ -1,3 +1,19 @@
+/* 9 November 2026 (Codex, real-loop and aggregate follow-up): 90 distinct
+ * source variants checked in the existing rac2-gnu container: 64 combinations
+ * of four real three-append loops, four bank-preserving FP argument positions
+ * and four zero lifetimes; 26 distinct context-struct forms (30 test cases)
+ * grouping subsets of table/stride/state/index, with member order reversed.
+ * Game -O2 -G0 -ffunction-sections -fno-schedule-insns, plus -funroll-loops
+ * for loops: 396/400 bytes, no saved f20; the loop remains. Rechecking all 64
+ * with -funroll-all-loops -frerun-loop-opt gives 400/528 bytes, no match.
+ * Single-member aggregates tie at 412 bytes / 12 differing words; larger
+ * aggregates spill (428-456 bytes). No form improves the retained flat C.
+ * Standard tools/check.py --diff confirms flat C at 0/1 in both USA releases,
+ * and representative ascending/descending loops and aggregate tie/spill cases
+ * at 0/1 USA v1.01. The LO16 addiu destination counts as a real difference:
+ * retained p=s1/base=s3 versus retail p=s3/base=s1. No linked build was run.
+ * Executable retained C, src markers and compiler configuration are unchanged.
+ */
 /* 9 November 2026 (o122, owner ruling: several set-once locals for one constant): second stride `n2 = 0x150` and second base `tbl2 = D_L03_00259A30` for calls 2-4, 3-4 or 4, set before their first use or at case top (48 variants, local scorer): all 12 rows; cse merges them into n/tbl, so refs and lengths are unchanged (.lreg: p 7/47 beats stride 5/70 and base 5/72). Loop depth is per block, so groups cannot weight base/stride without p. */
 /* 9 November 2026 (o114, set-once constant sweep after func_L06_00382608): every literal in case 0 (0x150, 0x28, 2, 0x14, 4, 0xA, 6, 0.0f, 1, -1) as a set-once local at every statement position from before the switch to its use (72 singles + 2361 pairs), and the case 1/2 literals (55): all 12 rows or worse (local scorer). Constant locals do not touch base/stride/p refs or lengths that global-alloc ranks. */
 /* 9 November 2026 (o109): still 412/412, 0/1. Lesson 54: all seven callee prototypes agree with their definitions. Dumps: a do-while(0) group sets loop depth per basic block (calculate_loop_depth at the block head), so every case-0 insn after a group start is depth 2, p's lh refs too (split index loads + groups: p 9/47 = .57 goes first). Literal 0x150 per use: cse pseudo 5/62, 108 insns, obj loses s0; D_ inline per use: same; `tbl = D` before each call: cse deletes the repeats (identical). REG_EQUIV keeps same-constant multi-sets (local-alloc.c ~800), so only a different second value removes the base/stride doubling. */

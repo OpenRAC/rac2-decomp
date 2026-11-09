@@ -1,3 +1,7 @@
+/* 9 November 2026 (o157, cc1 harness ~75 compiles, 0 check.py, -O2 -G8 -ffunction-sections): best C unchanged (5972/5968, masked 45 / full 337); no match. (1) Rank colour: jump.c's conditional-move conversion (jump.c:980) needs the then-arm to be one insn right before the join label; cse1 (path from the 0x43-row join label, which has 2 uses, through the clamp, mcol and LY: under 9 branches) makes the arm `(n20-1)<<2` a copy of the table-index shift reg (563 in the .cse dump), so without the group it is movz. Tried without the group: LY2, label_y3, active one4/one3/n20, handles s/mcol (all movz, 5956-5964, 63-139), char-offset arms (n20-1)*4 / <<2 / pointer form (movz on the address, 60/400), n20*4-4 (branch kept, extra sll: 5980, 60/356), if/else of two loads (5972, 62/367); one group from before the 0x43 if through LY so the first label after LOOP_BEG is the 8-aligned 0xAB8 join (5936, 121/452). (2) The (use (const_int 0)) is flow.c's nop after a call that ends a basic block (func_002AA2E8 directly before the ruler loop label): it counts in max_cuid and in sched1 block 198 it fills cycle 9, which puts i = 0 and hp = h + 0x10 right before func_002830C0 like retail. With m2 set after func_002AA2E8 the nop goes (753 -> 751) and i/hp issue a cycle earlier (hp before the first func_00282D30). Restoring the count alone (`none = -1` set before the 0x43 if, used as func_0027F5B8's last arg: 753) leaves 70/378, so the cycle, not the buckets, decides; retail's filler there is the ruler-half `mov.s $f23,$f20` (item 3), so (2) needs (3) first. m2 set inside the ruler loop (loop.c hoists it, nop kept): 51/342 but m2 gets slot 0x124; m2 after the loop: 45/337 (= base). (3) Sweep of `half = 0.5f` placement (before func_00283388(m) / box 1 / box 3 / i = 0 / loop / sprintf row) x box 3 literal-or-half x ruler rh-or-half: best 45 (current); with half li.s after box 3 the 0.5 takes f24 and 1/15 f23 (retail f23 = copy of f20, f24 = 1/15), and reload_cse does not turn the li.s into a copy. */
+/* 9 November 2026 (o156, cc1 harness ~60 compiles, -O2 -G8 -ffunction-sections): masked 51 -> 45, full 354 -> 337, 5972/5968 bytes; no match. (1) The fb clamp now reuses the dead float fa (owner: reusing a dead local): fa's later f12 argument use gives it a hard-reg preference, so the clamp value takes f12 and the 0x7A8-0x808 f1/f2 roles equal retail (342). (2) The extra daddu a1,v1 at 0x81C: the LY(&vF0) literal-1 active pseudo (dead mode test) took a1 by local-alloc and conflicts with the result pseudo (born before the test), so the result went to v1; a set-once `one4 = 1` before `if (I(p, 0x278) != 0)` passed as that label_y's active (a set next to the call folds; n20 there drops gcse buckets 753 -> 751 and moves n20 to s5) gives mfc1 a1 like retail. The +4 is now an alignment nop at 0xB34: final.c gives the next CODE_LABEL after any NOTE_INSN_LOOP_BEG LOOP_ALIGN 3, and the rank-row `do { y = LY(n20, 24.0f); } while (0)` group's LOOP_BEG has no label before the ternary join $L161 (retail's 0xB34 label is unaligned, so retail had no LOOP_BEG there); without the group the rank colour is movz (5964, 63/398); groups on s/mcol: 58-76. (3) Slots: a named set-once `Vec *m2 = &m[2];` declared after arr and before hp (`u8 *pa, *pb, *arr; Vec *m2; u8 *hp;`), used at both func_00282D30(&m[2]...) args, gives every spill slot retail's (m2 0x120, hp 0x124, arr/pa/pb 0x11C/0x114/0x118, &sy/&sy2 0x128/0x12C) when set before func_00282CD8 (49/341; the m2 store lands at 0xDA0, retail after func_002AA2E8 at 0xDE4); set after func_002AA2E8 (retail's place) gcse buckets drop 753 -> 751 and sched1 moves hp/arr births above the preceding calls (the loop.c `(use (const_int 0))` insn in the preheader is gone): 70/378; other placements 55-75. Body below is (1)+(2). */
+/* 9 November 2026 (o155, cc1 harness ~90 compiles + 2 check.py, -O2 -G8 -ffunction-sections): masked 65 -> 51, full 369 -> 354, 5964 -> 5972/5968 bytes (check.py 0/2); no match. (a) hp: a set-once `one3 = 1` passed as the ruler rows' hud_coord_a active (owner: set-once constant as active), set just before func_002AA2E8: its dead mode tests keep it live through the ruler with no code, it takes s6 (359 > &vE0 copy 235), so &vE0 copy -> s7, &vF0 copy -> fp (retail), and hp gets no register: lw/addiu/sw 0x120 at retail's 0xD48 position (+4 bytes = retail's store). Left: hp slot 0x120 and X=&m[2] 0x124 (retail swapped): a user var's alter_reg slot precedes every PRE reg. With inline h + 0x10 and the o154 h-decl move (r1) all slots are retail's (X 0x120, hp 0x124, &sy 0x128, &sy2 0x12C, same registers) but the PRE insert has no backward deps in sched1, so adjust_priority never boosts it (priority 1) and it lands after func_00282DB0 (0xD98, retail 0xD48): 60/366. Groups around the first two preheader calls: 99-128. (b) D_L04_001B31A4: retail reads it as lui/lwc1 0x31A4($at) before the jal; a MACRO_ADDR view `D_L04_001B31A0_view[] __asm__("D_L04_001B31A0")` read at [1] is two words and stays out of the slot (59/366 alone); a MACRO_ADDR scalar or [0] view still takes the $gp slot. (c) +4 bytes now: a loop-label alignment nop at 0xDF4 because of the old extra daddu a1,v1 at 0x81C (the 0x7F8 mfc1 register) while retail's load-delay nop at 0x1280 is missing in mine. (d) Box 3 now passes `half` set just before it (51 vs 53); `half = 0.5f` after box 3 is li.s (cse2 has no 0.5 register in that path: 18 dead-test branches in the boxes > PATHLENGTH 9). MACRO_ADDR on D_L04_001B3190 gives retail's lui a2/addiu a2 at 0xFD4/0x1110 but drops a PRE expression, buckets 753 -> 751 and the &sy/&sy2 slots rotate (57/356); named constants did not move max_cuid. Body below is (a)+(b)+(d). */
+/* 9 November 2026 (o154, cc1 harness ~40 compiles + 1 check.py, -O2 -G8 -ffunction-sections): masked 84 -> 65, full 399 -> 369, 5956 -> 5964/5968 bytes (check.py 0/2); no match. Ruler half: `half = 0.5f;` moved before func_00283388(m) and the ruler rows use a per-iteration set-once copy `float rh = half;` (owner: set-once copy per use site): gcse cprop no longer folds the ruler constant into 596, so f22 = zero and f23 = a mov.s copy of f20 like retail; gcse buckets 751 -> 753. Left: the copy is scheduled at 0xBA0 (sprintf strlen slot; retail 0xCF8 after box 3: retail makes the copy in the block after the third box, but `half = 0.5f` placed there (or before the loop) is not a cse1 copy of the label_y3 0.5 and comes out li.s or is cprop-folded: 67/376 or 83/398); hp: slots now X=&m[2] 0x120, &sy 0x124, &sy2 0x128 = retail minus the hp hole at 0x124. Global-alloc order needed: hp above &vE0 copy (235): with do { hp = h + 0x10; } while (0) and a group on its func_00282CF0 use (hp 4/151 = 529) &vE0 -> s7, &vF0 -> fp, hp -> s6 = retail copy registers, 5968 bytes but alignment nops, masked 116; reload never evicts s6 here (no callee-saved spill reg), so retail's hp eviction is still unexplained. PRE-bucket alternative measured: with inline h + 0x10 the slot order X < hp < sy < sy2 follows from h pseudo >= 98 (decl `s32 sy, sy2; u8 *h; s32 sy3;`) and S in 753..785, but the hoisted h + 0x10 still takes fp (153 > nothing conflicting): 75/381. D_L04_001B31A4 $gp slot unchanged. Body below is the rh change. */
 /* 9 November 2026 (o133, global-alloc dump analysis, cc1 harness 13 compiles, -O2 -G8 -ffunction-sections): best C unchanged (5956/5968, masked 84 / full 399); no match. Retail s6 has no reference at all outside the marker loop (only s6 = -1 at 0x1090 and its loop uses), fp holds &vF0 copy 0x4B4..0xD94 then j, s7 the &vE0 copy 0xD50..0xFF4 then the constant 1 (used once, 0x10FC). Mine (.greg): -1 r825 756 -> s6, j r126 613 -> s7, one2 r127 425 -> fp, &vE0 copy r2000 236 -> s6 (r825 does not conflict, so pass 1 takes it), &vF0 copy r1988 204 -> s7, hp r108 2 refs/147 = 136 -> fp. Retail needs (a) one2 above j and (b) an allocno in s6 that conflicts with r2000, r1988 and hp but leaves no code: only hp fits. With do { hp = h + 0x10; } while (0) and do { func_00282CF0(&vE0, hp, ...); } while (0) (hp 4 refs = 526 > 236) global-alloc gives hp s6, &vE0 copy s7, &vF0 copy fp = retail's copy registers (5976, alignment nops, masked 116 / full 438); set-only group: hp 197, no change. So retail allocated hp above the two copies and reload then evicted it (it sits in slot 0x124 between the alter_reg slot of &m[2] 0x120 and &sy/&sy2 0x128/0x12C, which fits evicted pseudos getting slots in pseudo order after the initial ones only if &sy/&sy2 were evicted too). Not reproduced: no spill-reg need in the ruler preheader evicts it here. No gain: int none = -1 set at the func_0027F5B8 call and used at the 5 marker-loop -1 sites (none 11/1016 = 324 < h 335: h takes fp, 5944, masked 121), inline h + 0x10 (slot 0x124 becomes &sy2, masked 97), literal 1 as the post-loop label_y active (h takes fp, 117). */
 /* 9 November 2026 (o129, cc1 harness ~25 compiles, -O2 -G8 -ffunction-sections): masked 90 -> 84, full 427 -> 399, 5964 -> 5956/5968 bytes (the two alignment nops are gone); no match. (1) Groups (4) removed: n20 gets its 2 missing refs honestly. Two dead mode tests in the first segment (HC(142.0f) in the func_0029B658 call, the row-1 LY) were comparing against reg 157, a stray const-1 pseudo from insn 138 (inlined hud_coord literal), not n20; passing n20 as `active` there (hud_coord_a / label_y with n20, owner: local holding 1 as active) gives n20 20/246 = 3252 > s 3000, so one s2 / s s3 like retail with no groups (88/422). (2) Retail s5 is one pseudo across rank-row x, ruler col and the marker colour, separate from the 0x35-row col (retail s0): rank x and ruler col now reuse mcol (owner: reusing a dead local). Ruler s0/s1/s3/s5 now equal retail (84/399); &vE0 copy s6 (retail s7), &vF0 s7 (retail fp), hp fp (retail spilled 0x124). Retail leaves s6 unreferenced from 0xB40 to 0x108C yet hp still spills, so some pseudo holding s6 is live through the ruler without refs there; not identified. No gain: n20 extra refs via groups in the rank row (+1 ref each, worse code), own rank string local (95), col shared with rank x / mcol (col priority rises; s0 kept), obj reused for an earlier sprite row to drop its sched1 birthing boost (5964, +copy +nop; the 31A4 l.s still takes the jal slot). Body below is (1)+(2). */
 /* 9 November 2026 (o127, global-alloc order of the top values, cc1 harness ~45 compiles, -O2 -G8 -ffunction-sections): masked 90 -> 90, full 493 -> 427, 5956 -> 5964/5968 bytes; no match. Retail's top x s0 / y s1 / one s2 / s s3 / p s4 now matches: global-alloc order must be x > y > one > s > p (pri = floor_log2(refs)*refs/len). (1) `one` is the rank-row n20 reused (owner: reusing a dead local): `n20 = 1` for the h[0xBC] test and the 0x76C store, so one pseudo holds 1 and n20 (retail s2 in both places); merged refs 13/248 = 1572. (2) Rank row LY handle s -> n20 inside its group (n20 +4 refs, s 9 -> 5 refs). (3) Row-1 group `do { s = ...; x = ...; y = LY(x, 118.0f); } while (0);` (y 3750 > s; row 1 0x228-0x298 now matches, and the 0x210/0x224 a0/a1 swap goes). (4) Groups around the h[0xBC] test and the 0x76C store: n20 19 refs = 3040 > s 3000 (6/40). The +8 bytes are two LOOP_BEG alignment nops (0xF4, 0x2C4) from (4); without (4) n20 2786 < s and s/n20 swap (s2/s3, masked 86 full 443). Same-size alternatives: (1)-(3) with only x/y in the row-1 group (s set outside: s 5/41 = 2439): right regs, 5956, masked 96 full 431 (the s copy goes above the 118.0f load); clamp group instead of (4): right regs, 5956, masked 99 (rank colour becomes bnez/ no off CSE). Still open: hp keeps s7 (retail spills to 0x124), ruler f20/f22 + mov.s, &vF0 s5 vs fp, the D_L04_001B31A4 slot. Body below is (1)-(4). */
@@ -147,6 +151,7 @@ extern float D_L04_001B2D44;
 extern char D_L04_001B3190[];
 extern float D_L04_001B31A0;
 extern float D_L04_001B31A4;
+extern float D_L04_001B31A0_view[] __asm__("D_L04_001B31A0") MACRO_ADDR;
 extern float D_L04_001B31D0;
 extern char D_L04_001BDB80[];
 typedef struct { char pad[0x24]; int kind; u8 *owner; char tail[0x3C]; int active; char pad2[6]; u16 state; } OwnerContext;
@@ -302,6 +307,8 @@ s32 func_L04_00417308(void)
     int n33, n20, ne, i, col, idx, v, va, v3, vy;
     int j;
     int one2;
+    int one3;
+    int one4;
     float half;
     float tenth;
     int mcol;
@@ -389,18 +396,18 @@ s32 func_L04_00417308(void)
             D_L04_001B0B70 = 0;
         }
         {
-        float fb;
+        one4 = 1;
         if (I(p, 0x278) != 0)
-            fb = (float)I(p, 0x278) / (float)I(p, 0x650);
+            fa = (float)I(p, 0x278) / (float)I(p, 0x650);
         else
-            fb = (float)I(p, 0x338) * 0.004166667f;
-        if (fb > 1.0f) fb = 1.0f;
-        if (fb < 0.0f) fb = 0.0f;
+            fa = (float)I(p, 0x338) * 0.004166667f;
+        if (fa > 1.0f) fa = 1.0f;
+        if (fa < 0.0f) fa = 0.0f;
         vF0.i[0] = 0x603F00B2;
         vF0.i[1] = 0x603F00B2;
         vF0.i[2] = 0x603F00B2;
         vF0.i[3] = 0x603F00B2;
-        func_0027EAE8(0x1A, LY(&vF0, (float)(0x62 - (int)(fb * 74.0f))), 0x26, HC(98.0f), 0xFFFFF0,
+        func_0027EAE8(0x1A, label_y((void *)&vF0, (float)(0x62 - (int)(fa * 74.0f)), D_L04_001B2D44, 0.5f, one4), 0x26, HC(98.0f), 0xFFFFF0,
                       &vF0);
         }
         { void *spr = (void *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3F); func_00300A00(spr, 498.0f, 0x60442D00, (float)LY(spr, 10.0f), 1.0f, 1.0f, 0.0f); }
@@ -434,7 +441,8 @@ s32 func_L04_00417308(void)
         func_00283698(m, &D_L04_001B31A0);
         func_0028FC48(0x157, HC(36.0f), 0x1AB, HC(37.0f), 0x25F0C070, 0);
         func_0028FC48(0x151, HC(28.0f), 0x1AB, HC(29.0f), 0x25F0C070, 0);
-        func_0028FC48(0x160, HC(45.0f), 0x1AB, HC(46.0f), 0x25F0C070, 0);
+        half = 0.5f;
+        func_0028FC48(0x160, hud_coord(45.0f, D_L04_001B2D44, half), 0x1AB, hud_coord(46.0f, D_L04_001B2D44, half), 0x25F0C070, 0);
         i = 0;
         func_00282D30(&vD0, h + 0xC0, F(p, 0x30C) + F(p, 0x27C));
         hp = h + 0x10;
@@ -445,9 +453,10 @@ s32 func_L04_00417308(void)
         pb = p + 0x498;
         func_00282D30(&vD0, &D_L04_001B31A0, fd);
         func_00282CD8(&vF0, &vE0, &vD0);
+        one3 = 1;
         func_002AA2E8(&D_L04_001B31D0, vE0.f[0] * -1.25f, 0.050000004f);
-        half = 0.5f;
         for (; i < 9; i++) {
+            float rh = half;
             sy = (int)(D_L04_002605D0[i].y + D_L04_001B31D0);
             if (sy < 0x164 && D_L04_001B31D0 < 0.0f) {
                 if (i == 0)
@@ -471,7 +480,7 @@ s32 func_L04_00417308(void)
             if (fr > 1.0f) fr = 1.0f;
             if (fr < 0.0f) fr = 0.0f;
             mcol = func_00283D38(0x10F0C070, 0x25F0C070, fr);
-            func_0028FC48(sy, hud_coord(21.0f, D_L04_001B2D44, half), sy + 1, hud_coord(55.0f, D_L04_001B2D44, half), mcol, 0);
+            func_0028FC48(sy, hud_coord_a(21.0f, D_L04_001B2D44, rh, one3), sy + 1, hud_coord_a(55.0f, D_L04_001B2D44, rh, one3), mcol, 0);
         }
         func_00282CF0(&vE0, hp, D_L04_001B3190);
         func_002830C0(&vD0, &vE0, m);
@@ -482,7 +491,7 @@ s32 func_L04_00417308(void)
             fs = -1.0f;
         sy3 = (int)(fs * 13.0f) + 0x24;
         obj = (u8 *)(u32)func_00336D50((void *)(u32)(D_L04_001A904C + 0x8710), 0x3E);
-        f21 = func_00283248(D_L04_001B31A0, D_L04_001B31A4);
+        f21 = func_00283248(D_L04_001B31A0, D_L04_001B31A0_view[1]);
         j = 0;
         one2 = 1;
         tenth = 0.1f;
