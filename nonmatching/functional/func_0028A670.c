@@ -1,3 +1,4 @@
+/* 9 November 2026 (Sonnet round s42, lesson 52): scripted `do { real_op; } while (0)` groups around 1-3 consecutive statements at every position (120 singles + 86 pairs, pairs of the near-base ones) and every -frac2-* switch / -freduce-all-givs on the unit: nothing below the base 2 words (best only ties, most groups far worse); no switch changes it. */
 /* 8 November 2026, permuter round 4: see nonmatching/game/func_0028A670.c (draw 2 fixed only by an unsigned-char active helper variant; not landed). */
 /* functional: medium. Near-miss draft, not byte-compared in the latest sweep: paths the captured calls never take are unproven. */
 /* func_0028A670. Opus 5.5 (v1961). Unit profile of src/game/00288D88.c: -O2 -G0 -ffunction-sections.
