@@ -1,3 +1,4 @@
+/* 9 November 2026 (o113, func_L06_00382608 lever, ~1100 local cc1 scores): draw-3/draw-4 constants (0x8710, 0x4b/0x4a, 0x8000/0x2000, 0.5f, 1.0f, 0.0f, 0x118), label_y's literal 1 in draws 1-2, 0x49/0x48, 0.04f, 50/25, 0x47 as set-once locals at every legal statement position, plus moves of one/sc/z/half/entry: best stays 9 words (masked). */
 /* 9 November 2026 (round o100, today's HUD idioms, ~260 local cc1 scores, -fno-gcse): draw 1-4 helpers label_y/y2/y3/y4 (up to 2 changed) x active one/1: best stays 9 rows. Draw 3: all 24 orders of one/x/c/fy x 4 helpers x active (192): 9. Draw 3 handle (void *)c/(void *)color: 9, others worse. do-group over 1-3 draw-3 statements with label_y/y3/y4: +12 bytes (with -malign-loops=2 the loop label loses its alignment). No fix for the twin either. */
 /* 9 November 2026 (Codex, 69 new C variants, USA v1.01): baseline remains
  * 964/964 bytes, 0/1 places, nine relocation-masked instruction differences at

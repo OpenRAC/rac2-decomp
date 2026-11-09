@@ -1,3 +1,4 @@
+/* 9 November 2026 (o113, func_L06_00382608 lever, ~290 local cc1 scores): draw-3 constants (0x8710, 0x4b, 0x8000, 0.5f, 1.0f, 0.0f), label_y's 1 in draws 1-2 as set-once locals at every legal position, plus moves of one/c/x: best stays 9 words. */
 /* 9 November 2026 (round o100): today's HUD idioms (label_y3/label_y4, do-group placement) gave no gain on the L02 twin func_L02_003FDDE8 (see its note); nothing to port. */
 /* 9 November 2026 (Sonnet round s45): label_y2 per call and pairs on the 4 calls: no gain (best 59 vs base 54 quick scorer). */
 /* 9 November 2026 (Sonnet round, s43, lesson 52): twin of func_L02_003FDDE8; its do-while(0) group sweep (all 1-3 statement groups and pairs, plus -frac2-* switches) found no gain there (9 rows), so the same fix does not apply; this C itself was not swept. */

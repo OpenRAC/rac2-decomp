@@ -1,3 +1,4 @@
+/* 9 November 2026 (o113, func_L06_00382608 lever, 848 local cc1 scores): every corner literal (-1, 1, 0.3f), the two 1.0f scale args and the UV 0.5f as a set-once float local at every legal statement position (decl first or last): best stays 3 words. */
 /* 9 November 2026 (round o100, 60 local cc1 scores): no label_y here, so only idiom (b) applies. do-group over every 1-3 corner statements: +8 bytes (alignment nop before the vertex loop); one group from each statement through the vertex loop: +4..+12 bytes or 45-47 words. No gain, still 3 words. */
 /* 9 November 2026: corner ownership/type trial, no gain. Current master retained C
  * reproduced 740/740 bytes, frame 0x1D0, 0/6 USA v1.01 with default game G0.
