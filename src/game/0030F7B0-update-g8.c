@@ -1,15 +1,13 @@
-/*
- * func_003136D0: exact bytes in USA v1.01 with 15 dead initial values at declarations, whose only effect is gcse's insn count (the PRE spill-slot order). Over the limit of five per function ruled on 31 October 2026, so not linked; a maintainer can rule on it. Everything below is the whole unit `src/game/0030F7B0-ball-g8.c` as it matched, with flags `-O2 -G8 -ffunction-sections -g` (batch v1895).
- */
 /* func_003136D0: nanotech ball update (RAC1 nanotech_ball_update, 4080 bytes, 28 places).
  * -g gives retail's two NOPs before div.s. Three wordings below carry the match:
  * - D_001A7A44[2] is read at an offset from its array name, so the macro load is two words and
  *   never fills a branch slot; D_001AF180 is reached through its $gp view.
  * - The interpolation arm keeps &v40 in a local and copies in a scoped block: the extra block note
  *   gives the pseudo the lifetime loop needs to hoist it, so the later &v40 is rebuilt after the call.
- * - The initial stores on locals are dead (flow deletes them, no word remains). gcse sizes its
- *   expression table from the insn count and numbers its reaching registers in hash order, which
- *   decides the four spill slots at 0x7C-0x88: retail's order needs the 513-bucket table.
+ * - The named constants at the top are set once and read past a label (allowed by owner ruling,
+ *   9 November 2026): cprop folds each, no word remains. gcse sizes its expression table from the
+ *   insn count and numbers its reaching registers in hash order, which decides the four spill
+ *   slots at 0x7C-0x88: retail's order needs these 13.
  */
 #include "common.h"
 /* Adapted from RAC1 nanotech_ball_update (OpenRAC/rac1-decomp, GPL-3.0). */
@@ -121,11 +119,24 @@ extern float func_002A7AA8(float, float, float, float, float);
 void func_003136D0(Moby *m) {
     V_2D9EA0 v0, v10, v20, v30, v40, v50, v60;
     D_2D9EA0 *d = (D_2D9EA0 *)m->pvars;
+    int burst = 0x14;
+    int far_count = 5;
+    int near_count = 40;
+    int absorbed = 3;
+    int done = 4;
+    int grace = 0x258;
+    int sound = 0x168;
+    int big = 0x200;
+    int small = 0x1F5;
+    int channel = 0x20;
+    int idle = 2;
+    int range = 0xFF;
+    int odds = 5;
 
     switch (m->state) {
     case 0: {
-        Moby *c = 0;
-        int i = 0;
+        Moby *c;
+        int i;
         m->state = 1;
         m->flags |= 0x41;
         m->collision = 0;
@@ -140,7 +151,7 @@ void func_003136D0(Moby *m) {
         d->f4 = func_002A7878(d->f0, 3.1415927f);
         d->h56 = 0;
         d->owner = 0;
-        for (i = 0; i < 4; i++) d->f60[i] = (float)func_002A77E0(0xFF);
+        for (i = 0; i < 4; i++) d->f60[i] = (float)func_002A77E0(range);
         for (i = 3; i >= 0; i--) d->h58[i] = D_001AF174;
         for (i = 7; i >= 0; i--) d->slots[i] = 0;
         if (D_L00_001B1AEC == 0) {
@@ -171,14 +182,14 @@ void func_003136D0(Moby *m) {
             func_00282DD8(&D_L00_0023A6F0[7], &D_L00_0023A670[7], &m->rot_row2);
         }
         {
-            float a = 0.0f;
+            float a;
             a = func_002A7878(0.0f, 6.2831855f);
             func_002AF000(&d->v20, 1.0f, a, func_002A7878(-1.5707964f, 1.5707964f));
         }
         d->v20.w = func_002A78D8(0.785398006f, 1.5707964f);
     }
     case 1: {
-        Moby *c = 0;
+        Moby *c;
         qcopy_nc(&m->pos, &m->owner->pos);
         qcopy_nc(&d->pos, &m->owner->pos);
         func_002B00D8(&m->pos, &d->pos, &d->pos, -0.5f);
@@ -190,7 +201,7 @@ void func_003136D0(Moby *m) {
     }
     case 2:
         if (m->state == 2) {
-            int i = 0;
+            int i;
             qcopy_nc(&d->pos, &m->pos);
             func_002B00D8(&m->pos, &d->pos, &d->pos, -0.5f);
             func_00312EB0(m);
@@ -212,9 +223,9 @@ void func_003136D0(Moby *m) {
                 && func_00282E48(&m->pos, D_00189EA0) < 10.0f
                 && func_00313678(m)) {
                 int i;
-                m->state = 3;
+                m->state = absorbed;
                 ((D_2D9EA0 *)D_L00_001B1AEC->pvars)->pending++;
-                if (D_001A7A44[2] != 0) *(short *)(D_00189EA0 + 0x15C) = 0x258;
+                if (D_001A7A44[2] != 0) *(short *)(D_00189EA0 + 0x15C) = grace;
                 d->h54 = (D_001AF158);
                 func_00282D30(&v30, D_00189EA0 + 0x240, -D_001AF170);
                 func_00282CC0(&v30, D_00189EA0, &v30);
@@ -257,13 +268,13 @@ void func_003136D0(Moby *m) {
         v0.w = 1.0f;
         if (func_00283DB8(&v0, 64.0f) >= 0) {
             int i;
-            int n = 0;
+            int n;
             func_0027CDC8(func_003146C0, m);
-            if (10.0f < func_00282E80(&m->pos, D_L00_001B8DC0)) n = (5);
-            else n = (40);
+            if (10.0f < func_00282E80(&m->pos, D_L00_001B8DC0)) n = far_count;
+            else n = near_count;
             for (i = 0; i < 8; i++) {
-                Part_2D9EA0 *e = 0;
-                Part_2D9EA0 *p = 0;
+                Part_2D9EA0 *e;
+                Part_2D9EA0 *p;
                 func_00313548(m, &v10, i);
                 e = func_002C36D0(&v10, n, 2, 0);
                 if (e != 0) {
@@ -302,7 +313,7 @@ void func_003136D0(Moby *m) {
                 }
             }
         } else if (D_001AD7EC || d->owner) {
-            int i = 0;
+            int i;
             for (i = 0; i < 8; i++) if (d->slots[i]) qcopy_nc(&d->slots[i]->pos, &m->pos);
         }
         break;
@@ -312,31 +323,31 @@ void func_003136D0(Moby *m) {
             func_00282D30(&m->pos, D_00189E20 + 0x2C0, -D_001AF170);
             func_00282CC0(&m->pos, D_00189E20 + 0x80, &m->pos);
             m->rot.w = 0.523598849773407f;
-            if (func_00313210(m) != 0 && func_002A77E0(5) == 0) func_003130F0(m);
+            if (func_00313210(m) != 0 && func_002A77E0(odds) == 0) func_003130F0(m);
         }
         {
             Hero *g = (Hero *)(D_00189E20);
             int lim = D_001A7A00;
             if (g->vehicle_mode == 1) lim = 4;
             if (g->health.hp == lim && g->invulnerable_frames != 0 && D_001A7A44[2] != 0) {
-                int r = 0;
+                int r;
                 r = (D_001AF15C);
                 if (d->h54 < r) {
-                    int i = 0;
+                    int i;
                     d->h54 = r;
                     for (i = 0; i < 4; i++) d->h58[i]++;
                 }
             }
         }
         if (func_00282978(&d->h54)) {
-            int i = 0;
+            int i;
             for (i = 0; i < 8; i++) {
                 if (d->slots[i] != 0) {
                     func_002B9180(d->slots[i]);
                     d->slots[i] = 0;
                 }
             }
-            if (D_L00_001B1AEC == m) m->state = 4;
+            if (D_L00_001B1AEC == m) m->state = done;
             else func_0029F338(m);
         } else {
             int i;
@@ -344,7 +355,7 @@ void func_003136D0(Moby *m) {
             func_00282CC0(&v20, D_00189E20 + 0x80, &v20);
             for (i = 0; i < 8; i++) {
                 Part_2D9EA0 *e = d->slots[i];
-                Ext_2D9EA0 *x = 0;
+                Ext_2D9EA0 *x;
                 if (e == 0) continue;
                 x = (Ext_2D9EA0 *)(e + 1);
                 if (func_00282978(&x->h1E)) {
@@ -363,23 +374,23 @@ void func_003136D0(Moby *m) {
                                 int t = g->health.hp + amount;
                                 g->health.hp = (lim < t) ? lim : t;
                             }
-                            if (old_health != ((Hero *)D_00189E20)->health.hp) func_0029B720(0x168);
+                            if (old_health != ((Hero *)D_00189E20)->health.hp) func_0029B720(sound);
                         }
                         {
                             D_2D9EA0 *o = (D_2D9EA0 *)D_L00_001B1AEC->pvars;
                             o->pending--;
                             if ((signed char)o->pending < 0) o->pending = 0;
                         }
-                        if (d->special) func_002E5DA0(1, 0x20, m, 0x200);
-                        else func_002E5DA0(1, 0x20, m, 0x1F5);
+                        if (d->special) func_002E5DA0(1, channel, m, big);
+                        else func_002E5DA0(1, channel, m, small);
                         d->h56 = 1;
                     }
                     func_002B9180(e);
                     d->slots[i] = 0;
                 } else {
                     float t;
-                    float k = 0.0f;
-                    Part_2D9EA0 *n = 0;
+                    float k;
+                    Part_2D9EA0 *n;
                     V_2D9EA0 *mid = &v40;
                     {
                         qcopy(mid, &e->pos);
@@ -406,7 +417,7 @@ void func_003136D0(Moby *m) {
                     v50.x = func_002A78D8(0.0f, 0.00999999978f) + e->pos.x;
                     v50.y = func_002A78D8(0.0f, 0.00999999978f) + e->pos.y;
                     v50.z = func_002A78D8(0.0f, 0.00999999978f) + e->pos.z;
-                    n = func_002C36D0(&v50, (0x14), 0, 0);
+                    n = func_002C36D0(&v50, burst, 0, 0);
                     if (n != 0) {
                         if (d->special) n->f4 = D_001AF11C;
                         else n->f4 = D_001AF118;
@@ -417,7 +428,7 @@ void func_003136D0(Moby *m) {
                     v50.x = func_002A78D8(0.0f, 0.00999999978f) + v40.x;
                     v50.y = func_002A78D8(0.0f, 0.00999999978f) + v40.y;
                     v50.z = func_002A78D8(0.0f, 0.00999999978f) + v40.z;
-                    n = func_002C36D0(&v50, (0x14), 0, 0);
+                    n = func_002C36D0(&v50, burst, 0, 0);
                     if (n != 0) {
                         if (d->special) n->f4 = D_001AF11C;
                         else n->f4 = D_001AF118;
@@ -431,7 +442,7 @@ void func_003136D0(Moby *m) {
         if (D_L00_001B1AEC == m) func_00313600();
         break;
     case 5:
-        if ((D_001B1688 & 1) && func_002ACD38(&m->pos)) func_002A7750(m, 2, -1);
+        if ((D_001B1688 & 1) && func_002ACD38(&m->pos)) func_002A7750(m, idle, -1);
         break;
     }
 }

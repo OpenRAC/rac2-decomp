@@ -195,7 +195,7 @@ extern void func_L11_00456540(char *);
 extern void func_L11_00456378(char *);
 extern void func_L11_00456EA0(void);
 
-INCLUDE_ASM("asm/levels", func_L11_00453358);
+/* func_L11_00453358 is in L11_00453358-drone-g8.c. */
 
 /* func_L11_00454508 lives in the sibling small-data unit (L11_00453358-g8.c). */
 

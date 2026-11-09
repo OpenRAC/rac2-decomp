@@ -2,7 +2,7 @@
 
 /* func_00308600 is defined in 00308600-spawn.c. */
 
-INCLUDE_ASM("asm/game", func_00308768);
+/* func_00308768 is in 00308768-g8.c. */
 
 typedef struct { f32 f[4]; } __attribute__((aligned(16))) V4;
 typedef struct { s32 f00; u8 p04[8]; s32 f0C; V4 v10; } N;

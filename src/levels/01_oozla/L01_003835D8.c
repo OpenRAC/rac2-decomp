@@ -73,7 +73,7 @@ void func_L01_003A6350(u8 *arg0) {
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L01_003A6638);
+/* func_L01_003A6638 is in L01_003A6638-ride-g8.c. */
 
 void func_L01_003A6448(float *arg0, float *arg1) {
     *arg0 = -D_00189E20.f1FB0;

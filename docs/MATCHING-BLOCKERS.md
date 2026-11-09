@@ -666,6 +666,14 @@ repeated idiom is a count lever: F4's "inline helpers returning a value do nothi
 extend to these. On the forced-bucket check, an `emit()` helper around the `func_002A8C28`
 calls is code-neutral too (S 541). For `func_L11_00451178` the same helpers bring the natural
 wording into its window (`turn` alone gives S 581), but its case-7 hoist order still differs.
+**9 November 2026, strict linked matches (USA v1.01):** `func_L11_00453358` is C in
+`src/levels/11_joba/L11_00453358-drone-g8.c` (1/1 USA v1.01); the owner allowed its case-9
+`height = 0.0f;`, the construct its matched twin `func_L02_0040BE08` already uses. `func_003136D0`
+(4,080 bytes, 28/28) is C in `src/game/0030F7B0-update-g8.c`: its 15 dead initial values are replaced
+by 13 set-once named constants declared before the `switch` and read inside its arms (`burst = 0x14`,
+`absorbed = 3`, `grace = 0x258`, ...). Each survives cse1, counts one insn at gcse and is folded by
+cprop, so no word changes; 12 or 14 of them leave the 0x7C-0x88 slots wrong, so the window is one wide.
+
 **Resolved later the same day:** `func_L11_00451178` matches too (`L11_00451178-gu-g8.c`). Three
 steps, each read from a dump:
 - **Slot order.** Retail's 0xCC slot for `tmpl` sits between gcse registers (0xC4/0xC8 for

@@ -1,21 +1,3 @@
-/* 4 November 2026 contract review: restore the integer returns of func_002A8C28,
- * func_002A8D70 and func_L07_00321D68, and the float return of func_002AA548, from their
- * matched definitions. The ignored results do not change the generated body: the retained
- * -O2 -G8 -ffunction-sections candidate passes 1/1 in both USA releases. PAL has no canonical
- * identity. It remains a held diagnostic because of the case-9 dead store below.
- */
-/* func_L11_00453358 (4,524 B, 1 place), 5 November 2026: exact in tools/check.py (1 of 1) and in
- * tools/build.py all --strict, but NOT landable under AGENTS.md / MATCHING-BLOCKERS blocker 26:
- * case 9's `height = 0.0f;` is a dead store whose only job is to keep a label between case 9's
- * func_002A7750(self, 11, -1) and its break until jump2, so jump2 does not cross-jump that tail
- * into case 13's (14, -1) one (without it: 4516 bytes). The merged twin func_L02_0040BE08 uses
- * the same store; a ruling on both, or a natural construct that leaves that label, is needed.
- * Tried without success: case 9 with an early break, and three inline-helper shapes for the
- * transition (an inlined body's return label is deleted too early).
- * Everything else is ordinary C: own -G8 unit with the default -g8 profile; the anim() and
- * turn() inline helpers give gcse retail's count (S 543), which orders the four spilled
- * reaching registers (pos, self+0xC0, self+0xF0, pv+0x1B0) as retail does.
- */
 /* func_L11_00453358: the Joba drone's state machine (patrol path, chase, grab, release, fall).
  * Own -G8 unit: the level gate D_L11_001A8FF4 and D_L11_001B1D40 are $gp-relative.
  * The four spilled pointers (self+0x10, self+0xC0, self+0xF0, pv+0x1B0) are gcse reaching
@@ -23,7 +5,8 @@
  * count at gcse. The anim() and turn() helpers are inlined; their expansion gives retail's
  * count (S 543) without changing any instruction.
  * Case 9's `height = 0.0f;` is the same construct as case 9 of the matched twin
- * func_L02_0040BE08: it keeps case 9's tail apart from case 13's in jump2's cross-jumping.
+ * func_L02_0040BE08: it keeps case 9's tail apart from case 13's in jump2's cross-jumping
+ * (allowed by owner ruling, 9 November 2026).
  */
 #include "common.h"
 

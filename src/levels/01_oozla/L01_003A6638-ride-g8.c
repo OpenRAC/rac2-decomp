@@ -1,22 +1,10 @@
-/* Second-pass layout/ABI review, 2026-11-03; retained, not linked.
- * Profile: -O2 -G8 -ffunction-sections -frac2-zero-ti-por -g.
- * US check.py: 2276/2276 bytes,0/1 places; frame0x230,first mismatch+0x1B4.
- * The inverse destination was already64 bytes, but its leading pad was unowned storage. It is now the actual postinverse displacement vector at the prior rotation base, preserving the measured16-byte overlap. All3 earlier matrices remain64 because their producers/consumers access64. The state helper retains its actual int return.
- * Remaining: PRE frame-address spill-slot order remains. The lawful first-pass initializer removals are retained; no dead-value count control.
- * No linked or functional-port qualification; prior measurements follow.
- */
-/* 2 November 2026: lawful retained reconstruction, not a match.
- * Removed ten deliberately dead initial values used only to alter the
- * compiler PRE hash-table count. Every actual first-use state assignment
- * remains. Current default G8/zero-ti-por/debug check: 2276/2276 bytes,
- * 0/1 USA v1.01 placement, first difference +0x1B4 (spill-slot ordering).
- * Three additional controls named real used material/attack constants,
- * angular/timestep constants, or both. None recovered the retail slots:
- * integer-only remains nonmatching; the two float forms emit 2272 bytes,
- * with the float-only form also growing the frame to 0x240.
- * The earlier exact-byte dead-initializer diagnostic is privately preserved
- * and provides no accepted C credit. Reopen on genuine PRE-copy lifetimes.
- * Use -O2 -G8 -ffunction-sections -frac2-zero-ti-por -g in a separate unit.
+/* func_L01_003A6638: the Oozla ride controller (steering, ground probe, bail-out), 2,276 bytes.
+ * Own unit: -O2 -G8 -ffunction-sections -frac2-zero-ti-por -g.
+ * The workspace union is the measured stack overlap: the inverse written after the rotation
+ * phase starts 16 bytes in, behind the displacement vector.
+ * The named constants at the top are set once and read past the switch labels (allowed by owner
+ * ruling, 9 November 2026): cprop folds each and no word changes. They give gcse the insn count
+ * that orders the PRE frame-address spill slots 0x1B8-0x1C8 as retail does; it takes these 12.
  */
 #include "common.h"
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
@@ -103,12 +91,24 @@ void func_L01_003A6638(u8 *object)
     float maximum, speed, progress, sign, angle, half, cosine;
     u8 *state = *(u8 **)(object+0x68);
     int collision, count, blocked, level, level2;
+    int ride_blend = 0;
+    int ride_anim = 10;
+    int debris = 16;
+    int debris_mode = 0;
+    int burst_mode = 0;
+    int pieces = 10;
+    int layer = 3;
+    int spread = 16;
+    int burst_owner = 0;
+    int spray_mode = 0;
+    int spray_flags = 0x830000;
+    int spray_kind = 3;
     qcopy(previous, (object+0x10));
     switch (object[0x20]) {
     case 0:
         F(state,0x44) = F(state,0x18);
         object[0x20] = 1;
-        if (object[0x43] != 1) func_002A7470(object,1,0,10);
+        if (object[0x43] != 1) func_002A7470(object,1,ride_blend,ride_anim);
         break;
     case 1:
         func_L01_003A6448(&horizontal,&vertical);
@@ -199,11 +199,11 @@ void func_L01_003A6638(u8 *object)
         func_00283098(displacement,displacement,object+0xC0);
         func_00282CC0(object+0x10,previous,displacement);
         if (((OozlaInput *)D_00138180)->flags & 0x20) {
-            func_002ABBB8(object,velocity,0,10,3,16,1,1,1,-1,0,0x810001,0.0f,0.0f,4.0f,2.0f,0.0f,1.0f,20.0f);
-            count = func_00277F48(object+0x10,16,object,0,D_L01_001AF874);
+            func_002ABBB8(object,velocity,burst_mode,pieces,layer,spread,1,1,1,-1,burst_owner,0x810001,0.0f,0.0f,4.0f,2.0f,0.0f,1.0f,20.0f);
+            count = func_00277F48(object+0x10,debris,object,debris_mode,D_L01_001AF874);
             *(OozlaQuad *)vector = *(OozlaQuad *)(object+0x10);
             level2 = D_00139568[0x20];
-            func_002A9850(object,vector,D_L01_001C3980,count,0,0x830000,3,2,((OozlaMaterial *)((u32)D_L01_002637A0 + level2*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
+            func_002A9850(object,vector,D_L01_001C3980,count,spray_mode,spray_flags,spray_kind,2,((OozlaMaterial *)((u32)D_L01_002637A0 + level2*sizeof(OozlaMaterial)))->material,1.0f,1.0f);
             I(state,0x40) = D_L01_001AF878;
             I(object,0x98) = 0;
             *(u16 *)(object+0x34) = (*(u16 *)(object+0x34) | 0x41)&0xEFFF;

@@ -539,10 +539,43 @@ void func_00319FB8(char *object)
     func_0031A340(object, data + 0x330, 0.15f, 0x1050B0, 0x10000000, 0x30000000);
 }
 
-INCLUDE_ASM("asm/game", func_0031A098);
+typedef int Quad_0031A098 __attribute__((mode(TI), aligned(16)));
+typedef union { float f[4]; Quad_0031A098 q; } Row_0031A098;
+typedef struct { Row_0031A098 row[4]; } __attribute__((aligned(16))) Tmpl_0031A098;
+extern Tmpl_0031A098 D_001AFAA0;
+
+void func_0031A098(char *p)
+{
+    Tmpl_0031A098 t;
+    Row_0031A098 *src = t.row;
+    Row_0031A098 *dst = (Row_0031A098 *)p;
+    float scale = 2.0f;
+    int i;
+
+    t.row[0].q = D_001AFAA0.row[0].q;
+    t.row[1].q = D_001AFAA0.row[1].q;
+    t.row[2].q = D_001AFAA0.row[2].q;
+    t.row[3].q = D_001AFAA0.row[3].q;
+    for (i = 0; i < 4; i++) {
+        qcopy(dst, src);
+        dst->f[1] *= scale;
+        dst->f[2] *= scale;
+        src++;
+        dst++;
+    }
+    *(long long *)(p + 112) = 0LL;
+    *(int *)(p + 80) = 0;
+    *(int *)(p + 84) = 0;
+    *(int *)(p + 88) = 0;
+    *(float *)(p + 92) = 1.0f;
+    *(float *)(p + 96) = 1.0f;
+    *(int *)(p + 100) = 0;
+    *(float *)(p + 104) = 1.0f;
+    *(long long *)(p + 128) = 0x0000FF9000000260LL;
+    *(float *)(p + 108) = 1.0f;
+}
 
 
-extern void func_0031A098(void *record);
 extern long long func_0027C878_1(int id);
 extern float func_00283248(float x, float y);
 extern float func_00282E80(void *a, void *b);
