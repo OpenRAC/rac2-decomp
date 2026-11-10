@@ -43,11 +43,11 @@ The 27 levels hold 100,562 function placements; C covers 94,363 of them.
 
 ## Supported versions
 
-| Release | Region | Boot executable | Notes |
-| --- | --- | --- | --- |
-| v1.01 | USA | `SCUS_972.68` | Primary version |
-| v1.00 | Europe/Australia | `SCES_516.07` | |
-| v2.00 (Greatest Hits) | USA | `SCUS_972.68` | Report id `SCUS_972.68_v2` |
+| Release | Region | Boot executable | Code | Notes |
+| --- | --- | --- | --- | --- |
+| v1.01 | USA | `SCUS_972.68` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent)](https://bytematch.dev/OpenRAC/rac2-decomp) | Primary version |
+| v1.00 | Europe/Australia | `SCES_516.07` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent&version=SCES_516.07)](https://bytematch.dev/OpenRAC/rac2-decomp/SCES_516.07) | |
+| v2.00 (Greatest Hits) | USA | `SCUS_972.68` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent&version=SCUS_972.68_v2)](https://bytematch.dev/OpenRAC/rac2-decomp/SCUS_972.68_v2) | Report id `SCUS_972.68_v2` |
 
 All releases share one C source. Expected SHA-256 of the primary disc image:
 
