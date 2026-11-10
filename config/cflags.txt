@@ -4298,3 +4298,4 @@ src/levels/02_maktar_nebula/L02_003FE8B8-g8.c	-O2 -G8 -ffunction-sections -frac2
 src/levels/02_maktar_nebula/L02_003FDDE8-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/11_joba/L11_00443940-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/shared/L13_0041AD00-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-sched-spec -Wa,--r5900-la-addend=sn
+src/us2/levels/19_grelbin/L19_00413430-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
