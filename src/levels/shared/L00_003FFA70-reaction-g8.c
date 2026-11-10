@@ -1,7 +1,7 @@
 /* func_L00_00408E58 has a unit of its own for -g: the entry pointer and the
  * division are two statements, so the second one's line label sits before the
  * lwc1 and the assembler pads one nop in front of div.s (the division floor,
- * docs/COMPILER-NOTES.md).
+ * docs/build/compiler-notes.md).
  *
  * done starts at 0 and takes the timer's result after the loop. Its value is
  * then equal to i's at the loop guard and it outlives i, so cse keeps it as the

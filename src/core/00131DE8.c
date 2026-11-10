@@ -2,7 +2,7 @@
  * the init request. A game-compiler unit of its own (00131780.c is an SDK unit). The last stores
  * before the request's jal are the plain payload stores and then the volatile D_001A7110 store;
  * the compiler's default set-side volatile rule (GCC 2.95's) leaves that slot empty, as retail
- * does, where the EE tree's rule fills it with `move $a2,$sp` (docs/COMPILER-NOTES.md). */
+ * does, where the EE tree's rule fills it with `move $a2,$sp` (docs/build/compiler-notes.md). */
 #include "common.h"
 
 /* Adapted from RAC1's GPL-3.0 989snd.c StartSoundSystem reconstruction,

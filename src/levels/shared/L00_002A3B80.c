@@ -153,7 +153,7 @@ extern int D_001A79F0;
 extern void func_L00_002D24B8(void);
 extern int func_L00_002C42E0(int, int);
 extern void func_L00_003B09F8(void);
-/* Incomplete sda array: retail clears this word as `lui $at; sw` (COMPILER-NOTES.md). */
+/* Incomplete sda array: retail clears this word as `lui $at; sw` (compiler-notes.md). */
 extern int D_001A73A0[] __attribute__((sda));
 
 void func_L00_002A4D18(void)

@@ -11,7 +11,7 @@
    -frac2-no-null-pointer-checks  block keeps no stray no-op after its last call;
    (the quadword clears' zeros in $a0/$v0 are the compiler's one-GPR TImode reload);
    -frac2-hazard-labels         the branch target on the mtc1 hazard nop.
-   See docs/COMPILER-NOTES.md for each option.
+   See docs/build/compiler-notes.md for each option.
 
    The common 0xF0 tail is GCC's cross-jumping of the inline func_L00_002D34C0 calls, not a
    source label.  Call argument orders follow retail's register setup (same ABI).

@@ -1,4 +1,4 @@
-/* 156 bytes vs retail 148 (39 instructions vs 37): the loop, the calls and the frame match retail instruction for instruction; the difference is that retail takes the addresses of two $gp-resident globals with one addiu each (addiu s1,$gp,0xBA8 and addiu s3,$gp,0xBB8), while cc1 emits lui+addiu for each. Same ordinary-flow $gp boundary as func_L00_003B8138 (docs/COMPILER-NOTES.md, -G8 .extern route). */
+/* 156 bytes vs retail 148 (39 instructions vs 37): the loop, the calls and the frame match retail instruction for instruction; the difference is that retail takes the addresses of two $gp-resident globals with one addiu each (addiu s1,$gp,0xBA8 and addiu s3,$gp,0xBB8), while cc1 emits lui+addiu for each. Same ordinary-flow $gp boundary as func_L00_003B8138 (docs/build/compiler-notes.md, -G8 .extern route). */
 typedef struct OBJ6 {
     char pad0[0x68];
     char *f68;

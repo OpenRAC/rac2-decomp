@@ -207,7 +207,7 @@ void func_L02_003C43F0(char *obj) {
  * only because they are locals, as in the siblings' `zero`.
  * What still differs:
  *  - retail saves $s1 and never uses it (obj is in $s2); here obj takes $s1 and the
- *    function is two words short (docs/MATCHING-BLOCKERS.md, "A register saved and never
+ *    function is two words short (docs/contributing/matching-blockers.md, "A register saved and never
  *    used"; func_00326A10 is the same family).
  *  - retail sets every call's constant arguments after the rounding chain
  *    (lwc1/mul/add/cvt/mfc1 v1/mtc1/cvt), as if a block boundary followed each

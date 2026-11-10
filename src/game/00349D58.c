@@ -1,7 +1,7 @@
 /* func_00349D58: initialises the HUD widget's text, sprites and fade keys. A unit of its own for
  * -frac2-keep-float-pun-source (config/cflags.txt): a colour read twice keeps its word in $v0, set
  * after the previous call, with one mtc1 into a saved FPR; a colour read once folds to li.s
- * (docs/COMPILER-NOTES.md). WriteBits is the one spelling for every colour. Same-file C calls and
+ * (docs/build/compiler-notes.md). WriteBits is the one spelling for every colour. Same-file C calls and
  * prototypes differ from 00345358.c, so it cannot live there. */
 static __inline__ float WriteBits(unsigned int bits)
 {

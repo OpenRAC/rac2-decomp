@@ -35,7 +35,7 @@ counts once in the progress, but one match removes it from 27 programs.
 ## Before any model: tools
 
 Much of the easy work needs no model at all. Before a wave, check whether a function is
-byte-identical to one already matched in rac1-decomp (docs/RAC1-TO-RAC2.md) or to another
+byte-identical to one already matched in rac1-decomp (docs/research/rac1-to-rac2.md) or to another
 function already matched here; those are carried over, not rewritten.
 
 ### Where the body may already exist
@@ -119,7 +119,7 @@ Workers may divide work locally only within that contributor's active reserved s
 
 Each worker gets its own git worktree and branch (`git worktree add ../rac2-w3 -b match/w3 origin/master`) and functions nobody else in the same contributor's wave has. Hand out whole files where you can: two workers editing one file is the usual source of conflicts. No separate per-worker issue #152 comment, committed queue, claim file or reservation database is required; the lead's local list of which worker has which functions is enough.
 
-Workers need the build environment (docs/BUILDING.md) but not a full build: `tools/check.py` compiles one file and compares one function in seconds.
+Workers need the build environment (docs/build/building.md) but not a full build: `tools/check.py` compiles one file and compares one function in seconds.
 
 ## Landing
 
@@ -133,13 +133,13 @@ The lead, for each finished worker:
 3. runs `python3 tools/progress.py`, the tests, `tests/check_repository.py` and
    `tools/progress.py --check`;
 4. commits coherent batches (prefer at least five related functions when practical;
-   see the [exceptions in AGENTS.md](../AGENTS.md#commits), and keep the report in its
+   see the [exceptions in AGENTS.md](../../AGENTS.md#commits), and keep the report in its
    own commit) and opens the pull request as AGENTS.md describes, with the build output in it.
 
 Shared blockers, measured attempts and reopening conditions go into
-[MATCHING-BLOCKERS.md](MATCHING-BLOCKERS.md). Every contributor can improve an existing entry
+[matching-blockers.md](../contributing/matching-blockers.md). Every contributor can improve an existing entry
 through a PR; there is no per-person ownership. Settled compiler mechanisms belong in
-[COMPILER-NOTES.md](COMPILER-NOTES.md), linked from the relevant blocker rather than duplicated.
+[compiler-notes.md](../build/compiler-notes.md), linked from the relevant blocker rather than duplicated.
 Discuss findings in the relevant PR; issue #157 is historical provenance only. No wave logs,
 lot documents or separate registers.
 

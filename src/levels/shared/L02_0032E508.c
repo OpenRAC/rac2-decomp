@@ -25,7 +25,7 @@ typedef struct L02RegionLink {
    polygons (up to 32 layers, CAPACITY nodes), then the links between the found nodes,
    then each node's centre and radius. Returns the node count.
    -g, as retail's two-nop floor before div.s shows. The first slot search is a label
-   loop inside a one-pass group (docs/COMPILER-NOTES.md:54): retail keeps its constant and
+   loop inside a one-pass group (docs/build/compiler-notes.md:54): retail keeps its constant and
    address unhoisted and its loop-start alignment nop, which a for loop does not give.
    The neighbour reset indexes the node array as flat bytes, which gives retail's
    address grouping. */

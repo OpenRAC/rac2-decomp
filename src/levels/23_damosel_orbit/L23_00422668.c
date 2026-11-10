@@ -2,7 +2,7 @@
 
 /* func_L23_00422668 is a unit of its own: it needs the opt-in quadword-copy profile
    (-frac2-qcopy) for the grouped `lq`/`sq` of its else branch, and
-   -frac2-no-annulled-wide-stores (docs/COMPILER-NOTES.md): reorg's search of that branch's
+   -frac2-no-annulled-wide-stores (docs/build/compiler-notes.md): reorg's search of that branch's
    target then stops at the 16-byte copy, so the `beqz` keeps an empty slot and `$a0 = $sp`
    stays on each path, as retail has it, where it would otherwise take the `$a0` move from
    behind the copy and fill the return test's `beql` slot from the epilogue. */

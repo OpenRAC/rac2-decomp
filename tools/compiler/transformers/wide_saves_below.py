@@ -27,7 +27,7 @@ as without the option, so a function that needs this belongs in a unit of its ow
 The option is off by default, enabled per unit in config/cflags.txt, has no effect with
 -mastra-quad-saves (every slot is already 16 bytes), and -fno-rac2-wide-saves-below disables it
 again. tests/test_wide_saves_below.py covers the anchors, the default/disabled equality, wide
-frames with and without stack arguments, and controls. See docs/COMPILER-NOTES.md.
+frames with and without stack arguments, and controls. See docs/build/compiler-notes.md.
 
 Usage: wide_saves_below.py <gcc source directory>   (the one holding toplev.c)
 """

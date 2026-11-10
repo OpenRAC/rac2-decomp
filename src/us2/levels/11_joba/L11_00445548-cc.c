@@ -46,7 +46,7 @@ extern u8 *D_L11_001B359C;
 
 /* The class table base read through an incomplete `sda` array: cc1 emits the one-instruction
    load, which the assembler expands absolute (`lui $r` / `lw $r,%lo($r)`) and which is not
-   hoisted out of the loop, as retail has it (docs/COMPILER-NOTES.md). */
+   hoisted out of the loop, as retail has it (docs/build/compiler-notes.md). */
 /* func_L11_00441350 lives below, after the id-list macros it uses. */
 
 /* arms the one-shot flag block when it is idle and the state agrees */

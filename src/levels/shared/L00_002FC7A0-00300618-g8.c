@@ -5,7 +5,7 @@
  * this follows: the function-scope scratch int `tmp`, sequential record reads through
  * char pointers, and header words read as ints (RAC1 reads them as struct members).
  * The section-8 records are copied by an explicit goto loop: a do loop has its four
- * cursor advances turned into address givs by this cc1 (docs/COMPILER-NOTES.md).
+ * cursor advances turned into address givs by this cc1 (docs/build/compiler-notes.md).
  */
 #include "common.h"
 

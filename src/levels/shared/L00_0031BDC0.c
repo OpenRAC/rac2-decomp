@@ -2,7 +2,7 @@
 
 /* func_L00_0031BDC0 is a unit of its own: it needs -ffast-math, the flag that lets the
    fold turn the clamp into the retail's `max.s` and `min.s` (the float MIN/MAX class of
-   docs/COMPILER-NOTES.md). The flag changes every other body of a shared unit, so the
+   docs/build/compiler-notes.md). The flag changes every other body of a shared unit, so the
    function lives here alone. */
 
 typedef float f32;

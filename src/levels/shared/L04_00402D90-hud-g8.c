@@ -27,7 +27,7 @@ extern int func_00283D38(int,int,float);
 extern float func_00283198(float),func_00283180(float);
 extern void func_0027AB40(void);
 extern int func_00336D50(char *,int);
-/* Typed interleaving (docs/COMPILER-NOTES.md, "Source methods shared with RAC1"): the same two
+/* Typed interleaving (docs/build/compiler-notes.md, "Source methods shared with RAC1"): the same two
    integer and five float arguments, in the same order within each register bank. */
 extern void func_00300A00(int,float,int,float,float,float,float);
 extern void func_002FC560(int,unsigned long long);

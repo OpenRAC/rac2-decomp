@@ -100,7 +100,7 @@ every script.
 
 Needs: OpenRAC's interpreter built (cmake -S tools/interpreter -B build/interpreter in
 OpenRAC; $OPENRAC_ROOT, default ~/Projects/RAC/OpenRAC; level00 needs its --stick), the
-compiler (docs/BUILDING.md; $RAC2_LINUX runs it, e.g. "docker exec rac2-gate"),
+compiler (docs/build/building.md; $RAC2_LINUX runs it, e.g. "docker exec rac2-gate"),
 build/boot/placed.json from `tools/build.py boot` (and build/00_aranos_tutorial/placed.json from
 `tools/build.py level 00` for level 00), and the disc image. Test-only: nothing here is linked or shipped.
 """

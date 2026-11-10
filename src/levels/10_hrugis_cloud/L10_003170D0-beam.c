@@ -27,7 +27,7 @@ typedef struct {
 } Moby;
 
 /* The moby table. Read as [0] of an incomplete sda array, for the absolute lui/lw
-   load (docs/COMPILER-NOTES.md). */
+   load (docs/build/compiler-notes.md). */
 extern Moby *D_L10_001B251C[] __attribute__((sda));
 extern u8 D_L10_001B9680[];
 

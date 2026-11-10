@@ -24,7 +24,7 @@ keeps the `nop` (func_00133988, `mflo` before `j $31`), so this is a per-object 
 With the option the guard tests `prev_pinfo & INSN_SYNC`, as GNU 2.10-ee does; every other
 swap rule is unchanged. Without it the assembler is unchanged. Pass it per file with
 `-Wa,--r5900-swap-branch-slots` in config/cflags.txt. tests/test_swap_branch_slots.py checks
-the transformer and the assembler output; see docs/COMPILER-NOTES.md.
+the transformer and the assembler output; see docs/build/compiler-notes.md.
 
 Usage: swap_branch_slots.py <gas/config/tc-mips.c>
 """

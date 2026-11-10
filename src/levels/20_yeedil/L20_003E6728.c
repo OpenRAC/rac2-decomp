@@ -1,4 +1,4 @@
-/* func_L20_003E6728: Yeedil's own copy of func_L00_003C5310 (same C); needs -frac2-sticky-volatile-refs, see docs/COMPILER-NOTES.md. */
+/* func_L20_003E6728: Yeedil's own copy of func_L00_003C5310 (same C); needs -frac2-sticky-volatile-refs, see docs/build/compiler-notes.md. */
 #include "common.h"
 
 /* Own unit: -fmove-all-movables lets loop.c hoist the second strip loop's

@@ -25,7 +25,7 @@ objects; forced on everywhere it changes only the four units whose functions ret
 0($sp) with `sq $zero`. Five functions are the measured witnesses, each a unit of its own.
 tests/test_zero_ti_por.py covers the anchors, the default/disabled equality and authored zero
 stores through $sp, a pointer, a global and in a loop, at zero and nonzero displacements, a
-mixed function, shared and live zeros and the function-value case. See docs/COMPILER-NOTES.md.
+mixed function, shared and live zeros and the function-value case. See docs/build/compiler-notes.md.
 
 Usage: zero_ti_por.py <gcc source directory>   (the one holding toplev.c)
 """

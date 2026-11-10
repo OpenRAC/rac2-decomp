@@ -3,7 +3,7 @@
    one return.  Same routine as the Yeedil, Grelbin and Dobbo handlers with a different set of
    states; state 0x71 comes from the Todano/Damosel copy.
 
-   The unit takes the Yeedil unit's flags (config/cflags.txt); see docs/COMPILER-NOTES.md for
+   The unit takes the Yeedil unit's flags (config/cflags.txt); see docs/build/compiler-notes.md for
    each option. */
 
 #include "common.h"

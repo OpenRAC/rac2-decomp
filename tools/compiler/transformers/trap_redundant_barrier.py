@@ -37,7 +37,7 @@ on the restore, none past it. No unit of src/ compiles differently.
 The first backward scan of redundant_insn now ends, finding nothing, at a TRAP_IF insn or a
 volatile asm.
 tests/test_trap_redundant_barrier.py covers the transformer and the compiler output; see
-docs/COMPILER-NOTES.md.
+docs/build/compiler-notes.md.
 
 Usage: trap_redundant_barrier.py <gcc/reorg.c>
 """

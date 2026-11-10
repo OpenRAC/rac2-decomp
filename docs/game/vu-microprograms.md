@@ -8,7 +8,7 @@ is given.
 The overlay convention itself is documented by the community project
 **re-rac/rerac** (`docs/formats/vu_microprograms.md`, ISC) for RAC1. Their renderer
 attributions are a **lead to verify**, never evidence — the same rule as
-COMMUNITY-ENGINE-REFERENCE.md. Section 4 separates what is measured here from what is
+community-engine-reference.md. Section 4 separates what is measured here from what is
 not.
 
 The `.DVP.ovly*` tables are already pinned in `config/boot-sections.json`; this page

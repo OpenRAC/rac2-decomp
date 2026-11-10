@@ -24,7 +24,7 @@ The option is off by default, enabled per compilation unit in config/cflags.txt 
 -frac2-keep-block-order, whose pass also counts blocks before cse), and
 -fno-rac2-no-null-pointer-checks disables it again. Without it the source is unchanged in
 effect. tests/test_no_null_pointer_checks.py covers the anchors, the default/disabled
-equality and an authored check the pass deletes. See docs/COMPILER-NOTES.md.
+equality and an authored check the pass deletes. See docs/build/compiler-notes.md.
 
 Usage: no_null_pointer_checks.py <gcc source directory>   (the one holding toplev.c)
 """

@@ -35,7 +35,7 @@ s32 Camera_CollPrimTest(void *prim, void *grid);
 /* Measured USA v1.01 memory views, not native host-pointer structures.
  * Addresses are 32-bit PS2 values; decode them explicitly in a PC port/debugger.
  * Field purposes not established by callers and the consumer retain offset names.
- * See docs/COMMUNITY-ENGINE-REFERENCE.md, "Measured retail impact queue". */
+ * See docs/game/community-engine-reference.md, "Measured retail impact queue". */
 typedef struct Rac2Impact32 {
     /* 0x00 */ f32 vector[4];
     /* 0x10 */ u32 sourceAddress;

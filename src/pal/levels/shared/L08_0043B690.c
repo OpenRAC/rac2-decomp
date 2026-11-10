@@ -57,7 +57,7 @@ typedef struct {
 extern L08Moby *D_L08_001B29DC MACRO_ADDR;
 
 /* Words retail never moves into a delay slot are fields read at an offset from
-   an earlier symbol; bare names are loaded by $gp in a slot (docs/COMPILER-NOTES.md). */
+   an earlier symbol; bare names are loaded by $gp in a slot (docs/build/compiler-notes.md). */
 extern u8 D_001A7A00[] __attribute__((sda));
 extern u8 D_L08_001A7C80[] __attribute__((sda));
 extern int D_L08_001B2724[] __attribute__((sda));

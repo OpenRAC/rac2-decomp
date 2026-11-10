@@ -79,7 +79,7 @@ extern char D_L00_001AEED0[];
 /* A six-word block of x/y pairs and a three-word block of colours. Retail reads
  * element 0 of each through $gp and the other elements as absolute macro loads at
  * an offset from the block, which keeps them out of the call delay slots
- * (docs/COMPILER-NOTES.md, "reorg: which global loads may fill a slot"). */
+ * (docs/build/compiler-notes.md, "reorg: which global loads may fill a slot"). */
 extern int D_L00_001AEE98[] MACRO_ADDR;
 
 extern int D_L00_001AEE98_gp SDATA(D_L00_001AEE98);

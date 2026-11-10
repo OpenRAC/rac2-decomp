@@ -1,7 +1,7 @@
 /* func_L03_0043AD30 (512 bytes, 12 places), in its own -G8 -g unit: D_L03_001B21B8 is small
  * data, D_00138284 is read by lui/lwc1 (an incomplete array), and each angle's dot product is
  * its own statement. Under -g the second one leaves a line label right after the call's delay
- * slot, and the division there gets retail's two-nop floor (docs/COMPILER-NOTES.md, division
+ * slot, and the division there gets retail's two-nop floor (docs/build/compiler-notes.md, division
  * label floor after a call). The size window is written as retail's negated tests. */
 
 #include "include_asm.h"

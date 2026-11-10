@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 /* func_L02_003EAE10 is a unit of its own: it reads $gp data (hence -G8) and needs the opt-in
-   clear profile (-frac2-zero-ti-barrier, docs/COMPILER-NOTES.md): with it, the load of the
+   clear profile (-frac2-zero-ti-barrier, docs/build/compiler-notes.md): with it, the load of the
    state's +0x3C float follows the 16-byte clear at once, as retail has it. */
 
 typedef unsigned char u8;

@@ -1,8 +1,8 @@
 # Instructions for agents
 
 This file is for AI agents (Claude, Codex, Qwen or others) working in this repository. Read it
-completely before changing anything; then read README.md, CONTRIBUTING.md, docs/BUILDING.md and
-docs/LEVELS.md. The repository follows the same structure as rac1-decomp and the other OpenRAC
+completely before changing anything; then read README.md, CONTRIBUTING.md, docs/build/building.md and
+docs/build/levels.md. The repository follows the same structure as rac1-decomp and the other OpenRAC
 decompilations: keep it that way.
 
 Also read `CLAUDE.md` and `.claude/CLAUDE.md` when present, and follow their applicable
@@ -24,7 +24,7 @@ equals the retail programs.
 | `config/cflags.txt` | compiler flags per file | by hand, when a whole file needs other flags |
 | `include/` | headers shared with rac1-decomp | by hand |
 | `nonmatching/` | near misses, never linked | you |
-| `progress/report.json`, the README table | progress | `tools/progress.py` only, on `master` by a maintainer |
+| `progress/report.json` | progress | `tools/progress.py` only, on `master` by a maintainer |
 | `tools/` | disc reader, build, check, progress, compiler recipes | by hand, with tests |
 | `docs/` | how to build, the level format, the compiler, game research | by hand |
 | `baserom/`, `build/`, `toolchain/`, `work/` | game data, build output, proprietary tools, scratch | never committed |
@@ -111,13 +111,13 @@ attempt; OpenRAC's `docs/port/BACKFILL.md` has the measurements and the full pro
 - **Out of budget.** About ten compiles without getting closer.
 
 Then stop: put the marker back, leave the attempt in `nonmatching/<area>/` with what differs and
-what would unblock it, and let it go up one model tier (docs/AGENT_WORKFLOW.md). Stopping is a
+what would unblock it, and let it go up one model tier (docs/agents/agent-workflow.md). Stopping is a
 normal result. C that behaves like the function without matching it is useful to the native port,
 never to `src/` or the progress report.
 
 ## Shared blocker knowledge
 
-[`docs/MATCHING-BLOCKERS.md`](docs/MATCHING-BLOCKERS.md) is the shared reference for
+[`docs/contributing/matching-blockers.md`](docs/contributing/matching-blockers.md) is the shared reference for
 blockers, measured attempts and verified remedies. **Every contributor may edit any
 entry through a normal fork/topic branch and pull request**, including entries originally
 written by someone else. Maintainers review merges; they do not own all knowledge edits.
@@ -129,7 +129,7 @@ read the relevant entry and retained source, and check cited fixes against curre
 `origin/master`. Do not repeat recorded attempts without a new hypothesis or changed input.
 
 When you find a blocker, useful evidence or a solution, update the existing entry in
-`docs/MATCHING-BLOCKERS.md` in your branch and include it in the relevant PR. Keep it concise:
+`docs/contributing/matching-blockers.md` in your branch and include it in the relevant PR. Keep it concise:
 
 - Identify the target/family, release, compiler/assembler profile and placement coverage.
 - Record the hypothesis, measured result, remaining difference and next useful experiment.
@@ -161,7 +161,7 @@ side by side instead of one after another:
 - Start long steps in the background and keep working; do not sit on a build.
 
 The exception: never run two builds of the same program in the same checkout at once. Workers
-each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
+each have their own worktree for that reason (docs/agents/agent-workflow.md).
 
 ## Rules
 
@@ -207,7 +207,7 @@ each have their own worktree for that reason (docs/AGENT_WORKFLOW.md).
   permitted when the EE ABI preserves each register bank's argument order, count and
   widths, stack arguments, return contract and side effects. Do not invent accesses or
   change the callee's physical interface to influence allocation. See
-  [the examples and limits](docs/COMPILER-NOTES.md#source-methods-shared-with-rac1).
+  [the examples and limits](docs/build/compiler-notes.md#source-methods-shared-with-rac1).
 - **English.** Everything that lands here is in English: code, comments, commit messages,
   issues, pull requests, reviews, and the notes kept in `nonmatching/`. Translate before it is
   published.
@@ -268,22 +268,22 @@ work in. It was removed on purpose. Do not recreate any of it:
   for an isolated fix, an independent change that needs separate review, or the final
   remainder of a batch. Do not combine unrelated work or delay a necessary fix just
   to reach five. Every batch must still pass the required checks before publication.
-- Leave `progress/report.json` and the README table out of your commits (see "The progress
+- Leave `progress/report.json` out of your commits (see "The progress
   report").
 
 ## The progress report
 
-`progress/report.json` and the README table are generated, and every pull request that
-regenerates them conflicts with every other one. So pull requests do not touch them:
+`progress/report.json` is generated, and every pull request that regenerates it conflicts
+with every other one. So pull requests do not touch it:
 
 - In a pull request, say what `tools/build.py all` printed and how many functions you added.
   `tools/progress.py --check` passes with the report behind; it only fails if the report counts
   something that is no longer C.
 - After merging, a maintainer runs `tools/build.py all` and `tools/progress.py` on `master` and
-  commits the two files alone (`chore(progress): N of 9,101 functions`). Several merged pull
+  commits it alone (`chore(progress): N of 9,101 functions`). Several merged pull
   requests can share one regeneration.
-- If your branch already has the two files changed, restore them before pushing:
-  `git checkout origin/master -- progress/report.json README.md`.
+- If your branch already has it changed, restore it before pushing:
+  `git checkout origin/master -- progress/report.json`.
 
 ## Pushing changes
 
@@ -306,7 +306,7 @@ reservation files.
 
 ## Which model does what
 
-docs/AGENT_WORKFLOW.md is the whole procedure. In short, sort by size with `python3 tools/todo.py`:
+docs/agents/agent-workflow.md is the whole procedure. In short, sort by size with `python3 tools/todo.py`:
 
 - **Haiku 5.5**: small functions, up to 400 bytes, many workers at once.
 - **Sonnet 5.5**: 401 to 1,000 bytes, and what Haiku gave up on.

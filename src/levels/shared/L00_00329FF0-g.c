@@ -2,7 +2,7 @@
 
 /* func_L00_00329FF0 is a unit of its own: it is built with -g, whose line label in front of
    the `div.s` makes the assembler pad that division with retail's two nops (the
-   division-floor class of docs/COMPILER-NOTES.md). The division has to be a statement of
+   division-floor class of docs/build/compiler-notes.md). The division has to be a statement of
    its own for the label to land on it, and the integer divisor has to be converted on a
    line of its own too, so that the conversion lands between the call and the division. */
 

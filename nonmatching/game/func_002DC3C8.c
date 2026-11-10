@@ -1,6 +1,6 @@
 /* 9 November 2026 (o16): measured with the catalogue row shifted +8 (to 0x002DC3D0, 848 bytes),
  * the C below equals retail in all 214 instructions (opcodes and registers; relocations not
- * compared). The +8 shift itself stays unproved under docs/MATCHING-BLOCKERS.md "Entry still
+ * compared). The +8 shift itself stays unproved under docs/contributing/matching-blockers.md "Entry still
  * unproved" (no traced entry; a store at the start is not an entry witness); the owner chose to
  * keep the 856-byte row. Reopen only on a traced entry or object-origin evidence. */
 /* 8 November 2026: no RAC1/RAC4 twin. ~/rac1-decomp/src and ~/rac4-decomp have no timed text-page state machine with these text ids, timers (180/240/300) or the 0x900 pad test; the open question stays the catalogue entry (+0 vs +8). */

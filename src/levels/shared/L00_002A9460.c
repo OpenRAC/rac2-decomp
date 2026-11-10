@@ -1,4 +1,4 @@
-/* func_L00_002A9460: needs -frac2-sticky-volatile-refs (reorg stops at the second qcopy asm); see docs/COMPILER-NOTES.md. */
+/* func_L00_002A9460: needs -frac2-sticky-volatile-refs (reorg stops at the second qcopy asm); see docs/build/compiler-notes.md. */
 #include "common.h"
 
 /* Its first two callees differ by level (ref_ names); func_L00_002ADF80 is C in

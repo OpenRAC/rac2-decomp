@@ -13,7 +13,7 @@
    The unit's flags (config/cflags.txt): -G16 -Wa,-G16 for the 16-byte sda records,
    -frac2-zero-ti-por, -frac2-qcopy -frac2-qcopy-barrier for the 128-bit copies,
    -frac2-hazard-labels for the branches onto compare hazard nops.
-   See docs/COMPILER-NOTES.md for each option. */
+   See docs/build/compiler-notes.md for each option. */
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));

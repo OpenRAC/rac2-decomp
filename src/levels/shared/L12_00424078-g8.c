@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* func_L12_00424078 is a unit of its own: -g (config/cflags.txt) gives the line label that
-   puts retail's two-nop floor in front of each div.s (docs/COMPILER-NOTES.md, "Division/root
+   puts retail's two-nop floor in front of each div.s (docs/build/compiler-notes.md, "Division/root
    scheduling and padding"), and -G8 reads the frame counter through $gp. */
 
 extern u8 *D_L12_001B2E9C[3] __attribute__((sda)); /* entity base, read bare (lui/lw) */

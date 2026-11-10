@@ -6,7 +6,7 @@
    load behind them).  Tables are indexed as (index << n) + (s32)base, the operand order retail
    adds in.  Two addressing forms of the 0x1B255C and 0x1B264C pointers: the _sda names are the
    $gp form.  -frac2-hazard-labels gives the forward branch onto the 17.0f compare its hazard nop
-   target (docs/COMPILER-NOTES.md, Labels on hazard nops). */
+   target (docs/build/compiler-notes.md, Labels on hazard nops). */
 #include "common.h"
 typedef union { u8 b[0x800]; s8 c[0x800]; s16 h[0x400]; u16 uh[0x400]; s32 i[0x200]; u32 u[0x200]; f32 f[0x200]; void *p[0x200]; } UView;
 extern int func_002761F8(void *,void *,int,void *,void *);

@@ -24,7 +24,7 @@ func_L00_002A3B88 and func_00131DE8, where the EE tree's rule fills it. The rule
 default because retail's compiler shows it wherever it can be seen: with it, no matched
 function of src/ changes. -fno-rac2-sticky-volatile-sets restores the EE tree's assignment
 for a unit that needs it (none does). tests/test_sticky_volatile_sets.py covers the anchors,
-the default, the explicit opt-out and controls. See docs/COMPILER-NOTES.md.
+the default, the explicit opt-out and controls. See docs/build/compiler-notes.md.
 
 Usage: sticky_volatile_sets.py <gcc source directory>   (the one holding toplev.c)
 """

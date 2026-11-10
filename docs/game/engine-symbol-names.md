@@ -93,7 +93,7 @@ a seven-case menu-action switch — sits at `0x0026ede8`, inside retail FRONTEND
 
 - **Do not apply these addresses, or any name derived from them, to the retail Ghidra
   project.** Every one indexes the prototype's image.
-- The **6 356 level names** in `docs/MOBY-DISPATCH-TABLES.md` are unaffected: they come
+- The **6 356 level names** in `docs/game/moby-dispatch-tables.md` are unaffected: they come
   from the *overlay* dispatch tables and were verified against the retail overlays, not
   from this linker script.
 - The prototype's section table is itself a usable result: it documents the engine's

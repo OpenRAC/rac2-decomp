@@ -32,7 +32,7 @@ other test of loop_has_volatile, in check_dbra_loop's loop reversal. It keys on 
 only on the option. It is off by default, enabled per unit in config/cflags.txt, and
 -fno-rac2-no-extra-increment-givs disables it again. tests/test_no_extra_increment_givs.py
 covers the anchors, the default/disabled equality, a loop whose code changes only with the
-option and controls. See docs/COMPILER-NOTES.md.
+option and controls. See docs/build/compiler-notes.md.
 
 Usage: no_extra_increment_givs.py <gcc source directory>   (the one holding toplev.c)
 """

@@ -328,7 +328,7 @@ void func_US2_L16_0038EE98(Moby *self)
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
        dies at combine). gcse's hash needs 677 buckets, max_cuid >= 1352, for retail's spill
-       slots. See F4 in docs/MATCHING-BLOCKERS.md. */
+       slots. See F4 in docs/contributing/matching-blockers.md. */
     {
         float *anchor = st->a;
         qcopy(&D_L08_0023A690[0][0], anchor);

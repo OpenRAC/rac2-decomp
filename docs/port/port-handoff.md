@@ -8,8 +8,8 @@ native port of Going Commando (NTSC-U, SCUS_972.68). It covers four things:
 - the bugs found in two days of player testing, and which of them traced back to this repository;
 - the methods and lessons that saved time.
 
-Matching itself is covered by [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md) and
-[COMPILER-NOTES.md](COMPILER-NOTES.md). This document is about **behaviour**: C that has to do
+Matching itself is covered by [agent-workflow.md](../agents/agent-workflow.md) and
+[compiler-notes.md](../build/compiler-notes.md). This document is about **behaviour**: C that has to do
 what the retail code does when the port runs it.
 
 ## How this repository feeds the port

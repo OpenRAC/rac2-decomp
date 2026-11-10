@@ -4,7 +4,7 @@
    D_001A79F0 and the record bases are not the ones the rest of that file uses. Retail reads each
    of them with the absolute `lui`/`lw` pair in ordinary flow and with one $gp-relative `lw` where
    reorg puts the load in a branch delay slot; a single MACRO_ADDR declaration gives exactly that
-   mix (docs/COMPILER-NOTES.md, small data). */
+   mix (docs/build/compiler-notes.md, small data). */
 
 /* The trailing flags have no measured fixed extent. */
 typedef struct {

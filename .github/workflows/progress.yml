@@ -1,5 +1,5 @@
 # ByteMatch progress reports (https://bytematch.dev/OpenRAC/rac2-decomp), as rac1-decomp
-# publishes its own. One per release (docs/VERSIONS.md):
+# publishes its own. One per release (docs/build/versions.md):
 #
 #   SCUS_972.68     USA v1.01 (the primary target)  progress/report.json      -> SCUS_972.68_report
 #   SCES_516.07     Europe/Australia v1.00          progress/pal/report.json  -> SCES_516.07_report

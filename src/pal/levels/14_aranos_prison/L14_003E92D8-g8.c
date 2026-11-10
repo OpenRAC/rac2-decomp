@@ -2,7 +2,7 @@
    span are key positions scaled to 50 Hz and the current position stays unscaled. A unit of its
    own: it reads four float constants through $gp (hence -g8), and it is built with -g, whose line
    label in front of the `mul.s` before the second division makes the assembler pad that `div.s`
-   with retail's `nop` (the division-floor class of docs/COMPILER-NOTES.md, as in
+   with retail's `nop` (the division-floor class of docs/build/compiler-notes.md, as in
    func_L23_004160B0). func_00282C48 is `fabs`. The state block is read as a halfword key table at
    +0x00, with the current position at +0x14 and the current key index at +0x16: the span runs
    from the key to the previous one (index != 0), or to one of three words (index == 0). `raw`

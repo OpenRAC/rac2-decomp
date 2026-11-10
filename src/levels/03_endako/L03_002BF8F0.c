@@ -6,7 +6,7 @@
    states.  Ported from that match by renaming the per-level symbols and pruning.
 
    The unit's flags (config/cflags.txt) are the ones L20_002CD928 needs, minus the two for its
-   state 0x7C (see its header and docs/COMPILER-NOTES.md): -g, -ffast-math, -frac2-zero-ti-por,
+   state 0x7C (see its header and docs/build/compiler-notes.md): -g, -ffast-math, -frac2-zero-ti-por,
    -frac2-hazard-labels.  Dropping any of them breaks the match. */
 
 #include "common.h"

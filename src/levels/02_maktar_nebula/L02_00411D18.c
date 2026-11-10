@@ -1,6 +1,6 @@
 /* func_L02_00411D18 is a unit of its own: $s2 holds a TImode value, and retail saves it
    with `sq` in a 16-byte slot below the 8-byte GPR saves (-frac2-wide-saves-below,
-   docs/COMPILER-NOTES.md). The option keys on that mode, and the widened save mode
+   docs/build/compiler-notes.md). The option keys on that mode, and the widened save mode
    carries over to later functions of a unit, so nothing else shares this file. */
 #include "common.h"
 

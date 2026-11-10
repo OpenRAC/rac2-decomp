@@ -3,7 +3,7 @@
  * while at full size or growing, 0.15 while shrinking) and eases towards the camera.
  *
  * Retail keeps the branch label of the limit selection on its mtc1 hazard nop, so the
- * unit is built with -frac2-hazard-labels (docs/COMPILER-NOTES.md, "Labels on hazard
+ * unit is built with -frac2-hazard-labels (docs/build/compiler-notes.md, "Labels on hazard
  * nops").  The two limit cases are separate statements: cross-jumping merges their
  * common compare, which keeps the two constant loads in their own arms. */
 #include "common.h"

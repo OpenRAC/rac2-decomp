@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Built with -g: retail has the two-nop floor that the line label before the division
-   gives (docs/COMPILER-NOTES.md, "Division/root scheduling and padding"). */
+   gives (docs/build/compiler-notes.md, "Division/root scheduling and padding"). */
 
 typedef int Quad __attribute__((mode(TI)));
 

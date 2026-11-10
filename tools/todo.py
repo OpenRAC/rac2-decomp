@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-The functions still to match, to pick work by size (docs/AGENT_WORKFLOW.md).
+The functions still to match, to pick work by size (docs/agents/agent-workflow.md).
 
   python3 tools/todo.py                    # a summary by size tier
   python3 tools/todo.py --max 400          # functions of at most 400 bytes

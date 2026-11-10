@@ -8,7 +8,7 @@
    -membedded-data makes cc1 count a small-data reference as two words (no delay slot, no
    displacement fold), which gives both, unchanged elsewhere: retail puts no $gp access of this
    function into a slot either. The `sda` incomplete arrays are the bare absolute reads
-   (COMPILER-NOTES.md); the sized `sda` declarations are the $gp ones. */
+   (compiler-notes.md); the sized `sda` declarations are the $gp ones. */
 
 typedef int Quadword __attribute__((mode(TI)));
 

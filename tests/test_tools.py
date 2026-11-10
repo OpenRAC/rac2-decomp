@@ -1376,7 +1376,7 @@ class MobyDispatchMetadata(unittest.TestCase):
         import csv
         import re
 
-        with (ROOT / "docs/moby-dispatch.tsv").open(encoding="utf-8", newline="") as stream:
+        with (ROOT / "docs/game/moby-dispatch.tsv").open(encoding="utf-8", newline="") as stream:
             reader = csv.DictReader(stream, delimiter="\t")
             self.assertEqual(reader.fieldnames, [
                 "table", "level", "id", "role", "address", "aux", "proposed_name", "source",

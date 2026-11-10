@@ -2,7 +2,7 @@
  * -G8, -g, -frac2-hazard-labels and -frac2-frame-pointer-liveness (config/cflags.txt). The hazard
  * option puts the 00414AD8 bc1f target on the nop at 00414BF8, as retail. Without the liveness
  * option flow keeps $fp live after reload and reorg annuls the slot of the branch at 004147A8
- * (bnel where retail has bne, same slot `addiu $fp,$s7,0x10`; docs/COMPILER-NOTES.md).
+ * (bnel where retail has bne, same slot `addiu $fp,$s7,0x10`; docs/build/compiler-notes.md).
  * D_L04_001B08F0 and D_001A7CC0 are sda ($gp); D_00189FC0 and D_00138320 are NOT_SDA (absolute);
  * D_L04_001B24DC is plain (unsplit -G8 macro load); D_L04_001A8F20 is MACRO_ADDR (unsplit la).
  * Source notes:

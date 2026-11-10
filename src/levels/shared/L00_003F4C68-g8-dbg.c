@@ -61,7 +61,7 @@ char *func_L00_003F4C68(char *position,char *velocity,int id,int mode)
         frames=0.016666668f * (D_L00_00262570 + D_0013957F[0])->speed;
         state->frames=func_00283CF0(128.0f / frames);
         /* Call and division in one statement: retail has no line label between them,
-           so no division padding (docs/COMPILER-NOTES.md). */
+           so no division padding (docs/build/compiler-notes.md). */
         state->rate=1.0f/func_00283CE0(state->frames);
         state->id=id;
         state->target=func_L00_0032A088(0xc04,id);

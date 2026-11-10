@@ -30,7 +30,7 @@ Every tool takes `--version us|pal|us2` (or `$RAC2_VERSION`):
     python3 tools/levels.py dump                   # and --version pal, --version us2
 
 Each release has the same layout: the boot executable in the ISO's root and 27 level programs
-in `G/LEVELn.WAD` (docs/LEVELS.md). `dump` writes them, checks that every level's dump
+in `G/LEVELn.WAD` (docs/build/levels.md). `dump` writes them, checks that every level's dump
 converts back to the bytes the disc stores (its section records and sections, a `.bss` as
 zeros), and records every program's SHA-1, size and entry point in `config/programs.tsv`;
 `tools/levels.py check` compares the dumps with it, without the disc.

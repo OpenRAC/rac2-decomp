@@ -184,7 +184,7 @@ class CompilerOutputTests(unittest.TestCase):
     def test_default_loses_the_low_half(self):
         # The wrong code this tree gives by default: sched1 splits the store, the reads win
         # FP_REGS, and reload drops the ior's output reload. It must stay stock here
-        # (docs/COMPILER-NOTES.md, known issue).
+        # (docs/build/compiler-notes.md, known issue).
         for name in LOW_HALF_LOST:
             with self.subTest(name):
                 lines = self.lines("default", name)

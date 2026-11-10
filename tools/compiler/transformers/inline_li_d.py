@@ -25,7 +25,7 @@ tools/build.py passes it to every unit of the SDK profile (`sdk` flags in config
 so the SDK's objects assemble as before. `--r5900-inline-li-d` states the default explicitly.
 It is the li.d counterpart of patch 0027's inline `li.s`.
 tests/test_inline_li_d.py checks the transformer and the assembler output; see
-docs/COMPILER-NOTES.md.
+docs/build/compiler-notes.md.
 
 Usage: inline_li_d.py <gas/config/tc-mips.c> (after swap_branch_slots.py)
 """

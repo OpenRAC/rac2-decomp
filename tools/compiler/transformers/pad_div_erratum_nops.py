@@ -54,7 +54,7 @@ inside a noreorder region gets no new floor; SDK 3.01 pads ordinary noreorder
 cases too, so that behavior remains unsupported. A division scheduled in a delay
 slot still loses the padding. Cross-fragment alignment/relaxation and speculative
 nop removal are not generally reproduced. This is a bounded improvement, not
-whole-assembler equivalence. See docs/COMPILER-NOTES.md.
+whole-assembler equivalence. See docs/build/compiler-notes.md.
 
 Usage: pad_div_erratum_nops.py <gas source directory or tc-mips.c>
 """
@@ -183,7 +183,7 @@ LABEL_PAD = """      /* RAC2: require two emitted slots between a code label and
    reset: a label that follows a compiler .set noreorder group (a call and
    its delay slot) still gets the floor, as retail shows (jal, delay, nop,
    nop, div.s after a -g line label in func_L00_0040A4A8 and 23 other
-   level-00 sites). See docs/COMPILER-NOTES.md.
+   level-00 sites). See docs/build/compiler-notes.md.
     */
       if (rac2_div_label_defined
 	  && ! mips_opts.mips16

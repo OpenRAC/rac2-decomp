@@ -1,4 +1,4 @@
-/* func_L00_003C5310: needs -frac2-sticky-volatile-refs (keeps the f20=f21 move after the final copy); see docs/COMPILER-NOTES.md. */
+/* func_L00_003C5310: needs -frac2-sticky-volatile-refs (keeps the f20=f21 move after the final copy); see docs/build/compiler-notes.md. */
 #include "common.h"
 
 /* Own unit: -fmove-all-movables lets loop.c hoist the second strip loop's

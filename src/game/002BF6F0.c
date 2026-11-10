@@ -1151,7 +1151,7 @@ void func_002C3280(u8 *self)
     n = *(int *)(self + 4) & 0xFFFFFF;
     a = func_00283CE0_4(*(short *)(self + 10) - 1);
     /* One statement: retail has no line label between the second call and the
-       division, so no division padding (docs/COMPILER-NOTES.md). */
+       division, so no division padding (docs/build/compiler-notes.md). */
     *(int *)(self + 4) = func_00283D38_3(n, *(int *)(self + 4), a / func_00283CE0_4(*(short *)(self + 10)));
 }
 

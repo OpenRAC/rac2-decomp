@@ -4,7 +4,7 @@
 #   tools/compiler/build.sh [OUT]        # default build/compiler/tools
 #
 # Run it on 32-bit-capable x86-64 Linux (gcc -m32), e.g. in the rac2-linux container
-# (docs/BUILDING.md). It downloads the two inputs to build/downloads/ and checks them,
+# (docs/build/building.md). It downloads the two inputs to build/downloads/ and checks them,
 # applies the patches in tools/compiler/patches/ (Lombyte's sce-991111b stack, MIT, with its
 # retired 0034 and its earlier 0020), the 0057/0058 compiler profiles, the 0059/0061/0062 assembler options and the
 # transformers in tools/compiler/transformers/,

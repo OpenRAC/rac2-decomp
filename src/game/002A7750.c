@@ -9,7 +9,7 @@ typedef float f32;
 /* The campaign: call-bearing bodies reproduced by the reconstructed toolchain
    (2.9-ee + refined gas) -- sd saves in 8-byte slots,
    no sibcall, the s32 return prototype determines v0 versus v1, and || chains
-   with a shared exit. Measurements and evidence: docs/COMPILER-NOTES.md. */
+   with a shared exit. Measurements and evidence: docs/build/compiler-notes.md. */
 
 /* func_002A77E0 : random draw bounded by the argument */
 extern s32 func_001163B0(void);

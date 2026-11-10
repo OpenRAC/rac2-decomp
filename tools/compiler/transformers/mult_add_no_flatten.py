@@ -15,7 +15,7 @@ no matched unit changes; only func_L20_0039F968's unit (and two nonmatching note
 
 The option is off by default, enabled per unit in config/cflags.txt, and
 -fno-rac2-mult-add-no-flatten disables it again. tests/test_mult_add_no_flatten.py covers
-the anchors, the default/disabled equality and the kept grouping. See docs/COMPILER-NOTES.md.
+the anchors, the default/disabled equality and the kept grouping. See docs/build/compiler-notes.md.
 
 Usage: mult_add_no_flatten.py <gcc source directory>   (the one holding toplev.c)
 """

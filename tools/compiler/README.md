@@ -20,14 +20,14 @@ The retail code was built with GNU EE-GCC 2.9-ee-991111b. `build.sh` rebuilds it
   which interlocks it. `tidy_condjump_fallthru.py` lets flow delete a conditional jump to the
   next block, as GCC 2.95 does. `zero_ti_store_barrier.py` adds the opt-in
   `-frac2-zero-ti-barrier` model of the inferred quadword-clear macro
-  (docs/COMPILER-NOTES.md); default compilation retains ordinary scheduling.
+  (docs/build/compiler-notes.md); default compilation retains ordinary scheduling.
   `ti_one_gpr.py` makes reload count a TImode value as one general register on the R5900,
   as `HARD_REGNO_NREGS` already does, so quadword reloads (a `por` zero for `sq`) take
-  single spill registers as retail's do; it is unconditional (docs/COMPILER-NOTES.md).
+  single spill registers as retail's do; it is unconditional (docs/build/compiler-notes.md).
   `reload_reg_used_guard.py` puts back the archive's test that keeps reload from inheriting
   a value into a register a pseudo of the insn holds, which patch 0047 drops; it is
   unconditional. It snapshots the non-spill exclusions before reloads add their own marks,
-  so self-inheritance reaches the existing lifetime checks (docs/COMPILER-NOTES.md).
+  so self-inheritance reaches the existing lifetime checks (docs/build/compiler-notes.md).
   `count_asm_words.py` counts copy words and inserted loop nops, including nops before an
   already-visited branch. It also counts an unannounced external SI load/address as its
   two emitted words, preserving the scheduler's lengths and the explicit GP/PIC/buffering
@@ -41,16 +41,16 @@ The retail code was built with GNU EE-GCC 2.9-ee-991111b. `build.sh` rebuilds it
   `swap_branch_slots.py` adds the opt-in assembler option `--r5900-swap-branch-slots`: gas
   fills a reorder-mode delay slot from the previous instruction, as the GNU as that built the
   SDK libraries does (this tree's swap guard reads `&&` for `&` and never swaps). SDK units
-  pass it as `-Wa,--r5900-swap-branch-slots` (docs/COMPILER-NOTES.md).
+  pass it as `-Wa,--r5900-swap-branch-slots` (docs/build/compiler-notes.md).
   `inline_li_d.py` makes gas build every `li.d` into a 64-bit general register inline
   (load_register's dli form) instead of pooling the values that lack a zero 16-bit chunk in
   each half in `.lit8`, as the game's own code does; this is the default. The SDK objects
   pool, so `tools/build.py` passes the opt-out `--r5900-pool-li-d` to every `sdk`-profile unit
-  (docs/COMPILER-NOTES.md).
+  (docs/build/compiler-notes.md).
   `convert_frag_memmove.py` makes md_convert_frag slide the chosen macro variant with
   memmove: the absolute form of a base-register load (12 bytes) overlaps the `$gp` form it
   replaces (8 bytes), and a host memcpy that copies backwards lost its `lui`
-  (func_00117278; docs/COMPILER-NOTES.md, "Overlapping variants in md_convert_frag").
+  (func_00117278; docs/build/compiler-notes.md, "Overlapping variants in md_convert_frag").
   `no_recombine_givs.py` drops strength_reduce's call to `recombine_givs` (loop.c), as the
   gcc-2.95 release branch did, so address givs stay on the giv combine_givs chose, as in
   retail; it is unconditional too. `no_extra_increment_givs.py` adds the opt-in
@@ -123,7 +123,7 @@ macro. Instructions, operands, register-allocation inputs and memory flags are u
 and `-fno-rac2-qcopy-barrier` disables it again. Without the switch no object of `src/`
 changes; forced on in the eight `-frac2-qcopy` units, it changes none of their objects.
 Twelve functions (59 places) are the measured witnesses, each a unit of its own with both
-switches (docs/COMPILER-NOTES.md). It models only the schedulers' view of such an asm:
+switches (docs/build/compiler-notes.md). It models only the schedulers' view of such an asm:
 jump2, for one, still deletes a redundant register move across the copy, which a volatile
 asm keeps. `tests/test_qcopy_barrier.py` covers the selector, the default/disabled
 equality, and authored copies among neighbours, calls, branches and volatile accesses.
@@ -139,7 +139,7 @@ so the address alone does not decide it and a unit says that its stack clears ar
 `-fno-rac2-zero-ti-por` disables it again. Without the switch no object of `src/` changes;
 forced on everywhere, it changes only the four units whose functions retail clears `0($sp)`
 with `sq $zero`. Five functions are the measured witnesses, each a unit of its own
-(docs/COMPILER-NOTES.md). `tests/test_zero_ti_por.py` covers the transformer's anchors, the
+(docs/build/compiler-notes.md). `tests/test_zero_ti_por.py` covers the transformer's anchors, the
 default/disabled equality, and authored zero stores to the stack, through pointers, to a global
 and in loops, a function with both kinds, nonzero displacements, shared and live zeros and the
 function-value fold.
@@ -150,7 +150,7 @@ gas keeps a code label in front of the coprocessor hazard `nop` it inserts after
 (an FPU compare before its `bc1f`/`bc1t`, an `mtc1` before a reader of the register), where
 GNU `as` moves the label behind the nop. Retail has the label on the nop at all 198 such
 branch targets, and SN ProDG 2.0's `Ps2EeAs` keeps it there for forward, backward, `j` and
-`.word` references alike (docs/COMPILER-NOTES.md). Without the switch neither program's
+`.word` references alike (docs/build/compiler-notes.md). Without the switch neither program's
 output changes. `src/levels/18_damosel/L18_004308F0.c` and `src/levels/shared/L02_00411530.c`
 are the measured witnesses; forcing the switch on every unit changes only the `.mdebug` of
 one `-g` unit. `tests/test_hazard_labels.py` covers the fixed cases and the controls.
@@ -161,7 +161,7 @@ branch's target (`fill_slots_from_thread`, `steal_delay_list_from_target` in `re
 wider than 32 bits (`sd`, `sq`) no longer goes into the annulled slot of a branch-likely, and
 the search of that thread stops at it. `optimize_skip`, which annuls the one instruction a branch
 skips, is unchanged. In retail's compiled code the annulled slots hold 2,895 stores and none is
-wider than 32 bits, while the other slots hold 547 `sq` and 497 `sd` (docs/COMPILER-NOTES.md).
+wider than 32 bits, while the other slots hold 547 `sq` and 497 `sd` (docs/build/compiler-notes.md).
 Without the switch the output is unchanged, and forcing it on every other game-compiler unit
 of `src/` changes no object. `src/levels/23_damosel_orbit/L23_00422668.c` (with
 `-frac2-qcopy`) and `src/levels/shared/L02_0042EDD0-g8.c` (with `-frac2-zero-ti-barrier`)
@@ -324,7 +324,7 @@ witness has a file of its own. With `-mastra-quad-saves` the option does nothing
 default, enabled per unit in `config/cflags.txt`, and `-fno-rac2-wide-saves-below` disables it;
 `tests/test_wide_saves_below.py` covers the anchors, the default/disabled equality, one and two
 wide saves, stack arguments, a unit-wide carried mode, the quad-save profiles and a control
-(docs/COMPILER-NOTES.md).
+(docs/build/compiler-notes.md).
 
 `mult_add_no_flatten.py` adds `-frac2-mult-add-no-flatten`: expand_mult_add (expmed.c), which
 builds a reduced giv's start for loop.c, folds its `b*m + a` tree with flag_schedule_insns
@@ -333,7 +333,7 @@ there. func_L20_0039F968's source cursor then starts as retail's `x*16 + (i*400 
 not `(x*16 + i*400) + (D-16)`; FSF 2.95.2 (SN v2.73a) gives the same shape. Forced on in every
 game unit, nothing else changes. It is off by default, enabled per unit in `config/cflags.txt`,
 and `-fno-rac2-mult-add-no-flatten` disables it; `tests/test_mult_add_no_flatten.py` covers the
-anchors, the default/disabled equality, the kept grouping and a control (docs/COMPILER-NOTES.md).
+anchors, the default/disabled equality, the kept grouping and a control (docs/build/compiler-notes.md).
 
 `keep_float_pun_source.py` adds `-frac2-keep-float-pun-source`. `f32 f; *(s32 *)&f = K;` reaches
 cse2 as a set of an integer pseudo g and `(set (subreg:SI (reg:SF f) 0) (reg:SI g))`. With the
@@ -345,7 +345,7 @@ twice lose g: `li.s` hoisted to the block start, or sched1 splits the SUBREG sto
 saved GPR with an `mtc1` per read, or, if the reads win FP_REGS, reload drops the `ori` and the
 default compiler emits wrong code (a known issue of the EE 2.9 base, also in the SDK compiler).
 The rule is inferred from retail: no GCC release has it
-(docs/COMPILER-NOTES.md). It is off by default, enabled per unit in `config/cflags.txt`, and
+(docs/build/compiler-notes.md). It is off by default, enabled per unit in `config/cflags.txt`, and
 `-fno-rac2-keep-float-pun-source` disables it; `tests/test_keep_float_pun_source.py` covers the
 anchors, the default/disabled equality, the set after the previous call, the one move, the
 older-register case, the default's lost `ori` (three reads, reads in a loop, reads across a

@@ -24,7 +24,7 @@ with both switches. It is an inference from those records, not proof of the orig
 macro, and models only the schedulers' view of a volatile asm (jump2, for one, still
 deletes a redundant move across the copy). tests/test_qcopy_barrier.py covers the
 selector, the default/disabled equality and authored copies around calls, branches,
-volatile accesses and neighbouring instructions. See docs/COMPILER-NOTES.md.
+volatile accesses and neighbouring instructions. See docs/build/compiler-notes.md.
 
 Usage: qcopy_barrier.py <gcc source directory>
 """

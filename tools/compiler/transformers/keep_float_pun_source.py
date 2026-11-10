@@ -26,7 +26,7 @@ No GCC release does this. gen_lowpart_common's SFmode case, fold_rtx's SUBREG ca
 SUBREG simplification and expand_field_assignment are the same in GCC 2.95, 2.95.1, 2.95.2,
 2.95.3 and this tree, and no ChangeLog entry concerns it (nor, for the lost output reload, up
 to 3.4.6). The rule is inferred from retail alone and was designed to give retail's form; where
-that form comes from is unverified (docs/COMPILER-NOTES.md). It also prevents the wrong code above. It keys on the insn's shape, never on a function, is off by default,
+that form comes from is unverified (docs/build/compiler-notes.md). It also prevents the wrong code above. It keys on the insn's shape, never on a function, is off by default,
 is enabled per unit in config/cflags.txt, and -fno-rac2-keep-float-pun-source disables it again.
 
 Usage: keep_float_pun_source.py <gcc source directory>   (the one holding toplev.c)

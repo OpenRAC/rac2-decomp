@@ -1,4 +1,4 @@
-// Apply the dispatch-table names of docs/moby-dispatch.tsv to the level overlay that is
+// Apply the dispatch-table names of docs/game/moby-dispatch.tsv to the level overlay that is
 // currently open in Ghidra.
 //
 // Usage (Ghidra script, not a build script):
@@ -44,7 +44,7 @@ public class ApplyMobyNames extends GhidraScript {
             return;
         }
         String level = argv[0];
-        String tsv = argv.length > 1 ? argv[1] : "docs/moby-dispatch.tsv";
+        String tsv = argv.length > 1 ? argv[1] : "docs/game/moby-dispatch.tsv";
         String pins = argv.length > 2 ? argv[2] : "config/overlays.json";
 
         String elfPath = currentProgram.getExecutablePath();

@@ -11,7 +11,7 @@
    -frac2-no-null-pointer-checks  block keeps no stray no-op after its last call;
    (the quadword clears' zero in $a0/$v0/$a0/$v0 is the compiler's one-GPR TImode reload);
    -frac2-hazard-labels         the branch target on the mtc1 hazard nop at 0x002C46FC.
-   See docs/COMPILER-NOTES.md for each option.
+   See docs/build/compiler-notes.md for each option.
 
    Function-scope shared_rate and shared_limit: one variable each serves two cases, as
    retail's register choices show.  shared_rate is case 0x00's frame count (state 3) and 0x57's

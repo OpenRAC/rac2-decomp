@@ -21,7 +21,7 @@ compile, 9 of 922 change, none of them close to a match.
 
 The call to recombine_givs in strength_reduce is removed (the function itself stays, unused,
 as in the release branch). tests/test_no_recombine_givs.py covers the transformer and the
-compiler output; see docs/COMPILER-NOTES.md.
+compiler output; see docs/build/compiler-notes.md.
 
 Usage: no_recombine_givs.py <gcc/loop.c>
 """

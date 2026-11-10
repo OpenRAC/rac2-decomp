@@ -4,7 +4,7 @@
    play sound 0x1A (with the explosion) or 0x21. Returns 1 when the object was handled.
 
    The kind 0xF arm groups its effect in a nonempty one-pass statement, as current RAC1 game
-   C does (docs/COMPILER-NOTES.md, source methods shared with RAC1): its loop notes keep the
+   C does (docs/build/compiler-notes.md, source methods shared with RAC1): its loop notes keep the
    `la` of D_L23_001B3850 ahead of the two frame-address arguments. func_L00_0035F5A0 returns
    int, as its matched definition does. -mno-split-addresses keeps retail's adjacent
    lui/addiu pairs; D_L23_001B3850 is MACRO_ADDR so each use rematerializes its address. */

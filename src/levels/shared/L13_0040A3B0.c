@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 /* func_L13_0040A3B0 is a unit of its own: it needs the opt-in clear profile
-   (-frac2-zero-ti-barrier, docs/COMPILER-NOTES.md), as its level-0 twin func_L00_003BFF68 does. */
+   (-frac2-zero-ti-barrier, docs/build/compiler-notes.md), as its level-0 twin func_L00_003BFF68 does. */
 
 typedef int Rac2TI128 __attribute__((mode(TI)));
 

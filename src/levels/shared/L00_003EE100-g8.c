@@ -3,7 +3,7 @@
 
 /* A body whose retail bytes address its global through $gp in ordinary flow: the assembler
    only selects that form when the back end emits the .extern size directive, which the
-   pinned profile does at -G8 (see docs/COMPILER-NOTES.md). */
+   pinned profile does at -G8 (see docs/build/compiler-notes.md). */
 extern unsigned char *func_0029EFD0(int size);
 
 extern unsigned char *D_L00_001B0A20 __attribute__((sda));

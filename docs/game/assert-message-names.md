@@ -17,7 +17,7 @@ messages, extracted instructions or assets.
 ## First pass: the remaining 59 messages
 
 **Historical investigation, 2–3 October 2026:** after the dispatch-table pass
-described in [`MOBY-DISPATCH-TABLES.md`](MOBY-DISPATCH-TABLES.md), a selected set
+described in [`moby-dispatch-tables.md`](moby-dispatch-tables.md), a selected set
 of **59 diagnostic messages** remained without a carrying function in the analyzed
 retail boot. The comparison used the retail target and the **9 September 2003 PAL
 review disc**, whose boot identifier is `SCES_516.07`. These 59 cases were resolved
@@ -161,7 +161,7 @@ name fidelity; it does not repair missing references or certify every semantic d
 
 The previous pass contributed 102 annotations across 25 overlays. Its independent
 class-identifier cross-check remains documented in
-[`MOBY-DISPATCH-TABLES.md`](MOBY-DISPATCH-TABLES.md). Functions with conflicting
+[`moby-dispatch-tables.md`](moby-dispatch-tables.md). Functions with conflicting
 diagnostic labels and names already assigned by another method were preserved.
 
 No game text is necessary to reproduce the application step. The privately owned
@@ -169,7 +169,7 @@ retail image and analysis database remain the source for semantic review.
 
 ## Applying or verifying the table
 
-[`ApplyAssertMessageNames.java`](../tools/ghidra/ApplyAssertMessageNames.java)
+[`ApplyAssertMessageNames.java`](../../tools/ghidra/ApplyAssertMessageNames.java)
 accepts a program identifier and the TSV path. It previews by default; the explicit
 third argument `--apply` enables renaming. It checks the complete level `.text`
 SHA-256 against its recorded retail fingerprint before processing names, resolves a
@@ -180,7 +180,7 @@ non-generic name. Conflicting rows fail before any renames.
 Example arguments for the level 0 overlay:
 
 ```text
-0_aranos_tutorial docs/assert-message-names.tsv
+0_aranos_tutorial docs/game/assert-message-names.tsv
 ```
 
 With `--apply`, review the summary and save the program explicitly after inspecting
@@ -190,6 +190,6 @@ transfer prototype addresses, or apply the cross-build anchor survey.
 ## Separate cross-build evidence
 
 The Aug6/retail survey is qualified separately in
-[`AUG6-RETAIL-ANCHORS.md`](AUG6-RETAIL-ANCHORS.md). Matching code windows, diagnostic
+[`aug6-retail-anchors.md`](../research/aug6-retail-anchors.md). Matching code windows, diagnostic
 annotations and class-table identifiers are different forms of evidence. None of them
 alone establishes a byte-exact C reconstruction or a playable runtime.

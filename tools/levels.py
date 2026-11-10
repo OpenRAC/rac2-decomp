@@ -15,7 +15,7 @@ archive's header gives the level data (sector offset, sector count); the data
 opens with twelve (offset, size) slots, and slot 0 is the program, a list of
 sections, each a 16-byte record (destination, size, type, entry point) followed by
 its bytes (a NOBITS section's too). Every section of one program repeats the entry point; the list ends
-where it changes (docs/LEVELS.md).
+where it changes (docs/build/levels.md).
 
 `catalogue` deduplicates the functions of the 27 programs against each other and
 against the boot executable, comparing instructions with only their address
@@ -38,7 +38,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# The three releases (docs/VERSIONS.md). "us" (USA v1.01) is the primary target: its paths are
+# The three releases (docs/build/versions.md). "us" (USA v1.01) is the primary target: its paths are
 # the repository's original ones. The others keep their dumps, tables, build and report under
 # a directory of their own, and their own C under src/<version>/.
 VERSIONS = {
@@ -1309,7 +1309,7 @@ def is_epilogue_residue(body: bytes, previous: bytes) -> bool:
 # Each follows a completed return across alignment padding, with no direct
 # branch/call or aligned pointer into the extent in any of its programs.
 # Unlike is_padding, these include stores/float arithmetic; do not generalise
-# their removal to arbitrary code without a return. See docs/LEVELS.md.
+# their removal to arbitrary code without a return. See docs/build/levels.md.
 BOOT_RESIDUES = {
     0x00289018: 4,    # an isolated store using an uninitialised $v0
     0x002A77C0: 28,   # orphan float operations using live-in $f0/$f1
@@ -1368,7 +1368,7 @@ LEVEL_FUNCTION_SPLITS = {
 }
 
 
-# Audited fingerprint collisions (docs/MATCHING-BLOCKERS.md section 34): the
+# Audited fingerprint collisions (docs/contributing/matching-blockers.md section 34): the
 # fingerprint masks these field offsets with the address halves, so two bodies
 # share one key. The words after the leading SKIP bytes (the release-specific
 # address pair) are the same in every release and tell the bodies apart. Retired
