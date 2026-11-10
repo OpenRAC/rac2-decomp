@@ -17,8 +17,8 @@
 </p>
 
 <p align="center">
-  A work-in-progress, matching decompilation of <i>Ratchet &amp; Clank: Going Commando</i> (2003) for PlayStation 2.<br>
-  The boot executable and its 27 level programs, rebuilt as C that compiles back to the same bytes as retail.
+  A matching decompilation of <i>Ratchet &amp; Clank: Going Commando</i> (2003) for PlayStation 2.<br>
+  The boot executable and 27 levels, rebuilt as C that matches retail byte for byte.
 </p>
 
 > [!WARNING]
