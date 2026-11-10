@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 How much of the game's code is C: progress/report.json, in objdiff's report format (the one
-ByteMatch reads, as rac1-decomp's), and the table in README.md.
+ByteMatch reads, as rac1-decomp's). The README shows ByteMatch's badges, so it never changes.
 
-  python3 tools/progress.py            # write both, after tools/build.py all (maintainers, on master)
+  python3 tools/progress.py            # write it, after tools/build.py all (maintainers, on master)
   python3 tools/progress.py --check    # the report counts nothing that is not C; it may be behind
   python3 tools/progress.py --check --strict   # and it is not behind either
   python3 tools/progress.py --version pal      # another release's (pal, us2): progress/<version>/report.json
@@ -555,22 +555,6 @@ def main() -> None:
     REPORT.write_text(json.dumps(report, indent=1) + "\n")
     release_table("us", report)
 
-    # README table
-    placements = sum(len(json.loads((ROOT / "build" / p / "placed.json").read_text())["functions"])
-                     for p in programs[1:])
-    row = lambda label, m: (f"| {label} | {m['matched_functions']:,} of {m['total_functions']:,} | "
-                            f"{int(m['matched_code']):,} of {int(m['total_code']):,} bytes |")
-    table = "\n".join(["| | Functions | Code |", "| --- | ---: | ---: |",
-                       row("Boot executable", cats[0]["measures"]), row("Levels", cats[1]["measures"]),
-                       row("**Total**", total)[:-2] + f" ({total['matched_code_percent']:.2f}%) |", "",
-                       f"The 27 levels hold {sum(len(r[4]) for r in levels.read_catalogue()):,} function "
-                       f"placements; C covers {placements:,} of them.",
-                       f"{len(by_hand):,} of the matched functions are the original's own assembly "
-                       f"(`ASM_FUNC`), kept as assembly."])
-    readme = ROOT / "README.md"
-    text = readme.read_text()
-    a, b = text.index("<!-- progress -->") + len("<!-- progress -->"), text.index("<!-- /progress -->")
-    readme.write_text(text[:a] + "\n" + table + "\n" + text[b:])
     print(f"{total['matched_functions']} of {total['total_functions']} functions, {total['matched_code']} of "
           f"{total['total_code']} bytes ({total['matched_code_percent']:.2f}%)")
 

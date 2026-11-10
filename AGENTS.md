@@ -24,7 +24,7 @@ equals the retail programs.
 | `config/cflags.txt` | compiler flags per file | by hand, when a whole file needs other flags |
 | `include/` | headers shared with rac1-decomp | by hand |
 | `nonmatching/` | near misses, never linked | you |
-| `progress/report.json`, the README table | progress | `tools/progress.py` only, on `master` by a maintainer |
+| `progress/report.json` | progress | `tools/progress.py` only, on `master` by a maintainer |
 | `tools/` | disc reader, build, check, progress, compiler recipes | by hand, with tests |
 | `docs/` | how to build, the level format, the compiler, game research | by hand |
 | `baserom/`, `build/`, `toolchain/`, `work/` | game data, build output, proprietary tools, scratch | never committed |
@@ -268,22 +268,22 @@ work in. It was removed on purpose. Do not recreate any of it:
   for an isolated fix, an independent change that needs separate review, or the final
   remainder of a batch. Do not combine unrelated work or delay a necessary fix just
   to reach five. Every batch must still pass the required checks before publication.
-- Leave `progress/report.json` and the README table out of your commits (see "The progress
+- Leave `progress/report.json` out of your commits (see "The progress
   report").
 
 ## The progress report
 
-`progress/report.json` and the README table are generated, and every pull request that
-regenerates them conflicts with every other one. So pull requests do not touch them:
+`progress/report.json` is generated, and every pull request that regenerates it conflicts
+with every other one. So pull requests do not touch it:
 
 - In a pull request, say what `tools/build.py all` printed and how many functions you added.
   `tools/progress.py --check` passes with the report behind; it only fails if the report counts
   something that is no longer C.
 - After merging, a maintainer runs `tools/build.py all` and `tools/progress.py` on `master` and
-  commits the two files alone (`chore(progress): N of 9,101 functions`). Several merged pull
+  commits it alone (`chore(progress): N of 9,101 functions`). Several merged pull
   requests can share one regeneration.
-- If your branch already has the two files changed, restore them before pushing:
-  `git checkout origin/master -- progress/report.json README.md`.
+- If your branch already has it changed, restore it before pushing:
+  `git checkout origin/master -- progress/report.json`.
 
 ## Pushing changes
 

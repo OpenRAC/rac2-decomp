@@ -68,7 +68,7 @@ Every doc of this repository, by folder. New here? Read [building.md](build/buil
 | `tools/build.py` | The build: one `OK` per program, or the first byte that differs |
 | `tools/check.py` | Compiles one function with its file's flags and diffs it against retail |
 | `tools/todo.py` | Sorts the functions still to match into size tiers |
-| `tools/progress.py` | The counts, the README table and `progress/report.json` |
+| `tools/progress.py` | The counts and `progress/report.json` |
 | `tools/expand_asm.py` | Adapts splat's assembly to SN ProDG's assembler |
 | `tools/elf.py` | The ELF32 reading and writing the build needs |
 | `tools/compiler/` | The game's compiler, rebuilt from public source, with its patches |

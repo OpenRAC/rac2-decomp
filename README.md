@@ -27,19 +27,8 @@
 
 ## Progress
 
-USA v1.01, counted by `tools/progress.py` (each function once, however many levels share it).
-Live numbers for every release are on [ByteMatch](https://bytematch.dev/OpenRAC/rac2-decomp).
-
-<!-- progress -->
-| | Functions | Code |
-| --- | ---: | ---: |
-| Boot executable | 3,060 of 3,078 | 1,005,500 of 1,041,544 bytes |
-| Levels | 5,431 of 5,449 | 4,453,760 of 4,482,516 bytes |
-| **Total** | 8,491 of 8,527 | 5,459,260 of 5,524,060 bytes (98.83%) |
-
-The 27 levels hold 100,562 function placements; C covers 94,363 of them.
-449 of the matched functions are the original's own assembly (`ASM_FUNC`), kept as assembly.
-<!-- /progress -->
+Progress is tracked on [ByteMatch](https://bytematch.dev/OpenRAC/rac2-decomp), one badge per version below. Each
+function counts once, however many of the 27 levels share it.
 
 ## Supported versions
 

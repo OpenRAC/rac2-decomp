@@ -15,7 +15,7 @@
 5. `tools/build.py` the programs that have it (`boot`, `level 4`, or `all`). It places the
    function everywhere the catalogue says and prints `OK` per program, or why a place does
    not match. A function counts once its C links into a program that equals the retail one.
-6. Leave `progress/report.json` and the README table alone: a maintainer regenerates them on
+6. Leave `progress/report.json` alone: a maintainer regenerates it on
    `master` after merging, so pull requests do not conflict on them (AGENTS.md, "The progress report").
 
 Close but not matching: put it in `nonmatching/` with a line in its README.
@@ -33,10 +33,10 @@ Close but not matching: put it in `nonmatching/` with a line in its README.
   be there.
 - **Near misses.** C that does not match goes into `nonmatching/` with a row in its README,
   and the function keeps its `INCLUDE_ASM` marker in `src/`.
-- **The progress report.** `progress/report.json` and the table in the README are generated. Only a
-  maintainer refreshes them, on `master`, after merging. Leave both out of your pull request;
+- **The progress report.** `progress/report.json` is generated. Only a
+  maintainer refreshes it, on `master`, after merging. Leave it out of your pull request;
   if you ran `tools/progress.py`, undo it with
-  `git checkout origin/master -- progress/report.json README.md`.
+  `git checkout origin/master -- progress/report.json`.
   `python3 tools/progress.py --check` passes while the report is behind and prints how many
   new functions wait for the refresh.
 - **Before a pull request**, all must pass:
