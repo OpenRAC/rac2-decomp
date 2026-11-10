@@ -251,6 +251,34 @@ the 2.2f constant and the mode load, the last two tie, and the load is allocated
 out of the block gives retail's pair but moves the FPRs. When two integer registers swap in a
 block with few locals, count its quantities before trying spellings.
 
+### A PAL constant that reorders local allocation
+
+**10 November 2026, retained near miss.** `func_PAL_L09_0040FD68` (PAL, level 9, default
+`-O2 -G8 -ffunction-sections`) is the USA `func_L09_0040AC48` with 50 Hz constants, and is
+984/984 bytes with one `$v0`/`$v1` and `$f3`/`$f4` swap in its tick test. The extra `2.0f` of
+`(x * 300.0f + 2.0f) * 0.16666667f` is scheduled by sched1 before the counter's store. That pushes
+the conversion after it, so `ticks` loses local-alloc priority to `ticks + 1`, and the converted
+value ties `2.0f`, which is born first. Enumerating the block's 16,098 legal orders under
+`floor_log2(refs)*refs/(death-birth)` leaves 2 that give retail, both with every constant set
+before the conversion and the conversion before the store. About 55 forms (operand orders,
+struct-member accesses, counter types and casts, post-increments, named constant locals, an
+inline timer accessor, `/ 6.0f` under `-ffast-math`) and six profiles (`-fstrict-aliasing`,
+`-fno-schedule-insns` among them) were measured; none moves sched1. The matched `func_PAL_L17_003CBDF4` timer test shows sched1 hoisting all three constants
+when no store-to-load chain dominates; here both `lwc1` depend on the counter's `sh`. The `-dS`
+trace shows the r5900 model issuing constant moves on the memory unit with `lhu`; at t = 1 the
+store-to-load chain makes `lhu` outrank `300.0f`, which every retail-compatible order needs first,
+and retail keeps that dependence. So retail's RTL must differ before local-alloc (reference
+counts or a transient insn), not its schedule. Retained in
+`nonmatching/levels/func_PAL_L09_0040FD68.c`. A private cc1 with a quantity dump in `block_alloc` (identical assembly with
+the dump off) confirms it: no suggested registers; `ticks` 3000 against `ticks + 1` 5000, and
+the conversion ties `2.0f` at 1250 and loses on quantity number. A second pass (round 7, about 80 block compiles
+and 34 profiles) measured that one extra insn between the `lhu` and the conversion, tied to
+`ticks`, gives retail's whole assignment: the post-increment's `andi` and a `long` round trip's
+`dsll`/`dsra` both do, as real code. Retail fits such an insn that emits nothing, such as a move
+or `extendsidi2` between equal registers; cse, combine and shared variables remove every copy tried.
+**Next:** a matched function whose retail shows the same `lhu`/`addiu`/`sh`/`mtc1` idiom with a
+wider or re-typed counter.
+
 ### 16-bit counters read through a wider local
 
 **1 November 2026, local match.** `x++ > n` on a `u16` field keeps the old value in a HImode pseudo

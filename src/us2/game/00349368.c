@@ -19,7 +19,3 @@ void func_US2_00349378(char *a0, int a1, int *a2)
     for (i = 0; i < a1; i++)
         func_00336A38(a0 + 536 + i * 88, func_00288FB8(a2[i]));
 }
-
-
-INCLUDE_ASM("asm/us2/game", func_US2_00349C00);
-

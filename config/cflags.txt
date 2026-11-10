@@ -4282,3 +4282,6 @@ src/levels/02_maktar_nebula/L02_003FE8B8-g8.c	-O2 -G8 -ffunction-sections -frac2
 src/levels/02_maktar_nebula/L02_003FDDE8-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/11_joba/L11_00443940-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
 src/levels/shared/L13_0041AD00-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-sched-spec -Wa,--r5900-la-addend=sn
+src/us2/game/002D3138-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
+src/us2/levels/02_maktar_nebula/L02_00400E04-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -frac2-keep-block-order
+src/pal/levels/shared/L08_003DF82C-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
