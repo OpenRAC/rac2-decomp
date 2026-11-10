@@ -4,6 +4,7 @@
 .venv/
 reference/
 assets/
+!docs/assets/
 asm/
 asm_pp/
 build/
