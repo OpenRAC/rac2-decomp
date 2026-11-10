@@ -91,9 +91,3 @@ s32 func_PAL_L10_00428E38(Moby *moby, s32 keep)
     }
     return destroyed;
 }
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L10_00429070);
-
-
-INCLUDE_ASM("asm/pal/levels", func_PAL_L10_0042A5C8);

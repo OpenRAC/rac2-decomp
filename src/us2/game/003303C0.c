@@ -5,8 +5,6 @@
    first axis is negated only while the byte D_US2_001A7A4C is clear, as in
    func_US2_00327AB0. */
 
-INCLUDE_ASM("asm/us2/game", func_US2_003303C0);
-
 extern char D_00189E20[];
 extern unsigned char D_US2_001A7A4C MACRO_ADDR;
 extern void func_00282C88(float *buf);

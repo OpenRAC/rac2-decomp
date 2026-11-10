@@ -4262,6 +4262,7 @@ src/pal/levels/08_tabora/L08_00422A2C-cc-g8.c	-O2 -G8 -ffunction-sections -g -fn
 src/pal/levels/shared/L00_003B14C8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/shared/L00_002AEC50-cc-g8.c	-O2 -G8 -ffunction-sections -fcall-used-hi1 -fcall-used-lo1 -fcall-used-accum1
 src/pal/levels/shared/L04_003C7600-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/shared/L04_00418DE8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-hazard-labels -frac2-frame-pointer-liveness
 src/pal/levels/shared/L00_003986B0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/01_oozla/L01_003A9CB8-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -g
 src/us2/levels/30_insomniac_museum/L30_0040C018-cc-g8.c	-O2 -G8 -ffunction-sections
@@ -4277,6 +4278,21 @@ src/us2/levels/shared/L08_003CF3E8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2
 src/us2/levels/25_wupash_nebula/L25_0040E7A8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/23_damosel_orbit/L23_0041EF48-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g
 src/levels/shared/L04_00402D90-hud-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/game/00314B5C-sw-g8.c	-O2 -G8 -ffunction-sections -g
+src/us2/levels/shared/L00_003012A0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/shared/L00_003021B0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/shared/L22_003A0A08-main-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -frac2-qcopy-barrier -frac2-keep-block-order -frac2-gcse-unsplit-edges -frac2-sticky-volatile-refs -frac2-hazard-labels
+src/us2/game/002FC008-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/us2/levels/08_tabora/L08_0041EDCC-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
+src/pal/levels/shared/L00_003C7B10-g8.c	-O2 -G8 -ffunction-sections -g -frac2-mult-add-no-flatten
+src/pal/levels/shared/L04_004158F0-hud-g8.c	-O2 -G8 -ffunction-sections
+src/pal/game/00331118-turret-g8.c	-O2 -G8 -ffunction-sections -ffast-math
+src/pal/game/0026EC50-loader.c	-O2 -G0 -ffunction-sections -fcall-used-hi1 -fcall-used-lo1 -fcall-used-accum1
+src/pal/game/002FC1D0-preview-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/us2/game/003303C0-turret-g8.c	-O2 -G8 -ffunction-sections -ffast-math
+src/pal/levels/30_insomniac_museum/L30_00410A38-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/20_yeedil/L20_00449C78-g8.c	-O2 -G8 -ffunction-sections -frac2-sticky-volatile-refs
+src/pal/levels/shared/L08_003D1E50-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -ffast-math
 src/game/00294BC8-map-setup-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g -Wa,--r5900-la-addend=sn
 src/levels/02_maktar_nebula/L02_003FE8B8-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
 src/levels/02_maktar_nebula/L02_003FDDE8-g8.c	-O2 -G8 -ffunction-sections -fno-gcse
