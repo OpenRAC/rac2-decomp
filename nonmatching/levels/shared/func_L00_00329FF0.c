@@ -1,7 +1,7 @@
 /* 0 of 27 places match - last line: 00_aranos_tutorial: 100 bytes, expected 108
    The body is recovered and every instruction is retail's; the eight missing
    bytes are the two NOPs the patched assembler puts in front of a `div.s`
-   (see docs/COMPILER-NOTES.md, the division-erratum section):
+   (see docs/build/compiler-notes.md, the division-erratum section):
 
      retail  jal func_00283CE0 ; nop ; mtc1 $s0,$f12 ; nop ;
              cvt.s.w $f12,$f12 ; nop ; nop ; div.s $f12,$f0,$f12

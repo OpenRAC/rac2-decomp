@@ -15,7 +15,7 @@
    the return slot. */
 /* 3 November 2026: a non-volatile form now reproduces every retail word
    except the `nop` at +0x24 (blocker 4, "`nop` before `jr $ra`", in
-   docs/MATCHING-BLOCKERS.md). The body below, with u64 arguments and the
+   docs/contributing/matching-blockers.md). The body below, with u64 arguments and the
    duplicate-arm `if` already used by the matched neighbour func_002A0468
    (Lombyte's PackRenderCommandFields), keeps the whole-word `ld` because the
    load and the `(x << 32) >> 32` sit in different blocks when combine runs,

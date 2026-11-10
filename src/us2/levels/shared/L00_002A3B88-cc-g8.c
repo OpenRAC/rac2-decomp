@@ -3,7 +3,7 @@
  * until loading ends. A -G8 unit of its own. In the loop header the plain `sd` of D_001A7200 and
  * then the volatile T1_COUNT (0x10000800) clear come just before the first jal; the compiler's
  * default set-side volatile rule (GCC 2.95's) leaves that slot empty, as retail does, where the
- * EE tree's rule fills it with the clear of the frame accumulator (docs/COMPILER-NOTES.md).
+ * EE tree's rule fills it with the clear of the frame accumulator (docs/build/compiler-notes.md).
  * T1_COUNT (include/common.h) is the EE timer 1 count register, 0x10000800. */
 #include "common.h"
 

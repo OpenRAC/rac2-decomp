@@ -10,7 +10,7 @@ lost. Whether that happens depends on the host C library and on how the assemble
 an assembler built on 3 November 2026 gave the `lui`, the ones built from 8 November did not,
 and func_00117278 (strtol, an -O0 unit, the only C that uses the base-register form) stopped
 matching. memmove gives the 1999 hosts' forward copy on every host
-(docs/COMPILER-NOTES.md, "Overlapping variants in md_convert_frag")."""
+(docs/build/compiler-notes.md, "Overlapping variants in md_convert_frag")."""
 import sys
 from pathlib import Path
 

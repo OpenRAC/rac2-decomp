@@ -14,5 +14,5 @@ assignees: ''
 
 **Your setup**
 
-- Disc: USA v1.01 (`SCUS_972.68`), SHA-256 matching docs/BUILDING.md? 
+- Disc: USA v1.01 (`SCUS_972.68`), SHA-256 matching docs/build/building.md? 
 - Host: (macOS / Linux / Windows + WSL), Docker or native

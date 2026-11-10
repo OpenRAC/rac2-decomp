@@ -2,7 +2,7 @@
 
 /* func_L04_003FBEF8 has a unit of its own because it needs -g: retail pads its first
    division (lo's div.s) against the statement's line label, see the div.s floor in
-   docs/COMPILER-NOTES.md. */
+   docs/build/compiler-notes.md. */
 
 typedef int QuadWord __attribute__((mode(TI)));
 

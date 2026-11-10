@@ -81,7 +81,7 @@ original date and toolchain scope.
   `sce_ps2_sdk_24` kit) lays out callee-saved slots like RAC1 retail; v1.36
   (`ee-gcc2953` in ProDG 3.01) uses a mirrored layout. No command-line flag
   changes either. This matches the `sd`/`sq` difference in
-  [COMPILER-NOTES.md](COMPILER-NOTES.md), which compared the ProDG 3.01 kit.
+  [compiler-notes.md](../build/compiler-notes.md), which compared the ProDG 3.01 kit.
 - **GCC 2.95.3 has no sibling-call optimisation**: `-foptimize-sibling-calls` is
   rejected and `-O3` does not help. RAC1's bare `j target` tail calls came from
   post-processing. Sony's 2.9-ee performs tail calls natively, also in eight
@@ -92,14 +92,14 @@ original date and toolchain scope.
 - **Short-loop erratum.** SN's `ps2eeas` pads every backward branch whose loop
   is shorter than six instructions with nops. The 2.9-ee driver's own `as.exe`
   pads call-free short loops; the standalone GNU `ee-as` of the same version
-  pads none. RAC2's [RAC1-TO-RAC2.md](RAC1-TO-RAC2.md) records the same
+  pads none. RAC2's [rac1-to-rac2.md](rac1-to-rac2.md) records the same
   hazard-nop behaviour for the ProDG 3.01 assembler.
 
 ## 4. Candidate-generation aids
 
 rac1-decomp uses these to propose candidates. These observations do not
 permit source permutations on parked RAC2 targets: the concrete reopening
-evidence required by `AGENTS.md` and `docs/MATCHING-BLOCKERS.md` still applies.
+evidence required by `AGENTS.md` and `docs/contributing/matching-blockers.md` still applies.
 
 - **m2c with generated context** for a first C sketch. Its output is never
   matching as emitted and mis-decodes branch-likely conditions.

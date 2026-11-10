@@ -42,7 +42,7 @@ load (load_killed_in_block_p for availability and anticipation, compute_transp a
 store-motion walk all call it), so it now reports a conflict for every memory destination,
 which is what mem_set_in_block amounts to. Calls already kill every load.
 tests/test_gcse_store_kills_loads.py covers the transformer and the compiler output; see
-docs/COMPILER-NOTES.md.
+docs/build/compiler-notes.md.
 
 Usage: gcse_store_kills_loads.py <gcc/gcse.c>
 """

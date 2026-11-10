@@ -306,7 +306,7 @@ extern void func_L11_003F3098(u8 *);
 
 /* The class table base read through an incomplete `sda` array: cc1 emits the one-instruction
    load, which the assembler expands absolute (`lui $r` / `lw $r,%lo($r)`) and which is not
-   hoisted out of the loop, as retail has it (docs/COMPILER-NOTES.md). */
+   hoisted out of the loop, as retail has it (docs/build/compiler-notes.md). */
 extern u8 *D_L11_001B359C_base[] __asm__("D_L11_001B359C") __attribute__((sda));
 
 void func_L11_004411C8(u8 *obj)

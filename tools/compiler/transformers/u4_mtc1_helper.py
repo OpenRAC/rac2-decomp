@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The earlier transfer-hazard helper rac2_mtc1_nop_ok() in gas/config/tc-mips.c, which
-restrict_mtc1_exemption.py then narrows (docs/COMPILER-NOTES.md, the tc-mips.c rows)."""
+restrict_mtc1_exemption.py then narrows (docs/build/compiler-notes.md, the tc-mips.c rows)."""
 import sys
 from pathlib import Path
 tc_mips = Path(sys.argv[1])

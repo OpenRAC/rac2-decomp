@@ -5,7 +5,7 @@
  * strip, a far quad, and two scrolling layers of grid cells around the camera. As in RAC1, the
  * scroll table is declared in .sdata, so its address is one `la` macro instruction rather than a
  * split %hi/%lo pair; that makes the loop optimizer hoist both per-layer scroll pointers. This
- * unit needs -g for the measured division padding (docs/COMPILER-NOTES.md).
+ * unit needs -g for the measured division padding (docs/build/compiler-notes.md).
  */
 
 typedef unsigned int Quadword __attribute__((mode(TI)));

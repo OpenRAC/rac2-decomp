@@ -4,7 +4,7 @@
  * `j func_11F058` and its `addiu $sp,$sp,0x10` delay slot end at 0x0011F860)
  * and func_0011F868 at 0x0011F868 - the two are in different source objects
  * (src/core/0011F828.c and src/core/0011F868.c), and the fill is what the
- * catalogue's object boundary is made of (docs/LEVELS.md). Nothing in the boot
+ * catalogue's object boundary is made of (docs/build/levels.md). Nothing in the boot
  * jumps to 0x0011F864.
  *
  * tools/check.py func_0011F864: the smallest C function is `jr $ra; nop`, so the

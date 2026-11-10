@@ -1,6 +1,6 @@
 /* func_PAL_L02_002F1100, the PAL copy of func_L02_002EFB60: the same C, where the gravity factor 0.00027777778f
    becomes 0.00040000002f and the three colour arguments are scaled for 50 Hz. Needs -frac2-sticky-volatile-refs
-   (reorg stops at the copy's volatile asm); see docs/COMPILER-NOTES.md. */
+   (reorg stops at the copy's volatile asm); see docs/build/compiler-notes.md. */
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vec4;

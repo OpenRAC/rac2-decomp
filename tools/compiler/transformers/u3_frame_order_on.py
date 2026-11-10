@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The earlier step that turned the frame-order option on by default, which
-disable_frame_order_default.py later turns off again (docs/COMPILER-NOTES.md)."""
+disable_frame_order_default.py later turns off again (docs/build/compiler-notes.md)."""
 import sys
 from pathlib import Path
 p = Path(sys.argv[1])

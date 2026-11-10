@@ -1,4 +1,4 @@
-/* Rests on the redundant-insn rule of docs/COMPILER-NOTES.md (volatile asm): the last jump of the
+/* Rests on the redundant-insn rule of docs/build/compiler-notes.md (volatile asm): the last jump of the
    mode == 0 arm lands on the restore of $s0, across a qcopy. */
 
 #include "common.h"

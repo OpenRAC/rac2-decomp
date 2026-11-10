@@ -10,7 +10,7 @@ extern unsigned int D_001A7180 MACRO_ADDR;
    record (00132028-g8.c): a word callback, 4 bytes of padding and a doubleword
    argument, as the return callback and its argument at 0x001A74E0/E8 do. This
    doubleword view of the record stores the argument as its second element, an sda
-   symbol+offset access, which docs/COMPILER-NOTES.md ("reorg: which global loads may
+   symbol+offset access, which docs/build/compiler-notes.md ("reorg: which global loads may
    fill a slot") shows never fills a delay slot: the store stays where retail has it. */
 extern long D_001A74D0_1[] __attribute__((sda));
 extern int D_001A7140 MACRO_ADDR;

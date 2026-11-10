@@ -3,7 +3,7 @@
 
 /* A body whose retail bytes address its global through $gp in ordinary flow: the assembler
    only selects that form when the back end emits the .extern size directive, which the
-   pinned profile does at -G8 (see docs/COMPILER-NOTES.md). */
+   pinned profile does at -G8 (see docs/build/compiler-notes.md). */
 /* Per-frame update of the player's gadget table: it walks the records of one table
    entry, scales each record's pair of floats and asks the slot manager to refresh
    them, then folds the two level globals into the table's offset. */

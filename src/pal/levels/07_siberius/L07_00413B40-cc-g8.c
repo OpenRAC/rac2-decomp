@@ -2,7 +2,7 @@
 /* func_PAL_L07_00413B40: the five path riders' update (Siberius). A unit of its own for -G8 and
  * -frac2-frame-pointer-liveness (config/cflags.txt): without the option flow keeps $fp, which
  * holds the rider index here, live after the loop, and reorg annuls the slot of the first
- * player-mode test (bnel where retail has bne, docs/COMPILER-NOTES.md). */
+ * player-mode test (bnel where retail has bne, docs/build/compiler-notes.md). */
 #include "common.h"
 extern f32 func_002AA2E8(void *,f32,f32);
 extern s32 func_002E5CF8(s32,s32,void *);

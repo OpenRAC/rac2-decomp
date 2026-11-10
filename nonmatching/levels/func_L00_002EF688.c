@@ -3,5 +3,5 @@
  * after the function whose epilogue ends at 0x002EF684 (`jr $ra` at 0x002EF67C,
  * `addiu $sp,$sp,0x10` in the slot); the row itself has no prologue and no
  * `jr $ra`. The next function starts at 0x002EF6A0. Defect class of
- * docs/COMPILER-NOTES.md, "Catalogue rows that are not functions": a
+ * docs/build/compiler-notes.md, "Catalogue rows that are not functions": a
  * tools/levels.py fix, no C reaches it. */

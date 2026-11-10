@@ -4,7 +4,7 @@
    join label forward, between the reload of 1.0f (lui $at ; mtc1 $at,$f0) and the sub.s
    that reads it. Retail keeps the label on the hazard nop the assembler inserts there; GNU
    as without the switch moves it behind the nop, and the bc1tl lands one word late
-   (docs/COMPILER-NOTES.md, labels in front of the hazard nop). */
+   (docs/build/compiler-notes.md, labels in front of the hazard nop). */
 
 typedef unsigned char u8;
 

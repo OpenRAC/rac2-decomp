@@ -2,7 +2,7 @@
  * src/levels/18_damosel/L18_002C2D48-reset.c is the level 18 copy). As there, the two arms on
  * the busy field at +0x340 are one in retail: jump2 cross-jumps them, the branch goes and its
  * load stays as the dead lw, which also ends the extended block, so later blocks rebuild the
- * hero address (docs/MATCHING-BLOCKERS.md, "jump2 cross-jumps two arms that end the same").
+ * hero address (docs/contributing/matching-blockers.md, "jump2 cross-jumps two arms that end the same").
  * The rebase of `h` before the 0x1494 store is retail's address rebuild there.
  */
 #include "common.h"

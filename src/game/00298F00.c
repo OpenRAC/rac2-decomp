@@ -6,7 +6,7 @@
  * What it takes:
  *   - The directory loop reads the slot digit as entry->name[4] from the entry pointer
  *     (lbu 0x24(entry)); that needs a compiler without giv recombination, as retail's
- *     (tools/compiler/transformers/no_recombine_givs.py, docs/COMPILER-NOTES.md).
+ *     (tools/compiler/transformers/no_recombine_givs.py, docs/build/compiler-notes.md).
  *   - Error chains: sched1 puts the last of a run of independent zero stores first, so the
  *     source order is state, cur, busy (state 3's chain is err, state, cur, busy), which makes
  *     the state-25 reset block the cross-jump target.

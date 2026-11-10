@@ -15,7 +15,7 @@ Retail witnesses: func_L23_002C38B0's four quadword zeros are a0, v0, a0, v0 wit
 a0, v1, a0 without it, and ten more unmatched functions clear with `por $a0,$0,$0`
 (func_002ABBB8, func_L00_0038ADD0, ...). Every matched function of all 28 programs compiles to
 the same bytes with and without it. tests/test_ti_one_gpr.py covers the anchor and the
-register choice; see docs/COMPILER-NOTES.md.
+register choice; see docs/build/compiler-notes.md.
 
 Usage: ti_one_gpr.py <gcc/config/mips/mips.h>
 """

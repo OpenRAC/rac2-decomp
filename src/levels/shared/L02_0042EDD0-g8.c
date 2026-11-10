@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 /* func_L02_0042EDD0 is a unit of its own: it reads D_L02_001B2434 through $gp (hence -G8) and
-   needs two opt-in profiles (docs/COMPILER-NOTES.md). -frac2-no-annulled-wide-stores keeps
+   needs two opt-in profiles (docs/build/compiler-notes.md). -frac2-no-annulled-wide-stores keeps
    reorg from copying the 16-byte clear at the top of the second loop into the annulled slot of
    a `bnel` that closes the loop: retail keeps the clear under the loop label and ends with a
    plain `bnez` whose slot is the fall-through's `lwc1`. -frac2-zero-ti-barrier schedules

@@ -40,7 +40,7 @@ With this option both seeds are left out, as in 2.95.3, and a nested function's 
 base; it keys on no function, only on the option. It is off by default, enabled per unit in
 config/cflags.txt, and -fno-rac2-no-static-chain-base disables it again.
 tests/test_no_static_chain_base.py covers the anchors, the default/disabled equality, the late
-saves, both nested-function store orders and controls. See docs/COMPILER-NOTES.md.
+saves, both nested-function store orders and controls. See docs/build/compiler-notes.md.
 
 Usage: no_static_chain_base.py <gcc source directory>   (the one holding toplev.c)
 """

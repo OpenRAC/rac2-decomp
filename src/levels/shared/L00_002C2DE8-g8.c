@@ -1,6 +1,6 @@
 /* func_L00_002C2DE8 (708 bytes, 27 places), in its own -G8 unit: the frame counter
  * D_L00_001B19C8 is one .sdata word, read as a lui/lw macro in ordinary flow and through $gp
- * in a delay slot (the reload after the % 3 guard, docs/COMPILER-NOTES.md, "a division guard
+ * in a delay slot (the reload after the % 3 guard, docs/build/compiler-notes.md, "a division guard
  * ends the redundant-insn search"). */
 #include "common.h"
 typedef struct {

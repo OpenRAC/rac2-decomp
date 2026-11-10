@@ -17,7 +17,7 @@ mark_set_resources half of the same upstream change is the compiler's default
 The option is off by default, enabled per unit in config/cflags.txt, and
 -fno-rac2-sticky-volatile-refs disables it again. tests/test_sticky_volatile_refs.py covers
 the anchors, the default/disabled equality, the moved delay slot and a control without an asm.
-See docs/COMPILER-NOTES.md.
+See docs/build/compiler-notes.md.
 
 Usage: sticky_volatile_refs.py <gcc source directory>   (the one holding toplev.c)
 """

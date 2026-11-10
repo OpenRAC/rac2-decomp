@@ -63,7 +63,7 @@ already unique under the mask.
 those 41 selected correspondences. Prototype CSV exports examined as data corroborate
 all 41 addresses; no third-party script was executed. The independent evidence is
 the class/role identifier in the two privately owned dispatch tables, using the
-record layouts documented in [`MOBY-DISPATCH-TABLES.md`](MOBY-DISPATCH-TABLES.md).
+record layouts documented in [`moby-dispatch-tables.md`](../game/moby-dispatch-tables.md).
 
 This recovers known structural relationships, including `UpdateMoby_775`,
 `UpdateMoby_2384`, `UpdateMoby_3077`, `UpdateCamera_6` and `InitCamera_24`.

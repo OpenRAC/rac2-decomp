@@ -8,7 +8,7 @@ Another release's function catalogues, carried from USA v1.01's by identical cod
   python3 tools/carry.py --version pal --demote   # after tools/build.py all --version pal: what the build disproved
 
 Needs the dumps of both releases (tools/levels.py dump, and with --version V). Writes the two
-catalogues of release V in the formats of USA v1.01's (docs/VERSIONS.md), and
+catalogues of release V in the formats of USA v1.01's (docs/build/versions.md), and
 build/<V>/carry.json: which v1.01 function each of V's corresponds to and how it was found.
 
 Every program of V is compared with the same program of v1.01, one code section at a time
@@ -418,7 +418,7 @@ def call_edges(boot_rows: list, rows: list) -> list[tuple[str, str]]:
 
 def write_catalogues(boot_rows: list, rows: list) -> None:
     """config/<version>/boot/functions.tsv and config/<version>/levels/functions.tsv, in the
-    formats docs/VERSIONS.md gives them."""
+    formats docs/build/versions.md gives them."""
     levels.BOOT_FUNCTIONS.parent.mkdir(parents=True, exist_ok=True)
     levels.BOOT_FUNCTIONS.write_text("# name\taddress\tsize -- tools/carry.py\n" + "".join(
         f"{name}\t{address:08X}\t{size}\n" for name, address, size in boot_rows), newline="\n")
@@ -942,7 +942,7 @@ def main() -> None:
 
     write_catalogues([(n, a, s) for n, a, s, _, _ in sorted(boot_rows, key=lambda r: r[1])], out)
 
-    # What each v1.01 function became, for docs/VERSIONS.md and tools/progress.py's notes.
+    # What each v1.01 function became, for docs/build/versions.md and tools/progress.py's notes.
     report = {"boot": {}, "levels": {}}
     for name, a, n, how, was in boot_rows:
         report["boot"][name] = {"address": a, "size": n, "how": how, "was": was}

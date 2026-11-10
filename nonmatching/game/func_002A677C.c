@@ -17,7 +17,7 @@
  * A separate compiler probe using standard 16-byte C vector types and lane
  * addition, multiplication and shift lowered to scalar GPR operations; it
  * emitted none of the packed instructions listed above. The compiler survey
- * in docs/MATCHING-BLOCKERS.md establishes that game C emits only por and the
+ * in docs/contributing/matching-blockers.md establishes that game C emits only por and the
  * SPECIAL2 mult1/madd forms in the MMI space; the packed operations here fall
  * outside that set. This is evidence for handwritten assembly under
  * AGENTS.md, but ASM_FUNC still needs maintainer agreement. Marker remains;

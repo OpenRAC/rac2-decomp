@@ -2,7 +2,7 @@
  * otherwise &D_001AB658, and returns 0. Retail reaches it through data pointers.
  *
  * The catalogue entry is 0x002CC530 (32 bytes): the 8 bytes at 0x002CC528 are filler
- * left after the previous body (docs/LEVELS.md). Retail addresses the two bytes via $gp
+ * left after the previous body (docs/build/levels.md). Retail addresses the two bytes via $gp
  * and the flag as an absolute `lui`/`lw` into its own destination register, which is
  * -G8 with sda/nosda declarations plus -mno-split-addresses (the assembler expands
  * `lw $3,D_001A7318` using $3 as the address temporary). Under that profile the

@@ -1,5 +1,5 @@
 /* func_US2_00338D48: needs -frac2-keep-block-zero-copy (cse keeps `i = length`); see
-   docs/COMPILER-NOTES.md. */
+   docs/build/compiler-notes.md. */
 
 extern void *func_00115484(void *, int, unsigned int);
 extern int func_0027F178(unsigned char *text, int length); /* text width */

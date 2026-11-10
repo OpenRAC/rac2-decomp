@@ -140,7 +140,7 @@ void func_US2_L00_002A4928(void)
 }
 
 extern char D_00189E20[];
-/* Incomplete sda array: retail clears this word as `lui $at; sw` (COMPILER-NOTES.md). */
+/* Incomplete sda array: retail clears this word as `lui $at; sw` (compiler-notes.md). */
 /* walks one loaded entry of an owner's list and hands it to the vector routine when the
    tag bits are set, else to the count-driven copy, then polls and returns the caller's
    handle */

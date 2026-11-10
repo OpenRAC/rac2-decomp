@@ -7,4 +7,4 @@
    extent, and the aligned literal-pointer scan found no reference to any placement.
    A plain C zeroing store compiles to sw / jr $ra / daddu in the same 12 bytes, so
    it cannot reproduce this fallthrough. Retained only as catalogue-defect evidence;
-   no C is deposited. See docs/LEVELS.md. */
+   no C is deposited. See docs/build/levels.md. */

@@ -19,7 +19,7 @@ emitted exactly as before, and without -mastra-quad-saves the option has no effe
 The option is off by default, enabled per unit in config/cflags.txt (with -mastra-quad-saves),
 and -fno-rac2-narrow-saves-below disables it again. tests/test_narrow_saves_below.py covers
 the anchors, the default/disabled equality, an authored mixed-width frame and a control.
-See docs/COMPILER-NOTES.md.
+See docs/build/compiler-notes.md.
 
 Usage: narrow_saves_below.py <gcc source directory>   (the one holding toplev.c)
 """

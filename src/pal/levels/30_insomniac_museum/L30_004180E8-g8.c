@@ -6,7 +6,7 @@
    loop's preserved subexpressions, so both loops call an inline helper that holds the colour.
 
    A unit of its own: -g (config/cflags.txt) gives the line label that
-   puts retail's two-nop floor in front of each div.s (docs/COMPILER-NOTES.md, "Division/root
+   puts retail's two-nop floor in front of each div.s (docs/build/compiler-notes.md, "Division/root
    scheduling and padding"), and -G8 is the template's flag. */
 
 extern u8 *D_L12_001B2E9C[3] __attribute__((sda)); /* entity base, read bare (lui/lw) */

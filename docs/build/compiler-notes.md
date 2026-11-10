@@ -130,7 +130,7 @@ units, then recheck their existing C and all carrying releases. Stop a tied
 approach instead of manufacturing references or trying equivalent permutations.
 
 This reference groups qualified compiler mechanisms and useful C source shapes by
-topic. Open cases belong in [MATCHING-BLOCKERS.md](MATCHING-BLOCKERS.md). The source
+topic. Open cases belong in [matching-blockers.md](../contributing/matching-blockers.md). The source
 recipe, per-file flags and complete linked build take precedence over historical
 observations; this document is not a progress report or a reconstruction of the
 unknown shipping toolchain.
@@ -143,15 +143,15 @@ belong to that PR; they are not additional project-progress claims.
 
 | Input | Maintained implementation | Role |
 | --- | --- | --- |
-| Game C | [tools/compiler/build.sh](../tools/compiler/build.sh) | Public GNU EE 2.9-ee-991111b cpp/cc1, pinned Lombyte sce-991111b patches and measured transformers |
-| SDK C | [tools/compiler/sdk/build.py](../tools/compiler/sdk/build.py) | Public-source Sony EE-GCC 2.9-ee-991111-01, selected with the sdk prefix in config/cflags.txt |
+| Game C | [tools/compiler/build.sh](../../tools/compiler/build.sh) | Public GNU EE 2.9-ee-991111b cpp/cc1, pinned Lombyte sce-991111b patches and measured transformers |
+| SDK C | [tools/compiler/sdk/build.py](../../tools/compiler/sdk/build.py) | Public-source Sony EE-GCC 2.9-ee-991111-01, selected with the sdk prefix in config/cflags.txt |
 | Assembly from either C frontend | Source-built game GNU as | Qualified immediate, hazard and padding rules |
 | Remaining assembly reconstructed from the disc | Locally supplied SN ProDG 2.0 Ps2EeAs.exe | Separate from the GNU-assembled C-object path |
 | Final link | Locally supplied SN ld.exe | Places the objects before comparison against retail |
 
 The GNU archive is `gnu-ee-binutils-gcc-1.1.tar.gz`, SHA-256
 `1f518043e252d6eda726386971d52eda26541ab936ea73a9783d73712b595f92`, target
-`mips64r5900-sf-elf`. [CREDITS.md](../CREDITS.md) records the public sources.
+`mips64r5900-sf-elf`. [CREDITS.md](../../CREDITS.md) records the public sources.
 Proprietary SDK source, samples and headers are not inputs.
 
 Matching bodies establishes compatibility, not Insomniac's exact original binary,
@@ -171,8 +171,8 @@ python3 tools/check.py func_XXXXXXXX --diff
 python3 tools/build.py all --strict --jobs 8
 ```
 
-See [BUILDING.md](BUILDING.md) for setup and [VERSIONS.md](VERSIONS.md) for releases.
-Flags are per file in [config/cflags.txt](../config/cflags.txt). A `*-g8.c` sibling
+See [building.md](building.md) for setup and [versions.md](versions.md) for releases.
+Flags are per file in [config/cflags.txt](../../config/cflags.txt). A `*-g8.c` sibling
 gets `-G8` unless an earlier explicit rule matches. Qualify every C definition in a
 unit after changing its profile.
 
@@ -307,13 +307,13 @@ before every FPR save. Emission order is not final scheduled order. Fixing a fra
 does not fix unrelated entry-block allocation or address formation.
 
 The implementations are
-[neutralise_timode_anchor.py](../tools/compiler/transformers/neutralise_timode_anchor.py),
-[ascending_save_order.py](../tools/compiler/transformers/ascending_save_order.py) and
-[reorder_save_blocks.py](../tools/compiler/transformers/reorder_save_blocks.py).
+[neutralise_timode_anchor.py](../../tools/compiler/transformers/neutralise_timode_anchor.py),
+[ascending_save_order.py](../../tools/compiler/transformers/ascending_save_order.py) and
+[reorder_save_blocks.py](../../tools/compiler/transformers/reorder_save_blocks.py).
 The reorder consumes the ascending-order transformer's output. Replacing `mips.c`
 with an older file also removes the zero-fold code called by `toplev.c`.
 
-[disable_frame_order_default.py](../tools/compiler/transformers/disable_frame_order_default.py)
+[disable_frame_order_default.py](../../tools/compiler/transformers/disable_frame_order_default.py)
 keeps generic frame scheduling by default; `-mastra-keep-frame-order` is an explicit
 experiment. `func_002B7170` needs the generic order plus measured source lifetimes
 and stores. No frame-order option fixes arbitrary entry-block allocation.
@@ -322,14 +322,14 @@ and stores. No frame-order option fixes arbitrary entry-block allocation.
 
 Short-loop padding must run after delay-slot scheduling: this C pipeline uses GNU
 `as`, rather than the assembler assumed by patch 0054.
-[enable_loop_padding.py](../tools/compiler/transformers/enable_loop_padding.py)
+[enable_loop_padding.py](../../tools/compiler/transformers/enable_loop_padding.py)
 restores the hook.
-[count_trap_length.py](../tools/compiler/transformers/count_trap_length.py) counts a
+[count_trap_length.py](../../tools/compiler/transformers/count_trap_length.py) counts a
 `TRAP_IF` by its machine-description length: a division guard is branch plus break,
 not one word. Counting one overpads `func_0028B950`; `func_0034FB20` is the 168-byte
 polling-loop witness.
 
-[count_block_move_length.py](../tools/compiler/transformers/count_block_move_length.py)
+[count_block_move_length.py](../../tools/compiler/transformers/count_block_move_length.py)
 does the same for block moves. A structure copy of 0x40 bytes or more becomes a loop
 of one `movstrsi_internal2` insn (its loads) and one `movstrsi_internal3` insn (its
 stores); counted as one word each, every such loop looked five words long and got two
@@ -339,10 +339,10 @@ length (20 and 1) keeps both above the seven-word threshold. Retail witnesses, a
 unpadded: `func_L08_003C6AB0` (both loops, three places), `func_002F7738` (seven
 loops), `func_L00_002FC980` (27 places), `func_L30_0040B9D8`, `func_002AF0A8`. No
 matched function changes: `build.py all --strict` is OK with and without the patch.
-Control: [test_block_move_loop.py](../tests/test_block_move_loop.py), where a
+Control: [test_block_move_loop.py](../../tests/test_block_move_loop.py), where a
 four-word store loop keeps its three NOPs.
 
-[block_move_quad.py](../tools/compiler/transformers/block_move_quad.py) gives those loops
+[block_move_quad.py](../../tools/compiler/transformers/block_move_quad.py) gives those loops
 retail's quadword form. `expand_block_move` capped the alignment at the 8-byte word, so a
 structure of 16-byte alignment copied by `ld`/`sd`: four scratch registers per 32-byte round
 and four more for the leftover. Retail has `lq ; lq ; sq ; sq ; addiu ; bne ; addiu` with
@@ -352,11 +352,11 @@ and four more for the leftover. Retail has `lq ; lq ; sq ; sq ; addiu ; bne ; ad
 `move_by_pieces` at word alignment. Witnesses: `func_L12_00418418` (one place) and
 `func_L03_003E4148` (eight) become exact, `func_L12_0041BF88`'s six copies each lose their six
 extra words. All 5,849 compilable units give the same assembly with and without the patch, so
-nothing already matched moves. Control: [test_block_move_quad.py](../tests/test_block_move_quad.py),
+nothing already matched moves. Control: [test_block_move_quad.py](../../tests/test_block_move_quad.py),
 where an 8-byte-aligned page keeps `ld`/`sd` and a 0x40-byte copy keeps its pieces.
 
 The padding counts words, as the retail assembler does, for the two 16-byte copies too:
-[count_asm_words.py](../tools/compiler/transformers/count_asm_words.py) counts an asm
+[count_asm_words.py](../../tools/compiler/transformers/count_asm_words.py) counts an asm
 statement by its instruction count (`qcopy` is `lq` plus `sq`) and the grouped
 `rac2_qcopy` pattern by its length of 2. Counted as one, a copy loop got one NOP too many.
 Retail evidence: in levels 0, 4 and 11, 44 seven-word loops holding an `lq`/`sq` pair
@@ -365,7 +365,7 @@ and six-word ones (`lq ; sq ; addiu ; addiu ; bgtz ; addiu`, `func_L00_003ABEC0`
 exactly one. Witness: the three-row matrix copy in `func_L00_0041CB80` (27 places).
 It runs after count_block_move_length.py and extends the same counter condition.
 No matched function changes: `build.py all --strict` is OK with both patches.
-Test: [test_count_asm_words.py](../tests/test_count_asm_words.py).
+Test: [test_count_asm_words.py](../../tests/test_count_asm_words.py).
 
 Inserted padding also advances the running word count. The pass places nops
 before the branch it is already visiting, so they will not be visited later.
@@ -388,7 +388,7 @@ This applies only to simple SI register SETs on R5900/GAS: not delay-slot
 sequences, stores, FP/wide operations, PIC or buffered extern output. Explicit
 `SDATA` aliases are excluded because their `__gp` metadata is supplied by the
 existing assembly-input pass. Scheduler lengths and compiler-authored operations
-are untouched. [test_symbolic_loop_words.py](../tests/test_symbolic_loop_words.py)
+are untouched. [test_symbolic_loop_words.py](../../tests/test_symbolic_loop_words.py)
 checks unknown addresses/loads, early SDA, incomplete SDATA, both alias spellings
 and an external defined between functions. The previous compiler produces
 eight-word loops in the three positive cases; all seven controls pass with the
@@ -412,7 +412,7 @@ catalogue prologue finds one other frame mixing `sq` and `sd` GPR saves, func_L0
 (`sq $s2` in a 16-byte slot below 8-byte ones), which `-frac2-wide-saves-below` covers
 (below). The stock EE attribute `register_precision(ra, 64)` on the prototype narrows the
 `$ra` save to `sd`, but the save loop still gives `$ra` the top slot.
-[narrow_saves_below.py](../tools/compiler/transformers/narrow_saves_below.py) adds
+[narrow_saves_below.py](../../tools/compiler/transformers/narrow_saves_below.py) adds
 `-frac2-narrow-saves-below`: with `-mastra-quad-saves` the loop walks the registers saved at
 the slot's full width first, then the narrower ones, so the narrower save sits below. A frame
 whose saves all have one width keeps `$ra` on top, as func_00115C90 and func_00115FC0 do;
@@ -429,7 +429,7 @@ It is the only one of 7,980 framed retail functions that holds TImode in a saved
 `-mastra-quad-saves` every GPR slot is 8 bytes, but save_restore_insns saves a register in the
 widest mode the function writes it in, so stock cc1 gives a 0x680 frame and `sq $s2,0x630` in an
 8-byte slot. `sq` ignores the low four address bits, so that store overwrites `$s3`'s save.
-[wide_saves_below.py](../tools/compiler/transformers/wide_saves_below.py) adds
+[wide_saves_below.py](../../tools/compiler/transformers/wide_saves_below.py) adds
 `-frac2-wide-saves-below`. In a unit without `-mastra-quad-saves`, a saved GPR whose save is
 wider than the slot then takes a 16-byte slot at the bottom of the GPR save area. The other
 GPRs keep 8-byte slots above it in register order, and compute_frame_size adds 8 bytes for
@@ -466,7 +466,7 @@ Cygnus-based tree fold runs the CYGNUS LOCAL reduce_expression_tree_depth on eve
 +0xC8..+0xF8. SN's "GNU C version 2.95.2 SN BUILD v2.73a" cc1 (FSF 2.95.2, which has no CYGNUS
 LOCAL code) builds the same giv (its loop dump matches) but emits retail's nested sum; Sony's
 991111a/-01/b-r4 cc1 flatten like ours. Only that observable output was used.
-[mult_add_no_flatten.py](../tools/compiler/transformers/mult_add_no_flatten.py) adds
+[mult_add_no_flatten.py](../../tools/compiler/transformers/mult_add_no_flatten.py) adds
 `-frac2-mult-add-no-flatten`: the fold calls inside expand_mult_add run with
 flag_schedule_insns clear, so the flattening is skipped there and nowhere else. Without the
 switch all 8,733 game-compiler units of `src/` compile to the same assembly as before. Forced
@@ -481,7 +481,7 @@ func_002F7320 (132 bytes, 28 places) starts `daddu $t1,$zero,$zero ... daddu $a3
 for `int result = 0; int i = result;`. Stock cse folds that copy to `move $a3,$0`: CONST_INT
 costs 0 and a pseudo 1. With the copy alive, result=0 has a dependent, sched1 moves it ahead
 of the argument copies and allocation becomes retail's (a0 value, a3 i, t1 result).
-[keep_block_zero_copy.py](../tools/compiler/transformers/keep_block_zero_copy.py) adds
+[keep_block_zero_copy.py](../../tools/compiler/transformers/keep_block_zero_copy.py) adds
 `-frac2-keep-block-zero-copy`: cse keeps a copy from one pseudo to another whose value is known
 to be 0 when its source is set earlier in the same basic block; the REG_EQUAL note still gives
 loop.c the zero start. Without the same-block limit, forced on, it changes one matched body,
@@ -495,7 +495,7 @@ forward search from the first call passes the second qcopy asm (volatile). The E
 resource.c predates GCC 2.95's 6 May 1999 change (Mark Mitchell: "Make volatil monotonically
 increasing"): mark_referenced_resources assigns `res->volatil = MEM_VOLATILE_P (x)`, so the
 next ordinary load clears the flag and the search goes on to the addiu. Upstream 2.95 and
-2.95.3 use `|=` there. [sticky_volatile_refs.py](../tools/compiler/transformers/sticky_volatile_refs.py)
+2.95.3 use `|=` there. [sticky_volatile_refs.py](../../tools/compiler/transformers/sticky_volatile_refs.py)
 adds `-frac2-sticky-volatile-refs`: the MEM and ASM_OPERANDS cases of
 mark_referenced_resources keep the flag set. Forced on in every game unit it changes none of
 8,510 others. The mark_set_resources half of the same upstream change is the compiler's
@@ -521,7 +521,7 @@ find_dead_or_set_registers' budget (one conditional branch) runs out before the 
 path sets `$fp`, `$fp` stays live there and the slot must be annulled. GCC 2.95 has John Wehle's
 change of 2 June 1999 (gcc/ChangeLog: "Only give FRAME_POINTER_REGNUM and
 HARD_FRAME_POINTER_REGNUM special treatment if reload hasn't run or the frame pointer is
-needed"). [frame_pointer_liveness.py](../tools/compiler/transformers/frame_pointer_liveness.py)
+needed"). [frame_pointer_liveness.py](../../tools/compiler/transformers/frame_pointer_liveness.py)
 adds `-frac2-frame-pointer-liveness`, which puts that condition, `! reload_completed ||
 frame_pointer_needed`, on the five flow.c tests and attach_deaths. Checked against
 gcc-core-2.95.tar.gz from ftp.gnu.org (flow.c 2276, 2965/2968, 3278/3281, 3740/3746, 3923/3926;
@@ -554,7 +554,7 @@ the symbol, which cannot alias a stack slot. GCC removed both seeds: Richard Hen
 struct_value_incoming_rtx or static_chain_rtx as pointing to stack memory.") reverses an addition
 of October 1997 (ChangeLog.0) and is in gcc-2.95.3. A Pmode ADDRESS is the base the stack, frame and
 argument pointers get, so the seed declared the static chain, which points into another
-function's frame, a stack reference. [no_static_chain_base.py](../tools/compiler/transformers/no_static_chain_base.py)
+function's frame, a stack reference. [no_static_chain_base.py](../../tools/compiler/transformers/no_static_chain_base.py)
 adds `-frac2-no-static-chain-base`, which leaves both seeds out. Checked against gcc-core-2.95 and
 gcc-core-2.95.3 from ftp.gnu.org: their alias.c files differ only in the copyright line and these
 nine lines (2.95 lines 1458-1466); gcc-3.0, 3.4.0 and 4.0.0 have neither seed (3.4 moves the other
@@ -753,10 +753,10 @@ observations, not qualified rules:
 ## Symbols, addresses and small data
 
 Use catalogue function identities, resident `D_XXXXXXXX` within the resident region
-described in [AGENTS.md](../AGENTS.md#naming-in-c), and level `D_LNN_XXXXXXXX`
+described in [AGENTS.md](../../AGENTS.md#naming-in-c), and level `D_LNN_XXXXXXXX`
 data names. When a callee/data pairing changes by
 program, use `ref_LNN_XXXXXXXX_kk`. Zero-padding a level address is not enough to
-identify its canonical function. See [LEVELS.md](LEVELS.md).
+identify its canonical function. See [levels.md](levels.md).
 
 GP and overlay base depend on the release. USA v1.01 uses GP `0x001AEFF0`; take
 other releases' constants from the selected layout, not a copied literal.
@@ -872,7 +872,7 @@ with distinct incoming values can retain a register address. An artificial volat
 pointer adds a stack round trip and is not a production remedy. Never change the
 real offset or add fake barriers just to force that shape.
 
-[qcopy_pattern.py](../tools/compiler/transformers/qcopy_pattern.py) implements the
+[qcopy_pattern.py](../../tools/compiler/transformers/qcopy_pattern.py) implements the
 default-off, per-file `-frac2-qcopy`: aligned TImode memory-to-memory assignments,
 register addresses, grouped lq/sq and a declared `$v0` scratch. Memory flags/alias
 sets survive; it adds no memory barrier. The MD length is two instructions. Scalar
@@ -886,7 +886,7 @@ The ordinary folded-copy witness `func_L00_00395240` stays on its default profil
 
 ### Scheduling around copies
 
-[qcopy_barrier.py](../tools/compiler/transformers/qcopy_barrier.py) adds
+[qcopy_barrier.py](../../tools/compiler/transformers/qcopy_barrier.py) adds
 `-frac2-qcopy-barrier`, effective only with qcopy. Its TImode memory-to-memory SET
 plus `(clobber (reg:TI 2))` gets both schedulers' volatile-copy dependences, cost 1
 and unit classification. Operands, allocation inputs and memory flags stay unchanged;
@@ -940,7 +940,7 @@ and `sp+0x10`; two separate locals reverse their placement.
 
 ### Default fold and live return values
 
-[fold_zero_ti_store.py](../tools/compiler/transformers/fold_zero_ti_store.py) folds a
+[fold_zero_ti_store.py](../../tools/compiler/transformers/fold_zero_ti_store.py) folds a
 materialized zero to `sq $zero,0(reg)` only for a bare register address and no other
 live reader. Its bounded search stops at calls/jumps/labels and looks back at most
 twelve instructions. Shared zeros feeding several stores keep their register.
@@ -953,7 +953,7 @@ loop store order. Positive controls: `func_00282C88` (8 bytes), `func_002E5FE0`
 witnesses: `func_L20_0044AB68` (204), `func_L20_00443908` (264),
 `func_L00_003ACC88` (112 at 27 places).
 
-[fold_zero_ti_return_value.py](../tools/compiler/transformers/fold_zero_ti_return_value.py)
+[fold_zero_ti_return_value.py](../../tools/compiler/transformers/fold_zero_ti_return_value.py)
 admits exactly one reconstructible function-value USE of that same
 `REG_FUNCTION_VALUE_P` register, without an intervening call/jump. The store fold
 and conversion of USE back into an explicit zero return SET form one
@@ -968,7 +968,7 @@ not harmless one-word differences.
 
 ### Reload registers for quadword values
 
-[ti_one_gpr.py](../tools/compiler/transformers/ti_one_gpr.py) is unconditional. The
+[ti_one_gpr.py](../../tools/compiler/transformers/ti_one_gpr.py) is unconditional. The
 sce-991111b stack makes `HARD_REGNO_NREGS` 1 for TImode in a general register, but
 `CLASS_MAX_NREGS` still answered 16/`UNITS_PER_WORD` = 2 for every non-FP class.
 Reload sizes its needs and its reload registers by the latter, so each TImode reload
@@ -985,14 +985,14 @@ where retail has `$a0`. Ten more unmatched retail functions clear with
 holds a call's value and `$v1` a constant across the clear). Every matched function
 of the 28 programs compiles to the same bytes with and without it, so it changes only
 code that had no matching C yet. A non-quadword pseudo can move too, since regclass
-and local-alloc read the same macro. [tests/test_ti_one_gpr.py](../tests/test_ti_one_gpr.py)
+and local-alloc read the same macro. [tests/test_ti_one_gpr.py](../../tests/test_ti_one_gpr.py)
 checks authored controls: five reloaded zeros between calls rotate `$v1`, `$v0`,
 `$v1`, `$v0`, `$v1` (the pair model: `$a1`, `$v0`, ...), a shared stack zero beside a
 live call value takes `$v1` (pair model: `$a1`), and a lone zero keeps `$v0`.
 
 ### Inheritance into a register the insn's pseudos hold
 
-[reload_reg_used_guard.py](../tools/compiler/transformers/reload_reg_used_guard.py) is
+[reload_reg_used_guard.py](../../tools/compiler/transformers/reload_reg_used_guard.py) is
 unconditional. The archive's `reload_reg_free_for_value_p` returns 0 for a register in
 `reload_reg_used`, which `choose_reload_regs` fills with every register outside the insn's
 spill set (`IOR_COMPL_HARD_REG_SET (reload_reg_used, chain->used_spill_regs)`). Patch 0047,
@@ -1019,7 +1019,7 @@ under it: the count reload after `n++` and the index reloads in `$a0` were their
 differences. Every matched function of the 28 programs compiles to the same bytes with and
 without it (`tools/build.py all --strict`, 28 of 28). Of 625 profiled near misses in
 `nonmatching/`, 57 compile differently; 9 of their functions come closer to retail,
-3 move further and the rest are unchanged. [tests/test_reload_reg_used_guard.py](../tests/test_reload_reg_used_guard.py)
+3 move further and the rest are unchanged. [tests/test_reload_reg_used_guard.py](../../tests/test_reload_reg_used_guard.py)
 checks the anchors and the two original object controls. A native harness additionally
 compiles the actual prepared GCC predicate and covers self-inheritance, non-spill
 exclusions, other reload lifetimes, equal read-only inputs, multi-register overlaps
@@ -1034,13 +1034,13 @@ not substitutes for linked game builds.
 | -frac2-zero-ti-barrier | Selected isolated zero stores get a scheduling barrier | The pre-reload heuristic also selects some displaced clears; it is not a recovered macro detector |
 | -frac2-zero-ti-por | Suppress zero folding at bare 0($sp) | Other register addresses still fold; mixed forms at the same address cannot be distinguished per file |
 
-[zero_ti_store_barrier.py](../tools/compiler/transformers/zero_ti_store_barrier.py)
+[zero_ti_store_barrier.py](../../tools/compiler/transformers/zero_ti_store_barrier.py)
 selects before reload an isolated const-zero TImode store between calls/labels/jumps;
 shared zeros keep normal C lowering. After reload it selects an architectural-zero
 TImode store. Lowering ready cost alone did not reproduce the dependences.
 `func_L00_003BFF68` matches 12/12 with the switch and 0/12 without it.
 
-[zero_ti_por.py](../tools/compiler/transformers/zero_ti_por.py) is a statement about
+[zero_ti_por.py](../../tools/compiler/transformers/zero_ti_por.py) is a statement about
 a unit's stack clears, not a detector. The control-flow-aware retail census found
 183 register-fed zero stores in 153 functions, all at `0($sp)`, but also 396
 architectural-zero stores in 263 functions, including 82 at `0($sp)`. The address
@@ -1150,7 +1150,7 @@ Four shapes from `func_L01_003B9798`, `func_L00_003E8A98` and the near misses
 
 ### gcse: every store kills every load
 
-[gcse_store_kills_loads.py](../tools/compiler/transformers/gcse_store_kills_loads.py) is
+[gcse_store_kills_loads.py](../../tools/compiler/transformers/gcse_store_kills_loads.py) is
 unconditional: it is the real compiler's memory model, not an option. This Cygnus tree's gcse
 keeps a list of each block's stores and asks alias analysis (`mems_conflict_for_gcse_p`,
 `true_dependence`) whether a store kills a load, so a load of a global survives stores to other
@@ -1175,13 +1175,13 @@ analysis and matches as a plain `for (p = start; p < end; p += 256)` loop.
 The decider family (`func_L04_002EDBC8`, `func_L08_002D90C8`, `func_L09_002C9738`,
 `func_L19_002CAAB0`) had read case 0x32's 0x1B4 through a `char *hb` copy of the hero
 pointer to force retail's reload; under this model it reads the field directly and matches.
-[tests/test_gcse_store_kills_loads.py](../tests/test_gcse_store_kills_loads.py) checks the
+[tests/test_gcse_store_kills_loads.py](../../tests/test_gcse_store_kills_loads.py) checks the
 transformer and authored controls: a global is loaded again after stores to another record,
 reused when no store intervenes, and loaded again after a call.
 
 ### reorg: a division guard ends the delay-slot search
 
-[trap_delay_barrier.py](../tools/compiler/transformers/trap_delay_barrier.py) is
+[trap_delay_barrier.py](../../tools/compiler/transformers/trap_delay_barrier.py) is
 unconditional: it is the real compiler's delay-slot rule, not an option. `fill_simple_delay_slots`
 (reorg.c) fills a call's slot by scanning backward from the call for an independent insn, and
 stops at a label, a jump or an insn that already holds a slot (`stop_search_p`). On the R5900 an
@@ -1204,13 +1204,13 @@ retail sets `li $a0,2`/`li $a0,3` in the preceding `beq` slot (fill_eager_delay_
 leaves both `jal` slots empty, where this tree filled the `jal` slots first and the `beq` took
 an insn from its target (12 instructions). `func_L12_002CF7B0` and `func_L11_002DE9E0`, members
 of that family, match with the barrier; of every other matched function in the 28 programs none
-compiled differently. [tests/test_trap_delay_barrier.py](../tests/test_trap_delay_barrier.py)
+compiled differently. [tests/test_trap_delay_barrier.py](../../tests/test_trap_delay_barrier.py)
 checks the transformer and authored controls: an argument set above a guard stays there and the
 call keeps an empty slot, and without a division the call's slot is filled as before.
 
 ### reorg: a division guard ends the redundant-insn search
 
-[trap_redundant_barrier.py](../tools/compiler/transformers/trap_redundant_barrier.py) is
+[trap_redundant_barrier.py](../../tools/compiler/transformers/trap_redundant_barrier.py) is
 unconditional: like the barrier above, it is the real compiler's rule, not an option, and no
 file needs a switch for it. It is that barrier's companion for reorg's other backward search. When
 `fill_slots_from_thread` takes an insn from a branch's target for the slot, it first asks
@@ -1233,7 +1233,7 @@ ends with a `% 6` test whose `beqz` goes to the epilogue's `ld $s0` in retail; t
 restore already in an earlier `bne` slot as redundant and branched one word further. M10's draft
 (26 October 2026) differed only there and matches 3/3 in us, pal and us2 with the barrier. Of
 every matched function in `tools/build.py all --strict`, none compiled differently.
-[tests/test_trap_redundant_barrier.py](../tests/test_trap_redundant_barrier.py)
+[tests/test_trap_redundant_barrier.py](../../tests/test_trap_redundant_barrier.py)
 checks the transformer and authored controls: across a guard the reload fills the slot, and
 without a division the redundant reload is still dropped.
 
@@ -1249,7 +1249,7 @@ the dropped restore, which the test's `stored` control checks.
 
 ### reorg: a volatile store stays marked
 
-[sticky_volatile_sets.py](../tools/compiler/transformers/sticky_volatile_sets.py) is the
+[sticky_volatile_sets.py](../../tools/compiler/transformers/sticky_volatile_sets.py) is the
 default: it is the real compiler's rule, so no file needs a switch for it, and
 `-fno-rac2-sticky-volatile-sets` restores the EE tree's rule for a unit (none uses it). The lead
 maintainer chose this shape on 8 November 2026. It supersedes the note of 11876eec6 (7 November)
@@ -1301,14 +1301,14 @@ The signature: retail's `jal` slot is a nop while the insns just before the call
 store and then a volatile store. A store retail lets into a slot past a volatile store is a
 store the rule cannot see as plain: func_00132498's argument, stored as the second element of an
 incomplete sda array (`D_001A74D0_1[1]`), is the length-2 `m` alternative and never a slot
-candidate (below). [tests/test_sticky_volatile_sets.py](../tests/test_sticky_volatile_sets.py)
+candidate (below). [tests/test_sticky_volatile_sets.py](../../tests/test_sticky_volatile_sets.py)
 checks the transformer's anchors and authored controls: the empty slot by default, the filled
 slot with the opt-out, that `-frac2-sticky-volatile-refs` alone does not empty it, and three
 controls that no rule changes.
 
 ### SDK objects: the assembler fills the slots the compiler leaves
 
-[swap_branch_slots.py](../tools/compiler/transformers/swap_branch_slots.py) adds the opt-in
+[swap_branch_slots.py](../../tools/compiler/transformers/swap_branch_slots.py) adds the opt-in
 assembler option `--r5900-swap-branch-slots`, passed per file as
 `-Wa,--r5900-swap-branch-slots` after `sdk` in `config/cflags.txt`. It is an assembler
 profile, not a compiler change: the SDK compiler's output is identical either way.
@@ -1344,7 +1344,7 @@ With the option on every one of the 112 SDK-profile units, only `func_00133988`
 (989snd's snd_GetDopplerPitchMod, `mflo` before `jr $ra`) changes: retail keeps its `nop`.
 rac1-decomp shows that 989snd was assembled with SN's ps2eeas, not GNU as, so the option is a
 per-object profile, like rac1's `gas210` column. Game C and 989snd units leave it off.
-[tests/test_swap_branch_slots.py](../tests/test_swap_branch_slots.py) checks the transformer
+[tests/test_swap_branch_slots.py](../../tests/test_swap_branch_slots.py) checks the transformer
 and authored controls: without the option every slot gets a `nop`; with it a store, a load and
 a sign extension move into the slot, and a branch that reads the previous result or carries a
 label still gets a `nop`.
@@ -1383,7 +1383,7 @@ retail keeps in a `bnez` slot is read into a local before the wave test.
 
 ### loop: no giv recombination
 
-[no_recombine_givs.py](../tools/compiler/transformers/no_recombine_givs.py) is unconditional:
+[no_recombine_givs.py](../../tools/compiler/transformers/no_recombine_givs.py) is unconditional:
 it is the real compiler's strength reduction, not an option. After `combine_givs` has chosen the
 reduced giv each address giv is expressed from, this tree's `strength_reduce` (loop.c) calls
 `recombine_givs`, which moves every combined giv onto the most recently set DEST_REG giv it can
@@ -1404,7 +1404,7 @@ matched function in `tools/build.py all --strict`, none compiled differently; of
 compilable near-miss drafts in nonmatching/, 9 compile differently, none close to a match.
 The same release-branch change also turned off the biv-to-giv conversion of extra biv
 increments (`n_extra_increment`); that half is the opt-in `-frac2-no-extra-increment-givs`
-(below), with func_00284268 as its witness. [tests/test_no_recombine_givs.py](../tests/test_no_recombine_givs.py)
+(below), with func_00284268 as its witness. [tests/test_no_recombine_givs.py](../../tests/test_no_recombine_givs.py)
 checks the transformer and an authored loop: the digit read stays on the entry pointer
 (`lbu 36(entry)`, not `-1(name + 5)`), and a one-pointer loop is unchanged.
 
@@ -1421,7 +1421,7 @@ from the last one (`sd 0($a)`, `sd 0($b)`, `sd -24($c)` ... and one add of 32 ea
 disabled the conversion for the gcc-2.95 release: Jeffrey A Law, 10 June 1999 (gcc-2.95
 gcc/ChangeLog: "loop.c (strength_reduce): Disable biv->giv translations and giv recombination.
 For the release branch only."), the change that also put `recombine_givs` under `#if 0`
-(no_recombine_givs.py, above). [no_extra_increment_givs.py](../tools/compiler/transformers/no_extra_increment_givs.py)
+(no_recombine_givs.py, above). [no_extra_increment_givs.py](../../tools/compiler/transformers/no_extra_increment_givs.py)
 adds `-frac2-no-extra-increment-givs`, which adds `! flag_rac2_no_extra_increment_givs` to that
 guard, so every increment stays a biv increment: store, add, store, add.
 
@@ -1485,8 +1485,8 @@ gives that shape only with the switch (two steps of 12, 8 and 4, two `+1`s); wit
 of 24, 16 and 8 and one `+2`. So retail's compiler kept every increment in this function too, as in
 func_00284268, and the switch is not a per-function one. The goto-loop record copy of
 `func_L00_00300618` (below) does not change: a goto loop has no loop notes.
-[tests/test_no_extra_increment_givs.py](../tests/test_no_extra_increment_givs.py) and
-[no_extra_increment_givs.c](../tests/fixtures/no_extra_increment_givs.c) cover the anchors (the
+[tests/test_no_extra_increment_givs.py](../../tests/test_no_extra_increment_givs.py) and
+[no_extra_increment_givs.c](../../tests/fixtures/no_extra_increment_givs.c) cover the anchors (the
 option table on its own), the default/disabled equality, a pointer cursor and an index cursor
 whose four increments the default splits and the switch keeps, the twice-incremented counter
 above, and controls that do not change: one increment, a volatile read, increments under a test
@@ -1510,7 +1510,7 @@ conversion in the compiler; the complete loader still does not match (11,280 ver
 
 ### Compiler control-flow passes
 
-[tidy_condjump_fallthru.py](../tools/compiler/transformers/tidy_condjump_fallthru.py)
+[tidy_condjump_fallthru.py](../../tools/compiler/transformers/tidy_condjump_fallthru.py)
 lets flow remove a conditional jump to its immediate successor and its now-dead
 input load. The rule follows GCC fixes from April/August 1999; witnesses include
 `func_L02_003FD070`, `func_L02_003FC268`, `func_L02_003FC518`, `func_L02_003FD228`,
@@ -1523,9 +1523,9 @@ input load. The rule follows GCC fixes from April/August 1999; witnesses include
 | Both | Compose the two independent changes | func_L02_003FCCA0 |
 | -frac2-no-null-pointer-checks | Skip the Cygnus delete_null_pointer_checks calls (after jump1 and after the jump pass behind cse); with keep-block-order no block count runs before cse | func_L20_002CD928 case 0x7C, 34,964 bytes/1 place |
 
-Implementations: [gcse_unsplit_edges.py](../tools/compiler/transformers/gcse_unsplit_edges.py),
-[keep_block_order.py](../tools/compiler/transformers/keep_block_order.py),
-[no_null_pointer_checks.py](../tools/compiler/transformers/no_null_pointer_checks.py). These are
+Implementations: [gcse_unsplit_edges.py](../../tools/compiler/transformers/gcse_unsplit_edges.py),
+[keep_block_order.py](../../tools/compiler/transformers/keep_block_order.py),
+[no_null_pointer_checks.py](../../tools/compiler/transformers/no_null_pointer_checks.py). These are
 inferences from retail and comparison with GCC 2.95, not the recovered original
 patches. A lone lui at a branch target is not a unique signature of edge splitting.
 
@@ -1552,7 +1552,7 @@ passes leaves the other's count, so such a unit needs both options.
 
 ### Wide stores and annulled slots
 
-[no_annulled_wide_stores.py](../tools/compiler/transformers/no_annulled_wide_stores.py)
+[no_annulled_wide_stores.py](../../tools/compiler/transformers/no_annulled_wide_stores.py)
 adds `-frac2-no-annulled-wide-stores`. Thread search stops at a wide store that
 cannot occupy an ordinary slot; target-delay-list stealing refuses it for an
 annulled slot. Searching past the store selects a different instruction.
@@ -1614,7 +1614,7 @@ read twice:
   output reload is lost: **`lui; mtc1` and no `ori`, wrong code from the default compiler** (see
   the known issue below).
 
-With `-frac2-keep-float-pun-source` ([keep_float_pun_source.py](../tools/compiler/transformers/keep_float_pun_source.py))
+With `-frac2-keep-float-pun-source` ([keep_float_pun_source.py](../../tools/compiler/transformers/keep_float_pun_source.py))
 cse_insn leaves that insn's source register alone, and combinable_i3pat refuses it as I3 unless
 f has a single use (find_single_use, which finds the use even where it returns 0). g crosses no
 call, so sched_analyze_1 keeps its set after the previous call; f, with one SUBREG store against
@@ -1692,8 +1692,8 @@ The expanded retail survey found 915 immediate dependencies: 897 delayed, 18 not
 the original 598 sites (587 delayed) are a subset. Cleared assembler history can
 occur within a function and is not a function-boundary detector.
 
-[u4_mtc1_helper.py](../tools/compiler/transformers/u4_mtc1_helper.py) and
-[restrict_mtc1_exemption.py](../tools/compiler/transformers/restrict_mtc1_exemption.py)
+[u4_mtc1_helper.py](../../tools/compiler/transformers/u4_mtc1_helper.py) and
+[restrict_mtc1_exemption.py](../../tools/compiler/transformers/restrict_mtc1_exemption.py)
 retain two measured cleared-history exemptions: a0 to f0 before cvt.s.w f0,f0,
 and zero to f0 before c.lt.s f12,f0. Eight first-transfer witnesses split four
 requiring a nop and four not. A distance-two producer rule failed `func_002A7878`.
@@ -1730,7 +1730,7 @@ The private 89-case fixture history does not qualify every transfer in the game.
 
 Mfc1 is interlocked on R5900: the measured boot text had 88 immediate readers in
 47 functions; its only extra-nop example used handwritten VU code.
-[r5900_mfc1_interlock.py](../tools/compiler/transformers/r5900_mfc1_interlock.py)
+[r5900_mfc1_interlock.py](../../tools/compiler/transformers/r5900_mfc1_interlock.py)
 removes the MIPS-I coprocessor-load delay in append_insn for mfc1 only. Cfc2 and
 label padding are not waived. `func_002ED4B8` and `func_00290680` match at 28 places.
 
@@ -1744,14 +1744,14 @@ host-dependent. An assembler built on 3 November 2026 emitted `lui; addu; lbu`; 
 from the same sources on and after 8 November copied backwards and left the second word in the
 first slot (`lbu $2,0($2); addu; lbu`), so `func_00117278` (strtol, the -O0 unit that uses
 this form) and `func_00132498` stopped matching in `tools/build.py boot --strict` on those hosts.
-[convert_frag_memmove.py](../tools/compiler/transformers/convert_frag_memmove.py) makes the
-copy a `memmove`; [the test](../tests/test_convert_frag_memmove.py) assembles the two forms.
+[convert_frag_memmove.py](../../tools/compiler/transformers/convert_frag_memmove.py) makes the
+copy a `memmove`; [the test](../../tests/test_convert_frag_memmove.py) assembles the two forms.
 The 4/8-byte pairs overlap the same way; patch 0020 already rebuilds their first word, and
 that rebuild is kept unchanged.
 
 ### Labels on hazard nops
 
-[hazard_labels.py](../tools/compiler/transformers/hazard_labels.py) adds
+[hazard_labels.py](../../tools/compiler/transformers/hazard_labels.py) adds
 `-frac2-hazard-labels`: cc1 emits `.set rac2_hazard_labels`, and gas retains labels
 on the needed nop rather than moving them behind it, including the noreorder
 flush. This connects a per-file option to the assembler without patching output.
@@ -1770,16 +1770,16 @@ not the shipping assembler's identity. Witnesses: `func_L18_004308F0` (1,384/1),
 
 Compose these three mechanisms; none replaces the others:
 
-1. [neutralise_div_dslot.py](../tools/compiler/transformers/neutralise_div_dslot.py)
+1. [neutralise_div_dslot.py](../../tools/compiler/transformers/neutralise_div_dslot.py)
    keeps single-precision division/root operations out of compiler-selected delay
    slots. Retail had 0 of 19,806 div.s in slots, but 61 integer HI/LO divisions.
    Sqrt.s/rsqrt.s are extrapolated: neither occurred in that retail census and GNU
    as does not assemble rsqrt.s.
-2. [pad_div_erratum_nops.py](../tools/compiler/transformers/pad_div_erratum_nops.py)
+2. [pad_div_erratum_nops.py](../../tools/compiler/transformers/pad_div_erratum_nops.py)
    models a measured SN 3.01 two-slot incoming floor after code labels for div.s,
    sqrt.s and rsqrt.s. Needed hazard nops count toward it; labels stay on padding.
    Sync.p imposes one nop, unlike sync/sync.l.
-3. [pad_div_erratum_branch.py](../tools/compiler/transformers/pad_div_erratum_branch.py)
+3. [pad_div_erratum_branch.py](../../tools/compiler/transformers/pad_div_erratum_branch.py)
    extends the floor to branch groups: bc1t/ld/div.s gains two nops; one intervening
    instruction gains one, two gain none. Conditional/likely branches and b trigger
    it; j/jal/jr/jalr do not. Integer division is unaffected. It consumes the label
@@ -1803,7 +1803,7 @@ build changed one matched function, func_002C3280, whose C had the second call a
 the division in separate statements; retail has no padding there, so the division
 now sits in the call's statement (no line label between), which matches with and
 without the change. A division emitted inside a noreorder region still gets no new
-floor. [test_div_label_after_call.py](../tests/test_div_label_after_call.py) covers
+floor. [test_div_label_after_call.py](../../tests/test_div_label_after_call.py) covers
 the label, no-label and noreorder cases.
 
 Across a non-PIC GP relaxation fragment, the label-distance calculation follows
@@ -1813,7 +1813,7 @@ instructions. Thus a labelled GP load followed by `div.s` receives one nop,
 just like an explicit GP operand; an absolute two-word expansion receives none.
 Unknown forward symbols, alignment and unsupported fragment kinds retain the
 previous fallback. This is a bounded distance correction, not general relaxation
-or SDK equivalence. [test_div_gp_fragments.py](../tests/test_div_gp_fragments.py)
+or SDK equivalence. [test_div_gp_fragments.py](../../tests/test_div_gp_fragments.py)
 checks authored GP, absolute, two-load, `.word` and unknown-symbol controls. The
 previous assembler fails only the one-load GP macro control. The corresponding
 C witnesses are `func_L05_00419CC8` and `func_L00_00424F98`, at four and 27
@@ -1903,7 +1903,7 @@ form, and no compiled game code in the boot or any level loads a `.lit8` value (
 `lui $at`/`ld` pair reads the scratchpad in hand-written blocks). The SDK's objects pool:
 `func_0011C090` (libc's exponent formatter, SDK profile) loads 0.1 and 10.0 from `.lit8`
 and matches only that way. So the game code's form is the assembler's default:
-[inline_li_d.py](../tools/compiler/transformers/inline_li_d.py) takes the whole value for every
+[inline_li_d.py](../../tools/compiler/transformers/inline_li_d.py) takes the whole value for every
 `li.d` into a GPR on a 64-bit ISA (the `F` operand of M_LI_D) and builds it with load_register;
 FPR forms and 32-bit ISAs are unchanged. `--r5900-pool-li-d` restores the archive's pooling, and
 `tools/build.py` (`split_flags`) passes it to every unit of the SDK profile (`sdk` flags in
@@ -1911,7 +1911,7 @@ FPR forms and 32-bit ISAs are unchanged. `--r5900-pool-li-d` restores the archiv
 unit needs a switch. `--r5900-inline-li-d` states the default explicitly. An earlier default-on
 trial without the SDK opt-out broke `func_0011C090`. With the default, no matched function in
 any release compiled differently (`build.py all --strict`: us 28/28; pal and us2 only their
-known failures). [tests/test_inline_li_d.py](../tests/test_inline_li_d.py) checks the
+known failures). [tests/test_inline_li_d.py](../../tests/test_inline_li_d.py) checks the
 transformer, both profiles' words, and that only SDK units get the opt-out.
 
 Two sign-bit loads need a zero-extending seed. Patch 0059 exposes per-object
@@ -1984,7 +1984,7 @@ table+16. That address is past the 4-float table, so it is a separate retail
 object; the unit now names it `D_L00_001B0A80` (owner ruling 8 November 2026)
 and the forced-on sweep changes nothing. With every access through the SDATA
 alias, func_00294F10's coefficient loops and func_L01_003801B8's column
-pointers take retail's form. [tests/test_la_addend.py](../tests/test_la_addend.py)
+pointers take retail's form. [tests/test_la_addend.py](../../tests/test_la_addend.py)
 covers both profiles, unchanged loads/stores and invalid options.
 
 ## Reading output and identifying limits
@@ -2017,7 +2017,7 @@ addresses within an object, cross-object borrowing, overlapping claims, partial
 spans, and relocated/mixed pools are rejected. No generated section is rewritten;
 data credit is not inferred from placing it. Unsupported `.sdata` remains
 unplaceable. See
-[switch-table qualification and limits](MATCHING-BLOCKERS.md#blocker-06).
+[switch-table qualification and limits](../contributing/matching-blockers.md#blocker-06).
 
 A legacy table already in retail can use its measured symbol and computed goto;
 a static label-address array keeps legitimate arms in discarded data. That array
@@ -2039,33 +2039,33 @@ oracle, and a same-size draft screen is not a match or current progress.
 
 | Mechanism | Maintained controls |
 | --- | --- |
-| Zero folding/clear scheduling | [test_zero_ti_store.py](../tests/test_zero_ti_store.py) |
-| CSE edges/block order | [test_gcse_unsplit_edges.py](../tests/test_gcse_unsplit_edges.py), [test_keep_block_order.py](../tests/test_keep_block_order.py) |
-| gcse load kills | [test_gcse_store_kills_loads.py](../tests/test_gcse_store_kills_loads.py) |
-| Division-guard slot barrier | [test_trap_delay_barrier.py](../tests/test_trap_delay_barrier.py), [test_trap_redundant_barrier.py](../tests/test_trap_redundant_barrier.py) |
-| SDK assembler slot swaps | [test_swap_branch_slots.py](../tests/test_swap_branch_slots.py) |
-| Division label floor after a call | [test_div_label_after_call.py](../tests/test_div_label_after_call.py) |
-| No giv recombination | [test_no_recombine_givs.py](../tests/test_no_recombine_givs.py) |
-| Copies and RTL contract | [test_qcopy.py](../tests/test_qcopy.py), [test_qcopy_rtl.py](../tests/test_qcopy_rtl.py) |
-| Copy scheduling | [test_qcopy_barrier.py](../tests/test_qcopy_barrier.py) |
-| Annulled wide stores | [test_no_annulled_wide_stores.py](../tests/test_no_annulled_wide_stores.py) |
-| Stack por form | [test_zero_ti_por.py](../tests/test_zero_ti_por.py) |
-| TImode reload count | [test_ti_one_gpr.py](../tests/test_ti_one_gpr.py) |
-| Inheritance into non-spill registers | [test_reload_reg_used_guard.py](../tests/test_reload_reg_used_guard.py) |
-| Null-pointer-check pass | [test_no_null_pointer_checks.py](../tests/test_no_null_pointer_checks.py) |
-| Width-ordered quad saves | [test_narrow_saves_below.py](../tests/test_narrow_saves_below.py) |
-| 16-byte slots for TImode GPR saves | [test_wide_saves_below.py](../tests/test_wide_saves_below.py), [wide_saves_below.c](../tests/fixtures/wide_saves_below.c) |
-| Unflattened giv start | [test_mult_add_no_flatten.py](../tests/test_mult_add_no_flatten.py), [mult_add_no_flatten.c](../tests/fixtures/mult_add_no_flatten.c) |
-| Static-chain alias seed | [test_no_static_chain_base.py](../tests/test_no_static_chain_base.py), [no_static_chain_base.c](../tests/fixtures/no_static_chain_base.c) |
-| Integer words stored into floats | [test_keep_float_pun_source.py](../tests/test_keep_float_pun_source.py), [keep_float_pun_source.c](../tests/fixtures/keep_float_pun_source.c) |
-| Extra biv increments | [test_no_extra_increment_givs.py](../tests/test_no_extra_increment_givs.py), [no_extra_increment_givs.c](../tests/fixtures/no_extra_increment_givs.c) |
-| Sticky volatile sets (default) | [test_sticky_volatile_sets.py](../tests/test_sticky_volatile_sets.py), [sticky_volatile_sets.c](../tests/fixtures/sticky_volatile_sets.c) |
-| Masks/sign seed | [test_dli_masks.py](../tests/test_dli_masks.py) |
-| Inline li.d into GPRs | [test_inline_li_d.py](../tests/test_inline_li_d.py) |
-| Hazard labels | [test_hazard_labels.py](../tests/test_hazard_labels.py), [hazard_labels.s](../tests/fixtures/hazard_labels.s) |
-| Block-move loop padding | [test_block_move_loop.py](../tests/test_block_move_loop.py) |
-| Quadword block moves | [test_block_move_quad.py](../tests/test_block_move_quad.py) |
-| Asm-word loop padding | [test_count_asm_words.py](../tests/test_count_asm_words.py) |
+| Zero folding/clear scheduling | [test_zero_ti_store.py](../../tests/test_zero_ti_store.py) |
+| CSE edges/block order | [test_gcse_unsplit_edges.py](../../tests/test_gcse_unsplit_edges.py), [test_keep_block_order.py](../../tests/test_keep_block_order.py) |
+| gcse load kills | [test_gcse_store_kills_loads.py](../../tests/test_gcse_store_kills_loads.py) |
+| Division-guard slot barrier | [test_trap_delay_barrier.py](../../tests/test_trap_delay_barrier.py), [test_trap_redundant_barrier.py](../../tests/test_trap_redundant_barrier.py) |
+| SDK assembler slot swaps | [test_swap_branch_slots.py](../../tests/test_swap_branch_slots.py) |
+| Division label floor after a call | [test_div_label_after_call.py](../../tests/test_div_label_after_call.py) |
+| No giv recombination | [test_no_recombine_givs.py](../../tests/test_no_recombine_givs.py) |
+| Copies and RTL contract | [test_qcopy.py](../../tests/test_qcopy.py), [test_qcopy_rtl.py](../../tests/test_qcopy_rtl.py) |
+| Copy scheduling | [test_qcopy_barrier.py](../../tests/test_qcopy_barrier.py) |
+| Annulled wide stores | [test_no_annulled_wide_stores.py](../../tests/test_no_annulled_wide_stores.py) |
+| Stack por form | [test_zero_ti_por.py](../../tests/test_zero_ti_por.py) |
+| TImode reload count | [test_ti_one_gpr.py](../../tests/test_ti_one_gpr.py) |
+| Inheritance into non-spill registers | [test_reload_reg_used_guard.py](../../tests/test_reload_reg_used_guard.py) |
+| Null-pointer-check pass | [test_no_null_pointer_checks.py](../../tests/test_no_null_pointer_checks.py) |
+| Width-ordered quad saves | [test_narrow_saves_below.py](../../tests/test_narrow_saves_below.py) |
+| 16-byte slots for TImode GPR saves | [test_wide_saves_below.py](../../tests/test_wide_saves_below.py), [wide_saves_below.c](../../tests/fixtures/wide_saves_below.c) |
+| Unflattened giv start | [test_mult_add_no_flatten.py](../../tests/test_mult_add_no_flatten.py), [mult_add_no_flatten.c](../../tests/fixtures/mult_add_no_flatten.c) |
+| Static-chain alias seed | [test_no_static_chain_base.py](../../tests/test_no_static_chain_base.py), [no_static_chain_base.c](../../tests/fixtures/no_static_chain_base.c) |
+| Integer words stored into floats | [test_keep_float_pun_source.py](../../tests/test_keep_float_pun_source.py), [keep_float_pun_source.c](../../tests/fixtures/keep_float_pun_source.c) |
+| Extra biv increments | [test_no_extra_increment_givs.py](../../tests/test_no_extra_increment_givs.py), [no_extra_increment_givs.c](../../tests/fixtures/no_extra_increment_givs.c) |
+| Sticky volatile sets (default) | [test_sticky_volatile_sets.py](../../tests/test_sticky_volatile_sets.py), [sticky_volatile_sets.c](../../tests/fixtures/sticky_volatile_sets.c) |
+| Masks/sign seed | [test_dli_masks.py](../../tests/test_dli_masks.py) |
+| Inline li.d into GPRs | [test_inline_li_d.py](../../tests/test_inline_li_d.py) |
+| Hazard labels | [test_hazard_labels.py](../../tests/test_hazard_labels.py), [hazard_labels.s](../../tests/fixtures/hazard_labels.s) |
+| Block-move loop padding | [test_block_move_loop.py](../../tests/test_block_move_loop.py) |
+| Quadword block moves | [test_block_move_quad.py](../../tests/test_block_move_quad.py) |
+| Asm-word loop padding | [test_count_asm_words.py](../../tests/test_count_asm_words.py) |
 
 Copy controls cover volatile/unaligned/scalar/quadword memory, calls, integer/FP
 branches, loop placement and complete pairs outside slots. Clear controls cover
@@ -2094,6 +2094,6 @@ neutrality does not prove that enabling an option in another unit is safe.
 Final acceptance is tools/build.py with --strict for every affected program: all
 C placements accepted and every loaded byte, segment property and entry point
 equal to the matching private reference. Check every applicable release under
-VERSIONS.md. Progress consistency uses --check; regeneration is separate.
+versions.md. Progress consistency uses --check; regeneration is separate.
 Keep unresolved attempts and reopening evidence in nonmatching/ and the shared
 blocker document, rather than appending session diaries here.

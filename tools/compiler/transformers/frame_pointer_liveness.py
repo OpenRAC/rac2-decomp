@@ -25,7 +25,7 @@ the r5900").
 The option is off by default, enabled per unit in config/cflags.txt, and
 -fno-rac2-frame-pointer-liveness disables it again. tests/test_frame_pointer_liveness.py covers
 the anchors, the default/disabled equality, the un-annulled slot and controls.
-See docs/COMPILER-NOTES.md.
+See docs/build/compiler-notes.md.
 
 Usage: frame_pointer_liveness.py <gcc source directory>   (the one holding toplev.c)
 """

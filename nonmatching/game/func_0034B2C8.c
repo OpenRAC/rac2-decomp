@@ -99,7 +99,7 @@
 /* 7 November 2026: compile as its own unit (src/game/0034B2C8.c) with -O2 -G0 -ffunction-sections
  * -frac2-keep-float-pun-source. 6048 of 6048 bytes, 1508 of 1512 instructions aligned, 12 words differ
  * in place, 0 of 28 places. All 16 colours are right with the one helper hud_bits_34B2C8, the double-use
- * colours and 0x1EFF included (docs/COMPILER-NOTES.md), and the spill slots and FPR numbers follow. The two
+ * colours and 0x1EFF included (docs/build/compiler-notes.md), and the spill slots and FPR numbers follow. The two
  * items left are not colours. In both, sched2 puts a set of a saved register into a jal slot where retail
  * has the store that reads the old value there, and the set after the jal:
  *   1. before func_00335F20: ours `sw $s5,0x48($sp); sw $v1,0x30($sp); jal; move $s5,$0`,

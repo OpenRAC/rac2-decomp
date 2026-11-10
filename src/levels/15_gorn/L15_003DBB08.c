@@ -1,6 +1,6 @@
 /* func_L15_003DBB08 (5,824 bytes), ported from its twin func_L02_003CB0F0. The last spot, in case 11, was
  * D_L15_001B2148's absolute macro read (lui $v1; lw $v1 in one register, before the sra of
- * self): the sda incomplete-array declaration at -G0 gives it (docs/COMPILER-NOTES.md), and
+ * self): the sda incomplete-array declaration at -G0 gives it (docs/build/compiler-notes.md), and
  * retail compares the table value first.
  * The shape (big13): case bodies of the second switch in jump-table address order;
  * every state change written out per arm (retail cross-jumps the func_002A7750 tails); hero

@@ -2,7 +2,7 @@
  * of its own for -frac2-frame-pointer-liveness and -frac2-no-static-chain-base (config/cflags.txt):
  * the first deletes a dead `lui $fp`; without the second the table base in $v0 has no alias base
  * after reload, so every store depends on the prologue's saves and sched2 issues them at the top,
- * where retail has them among the stores (docs/COMPILER-NOTES.md). */
+ * where retail has them among the stores (docs/build/compiler-notes.md). */
 extern void func_002B9288();
 extern void func_002B9380();
 extern void func_002BA6A0();

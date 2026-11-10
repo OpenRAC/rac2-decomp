@@ -14,7 +14,7 @@
    -frac2-no-null-pointer-checks
    (the quadword clears' zero in $a0 is the compiler's one-GPR TImode reload);
    -frac2-hazard-labels         branch targets on the mtc1 hazard nops.
-   See docs/COMPILER-NOTES.md for each option.
+   See docs/build/compiler-notes.md for each option.
 
    Stack: retail keeps the 0x20-byte vector at 0x20/0x40/0x30 and the matrix at 0x80 in
    case 0x2B, so that case uses v20, v40, v30 and m80 (v70 only reserves the 0x70 slot). */

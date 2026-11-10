@@ -29,7 +29,7 @@ differently with the barrier.
 
 The backward scan of fill_simple_delay_slots now stops at a TRAP_IF insn, as it stops at a
 jump. tests/test_trap_delay_barrier.py covers the transformer and the compiler output; see
-docs/COMPILER-NOTES.md.
+docs/build/compiler-notes.md.
 
 Usage: trap_delay_barrier.py <gcc/reorg.c>
 """

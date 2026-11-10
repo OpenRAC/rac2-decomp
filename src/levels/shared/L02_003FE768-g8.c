@@ -1,6 +1,6 @@
 /* func_L02_003FE768: the boss health bar (shared by Maktar and Joba).
  * Own -G8 unit. Each screen edge is rounded into t and converted in a one-pass group
- * (docs/COMPILER-NOTES.md, source methods shared with RAC1): the group's loop notes keep
+ * (docs/build/compiler-notes.md, source methods shared with RAC1): the group's loop notes keep
  * the D_001A7B90 mode load after the conversions, as retail schedules it. Without the
  * groups the load is hoisted across them (0 of 2 places).
  */

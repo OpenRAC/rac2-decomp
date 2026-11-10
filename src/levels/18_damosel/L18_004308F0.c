@@ -4,7 +4,7 @@
    the compare its other path already made, so a forward branch reaches the join label
    between that c.le.s and its bc1fl. Retail keeps the label on the hazard nop the assembler
    inserts there; GNU as without the switch moves it behind the nop, and the bc1f at +0xE4
-   lands one word late (docs/COMPILER-NOTES.md, labels in front of the hazard nop). */
+   lands one word late (docs/build/compiler-notes.md, labels in front of the hazard nop). */
 
 typedef unsigned char u8;
 typedef unsigned short u16;

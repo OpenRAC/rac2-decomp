@@ -6,7 +6,7 @@ are directly followed by an instruction that reads their target, and the only mf
 before such a reader is in a hand-written VU0 routine (func_00283248). This assembler gave
 every mfc1 the load delay of the MIPS I coprocessor move, so no function with that pair could
 match from C. Only mfc1 is exempted: cfc2, the other move measured, has the nop in retail
-(docs/COMPILER-NOTES.md, the mfc1 interlock)."""
+(docs/build/compiler-notes.md, the mfc1 interlock)."""
 import sys
 from pathlib import Path
 

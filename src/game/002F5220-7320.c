@@ -1,4 +1,4 @@
-/* func_002F7320: needs -frac2-keep-block-zero-copy (cse keeps `i = result`); see docs/COMPILER-NOTES.md. */
+/* func_002F7320: needs -frac2-keep-block-zero-copy (cse keeps `i = result`); see docs/build/compiler-notes.md. */
 #include "common.h"
 
 typedef struct {

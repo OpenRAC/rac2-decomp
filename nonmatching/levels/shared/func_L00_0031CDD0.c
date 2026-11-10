@@ -5,7 +5,7 @@
      retail  jal func_00282E20 ; daddu $a0,$sp,$zero ; nop ; nop ; div.s $f4,$f0,$f20
      ours    jal func_00282E20 ; daddu $a0,$sp,$zero ; div.s $f4,$f0,$f20
    cc1's .s emits no marker at all there (`div.s` directly after the delay slot), so this
-   is the division-padding hole described in docs/COMPILER-NOTES.md item (4): the retail
+   is the division-padding hole described in docs/build/compiler-notes.md item (4): the retail
    two-`nop` runs at a division site that the SDK 3.01 assembler does not produce from
    that sequence, i.e. compiler-emitted and not recovered by this lot.
    Meaning of the body (for a future pass): buf = a - b (0x00282CF0), t = |buf|

@@ -15,7 +15,7 @@
    The body proper is the 272 bytes from 03:003564D0 and 19:00352E28. The
    same body is the level 00 row func_L00_00354DF8 (272 bytes at 00:00354DF8),
    whose extent the catalogue already starts after the same 16-byte prefix -
-   docs/LEVELS.md names that correction ("00354DE8 to 00354DF8") among the
+   docs/build/levels.md names that correction ("00354DE8 to 00354DF8") among the
    three measured Aranos entries. The two rows here carry the prefix, so they
    are 16 bytes too long and start 16 bytes too early.
 

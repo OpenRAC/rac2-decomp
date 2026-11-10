@@ -8,7 +8,7 @@ Build the game's programs and compare them with the retail ones.
   python3 tools/build.py all              # the boot and all 27
   python3 tools/build.py all --jobs 12    # that many programs at once (default: half the cores, at most 8)
   python3 tools/build.py all --strict     # release check: also reject any C falling back to assembly
-  python3 tools/build.py all --version pal  # another release (pal, us2): build/<version>/, docs/VERSIONS.md
+  python3 tools/build.py all --version pal  # another release (pal, us2): build/<version>/, docs/build/versions.md
 
 Each program is disassembled with splat into build/<program>/asm/, converted for SN
 ProDG 2.0's assembler (tools/expand_asm.py) and assembled with it; the C in src/ is
@@ -18,7 +18,7 @@ the segments and the entry point are compared with the retail program's. A progr
 that differs stops the build.
 
 Inputs: baserom/ (tools/levels.py dump), toolchain/sn-prodg-2.0/ee/bin/{Ps2EeAs,ld}.exe
-and build/compiler/tools/{cpp,cc1,as} (docs/BUILDING.md). The Windows tools run through
+and build/compiler/tools/{cpp,cc1,as} (docs/build/building.md). The Windows tools run through
 $RAC2_WINE (default `wine`; `{cwd}` is replaced by the directory they run in), the
 32-bit Linux compiler through $RAC2_LINUX (default: directly).
 
@@ -257,7 +257,7 @@ def split_flags(flags: str) -> tuple[list[str], list[str]]:
     Both frontends stop at assembly, so standard -Wa, options are forwarded here. SDK units
     (flags starting with "sdk") also get --r5900-pool-li-d: the SDK's objects pool li.d
     constants in .lit8, while the game code builds them inline, the assembler's default
-    (docs/COMPILER-NOTES.md, "Double constants in general registers")."""
+    (docs/build/compiler-notes.md, "Double constants in general registers")."""
     compiler_args, assembler_args = [], []
     sdk = flags.startswith("sdk")
     if sdk:

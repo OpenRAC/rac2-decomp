@@ -3,7 +3,7 @@
  * own for -fno-rerun-loop-opt and -frac2-no-extra-increment-givs (config/cflags.txt): every loop
  * advances its cursor several times per iteration and retail keeps each increment, as GCC 2.95's
  * strength reduction does, where this tree's default turns all but the last into givs
- * (docs/COMPILER-NOTES.md). The two D_001A6860 loops index q[n] with n++ after each store, so
+ * (docs/build/compiler-notes.md). The two D_001A6860 loops index q[n] with n++ after each store, so
  * the cursor is a reduced giv of n whose init comes last in the pre-header; the other five use
  * *p++. */
 typedef unsigned int u128_FAB40 __attribute__((mode(TI)));

@@ -1,5 +1,5 @@
 /* func_L20_0039F968 is a unit of its own: the history-copy loop needs -frac2-mult-add-no-flatten
-   (docs/COMPILER-NOTES.md) so its source cursor keeps retail's i*400 + (D - 16) grouping. */
+   (docs/build/compiler-notes.md) so its source cursor keeps retail's i*400 + (D - 16) grouping. */
 #include "common.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;

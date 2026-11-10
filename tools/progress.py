@@ -411,8 +411,8 @@ def release_check(version: str, report_path: Path) -> None:
 
 
 def release_table(version: str, report: dict) -> None:
-    """The release's line in docs/VERSIONS.md's table of totals."""
-    doc = ROOT / "docs/VERSIONS.md"
+    """The release's line in docs/build/versions.md's table of totals."""
+    doc = ROOT / "docs/build/versions.md"
     if not doc.is_file():
         return
     m = report["measures"]
@@ -455,7 +455,7 @@ def sync_check() -> None:
                     problems.append(f"{a} and {b} disagree on {len(one)} function(s) both have, e.g. {', '.join(one[:6])}")
     if problems:
         sys.exit("the releases' reports are out of step (rebuild every release and regenerate "
-                 "every report: docs/VERSIONS.md):\n  " + "\n  ".join(problems))
+                 "every report: docs/build/versions.md):\n  " + "\n  ".join(problems))
     print(f"the reports of {', '.join(status)} agree on every function they share")
 
 

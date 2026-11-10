@@ -5,7 +5,7 @@
 
 1. config/levels/functions.tsv and config/boot/functions.tsv parse: right column count,
    unique names, kinds in {boot, shared, level}, places NN:XXXXXXXX of a known level; so do
-   the other releases' (config/pal/, config/us2/: docs/VERSIONS.md).
+   the other releases' (config/pal/, config/us2/: docs/build/versions.md).
 2. Every function of the two catalogues appears in src/**/*.c exactly once, as its C or as an
    INCLUDE_ASM marker (rac1-decomp's layout), and nothing else does. A release's own functions
    (func_PAL_..., func_US2_...) are in its src/<version>/ and only there; every other function
@@ -197,7 +197,7 @@ def check_hygiene(errors: list) -> None:
         reports = {v["report"] for v in levels.VERSIONS.values()}
         if f.startswith("progress/") and f not in reports:
             errors.append(f"{f}: progress/ holds only the releases' report.json, written by tools/progress.py")
-        if path.is_file() and path.stat().st_size > MAX_BYTES and f != "assets/rac2-logo.png":
+        if path.is_file() and path.stat().st_size > MAX_BYTES:
             errors.append(f"{f}: {path.stat().st_size} bytes; generated data stays out of git")
         if f.startswith("src/") and f.endswith((".c", ".h")):
             text = path.read_text(errors="replace")

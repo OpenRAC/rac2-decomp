@@ -7,7 +7,7 @@
    Bordered text panel: background box, six border pieces, then the text lines.
    The border offsets are per-program records (ref_ names); 0x1D0 is a float field.
    Retail reaches the offset table's x column through $gp and its y column as an absolute address,
-   so the table has two names, as in other mixed GP/absolute accesses (docs/COMPILER-NOTES.md). */
+   so the table has two names, as in other mixed GP/absolute accesses (docs/build/compiler-notes.md). */
 typedef struct { float x, y; } BorderOffset_00338AD8;
 typedef struct { int x, y; } TextOffset_00338AD8;
 extern BorderOffset_00338AD8 ref_00338AD8_00;

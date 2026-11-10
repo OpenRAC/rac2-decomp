@@ -20,7 +20,7 @@
    -frac2-no-null-pointer-checks
    (the quadword clears' zero in $a0 is the compiler's one-GPR TImode reload);
    -frac2-hazard-labels         branch targets on the mtc1 hazard nops.
-   See docs/COMPILER-NOTES.md for each option. */
+   See docs/build/compiler-notes.md for each option. */
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));

@@ -7,7 +7,7 @@
 
    What the last differences needed (they apply to the family):
    - case 0x32: retail loads 0x1B4 again for the 1/30 test after the 0xC20 store, which is
-     gcse letting every store kill every load (docs/COMPILER-NOTES.md), not anything in the C;
+     gcse letting every store kill every load (docs/build/compiler-notes.md), not anything in the C;
    - case 0x1: one local per call result (anim0 / anim), giving retail's v0 -> a0 copy order;
    - case 0x7B: `flag = 0; if (348 != 0) flag = 1;` with literal constants, so jump.c keeps
      (eq ? 0 : 1) and reload ties the 1 (retail's daddu a0,a1 + movz a0,$zero);
@@ -19,7 +19,7 @@
    The unit's flags (config/cflags.txt): -G16 -Wa,-G16 for the 16-byte sda records,
    -frac2-zero-ti-por, -frac2-qcopy -frac2-qcopy-barrier for the 128-bit copies,
    -frac2-hazard-labels for the branches onto compare hazard nops (0x002CBEE8, 0x002CEA94).
-   See docs/COMPILER-NOTES.md for each option. */
+   See docs/build/compiler-notes.md for each option. */
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));

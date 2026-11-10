@@ -8,7 +8,7 @@
 extern int D_L01_001AEC38 __attribute__((sda));
 
 /* The level's mode word: one read, which reorg copies into a branch delay slot ($gp form there)
-   and the fall-through keeps as the absolute macro (docs/COMPILER-NOTES.md, MACRO_ADDR). */
+   and the fall-through keeps as the absolute macro (docs/build/compiler-notes.md, MACRO_ADDR). */
 extern int D_L01_001B2088 MACRO_ADDR;
 
 /* The one-shot flag byte, absolute: retail leaves the preceding bgtz slot empty, so cc1 must not

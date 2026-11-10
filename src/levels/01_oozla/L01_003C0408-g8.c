@@ -4,7 +4,7 @@
    it over the height store, the height temporary takes $f0 as in retail, and the
    -1000 fallback's store (through $f1) is not cross-jumped with it.
    -frac2-hazard-labels keeps the forward branch into the division on its hazard nop
-   (docs/COMPILER-NOTES.md, Labels on hazard nops). */
+   (docs/build/compiler-notes.md, Labels on hazard nops). */
 #include "common.h"
 
 extern float func_00282E80(void *, void *);
@@ -26,7 +26,7 @@ typedef struct {
 } L01ArenaRow;
 
 /* The table pointer, read with retail's absolute macro load at each use
-   (docs/COMPILER-NOTES.md, incomplete sda array read as element 0). */
+   (docs/build/compiler-notes.md, incomplete sda array read as element 0). */
 extern L01ArenaRow *D_L01_001B264C[] __attribute__((sda));
 extern float D_L01_001AFED0 __attribute__((sda));
 

@@ -16,6 +16,46 @@ from the game comes from your own disc; nothing game-derived is committed.
 - An x86-64 Linux environment with 32-bit support (`gcc -m32`) for the compilers, and Wine
   for the SN tools.
 
+## Get the SN tools
+
+Both come from public mirrors of SN Systems' ProDG for PS2: the assembler from 2.0, the
+linker from 3.01. `toolchain/` is in `.gitignore`.
+
+Make the folder:
+
+```sh
+mkdir -p toolchain/sn-prodg-2.0/ee/bin
+```
+
+The assembler, `ps2eeas.exe` from ProDG 2.0:
+
+```sh
+curl -L -o /tmp/sn20.tar.gz https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_2.0/releases/download/1/eegcc_sn_v2.73a.tar.gz
+```
+```sh
+tar xzf /tmp/sn20.tar.gz -O ee/bin/ps2eeas.exe > toolchain/sn-prodg-2.0/ee/bin/Ps2EeAs.exe
+```
+
+The linker, `ld.exe` from ProDG 3.01:
+
+```sh
+curl -L -o /tmp/sn301.tar.gz https://github.com/AngheloAlf/SN-Systems-ProDG_for_PS2_3.01/releases/download/1/eegcc_2.95.3_sn_v1.36.tar.gz
+```
+```sh
+tar xzf /tmp/sn301.tar.gz -O ee/bin/ld.exe > toolchain/sn-prodg-2.0/ee/bin/ld.exe
+```
+
+Check both files:
+
+```sh
+sha256sum toolchain/sn-prodg-2.0/ee/bin/*.exe
+```
+
+| File | SHA-256 |
+| --- | --- |
+| `Ps2EeAs.exe` | `c839dd63facabe7b76573c114056be61eaa7b3aa2329dd546930ab8f98898c76` |
+| `ld.exe` | `80f3724a63ce3c77c8b00d075f5c49448636518700ae251e5d6a6c809bbf5f48` |
+
 ## Steps
 
 ```sh
@@ -107,6 +147,17 @@ RAC2_LINUX="docker exec rac2-gnu" RAC2_WINE="docker exec -w {cwd} rac2-wine wine
 `RAC2_LINUX` prefixes the compiler commands and `RAC2_WINE` the SN tools (`{cwd}` becomes the
 directory they run in). On x86-64 Linux with Wine and `gcc -m32`, neither is needed.
 
+### Container notes
+
+- `run.sh` uses podman if installed, else docker. It uses a local `rac2-build:latest` image,
+  else pulls `ghcr.io/openrac/rac2-build`, else builds `tools/docker/Dockerfile` (about 15
+  minutes).
+- The image has Python 3.11, and `tools/build.py` needs 3.12. Until that is fixed, run Python
+  on the host and only the tools in the container (the faster split above), or add Python 3.12
+  to the image.
+- With SELinux (Fedora, RHEL) the container cannot read the mounted repository. Add
+  `--security-opt label=disable` to the `run` line, or relabel the mount.
+
 ## CI
 
 `.github/workflows/checks.yml` runs the tool tests and the repository check;
@@ -120,7 +171,7 @@ no SN tools, so the build is run locally and its result committed.
 
 - **The game's code**: GNU EE-GCC 2.9-ee-991111b rebuilt from its public source with
   Lombyte's patch stack and the transformers this project measured
-  ([tools/compiler/](../tools/compiler/README.md)). The build stops unless the pinned modified
+  ([tools/compiler/](../../tools/compiler/README.md)). The build stops unless the pinned modified
   sources hash as recorded; the binaries' own hashes depend on the host, so a compiler is
   checked by its output.
 - **The boot's SDK units** (the `src/core/` files `config/cflags.txt` marks `sdk`): Sony EE-GCC 2.9-ee-991111-01, unmodified, from

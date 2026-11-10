@@ -3,7 +3,7 @@
 /* func_L00_0041A490 is a unit of its own: it needs the debug profile (-g, config/cflags.txt).
    The line labels cc1 emits with -g ($LM) are code labels, and a code label right in front of
    a `div.s` is what the assembler's division floor needs to add retail's two nops before the
-   division (docs/COMPILER-NOTES.md, the division-erratum section). The float division is
+   division (docs/build/compiler-notes.md, the division-erratum section). The float division is
    therefore a statement of its own, so the label lands on the `div.s`. */
 
 typedef int s32;

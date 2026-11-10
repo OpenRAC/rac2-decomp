@@ -7,7 +7,7 @@
 
    The row y values go through the HUD label helpers (label_y, label_y3, MenuSpriteY); their tests
    have no effect on the result. Each do-while(0) group holds real statements (allowed,
-   docs/COMPILER-NOTES.md); it ends the scheduling block after the reward row's y. */
+   docs/build/compiler-notes.md); it ends the scheduling block after the reward row's y. */
 
 extern f32 func_00283CE0(s32);
 extern s32 func_00283CF0(f32);

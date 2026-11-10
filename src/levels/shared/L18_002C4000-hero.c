@@ -1,7 +1,7 @@
 /* func_L18_002C4000 (496 bytes, 3 places: levels 18, 19 and 20), in its own unit for the hero
  * union view: the hero's fixed-address fields are read through one based register. The last
  * beqz (the % 6 test) reaches the epilogue's ld $s0 through the division-guard barrier on
- * reorg's redundant-insn search (docs/COMPILER-NOTES.md, "a division guard ends the
+ * reorg's redundant-insn search (docs/build/compiler-notes.md, "a division guard ends the
  * redundant-insn search"). */
 #include "common.h"
 typedef unsigned int TI128 __attribute__((mode(TI)));

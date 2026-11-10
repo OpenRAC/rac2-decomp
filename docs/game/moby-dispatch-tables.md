@@ -80,7 +80,7 @@ The retail camera identifier set (`0,3,4,5,6,7,17,19,20,23,24,25,26,27`)
 contains the prototype's set exactly, plus `20`; camera transfer rests on that set equality
 and on the record layout, not on the pair control above, which is moby-specific.
 
-The data is in **`docs/moby-dispatch.tsv`** —
+The data is in **`docs/game/moby-dispatch.tsv`** —
 `table · level · id · role · address · aux · proposed_name · source · class_label · class_label_source · class_label_basis` — with virtual addresses
 as they appear in the overlay ELF. A tool that loads an overlay at file offset rather than at
 its virtual address must translate first.
@@ -229,7 +229,7 @@ For example, run this Python code from the repository root to generate the looku
 import csv
 from pathlib import Path
 
-with Path("docs/moby-dispatch.tsv").open(encoding="utf-8", newline="") as stream:
+with Path("docs/game/moby-dispatch.tsv").open(encoding="utf-8", newline="") as stream:
     labels = {int(r["id"]): r["class_label"] for r in csv.DictReader(stream, delimiter="\t")
               if r["table"] == "moby" and r["class_label_basis"] == "ps2-source"}
 Path("build").mkdir(exist_ok=True)
@@ -246,7 +246,7 @@ does not verify it. Keep the complete set in the one TSV, with its basis intact.
 - **Not designer names.** `UpdateMoby_3032` states a moby class, not a creature. The sourced
   community labels above describe classes or equipment models, not the full behaviour of
   their handlers. Assert-message evidence is a separate source of semantic information
-  (see [`ASSERT-MESSAGE-NAMES.md`](ASSERT-MESSAGE-NAMES.md)).
+  (see [`assert-message-names.md`](assert-message-names.md)).
 - **Not boot code.** Crossing all 5,788 handlers with the boot bodies this project has
   mapped into the levels (82 per level in `config/level-catalog.json`, 288 in the wider
   prefix survey) gives **zero overlap**. The dispatch tables point at level-local code —
@@ -256,7 +256,7 @@ does not verify it. Keep the complete set in the one TSV, with its basis intact.
 
 ## Applying the names
 
-`tools/ghidra/ApplyMobyNames.java` is a Ghidra script: it reads `docs/moby-dispatch.tsv`
+`tools/ghidra/ApplyMobyNames.java` is a Ghidra script: it reads `docs/game/moby-dispatch.tsv`
 and names the functions of the overlay currently open, taking the level name as its first
 argument. It builds both address candidates from the ELF section table on disk (virtual
 address and file offset, because an overlay may have been imported either way), leaves an

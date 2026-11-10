@@ -26,7 +26,7 @@ only with -frac2-zero-ti-barrier for a measured compilation unit in config/cflag
 The option does not change the separate zero-folding pass. Default output remains unchanged;
 the opt-in witness func_L00_003BFF68 matches at all 12 placements. Compiler regression tests
 cover the selector, call/branch boundaries, shared clears, displacement controls and disabling
-the option again. See docs/COMPILER-NOTES.md for the evidence and limits.
+the option again. See docs/build/compiler-notes.md for the evidence and limits.
 
 Usage: zero_ti_store_barrier.py <gcc/haifa-sched.c>
 """

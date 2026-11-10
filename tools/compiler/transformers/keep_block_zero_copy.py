@@ -19,7 +19,7 @@ same-block limit leaves func_00349680 (jump1's duplicated loop-exit copy `lo = h
 The option is off by default, enabled per unit in config/cflags.txt, and
 -fno-rac2-keep-block-zero-copy disables it again. tests/test_keep_block_zero_copy.py covers
 the anchors, the default/disabled equality, the kept copy and a cross-block control.
-See docs/COMPILER-NOTES.md.
+See docs/build/compiler-notes.md.
 
 Usage: keep_block_zero_copy.py <gcc source directory>   (the one holding toplev.c)
 """
