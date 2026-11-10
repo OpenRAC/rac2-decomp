@@ -934,7 +934,7 @@ int func_002CBA58(int mode)
 
 /* func_002CBAE0 is defined in 002C7748-g8.c. */
 
-INCLUDE_ASM("asm/game", func_002CBC58);
+/* func_002CBC58 is in 002C7748-panels-g8.c. */
 
 int func_002CC490(int a0)
 {

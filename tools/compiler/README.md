@@ -47,6 +47,10 @@ The retail code was built with GNU EE-GCC 2.9-ee-991111b. `build.sh` rebuilds it
   each half in `.lit8`, as the game's own code does; this is the default. The SDK objects
   pool, so `tools/build.py` passes the opt-out `--r5900-pool-li-d` to every `sdk`-profile unit
   (docs/COMPILER-NOTES.md).
+  `convert_frag_memmove.py` makes md_convert_frag slide the chosen macro variant with
+  memmove: the absolute form of a base-register load (12 bytes) overlaps the `$gp` form it
+  replaces (8 bytes), and a host memcpy that copies backwards lost its `lui`
+  (func_00117278; docs/COMPILER-NOTES.md, "Overlapping variants in md_convert_frag").
   `no_recombine_givs.py` drops strength_reduce's call to `recombine_givs` (loop.c), as the
   gcc-2.95 release branch did, so address givs stay on the giv combine_givs chose, as in
   retail; it is unconditional too. `no_extra_increment_givs.py` adds the opt-in

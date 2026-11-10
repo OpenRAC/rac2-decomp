@@ -1734,6 +1734,21 @@ Mfc1 is interlocked on R5900: the measured boot text had 88 immediate readers in
 removes the MIPS-I coprocessor-load delay in append_insn for mfc1 only. Cfc2 and
 label padding are not waived. `func_002ED4B8` and `func_00290680` match at 28 places.
 
+### Overlapping variants in md_convert_frag
+
+A relaxable macro keeps its `$gp` form in the frag and its absolute form behind it;
+`md_convert_frag` slides the absolute form down with `memcpy (fixptr - old, fixptr, new)`.
+For a load or store with a base register and a symbol of unknown size
+(`lbu $2,_ctype_+1($18)`), `old` is 8 and `new` is 12, so the ranges overlap: undefined, and
+host-dependent. An assembler built on 3 November 2026 emitted `lui; addu; lbu`; the ones built
+from the same sources on and after 8 November copied backwards and left the second word in the
+first slot (`lbu $2,0($2); addu; lbu`), so `func_00117278` (strtol, the -O0 unit that uses
+this form) and `func_00132498` stopped matching in `tools/build.py boot --strict` on those hosts.
+[convert_frag_memmove.py](../tools/compiler/transformers/convert_frag_memmove.py) makes the
+copy a `memmove`; [the test](../tests/test_convert_frag_memmove.py) assembles the two forms.
+The 4/8-byte pairs overlap the same way; patch 0020 already rebuilds their first word, and
+that rebuild is kept unchanged.
+
 ### Labels on hazard nops
 
 [hazard_labels.py](../tools/compiler/transformers/hazard_labels.py) adds

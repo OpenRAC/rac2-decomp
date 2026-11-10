@@ -1923,6 +1923,20 @@ zero: r = 0; return r;
 
 That keeps `bnez` + `addiu $2,zero,1` + `daddu $2,zero,$zero` where `if/else`, two `return`s and the ternary all collapse to `sltu`. It matched a body first try.
 
+**9 November 2026, local match (`func_002CBC58`, 2,100 bytes, 28/28 USA v1.01; strict build with the commit):**
+a selection that retail keeps as `x = 0` at entry plus a later `movn` cannot survive a conditional move
+formed by the jump pass after cse1: gcse's cprop puts the entry constant into its keep operand (`movz`,
+and the entry zero is deleted). Any def of `x` that reads `x` is folded the same way. The pass order is
+the lever (toplev.c, jump.c): cse1, `delete_trivially_dead_insns`, jump, gcse, loop, then
+`jump_optimize (..., JUMP_AFTER_REGSCAN)`, which is the only jump pass that first deletes sets of
+registers used nowhere else, then cse2. `BRANCH_COST` is 1 here, so the "t = exp; if (...) x = t" hoists
+are off and only a one-insn arm becomes a cmov. An arm of two insns that cprop reduces to one is
+therefore converted after constant propagation:
+`if (page) { panels = page->panels; panels = (T)((char *)panels + none); }` with a set-once `none = 0`
+(owner ruling). cprop makes the add a no-op, the pre-cse2 jump forms the cmov and the entry zero stays.
+The reverse order of the two statements, a dead store before the assignment and `&panels[first]` do not
+close (38 rows or other sizes).
+
 <a id="blocker-17"></a>
 
 ## 17. A 128-bit zero: por plus sq against sq zero
