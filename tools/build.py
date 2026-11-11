@@ -816,7 +816,7 @@ def split_table_data(text: str, tables: dict[int, tuple[int, str]], *, scalar: b
                 sys.exit("noncontiguous compiler jump table span")
             if address + width > start + size:
                 sys.exit("compiler data record crosses its input-section boundary")
-            if not scalar and not re.search(r"\*/\s*\.word\s+[^,;\n]+$", line.rstrip()):
+            if not scalar and not re.search(r"\*/\s*\.(?:word|float)\s+[^,;\n]+$", line.rstrip()):
                 sys.exit("compiler jump table span is not whole-word data")
             for previous in pending:
                 label = re.fullmatch(r"\s*([A-Za-z_.$][\w.$]*):\s*", previous)

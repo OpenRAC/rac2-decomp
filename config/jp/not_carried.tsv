@@ -43,3 +43,37 @@ func_00341CE0	boot: instruction at +0x60 differs
 func_003438E8	boot: instruction at +0x18 differs
 func_00344378	boot: instruction at +0x8 differs
 func_0034E070	boot: instruction at +0x54 differs
+func_002CAF18	00_aranos_tutorial: instruction at +0x30 differs
+func_00335D30	00_aranos_tutorial: func_00335870 would be at 0x002dbf30
+func_L00_0030C7F8	00_aranos_tutorial: instruction at +0x1c differs
+func_L00_0030D4B8	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030D4E8	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030D528	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030D6A8	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030D718	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030D758	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030D788	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030D838	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030D878	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030D8A8	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030D8E8	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030D9F8	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030DA38	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030DA68	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030DAA8	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030DAD8	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030DB18	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030DB48	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_0030DB88	00_aranos_tutorial: instruction at +0x18 differs
+func_L00_0030DBB8	00_aranos_tutorial: instruction at +0x24 differs
+func_L00_00424BB8	16_snivelak: instruction at +0x28 differs
+func_L03_003D20F8	03_endako: instruction at +0x4c differs
+func_L08_00318F90	08_tabora: instruction at +0x38 differs
+func_L10_003F5EF8	10_hrugis_cloud: func_L00_003CD158 would be at 0x003fa920
+func_L10_0041EC10	10_hrugis_cloud: func_L00_00414018 would be at 0x004235b8
+func_L12_0041DDA8	12_todano: func_L00_00410D18 would be at 0x00420720
+func_L16_00435CE8	16_snivelak: func_L00_00424BB8 would be at 0x004344f8
+func_L20_00446E70	20_yeedil: instruction at +0x64 differs
+func_L22_0042ACA0	22_dobbo_orbit: func_L00_00424BB8 would be at 0x0042aa68
+func_L23_004402D8	23_damosel_orbit: func_L00_00424BB8 would be at 0x004400a0
+func_L26_0041C598	26_jamming_array: func_L00_00424BB8 would be at 0x0041c380

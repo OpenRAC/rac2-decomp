@@ -4,6 +4,8 @@
 #   SCUS_972.68     USA v1.01 (the primary target)  progress/report.json      -> SCUS_972.68_report
 #   SCES_516.07     Europe/Australia v1.00          progress/pal/report.json  -> SCES_516.07_report
 #   SCUS_972.68_v2  USA v2.00 (Greatest Hits)       progress/us2/report.json  -> SCUS_972.68_v2_report
+#   SCPS_150.56     Japan v1.00                     progress/jp/report.json   -> SCPS_150.56_report
+#   SCKA_200.11     Korea v1.00                     progress/kr/report.json   -> SCKA_200.11_report
 #
 # Both US discs have the serial SCUS_972.68, so v2.00's version is SCUS_972.68_v2.
 #
@@ -42,6 +44,8 @@ jobs:
           python tools/progress.py --check
           python tools/progress.py --check --version pal
           python tools/progress.py --check --version us2
+          python tools/progress.py --check --version jp
+          python tools/progress.py --check --version kr
 
       - name: Validate the reports with objdiff
         run: |
@@ -49,7 +53,7 @@ jobs:
             https://github.com/encounter/objdiff/releases/download/v3.8.1/objdiff-cli-linux-x86_64
           echo "c8290281e82114bcc1a06ff73061110d3902a177822e750337de2537188e358f  $RUNNER_TEMP/objdiff-cli" | sha256sum --check
           chmod +x "$RUNNER_TEMP/objdiff-cli"
-          for r in progress/report.json progress/pal/report.json progress/us2/report.json; do
+          for r in progress/report.json progress/pal/report.json progress/us2/report.json progress/jp/report.json progress/kr/report.json; do
             "$RUNNER_TEMP/objdiff-cli" report changes "$r" "$r" -o "$RUNNER_TEMP/validation.json"
           done
 
@@ -58,7 +62,9 @@ jobs:
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           for version, path in (("SCUS_972.68", "progress/report.json"), ("SCES_516.07", "progress/pal/report.json"),
-                                ("SCUS_972.68_v2", "progress/us2/report.json")):
+                                ("SCUS_972.68_v2", "progress/us2/report.json"),
+                                ("SCPS_150.56", "progress/jp/report.json"),
+                                ("SCKA_200.11", "progress/kr/report.json")):
               r = json.load(open(path))
               m = r["measures"]
               print("### %s\n" % version)
@@ -93,4 +99,18 @@ jobs:
         with:
           name: SCUS_972.68_v2_report
           path: progress/us2/report.json
+          if-no-files-found: error
+
+      - name: Upload the Japan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCPS_150.56_report
+          path: progress/jp/report.json
+          if-no-files-found: error
+
+      - name: Upload the Korea report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCKA_200.11_report
+          path: progress/kr/report.json
           if-no-files-found: error
