@@ -90,7 +90,7 @@ extern void func_0030CCD0(void *);
 extern void func_L00_002E6EF8(void (*)(void *),void *);
 extern void func_0030D430(void *);
 extern void func_0032DA58(void *,void *,void *,float);
-extern void func_L03_00326458(void);
+extern void func_L03_00326458(void *);
 extern void *func_0032C700(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 
 void func_L20_0039BB18(void *arg0)
@@ -269,7 +269,7 @@ void func_L20_00310E38(void *incoming)
                     *(u16 *)(object+0x7C) = word = (s16)word == 0xD0F ? 15 : 0x3FF;
                 }
                 if (*(s16 *)(object+0xAA) == 0xCE0 && (D_L20_001BDCC0.mode != 3 || D_L20_001BDCC0.state < D_L20_001A9430))
-                    func_L03_00326458();
+                    func_L03_00326458(object);
             }
         }
         if (D_L20_001BDCC0.mode == 3 && D_L20_001BDCC0.state == D_L20_001A9430) {
