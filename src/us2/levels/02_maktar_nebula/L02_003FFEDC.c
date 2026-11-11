@@ -1,3 +1,3 @@
-#include "include_asm.h"
+#include "common.h"
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L02_003FFEDC);
+/* func_US2_L02_003FFEDC lives in L02_003FFEDC-g8.c. */
