@@ -35,14 +35,22 @@ typedef enum SaveGameBlockId {
 } SaveGameBlockId;
 
 /*
- * RaC1 Save Import Legacy Weapon bitmask in SAVE_BLOCK_UNLOCKS (Block 10):
- * When detected by the Gadgetron vendor on Planet Barlow in RaC2,
- * legacy weapons are granted for free (0 bolts).
+ * Ratchet & Clank saves on the card: the Barlow Gadgetron vendor's free weapons.
+ *
+ * The vendor's card check (func_002FAE68) runs the card state machine's states 24-27
+ * (func_00298F00): it opens BASCUS-97199RATCHET/save0.bin to save4.bin, then the
+ * BESCES-50916RATCHET and BISCPS-15037RATCHET ones, reads 0x2800 bytes of each and checks the
+ * save (func_0029AF58). Block 10 of a RaC1 save is a byte per RaC1 item id; a nonzero byte for
+ * one of five weapons sets a bit of the flags word D_001A7A00[8] (0x001A7A20), and any good save
+ * sets RAC1_SAVE_FOUND. func_002FADB0 then makes the vendor's items for the set bits free
+ * (func_002FAD68 with RaC2 items 12 Bomb Glove, 53
+ * Walloper, 17 Decoy Glove, 14 Visibomb Gun, 18 Tesla Claw, in bit order) and clears RAC1_SAVE_FOUND.
  */
-#define RAC1_SAVE_UNLOCK_BOMB_GLOVE     (1 << 0)  /* 0x01: Bomb Glove */
-#define RAC1_SAVE_UNLOCK_PYROCITOR      (1 << 1)  /* 0x02: Pyrocitor */
-#define RAC1_SAVE_UNLOCK_BLASTER        (1 << 2)  /* 0x04: Blaster */
-#define RAC1_SAVE_UNLOCK_GLOVE_OF_DOOM  (1 << 3)  /* 0x08: Glove of Doom */
-#define RAC1_SAVE_UNLOCK_SUCK_CANNON    (1 << 4)  /* 0x10: Suck Cannon */
+#define RAC1_SAVE_UNLOCK_BOMB_GLOVE     (1 << 0)  /* RaC1 item 0x0A: Bomb Glove */
+#define RAC1_SAVE_UNLOCK_WALLOPER       (1 << 1)  /* RaC1 item 0x12: Walloper */
+#define RAC1_SAVE_UNLOCK_DECOY_GLOVE    (1 << 2)  /* RaC1 item 0x19: Decoy Glove */
+#define RAC1_SAVE_UNLOCK_VISIBOMB       (1 << 3)  /* RaC1 item 0x0D: Visibomb Gun */
+#define RAC1_SAVE_UNLOCK_TESLA_CLAW     (1 << 4)  /* RaC1 item 0x13: Tesla Claw */
+#define RAC1_SAVE_FOUND                 (1 << 7)  /* a RaC1 save was read */
 
 #endif /* SAVE_H */
