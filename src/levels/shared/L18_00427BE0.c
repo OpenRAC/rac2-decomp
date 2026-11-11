@@ -125,7 +125,7 @@ void func_L18_0043F040(u8 *obj) {
 
 /* func_L18_0043EF40 is matched in its own unit, L18_0043EF40-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L18_0043FFF8);
+/* func_L18_0043FFF8 is in L18_0043FFF8-g8.c. */
 
 /* func_L18_004401E0 is in L18_00427BE0-sparks.c. */
 

@@ -4306,3 +4306,4 @@ src/us2/levels/19_grelbin/L19_00413430-g8.c	-O2 -G8 -ffunction-sections -g -fno-
 src/us2/levels/02_maktar_nebula/L02_00400E04-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -frac2-keep-block-order
 src/pal/levels/shared/L08_003DF82C-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/02_maktar_nebula/L02_003D4458-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
+src/levels/shared/L18_0043FFF8-g8.c	-O2 -G0 -ffunction-sections -g

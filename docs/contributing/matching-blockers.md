@@ -119,11 +119,10 @@ eight real instructions. The unchanged best source was rechecked with
 `tools/check.py func_00342BE8 --diff` in USA, PAL and USA v2.00: 0/28 in each.
 No linked build was run. These results do not establish a new remedy.
 
-The spawn routine `func_L18_0043FFF8` likewise stays 488/488 bytes and 0/3
-in each release under game `-O2 -G0 -ffunction-sections -g`. Grouped header
-writes or grouped byte-constant locals before/inside the null guard do not
-improve its five flag constant/store differences. Reopen with a measured
-constant lifetime explanation, rather than another equivalent store order.
+The spawn routine `func_L18_0043FFF8` (488 B) matches 3 of 3 places across all
+releases (USA v1.01, PAL, USA v2.00; levels 18, 19, 20) in `L18_0043FFF8-g8.c`
+under `-O2 -G0 -ffunction-sections -g` by establishing independent scalar constant
+lifetimes for the byte and halfword 255 header values.
 
 
 ### Floating formatter lifetimes and inherited limits
@@ -5073,8 +5072,7 @@ September 2003 prototype module hierarchy and symbol tables establishes:
     $v1 vs $a3 across `MobySetState(object, 1, -1)` call delay slot.
   - `func_0028A670`: 1192/1192 B, 2 words off. Reload register round robin after clobbering
     `$a1` wraps draw-2 `0x8710` reload to `$v0` instead of retail `$a2`.
-  - `func_L18_0043FFF8`: 488/488 B, 4 words off. Retail splits byte 255 and halfword 255
-    stores; CSE2 folds identical scalar constants without a separate type boundary.
+  - `func_L18_0043FFF8`: 488/488 B, matched in 3/3 programs across US/PAL/US2 in `L18_0043FFF8-g8.c`.
   - `func_002D3FA0`: 1 row off at 2476/2468 B. Local allocator 3-quantity sort in block 125
     swaps `$f0/$f1` rounding registers. Profile `-O2 -G8 -ffunction-sections -fno-gcse -frac2-frame-pointer-liveness`.
   - `func_0034B2C8`: 6048/6048 B, 12 words off with `-frac2-keep-float-pun-source`. All 16
