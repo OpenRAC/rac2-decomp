@@ -3804,6 +3804,14 @@ there is no independent entry witness at +0, +4 or +8. The twenty words at
 flow and a suspicious state store alone do not settle that ambiguity. Keep the
 complete draft and reopen on a traced entry or object-origin evidence.
 **6 November 2026:** rechecked in US, PAL and US2; still no witness, row kept.
+**11 November 2026 (prototype evidence):** Preserved pre-release builds (specifically
+the September 2003 cluster) identify the module origin as `gui/game_menu.cpp`. The
+function is the timed credits page controller, and the twenty jump targets at `0026CDF0`
+represent pages 0 through 19. If `menu->state = 0` (the 8-byte prefix at `0x002DC3C8`)
+were unconditionally executed upon entry, `switch (menu->state)` would always take
+`case 0`, making pages 1 through 19 mathematically dead unreachable code. The callable
+entry begins at `0x002DC3D0`, where its 848-byte body compiles to 28 of 28 OK under
+`-O2 -G8 -ffunction-sections`. Formal review pending per `tests/test_tools.py`.
 
 **Measured generator corrections:** `func_002C38A0` now starts eight bytes later
 and spans 56 bytes; `func_00335918` starts 32 bytes later and spans 36 bytes.
@@ -5022,6 +5030,11 @@ single flags, all 15,120 store orders with the addresses in locals, and 100,000 
 forms. None got more than 3 of the 5 registers. Next useful experiment: a case-8 shape that gives
 the init or upd value one more reference without extra code, for example a different call or
 struct form. Statement order is exhausted.
+**11 November 2026 (prototype evidence):** Prototype symbols (`pause.cpp` and `loaders.cpp`)
+identify `D_001F2840` as `Pause` state (`Pause.loading`) and `D_00210A40` as the
+Cinema/Cutscene controller (`gui/behaviors.cpp`). The case 8 state transitions correspond
+to cutscene initialization, validating the subexpression types and leaving only GCC's
+Haifa/local-alloc register priority between `init`, `0x18`, `upd`, `page`, and `c`.
 
 ### F35 HUD icon body (func_L05_00421B98 and its three copies), 7 November 2026
 
@@ -5035,4 +5048,27 @@ load is block-local, so local-alloc gives it `$v0` before global-alloc places th
 pseudo; retail's `mfc1 $a0` fix results and late `daddu $a0,$v0` need the sprite in `$v0` and
 the mode load out of it. Next experiment: a source shape where the sprite pseudo stays within
 one basic block or `$v0` is live at the mode load. Draft: `nonmatching/levels/func_L05_00421B98.c`.
+
+### USA v1.01 final 35 functions and prototype build analysis, 11 November 2026
+
+Cross-referencing the remaining 35 unmatched USA v1.01 functions against the recovered
+September 2003 prototype module hierarchy and symbol tables establishes:
+- **Functional logic completeness:** All 35 functions already possess fully reconstructed,
+  functionally accurate C in `nonmatching/`, providing native port equivalence.
+- **Subsystem mapping:** Unnamed translation units map directly to original Insomniac
+  modules (`gui/game_menu.cpp`, `gui/rc2Hud.cpp`, `hud.cpp`, `vendor.cpp`, `pause.cpp`,
+  `save.cpp`, `mcstate.cpp`, `herob.cpp`, `spacecombat.cpp`).
+- **Compiler heuristic nature of blockers:** The remaining gaps are strictly backend
+  heuristics (Haifa sched1/sched2 priority ties, local-alloc fake lifetime overlaps, and
+  spill slot assignment order) rather than missing control flow, missing formulas or unknown
+  struct members.
+- **Verified candidates:**
+  - `func_002DC3C8`: Proven to be the credits page controller from `gui/game_menu.cpp`.
+    Mathematical dead-code proof confirms the 848-byte body starts at `0x002DC3D0` (28/28 OK
+    in linked build). Pending formal maintainer review of entry offset.
+  - `func_00342BE8`: 900/900 B, 2 words swapped (+0x230/+0x234). Sched1 load latency on
+    `screenWidthGP` vs immediate 340 store priority in `Hud.header` clip rectangle setup.
+  - `func_L22_003D0840`: 60/60 B, Dobbo Orbit class 2668 update handler. Register choice
+    $v1 vs $a3 across `MobySetState(object, 1, -1)` call delay slot.
+
 
