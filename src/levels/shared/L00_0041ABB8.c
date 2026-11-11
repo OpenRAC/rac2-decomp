@@ -99,18 +99,19 @@ extern void func_00282CC0(void *dst, void *a, void *b);
 
 extern float func_00282DB0(void *a, void *b);
 
-#ifndef RAC2_T_OBJ_0014C80
-#define RAC2_T_OBJ_0014C80
-/* the resident object at D_0014C80; only its vector at +0x140 is read here */
+#ifndef RAC2_T_CAMERAPOSITION
+#define RAC2_T_CAMERAPOSITION
+/* The level's camera at D_L00_001B8C80 (its address differs per level); only its
+   position at +0x140 is read here. */
 typedef struct {
     char pad[0x140];
     float f140;
     float f144;
     float f148;
-} OBJ_0014C80;
+} CameraPosition;
 #endif
 
-extern OBJ_0014C80 D_0014C80;
+extern CameraPosition D_L00_001B8C80;
 
 #ifndef RAC2_T_BLOCK_F043C77A5
 #define RAC2_T_BLOCK_F043C77A5
@@ -196,9 +197,11 @@ void func_L00_0041AF60(char *p)
 }
 
 
-/* fills a local record with the level's fixed fields, measures two angles against the
-   resident vector at D_0014C80, adds a quarter of the cross product of that vector with
-   the position, and hands the record to the level's matrix builder */
+/* The Lava Gun's muzzle glow (class 1481, drawn twice by func_L00_0041AE28).
+   Draws a camera-facing sprite (texture 44) at A: fills a local record with the level's
+   fixed fields, turns it to face the camera position at D_L00_001B8C80 + 0x140, moves it
+   a quarter of the way from A toward the camera, and hands the quad to func_00280B90
+   to draw. */
 void func_L00_0041AFD8(void *unused, float *a, int k, float f)
 {
     LOC_F043c77a5 local;
@@ -223,12 +226,12 @@ void func_L00_0041AFD8(void *unused, float *a, int k, float f)
     local.k0 = k;
     local.v112 = 0;
     local.v220 = 0.0f;
-    local.f216 = func_00283248(D_0014C80.f140 - a[0], D_0014C80.f144 - a[1]);
-    x = func_00282E80(a, &D_0014C80.f140);
-    local.f212 = -func_00283248(x, D_0014C80.f148 - a[2]);
+    local.f216 = func_00283248(D_L00_001B8C80.f140 - a[0], D_L00_001B8C80.f144 - a[1]);
+    x = func_00282E80(a, &D_L00_001B8C80.f140);
+    local.f212 = -func_00283248(x, D_L00_001B8C80.f148 - a[2]);
     local.v208 = func_002A7940();
     func_00283410(&local.m00, &local.v208);
-    func_00282CF0(v, &D_0014C80.f140, a);
+    func_00282CF0(v, &D_L00_001B8C80.f140, a);
     func_00282F20(v, v, 0.25f);
     local.v192 = a[0] + v[0];
     local.v196 = a[1] + v[1];
