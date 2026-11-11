@@ -1,13 +1,13 @@
 {
  "version": 2,
  "measures": {
-  "fuzzy_match_percent": 63.08743910320956,
+  "fuzzy_match_percent": 63.09056527779696,
   "total_code": "5501932",
-  "matched_code": "3471028",
-  "matched_code_percent": 63.08743910320956,
+  "matched_code": "3471200",
+  "matched_code_percent": 63.09056527779696,
   "total_functions": 8534,
-  "matched_functions": 7311,
-  "matched_functions_percent": 85.66908835247246,
+  "matched_functions": 7314,
+  "matched_functions_percent": 85.70424185610499,
   "complete_code": "731452",
   "complete_code_percent": 13.29445729245654,
   "total_units": 1140,
@@ -18,13 +18,13 @@
    "id": "executable",
    "name": "Boot executable",
    "measures": {
-    "fuzzy_match_percent": 71.57364103350456,
+    "fuzzy_match_percent": 71.59012497124894,
     "total_code": "1043440",
-    "matched_code": "746828",
-    "matched_code_percent": 71.57364103350456,
+    "matched_code": "747000",
+    "matched_code_percent": 71.59012497124894,
     "total_functions": 3097,
-    "matched_functions": 2491,
-    "matched_functions_percent": 80.4326767839845,
+    "matched_functions": 2494,
+    "matched_functions_percent": 80.52954472069744,
     "complete_code": "731452",
     "complete_code_percent": 70.10005366863452
    }
@@ -48,13 +48,13 @@
    "id": "game",
    "name": "Boot game code",
    "measures": {
-    "fuzzy_match_percent": 71.57364103350456,
+    "fuzzy_match_percent": 71.59012497124894,
     "total_code": "1043440",
-    "matched_code": "746828",
-    "matched_code_percent": 71.57364103350456,
+    "matched_code": "747000",
+    "matched_code_percent": 71.59012497124894,
     "total_functions": 3097,
-    "matched_functions": 2491,
-    "matched_functions_percent": 80.4326767839845,
+    "matched_functions": 2494,
+    "matched_functions_percent": 80.52954472069744,
     "complete_code": "731452",
     "complete_code_percent": 70.10005366863452
    }
@@ -96473,13 +96473,13 @@
   {
    "name": "jp/game/0027FB70",
    "measures": {
-    "fuzzy_match_percent": 0.0,
+    "fuzzy_match_percent": 8.72210953346856,
     "total_code": "1972",
-    "matched_code": "0",
-    "matched_code_percent": 0.0,
+    "matched_code": "172",
+    "matched_code_percent": 8.72210953346856,
     "total_functions": 4,
-    "matched_functions": 0,
-    "matched_functions_percent": 0.0,
+    "matched_functions": 3,
+    "matched_functions_percent": 75.0,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "total_units": 1,
@@ -96498,7 +96498,7 @@
     {
      "name": "func_JP_00280280",
      "size": "40",
-     "fuzzy_match_percent": 0.0,
+     "fuzzy_match_percent": 100.0,
      "address": "1808",
      "metadata": {
       "virtual_address": "2622080"
@@ -96507,7 +96507,7 @@
     {
      "name": "func_JP_002802A8",
      "size": "104",
-     "fuzzy_match_percent": 0.0,
+     "fuzzy_match_percent": 100.0,
      "address": "1848",
      "metadata": {
       "virtual_address": "2622120"
@@ -96516,7 +96516,7 @@
     {
      "name": "func_JP_00280320",
      "size": "28",
-     "fuzzy_match_percent": 0.0,
+     "fuzzy_match_percent": 100.0,
      "address": "1968",
      "metadata": {
       "virtual_address": "2622240"
