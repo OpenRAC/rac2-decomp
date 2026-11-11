@@ -420,6 +420,8 @@ src/us2/game/0033C958-flags.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/us2/game/003424C8-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
 src/us2/game/00341C28-rc2.c	-O2 -G8 -ffunction-sections -fno-builtin
 src/us2/levels/02_maktar_nebula/L02_003FE240-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -frac2-keep-block-order
+src/us2/levels/02_maktar_nebula/L02_003FFEDC-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
+src/us2/levels/11_joba/L11_00445CB4-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
 src/pal/game/0033AEF8-b.c	-O2 -G8 -ffunction-sections
 src/us2/game/0033A5D8-b.c	-O2 -G8 -ffunction-sections
 src/us2/game/0033C958-b.c	-O2 -G8 -ffunction-sections

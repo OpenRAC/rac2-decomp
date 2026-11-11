@@ -1,6 +1,6 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L11_004455E0);
+/* func_US2_L11_004455E0 lives in L11_004455E0-g8.c. */
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L11_00445CB4);
+/* func_US2_L11_00445CB4 lives in L11_00445CB4-g8.c. */
