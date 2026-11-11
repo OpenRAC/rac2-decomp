@@ -1,4 +1,4 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L03_00426DE8);
+/* func_PAL_L03_00426DE8 is defined in L03_00426DE8.c. */

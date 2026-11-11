@@ -707,7 +707,16 @@ The five words exchange the `step + 1` and translation-address spill slots.
 The retained C is unchanged; reopen on a different operation or PRE
 expression/lifetime. No linked build was run.
 
-**6 November 2026, Endako initializer (retained):** `func_L03_00421930`
+**11 November 2026, Endako initializer (matched):** `func_L03_00421930`
+(and `func_PAL_L03_00426DE8` in PAL) matched in all carrying programs across USA v1.01,
+PAL, JP, KR, and US2. Profile: own unit `src/levels/03_endako/L03_00421930.c` with
+`-O2 -G0 -ffunction-sections -fno-schedule-insns -frac2-allocno-live-length`.
+Opt-in flag `-frac2-allocno-live-length` in `global.c:allocno_compare` prioritizes
+allocnos with longer live length (obj 94 > base 72 > stride 70 > p 47), resolving the
+p=$s1 / base=$s3 register swap to retail's obj=$s0, base=$s1, stride=$s2, p=$s3 with exact
+scheduling.
+
+**6 November 2026, Endako initializer (superseded):** `func_L03_00421930`
 now has a 412/412-byte candidate, 0/1 USA v1.01 placements, with only three
 real instruction differences. Profile: own unit, game `-O2 -G0
 -ffunction-sections -fno-schedule-insns`. Read the first state index before

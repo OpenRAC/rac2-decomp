@@ -2,7 +2,7 @@
 #include "common.h"
 
 
-INCLUDE_ASM("asm/levels", func_L03_00421930);
+/* func_L03_00421930 is defined in L03_00421930.c. */
 
 /* The group count and the entity table's base, read as bare symbols (an `sda` array of unknown
    size keeps the `lui`/`lw` pair here, and the assembler turns the count's load into a $gp

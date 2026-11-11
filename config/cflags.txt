@@ -550,6 +550,7 @@ src/levels/shared/L00_0038AAD0.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2
 src/levels/shared/L00_002AABE0.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -fno-gcse
 src/levels/shared/L00_003B81D0.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/03_endako/L03_0041CEB0.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por -mno-split-addresses
+src/levels/03_endako/L03_00421930.c	-O2 -G0 -ffunction-sections -fno-schedule-insns -frac2-allocno-live-length
 src/levels/07_siberius/L07_003F6328.c	-O2 -G16 -Wa,-G16 -mno-split-addresses -ffunction-sections -Wall -Werror
 src/levels/01_oozla/L01_00416E78-camera.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/01_oozla/L01_003DD3A0.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
@@ -4161,6 +4162,7 @@ src/game/002ECB70-g8.c	-O2 -G8 -ffunction-sections -g -fno-gcse
 src/levels/shared/L00_003B3158-mesh-g8.c	-O2 -G8 -ffunction-sections -frac2-sticky-volatile-refs
 src/pal/game/00309A30-cc-g8.c	-O2 -G8 -ffunction-sections
 src/pal/levels/03_endako/L03_00422F18-cc-g8.c	-O2 -G8 -ffunction-sections
+src/pal/levels/03_endako/L03_00426DE8.c	-O2 -G0 -ffunction-sections -fno-schedule-insns -frac2-allocno-live-length
 src/pal/levels/shared/L00_0035B058-cc-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-block-order
 src/pal/game/002D0500-cc.c	-O2 -G32 -Wa,-G32 -ffunction-sections
 src/pal/game/002FA330-cc-g8.c	-O2 -G8 -ffunction-sections

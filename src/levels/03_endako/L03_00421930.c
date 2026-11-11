@@ -1,11 +1,4 @@
-/* 9 November 2026 (PAL port of func_L03_00421930): 412/412 bytes, PAL 0/1 places (03_endako),
- * 12 differing instruction positions with relocation fields masked (check.py: "instruction at
- * +0x2c differs"). The USA best flat C, unchanged apart from the name, in its own unit with
- * -O2 -G0 -ffunction-sections -fno-schedule-insns. PAL retail is the USA retail instruction for
- * instruction (only addresses differ: table at lui 0x26/-0x6590), so the blocker is the same one
- * register swap: ours p s1 / table base s3, retail base s1 / p s3 (global-alloc priority, see the
- * USA note). Default scheduling gives 416 bytes; an if/goto chain for the switch gives 91 rows.
- * Nothing in the PAL bytes suggests a new hypothesis; matching the USA twin should match this. */
+#include "include_asm.h"
 #include "common.h"
 
 extern char D_L03_00259A30[];
@@ -17,7 +10,7 @@ extern void func_002A7750(u8 *, s32, s32);
 extern s32 func_00273B70(u8 *);
 extern void func_0029F338(void *);
 
-void func_PAL_L03_00426DE8(u8 *obj)
+void func_L03_00421930(u8 *obj)
 {
     u8 *p = *(u8 **)(obj + 0x68);
     char *tbl;
