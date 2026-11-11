@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 
-/* Three words handed to the spawner by value. */
+/* Three words handed to the spawner through a pointer to a copy, as the other callers pass their block. */
 typedef struct {
     s32 a;
     s32 b;
@@ -14,7 +14,7 @@ extern int func_002A7820(int, int);
 extern void func_002A0F48(void *);
 extern int func_L20_0039DF18(char *, int);
 extern void func_L20_0039DE88(char *);
-extern void func_L02_002EF388(void *, void *, void *, L20_0039DCF8_Args, int);
+extern void func_L02_002EF388(void *, void *, void *, L20_0039DCF8_Args *, int);
 
 /* Sets up a spawned object at pos/rot; if it finds its slot it passes the three link words on. */
 int func_L20_0039DCF8(char *obj, char *pos, char *rot)
@@ -50,7 +50,7 @@ int func_L20_0039DCF8(char *obj, char *pos, char *rot)
         st.b = *(s32 *)(vars + 0x258);
         st.c = *(s32 *)(vars + 0x25C);
         arg = st;
-        func_L02_002EF388(obj, pos, rot, arg, 3);
+        func_L02_002EF388(obj, pos, rot, &arg, 3);
         ret = 1;
     }
     return ret;
