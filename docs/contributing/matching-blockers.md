@@ -5068,8 +5068,7 @@ September 2003 prototype module hierarchy and symbol tables establishes:
 - **Verified near-miss candidates:**
   - `func_00342BE8`: 900/900 B, 2 words swapped (+0x230/+0x234). Sched1 load latency on
     `screenWidthGP` vs immediate 340 store priority in `Hud.header` clip rectangle setup.
-  - `func_L22_003D0840`: 60/60 B, Dobbo Orbit class 2668 update handler. Register choice
-    $v1 vs $a3 across `MobySetState(object, 1, -1)` call delay slot.
+  - `func_L22_003D0840`: 60/60 B, matched across US/PAL/US2 in `L22_003D0840.c` using `-frac2-caller-reg-order`.
   - `func_0028A670`: 1192/1192 B, 2 words off. Reload register round robin after clobbering
     `$a1` wraps draw-2 `0x8710` reload to `$v0` instead of retail `$a2`.
   - `func_L18_0043FFF8`: 488/488 B, matched in 3/3 programs across US/PAL/US2 in `L18_0043FFF8-g8.c`.

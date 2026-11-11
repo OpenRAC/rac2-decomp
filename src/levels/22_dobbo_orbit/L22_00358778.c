@@ -286,7 +286,7 @@ finish:
 
 
 
-INCLUDE_ASM("asm/levels", func_L22_003D0840);
+/* func_L22_003D0840 is in L22_003D0840.c. */
 
 /* func_L22_003E87B8 is in L22_003E87B8.c. */
 
