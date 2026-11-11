@@ -34,6 +34,7 @@ Every doc of this repository, by folder. New here? Read [building.md](build/buil
 | Doc | What it covers |
 |---|---|
 | [prototype-builds.md](research/prototype-builds.md) | Public prototype builds |
+| [prototype-engine-symbols.md](research/prototype-engine-symbols.md) | Recovered prototype engine symbols and subsystem hierarchy |
 | [aug6-retail-anchors.md](research/aug6-retail-anchors.md) | Code shared by the August preview and retail |
 | [rac1-decomp-findings.md](research/rac1-decomp-findings.md) | Findings from rac1-decomp |
 | [rac1-to-rac2.md](research/rac1-to-rac2.md) | What carries over from the first game |
