@@ -410,10 +410,12 @@ src/pal/levels/02_maktar_nebula/L02_004013F8-g8.c	-O2 -G8 -ffunction-sections -f
 src/pal/levels/shared/L12_0042C130-rc2.c	-O2 -G0 -mno-split-addresses -ffunction-sections -fno-builtin
 src/pal/levels/shared/L18_003F9170-flags.c	-O2 -G0 -ffunction-sections -mno-split-addresses
 src/pal/levels/23_damosel_orbit/L23_003C3978-flags.c	-O2 -G0 -ffunction-sections -g
+src/us2/game/0026EDE8-loader.c	-O2 -G0 -ffunction-sections -fcall-used-hi1 -fcall-used-lo1 -fcall-used-accum1
 src/us2/game/0029C448-rc2.c	-O2 -fno-schedule-insns -G0 -mno-split-addresses -ffunction-sections -fno-builtin
 src/us2/game/002CE618-flags.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/us2/game/002CE6A8-flags.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
 src/us2/game/002CE6D8-flags.c	-O2 -G0 -ffunction-sections -frac2-gcse-unsplit-edges
+src/us2/game/002957C0-map-setup-g64.c	-O2 -G64 -Wa,-G64 -ffunction-sections -g -Wa,--r5900-la-addend=sn
 src/us2/game/002D5F10-b.c	-O2 -G8 -ffunction-sections
 src/us2/game/002DCF58-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
 src/us2/game/0033C958-flags.c	-O2 -G0 -ffunction-sections -mno-split-addresses

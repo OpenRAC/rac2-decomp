@@ -1,13 +1,19 @@
+/* func_US2_002CCAA0: v2.00's copy of func_002CBAE0 (src/game/002C7748-g8.c), the
+ * menu-source dispatcher. The code is v1.01's with every address moved; it is the
+ * release's own function because three of its callees changed in v2.00.
+ * D_001AB910 is declared volatile as in func_002CBAE0 and func_002CBC58: retail
+ * rereads it for every test and keeps one load whose value it discards (the empty
+ * D_0025A058/D_00259B48 arm). Without the qualifier the body is 328 bytes, not 376. */
 typedef struct {
     int mode, pad4, value;
     int padC[2];
     char *source;
     char *destination;
     int state;
-} MenuState_2CCAA0;
-typedef struct { char pad[0x1C4]; int flags; } InputState_2CCAA0;
-extern MenuState_2CCAA0 D_001F2840;
-extern InputState_2CCAA0 D_00138180;
+} MenuState_US2_2CCAA0;
+typedef struct { char pad[0x1C4]; int flags; } InputState_US2_2CCAA0;
+extern MenuState_US2_2CCAA0 D_001F2840;
+extern InputState_US2_2CCAA0 D_00138180;
 extern char D_00259018[];
 extern char D_0025A738[];
 extern char D_0025A498[];
