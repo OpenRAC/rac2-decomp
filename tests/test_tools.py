@@ -394,10 +394,10 @@ class RoundElevenBoundaries(unittest.TestCase):
         with self.assertRaises(ValueError):
             levels.function_residue("func_00334550", 432)
 
-    def test_unproved_entry_is_kept(self):
-        # A store at the start is not an entry witness (section 50).
+    def test_func_002dc3c8_entry_is_proven(self):
+        # Entry proven at +8: gui/game_menu.cpp credits controller switch states 1-19.
         self.assertNotIn("func_002DC3C8", levels.FUNCTION_RESIDUES)
-        self.assertNotIn("func_002DC3C8", levels.FUNCTION_ENTRY_OFFSETS)
+        self.assertEqual(levels.FUNCTION_ENTRY_OFFSETS["func_002DC3C8"], (856, 8))
 
 
 class AuditedIdentitySplit(unittest.TestCase):
