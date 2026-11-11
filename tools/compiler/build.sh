@@ -93,15 +93,18 @@ python3 $T/keep_float_pun_source.py gcc
 python3 $T/no_extra_increment_givs.py gcc
 python3 $T/sticky_volatile_sets.py gcc
 python3 $T/caller_reg_order.py gcc
+python3 $T/delay_no_split_hi.py gcc
+python3 $T/gcse_hash_111.py gcc
+python3 $T/sched_store_offset.py gcc
 sha256sum --check --quiet <<'SUMS'
 a7436602ef9e063c0eafef9888797527ea3fd6e2d35b041d3fed46fcb457f504  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-7b10fcfa6ade05773acac12e67a5b7df35cfa98eddc1eb97cf910326500cba63  gcc/toplev.c
-fa211f12b39de727c033f57a16ab627572547901d9cf8d2a7aa2e5dd77949e9e  gcc/haifa-sched.c
-656c2b9546b5c38d96cfe25b02620cce02b625f5637ecad6386f0a4d89f3e0fe  gcc/reorg.c
-adf65f4aefd6d54ec771f6cd644142fef1e0ba8ec3b5fd6c464cea1d1f155e1c  gcc/flags.h
-feb3bd29dd08e1d1b1db78861d580c55f161a55e63cedd368e873c48bc36982d  gcc/gcse.c
+1b0978568e7348d762cbd2c6d56ed9f54ce93f6500a50f150c87e1300a97906e  gcc/toplev.c
+e080331d7fd7243aaf0bc85ac57dc5f62a46da3cfeb7990c8a2729e8edad1d39  gcc/haifa-sched.c
+7b58c94fbad9767bc95c7f444f1bb31a4bc1d557e87787fa6921c59031412a67  gcc/reorg.c
+f9b2ffcd7d33a4d002cfbb6ac1e6f4f944a77d2f5bd50f8f3073d72fb41f3322  gcc/flags.h
+28391f37355e5a0324ac19a9451f8f0dfa42e8e9f25b0157939388924d35f632  gcc/gcse.c
 efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
 3535b59f5a754e44fb67989b1c30ad8f8f4fab6c30f12ef4dff287f527a82306  gas/config/tc-mips.c
 6d4c688bdf8517a1da1b35a04bb1e3b6137093a6224b3ed52666581e3a7bd557  gcc/reload1.c

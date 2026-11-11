@@ -58,7 +58,6 @@ s32 func_00342BC0(u8 *a0) {
  return 0;
 }
 
-INCLUDE_ASM("asm/game", func_00342BE8);
 
 /* The table of ids the engine accepts, at the boot's resident data. */
 extern u8 D_001A7AF8[] __attribute__((sda));

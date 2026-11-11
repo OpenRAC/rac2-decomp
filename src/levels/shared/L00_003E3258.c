@@ -383,7 +383,6 @@ void func_L00_003E5340(char *object, float *position)
 
 /* func_L00_003E5978 is defined in L00_003E3258-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003E5BD8);
 
 /* func_L00_003E6030 is defined in L00_003E6030-g8.c. */
 

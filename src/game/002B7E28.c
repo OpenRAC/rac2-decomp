@@ -445,7 +445,6 @@ void func_002BB050(u8 *a0)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002BB100);
 
 void func_002BB798(char *a0)
 {
