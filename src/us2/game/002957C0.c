@@ -1,6 +1,6 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_002957C0);
+/* func_US2_002957C0 lives in 002957C0-map-setup-g64.c. */
 
 /* func_US2_00295D70, the v2.00 copy of func_002954C0: the same C with one added store,
    D_001C4FA0[0x2B8 / 4] = e. */

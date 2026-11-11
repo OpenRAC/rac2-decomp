@@ -1065,6 +1065,10 @@ FUNCTION_END_EXTRA = {
     # was a row of its own, func_PAL_0026F578 (see FUNCTION_RESIDUES). The function
     # is 12 bytes longer than USA v1.01's func_0026EDE8 and has no padding nop after it.
     "func_PAL_0026EC50": (2340, 12),
+    # Boot only, the same function in USA v2.00: the row stopped before its
+    # `jr $ra; addiu $sp,$sp,0xD0`, which no row held; a padding nop follows. The
+    # function is 8 bytes longer than USA v1.01's func_0026EDE8 (a skipped table).
+    "func_US2_0026EDE8": (2340, 8),
 }
 
 
