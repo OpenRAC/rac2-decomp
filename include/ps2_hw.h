@@ -8,7 +8,11 @@
  * Names follow the public PS2 hardware documentation (EE User's Manual register names as
  * used by the open PS2SDK), grouped by hardware block. */
 
+#if defined(__mips__) || defined(__mips64)
 typedef unsigned int ps2_u128 __attribute__((mode(TI), aligned(16)));
+#else
+typedef struct { unsigned int words[4]; } ps2_u128;
+#endif
 
 /* EE timers (10000000 timer 0, 10000800 timer 1, 10001800 timer 3) */
 #define T0_COUNT (*(volatile unsigned int *)0x10000000)
