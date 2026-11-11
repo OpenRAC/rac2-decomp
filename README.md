@@ -37,6 +37,8 @@ function counts once, however many of the 27 levels share it.
 | v1.01 | USA | `SCUS_972.68` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent)](https://bytematch.dev/OpenRAC/rac2-decomp) | Primary version |
 | v1.00 | Europe/Australia | `SCES_516.07` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent&version=SCES_516.07)](https://bytematch.dev/OpenRAC/rac2-decomp/SCES_516.07) | Shares the USA C source |
 | v2.00 (Greatest Hits) | USA | `SCUS_972.68` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent&version=SCUS_972.68_v2)](https://bytematch.dev/OpenRAC/rac2-decomp/SCUS_972.68_v2) | Report id `SCUS_972.68_v2` |
+| v1.00 | Japan | `SCPS_150.56` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent&version=SCPS_150.56)](https://bytematch.dev/OpenRAC/rac2-decomp/SCPS_150.56) | Report id `SCPS_150.56` |
+| v1.00 | Korea | `SCKA_200.11` | [![Code](https://bytematch.dev/OpenRAC/rac2-decomp.svg?mode=shield&label=Code&measure=matched_code_percent&version=SCKA_200.11)](https://bytematch.dev/OpenRAC/rac2-decomp/SCKA_200.11) | Report id `SCKA_200.11` |
 
 All releases share one C source. Expected SHA-256 of the primary disc image:
 
@@ -52,6 +54,7 @@ You need x86-64 Linux with 32-bit support (`gcc -m32`), Wine and Python 3.12, or
 SN ProDG's assembler and linker go in `toolchain/` first: [docs/build/building.md](docs/build/building.md#get-the-sn-tools).
 
 ```sh
+<<<<<<< HEAD
 git clone https://github.com/OpenRAC/rac2-decomp.git && cd rac2-decomp
 python3 -m pip install -r requirements.txt
 cp /path/to/your-disc.iso baserom/SCUS_972.68.iso
@@ -59,6 +62,15 @@ tools/compiler/build.sh
 python3 tools/compiler/sdk/build.py
 python3 tools/levels.py dump
 python3 tools/build.py all        # one "OK" per program
+=======
+cp /path/to/SCUS_972.68.iso        baserom/SCUS_972.68.iso          # USA v1.01, required
+cp /path/to/SCES_516.07.iso        baserom/SCES_516.07.iso          # PAL, optional
+cp /path/to/SCUS_972.68_v2.00.iso  baserom/SCUS_972.68_v2.00.iso    # USA v2.00, optional
+cp /path/to/SCPS_150.56.iso        baserom/SCPS_150.56.iso          # Japan, optional
+cp /path/to/SCKA_200.11.iso        baserom/SCKA_200.11.iso          # Korea, optional
+sha256sum baserom/SCUS_972.68.iso
+# 9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5
+>>>>>>> b08ede63 (feat(releases): integrate Japan and Korea Going Commando releases)
 ```
 
 macOS, Windows, the container and the other releases: [docs/build/building.md](docs/build/building.md).

@@ -160,7 +160,8 @@ def run_compile(source: Path, work: Path, flags: str, dumps: tuple[str, ...], ta
 
 
 def diagnose(name: str) -> dict:
-    if not re.fullmatch(r"func_(?:(?:PAL|US2)_)?(?:L\d\d_)?[0-9A-F]{8}", name):
+    tag_pattern = "|".join(re.escape(v["tag"]) for v in levels.VERSIONS.values() if v["tag"])
+    if not re.fullmatch(rf"func_(?:(?:{tag_pattern})_)?(?:L\d\d_)?[0-9A-F]{{8}}", name):
         raise ValueError("expected a catalogue function name, e.g. func_002A77E0")
     programs = (["boot"] if any(n == name for n, _, _ in levels.read_boot_functions()) else [])
     for row in levels.read_catalogue():

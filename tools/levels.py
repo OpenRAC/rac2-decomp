@@ -51,6 +51,12 @@ VERSIONS = {
     "us2": {"id": "SCUS_972.68_v2", "iso": "baserom/SCUS_972.68_v2.00.iso", "boot": "SCUS_972.68",
             "baserom": "baserom/us2", "config": "config/us2", "build": "build/us2",
             "report": "progress/us2/report.json", "tag": "US2", "release": "USA v2.00 (Greatest Hits)"},
+    "jp": {"id": "SCPS_150.56", "iso": "baserom/SCPS_150.56.iso", "boot": "SCPS_150.56",
+           "baserom": "baserom/jp", "config": "config/jp", "build": "build/jp",
+           "report": "progress/jp/report.json", "tag": "JP", "release": "Japan v1.00"},
+    "kr": {"id": "SCKA_200.11", "iso": "baserom/SCKA_200.11.iso", "boot": "SCKA_200.11",
+           "baserom": "baserom/kr", "config": "config/kr", "build": "build/kr",
+           "report": "progress/kr/report.json", "tag": "KR", "release": "Korea v1.00"},
 }
 VERSION = "us"
 
@@ -277,6 +283,8 @@ LAYOUT = {
     "us": {"level_base": 0x1A7C80, "gp": 0x001AEFF0},
     "pal": {"level_base": 0x1A7D00, "gp": 0x001AF070},
     "us2": {"level_base": 0x1A7C80, "gp": 0x001AEFF0},
+    "jp": {"level_base": 0x1A7C80, "gp": 0x001AEFF0},
+    "kr": {"level_base": 0x1A7C80, "gp": 0x001AEFF0},
 }
 LEVEL_BASE = 0x1A7C80          # a level's program replaces the boot's memory from here
 GP = 0x001AEFF0

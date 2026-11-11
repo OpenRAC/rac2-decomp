@@ -11,7 +11,9 @@ repo=$(cd "$(dirname "$0")/../.." && pwd)
 CLI="${CONTAINER_CLI:-$(command -v podman >/dev/null 2>&1 && echo podman || echo docker)}"
 GHCR_IMAGE="${RAC2_BUILD_IMAGE:-ghcr.io/openrac/rac2-build:latest}"
 LOCAL_IMAGE="rac2-build:latest"
-if $CLI image inspect "$LOCAL_IMAGE" >/dev/null 2>&1; then
+if $CLI image inspect "localhost/$LOCAL_IMAGE" >/dev/null 2>&1; then
+  image="localhost/$LOCAL_IMAGE"
+elif $CLI image inspect "$LOCAL_IMAGE" >/dev/null 2>&1; then
   image="$LOCAL_IMAGE"
 elif $CLI image inspect "$GHCR_IMAGE" >/dev/null 2>&1 || $CLI pull "$GHCR_IMAGE"; then
   image="$GHCR_IMAGE"
@@ -20,5 +22,9 @@ else
   $CLI build --platform linux/386 -t "$LOCAL_IMAGE" -f "$repo/tools/docker/Dockerfile" "$repo"
   image="$LOCAL_IMAGE"
 fi
-exec $CLI run --rm --platform linux/386 -v "$repo:$repo" -w "$repo" -e WORK=/tmp/rac2-compiler \
+OPTS=()
+if [ "$CLI" = "podman" ]; then
+  OPTS+=(--security-opt label=disable)
+fi
+exec $CLI run --rm --platform linux/386 "${OPTS[@]}" -v "$repo:$repo" -w "$repo" -e WORK=/tmp/rac2-compiler \
   "$image" bash -c 'wineserver -p >/dev/null 2>&1 || true; exec "$@"' bash "$@"

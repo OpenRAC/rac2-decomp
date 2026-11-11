@@ -32,8 +32,9 @@ import levels  # noqa: E402
 
 KINDS = {"boot", "shared", "level"}
 PLACE = re.compile(r"^(\d\d):([0-9A-F]{8})$")
-NAME = r"(?:func_(?:(?:PAL|US2)_)?(?:L[0-9]{2}_)?[0-9A-F]{8}|sceIpuRestartDMA|_sysbitFlush)"
 TAGS = {v["tag"]: k for k, v in levels.VERSIONS.items() if v["tag"]}      # PAL -> pal
+TAG_PATTERN = "|".join(re.escape(t) for t in TAGS) if TAGS else "PAL|US2"
+NAME = rf"(?:func_(?:(?:{TAG_PATTERN})_)?(?:L[0-9]{{2}}_)?[0-9A-F]{{8}}|sceIpuRestartDMA|_sysbitFlush)"
 DEFINITION = re.compile(rf"^(?:[A-Za-z_][^;=#]*?\b)?({NAME})\s*\(")    # the type may be on the line before
 
 

@@ -35,7 +35,8 @@ sys.path.insert(0, str(ROOT / "tools"))
 import levels  # noqa: E402
 
 REPORT = ROOT / "progress/report.json"
-NAME = r"(?:func_(?:(?:PAL|US2)_)?(?:L\d\d_)?[0-9A-F]{8}|sceIpuRestartDMA|_sysbitFlush)"
+TAG_PATTERN = "|".join(re.escape(v["tag"]) for v in levels.VERSIONS.values() if v["tag"])
+NAME = rf"(?:func_(?:(?:{TAG_PATTERN})_)?(?:L\d\d_)?[0-9A-F]{{8}}|sceIpuRestartDMA|_sysbitFlush)"
 OTHER = {v for v in levels.VERSIONS if v != "us"}     # src/<version>/: another release's own C
 
 

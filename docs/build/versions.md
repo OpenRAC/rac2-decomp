@@ -9,6 +9,8 @@ had. The other two are built and counted the same way from the same C.
 | `us` (default) | USA v1.01 | `SCUS_972.68` | `9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5` | `SCUS_972.68` |
 | `pal` | Europe/Australia v1.00 | `SCES_516.07` | `519f9fa78b8e821b6bb7fa501fc10e8b10f378e27a6410f68d0dd8952860b41a` | `SCES_516.07` |
 | `us2` | USA v2.00 (Greatest Hits) | `SCUS_972.68` | `eda31b4519d16014164090e8a36733af63ef8e458a96d37d6054b65c00ec6e72` | `SCUS_972.68_v2` |
+| `jp` | Japan v1.00 | `SCPS_150.56` | `cd27f7445fbbc64f8d04f1e92a88c687b7ee84cdfd78d096c600616cb1aa78f5` | `SCPS_150.56` |
+| `kr` | Korea v1.00 | `SCKA_200.11` | `aa2234cb4b5d989c334ddccc65be1c712ca48e48d6d804ed1925bbd7db671f78` | `SCKA_200.11` |
 
 Put the discs in `baserom/` as `SCUS_972.68.iso`, `SCES_516.07.iso` and
 `SCUS_972.68_v2.00.iso`. Both US releases carry the serial `SCUS_972.68`, so v2.00's version

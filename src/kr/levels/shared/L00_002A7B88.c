@@ -1,0 +1,5 @@
+#include "include_asm.h"
+
+INCLUDE_ASM("asm/kr/levels", func_KR_L00_002A7B88);
+
+INCLUDE_ASM("asm/kr/levels", func_KR_L00_002A8928);

@@ -33,8 +33,8 @@ Synthesized from community research, Aug 8 2002 prototype datamining, and cross-
 
 | Build | Serial / Info | Significance & Notes |
 |---|---|---|
-| **NTSC-U v2.00 (Greatest Hits)** | `SCUS_972.68` (`4124a79c1...`) | Primary target executable. Entry point `0x00131AE8`, GP base `0x001AEFF0`. |
-| NTSC-U v1.01 (Black Label) | `SCUS_972.68` | First retail press; minor differences from GH. |
+| **NTSC-U v1.01 (Black Label)** | `SCUS_972.68` | Primary target executable. First retail press; entry point `0x00131AE8`, GP base `0x001AEFF0`. |
+| NTSC-U v2.00 (Greatest Hits) | `SCUS_972.68` (`4124a79c1...`) | Greatest Hits re-release; entry point `0x00131AE8`, GP base `0x001AEFF0`. |
 | JP / KR / Greatest Hits | Various | According to @foas (2020), **UYA's multiplayer engine was branched from the RaC2 JP/KR/GH codebase**. Symbols and shared structures in UYA (`ratchet-uya-decomp`) map closely to this target. |
 | Aug 8 2002 Prototype | Debug build | Core ELF is larger (`.lit` at `0x001af780` vs retail `0x001a8300`). Certain level overlays were compiled against a different internal build, causing broken overlay links. Rich in assert strings, symbols, and author initials. |
 | PS3 HD Port (Idol Minds) | EBOOT.BIN | Contains level-stacking artifacts; EBOOT retains ~8 never-called duplicates of the hero movement code. |
