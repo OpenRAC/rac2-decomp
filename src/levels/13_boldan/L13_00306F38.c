@@ -150,22 +150,21 @@ extern f32 func_00282E48(void *, void *);
 extern void func_002AAA00(void *, void *, f32, f32, f32, f32, s32);
 extern void func_00282F20(void *, void *, f32);
 extern void func_00282CC0(void *, void *, void *);
-extern u8 D_0012EA0[];
 
 void func_L13_003FE708(u8 *a0) {
     u8 *ptr = *(u8 **)(a0 + 0x68);
     f32 vec[4];
 
     if (*(s32 *)ptr != 0) {
-        if (func_00282E80(a0 + 0x10, D_0012EA0) < 8.0f) {
+        if (func_00282E80(a0 + 0x10, D_00189EA0) < 8.0f) {
             if (a0[0x20] == 0) {
                 a0[0x20] = 1;
             }
         }
     } else if (*(s32 *)(ptr + 8) != 0) {
-        if (func_00282E48(a0 + 0x10, D_0012EA0) < 8.0f) {
+        if (func_00282E48(a0 + 0x10, D_00189EA0) < 8.0f) {
             if (a0[0x20] == 0) {
-                if (*(s16 *)(D_0012EA0 + 0x2C8) == 1) {
+                if (*(s16 *)(D_00189EA0 + 0x2C8) == 1) {
                     a0[0x20] = 2;
                 }
             }
@@ -216,15 +215,15 @@ void func_L13_003FE970(u8 *a0) {
     f32 vec[4];
 
     if (*(s32 *)ptr != 0) {
-        if (func_00282E80(a0 + 0x10, D_0012EA0) < 8.0f) {
+        if (func_00282E80(a0 + 0x10, D_00189EA0) < 8.0f) {
             if (a0[0x20] == 0) {
                 a0[0x20] = 1;
             }
         }
     } else if (*(s32 *)(ptr + 8) != 0) {
-        if (func_00282E48(a0 + 0x10, D_0012EA0) < 8.0f) {
+        if (func_00282E48(a0 + 0x10, D_00189EA0) < 8.0f) {
             if (a0[0x20] == 0) {
-                if (*(s16 *)(D_0012EA0 + 0x2C8) == 1) {
+                if (*(s16 *)(D_00189EA0 + 0x2C8) == 1) {
                     a0[0x20] = 2;
                 }
             }

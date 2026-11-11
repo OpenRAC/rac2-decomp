@@ -11,7 +11,7 @@ extern u8 *D_L13_001B291C_2;
 extern u8 D_00189E20[];
 extern f32 func_00282E80(void *, void *);
 extern f32 func_00282E48(void *, void *);
-extern u8 D_0012EA0[];
+extern u8 D_00189EA0[];
 extern u8 D_00188660[];
 extern u8 D_L13_001B1C20[];
 extern u8 D_L13_001B1C48[];

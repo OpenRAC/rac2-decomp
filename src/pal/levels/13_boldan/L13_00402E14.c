@@ -25,7 +25,7 @@ extern f32 func_00282E48(void *, void *);
 extern void func_002AAA00(void *, void *, f32, f32, f32, f32, s32);
 extern void func_00282F20(void *, void *, f32);
 extern void func_00282CC0(void *, void *, void *);
-extern u8 D_0012EA0[];
+extern u8 D_00189EA0[];
 extern u8 D_00188660[];
 extern u8 D_L13_001B1C20[];
 extern u8 D_L13_001B1C48[];
@@ -45,15 +45,15 @@ void func_PAL_L13_00402E14(u8 *a0) {
     f32 vec[4];
 
     if (*(s32 *)ptr != 0) {
-        if (func_00282E80(a0 + 0x10, D_0012EA0) < 8.0f) {
+        if (func_00282E80(a0 + 0x10, D_00189EA0) < 8.0f) {
             if (a0[0x20] == 0) {
                 a0[0x20] = 1;
             }
         }
     } else if (*(s32 *)(ptr + 8) != 0) {
-        if (func_00282E48(a0 + 0x10, D_0012EA0) < 8.0f) {
+        if (func_00282E48(a0 + 0x10, D_00189EA0) < 8.0f) {
             if (a0[0x20] == 0) {
-                if (*(s16 *)(D_0012EA0 + 0x2C8) == 1) {
+                if (*(s16 *)(D_00189EA0 + 0x2C8) == 1) {
                     a0[0x20] = 2;
                 }
             }
