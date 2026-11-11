@@ -1,3 +1,5 @@
+/* func_US2_002D3138, the v2.00 copy of func_002D2188 (src/game/002D2188-g8.c): the same C,
+   with text id 0x2BE5 for the last label where v1.01 has 0x2D4F. */
 #include "common.h"
 
 extern void func_0027C540(s32);
