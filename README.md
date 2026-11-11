@@ -54,23 +54,17 @@ You need x86-64 Linux with 32-bit support (`gcc -m32`), Wine and Python 3.12, or
 SN ProDG's assembler and linker go in `toolchain/` first: [docs/build/building.md](docs/build/building.md#get-the-sn-tools).
 
 ```sh
-<<<<<<< HEAD
 git clone https://github.com/OpenRAC/rac2-decomp.git && cd rac2-decomp
 python3 -m pip install -r requirements.txt
-cp /path/to/your-disc.iso baserom/SCUS_972.68.iso
-tools/compiler/build.sh
-python3 tools/compiler/sdk/build.py
-python3 tools/levels.py dump
-python3 tools/build.py all        # one "OK" per program
-=======
 cp /path/to/SCUS_972.68.iso        baserom/SCUS_972.68.iso          # USA v1.01, required
 cp /path/to/SCES_516.07.iso        baserom/SCES_516.07.iso          # PAL, optional
 cp /path/to/SCUS_972.68_v2.00.iso  baserom/SCUS_972.68_v2.00.iso    # USA v2.00, optional
 cp /path/to/SCPS_150.56.iso        baserom/SCPS_150.56.iso          # Japan, optional
 cp /path/to/SCKA_200.11.iso        baserom/SCKA_200.11.iso          # Korea, optional
-sha256sum baserom/SCUS_972.68.iso
-# 9db2e33e276133cc283647fa3279b37911955e123d6199d10065547eaa9b1ce5
->>>>>>> b08ede63 (feat(releases): integrate Japan and Korea Going Commando releases)
+tools/compiler/build.sh
+python3 tools/compiler/sdk/build.py
+python3 tools/levels.py dump
+python3 tools/build.py all        # one "OK" per program
 ```
 
 macOS, Windows, the container and the other releases: [docs/build/building.md](docs/build/building.md).

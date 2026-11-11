@@ -162,7 +162,7 @@ Current matched coverage (the three reports from validated builds):
 | --- | --- | ---: | ---: | ---: | ---: |
 | `SCUS_972.68` | USA v1.01 | 8,491 of 8,527 | 1,005,500 of 1,041,544 | 4,453,760 of 4,482,516 | 5,459,260 of 5,524,060 (98.83%) |
 | `SCES_516.07` | Europe/Australia v1.00 | 8,526 of 8,607 | 998,504 of 1,051,268 | 4,504,700 of 4,645,608 | 5,503,204 of 5,696,876 (96.60%) |
-| `SCUS_972.68_v2` | USA v2.00 (Greatest Hits) | 8,515 of 8,579 | 998,088 of 1,045,204 | 4,441,812 of 4,532,744 | 5,439,900 of 5,577,948 (97.53%) |
+| `SCUS_972.68_v2` | USA v2.00 (Greatest Hits) | 8,528 of 8,579 | 1,008,100 of 1,045,204 | 4,468,140 of 4,532,744 | 5,476,240 of 5,577,948 (98.18%) |
 
 `tools/progress.py --version us|pal|us2` maintains the corresponding coverage row.
 In the original layout sample, 1,036 of v1.01's then-matched functions differed in
