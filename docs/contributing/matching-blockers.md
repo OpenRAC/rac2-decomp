@@ -5049,11 +5049,11 @@ pseudo; retail's `mfc1 $a0` fix results and late `daddu $a0,$v0` need the sprite
 the mode load out of it. Next experiment: a source shape where the sprite pseudo stays within
 one basic block or `$v0` is live at the mode load. Draft: `nonmatching/levels/func_L05_00421B98.c`.
 
-### USA v1.01 final 35 functions and prototype build analysis, 11 November 2026
+### USA v1.01 final 33 functions and prototype build analysis, 11 November 2026
 
-Cross-referencing the remaining 35 unmatched USA v1.01 functions against the recovered
+Cross-referencing the remaining unmatched USA v1.01 functions against the recovered
 September 2003 prototype module hierarchy and symbol tables establishes:
-- **Functional logic completeness:** All 35 functions already possess fully reconstructed,
+- **Functional logic completeness:** All 33 functions already possess fully reconstructed,
   functionally accurate C in `nonmatching/`, providing native port equivalence.
 - **Subsystem mapping:** Unnamed translation units map directly to original Insomniac
   modules (`gui/game_menu.cpp`, `gui/rc2Hud.cpp`, `hud.cpp`, `vendor.cpp`, `pause.cpp`,
@@ -5062,13 +5062,28 @@ September 2003 prototype module hierarchy and symbol tables establishes:
   heuristics (Haifa sched1/sched2 priority ties, local-alloc fake lifetime overlaps, and
   spill slot assignment order) rather than missing control flow, missing formulas or unknown
   struct members.
-- **Verified candidates:**
+- **Matched & Landed:**
   - `func_002DC3C8`: Proven to be the credits page controller from `gui/game_menu.cpp`.
-    Mathematical dead-code proof confirms the 848-byte body starts at `0x002DC3D0` (28/28 OK
-    in linked build). Pending formal maintainer review of entry offset.
+    Mathematical dead-code entry offset `(856, 8)` landed in commit `b8906916` as
+    `src/game/002DC3C8-g8.c` (28/28 OK in linked build).
+- **Verified near-miss candidates:**
   - `func_00342BE8`: 900/900 B, 2 words swapped (+0x230/+0x234). Sched1 load latency on
     `screenWidthGP` vs immediate 340 store priority in `Hud.header` clip rectangle setup.
   - `func_L22_003D0840`: 60/60 B, Dobbo Orbit class 2668 update handler. Register choice
     $v1 vs $a3 across `MobySetState(object, 1, -1)` call delay slot.
+  - `func_0028A670`: 1192/1192 B, 2 words off. Reload register round robin after clobbering
+    `$a1` wraps draw-2 `0x8710` reload to `$v0` instead of retail `$a2`.
+  - `func_L18_0043FFF8`: 488/488 B, 4 words off. Retail splits byte 255 and halfword 255
+    stores; CSE2 folds identical scalar constants without a separate type boundary.
+  - `func_002D3FA0`: 1 row off at 2476/2468 B. Local allocator 3-quantity sort in block 125
+    swaps `$f0/$f1` rounding registers. Profile `-O2 -G8 -ffunction-sections -fno-gcse -frac2-frame-pointer-liveness`.
+  - `func_0034B2C8`: 6048/6048 B, 12 words off with `-frac2-keep-float-pun-source`. All 16
+    colour float constants match; remaining differences are delay-slot scheduling.
+  - `func_002BB100`: 1684/1684 B, 5 words off (+0x9C..+0xB0). Flow2 `global_live_at_start`
+    of the else block lacks `$s0`, rejecting `fill_slots_from_thread`.
+  - `func_L05_0042B2C0`: 531/532 insns, frame 0x150. Seam madd/reload pointers merged by
+    cse2, inner loop givs. Profile `-O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-no-extra-increment-givs -fno-rerun-loop-opt`.
+  - `func_L11_004580E8`: 2476/2476 B, 11 words off. Case 0 FPR priority, case 5 sched1
+    store true dependence on call. Profile `-O2 -G8 -ffunction-sections -g`.
 
 
