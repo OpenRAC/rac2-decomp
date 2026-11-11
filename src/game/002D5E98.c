@@ -1206,7 +1206,7 @@ int func_002DC090(char *s0)
 }
 
 
-INCLUDE_ASM("asm/game", func_002DC3C8);
+/* func_002DC3C8 is built from 002DC3C8-g8.c for small-data access. */
 
 /* func_002DC720 is matched in its own unit, src/game/002DC720.c (its jump table). */
 
