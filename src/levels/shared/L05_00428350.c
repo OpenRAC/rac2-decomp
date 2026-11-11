@@ -321,7 +321,7 @@ void func_L05_00430BF0(Vec16_Fc936841d *object, int index)
 
 /* func_L05_00443D08 is defined in L05_00443D08-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L05_00444840);
+/* func_L05_00444840 is defined in L05_00444840-g8.c. */
 
 /* Converts a two-float record to the coordinate pair the level's bias words expect. */
 void func_L05_00444D60(char *a0, int *a1, int *a2, int a3)
