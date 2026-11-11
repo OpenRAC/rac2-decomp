@@ -209,7 +209,7 @@ typedef int BatchA_A17_s32;
 
 typedef short BatchA_A17_BatchAs16;
 
-INCLUDE_ASM("asm/levels", func_L02_003C43F0);
+/* func_L02_003C43F0 is defined in L02_003C43F0-menu-g8.c. */
 
 /* Walks an inline array of element pointers; for each element whose sub-object flag at +4 is zero it rewrites a 270-degree angle to -90, scales it by pi/180, compares a helper result against 0.001 and routes it through one of two pi/2 helpers, toggles the flag, then calls a two-pointer helper with element+192 and element+240. */
 void func_L02_003C46E0(struct Outer *p)

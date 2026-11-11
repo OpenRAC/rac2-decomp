@@ -98,14 +98,15 @@ python3 $T/gcse_hash_111.py gcc
 python3 $T/sched_store_offset.py gcc
 python3 $T/sched_stack_offset.py gcc
 python3 $T/allocno_live_length.py gcc
+python3 $T/sched_arg_copy.py gcc
 sha256sum --check --quiet <<'SUMS'
 a7436602ef9e063c0eafef9888797527ea3fd6e2d35b041d3fed46fcb457f504  gcc/config/mips/mips.c
 e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-ac510ce81929bc41707be97fd43a1e23ce62815990e1cac0ee7d8b416b71e70b  gcc/toplev.c
-4b210daa9030021109b5e28d88d9ef9f6cf879c09659c8586d7db9053f27438c  gcc/haifa-sched.c
+b4dee1db8c3c9a7461f786974807f295f41c1868913f318792db119fcd0ee404  gcc/toplev.c
+254670831bd1070c683caca607f0665e3ddfb0194b2ef278898870932b555f0e  gcc/haifa-sched.c
 7b58c94fbad9767bc95c7f444f1bb31a4bc1d557e87787fa6921c59031412a67  gcc/reorg.c
-5f27c022987d2bf2330149f896c76787a08036afed6f3041b49b77c0cd99e822  gcc/flags.h
+2a1ba1a16b8987cfffb1859dc5644901615af1e8ed3c97a2fd7b52b0be0a3cfe  gcc/flags.h
 28391f37355e5a0324ac19a9451f8f0dfa42e8e9f25b0157939388924d35f632  gcc/gcse.c
 efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
 3535b59f5a754e44fb67989b1c30ad8f8f4fab6c30f12ef4dff287f527a82306  gas/config/tc-mips.c
