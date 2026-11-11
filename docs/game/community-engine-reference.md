@@ -110,16 +110,23 @@ The game uses dynamic level overlays loaded over the high memory region:
 - **Save File IFF Architecture**:
   - Insomniac save streams use an IFF chunk protocol (`mc_gamedata` and `mc_leveldata`).
   - Key chunk IDs include: `0` (`SAVE_BLOCK_LEVEL`), `1` (`SAVE_BLOCK_BOLT_COUNT`), `2` (`SAVE_BLOCK_GAME_COMPLETES`), `5` (`SAVE_BLOCK_GLOBAL_FLAGS`), `10` (`SAVE_BLOCK_UNLOCKS`), `12` (`SAVE_BLOCK_PURCHASABLE_VENDOR_ITEMS`).
-- **Vendor Free-Weapon Unlock Mechanic**:
-  - When talking to the Gadgetron vendor on Planet Barlow (and Megacorp vendors), the game queries `libmc` for save files in slot 1 and slot 2 (`mc0:`, `mc1:`).
-  - If a valid RaC1 save is found, it parses Chunk 10 (`SAVE_BLOCK_UNLOCKS`).
-  - The bitmask indicates which legacy weapons Ratchet acquired in RaC1:
-    - Bit 0 (`0x01`): Bomb Glove (`GADGET_BOMB_GLOVE`)
-    - Bit 1 (`0x02`): Pyrocitor (`GADGET_PYROCITOR`)
-    - Bit 2 (`0x04`): Blaster (`GADGET_BLASTER`)
-    - Bit 3 (`0x08`): Glove of Doom (`GADGET_GLOVE_OF_DOOM`)
-    - Bit 4 (`0x10`): Suck Cannon (`GADGET_SUCK_CANNON`)
-  - For each legacy weapon unlocked in the RaC1 save, the purchase cost is set to **0 bolts** (free of charge).
+- **Vendor Free-Weapon Unlock Mechanic** (read from the code: `func_002FAE68`, `func_00298F00`
+  states 24-27, `func_002FADB0`):
+  - When the Gadgetron vendor on Planet Barlow checks the card, the card state machine opens
+    `BASCUS-97199RATCHET/save0.bin` to `save4.bin`, then `BESCES-50916RATCHET/…` and
+    `BISCPS-15037RATCHET/…` (every disc looks for all three regions), on the first card and then
+    the second, and reads the first `0x2800` bytes of each save.
+  - In a valid save (`func_0029AF58`) it reads Chunk 10 (`SAVE_BLOCK_UNLOCKS`), a byte per RaC1
+    item id, and sets a bit of the flags word `D_001A7A00[8]` (`0x001A7A20`) for each weapon
+    Ratchet had (`include/save.h`):
+    - Bit 0 (`0x01`): Bomb Glove (RaC1 item `0x0A`)
+    - Bit 1 (`0x02`): Walloper (`0x12`)
+    - Bit 2 (`0x04`): Decoy Glove (`0x19`)
+    - Bit 3 (`0x08`): Visibomb Gun (`0x0D`)
+    - Bit 4 (`0x10`): Tesla Claw (`0x13`)
+    - Bit 7 (`0x80`): a RaC1 save was found
+  - The vendor then marks its items for the set bits free of charge (`func_002FAD68` with RaC2
+    items 12, 53, 17, 14 and 18, the same five weapons) and clears bit 7.
 
 ### 4.5 Controller & Frontend Quirks
 - In the RaC2 title screen, `R2` and the Right Stick do not satisfy the "Press START" condition.
