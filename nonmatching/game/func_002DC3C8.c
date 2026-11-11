@@ -1,3 +1,8 @@
+/* 11 November 2026: Prototype evidence (Sep 4/Sep 7 2003 builds): function is
+ * the timed text/credits page controller in gui/game_menu.cpp. Predecessor
+ * func_002DC228 ends with return delay slot and alignment nop at 0x002DC3C4;
+ * the sw $zero,0x50($a0) at +0 resets menu->state before the timer dispatch.
+ */
 /* 9 November 2026 (o16): measured with the catalogue row shifted +8 (to 0x002DC3D0, 848 bytes),
  * the C below equals retail in all 214 instructions (opcodes and registers; relocations not
  * compared). The +8 shift itself stays unproved under docs/contributing/matching-blockers.md "Entry still
