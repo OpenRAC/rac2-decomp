@@ -20,6 +20,33 @@ typedef enum GeometryKind {
 } GeometryKind;
 
 /*
+ * Game Modes and Movie Playback states.
+ * Recovered from mode.cpp and loaders.cpp in prototype builds.
+ */
+typedef enum GameMode {
+    GAME_MODE_NONE            = 0,
+    GAME_MODE_DEBUG           = 1,
+    GAME_MODE_NORMAL          = 2,
+    GAME_MODE_MOVIE           = 3,
+    GAME_MODE_SCENE           = 4,
+    GAME_MODE_PAUSE           = 5,
+    GAME_MODE_FREEZE          = 6,
+    GAME_MODE_VENDOR          = 7,
+    GAME_MODE_SPACE           = 8,
+    GAME_MODE_PUZZLE          = 9,
+    GAME_MODE_HOVERBIKE_PAUSE = 10,
+    GAME_MODE_WEAPON_UPGRADE  = 11,
+    GAME_MODE_CREDITS         = 12
+} GameMode;
+
+typedef enum MovieType {
+    MOVIE_INFOBOT = 0,
+    MOVIE_HELP    = 1,
+    MOVIE_SPECIAL = 2,
+    MOVIE_STORY   = 3
+} MovieType;
+
+/*
  * Collision System API:
  * Pill/capsule collision detection for Mobies.
  * Recovered from assertion strings in engine core (0x001E8890).
