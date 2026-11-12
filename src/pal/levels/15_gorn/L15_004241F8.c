@@ -2,4 +2,4 @@
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L15_004342E0);
+/* func_PAL_L15_004342E0 lives in L15_004342E0-g8.c. */
