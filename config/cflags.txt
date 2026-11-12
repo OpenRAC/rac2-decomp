@@ -426,7 +426,9 @@ src/us2/game/003424C8-rc2.c	-O2 -G0 -ffunction-sections -fno-builtin
 src/us2/game/00341C28-rc2.c	-O2 -G8 -ffunction-sections -fno-builtin
 src/us2/levels/02_maktar_nebula/L02_003FE240-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges -frac2-keep-block-order
 src/us2/levels/02_maktar_nebula/L02_003FFEDC-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
+src/pal/levels/02_maktar_nebula/L02_004030B4-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
 src/us2/levels/11_joba/L11_00445CB4-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
+src/pal/levels/11_joba/L11_00449CBC-g8.c	-O2 -G8 -ffunction-sections -frac2-frame-pointer-liveness
 src/pal/game/0033AEF8-b.c	-O2 -G8 -ffunction-sections
 src/us2/game/0033A5D8-b.c	-O2 -G8 -ffunction-sections
 src/us2/game/0033C958-b.c	-O2 -G8 -ffunction-sections
@@ -2748,6 +2750,7 @@ src/levels/16_snivelak/L16_002F60B8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcop
 src/levels/shared/L02_003C43F0-ring-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L02_003C43F0-menu-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin -fno-gcse -frac2-sched-arg-copy
 src/us2/levels/shared/L02_003C58E0-menu-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin -fno-gcse -frac2-sched-arg-copy
+src/pal/levels/shared/L02_003C80F8-menu-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin -fno-gcse -frac2-sched-arg-copy
 src/game/00336A78-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/levels/shared/L00_0032A530-g.c	-O2 -G0 -ffunction-sections -g
 src/levels/shared/L13_0041B670-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
@@ -4292,6 +4295,7 @@ src/us2/levels/shared/L08_003CF3E8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2
 src/us2/levels/25_wupash_nebula/L25_0040E7A8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/23_damosel_orbit/L23_0041EF48-cc.c	-O2 -G16 -Wa,-G16 -ffunction-sections -g
 src/levels/shared/L04_00402D90-hud-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
+src/pal/levels/shared/L04_00410E40-hud-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/pal/game/00314B5C-sw-g8.c	-O2 -G8 -ffunction-sections -g
 src/us2/levels/shared/L00_003012A0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges
 src/pal/levels/shared/L00_003021B0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-unsplit-edges

@@ -1,3 +1,3 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L02_004030B4);
+/* func_PAL_L02_004030B4 lives in L02_004030B4-g8.c. */

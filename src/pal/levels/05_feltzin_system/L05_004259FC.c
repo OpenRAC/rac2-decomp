@@ -1,6 +1,6 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L05_004259FC);
+/* func_PAL_L05_004259FC lives in L05_004259FC-menu-g8.c. */
 
 
 
