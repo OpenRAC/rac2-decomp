@@ -1,4 +1,4 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L10_00423CB8);
+/* func_US2_L10_00423CB8 lives in L10_00423CB8-g8.c. */
