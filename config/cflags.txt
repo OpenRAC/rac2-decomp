@@ -4286,6 +4286,7 @@ src/us2/levels/15_gorn/L15_0042F6D0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/003144C8-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/us2/levels/shared/L00_002A3B88-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L04_004185D8-cc.c	-O2 -G0 -ffunction-sections
+src/pal/levels/shared/L04_0041B850-cc.c	-O2 -G0 -ffunction-sections
 src/us2/levels/10_hrugis_cloud/L10_00422CA8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L08_003CF3E8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -ffast-math
 src/us2/levels/25_wupash_nebula/L25_0040E7A8-cc-g8.c	-O2 -G8 -ffunction-sections
