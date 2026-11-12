@@ -2747,6 +2747,7 @@ src/levels/16_snivelak/L16_003F5708-g8.c	-O2 -G8 -ffunction-sections -g -membedd
 src/levels/16_snivelak/L16_002F60B8-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-zero-ti-por
 src/levels/shared/L02_003C43F0-ring-g8.c	-O2 -G8 -ffunction-sections -g
 src/levels/shared/L02_003C43F0-menu-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin -fno-gcse -frac2-sched-arg-copy
+src/us2/levels/shared/L02_003C58E0-menu-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin -fno-gcse -frac2-sched-arg-copy
 src/game/00336A78-g16.c	-O2 -G16 -ffunction-sections -Wa,-G16
 src/levels/shared/L00_0032A530-g.c	-O2 -G0 -ffunction-sections -g
 src/levels/shared/L13_0041B670-g16.c	-O2 -G16 -Wa,-G16 -ffunction-sections
