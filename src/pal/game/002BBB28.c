@@ -61,7 +61,7 @@ void func_PAL_002BBC10(u8 *a0)
 }
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002BBCC0);
+/* func_PAL_002BBCC0 lives in 002BBCC0.c. */
 
 extern int Fb77d67f1_FUN_00282948(char *p);
 extern void Fb77d67f1_FUN_002B9180(char *p);
