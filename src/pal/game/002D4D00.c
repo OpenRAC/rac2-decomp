@@ -47,4 +47,4 @@ int func_PAL_002D4D00(int index, int x)
     return func_0028EA58(texture, left, 334, 40, 40, colors);
 }
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002D4EA0);
+/* func_PAL_002D4EA0 lives in 002D4EA0-g8.c. */

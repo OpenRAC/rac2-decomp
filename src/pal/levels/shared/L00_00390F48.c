@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L00_00391958);
+/* func_PAL_L00_00391958 lives in L00_00391958-g8.c. */
 
 
 typedef int Quad __attribute__((mode(TI)));
