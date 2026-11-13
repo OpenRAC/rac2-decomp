@@ -1,3 +1,3 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_002DD0F8);
+/* func_US2_002DD0F8 is built from 002DD0F8-g8.c for small-data access. */

@@ -1,3 +1,3 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002DD0C0);
+/* func_PAL_002DD0C0 is built from 002DD0C0-g8.c for small-data access. */
