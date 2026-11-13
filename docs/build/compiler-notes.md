@@ -129,6 +129,22 @@ not a blanket profile. Confirm acceptance and improvement, isolate incompatible
 units, then recheck their existing C and all carrying releases. Stop a tied
 approach instead of manufacturing references or trying equivalent permutations.
 
+### A copy tied to a counter
+
+When a local-alloc dump shows retail's assignment only with one extra insn tied to a value (that
+value's quantity gaining the insn's references), retail may keep a copy that emits nothing:
+`mips_move_1word` prints no code for a move between equal registers. By default this tree
+never keeps one. cse makes the copy's source the canonical register and flow deletes the copy;
+combine folds a single-use copy into its user; and regmove's copy rules run under
+`-fexpensive-optimizations` even with `-fno-regmove`. The opt-in `-frac2-keep-user-copies`
+([keep_user_copies.py](../../tools/compiler/transformers/keep_user_copies.py)) keeps a register
+copy into a user variable: cse makes the variable canonical, and combine does not fold the copy.
+Write the copy as a named local where retail needs it, typically right after the value's last
+other use, so the source dies in the copy and local-alloc ties the two. In
+func_PAL_L09_0040FD68 and func_PAL_L00_003B9E80 a frame counter copied after its store then
+takes the first free register, and the conversion follows the 1/6 constant (L09), as in retail.
+`tests/test_keep_user_copies.py` checks the default, enabled and disabled outputs.
+
 This reference groups qualified compiler mechanisms and useful C source shapes by
 topic. Open cases belong in [matching-blockers.md](../contributing/matching-blockers.md). The source
 recipe, per-file flags and complete linked build take precedence over historical
@@ -203,6 +219,7 @@ wrong profile with extra operations or knowingly false prototypes.
 | Branch slot setting `$fp` annulled (`bnel`), retail `bne`; no frame pointer | -frac2-frame-pointer-liveness | func_L07_0040EC08, func_L04_00414698 |
 | Callee saves issued at the top, retail has them among stores through `$v0` | -frac2-no-static-chain-base (with -frac2-frame-pointer-liveness) | func_002BA0E0 |
 | A word stored into a float read twice: `lui`/`ori $v0` after the previous call, one `mtc1` into a saved FPR, `mov.s` per read | -frac2-keep-float-pun-source, write `*(s32 *)&f = K` | func_00349D58 |
+| A frame counter allocated as if a copy of it were tied to it: the counter takes the first free register ahead of `counter + 1` and constants | -frac2-keep-user-copies, write the copy as a named local after the counter's store | func_PAL_L09_0040FD68, func_PAL_L00_003B9E80 |
 | A cursor advanced several times per iteration is split into reduced pointers (`sd 0/8/16/24` and one add); retail stores and adds after each | -frac2-no-extra-increment-givs (with -fno-rerun-loop-opt) | func_00284268 |
 | Two-word truncation cannot fill return slot | -mastra-split-trunc-slot | func_0012E8C8 |
 | SDK unit: a volatile access or sign extension fills a `jal`/`jr` slot | -Wa,--r5900-swap-branch-slots | func_001253A8, func_0012E378, func_0011C000 |
