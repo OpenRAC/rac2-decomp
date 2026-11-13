@@ -2,4 +2,4 @@
 
 
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L15_00430500);
+/* func_US2_L15_00430500 lives in L15_00430500-g8.c. */

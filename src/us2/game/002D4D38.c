@@ -46,6 +46,6 @@ int func_US2_002D4D38(int index, int x)
     return func_0028EA58(texture, left, 334, 40, 40, colors);
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_002D4ED8);
+/* func_US2_002D4ED8 lives in 002D4ED8-g8.c. */
 
 INCLUDE_ASM("asm/us2/game", func_US2_002D5540);

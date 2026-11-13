@@ -3671,6 +3671,9 @@ src/us2/game/00348E70-menu.c	-O2 -G0 -ffunction-sections -fno-strength-reduce
 src/us2/game/0027FCB0-g8.c	-O2 -G8 -ffunction-sections -Wa,-G32
 src/us2/game/002D5C58-g8.c	-fno-builtin -O2 -G8 -ffunction-sections
 src/us2/game/002D5D10-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -fno-builtin
+src/us2/levels/15_gorn/L15_00430500-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/10_hrugis_cloud/L10_00423CB8-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/us2/levels/05_feltzin_system/L05_00420420-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/us2/levels/11_joba/L11_00433090-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/002CBED0-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L00_00345740-g8.c	-O2 -G8 -ffunction-sections
