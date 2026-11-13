@@ -4293,6 +4293,7 @@ src/us2/levels/15_gorn/L15_0042F6D0-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/game/003144C8-cc-g8.c	-O2 -G8 -ffunction-sections -g
 src/us2/levels/shared/L00_002A3B88-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L04_004185D8-cc.c	-O2 -G0 -ffunction-sections
+src/pal/levels/shared/L04_0041B850-cc.c	-O2 -G0 -ffunction-sections
 src/us2/levels/10_hrugis_cloud/L10_00422CA8-cc-g8.c	-O2 -G8 -ffunction-sections
 src/us2/levels/shared/L08_003CF3E8-cc-g8.c	-O2 -G8 -ffunction-sections -g -frac2-qcopy -ffast-math
 src/us2/levels/25_wupash_nebula/L25_0040E7A8-cc-g8.c	-O2 -G8 -ffunction-sections
@@ -4325,3 +4326,6 @@ src/pal/levels/shared/L08_003DF82C-g8.c	-O2 -G8 -ffunction-sections -malign-loop
 src/pal/levels/02_maktar_nebula/L02_003D4458-g8.c	-O2 -G8 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L18_0043FFF8-g8.c	-O2 -G0 -ffunction-sections -g
 src/levels/22_dobbo_orbit/L22_003D0840.c	-O2 -G0 -ffunction-sections -frac2-caller-reg-order
+src/pal/levels/15_gorn/L15_004342E0-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/10_hrugis_cloud/L10_00427628-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/pal/levels/05_feltzin_system/L05_00423C50-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
