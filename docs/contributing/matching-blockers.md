@@ -278,6 +278,16 @@ or `extendsidi2` between equal registers; cse, combine and shared variables remo
 **Next:** a matched function whose retail shows the same `lhu`/`addiu`/`sh`/`mtc1` idiom with a
 wider or re-typed counter.
 
+**Update, 13 November 2026 (pending review):** now matched, with `func_PAL_L00_003B9E80`, whose
+closing limit test has the same allocation. Both compare a copy of the counter made after its
+store (`t = ticks;`, `old = timer;`) and build with the opt-in `-frac2-keep-user-copies`
+([keep_user_copies.py](../../tools/compiler/transformers/keep_user_copies.py)). cse then keeps the
+user variable as the canonical register and combine leaves the copy, so it reaches local-alloc
+tied to the counter (five references) and costs no instruction. With an extra instrumented-cc1
+pass, both blocks give retail's whole assignment under that one rule, and neither does without
+it. C in `src/pal/levels/09_dobbo/L09_0040FD68-g8.c` and
+`src/pal/levels/shared/L00_003B9E80-counter-g8.c`; the near-miss draft is removed.
+
 ### 16-bit counters read through a wider local
 
 **1 November 2026, local match.** `x++ > n` on a `u16` field keeps the old value in a HImode pseudo

@@ -30,4 +30,4 @@ void func_PAL_L09_0040E1C0(char *obj)
 
 
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L09_0040FD68);
+/* func_PAL_L09_0040FD68 lives in L09_0040FD68-g8.c. */

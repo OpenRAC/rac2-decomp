@@ -3120,6 +3120,8 @@ src/core/00131424-sqrt.c	sdk -O2 -G2 -ffunction-sections
 src/game/0032AE30-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier
 src/levels/shared/L04_004135B8-g8.c	-O2 -G8 -g -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L00_003B63D8-counter-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por
+src/pal/levels/shared/L00_003B9E80-counter-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-keep-user-copies
+src/pal/levels/09_dobbo/L09_0040FD68-g8.c	-O2 -G8 -ffunction-sections -frac2-keep-user-copies
 src/levels/shared/L03_003E4680-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy
 src/core/0012646C-store.c	sdk -O2 -G2 -ffunction-sections
 src/core/0012672C-exec.c	sdk -O2 -G2 -ffunction-sections -Wa,--r5900-swap-branch-slots
