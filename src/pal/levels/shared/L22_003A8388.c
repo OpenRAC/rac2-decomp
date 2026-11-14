@@ -7,5 +7,5 @@ int func_PAL_L22_003A8388(void) {
     return 1;
 }
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L22_003A83A8);
+/* func_PAL_L22_003A83A8 lives in L22_003A83A8-hud-g8.c. */
 

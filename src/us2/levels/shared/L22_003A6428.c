@@ -7,4 +7,4 @@ int func_US2_L22_003A6428(void) {
     return 1;
 }
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L22_003A6448);
+/* func_US2_L22_003A6448 lives in L22_003A6448-hud-g8.c. */

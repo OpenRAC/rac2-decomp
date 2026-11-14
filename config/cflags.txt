@@ -5,6 +5,7 @@ src/levels/12_todano/L12_00429610.c	-O2 -G0 -ffunction-sections -frac2-hazard-la
 src/levels/shared/L04_0043BEE8-g8.c	-O2 -G8 -ffunction-sections -mno-split-addresses
 src/levels/shared/L03_003CC238.c	-O2 -G0 -ffunction-sections -frac2-zero-ti-por -g
 src/game/002BB100.c	-O2 -G0 -ffunction-sections -frac2-delay-no-split-hi
+src/pal/game/002BBCC0.c	-O2 -G0 -ffunction-sections -frac2-delay-no-split-hi
 src/game/003427B0-selection-g8.c	-O2 -G8 -ffunction-sections -frac2-sched-store-offset
 src/game/0034A808.c	-O2 -G0 -ffunction-sections -frac2-hazard-labels
 src/levels/shared/L00_003C58E8-qcopy.c	-O2 -G0 -ffunction-sections -frac2-qcopy
@@ -595,6 +596,8 @@ src/game/0030F7B0-dbg.c	-O2 -G0 -ffunction-sections -g
 # Format dispatch preserves the retail quadword return-address save.
 src/core/00118CC8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
 src/levels/shared/L22_003A5018.c	-O2 -G0 -ffunction-sections -g
+src/us2/levels/shared/L22_003A6448-hud-g8.c	-O2 -G8 -ffunction-sections -g -frac2-sched-global-yield
+src/pal/levels/shared/L22_003A83A8-hud-g8.c	-O2 -G8 -ffunction-sections -g -frac2-sched-global-yield
 src/levels/shared/L22_003B8FE8-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L22_003B9128-g8.c	-O2 -G8 -ffunction-sections
 # A quadword copy plus the line label in front of the division.
