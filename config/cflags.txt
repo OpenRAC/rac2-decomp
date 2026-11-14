@@ -596,6 +596,8 @@ src/game/0030F7B0-dbg.c	-O2 -G0 -ffunction-sections -g
 # Format dispatch preserves the retail quadword return-address save.
 src/core/00118CC8.c	-O2 -G2 -ffunction-sections -mastra-quad-saves
 src/levels/shared/L22_003A5018.c	-O2 -G0 -ffunction-sections -g
+src/us2/levels/shared/L22_003A6448-hud-g8.c	-O2 -G8 -ffunction-sections -g -frac2-sched-global-yield
+src/pal/levels/shared/L22_003A83A8-hud-g8.c	-O2 -G8 -ffunction-sections -g -frac2-sched-global-yield
 src/levels/shared/L22_003B8FE8-g8.c	-O2 -G8 -ffunction-sections
 src/levels/shared/L22_003B9128-g8.c	-O2 -G8 -ffunction-sections
 # A quadword copy plus the line label in front of the division.
