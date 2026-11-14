@@ -36,6 +36,19 @@ src/levels/shared/L05_0042B2C0-strip-g8.c	func_L05_0042B2C0	loop-invariant set i
 src/levels/shared/L05_0042B2C0-strip-g8.c	func_L05_0042B2C0	q and w are unused; they keep the pseudo register numbers, which break allocation ties
 src/levels/shared/L05_0042B2C0-strip-g8.c	func_L05_0042B2C0	the #pragma rac2_sched1_order list above fixes the pre-reload order of this function's insns
 src/pal/game/0028DC40-g8.c	func_PAL_0028DC40	do { } while (0) group; its loop notes make the read after the last draw a
+src/pal/game/002CD520-hud-g8.c	-	the #pragma rac2_sched1_order list fixes the pre-reload order of the clip and scroll
+src/pal/game/002CD520-hud-g8.c	-	the #pragma rac2_sched2_order list fixes the post-reload order of the same blocks
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	dead shift/unshift on stand-in globals (v1.01 func_002CC6B0's win_shift/win_unshift)
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	dead stand-in values: combine cancels the pairs, the four loads stay until
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	loop group weights the text references (allocation priority)
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	loop groups weight a21/a23
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	mask kept in the reused stand-in
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	nested loop groups weight the wflags/a23 references (allocation priority)
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	second dead shift/unshift pair
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	shift stand-in, then the 0x20000 mask
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	unshift after the s[0] copy
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	y holds gap*3 and then the s[0] copy
+src/pal/game/002CD520-hud-g8.c	func_PAL_002CD520	y/x/m only serve the scroll block
 src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	do { } while (0) adds loop notes, so flow counts the 0x70202080 register's refs at a deeper loop level; global then allocates it (s6) before `low`, as retail
 src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	volatile load, see above
 src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124)

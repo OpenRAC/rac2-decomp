@@ -1,47 +1,20 @@
-/* func_PAL_002CD520 (2,420 bytes, PAL): near miss, G8 (unit 002CD520-hud-g8.c). FAKEMATCH forms
- * (owner ruling 14 November 2026 for src/pal/): each site is marked below.
- * The PAL copy of func_002CC6B0 (src/game/002CC6B0-hud-g8.c), adapted: 50 Hz frame counts
- * ((n * 5 + 2) / d with d = 6 through an inline, so the div keeps its trap), text id 0xBD1, and
- * each DRAW becomes DRAW_SCALED: func_PAL_002804A8 at scale 0.85f when the screen pointer at
- * D_PAL_001F2840 + 0x14 is D_PAL_0025BF30, else func_PAL_00280A30.
- * Flags: -O2 -G8 -ffunction-sections -frac2-flow2-trap-mem -frac2-la-multi-death-locals
- *        -frac2-sched-temp-store-after-args
- * 14 November 2026 (second pass): 2420/2420 bytes, 0/28 places, three small groups left.
- * Solved: the callee-saved order (a23 s3, wflags s4, a21 s5, &win s6, text s7, tex fp) with a
- * plain if/else macro (one &win pseudo, 13 refs) plus do { } while (0) groups, which double the
- * weight of the references inside (flow counts loop depth): wflags/a23 (nested), a21/a23 at the
- * origin arm, text in the 0x200 arm. Priority cliffs are steep (floor_log2 of the ref count);
- * a loop ending just before a branch or join (text == 0 test, `do wflags = 8; while (0);` before
- * an if, the f & 2 block, an inner loop at the end of the f & 1 block) breaks delay-slot filling
- * and adds nops. The v1.01 clip/scroll fakematches (dead shift/unshift pairs, y reuse) are ported;
- * the scroll pair as s5+, s0+, s0-, s5- gives retail's store order (s[0] first).
- * Left: (1) f & 1 block: the w+0x20 load takes v1 and the sign temp v0, retail the reverse (any
- * loop around `a23 = w[0x20] / 2` does this); (2) clip block: retail `lui t0,2` before the subu,
- * ours `lui a1,2` after it (moving `k = 0x20000` earlier puts the lui before the sra instead);
- * (3) scroll block: retail builds &D_PAL_001F2840 first into t2 and issues sll before lhu s[7];
- * ours a3 and later (a set-once local for the address changes nothing, CSE folds it).
- * 14 November 2026 (third pass, prototype -frac2-la-unweighted-refs plus -frac2-sched-const-first;
- * C unchanged, 12 lines left: (2) and (3) above). Allocator evidence (tools/regalloc.py):
- * - k (the mask) is a global allocno live only from its lui to the and; it conflicts with v0, v1, a0,
- *   so it takes a1. In v1.01 and v2.00 CSE reuses k in the post-draw `& 0x20000` test, so k crosses
- *   the draw and gets s0. Writing `& k` there here gives k s0 and moves the BF30 high part to s2:
- *   s2, s3 and s4 are free across the clip block in retail too, so retail's k does not cross a call.
- *   A set-once mask declared at the top is spilled and rematerialised (reload reg a1, lui before the
- *   sra: 23 lines).
- * - The scroll address (lo_sum of the spilled D_PAL_001F2840 high part, which crosses 8 calls and
- *   is reloaded at each test) is block-local: local-alloc gives it a3. Retail's load comes before
- *   the s[0]/s[5] stores, so its address has a known base: holding it in a multi-set user variable
- *   (f0, a23, content...) makes it global (t0 with f0) but the load then waits for the stores
- *   (2416 bytes). A set-once pointer assigned before the 0x400 test is global, takes a3, and its
- *   high part lands in a1 as in retail (19 lines).
- * - Moving the scroll stand-in loads into the previous block keeps them in code (2428 bytes; the
- *   USE keeps them live through flow2), although k then takes t0 and m a2.
- * - This compiler's reload (reload1.c, insn chains) picks reload regs round-robin (last_spill_reg)
- *   over the whole function's spill set minus the regs occupied at the insn (finish_spills). Our
- *   GPR spill set is v0..a2 (the struct copy takes v1, a0, a1, a2). If retail's t0/t2 are reload
- *   regs, t0 and t2 must be in retail's spill set, which no visible retail insn explains.
- * Next: find what puts a2..t1 out of reach at the scroll address (conflicts or regs_someone_prefers
- * from a lower-priority allocno that does not cross a call) without code in the block. */
+/* func_PAL_002CD520 (2,420 bytes, PAL): the PAL copy of func_002CC6B0 (src/game/002CC6B0-hud-g8.c).
+ * A FAKEMATCH unit (owner rulings of 14 November 2026 for src/pal/ and for this function's order
+ * hints; config/fakematch.tsv). Each site is marked below.
+ * Adapted from v1.01: 50 Hz frame counts ((n * 5 + 2) / d with d = 6 through an inline, so the div
+ * keeps its trap), text id 0xBD1, and each DRAW becomes DRAW_SCALED: func_PAL_002804A8 at scale
+ * 0.85f when the screen pointer at D_PAL_001F2840 + 0x14 is D_PAL_0025BF30, else func_PAL_00280A30.
+ * The callee-saved order (a23 s3, wflags s4, a21 s5, &win s6, text s7, tex fp) comes from a plain
+ * if/else macro (one &win pseudo) plus do { } while (0) groups, which double the weight of the
+ * references inside (flow counts loop depth). The v1.01 clip/scroll fakematches (dead shift/unshift
+ * pairs, y reuse) are ported; the scroll pair as s5+, s0+, s0-, s5- gives retail's store order.
+ * The clip mask in t0 and the scroll address in t2: retail's allocation of these two blocks is
+ * reproduced only with dead values that occupy registers until reload (combine keeps the sets it
+ * would delete, -frac2-combine-keep-dead-sets; flow2 deletes them after reload) and with the
+ * order of the first scheduling pass given as a list (#pragma rac2_sched1_order); the order of
+ * the second pass in the same two blocks is given as a list too (#pragma rac2_sched2_order).
+ * The lists name insn UIDs, so they hold for this source and these flags only: any change to the
+ * function needs new lists. */
 #include "common.h"
 typedef struct { short s[12]; } Win;
 typedef struct { char pad[0x3C]; int so; } LabelSO;
@@ -89,6 +62,12 @@ static inline int translated_edge(int extent, int origin) { return extent + orig
 static inline void set_anchor(Win *p, unsigned short anchor) { p->s[5] = anchor; }
 static inline void set_top(Win *p, unsigned short top) { p->s[0] = top; }
 static inline void set_window_vertical(Win *p, unsigned short top, unsigned short anchor) { p->s[5] = anchor; p->s[0] = top; }
+/* FAKEMATCH: the #pragma rac2_sched1_order list fixes the pre-reload order of the clip and scroll
+   blocks, which decides local-alloc's and global-alloc's registers there (mask t0, address t2) */
+#pragma rac2_sched1_order 1451 1628 1697 1630 1633 1580 1632 1636 1566 1569 1643 1560 1591 1671 1562 1701
+#pragma rac2_sched1_order 1589 1699 1614
+/* FAKEMATCH: the #pragma rac2_sched2_order list fixes the post-reload order of the same blocks */
+#pragma rac2_sched2_order 1398 1401 1404 1697 1571 1693 1665
 int func_PAL_002CD520(unsigned char *w) {
     char buf[0x40];
     int id;
@@ -322,6 +301,10 @@ int func_PAL_002CD520(unsigned char *w) {
         /* FAKEMATCH: second dead shift/unshift pair */
         m = D_001AB9A8; k = D_001AB974;
         win.s[5] += m; win.s[0] += k; win.s[0] -= k; win.s[5] -= m;
+        /* FAKEMATCH: dead stand-in values: combine cancels the pairs, the four loads stay until
+           reload and hold a2..t1 while the scroll address is live, then flow2 deletes them */
+        { int sa = D_001AB9AC, sb = D_001AA440, sc = D_001A79F0, sd = D_001C51D0;
+        win.s[5] += sa + sb; win.s[5] -= sa + sb; win.s[0] += sc + sd; win.s[0] -= sc + sd; }
         DRAW_SCALED(colour, text);
         if (*(int *)(w + 0x30) & 0x400) {
             ((LabelSO *)w)->so += (D_00138320[0] & 0xF) == 0xF ? 10 : 3;

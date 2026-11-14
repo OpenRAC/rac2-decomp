@@ -415,6 +415,15 @@ deleting it, for flow2 to remove. With dead user-variable copies and both order 
 [test_sched2_order.py](../../tests/test_sched2_order.py),
 [test_cd670_rules.py](../../tests/test_cd670_rules.py).
 
+### A local-alloc rule of func_PAL_002CD520 (opt-in)
+
+tools/compiler/transformers/cd520_rules.py adds, default off, `-frac2-la-unweighted-refs` (229
+forced-on corpus changes): local-alloc ranks a block's quantities by their reference counts
+divided by the block's loop depth (rounded, at least 1), so references inside do { } while (0)
+groups are not weighted. With -frac2-combine-keep-dead-sets, dead stand-in loads and both order
+hints it matches `func_PAL_002CD520` (owner rulings, 14 November 2026). Controls:
+[test_cd520_rules.py](../../tests/test_cd520_rules.py).
+
 ### Four rules of func_002CC6B0 (opt-in)
 
 tools/compiler/transformers/cc6b0_rules.py adds, all default off (forced-on corpus counts in
@@ -2453,6 +2462,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | PAL func_L11_004580E8 copy rules (sched1, global-alloc) | [test_l11_dce0_rules.py](../../tests/test_l11_dce0_rules.py) |
 | After-reload order hint (fakematch) | [test_sched2_order.py](../../tests/test_sched2_order.py) |
 | func_US2_002CD670 rules (sched1 live length, combine) | [test_cd670_rules.py](../../tests/test_cd670_rules.py) |
+| func_PAL_002CD520 rule (local-alloc) | [test_cd520_rules.py](../../tests/test_cd520_rules.py) |
 | func_002CC6B0 rules (flow, local-alloc, sched1) | [test_cc6b0_rules.py](../../tests/test_cc6b0_rules.py) |
 | func_L04_00417308 rules (final, local-alloc, sched1, cse, loop, global-alloc) | [test_l04_17308_rules.py](../../tests/test_l04_17308_rules.py) |
 | func_L17_003E8A58 rules (stmt, combine, sched1, sched2) | [test_l17_rules.py](../../tests/test_l17_rules.py) |

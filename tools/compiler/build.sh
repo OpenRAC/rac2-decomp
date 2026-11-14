@@ -130,14 +130,15 @@ python3 $T/gcse_hash_fp_59.py gcc
 python3 $T/l11_dce0_rules.py gcc
 python3 $T/sched2_order.py gcc
 python3 $T/cd670_rules.py gcc
+python3 $T/cd520_rules.py gcc
 sha256sum --check --quiet <<'SUMS'
 56ccede033f0d7041aeb573a89e79aeee2d635a18987403bee0a1e2d0370a44a  gcc/config/mips/mips.c
 e8b9e0234097ac5c9865812717b2b666c90f535cb114ceb5c579e911e78c972a  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-c01e6656316f7451e096fecfa70a06efa75cf01ec2225350b2800e045d111697  gcc/toplev.c
+eb72699abc435e8ac8d585f08e4193623a74ce9114bf3282bcae9f861a99750a  gcc/toplev.c
 d187684f1c2dfcfcb168bd808752ab786b590ea1810daaadf53fe4f8383cfa25  gcc/haifa-sched.c
 85ce08b12f1222054a9e7e009314ed0aafe48f8612af7ba0c9d2f878087d8ee6  gcc/reorg.c
-b586b9b35f21061280f5d3a3d2c2c947de4d748090eeb73abb6e8826acaffbd0  gcc/flags.h
+d39c08a27ee273a13221f59fe434222ec60d11b5c1012b99a1cd7ee64fe1733f  gcc/flags.h
 d141934f9b0181c58b79b05eba17074d7e773b06749e541c35ce43dc759bc114  gcc/gcse.c
 ae0cc11c65f6ec520668b917bb5ef5052d52ee93964e8f06b5383be6b3e82a39  gcc/flow.c
 72941ee59459c038850f9c330c32c623d1290fad4a54444f9dfd3cb008dfdb0c  gcc/emit-rtl.c
@@ -151,7 +152,7 @@ fef520171c0efbdd9066fed9caf5485df7821796eb73fdb9783e6fdbecdd44ab  gcc/loop.c
 06f9cb7a772a5af1b5e7c883030505ff623ef499ac76fb4ab8c143b1558e8ea1  gcc/global.c
 c64b9016b3dd89b525f5fd0810acd3f7dcbde43b3d9d3fe4657ee486f36f0cbe  gcc/alias.c
 25f59a6b97634b7d678db1939680e5c1d3a1675382a1d268c4ec4f7ce2b7b1a2  gcc/combine.c
-6164df9c2636274d06479453593f16aa01454ae99c3136179053d2adaa650bc6  gcc/local-alloc.c
+7239e13c0fc998f717b68e5f83b59435738bc723853126e7e97f1caec1c95b3d  gcc/local-alloc.c
 d7fca815635791e78130a1ab2f64a95139589f1c4b4862ec83facd1a0607aa23  gcc/final.c
 a0ad1bf96073c9b6395a026769e17f4bdb4ce7b13edaa8d5666597edb2b60819  gcc/stmt.c
 53b72984e05a65d7ad76844db9b1457ba8791a9d7959f32b9b375497e4e05a7b  gcc/regmove.c
@@ -251,6 +252,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_gcse_hash_fp_59.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l11_dce0_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched2_order.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_cd670_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_cd520_rules.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

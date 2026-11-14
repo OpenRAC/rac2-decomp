@@ -19,7 +19,7 @@ extern char D_0026A498[];
 extern char D_0026A190[];
 extern char D_0026A058[];
 extern char D_00269B48[];
-extern volatile int D_001AB9A0 __attribute__((sda));
+extern volatile int D_001AB910 __attribute__((sda));
 extern int (*D_00210AFC[])(int);
 extern void func_PAL_0029D7D0(void);
 extern int func_PAL_0029CC28(int);
@@ -39,15 +39,15 @@ int func_PAL_002CC950(void)
         }
     } else if (D_001F2840.source == D_0026A738) {
         func_PAL_0029D7D0();
-    } else if (D_001F2840.source == D_0026A498 && !D_001AB9A0) {
+    } else if (D_001F2840.source == D_0026A498 && !D_001AB910) {
         func_PAL_0029CC28(0);
-    } else if (D_001F2840.source == D_0026A190 && !D_001AB9A0) {
+    } else if (D_001F2840.source == D_0026A190 && !D_001AB910) {
         if (func_PAL_002D7B68(0))
             D_001F2840.state = D_001F2840.value == 4 ? 2 : 1;
         func_PAL_0029CC98(D_001483C4.flags);
         result = D_001F2840.destination != D_0026A498;
-    } else if ((D_001F2840.source == D_0026A058 && !D_001AB9A0)
-               || (D_001F2840.source == D_00269B48 && !D_001AB9A0)) {
+    } else if ((D_001F2840.source == D_0026A058 && !D_001AB910)
+               || (D_001F2840.source == D_00269B48 && !D_001AB910)) {
         /* nothing: only the tests remain */
     }
     return result;
