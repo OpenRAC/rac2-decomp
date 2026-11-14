@@ -1,3 +1,3 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/levels", func_US2_L04_0040C224);
+/* func_US2_L04_0040C224 lives in L04_0040C224-panel-g8.c. */
