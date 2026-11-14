@@ -208,7 +208,10 @@ each have their own worktree for that reason (docs/agents/agent-workflow.md).
   as a marked fakematch. By owner ruling of 14 November 2026, `func_L05_0042B2C0` alone
   may also give the compiler the order of its instructions before reload
   (`#pragma rac2_sched1_order` with `-frac2-sched1-order`): an order hint selected by
-  instruction, which stays forbidden as a compiler rule everywhere else.
+  instruction, which stays forbidden as a compiler rule everywhere else. By owner ruling of
+  14 November 2026 the same fakematch forms (not the order hint) are also allowed for any
+  PAL or USA v2.00 function in `src/pal/` or `src/us2/`, as a last resort once compiler
+  rules and plain source are exhausted.
   Each site carries `/* FAKEMATCH: <reason> */` and a row in
   `config/fakematch.tsv` (`python3 tools/fakematch.py --write`); the repository check
   rejects a site anywhere else, except in a helper defined in the same unit for that

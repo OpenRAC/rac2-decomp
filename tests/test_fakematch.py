@@ -43,6 +43,13 @@ class FakematchTests(unittest.TestCase):
         self.assertEqual(fakematch.problems(rows, {"src/u.c": {"helper", "func_002CC6B0"}}), [])
         self.assertEqual(len(fakematch.problems(rows, {"src/u.c": {"helper", "func_00100000"}})), 1)
 
+    def test_release_own_functions_pass_in_their_release_tree(self):
+        ok = [("src/pal/game/u.c", "func_PAL_0034F068", "r"), ("src/us2/levels/u.c", "func_US2_L03_003C8620", "r")]
+        self.assertEqual(fakematch.problems(ok), [])
+        self.assertEqual(fakematch.problems([("src/pal/u.c", "helper", "r")], {"src/pal/u.c": {"helper", "func_PAL_00100000"}}), [])
+        bad = [("src/game/u.c", "func_PAL_0034F068", "r"), ("src/pal/game/u.c", "func_00100000", "r")]
+        self.assertEqual(len(fakematch.problems(bad)), 2)
+
     def test_render_is_sorted_with_header(self):
         text = fakematch.render([("b.c", "f", "r"), ("a.c", "g", "s")])
         self.assertTrue(text.startswith("# Code that matches retail"))

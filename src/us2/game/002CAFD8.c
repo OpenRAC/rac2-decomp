@@ -30,4 +30,3 @@ void func_US2_002CAFD8(void) {
     func_00279D18();
 }
 
-INCLUDE_ASM("asm/us2/game", func_US2_002CB038);

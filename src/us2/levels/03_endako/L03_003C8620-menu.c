@@ -1,16 +1,8 @@
-/* 9 November 2026 (PAL port of func_L03_003C7018): 656/656 bytes, PAL 0/1 places (03_endako),
- * 13 differing instruction positions with relocation fields masked (check.py: "instruction at
- * +0xf0 differs"). The USA best C (o126), unchanged apart from the name, in its own unit with
- * -O2 -G0 -ffunction-sections -Wa,--r5900-la-addend=sn; under plain -O2 -G0 it is 648 bytes and
- * the .y walk is $gp+4. PAL retail is the USA retail instruction for instruction (only addresses
- * differ), so the three USA leftovers are the blocker here too: draw 2's ori a1 before the f15 load,
- * the buffer addiu s4 after the key copy (retail: between lui v0 and addiu a2), and the first
- * sprintf rematerialises addiu a0,sp,0x10 (retail daddu a0,s4). New, not kept: buffer and buf
- * declared in the outer if-block with `buf = buffer;` inside the `one = 1` group gives 11
- * positions: the buffer address lands before the copy and both sprintfs agree, but the frame swaps
- * (buffer sp+0, keys sp+0x80; retail keys sp+0, buffer sp+0x10) and the uses become daddu ...,sp.
- * A `buf = buffer` group in the keys block (with or without one = 1) gives 680 bytes (the
- * screen_coord branch is duplicated). Matching the USA twin should match this. */
+/* func_US2_L03_003C8620 (656 bytes, Endako): the USA v2.00 copy of func_L03_003C7018
+ * (src/levels/03_endako/L03_003C7018-menu.c), the two-line menu panel: the same code, only
+ * its addresses and its four text ids (v2.00 numbers its text differently) differ. Same C
+ * and unit flags (config/cflags.txt); label_y/label_y2 are the dead-test helpers allowed by
+ * owner ruling (7 November 2026). */
 #include "common.h"
 
 struct MenuCoordinate { float x, y; };
@@ -72,7 +64,7 @@ static __inline__ int screen_coord(int mode, float value, float offset, int one)
     return (int)scaled;
 }
 
-int func_PAL_L03_003CB058(void)
+int func_US2_L03_003C8620(void)
 {
     if (D_L03_001A904C) {
         int one;
@@ -96,20 +88,22 @@ int func_PAL_L03_003CB058(void)
             float row, x, c, d;
 
             do {
+            do {
                 title = (char *)func_00336D50(D_L03_001A904C + 0x8710, 0xc7);
                 row = (float)label_y2(title, D_L03_001B0150, D_L03_001B3284, 0.5f, 1);
                 x = D_L03_001B014C;
                 c = D_L03_001B0154;
                 d = D_L03_001B0158;
             } while (0);
-            func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+            do {
+                func_00300A00(title, 0x55f0c070, x, row, c, d, 0.0f);
+                i = 0;
+            } while (0);
+            } while (0);
         }
-        i = 0;
-        do {
-            one = 1;
-        } while (0);
+        one = 1;
         {
-            int keys[4] = {11599,12116,12769,12770};
+            int keys[4] = {11237,11754,12407,12408};
             unsigned char buffer[128];
             unsigned char *buf;
             buf = buffer;
@@ -121,10 +115,10 @@ int func_PAL_L03_003CB058(void)
                     func_00115DA8((char *)buf, D_L03_001B0190, label, D_L03_001B0140 + 1);
                     shift = -4;
                 } else {
-                    func_00115DA8((char *)buffer, D_L03_001B0198, label);
+                    func_00115DA8((char *)buf, D_L03_001B0198, label);
                 }
                 x = func_00283CF0(D_L03_001B0160[i].x);
-                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buffer, 0x80);
+                func_0027FB40(x, func_00283CF0((float)screen_coord(D_L03_001B3280, D_L03_001B0160[i].y, (float)shift, one)), 0x80808080UL, buf, 0x80);
                 i++;
             } while (i < 4);
         }

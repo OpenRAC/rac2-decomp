@@ -377,6 +377,16 @@ destination. Per-unit models under the owner's standard of 12 November 2026; `fu
 also a FAKEMATCH unit (config/fakematch.tsv). Controls:
 [test_cea0_rules.py](../../tests/test_cea0_rules.py).
 
+### Two PRE hash offsets of the PAL and USA v2.00 func_0034CEA0 copies (opt-in)
+
+tools/compiler/transformers/gcse_hash_fp_59.py adds, default off, `-frac2-gcse-hash-fp-59` and
+`-frac2-gcse-hash-parm-91`: siblings of fp-54 and parm-85 above, the frame pointer hashes 59
+buckets further on and an incoming argument's pseudo register 91. With `-frac2-gcse-hash-415`
+they give retail's spill-slot order in `func_PAL_0034F068` and `func_US2_0034DBE0`, whose larger
+menu object moves PRE's buckets (owner ruling, 14 November 2026). Forced on together for every
+USA v1.01 C unit they change 117 functions. Controls:
+[test_gcse_hash_fp_59.py](../../tests/test_gcse_hash_fp_59.py).
+
 ### Four rules of func_002CC6B0 (opt-in)
 
 tools/compiler/transformers/cc6b0_rules.py adds, all default off (forced-on corpus counts in
@@ -2411,6 +2421,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Frame-pointer PRE hash 112 | [test_gcse_hash_fp_112.py](../../tests/test_gcse_hash_fp_112.py) |
 | func_L04_0040AD28 rules (global-alloc, sched2) | [test_l04_ad28_rules.py](../../tests/test_l04_ad28_rules.py) |
 | func_0034CEA0 rules (gcse, sched2, reload, alias, reorg, regmove) | [test_cea0_rules.py](../../tests/test_cea0_rules.py) |
+| PRE hash offsets fp-59 / parm-91 (PAL and USA v2.00 func_0034CEA0 copies) | [test_gcse_hash_fp_59.py](../../tests/test_gcse_hash_fp_59.py) |
 | func_002CC6B0 rules (flow, local-alloc, sched1) | [test_cc6b0_rules.py](../../tests/test_cc6b0_rules.py) |
 | func_L04_00417308 rules (final, local-alloc, sched1, cse, loop, global-alloc) | [test_l04_17308_rules.py](../../tests/test_l04_17308_rules.py) |
 | func_L17_003E8A58 rules (stmt, combine, sched1, sched2) | [test_l17_rules.py](../../tests/test_l17_rules.py) |

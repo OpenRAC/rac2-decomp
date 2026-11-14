@@ -35,3 +35,20 @@ src/levels/shared/L05_0042B2C0-strip-g8.c	func_L05_0042B2C0	do { } while (0) kee
 src/levels/shared/L05_0042B2C0-strip-g8.c	func_L05_0042B2C0	loop-invariant set inside the inner loop (ee = E0 base per row): loop moves it and the 00E0 giv's add_val becomes (plus ee 4), so the giv init is retail's (out*8 + 4) + E0 instead of out*8 + (E0+4)
 src/levels/shared/L05_0042B2C0-strip-g8.c	func_L05_0042B2C0	q and w are unused; they keep the pseudo register numbers, which break allocation ties
 src/levels/shared/L05_0042B2C0-strip-g8.c	func_L05_0042B2C0	the #pragma rac2_sched1_order list above fixes the pre-reload order of this function's insns
+src/pal/game/0028DC40-g8.c	func_PAL_0028DC40	do { } while (0) group; its loop notes make the read after the last draw a
+src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	do { } while (0) adds loop notes, so flow counts the 0x70202080 register's refs at a deeper loop level; global then allocates it (s6) before `low`, as retail
+src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	volatile load, see above
+src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124)
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	`register` keeps t live to the end of its scope (-frac2-register-scope, retail's $f20); no-code copy chain of the 1.0 for state->f30 (tied in local-alloc, deleted by reload); its quantity holds $f2 over the init window like retail
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain copy
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain copy
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain copy
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain copy
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain copy
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	end of the 1.0 chain
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	moved before fCD/fCE (sched1 position for c9 span; sched2 restores retail order with -frac2-sched2-qi-store-offset)
+src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	see o1..o6
+src/us2/game/0028DC24-g8.c	func_US2_0028DC24	do { } while (0) group; its loop notes make the read after the last draw a
+src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	do { } while (0) adds loop notes, so flow counts the 0x70202080 register's refs at a deeper loop level; global then allocates it (s6) before `low`, as retail
+src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	volatile load, see above
+src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124)

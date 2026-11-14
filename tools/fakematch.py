@@ -10,7 +10,9 @@ tags nothing by itself: this repository's other allowed shapes (the HUD dead-tes
 locals and the like) are owner rulings, not fakematches.
 
 Fakematches are allowed only in the functions in ALLOWED and in helpers defined in their units (owner ruling, 13 November 2026: the last
-five USA v1.01 functions, after compiler rules and plain source were exhausted; AGENTS.md).
+five USA v1.01 functions, after compiler rules and plain source were exhausted; AGENTS.md), and in
+any PAL or USA v2.00 function of its own (owner ruling, 14 November 2026: func_PAL_* and func_US2_*
+functions, defined in src/pal/ or src/us2/).
 """
 import re
 import subprocess
@@ -29,6 +31,7 @@ ALLOWED = {
     "func_L05_0042B2C0",
     "func_L17_003E8A58",
 }
+RELEASE_OWN = re.compile(r"^func_(?:PAL|US2)_\w+$")
 DEFINITION = re.compile(r"^[A-Za-z_][^;{}=\n]*?\b(\w+)\s*\([^;{}]*\)\s*\{", re.M)
 COMMENT_OR_STRING = re.compile(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'', re.S)
 
@@ -88,7 +91,11 @@ def problems(rows: list, defined: dict = None) -> list:
     defines an allowed function (a static helper written for that fakematch) is allowed too."""
     errors = []
     for rel, function, reason in rows:
-        if function not in ALLOWED and not ALLOWED & set((defined or {}).get(rel, ())):
+        release_own = rel.startswith(("src/pal/", "src/us2/")) and (
+            RELEASE_OWN.match(function)
+            or any(RELEASE_OWN.match(f) for f in (defined or {}).get(rel, ())))
+        if function not in ALLOWED and not release_own \
+                and not ALLOWED & set((defined or {}).get(rel, ())):
             errors.append(f"{rel}: FAKEMATCH in {function}, which is not an allowed fakematch function")
         if not reason:
             errors.append(f"{rel}: FAKEMATCH in {function} gives no reason")

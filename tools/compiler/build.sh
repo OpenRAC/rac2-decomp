@@ -126,15 +126,16 @@ python3 $T/cc6b0_rules.py gcc
 python3 $T/l04_17308_rules.py gcc
 python3 $T/l17_rules.py gcc
 python3 $T/l05_42b2c0_rules.py gcc
+python3 $T/gcse_hash_fp_59.py gcc
 sha256sum --check --quiet <<'SUMS'
 56ccede033f0d7041aeb573a89e79aeee2d635a18987403bee0a1e2d0370a44a  gcc/config/mips/mips.c
 e8b9e0234097ac5c9865812717b2b666c90f535cb114ceb5c579e911e78c972a  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-3df1c0e9d98a970856781850d9d48a4d40ad055562b2bb2fbbd9e6d66d3a4557  gcc/toplev.c
+f7f85a76e0b1598bc596bb91ea4a6d4b129a430f12a76cb01f078b5fa6765b2a  gcc/toplev.c
 a359fb4867609e631ca952101051c2d88fd26656ced2626ba050f5d9c9bea281  gcc/haifa-sched.c
 85ce08b12f1222054a9e7e009314ed0aafe48f8612af7ba0c9d2f878087d8ee6  gcc/reorg.c
-41a783dd0df819436ba92bc8bfb14c241afdbd6156fb9c4fcbaab8e0d9569651  gcc/flags.h
-6eb6d00f923e38bb5c075ef87bdb7fd519d40842c2d57473cb2ee76ee60a62f5  gcc/gcse.c
+a24b59d0d3a3077d85dada8d6327987762575ee0c7db02f85c54b936adecaedc  gcc/flags.h
+d141934f9b0181c58b79b05eba17074d7e773b06749e541c35ce43dc759bc114  gcc/gcse.c
 ae0cc11c65f6ec520668b917bb5ef5052d52ee93964e8f06b5383be6b3e82a39  gcc/flow.c
 72941ee59459c038850f9c330c32c623d1290fad4a54444f9dfd3cb008dfdb0c  gcc/emit-rtl.c
 36132244008bfdfa284995132a7c33e522682486356cdaa38c99f2dca50b41be  gcc/jump.c
@@ -243,6 +244,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_cc6b0_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l04_17308_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l17_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l05_42b2c0_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_gcse_hash_fp_59.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

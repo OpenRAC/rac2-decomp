@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_00286378);
 
 /* func_US2_00287108: v2.00's own exit helper of the menu overlay: refresh, set D_0018A000 to 10, pop the state. */
 extern short D_0018A000;

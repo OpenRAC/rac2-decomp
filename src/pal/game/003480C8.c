@@ -110,4 +110,3 @@ void func_PAL_00349450(char *obj)
 
 
 
-INCLUDE_ASM("asm/pal/game", func_PAL_00349AB8);

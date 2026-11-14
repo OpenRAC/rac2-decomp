@@ -1,7 +1,6 @@
 #include "include_asm.h"
 #include "common.h"
 
-INCLUDE_ASM("asm/pal/game", func_PAL_002CAEA0);
 
 
 typedef int TI128 __attribute__((mode(TI)));

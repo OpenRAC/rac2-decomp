@@ -1,6 +1,5 @@
 #include "include_asm.h"
 
-INCLUDE_ASM("asm/us2/game", func_US2_0034C008);
 
 extern int func_00335E20(unsigned char *field);
 
@@ -120,7 +119,6 @@ void func_US2_0034DB68(int *self, int value)
 }
 
 
-INCLUDE_ASM("asm/us2/game", func_US2_0034DBE0);
 
 
 extern void func_003363D0(void *p);
