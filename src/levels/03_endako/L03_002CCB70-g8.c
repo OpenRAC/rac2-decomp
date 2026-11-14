@@ -8,7 +8,7 @@ extern int D_L03_001B2850 __attribute__((sda));
 
 extern int D_001A72E0;
 
-extern int D_001AD390;
+extern int D_L03_001AD390;
 
 extern void func_35E6B8(void);
 
@@ -27,7 +27,7 @@ void func_L03_002FDB10(void) {
     func_35E728();
     func_37CA78(0x47, 0x5360B);
     func_37CA78(0x4E, 0x1000000 | (D_001A72E0 >> 13));
-    p = (float *)(D_001AD390 + 0x74);
+    p = (float *)(D_L03_001AD390 + 0x74);
     *p += 0.011100001f;
     if (*p > 1.0f)
         *p -= 1.0f;

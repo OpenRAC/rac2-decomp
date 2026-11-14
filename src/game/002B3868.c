@@ -116,7 +116,7 @@ void func_002B4090(char *self, PoseVector128 *point, float x, float y, float z)
 
 /* func_002B41A8 is matched in 002B41A8.c. */
 
-INCLUDE_ASM("asm/game", func_002B44C0);
+/* func_002B44C0 is defined in 002B44C0-sway-g0.c. */
 
 extern int D_001AA0F0 __attribute__((sda));
 

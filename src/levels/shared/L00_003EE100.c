@@ -934,7 +934,7 @@ void func_L00_003F56F0(char *p)
 
 /* func_L00_003F6168 is in L00_003F6168-helpers-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L00_003F6308);
+/* func_L00_003F6308 is defined in L00_003F6308-rings-g8.c. */
 
 /* func_L00_003F6900 is defined in L00_003F6900-g8-qcopy.c. */
 

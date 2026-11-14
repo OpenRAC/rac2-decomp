@@ -49,7 +49,7 @@ extern int func_00283D38(int, int, f32);
 
 extern u8 D_001A63A8_4[];
 
-INCLUDE_ASM("asm/levels", func_L22_003A5018);
+/* func_L22_003A5018 is defined in L22_003A5018-hud-g8.c. */
 
 /* func_L22_003A5BD8 is in L22_003A5BD8-effects-g32.c. */
 

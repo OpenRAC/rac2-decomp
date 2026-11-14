@@ -192,7 +192,7 @@ char *func_L06_004583A8(char *a0)
     return obj;
 }
 
-INCLUDE_ASM("asm/levels", func_L06_004587E8);
+/* func_L06_004587E8 is defined in L06_004587E8-axis-g8.c. */
 
 
 void func_L06_00458F30(char *a0)

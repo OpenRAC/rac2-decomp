@@ -44,6 +44,6 @@ void func_002858B0(int param_1)
   D_001BAD14 = param_1;
 }
 
-INCLUDE_ASM("asm/game", func_002859C8);
+/* func_002859C8 is defined in 002859C8-panel-g8.c. */
 
 

@@ -34,6 +34,64 @@ agreed result here. A persistent personal issue comment is no longer required fo
 
 ## Recent verified updates
 
+### 12 November 2026: compiler-rule screen over the last USA v1.01 functions
+
+Method: each candidate rule was built into a private cc1 and measured on its target draft and
+on every USA v1.01 C unit in `src/` (4,058 units, all matching), counting functions whose
+bytes change when the rule is forced on. A rule that is retail's behaviour should change none.
+Two rules landed as opt-in, per-unit switches by owner ruling: `-frac2-la-funcref-weight`
+(`func_002CA070`, 13 changes when forced on) and `-frac2-fix-scratch-reuse` (`func_002FA270`,
+0). See [compiler-notes](../build/compiler-notes.md). Counts marked * were measured by appending
+`-O2` after the unit's flags, which re-enables options some units turn off, so they are a
+little high; the conclusions stand.
+
+Rejected rules (target effect; functions changed when forced on):
+- reload spill round robin per register class: `func_0028A670` fixes its `0x8710` reload but
+  moves the draw-2 scratch and loop counter (2 -> 8 words); 175*. FP reloads not advancing
+  the round robin: 8 words; 53*. Scratch reloads not advancing it: unchanged; 18*, FP scratch
+  only 4*. FP class before GPR in reload order: 13 words.
+- sched weight counting only register destinations (GCC 2.95's form): 759*.
+- sched1 full tie, hard-register set before pseudo set: `func_L22_003A5018` moves its two words;
+  438* (reverse 85*). Stack stores by offset after reload: `func_0034B2C8` fixes one pair and
+  reverses another in the same function; 430*/610*.
+- any forced PRE hash table size 11..1199: no size or n_insns formula fits the group.
+- `fix_truncsfsi2` without its never-emitted GPR scratch: `func_002FA270` 16 -> 10,
+  `func_0028A670` 2 -> 5; 78*.
+- `func_00285030`: deferring a lone lowest-priority constant load one cycle after a store
+  that kills a single-use register matches, but changes 71 functions and the same-shape
+  `func_0028E640` contradicts it (owner: not landed).
+- `func_L22_003A5018`: on a full sched1 tie, an argument-register copy before a small-data
+  SImode load into a cross-block pseudo matches with 0 changes, but only through the small-data
+  narrowing; 8 same-shape functions with a `%lo` load need the load first (owner: not landed).
+- `func_L11_004580E8` case 5: an FP-mode store gets no true dependence from a call's
+  function-address MEM: 11 -> 2 words, 136 changes; no store-call link 492; sched1 only 488.
+  Case 0 (2 words) is a local-alloc 1111 tie, limit (q12) over 0.1 (q13) by quantity number.
+
+Located causes, not yet closed:
+- `func_L04_0040DCA8`: with the plain per-corner store order the residual is one sched1 issue
+  slot; removing a slot at clock 26 or 28 (diagnostic) matches, so retail's RTL had one more
+  short-lived non-memory insn there.
+- `func_002859C8` cases 9/10: retail leaves the ALU slot empty at t2-t3 of sched2 block 84, a
+  barrier with no emitted carrier; CLOBBER, no-op moves, blockage and delay-slot carriers ruled
+  out. Every label after it is unpadded, so no loop note sits there.
+- `func_L03_003C7018`: the owner-allowed dead-test candidate is back at 2 words; draw 2's
+  `lwc1 $f14` issues alone in retail where this compiler pairs it with `ori $a1`.
+- `func_002CC6B0`: 36 -> 22 words with the RAC1 tail form and GCC 2.95.2's flow hunk "a TRAP_IF
+  clears mem_set_list" in flow2 only (0 changes). Left: two sched1 issue orders.
+- `func_L00_003F6308`/`func_L00_003A91A0`: spill slots follow PRE creation in hash-bucket
+  order; retail's order is ours rotated, as if the frame addresses had a pseudo base
+  `(plus (reg P) c)`; shifting the frame-pointer hash gives 13 words but changes 100 functions.
+- `func_002B44C0`: the same PRE-order class as the L00 twins. Bucket =
+  (14029 + base regno + offset) % S; ours S=119 with self r84 and sway r85. Overriding just
+  those two bases' hash contribution (diagnostic) with `-frac2-gcse-hash-111` gives 6 words,
+  closing all 36 slot words. Retail's order fits only S = 111, 217, 235 or 239; for 111 that is
+  220..223 insns at gcse (ours 236..239), self's base pseudo 98..111 or 209..222 and sway's
+  113..239. Left beside the slots: the player-test pair (+0x94/+0x9C) and the `$v1` reuse
+  (+0x3E4..+0x3F0).
+- `func_L17_003E8A58`: retail keeps `15.0f` in `$f20` across a call with no visible later
+  read; `impact: if (hit) ...` (a redundant null test, `hit` in `$a0`) makes every opcode after
+  +0x2F0 match.
+
 ### Reload self-conflicts and padding counters
 
 **5 November 2026, strict linked matches; pending PR review.**
@@ -683,7 +741,17 @@ history were in `nonmatching/levels/func_L11_00443940.c`; no linked build ran.
 dead-test `label_y` helper, set-once constant locals and the x-before-colour argument order of
 `func_00300A00`. The measurements above are kept as history.
 
-**6 November 2026, Smolg fighter initializer (retained):**
+**11 November compiler-draft audit (not matched):** the retained body now
+replays at 948/964 bytes with game `-O2 -G8 -ffunction-sections -frac2-qcopy`,
+0/1 in USA v1.01 and v2.00; PAL has no canonical placement. The draft
+`calls-crossed-float` patch overwrote `REG_N_CALLS_CROSSED` for an SFmode
+quantity selected by block/quantity ordinal. That invents liveness and is
+rejected. An added redundant hit test gives 956 bytes but still lacks the
+saved `$f20` and retail frame. Neither draft is retained in the build recipe
+or linked C. The existing ordinary-C near miss remains; reopening needs a
+real float lifetime or evidenced general allocator rule.
+
+**6 November 2026, Smolg fighter initializer (historical):**
 `func_L17_003E8A58` is 944/964 bytes, USA v1.01 0/1 and v2.00 0/1;
 PAL absent, game `-O2 -G8 -ffunction-sections -frac2-qcopy` in its own unit.
 A complete state type with the overlapping vector/float at 0x6C0/0x6CC,
@@ -2296,7 +2364,19 @@ reproduces retail's `sd a2..t3` + `swc1 f12..f18` save prologue **and** the fram
 
 ## 22. Vector copies: address materialisation is only part of the mismatch
 
-**6 November 2026, Barlow UV storage (retained):**
+**11 November compiler-model controls (not matched):** the current retained
+C replays at 740/740 bytes, with the corrected 0x1D0 frame and three differing
+words at +0x224/+0x230/+0x238 under game `-O2 -G0 -ffunction-sections`.
+USA v1.01, v2.00 and PAL each remain 0/6. The draft sched2 preference for
+higher offsets when storing the same SF register also reorders already
+matching UV stores (first difference +0x94). Applying that preference in
+sched1 instead gives ten differing instruction positions. A separate
+machine-description control classifying `movti` memory operands explicitly
+as loads/stores gives thirteen, still at 740 bytes. These generalizations
+do not reproduce retail and are removed from the build recipe. The three-word
+retained source stays unchanged; no linked match is claimed.
+
+**6 November 2026, Barlow UV storage (historical):**
 `func_L04_0040DCA8` reaches 740/740 bytes and 0/6 USA v1.01 places with
 default game G0. Both UV cursors now walk the complete packet's unsigned-byte
 representation; the final v cursor remains inside the packet at +0x74.
@@ -2990,6 +3070,19 @@ Use measured siblings, final unit/profile checks and a bounded budget. Reopen a 
 ## 42. Register-allocation ties: a stopping signal for tested forms
 
 **Current counterexample:** func_L22_00328220 passes 2/2. The other named attempts remain open. Eight identical variants establish a stopping point for those variants, not the absence of every source/profile lever.
+
+**11 November 2026, `func_00285030` compiler controls (not matched):**
+the retained game `-O2 -G8 -ffunction-sections` body remains 680/680 bytes,
+six differing instruction positions and 0/28 placements in each of USA v1.01,
+v2.00 and PAL. An experimental option using exact quantity lifetimes in
+every block gives 35 differing positions; removing only birth or only death
+padding gives the same count. Removing the logarithmic reference weighting
+from local allocation gives 684 bytes/98 positions with stock padding,
+or 680 bytes/53 positions with either/both padding ends removed. None improves
+the retained C. The supplied draft's block-3/quantity-9 priority override is
+rejected: ordinals do not identify a compiler behavior. No experimental
+switch remains in the build recipe or source flags. Reopen on a general rule
+with independent controls that preserves the already matching allocation.
 
 **6 November 2026, retained USA v1.01 misses:** `func_00285030` remains
 680/680 bytes, 0/28 places with game `-O2 -G8 -ffunction-sections` (first
@@ -4531,6 +4624,19 @@ helper return type is not an acceptable match.
 
 ### Scalar-SDA table walks and packet construction
 
+**11 November 2026, Endako compiler/source audit (not matched):**
+the historical two-position `func_L03_003C7018` candidate contains unused
+mode/handle tests and assignments after the rounded return value is already
+computed. Removing them leaves the retained ordinary-C body at 656/656
+bytes, USA v1.01 0/1, with 25 differing instruction positions excluding
+relocation fields (first `check.py` difference +0x64). The older two-position
+result is not a basis for a compliant match. The draft sched2 load preference
+does not fix those original two positions; moving it ahead of dependent-count
+ranking also changes the prologue. Both the experimental switch and candidate
+definition are removed from the linked build. The pure rounding helper remains
+in `nonmatching/levels/func_L03_003C7018.c`. Reopen on an evidenced scheduling
+rule for the real conversion/call dataflow, without dead operations.
+
 **6 November 2026, Endako menu (`func_L03_003C7018`):** the retained
 ordinary C is 656/656 bytes, 0/1 USA v1.01 places under the default game
 `-O2 -G0 -ffunction-sections` profile. Grouping the real title lookup and
@@ -5037,10 +5143,214 @@ Keep per-placement raw scans private and state their coverage. Useful C stays
 in `nonmatching/`; the old dummy-frame and unrelated guessed bodies were removed
 from `func_L03_0041B848` and `func_L00_00309DB0` rather than promoted.
 
+### func_L17_003E8A58: matched as a fakematch (13 November 2026)
+
+1 of 1 USA v1.01 place, `src/levels/17_smolg/L17_003E8A58-fighter-g8.c` (owner rulings, 13 November
+2026; config/fakematch.tsv). Retail's unused $f2 over the init block is the 1.0 stored to
+state->f30, held in a chain of named copies o1..o6: with -frac2-keep-user-copies(-strict) the copies
+survive cse and combine, local-alloc ties them into one quantity with 12 references, and reload
+deletes them, so they cost no code. A `register float t` (plain keyword, allowed as a fakematch)
+with -frac2-register-scope gives retail's $f20; state->fCF is stored before fCD/fCE. Nine opt-in
+switches (l17_rules.py). Ruled out first: deleted quantities, REG_EQUIV substitution, reload spills,
+other EE GCC builds. Other releases not built.
+
+### func_L04_00417308: matched as a fakematch (13 November 2026)
+
+2 of 2 USA v1.01 places (Barlow, Damosel), `src/levels/shared/L04_00417308-hud-g8.c` (owner ruling,
+13 November 2026; config/fakematch.tsv). Sites: a label_y4 helper with one extra dead register
+test and HCN -> HC on one row (n20's global-alloc rank), a do { } while (0) around the rank-row
+call, the m2 declaration and set (stack slots), and set-once locals one3, fz, rh and none. Plain C
+from earlier rounds: the Marker struct view, the dead fa reuse, MACRO_ADDR D_L04_001B3190, the int
+cast for one addu. Eleven opt-in switches (l04_17308_rules.py) plus -frac2-reload-cse-branch-to-next.
+Other releases not built.
+
+### func_002CC6B0: matched as a fakematch (13 November 2026)
+
+28 of 28 USA v1.01 places, `src/game/002CC6B0-hud-g8.c` (owner ruling, 13 November 2026;
+config/fakematch.tsv). Retail's two empty issue slots match RAC1's `win_shift(&win); <draw>;
+win_unshift(&win);` (rac1-decomp src/game/ui/pause.c) with the draw removed: the dead shift/unshift
+pairs on the stand-in globals D_001AB974 and D_001AB9A8 cancel in combine and leave the USEs that
+fill them; the store helper is split into set_anchor/set_top so the s[5] store comes last, and y
+is reused so the lhu waits for gap*3. Four opt-in switches (cc6b0_rules.py). The stand-in operands
+were first ruled out (13 November 2026) and then allowed as fakematches. Other releases not built.
+
+### func_0034CEA0: matched as a fakematch (13 November 2026)
+
+28 of 28 USA v1.01 places, `src/game/0034CEA0-menu-g8.c`, the first FAKEMATCH unit (owner ruling,
+13 November 2026; config/fakematch.tsv): a volatile x store and a volatile D_001B18D4 load keep the
+zero stores ahead of the slot-table load, and a code-neutral do { } while (0) around one colour arm
+gives 0x70202080 its retail register before `low`. Plain C: `&self->slots[i]` at each use, the
+colour pointer before the constant, `previous--` with `li 7`/`movz`, `Hud *self`. Eleven opt-in
+switches (cea0_rules.py) plus -fstrict-aliasing and -frac2-reload-reuse-pseudo-reg. Compiler rules
+and plain source alone reached 183 words; other EE GCC builds (decomp.me's nine, SN v1.36 with
+RAC3's flags) and a second-compiler hypothesis were tested and ruled out. Other releases not built.
+
+### func_L04_0040AD28: matched with four opt-in switches (13 November 2026)
+
+2 of 2 USA v1.01 places (Barlow, Joba), `src/levels/shared/L04_00402D90-results-g8.c`. One source
+change: the name row uses the `label_y` idiom of every other TEXT row instead of a hand-expanded
+`hud_coord`. Deciding comparisons: name row, r267's $s0 preference passed through the lo_sum to
+base+4 made str skip $s0 (global-alloc); time / 60, time's priority 12580 against the 60's 2727;
+0x96 row, retail issues the str copy alone in the cycle after the call; 0x2F79/0x2F99, a
+priority-1 sched2 tie that insn order breaks the wrong way. Tried and failed: allocno live length
+(828 words); all const_int or constant equivalences first (57, 829); sched1 copy without the
+birthing boost (34-41); dropping r1005's copy preference (+9 in the reward rows); closing the whole
+cycle after the call copy (5). Other releases were not built.
+
+### func_L20_0039BEC8: matched with -frac2-gcse-hash-fp-112 (13 November 2026)
+
+1 of 1 USA v1.01 place, in place in `src/levels/20_yeedil/L20_002DEBE0-g8.c`, which now builds with
+`-O2 -G8 -ffunction-sections -frac2-gcse-hash-fp-112` (its 8 other C functions are unchanged). The
+retained draft's 44 extra bytes came from compiling it outside its unit: without the unit's
+`extern float` prototypes for func_002A7878 and func_002A7940 both were taken to return int. In
+the unit it was 24 words, all PRE spill-slot order; the README's -G32/qcopy profile was stale
+(1260 bytes). Other releases were not built.
+
+### func_002D3FA0: matched with an opt-in switch and a dead-test helper (13 November 2026)
+
+28 of 28 USA v1.01 places, `src/game/002D3FA0-options-g8.c`. y3 uses `label_y3` on `(void *)e`
+(no `e` copy, no loop-1 alignment nop); the y3 `$f0`/`$f1` choice is `-frac2-la-fp-const-first`.
+Rectangle 2's colour needed cse1 to lose the `cC = cB` equivalence: its y values go through
+`hud_coord5`, the dead-test helper with five tests (cse follows at most 9 jumps). Compiler-rule
+attempts first (owner asked for that): a shorter cse path length (550+ words), not merging
+copied user variables (544), keeping a user-variable source for argument registers (no change).
+`hud_coord5` is allowed by owner ruling, 13 November 2026. Other releases were not built.
+
+### func_002B44C0, func_002859C8 and func_003478F0: matched with opt-in switches (13 November 2026)
+
+All 28 of 28 USA v1.01 places, in `src/game/002B44C0-sway-g0.c`, `002859C8-panel-g8.c` and
+`003478F0-grid-g8.c`; switches in compiler-notes.
+- `func_002B44C0`: `qcopy_nc` for the offset copy although work[2] is read after it (owner
+  ruling, 13 November 2026).
+- `func_002859C8`: the retained draft unchanged.
+- `func_003478F0`: layout scalars declared yb, xs, xb, ys; `t` set before the row loop and
+  `ids = &t->id` inside it; the row address as `(short *)((row << 2) * 10 + (int)ids)` (owner
+  ruling, 13 November 2026). The draft's `D_L00_...` names are now `ref_003478F0_kk`: the data
+  sits at another address in level 00.
+Other releases were not built.
+
+### func_L00_003F6308 and func_L00_003A91A0: matched with three opt-in switches (13 November 2026)
+
+27 of 27 USA v1.01 places each, `src/levels/shared/L00_003F6308-rings-g8.c` and
+`L00_003A91A0-rings-g8.c`. Source: `int ring;` declared first (pseudo 85 instead of 96), which
+puts ring+1 between fp+0x490 and fp+0x4A0 in PRE's bucket walk. Switches: see compiler-notes.
+Failed on the way: no movable look-through in simplify_giv_expr (310 words), appending the
+constant in sge_plus_constant (341), find_split_point for two-insn combinations (7), a pointer
+`o = rings[ring].origin` before the loop (1504 bytes). Other releases were not built.
+
+### func_0028D1E8 and func_002D4948: matched with two opt-in switches each (13 November 2026)
+
+- `func_0028D1E8`, 28 of 28 USA v1.01 places, `src/game/0028D1E8-radial-g8.c`: the draft with
+  b1/b2 as their own 0x8710 locals and the sum written `[2] + [4] + [3]`;
+  `-frac2-cse2-keep-const-vars -frac2-sched-barrier-anti`. The earlier cse2 loop-end rule (43
+  words) is not needed.
+- `func_002D4948`, 28 of 28 places, `src/game/002D4948-options-g8.c`: the plain draft (no
+  always-false guard) with `-frac2-loop-exit-dup-first-pass
+  -frac2-sched-defer-const-after-death`.
+Other releases were not built.
+
+### func_L06_004587E8: matched with four opt-in switches (13 November 2026)
+
+1 of 1 USA v1.01 place, `src/levels/06_notak/L06_004587E8-axis-g8.c`. Source: the timer loop's
+table address is a set-once local `base` (owner ruling on set-once locals), so its `la` is
+hoisted and rematerialised in `$v1`. Each switch is needed (dropping one leaves 2-11 words).
+Rejected on the way: sched2 dependent count ignoring dependents past the next call (breaks
+func_002C2210), return-value store first for any register (1,783 changes), cse no-skip also for
+blocks with calls (63 words). Other releases were not built.
+
+### func_L03_003C7018: matched with an opt-in sched2 switch (12 November 2026)
+
+1 of 1 USA v1.01 place, `src/levels/03_endako/L03_003C7018-menu.c` with
+`-Wa,--r5900-la-addend=sn -frac2-sched2-barrier-hold`; the C is the retained two-position draft
+with the owner-allowed label_y dead-test helpers. Failed on the way: sched2 FIFO by ready time
+(22 words); earlier INSN_TICK on priority ties (3-5); a float-returning conversion helper (6).
+Other releases were not built.
+
+### func_002900B8: matched with three cse/reload_cse switches (12 November 2026)
+
+28 of 28 USA v1.01 places, `src/game/002900B8-bars-g8.c`. Source changes in case 0 (17 -> 6
+words): no do/while group around `top`, the scale written as in cases 1/2, `s = 128.0f` before
+the upper bar's rounding, `edge`/`edge2` locals. The last 6 words were cse2's canonical choice
+(+0x464) and text call 2's argument copies; see compiler-notes. Rejected variants: dropping
+make_regs_eqv's lives-past-block-end test (867 changes), any several-set old register (170),
+never promoting (1,027); `-fno-cse-skip-blocks` (1440 bytes). Other releases were not built.
+
+### func_0028A670: matched with two reload switches (12 November 2026)
+
+28 of 28 USA v1.01 places, in place in `src/game/00288D88.c`, which now builds with
+`-frac2-reload-lone-class-no-rotate -frac2-reload-reuse-pseudo-reg`; the C is the retained
+draft. A brute force over which reloads advance the round robin showed no single rule fits
+(455's FP scratch and 493 must not advance, 435 must). Same-constant affinity alone gave 8
+words; reusing the previous SCRATCH reload's register gave 9. Other releases were not built.
+
+### func_L11_004580E8: matched with two opt-in switches (12 November 2026)
+
+1 of 1 USA v1.01 place, `src/levels/11_joba/L11_004580E8-fighter-g8.c` with
+`-frac2-sched-call-addr-float -frac2-la-float-vars-last`. Case 0's float stores are written in
+retail's order (0x4C gravity, then 0x20, 0x28, 0x2C, 0x30, 0x50 limit, 0x54 0.1f); each switch
+alone leaves 9 words. Reversing every exact local-alloc tie gave 16; "all temporaries before all
+user variables" also matches (1,605 corpus changes). Other releases were not built.
+
+### func_L04_0040DCA8: matched with an opt-in sched1 switch (12 November 2026)
+
+6 of 6 USA v1.01 places, `src/levels/shared/L04_0040DCA8-quad.c` with
+`-frac2-sched-clear-holds-store`. The corners are now stored in plain order (c0.y..c3.w); every
+within-register order then follows the stock rules, and the remaining slot difference at sched1
+t26 is the quadword clear holding its cycle's store slot (5 functions change when forced on).
+Other releases were not built.
+
+### func_0034B2C8: matched with an opt-in sched2 switch (12 November 2026)
+
+28 of 28 USA v1.01 places, `src/game/0034B2C8-hud.c` with
+`-frac2-keep-float-pun-source -frac2-sched-store-clobbered-first`; the C is the retained draft
+unchanged. The last three words were the order of two PRE copy stores before a call
+(`sw $v1,0x30($sp)` before `sw $s5,0x48($sp)`); the switch puts the call-clobbered source first
+on a full sched2 tie (89 functions change when forced on). Other releases were not built.
+
+### func_00285030 and func_L22_003A5018: matched with opt-in sched1 switches (12 November 2026)
+
+Under the owner's standard of 12 November 2026 (any generally worded opt-in rule that makes a
+function match, its forced-on corpus count reported, not used to reject), two rules screened
+earlier the same day landed:
+- `func_00285030`, 28 of 28 USA v1.01 places, `src/game/00285030-sprite-g8.c` with
+  `-frac2-sched-defer-const` (163 functions change when forced on).
+- `func_L22_003A5018`, 2 of 2 places (levels 22 and 23), `src/levels/shared/L22_003A5018-hud-g8.c`
+  with `-frac2-sched-global-yield` (211 functions).
+The C is the retained drafts unchanged. See
+[compiler-notes](../build/compiler-notes.md). Other releases were not built.
+
+### func_002FA270: the icon height truncation's scratch (USA v1.01, boot and 27 programs)
+
+**12 November 2026: matched with an opt-in switch, 28 of 28 USA v1.01 places.**
+`src/game/002FA270-ammo-g8.c`, `-O2 -G8 -ffunction-sections -frac2-fix-scratch-reuse`.
+The draft had five small-data names 0x10 high (retail `$gp` is 0x1AEFF0; relocation
+masking hid it): C0/C4/C8/D0/D8 are B0/B4/B8/C0/C8. The 16 remaining words were decided in
+reload: the h truncation (insn 698) takes first-free `$4` for its never-emitted integer
+scratch; retail's is `$6`, the previous truncation's (676). Forcing that clobber to `$6`, or
+forcing sched1 to issue 634 before 695, matches; so does removing one sched1 issue slot in
+block 18 at clocks 5-17 except 7 and 8. The switch changes no other USA function (see
+[compiler-notes](../build/compiler-notes.md#consecutive-truncations-sharing-a-scratch-opt-in)).
+Rejected: a scratch-free `fix_truncsfsi2` (16 -> 10 words, 78 corpus changes); sched1
+"hard-register set yields at equal priority" (24 words). Other releases were not built.
+
 ### func_002CA070: case 8's local-alloc order (USA v1.01, boot and 27 programs)
 
-Profile: own unit, `-O2 -G16 -ffunction-sections -Wa,-G16`, current master compiler. The retained
-draft in `nonmatching/game/func_002CA070.c` differs only in five case-8 registers. Retail's
+**12 November 2026: matched with an opt-in switch, 28 of 28 USA v1.01 places.**
+`src/game/002CA070-pause.c`, `-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-la-funcref-weight`.
+Case 8 is written in natural order (page, next, a, b, c, upd, init, `init(0)`, no `upd`
+local). That source already gives retail's case-8 instruction order; only the five
+registers rotated (17 words). Block 10 `QTY_CMP_PRI` is 0x18 (q7, 3 refs, [26,34]) 3750,
+init 3125, page 2941, c 2857, upd 2857. The switch counts one more reference for a quantity
+set from a function's address, giving init, 0x18, upd, page, c as retail. It is not retail's
+global rule: forced on for every USA v1.01 C unit it changes 13 functions. Owner ruling,
+12 November 2026; see [compiler-notes](../build/compiler-notes.md#function-address-quantities-in-local-alloc-opt-in).
+No sched1 rank-key permutation (6,331 variants), random sched1 order (30,000), `-flive-range`
+or skipping `recompute_reg_usage` reached retail's assignment from the natural source.
+Other releases were not built.
+
+Historical (superseded by the match above): profile own unit,
+`-O2 -G16 -ffunction-sections -Wa,-G16`, current master compiler. The retained
+draft in `nonmatching/game/func_002CA070.c` differed only in five case-8 registers. Retail's
 allocation needs init > 0x18 > upd > page > c in local-alloc priority. For that, sched1 must emit
 the init store before the upd and c stores. `rank_for_schedule` compares `INSN_REG_WEIGHT` before
 LUID, so the stores that end their value's life always win. Measured on 7 November 2026: 28
@@ -5097,8 +5407,16 @@ September 2003 prototype module hierarchy and symbol tables establishes:
     colour float constants match; remaining differences are delay-slot scheduling.
   - `func_002BB100`: 1684/1684 B, 5 words off (+0x9C..+0xB0). Flow2 `global_live_at_start`
     of the else block lacks `$s0`, rejecting `fill_slots_from_thread`.
-  - `func_L05_0042B2C0`: 531/532 insns, frame 0x150. Seam madd/reload pointers merged by
-    cse2, inner loop givs. Profile `-O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-no-extra-increment-givs -fno-rerun-loop-opt`.
+  - `func_L05_0042B2C0`: matched 14 November 2026 as a FAKEMATCH unit
+    (`src/levels/shared/L05_0042B2C0-strip-g8.c`). Plain volatile-free C; the order of the first
+    scheduling pass is given to the compiler as a list (`#pragma rac2_sched1_order`,
+    `-frac2-sched1-order`, owner ruling). What was learned on the way: reload's spill set in retail
+    is `$v0`-`$a3` and scratch registers go round robin over it, so a run of one scratch register
+    tells which registers were live; local-alloc ties a sum to its dying first operand; a pointer
+    variable set twice has no alias base, so loads through it depend on every store; the natural
+    schedule of a named-statement form of the same code (without `-frac2-sched1-priority-only`)
+    gives retail's allocation, and transferring that order by role was the way to the list.
+    No general scheduler rule that produces the order was found.
   - `func_L11_004580E8`: 2476/2476 B, 11 words off. Case 0 FPR priority, case 5 sched1
     store true dependence on call. Profile `-O2 -G8 -ffunction-sections -g`.
 

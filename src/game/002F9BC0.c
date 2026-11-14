@@ -38,7 +38,7 @@ void func_002F9BC0(char *dst, int value)
 
 /* func_002F9C80 is in 002F9C80.c. */
 
-INCLUDE_ASM("asm/game", func_002FA270);
+/* func_002FA270 is defined in 002FA270-ammo-g8.c. */
 
 /* func_002FA880 is matched in 002F9BC0-vendor-g8.c. */
 

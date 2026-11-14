@@ -36,6 +36,56 @@ The retail code was built with GNU EE-GCC 2.9-ee-991111b. `build.sh` rebuilds it
   controls; neither changes compiler-authored operations or selects individual functions.
   `gcse_store_kills_loads.py` gives gcse GCC 2.95.3's memory model, where every store kills
   every load, in place of this tree's alias-analysis queries; it is unconditional too.
+  `la_funcref_weight.py` adds the opt-in `-frac2-la-funcref-weight`: local-alloc counts one
+  more reference for a quantity set from a function's address (a per-unit model, not retail's
+  global rule; docs/build/compiler-notes.md); `tests/test_la_funcref_weight.py`.
+  `fix_scratch_reuse.py` adds the opt-in `-frac2-fix-scratch-reuse`: a float-to-int truncation
+  reuses the previous truncation's (never emitted) integer scratch in reload
+  (docs/build/compiler-notes.md); `tests/test_fix_scratch_reuse.py`.
+  `sched_defer_const.py` and `sched_global_yield.py` add the opt-in
+  `-frac2-sched-defer-const` and `-frac2-sched-global-yield` sched1 rules (per-unit models;
+  docs/build/compiler-notes.md); `tests/test_sched_defer_const.py`, `tests/test_sched_global_yield.py`.
+  `sched_store_clobbered_first.py` adds the opt-in `-frac2-sched-store-clobbered-first` sched2
+  rule (per-unit model; docs/build/compiler-notes.md); `tests/test_sched_store_clobbered_first.py`.
+  `sched_clear_holds_store.py` adds the opt-in `-frac2-sched-clear-holds-store` sched1 rule
+  (per-unit model; docs/build/compiler-notes.md); `tests/test_sched_clear_holds_store.py`.
+  `sched_call_addr_float.py` and `la_float_vars_last.py` add the opt-in
+  `-frac2-sched-call-addr-float` and `-frac2-la-float-vars-last` (per-unit models;
+  docs/build/compiler-notes.md); `tests/test_sched_call_addr_float.py`, `tests/test_la_float_vars_last.py`.
+  `reload_rotation.py` adds the opt-in `-frac2-reload-lone-class-no-rotate` and
+  `-frac2-reload-reuse-pseudo-reg` (per-unit models; docs/build/compiler-notes.md);
+  `tests/test_reload_rotation.py`.
+  `cse_arg_rules.py` adds three opt-in cse/reload_cse switches (per-unit models;
+  docs/build/compiler-notes.md); `tests/test_cse_arg_rules.py`.
+  `sched2_barrier_hold.py` adds the opt-in `-frac2-sched2-barrier-hold` (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_sched2_barrier_hold.py`.
+  `l06_rules.py` adds four opt-in PRE/cse/sched2 switches for one Notak function (per-unit
+  models; docs/build/compiler-notes.md); `tests/test_l06_rules.py`.
+  `d1e8_rules.py` and `d4948_rules.py` add two opt-in switches each (per-unit models;
+  docs/build/compiler-notes.md); `tests/test_d1e8_rules.py`, `tests/test_d4948_rules.py`.
+  `l00_rules.py` adds three opt-in gcse/loop/cse switches for the L00 ring twins (per-unit
+  models; docs/build/compiler-notes.md); `tests/test_l00_rules.py`.
+  `b44c0_rules.py`, `d59c8_rules.py` and `d78f0_rules.py` add opt-in gcse/reorg/sched/emit-rtl
+  switches for three boot functions (per-unit models; docs/build/compiler-notes.md); tests
+  `tests/test_b44c0_rules.py`, `tests/test_d59c8_rules.py`, `tests/test_d78f0_rules.py`.
+  `la_fp_const_first.py` adds the opt-in `-frac2-la-fp-const-first` (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_la_fp_const_first.py`.
+  `gcse_hash_fp_112.py` adds the opt-in `-frac2-gcse-hash-fp-112` (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_gcse_hash_fp_112.py`.
+  `l04_ad28_rules.py` adds four opt-in global-alloc and sched2 switches (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_l04_ad28_rules.py`.
+  `cea0_rules.py` adds eleven opt-in switches for func_0034CEA0 (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_cea0_rules.py`.
+  `cc6b0_rules.py` adds four opt-in switches for func_002CC6B0 (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_cc6b0_rules.py`.
+  `l04_17308_rules.py` adds eleven opt-in switches for func_L04_00417308 (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_l04_17308_rules.py`.
+  `l17_rules.py` adds nine opt-in switches for func_L17_003E8A58 (per-unit model;
+  docs/build/compiler-notes.md); `tests/test_l17_rules.py`.
+  `l05_42b2c0_rules.py` adds eight opt-in switches for func_L05_0042B2C0: seven loop, cse and
+  scheduler rules and `-frac2-sched1-order`, an instruction-order hint read from
+  `#pragma rac2_sched1_order` (a fakematch mechanism, not a compiler model;
+  docs/build/compiler-notes.md); `tests/test_l05_42b2c0_rules.py`.
   `trap_delay_barrier.py` ends reorg's backward delay-slot search at a division guard
   (`trap_if`), as at a jump, as retail's compiler does; it is unconditional too.
   `swap_branch_slots.py` adds the opt-in assembler option `--r5900-swap-branch-slots`: gas

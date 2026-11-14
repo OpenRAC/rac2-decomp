@@ -12,7 +12,7 @@ typedef int s32;
 
 typedef float f32;
 
-INCLUDE_ASM("asm/levels", func_L04_00417308);
+/* func_L04_00417308 is defined in L04_00417308-hud-g8.c. */
 
 /* func_L04_00418A58 is defined in L04_00418A58-g8.c. */
 

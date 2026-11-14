@@ -290,7 +290,7 @@ s32 func_L17_003E7010(s32 a0) {
     return D_L17_001C0018 == *(s32 *)(s0 + 0x250);
 }
 
-INCLUDE_ASM("asm/levels", func_L17_003E8A58);
+/* func_L17_003E8A58 is defined in L17_003E8A58-fighter-g8.c. */
 
 /* func_L17_00417DB0 is in L17_003C7C70-f7-g8.c. */
 

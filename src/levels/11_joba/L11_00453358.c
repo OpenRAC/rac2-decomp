@@ -661,7 +661,7 @@ void func_L11_00457600(void) {
 
 /* func_L11_004577F8 is defined in L11_00453358-curve.c. */
 
-INCLUDE_ASM("asm/levels", func_L11_004580E8);
+/* func_L11_004580E8 is defined in L11_004580E8-fighter-g8.c. */
 
 /* func_L11_00458A98 is defined in L11_00453358-g8.c. */
 

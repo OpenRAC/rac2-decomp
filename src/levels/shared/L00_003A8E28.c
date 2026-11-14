@@ -32,7 +32,7 @@ typedef struct {
 #endif
 
 
-INCLUDE_ASM("asm/levels", func_L00_003A91A0);
+/* func_L00_003A91A0 is defined in L00_003A91A0-rings-g8.c. */
 
 
 /* The 16-byte value of func_L00_003A98E8's vectors, the projectile's own variables and the game's

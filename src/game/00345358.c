@@ -287,7 +287,7 @@ void func_003472B8(char *obj)
 
 /* func_00347468 is built from 00345358-selection-g8.c. */
 
-INCLUDE_ASM("asm/game", func_003478F0);
+/* func_003478F0 is defined in 003478F0-grid-g8.c. */
 
 unsigned long long func_00347EA0(unsigned long long value)
 {
@@ -847,7 +847,7 @@ void func_0034B000(char *p, int a1)
 
 
 
-INCLUDE_ASM("asm/game", func_0034B2C8);
+/* func_0034B2C8 is defined in 0034B2C8-hud.c. */
 
 unsigned int func_0034CA68(unsigned char *owner)
 {

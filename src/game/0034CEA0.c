@@ -151,7 +151,7 @@ extern void func_0033DFB0(void *, void *);
 extern void func_0033E1B0(void *, void *);
 
 
-INCLUDE_ASM("asm/game", func_0034CEA0);
+/* func_0034CEA0 is defined in 0034CEA0-menu-g8.c. */
 
 /* func_0034DB98 is in 0034CEA0-g8.c. */
 

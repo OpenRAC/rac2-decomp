@@ -21,7 +21,7 @@ void func_0028BDB0(u8 *object) {
 
 /* func_0028CCE0 is defined in 0028BDB0-radial-g8.c. */
 
-INCLUDE_ASM("asm/game", func_0028D1E8);
+/* func_0028D1E8 is defined in 0028D1E8-radial-g8.c. */
 
 extern int func_0028B740(void *, int *, int *);
 extern void func_0028B7A8(void *, int *, int *, int, int);

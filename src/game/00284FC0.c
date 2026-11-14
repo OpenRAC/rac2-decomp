@@ -17,4 +17,4 @@ void func_00284FC0(void)
     ref_L00_002F05B8_01 += 16;
 }
 
-INCLUDE_ASM("asm/game", func_00285030);
+/* func_00285030 is defined in 00285030-sprite-g8.c. */

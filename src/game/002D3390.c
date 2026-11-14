@@ -225,9 +225,9 @@ int func_002D3D88(int index, int x)
     return func_0028EA58(texture, left, y, 40, height, colors);
 }
 
-INCLUDE_ASM("asm/game", func_002D3FA0);
+/* func_002D3FA0 is defined in 002D3FA0-options-g8.c. */
 
-INCLUDE_ASM("asm/game", func_002D4948);
+/* func_002D4948 is defined in 002D4948-options-g8.c. */
 
 int func_002D4E10(void)
 {

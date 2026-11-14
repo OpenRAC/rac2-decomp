@@ -20,6 +20,9 @@
    build resolves but other readers of the C take for that level's address (OpenRAC's port read
    Damosel's particle settings at Damosel's address in Joba and crashed).
 
+6. config/fakematch.tsv lists every `/* FAKEMATCH: ... */` site, and sites sit only in the
+   functions tools/fakematch.py allows (owner ruling, 13 November 2026).
+
 Exits nonzero, listing every problem, on failure.
 """
 import re
@@ -220,6 +223,11 @@ def check_level_data_names(errors: list) -> None:
                           f"D_L{level}_<its address in level {level}>")
 
 
+def check_fakematch(errors: list) -> None:
+    import fakematch
+    errors.extend(fakematch.check())
+
+
 def main() -> int:
     errors: list = []
     check_hygiene(errors)
@@ -230,6 +238,7 @@ def main() -> int:
             print(f"{version}: {len(known[version])} catalogue names")
     check_functional(check_sources(known, errors), errors)
     check_level_data_names(errors)
+    check_fakematch(errors)
     if errors:
         print(f"\n{len(errors)} problem(s):", file=sys.stderr)
         for e in errors[:200]:

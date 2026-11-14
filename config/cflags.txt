@@ -4331,3 +4331,29 @@ src/levels/22_dobbo_orbit/L22_003D0840.c	-O2 -G0 -ffunction-sections -frac2-call
 src/pal/levels/15_gorn/L15_004342E0-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/10_hrugis_cloud/L10_00427628-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
 src/pal/levels/05_feltzin_system/L05_00423C50-g8.c	-O2 -G8 -ffunction-sections -malign-loops=2
+src/game/002CA070-pause.c	-O2 -G16 -Wa,-G16 -ffunction-sections -frac2-la-funcref-weight
+src/game/002FA270-ammo-g8.c	-O2 -G8 -ffunction-sections -frac2-fix-scratch-reuse
+src/game/00285030-sprite-g8.c	-O2 -G8 -ffunction-sections -frac2-sched-defer-const
+src/levels/shared/L22_003A5018-hud-g8.c	-O2 -G8 -ffunction-sections -g -frac2-sched-global-yield
+src/game/0034B2C8-hud.c	-O2 -G0 -ffunction-sections -frac2-keep-float-pun-source -frac2-sched-store-clobbered-first
+src/levels/shared/L04_0040DCA8-quad.c	-O2 -G0 -ffunction-sections -frac2-sched-clear-holds-store
+src/levels/11_joba/L11_004580E8-fighter-g8.c	-O2 -G8 -ffunction-sections -g -frac2-sched-call-addr-float -frac2-la-float-vars-last
+src/game/00288D88.c	-O2 -G0 -ffunction-sections -frac2-reload-lone-class-no-rotate -frac2-reload-reuse-pseudo-reg
+src/game/002900B8-bars-g8.c	-O2 -G8 -fno-expensive-optimizations -ffunction-sections -frac2-keep-block-order -frac2-cse2-keep-multi-set-reg -frac2-cse-arg-hard-reg -frac2-reload-cse-branch-to-next
+src/levels/03_endako/L03_003C7018-menu.c	-O2 -G0 -ffunction-sections -Wa,--r5900-la-addend=sn -frac2-sched2-barrier-hold
+src/levels/06_notak/L06_004587E8-axis-g8.c	-O2 -G8 -ffunction-sections -frac2-mult-add-no-flatten -frac2-pre-call-test -frac2-cse-noskip-store -frac2-sched-retstore -frac2-sched-stackaddr
+src/game/0028D1E8-radial-g8.c	-O2 -G8 -ffunction-sections -frac2-cse2-keep-const-vars -frac2-sched-barrier-anti
+src/game/002D4948-options-g8.c	-O2 -G8 -ffunction-sections -frac2-loop-exit-dup-first-pass -frac2-sched-defer-const-after-death
+src/levels/shared/L00_003F6308-rings-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-hash-fp-117 -frac2-giv-pair-init -frac2-cse2-skip-temp-sum
+src/levels/shared/L00_003A91A0-rings-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-hash-fp-117 -frac2-giv-pair-init -frac2-cse2-skip-temp-sum
+src/game/002B44C0-sway-g0.c	-O2 -G0 -ffunction-sections -frac2-gcse-hash-111 -frac2-gcse-hash-pseudo-spread -frac2-reorg-reverse-filled-branch
+src/game/002859C8-panel-g8.c	-O2 -G8 -ffunction-sections -frac2-sched2-fp-load-holds-store -frac2-sched2-stack-store-first
+src/game/003478F0-grid-g8.c	-O2 -G8 -ffunction-sections -fno-rerun-loop-opt -frac2-pseudo-base -frac2-gcse-hash-171 -frac2-sched-elapsed-latency
+src/game/002D3FA0-options-g8.c	-O2 -G8 -ffunction-sections -fno-gcse -frac2-frame-pointer-liveness -frac2-la-fp-const-first
+src/levels/20_yeedil/L20_002DEBE0-g8.c	-O2 -G8 -ffunction-sections -frac2-gcse-hash-fp-112
+src/levels/shared/L04_00402D90-results-g8.c	-O2 -G8 -ffunction-sections -g -frac2-ga-no-lo-sum-pref -frac2-ga-divisor-first -frac2-sched2-call-copy-fp-wait -frac2-sched2-const-low-reg-first
+src/game/0034CEA0-menu-g8.c	-O2 -G8 -ffunction-sections -ffast-math -fstrict-aliasing -frac2-gcse-hash-415 -frac2-gcse-hash-parm-85 -frac2-gcse-hash-fp-54 -frac2-sched2-pair-units -frac2-reload-reuse-pseudo-reg -frac2-equiv-const-keep-length -frac2-reload-const-in-out-reg -frac2-sched2-pair-after-higher -frac2-reload-reuse-until-label -frac2-output-dep-no-alias-sets -frac2-unsized-sda-no-cond-slot -frac2-regmove-cmove-copy
+src/game/002CC6B0-hud-g8.c	-O2 -G8 -ffunction-sections -frac2-flow2-trap-mem -frac2-la-multi-death-locals -frac2-sched-temp-store-after-args -frac2-sched-const-first
+src/levels/shared/L04_00417308-hud-g8.c	-O2 -G8 -ffunction-sections -frac2-loop-align-in-loop-only -frac2-la-const-longer-first -frac2-sched-hoisted-first -frac2-cse-path-11 -frac2-loop-move-temps -frac2-sched-arg-sum-first -frac2-reload-cse-branch-to-next -frac2-ga-hoisted-var-first -frac2-sched-call-last -frac2-sched-argreg-wait -frac2-sched-frame-temp-first -frac2-sched-call-with-arg-copy
+src/levels/17_smolg/L17_003E8A58-fighter-g8.c	-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier -frac2-keep-user-copies -frac2-register-scope -frac2-sched-flush-30 -frac2-sched1-priority-only -frac2-sched-uservar-const-no-boost -frac2-sched2-fp-symbol-load-latency-3 -frac2-keep-user-copies-strict -frac2-sched-uservar-copy-priority -frac2-sched2-fp-const-first-consumer -frac2-sched2-qi-store-offset
+src/levels/shared/L05_0042B2C0-strip-g8.c	-O2 -G8 -ffunction-sections -frac2-zero-ti-por -frac2-no-extra-increment-givs -frac2-loop-no-equal-copy-subst -frac2-cse2-loop-end-forgets-arith -frac2-loop-move-high-copy -frac2-rerun-loop-no-reverse -frac2-rerun-loop-move-consts -frac2-sched-phony-loop-notes -frac2-loop-ivs-in-order -frac2-sched1-order

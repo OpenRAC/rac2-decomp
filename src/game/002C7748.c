@@ -762,7 +762,8 @@ void func_002C9E60(int a0)
     }
 }
 
-INCLUDE_ASM("asm/game", func_002CA070);
+
+/* func_002CA070 is defined in 002CA070-pause.c. */
 
 /* func_002CA5D0 is defined in 002C7748-g8.c. */
 
@@ -974,7 +975,7 @@ int func_002CC698(void) {
 
 s32 func_002CC6A0(u8 *p) { *(s32 *)(p + 0x44) = -1; return 0; }
 
-INCLUDE_ASM("asm/game", func_002CC6B0);
+/* func_002CC6B0 is defined in 002CC6B0-hud-g8.c. */
 
 int func_002CCF68(char *obj)
 {

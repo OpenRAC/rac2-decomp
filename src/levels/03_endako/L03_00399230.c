@@ -74,7 +74,7 @@ typedef struct {
 
 /* func_L03_003C6E50 is defined in L03_003C6E50-g8.c. */
 
-INCLUDE_ASM("asm/levels", func_L03_003C7018);
+/* func_L03_003C7018 is defined in L03_003C7018-menu.c. */
 
 /* func_L03_003C72A8 is defined in L03_003C72A8-g8.c. */
 

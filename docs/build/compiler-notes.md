@@ -144,6 +144,314 @@ other use, so the source dies in the copy and local-alloc ties the two. In
 func_PAL_L09_0040FD68 and func_PAL_L00_003B9E80 a frame counter copied after its store then
 takes the first free register, and the conversion follows the 1/6 constant (L09), as in retail.
 `tests/test_keep_user_copies.py` checks the default, enabled and disabled outputs.
+### Function-address quantities in local-alloc (opt-in)
+`-frac2-la-funcref-weight` adds one to a block-local quantity's reference count when the
+quantity is set from a function's address (a SYMBOL_REF, directly or through its LO_SUM, whose
+file-scope binding is a FUNCTION_DECL), before `block_alloc` sorts quantities by
+`QTY_CMP_PRI` (`floor_log2(refs) * refs * size / life`). Data addresses, constants and hard
+registers are unchanged. The default compiler is unchanged.
+It models one retail block, case 8 of `func_002CA070` (pause and cinema state): page, c, 0x18
+and the two callbacks are stored, then the init callback is called through its register.
+Stock priorities are 0x18 3750, init 3125, page 2941, c 2857, upd 2857; retail's registers
+follow init, 0x18, upd, page, c. No sched1 rank-key order (6,331 variants), no random sched1
+order (30,000) and no source order reaches that from the natural source; one more reference on
+each callback quantity does. It is not retail's global behaviour: forced on for every USA
+v1.01 C unit it changes 13 functions. Use it only in a unit of its own (owner ruling,
+12 November 2026), as `src/game/002CA070-pause.c` does. Controls:
+[test_la_funcref_weight.py](../../tests/test_la_funcref_weight.py) (a positive fixture whose
+callback address moves ahead of two data addresses, and a data-only twin that must stay
+byte-identical).
+
+### Consecutive truncations sharing a scratch (opt-in)
+
+`fix_truncsfsi2` clobbers an integer SCRATCH that the R5900 template never emits: it prints
+`cvt.w.s` into the FP scratch and moves that to the destination. reload still names a
+general register for it, and that register's dependences decide which loads sched2 may lift
+above the truncation. `-frac2-fix-scratch-reuse` makes `order_regs_for_reload` put the general
+register used by the previous reloaded insn of the same block first, when both insns are such
+truncations; stock reload takes the first free register in `REG_ALLOC_ORDER`.
+
+In `func_002FA270` the icon height truncation (insn 698) follows the y rounding's (676). Stock
+gives it `$4`, which orders sched2's D_001AD3C0/scale/clamp loads differently from retail;
+retail's order is the one with `$6`, 676's scratch. Forced on for every USA v1.01 C unit the
+switch changes no function's bytes. It renames the unemitted scratch of 5 insns in 4 functions.
+Only the immediately preceding reloaded insn counts: skipping insns that took no register would
+change `func_0028F410`. Any integer scratch changes 17 functions, any GPR reload 39. A per-unit
+model (owner ruling, 12 November 2026), used by `src/game/002FA270-ammo-g8.c`. Controls:
+[test_fix_scratch_reuse.py](../../tests/test_fix_scratch_reuse.py) reads the scratch from the
+post-reload RTL dump (`-dg`).
+
+### Constant loads beside a dying store (opt-in)
+
+`-frac2-sched-defer-const`: before reload, Haifa does not issue a constant load (a pseudo set
+to a CONST_INT) in the slot right after a same-cycle store that is the single use of a
+one-set pseudo; the load waits one cycle, once per insn. local-alloc pads each quantity's
+life by an insn at each end, so a birth beside such a death conflicts with the freed
+register. In `func_00285030` this lets 0x8000 share `$a2` with 0xE as retail. Forced on for
+every USA v1.01 C unit it changes 163 functions; the same-shape `func_0028E640` shows retail
+does not always defer. Per-unit model, landed under the owner's standard of 12 November 2026
+(any generally worded opt-in rule that makes a function match). Controls:
+[test_sched_defer_const.py](../../tests/test_sched_defer_const.py).
+
+### Hard-register sets first on a full sched1 tie (opt-in)
+
+`-frac2-sched-global-yield`: when sched1 reaches the final LUID tie between a single set of a
+pseudo live in more than one block and a single set of a hard register, the hard-register set
+goes first. In `func_L22_003A5018` this issues `a0 = text` before the colour load and lets
+reorg put the load in the call's delay slot, as retail. Forced on for every USA v1.01 C unit it
+changes 211 functions; 8 matched functions with the same shape and a `%lo` load keep the load
+first. Per-unit model under the same standard. Controls:
+[test_sched_global_yield.py](../../tests/test_sched_global_yield.py).
+
+### Call-clobbered stores first on a full sched2 tie (opt-in)
+
+`-frac2-sched-store-clobbered-first`: when sched2 reaches the final LUID tie between two SImode
+stores of hard registers, the store whose source is call-clobbered goes first. In
+`func_0034B2C8` the two PRE copies spilled before a call become `sw $v1,0x30($sp)` then the call
+with `sw $s5,0x48($sp)` in its delay slot, as retail; stock order follows PRE's expression index.
+Forced on for every USA v1.01 C unit it changes 89 functions. Per-unit model under the owner's
+standard of 12 November 2026. Controls:
+[test_sched_store_clobbered_first.py](../../tests/test_sched_store_clobbered_first.py).
+
+### A quadword clear holds its cycle's store slot (opt-in)
+
+`-frac2-sched-clear-holds-store`: before reload, once a quadword clear (a TImode store of const
+0) issues in a cycle, no further memory store issues in that cycle; loads, ALU and FP insns may
+still take the second slot. In `func_L04_0040DCA8` (block 2, t26) the clear then pairs with a
+copy instead of a store, and the h stores reach the packet ahead of c1.w as retail. Forced on
+for every USA v1.01 C unit it changes 5 functions. Per-unit model under the owner's standard
+of 12 November 2026. Controls: [test_sched_clear_holds_store.py](../../tests/test_sched_clear_holds_store.py).
+
+### A call's address and pending FP stores; FP user variables last in local-alloc (opt-in)
+
+`-frac2-sched-call-addr-float`: in Haifa's dependence analysis the MEM inside a CALL (the
+function address) does not get a true dependence from a pending floating-point store. In
+`func_L11_004580E8` case 5 that drops store 819's priority from the call's link, and it issues
+after both `li`s as retail (136 functions change when forced on).
+
+`-frac2-la-float-vars-last`: local-alloc's `qty_compare`/`qty_compare_1` order floating-point
+quantities whose first pseudo is a user variable after every other quantity; within each group
+the stock priority and quantity order stand. In case 0 the temporary holding 0.1 takes `$f0`
+before gravity and limit, as retail (436 functions change when forced on). Both are per-unit
+models under the owner's standard of 12 November 2026. Controls:
+[test_sched_call_addr_float.py](../../tests/test_sched_call_addr_float.py),
+[test_la_float_vars_last.py](../../tests/test_la_float_vars_last.py).
+
+### Reload round robin: lone classes and pseudo reuse (opt-in)
+
+`-frac2-reload-lone-class-no-rotate`: a reload whose class holds a single spill register does
+not move `last_spill_reg`. `-frac2-reload-reuse-pseudo-reg`: an input reload of a pseudo goes
+back to the spill register that last loaded that pseudo, if no insn has stored into it since,
+and does not move the round robin. In `func_0028A670` draw 1's truncation FP scratch (`$f1`, a
+one-register class) no longer moves the pointer and draw 2's 0x8710 reload returns to `$a2`;
+the later scratch and loop-counter reloads then land as retail. Forced on together they change
+266 functions (142 and 185 alone). Per-unit models under the owner's standard of
+12 November 2026; `src/game/00288D88.c` uses them (none of its other 45 C functions change).
+Controls: [test_reload_rotation.py](../../tests/test_reload_rotation.py).
+
+### cse canonical registers, hard-register argument loads and reload_cse at branch targets (opt-in)
+
+Three switches (tools/compiler/transformers/cse_arg_rules.py) for `func_002900B8`:
+`-frac2-cse2-keep-multi-set-reg` (after loop, a set-once pseudo does not displace a
+several-set pseudo as a quantity's canonical register; keeps case 1/2's 128 multiply on r206),
+`-frac2-cse-arg-hard-reg` (a hard-register load from a constant or hard register is not
+rewritten to read a several-set pseudo; a constant takes another hard register of its quantity)
+and `-frac2-reload-cse-branch-to-next` (reload_cse keeps register values at a label used only by
+the conditional branches directly in front of it). The last two give text call 2's
+`mov.s $f14,$f22 ... mov.s $f15,$f14`. Forced on they change 13, 9 and 0 functions (22
+together). Per-unit models under the owner's standard of 12 November 2026. Controls:
+[test_cse_arg_rules.py](../../tests/test_cse_arg_rules.py).
+
+### sched2 holds lower-priority insns behind a pending barrier (opt-in)
+
+`-frac2-sched2-barrier-hold`: after reload, while the result of a scheduling barrier (an insn
+carrying saved loop notes) is pending (clock < issue cycle + `insn_cost`), only insns of the
+highest ready priority issue; an insn held this way ranks ahead of equal-priority insns once the
+hold ends. In `func_L03_003C7018` draw 2's barrier is a `cvt.s.w` with latency 3, and retail
+issues `lwc1 $f14` alone, then `ori $a1,0xC070` ahead of `mov.s`. Forced on for every USA v1.01
+C unit it changes no other function. Per-unit model under the owner's standard of
+12 November 2026. Controls: [test_sched2_barrier_hold.py](../../tests/test_sched2_barrier_hold.py).
+
+### PRE at a call-result test, cse block skipping, and two sched2 tie-breaks (opt-in)
+
+Four switches for `func_L06_004587E8` (tools/compiler/transformers/l06_rules.py):
+`-frac2-pre-call-test` (gcse PRE treats a block ending in a call, a copy of the return register
+and a conditional jump on it as ending in the call, so it inserts before the call's first
+parameter load; 254 functions change when forced on), `-frac2-cse-noskip-store` (cse does not
+skip a block containing a memory store; 737), `-frac2-sched-retstore` (after reload, on equal
+priority and class, a store of an FP return-value register goes before a load of a call argument
+register; 412) and `-frac2-sched-stackaddr` (on a full sched2 tie, `reg = $sp + offset` goes
+before `reg = const_int`; 266). Per-unit models under the owner's standard of 12 November 2026.
+Controls: [test_l06_rules.py](../../tests/test_l06_rules.py).
+
+### Constant user variables in cse2, barrier anti-dependences, loop-exit duplication, constant deferral (opt-in)
+
+For `func_0028D1E8` (tools/compiler/transformers/d1e8_rules.py): `-frac2-cse2-keep-const-vars`
+(in cse after loop, a user variable set to a constant does not join another register's quantity
+for that constant; 26 functions change when forced on) and `-frac2-sched-barrier-anti` (a read
+of a register the scheduling-barrier insn does not really set is only an anti-dependence on it;
+0). For `func_002D4948` (d4948_rules.py): `-frac2-loop-exit-dup-first-pass` (jump duplicates a
+loop's exit test only on its first pass, as its comment requires; 173) and
+`-frac2-sched-defer-const-after-death` (sched1 defers a constant load one cycle after an insn
+that ends a block-local single-use pseudo, generalising `-frac2-sched-defer-const`; 637).
+Per-unit models under the owner's standard of 12 November 2026. Controls:
+[test_d1e8_rules.py](../../tests/test_d1e8_rules.py), [test_d4948_rules.py](../../tests/test_d4948_rules.py).
+
+### Frame-pointer PRE hash, paired giv initial values, cse2 temporary sums (opt-in)
+
+For the L00 ring twins (tools/compiler/transformers/l00_rules.py): `-frac2-gcse-hash-fp-117`
+(the frame-pointer REG hashes 117 further on in gcse; with `ring` declared first this gives
+retail's PRE reaching-register and spill-slot order; offsets 113..120 fit; 100 functions change
+when forced on), `-frac2-giv-pair-init` (two reduced givs of one biv with initial values
+BASE+PRODUCT and (BASE+C)+PRODUCT are emitted as PRODUCT+BASE and (BASE+PRODUCT)+C; 2) and
+`-frac2-cse2-skip-temp-sum` (after loop, a register+register sum into a several-set non-user
+pseudo is not recorded; 10). The last two were fitted to retail's bytes. Per-unit models under
+the owner's standard of 12 November 2026. Controls: [test_l00_rules.py](../../tests/test_l00_rules.py).
+
+### PRE hash spread and pseudo base, reorg branch reversal, sched2 issue holds (opt-in)
+
+- `func_002B44C0` (b44c0_rules.py): `-frac2-gcse-hash-pseudo-spread` (a pseudo hashes as
+  regno + 16 * (regno - LAST_VIRTUAL_REGISTER) in gcse; with `-frac2-gcse-hash-111`; 92 units
+  change when forced on) and `-frac2-reorg-reverse-filled-branch` (in the last reorg pass a
+  filled, not-taken conditional branch followed by an unfilled jump has its targets swapped; 185).
+- `func_002859C8` (d59c8_rules.py): `-frac2-sched2-fp-load-holds-store` (after an FP load in a
+  cycle, a store blocked by the memory unit keeps lower-priority insns out of that cycle; 474)
+  and `-frac2-sched2-stack-store-first` (on a sched2 tie a stack store goes before an
+  argument-register copy; 198).
+- `func_003478F0` (d78f0_rules.py): `-frac2-pseudo-base` (pseudo numbering starts 128 higher;
+  107), `-frac2-gcse-hash-171` (171 PRE buckets; 133) and `-frac2-sched-elapsed-latency` (sched1's
+  class test counts an elapsed latency as independent; 4).
+Per-unit models under the owner's standard of 12 November 2026. Controls:
+[test_b44c0_rules.py](../../tests/test_b44c0_rules.py), [test_d59c8_rules.py](../../tests/test_d59c8_rules.py),
+[test_d78f0_rules.py](../../tests/test_d78f0_rules.py).
+
+### FP constant first in a two-quantity block (opt-in)
+
+`-frac2-la-fp-const-first` (tools/compiler/transformers/la_fp_const_first.py): in local-alloc,
+when a block has exactly two quantities, both floating point, and the first born is a constant
+(REG_EQUIV), the constant is allocated first. In `func_002D3FA0`'s y3 block the 187.0 constant
+then takes `$f0`, as in the three-quantity sibling blocks. 110 functions change when forced on.
+Per-unit model under the owner's standard of 12 November 2026. Controls:
+[test_la_fp_const_first.py](../../tests/test_la_fp_const_first.py).
+
+### Frame-pointer PRE hash offset 112 (opt-in)
+
+`-frac2-gcse-hash-fp-112` (tools/compiler/transformers/gcse_hash_fp_112.py), a sibling of
+`-frac2-gcse-hash-fp-117`: gcse hashes the frame pointer 112 buckets further on, which gives
+`func_L20_0039BEC8` retail's PRE reaching-register and spill-slot order at sp+0x148..0x168
+(111..113 fit). 102 functions change when forced on; none in `L20_002DEBE0-g8.c`, which builds with
+it. Per-unit model under the owner's standard of 12 November 2026. Controls:
+[test_gcse_hash_fp_112.py](../../tests/test_gcse_hash_fp_112.py).
+
+### Four global-alloc and sched2 rules of func_L04_0040AD28 (opt-in)
+
+tools/compiler/transformers/l04_ad28_rules.py adds four opt-in switches:
+- `-frac2-ga-no-lo-sum-pref`: in global-alloc's set_preference a LO_SUM source gives its
+  destination no register preference (211 functions change when forced on);
+- `-frac2-ga-divisor-first`: a pseudo set once from a const_int and used as a division or modulo
+  divisor is allocated first (48);
+- `-frac2-sched2-call-copy-fp-wait`: after reload no floating-point load issues in the cycle of a
+  copy that saves a call's value register in a call-saved register right after the call (69);
+- `-frac2-sched2-const-low-reg-first`: on a full sched2 tie between two constant loads into hard
+  registers, the lower-numbered register goes first (986).
+Each is needed by `func_L04_0040AD28` (name row, time / 60, 0x96 row, 0x2F79/0x2F99 order).
+Per-unit models under the owner's standard of 12 November 2026. Controls:
+[test_l04_ad28_rules.py](../../tests/test_l04_ad28_rules.py).
+
+### Eleven rules of func_0034CEA0 (opt-in)
+
+tools/compiler/transformers/cea0_rules.py adds, all default off (forced-on corpus counts in
+brackets): `-frac2-gcse-hash-fp-54` (89), `-frac2-gcse-hash-parm-85` (31) and
+`-frac2-gcse-hash-415` (136), fitted PRE hash offsets and table size like hash-111/fp-117;
+`-frac2-sched2-pair-units` (1224): after reload a cycle's second slot goes to an equal-priority
+ready insn of another unit; `-frac2-sched2-pair-after-higher` (883 with pair-units): only after a
+higher-priority insn issued; `-frac2-equiv-const-keep-length` (126): a once-set integer-constant
+pseudo with 7 or more refs keeps its live length (update_equiv_regs does not double it);
+`-frac2-reload-const-in-out-reg` (24): an integer constant input reload uses the insn's free
+output register; `-frac2-reload-reuse-until-label` (162 with reuse-pseudo-reg): the reuse memory
+is forgotten at labels; `-frac2-output-dep-no-alias-sets` (808 with -fstrict-aliasing): alias
+sets do not remove output dependences; `-frac2-unsized-sda-no-cond-slot` (115): a load of an
+sda variable of unknown size stays out of conditional delay slots; `-frac2-regmove-cmove-copy`
+(9): a conditional move with a live register arm and a zero arm gets a copy of that arm into its
+destination. Per-unit models under the owner's standard of 12 November 2026; `func_0034CEA0` is
+also a FAKEMATCH unit (config/fakematch.tsv). Controls:
+[test_cea0_rules.py](../../tests/test_cea0_rules.py).
+
+### Four rules of func_002CC6B0 (opt-in)
+
+tools/compiler/transformers/cc6b0_rules.py adds, all default off (forced-on corpus counts in
+brackets): `-frac2-flow2-trap-mem` (0): after reload a trap insn ends flow's dead-store tracking;
+`-frac2-la-multi-death-locals` (154): local-alloc also takes a block-local user variable that dies
+more than once, as one quantity from its first set to its last death; `-frac2-sched-const-first`
+(965): before reload, on a priority tie and ahead of the weight test, a constant load into a
+pseudo goes before a two-operand arithmetic set of a pseudo; `-frac2-sched-temp-store-after-args`
+(1109): before reload, on a priority tie, a store of a compiler temporary goes after a set of a
+call-argument register. Per-unit models under the owner's standard of 12 November 2026;
+`func_002CC6B0` is also a FAKEMATCH unit (config/fakematch.tsv). Controls:
+[test_cc6b0_rules.py](../../tests/test_cc6b0_rules.py).
+
+### Eleven rules of func_L04_00417308 (opt-in)
+
+tools/compiler/transformers/l04_17308_rules.py adds, all default off (forced-on corpus counts in
+brackets): `-frac2-loop-align-in-loop-only` (6): a loop's alignment goes only to a label inside it;
+`-frac2-la-const-longer-first` (810): of two integer-constant quantities with equal refs, the
+longer-lived is allocated first; `-frac2-sched-hoisted-first` (528): on a full sched1 tie, an insn
+moved out of a loop goes first; `-frac2-cse-path-11` (20): a cse path follows 11 jumps;
+`-frac2-loop-move-temps` (398): loop invariant motion may move a conditionally set temporary;
+`-frac2-sched-arg-sum-first` (1063): on a full sched1 tie, an argument-register sum before a pseudo
+copy; `-frac2-ga-hoisted-var-first` (1): a hoisted float user variable counts 3% higher in
+global-alloc; `-frac2-sched-call-last` (54): a call heading the ready list issues after the next
+ready insn of its cycle when that came first originally; `-frac2-sched-argreg-wait` (2317): an
+argument-register set that depends on a preceding call waits two cycles (constant loads after a
+call without a value excepted); `-frac2-sched-frame-temp-first` (64): of two frame-address sets,
+the temporary first; `-frac2-sched-call-with-arg-copy` (2 with argreg-wait): a call with a value
+issues in the cycle of the delayed argument copy that readies it. Per-unit models under the
+owner's standard of 12 November 2026; `func_L04_00417308` is a FAKEMATCH unit
+(config/fakematch.tsv). Controls: [test_l04_17308_rules.py](../../tests/test_l04_17308_rules.py).
+
+### Nine rules of func_L17_003E8A58 (opt-in)
+
+tools/compiler/transformers/l17_rules.py adds, all default off (forced-on corpus counts in
+brackets): `-frac2-register-scope` (0): when optimizing, a `register` variable stays live to the end
+of its scope; `-frac2-sched-flush-30` (37): the scheduler flushes its pending memory lists beyond 30
+entries; `-frac2-sched1-priority-only` (4338): before reload, ties after priority skip the weight
+and dependent-count keys; `-frac2-sched-uservar-const-no-boost` (22): a constant loaded into a user
+variable is not promoted as a register birth; `-frac2-sched2-fp-symbol-load-latency-3` (750): after
+reload an FP load from a symbol address has latency 3; `-frac2-keep-user-copies-strict` (98):
+combine substitutes nothing into a pseudo-to-pseudo copy into a user variable (beside upstream's
+`-frac2-keep-user-copies`); `-frac2-sched-uservar-copy-priority` (114): a copy into a user variable
+adds 4 to its dependences' priority; `-frac2-sched2-fp-const-first-consumer` (90): of two tied FP
+constant loads, the one whose first dependent comes first goes first;
+`-frac2-sched2-qi-store-offset` (282): of two tied byte stores to one base, the lower displacement
+first. Per-unit models under the owner's standard of 12 November 2026; `func_L17_003E8A58` is a
+FAKEMATCH unit (config/fakematch.tsv). Controls: [test_l17_rules.py](../../tests/test_l17_rules.py).
+
+### Eight switches of func_L05_0042B2C0 (opt-in)
+
+tools/compiler/transformers/l05_42b2c0_rules.py adds, all default off (forced-on corpus counts in
+brackets): `-frac2-loop-no-equal-copy-subst` (317): loop does not fold a pseudo copy that carries a
+REG_EQUAL note into its single use; `-frac2-loop-move-high-copy` (4): loop motion moves a pseudo
+copy of a symbol's high part as the copy; `-frac2-rerun-loop-move-consts` (59): the second pass of
+`-frerun-loop-opt` always moves an invariant symbolic constant out of a loop;
+`-frac2-rerun-loop-no-reverse` (462): that second pass does not reverse a loop;
+`-frac2-loop-ivs-in-order` (9): strength reduction visits the induction variable classes in the
+order their bivs were found; `-frac2-cse2-loop-end-forgets-arith` (14): after loop, at a loop end,
+cse forgets pseudos set inside that loop from a sum or product, so an address formed in a
+`do { } while (0)` group is formed again after it; `-frac2-sched-phony-loop-notes` (249): the loop
+notes of a `do { } while (0)` group are deleted before scheduling, so the group is no scheduling
+barrier (stock: a barrier in both scheduler passes, and its references count one loop level deeper
+in flow). These seven are per-unit models under the owner's standard of 12 November 2026.
+
+`-frac2-sched1-order` (0) is not a model. Before reload the scheduler issues the insns named by
+`#pragma rac2_sched1_order UID...` in the listed order, one per cycle and without waiting for a
+function unit, wherever the dependences allow; unlisted insns are scheduled as usual. The list
+belongs to the next function compiled and is dropped after its first scheduling pass; without the
+switch the pragma is ignored. It exists for `func_L05_0042B2C0` alone (owner ruling,
+14 November 2026): the function's plain C gives retail's instructions, but no general rule or
+source form was found for the order of its first scheduling pass, on which local-alloc's
+priorities and reload's round-robin scratch registers depend. The list names insn UIDs, so it
+holds for one source text and one set of flags. `func_L05_0042B2C0` is a FAKEMATCH unit
+(config/fakematch.tsv). Controls: [test_l05_42b2c0_rules.py](../../tests/test_l05_42b2c0_rules.py).
 
 This reference groups qualified compiler mechanisms and useful C source shapes by
 topic. Open cases belong in [matching-blockers.md](../contributing/matching-blockers.md). The source
@@ -2081,6 +2389,32 @@ oracle, and a same-size draft screen is not a match or current progress.
 | Inline li.d into GPRs | [test_inline_li_d.py](../../tests/test_inline_li_d.py) |
 | Hazard labels | [test_hazard_labels.py](../../tests/test_hazard_labels.py), [hazard_labels.s](../../tests/fixtures/hazard_labels.s) |
 | Block-move loop padding | [test_block_move_loop.py](../../tests/test_block_move_loop.py) |
+| Function-address weight in local-alloc | [test_la_funcref_weight.py](../../tests/test_la_funcref_weight.py), [la_funcref_weight.c](../../tests/fixtures/la_funcref_weight.c) |
+| Consecutive truncation scratch reuse | [test_fix_scratch_reuse.py](../../tests/test_fix_scratch_reuse.py), [fix_scratch_reuse.c](../../tests/fixtures/fix_scratch_reuse.c) |
+| Constant loads beside a dying store | [test_sched_defer_const.py](../../tests/test_sched_defer_const.py) |
+| Hard-register sets first on a sched1 tie | [test_sched_global_yield.py](../../tests/test_sched_global_yield.py) |
+| Call-clobbered stores first on a sched2 tie | [test_sched_store_clobbered_first.py](../../tests/test_sched_store_clobbered_first.py) |
+| Quadword clear holds the store slot | [test_sched_clear_holds_store.py](../../tests/test_sched_clear_holds_store.py) |
+| Call address vs pending FP stores | [test_sched_call_addr_float.py](../../tests/test_sched_call_addr_float.py) |
+| FP user variables last in local-alloc | [test_la_float_vars_last.py](../../tests/test_la_float_vars_last.py) |
+| Reload round robin rules | [test_reload_rotation.py](../../tests/test_reload_rotation.py) |
+| cse/reload_cse argument rules | [test_cse_arg_rules.py](../../tests/test_cse_arg_rules.py) |
+| sched2 barrier hold | [test_sched2_barrier_hold.py](../../tests/test_sched2_barrier_hold.py) |
+| L06 PRE/cse/sched2 rules | [test_l06_rules.py](../../tests/test_l06_rules.py) |
+| func_0028D1E8 rules | [test_d1e8_rules.py](../../tests/test_d1e8_rules.py) |
+| func_002D4948 rules | [test_d4948_rules.py](../../tests/test_d4948_rules.py) |
+| L00 ring twin rules | [test_l00_rules.py](../../tests/test_l00_rules.py) |
+| func_002B44C0 rules | [test_b44c0_rules.py](../../tests/test_b44c0_rules.py) |
+| func_002859C8 rules | [test_d59c8_rules.py](../../tests/test_d59c8_rules.py) |
+| func_003478F0 rules | [test_d78f0_rules.py](../../tests/test_d78f0_rules.py) |
+| FP constant first (local-alloc) | [test_la_fp_const_first.py](../../tests/test_la_fp_const_first.py) |
+| Frame-pointer PRE hash 112 | [test_gcse_hash_fp_112.py](../../tests/test_gcse_hash_fp_112.py) |
+| func_L04_0040AD28 rules (global-alloc, sched2) | [test_l04_ad28_rules.py](../../tests/test_l04_ad28_rules.py) |
+| func_0034CEA0 rules (gcse, sched2, reload, alias, reorg, regmove) | [test_cea0_rules.py](../../tests/test_cea0_rules.py) |
+| func_002CC6B0 rules (flow, local-alloc, sched1) | [test_cc6b0_rules.py](../../tests/test_cc6b0_rules.py) |
+| func_L04_00417308 rules (final, local-alloc, sched1, cse, loop, global-alloc) | [test_l04_17308_rules.py](../../tests/test_l04_17308_rules.py) |
+| func_L17_003E8A58 rules (stmt, combine, sched1, sched2) | [test_l17_rules.py](../../tests/test_l17_rules.py) |
+| func_L05_0042B2C0 switches (loop, cse, sched1 order hint) | [test_l05_42b2c0_rules.py](../../tests/test_l05_42b2c0_rules.py) |
 | Quadword block moves | [test_block_move_quad.py](../../tests/test_block_move_quad.py) |
 | Asm-word loop padding | [test_count_asm_words.py](../../tests/test_count_asm_words.py) |
 

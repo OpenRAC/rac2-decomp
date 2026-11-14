@@ -100,25 +100,59 @@ python3 $T/sched_stack_offset.py gcc
 python3 $T/allocno_live_length.py gcc
 python3 $T/sched_arg_copy.py gcc
 python3 $T/keep_user_copies.py gcc
+python3 $T/la_funcref_weight.py gcc
+python3 $T/fix_scratch_reuse.py gcc
+python3 $T/sched_defer_const.py gcc
+python3 $T/sched_global_yield.py gcc
+python3 $T/sched_store_clobbered_first.py gcc
+python3 $T/sched_clear_holds_store.py gcc
+python3 $T/sched_call_addr_float.py gcc
+python3 $T/la_float_vars_last.py gcc
+python3 $T/reload_rotation.py gcc
+python3 $T/cse_arg_rules.py gcc
+python3 $T/sched2_barrier_hold.py gcc
+python3 $T/l06_rules.py gcc
+python3 $T/d1e8_rules.py gcc
+python3 $T/d4948_rules.py gcc
+python3 $T/l00_rules.py gcc
+python3 $T/b44c0_rules.py gcc
+python3 $T/d59c8_rules.py gcc
+python3 $T/d78f0_rules.py gcc
+python3 $T/la_fp_const_first.py gcc
+python3 $T/gcse_hash_fp_112.py gcc
+python3 $T/l04_ad28_rules.py gcc
+python3 $T/cea0_rules.py gcc
+python3 $T/cc6b0_rules.py gcc
+python3 $T/l04_17308_rules.py gcc
+python3 $T/l17_rules.py gcc
+python3 $T/l05_42b2c0_rules.py gcc
 sha256sum --check --quiet <<'SUMS'
-a7436602ef9e063c0eafef9888797527ea3fd6e2d35b041d3fed46fcb457f504  gcc/config/mips/mips.c
-e25f1a54bfdcc6c96e1c8ba9c9b977f15738ca8554393920e6af33c2d3a3f7bc  gcc/config/mips/mips.h
+56ccede033f0d7041aeb573a89e79aeee2d635a18987403bee0a1e2d0370a44a  gcc/config/mips/mips.c
+e8b9e0234097ac5c9865812717b2b666c90f535cb114ceb5c579e911e78c972a  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-9d9b1f55d531523ac6ab4980037b0ac6620132305405418faa8bb3bf940c7e4f  gcc/toplev.c
-254670831bd1070c683caca607f0665e3ddfb0194b2ef278898870932b555f0e  gcc/haifa-sched.c
-7b58c94fbad9767bc95c7f444f1bb31a4bc1d557e87787fa6921c59031412a67  gcc/reorg.c
-9d4411fe15173f09b72052c78211c39e84dbe866eab6f11b1d1c400aa23bde06  gcc/flags.h
-28391f37355e5a0324ac19a9451f8f0dfa42e8e9f25b0157939388924d35f632  gcc/gcse.c
-efc2260dd9c22f76d0d343ae14c313833755995ebda0ceab098f99e009d3afe2  gcc/flow.c
+3df1c0e9d98a970856781850d9d48a4d40ad055562b2bb2fbbd9e6d66d3a4557  gcc/toplev.c
+a359fb4867609e631ca952101051c2d88fd26656ced2626ba050f5d9c9bea281  gcc/haifa-sched.c
+85ce08b12f1222054a9e7e009314ed0aafe48f8612af7ba0c9d2f878087d8ee6  gcc/reorg.c
+41a783dd0df819436ba92bc8bfb14c241afdbd6156fb9c4fcbaab8e0d9569651  gcc/flags.h
+6eb6d00f923e38bb5c075ef87bdb7fd519d40842c2d57473cb2ee76ee60a62f5  gcc/gcse.c
+ae0cc11c65f6ec520668b917bb5ef5052d52ee93964e8f06b5383be6b3e82a39  gcc/flow.c
+72941ee59459c038850f9c330c32c623d1290fad4a54444f9dfd3cb008dfdb0c  gcc/emit-rtl.c
+36132244008bfdfa284995132a7c33e522682486356cdaa38c99f2dca50b41be  gcc/jump.c
 3535b59f5a754e44fb67989b1c30ad8f8f4fab6c30f12ef4dff287f527a82306  gas/config/tc-mips.c
-6d4c688bdf8517a1da1b35a04bb1e3b6137093a6224b3ed52666581e3a7bd557  gcc/reload1.c
-94489f80e8769d277c3cfd7c73a3d5ee3f8ce0af790f61ef3c575b593b3b4099  gcc/loop.c
-6358bdfaabf03d28d0ad9a5abc2e21161fdf228025c07017f417ecabd378edcd  gcc/cse.c
+c7286dea5cf785e9f6317f46d124692c3b6c405c0da6372fd6c5df5a7d6cb1f4  gcc/reload1.c
+fef520171c0efbdd9066fed9caf5485df7821796eb73fdb9783e6fdbecdd44ab  gcc/loop.c
+13587efab4dd4ff3a22bebb6ffa975a86fd1a46b9260e14786c93413cb0de1a6  gcc/cse.c
 734dc911b2b3764dc532eb95e3ddc886a94f6c9289a9686080db5e99d2221cd8  gcc/resource.c
 23fccc683e52141c78256e75795be2b6573cc2be5683247c86379d416f213729  gcc/expmed.c
-60cc098fdef5da1d5d0597bd624c1b2d56661b39e3ffaca628dcd32bedca7f18  gcc/global.c
-cf87807db5f932724aaf0433323592a5eaa4eccfe58936ca5e3d3d395ca90e45  gcc/alias.c
-6c3c2be328bf2a1c5ad130ada2ecaaac1ff7135b3adfc1b256e5f96018cabff4  gcc/combine.c
+5af54a39f80de1661ed511d51abe5769158befe40d21d8ddf5cdc588c914c22d  gcc/global.c
+c64b9016b3dd89b525f5fd0810acd3f7dcbde43b3d9d3fe4657ee486f36f0cbe  gcc/alias.c
+02e2157fd4ddbd3c0733e03faeceba4dbb5879ee50d0a53a81fb686fc561abf4  gcc/combine.c
+6164df9c2636274d06479453593f16aa01454ae99c3136179053d2adaa650bc6  gcc/local-alloc.c
+d7fca815635791e78130a1ab2f64a95139589f1c4b4862ec83facd1a0607aa23  gcc/final.c
+a0ad1bf96073c9b6395a026769e17f4bdb4ce7b13edaa8d5666597edb2b60819  gcc/stmt.c
+53b72984e05a65d7ad76844db9b1457ba8791a9d7959f32b9b375497e4e05a7b  gcc/regmove.c
+0f87c4ba3a2fffe6ddb2c93c875b839354fe16441e6de3733b335ce7d96bc881  gcc/c-decl.c
+ff8ba53834779df40801e41ac090da9304eda53aa3df550a2dc62cb45db14458  gcc/c-lex.c
 SUMS
 
 # bison 1.28: the 1999 grammars need its skeleton.
@@ -137,14 +171,16 @@ export CC="gcc -m32" CFLAGS="$F"
   bash "$W/src/configure" --target=mips64r5900-sf-elf --host=i686-linux-gnu --build=i686-linux-gnu \
        --disable-nls --enable-languages=c --without-headers --prefix="$W/install"
   make -j$J all-libiberty
-  # The 1999 Makefile lacks flow.o -> insn-flags.h: generate the headers first.
+  # The 1999 Makefile lacks flow.o -> insn-flags.h (and gcse.o -> tree-check.h, which
+  # cea0_rules.py's tree.h include needs): generate the headers first.
   make -C gcc -f Makefile -f "$W/build/host-flags.mk" LANGUAGES=c "CC=gcc -m32" "CFLAGS=$F" \
-       BISON="$W/bison/bin/bison" insn-flags.h insn-codes.h insn-config.h
+       BISON="$W/bison/bin/bison" insn-flags.h insn-codes.h insn-config.h tree-check.h
   make -C gcc -f Makefile -f "$W/build/host-flags.mk" -j$J LANGUAGES=c "CC=gcc -m32" "CFLAGS=$F" \
        BISON="$W/bison/bin/bison" cc1 cpp xgcc
   make -j$J all-gas
 } > "$W/build.log" 2>&1 || { tail -30 "$W/build.log"; exit 1; }
-cp gcc/cc1 gcc/cpp "$OUT/" && cp gas/as-new "$OUT/as"
+# A failed cc1 build must not leave the previous binaries in place unnoticed.
+cp gcc/cc1 gcc/cpp "$OUT/" && cp gas/as-new "$OUT/as" || { tail -30 "$W/build.log"; exit 1; }
 # the compiler's own headers (stdarg.h and the va-*.h it includes), as the
 # SDK recipe installs them: an authored unit that includes <stdarg.h>
 # (a varargs body) needs them on the preprocessor's path.
@@ -181,6 +217,32 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_keep_user_copies.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_no_extra_increment_givs.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sticky_volatile_sets.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_caller_reg_order.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_la_funcref_weight.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_fix_scratch_reuse.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched_defer_const.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched_global_yield.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched_store_clobbered_first.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched_clear_holds_store.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched_call_addr_float.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_la_float_vars_last.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_reload_rotation.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_cse_arg_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched2_barrier_hold.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l06_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_d1e8_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_d4948_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l00_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_b44c0_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_d59c8_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_d78f0_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_la_fp_const_first.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_gcse_hash_fp_112.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l04_ad28_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_cea0_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_cc6b0_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l04_17308_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l17_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l05_42b2c0_rules.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

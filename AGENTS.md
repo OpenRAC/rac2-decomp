@@ -199,6 +199,20 @@ each have their own worktree for that reason (docs/agents/agent-workflow.md).
   allowed either. A function that matches only with a form these rules forbid is a near
   miss: its C goes to `nonmatching/` with a line in `nonmatching/README.md`, and its
   `INCLUDE_ASM` marker goes back.
+- **Fakematch exception.** By owner ruling (13 November 2026) five functions only,
+  `func_0034CEA0`, `func_002CC6B0`, `func_L04_00417308`, `func_L05_0042B2C0` and
+  `func_L17_003E8A58`, may match with RAC1-style fakematches once compiler rules and plain
+  source are exhausted: `volatile` on an access, dead branches or arms, no-op expressions,
+  `do { } while (0)` groups and stand-in operands. Inline asm, register pins and fake asm
+  dependencies stay forbidden; the plain `register` keyword (no asm register name) is allowed
+  as a marked fakematch. By owner ruling of 14 November 2026, `func_L05_0042B2C0` alone
+  may also give the compiler the order of its instructions before reload
+  (`#pragma rac2_sched1_order` with `-frac2-sched1-order`): an order hint selected by
+  instruction, which stays forbidden as a compiler rule everywhere else.
+  Each site carries `/* FAKEMATCH: <reason> */` and a row in
+  `config/fakematch.tsv` (`python3 tools/fakematch.py --write`); the repository check
+  rejects a site anywhere else, except in a helper defined in the same unit for that
+  fakematch.
 - **Check current RAC1 before rejecting a method.** Inspect its current source and build
   inputs, rather than treating an old experiment or private worker restriction as a ban.
   Methods used there are available here, subject to the same sourcing and strict-build

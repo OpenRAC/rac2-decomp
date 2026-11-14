@@ -207,7 +207,7 @@ void func_0028FDD8(int a0, int a1, int a2, int a3, long long a4, int a5, int a6)
 
 /* func_00290010 is in the -G8 sibling. */
 
-INCLUDE_ASM("asm/game", func_002900B8);
+/* func_002900B8 is defined in 002900B8-bars-g8.c. */
 
 
 

@@ -411,7 +411,7 @@ void func_L04_0040AC30(char *a0, char *a1)
    so its body lives in L04_00402D90-g8.c. */
 
 
-INCLUDE_ASM("asm/levels", func_L04_0040AD28);
+/* func_L04_0040AD28 is defined in L04_00402D90-results-g8.c. */
 
 /* func_L04_0040BA68 reaches its small globals off $gp, so its body lives in
    L04_00402D90-select-g8.c. */
@@ -577,7 +577,7 @@ void func_L04_0040CE30(char *a0)
     }
 }
 
-INCLUDE_ASM("asm/levels", func_L04_0040DCA8);
+/* func_L04_0040DCA8 is defined in L04_0040DCA8-quad.c. */
 
 
 extern BatchA_A04_u8 D_00188660[];
