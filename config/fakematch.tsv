@@ -49,7 +49,53 @@ src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain co
 src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	end of the 1.0 chain
 src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	moved before fCD/fCE (sched1 position for c9 span; sched2 restores retail order with -frac2-sched2-qi-store-offset)
 src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	see o1..o6
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	-	order hint (owner ruling, 14 November 2026): the marker heading is loaded before the
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	before i = 0 so one3 is born before the &vF0 copy dies
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	call inside the rank-row group so the 24.0 li.s precedes the s copy (0xAF8); label_y4 with n20 active keeps n20 (23/250 = 0.368..0.375 window) above s and below the s1 allocno
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	dead store, overwritten next: its &tmp, the first, gives tmp its frame slot (0x100) ahead of sy and sy2
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	fz
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	index precomputed outside the group
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	named &m[2] declared before hp: its alter_reg slot 0x114 precedes hp's 0x118
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	named &sy and &sy2 declared before pa, pb and arr: their slots 0x11C and 0x120 precede pa's 0x124
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	per-iteration ruler half, hoisted by loop.c; reload_cse makes it retail's mov.s f23,f20 (gcse would otherwise copy-propagate the 0.5 register into the ruler)
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once &m[2], see decl
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once &sy, see decl
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once &sy2, see decl
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once -1 after j = 0 puts j's daddu fp before the hoisted -1 (0x1070/0x1090)
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once copy: sy is read after the top row
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once copy: the heading is read before tmp is stored
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	set-once zero, hoisted first (retail preheader order)
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	func_PAL_L04_0041BC68	was HCN; drops one n20 ref so n20 lands at 23/250
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	label_y4	label_y plus a second dead mode test (D_L04_001B2D40 + 1 == active): one more n20 reference, no code
+src/pal/levels/shared/L04_0041BC68-hud-g8.c	label_y5	label_y plus a dead test of the result: two more references to the title row's y, so it is allocated before n20
 src/us2/game/0028DC24-g8.c	func_US2_0028DC24	do { } while (0) group; its loop notes make the read after the last draw a
+src/us2/game/002CD670-hud-g8.c	-	the #pragma rac2_sched1_order list below fixes the pre-reload order of the clip
+src/us2/game/002CD670-hud-g8.c	-	the #pragma rac2_sched2_order lists below fix the post-reload order of the clip
+src/us2/game/002CD670-hud-g8.c	-	the clip block and the scroll DRAW are ordered by instruction lists before reload
+src/us2/game/002CD670-hud-g8.c	func_US2_002CD670	dead shift/unshift on stand-in globals (RAC1 win_shift/win_unshift without the
+src/us2/game/002CD670-hud-g8.c	func_US2_002CD670	mask kept in the reused stand-in
+src/us2/game/002CD670-hud-g8.c	func_US2_002CD670	unshift after the s[0] copy
+src/us2/game/002CD670-hud-g8.c	func_US2_002CD670	volatile store keeps the sum's store, which the constant gap no longer
+src/us2/game/002CD670-hud-g8.c	func_US2_002CD670	y holds s[5] + 48 and then the s[0] copy, so the lhu waits for the add
+src/us2/game/002CD670-hud-g8.c	func_US2_002CD670	y/x only serve the second scroll block below
 src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	do { } while (0) adds loop notes, so flow counts the 0x70202080 register's refs at a deeper loop level; global then allocates it (s6) before `low`, as retail
 src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	volatile load, see above
 src/us2/game/0034DBE0-menu-g8.c	func_US2_0034DBE0	volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124)
+src/us2/levels/shared/L04_004188B8-hud-g8.c	-	order hint (owner ruling, 14 November 2026): the marker heading and the -1.0 constant
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	before i = 0 so one3 is born before the &vF0 copy dies
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	call inside the rank-row group so the 24.0 li.s precedes the s copy (0xAF8); label_y4 with n20 active keeps n20 (23/250 = 0.368..0.375 window) above s and below the s1 allocno
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	dead store, overwritten next: its &tmp, the first, gives tmp its frame slot (0xF0) ahead of sy and sy2
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	fz
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	index precomputed outside the group
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	named &m[2], declared last: its alter_reg slot 0x11C follows arr's 0x118
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	named &sy and &sy2 declared after hp and before pa: their alter_reg slots 0x108/0x10C follow hp's 0x104 and precede pa's 0x110
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	per-iteration ruler half, hoisted by loop.c; reload_cse makes it retail's mov.s f23,f20 (gcse would otherwise copy-propagate the 0.5 register into the ruler)
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	set-once &m[2], see decl
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	set-once &sy, see decl
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	set-once &sy2, see decl
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	set-once -1 after j = 0 puts j's daddu fp before the hoisted -1 (0x1070/0x1090)
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	set-once copy: sy is read after the top row
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	set-once copy: the heading is read before tmp is stored
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	set-once zero, hoisted first (retail preheader order)
+src/us2/levels/shared/L04_004188B8-hud-g8.c	func_US2_L04_004188B8	was HCN; drops one n20 ref so n20 lands at 23/250
+src/us2/levels/shared/L04_004188B8-hud-g8.c	label_y4	label_y plus a second dead mode test (D_L04_001B2D40 + 1 == active): one more n20 reference, no code

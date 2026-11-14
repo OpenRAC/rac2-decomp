@@ -102,6 +102,5 @@ void func_PAL_L04_0041A660(u8 *owner, f32 *pos, f32 *to, f32 *from)
 
 /* func_PAL_L04_0041B850 lives in L04_0041B850-cc.c. */
 
-INCLUDE_ASM("asm/pal/levels", func_PAL_L04_0041BC68);
 
 

@@ -211,7 +211,10 @@ each have their own worktree for that reason (docs/agents/agent-workflow.md).
   instruction, which stays forbidden as a compiler rule everywhere else. By owner ruling of
   14 November 2026 the same fakematch forms (not the order hint) are also allowed for any
   PAL or USA v2.00 function in `src/pal/` or `src/us2/`, as a last resort once compiler
-  rules and plain source are exhausted.
+  rules and plain source are exhausted; for the last four of them (`func_PAL_002CD520`,
+  `func_US2_002CD670`, `func_PAL_L04_0041BC68`, `func_US2_L04_004188B8`) the owner also
+  allows the instruction-order hints, `#pragma rac2_sched1_order` with `-frac2-sched1-order`
+  and `#pragma rac2_sched2_order` with `-frac2-sched2-order` (after reload).
   Each site carries `/* FAKEMATCH: <reason> */` and a row in
   `config/fakematch.tsv` (`python3 tools/fakematch.py --write`); the repository check
   rejects a site anywhere else, except in a helper defined in the same unit for that

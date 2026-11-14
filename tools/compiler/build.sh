@@ -128,14 +128,16 @@ python3 $T/l17_rules.py gcc
 python3 $T/l05_42b2c0_rules.py gcc
 python3 $T/gcse_hash_fp_59.py gcc
 python3 $T/l11_dce0_rules.py gcc
+python3 $T/sched2_order.py gcc
+python3 $T/cd670_rules.py gcc
 sha256sum --check --quiet <<'SUMS'
 56ccede033f0d7041aeb573a89e79aeee2d635a18987403bee0a1e2d0370a44a  gcc/config/mips/mips.c
 e8b9e0234097ac5c9865812717b2b666c90f535cb114ceb5c579e911e78c972a  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-e67480d061a35bed2ab1f21b25c5f5c52ad2bbe9f9cf5a7ed5f3d0f4e82826c5  gcc/toplev.c
-93fc013939a54de9764d57c21c3e4565934d906cce4a26c43b6a04eb857c4e6d  gcc/haifa-sched.c
+c01e6656316f7451e096fecfa70a06efa75cf01ec2225350b2800e045d111697  gcc/toplev.c
+d187684f1c2dfcfcb168bd808752ab786b590ea1810daaadf53fe4f8383cfa25  gcc/haifa-sched.c
 85ce08b12f1222054a9e7e009314ed0aafe48f8612af7ba0c9d2f878087d8ee6  gcc/reorg.c
-f2c893c27701fc503b8f098a69d86df9c0bb9a7a25344a99c5c029d173ca4d5c  gcc/flags.h
+b586b9b35f21061280f5d3a3d2c2c947de4d748090eeb73abb6e8826acaffbd0  gcc/flags.h
 d141934f9b0181c58b79b05eba17074d7e773b06749e541c35ce43dc759bc114  gcc/gcse.c
 ae0cc11c65f6ec520668b917bb5ef5052d52ee93964e8f06b5383be6b3e82a39  gcc/flow.c
 72941ee59459c038850f9c330c32c623d1290fad4a54444f9dfd3cb008dfdb0c  gcc/emit-rtl.c
@@ -148,13 +150,13 @@ fef520171c0efbdd9066fed9caf5485df7821796eb73fdb9783e6fdbecdd44ab  gcc/loop.c
 23fccc683e52141c78256e75795be2b6573cc2be5683247c86379d416f213729  gcc/expmed.c
 06f9cb7a772a5af1b5e7c883030505ff623ef499ac76fb4ab8c143b1558e8ea1  gcc/global.c
 c64b9016b3dd89b525f5fd0810acd3f7dcbde43b3d9d3fe4657ee486f36f0cbe  gcc/alias.c
-02e2157fd4ddbd3c0733e03faeceba4dbb5879ee50d0a53a81fb686fc561abf4  gcc/combine.c
+25f59a6b97634b7d678db1939680e5c1d3a1675382a1d268c4ec4f7ce2b7b1a2  gcc/combine.c
 6164df9c2636274d06479453593f16aa01454ae99c3136179053d2adaa650bc6  gcc/local-alloc.c
 d7fca815635791e78130a1ab2f64a95139589f1c4b4862ec83facd1a0607aa23  gcc/final.c
 a0ad1bf96073c9b6395a026769e17f4bdb4ce7b13edaa8d5666597edb2b60819  gcc/stmt.c
 53b72984e05a65d7ad76844db9b1457ba8791a9d7959f32b9b375497e4e05a7b  gcc/regmove.c
 0f87c4ba3a2fffe6ddb2c93c875b839354fe16441e6de3733b335ce7d96bc881  gcc/c-decl.c
-ff8ba53834779df40801e41ac090da9304eda53aa3df550a2dc62cb45db14458  gcc/c-lex.c
+d0b1373e522732ce4e20436d4424e1d12b716be14d9ef06155d66dd295635935  gcc/c-lex.c
 SUMS
 
 # bison 1.28: the 1999 grammars need its skeleton.
@@ -247,6 +249,8 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l17_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l05_42b2c0_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_gcse_hash_fp_59.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l11_dce0_rules.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_sched2_order.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_cd670_rules.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

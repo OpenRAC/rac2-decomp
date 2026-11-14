@@ -1,16 +1,14 @@
-/* func_US2_002CD670 (2,108 bytes, USA v2.00): near miss, G8 (unit 002CD670-hud-g8.c).
- * The v2.00 copy of func_002CC6B0 (src/game/002CC6B0-hud-g8.c), adapted: text ids 0x31B9/0x31B8/
- * 0x2C56, gap constant 16 (s[8] = 16, scroll pitch 48), a new $gp word D_US2_001AB9D0 (the last
- * w+0x34 seen: a change of it restarts the scroll at -(height * 8)).
- * Flags: -O2 -G8 -ffunction-sections -frac2-flow2-trap-mem -frac2-la-multi-death-locals
- *        -frac2-sched-temp-store-after-args   (no -frac2-sched-const-first: it hoists the 16)
- * 14 November 2026: 2108/2108 bytes, 0/28 places. Left: (1) text and tex swap $fp/$s7 (text needs
- * a higher global-alloc priority than tex: regalloc.py gives text 45/806 against tex 8/138);
- * (2) after the w+0x34 test retail loads w+0x34 before w+0x30 and issues `lui s0,2` after the lhu
- * (regs a0/a3/v0/v1); ours loads w+0x30 first; (3) the scroll DRAW: `addiu a3,-1` before
- * `sh 0x4A`. FAKEMATCH sites: volatile store keeping the sum's store before the modulo (with the
- * gap constant nothing protects it from flow's dead-store deletion), y reuse in the scroll copy,
- * and the dead win_shift/unshift of func_002CC6B0 in the clip block. */
+/* func_US2_002CD670 (2,108 bytes, USA v2.00), G8: the v2.00 copy of func_002CC6B0
+ * (src/game/002CC6B0-hud-g8.c), adapted: text ids 0x31B9/0x31B8/0x2C56, gap constant 16
+ * (s[8] = 16, scroll pitch 48), a new $gp word D_US2_001AB9D0 (the last w+0x34 seen: a change of
+ * it restarts the scroll at -(height * 8)).
+ * Rules: -frac2-keep-user-copies(-strict) and -frac2-combine-keep-dead-sets keep the dead user
+ * copies sa/sb/ta/tb of the clip block; -frac2-sched-keep-live-length gives text the global-alloc
+ * priority that puts it in $fp and tex in $s7 (no -frac2-sched-const-first: it hoists the 16).
+ * FAKEMATCH: the clip block and the scroll DRAW are ordered by instruction lists before reload
+ * (#pragma rac2_sched1_order) and after reload (#pragma rac2_sched2_order); further sites are the
+ * volatile store keeping the sum's store before the modulo, y reuse in the scroll copy, and the
+ * dead win_shift/unshift of func_002CC6B0 in the clip block. */
 #include "common.h"
 typedef struct { short s[12]; } Win;
 typedef struct { char pad[0x3C]; int so; } LabelSO;
@@ -49,6 +47,14 @@ static inline int translated_edge(int extent, int origin) { return extent + orig
 static inline void set_anchor(Win *p, unsigned short anchor) { p->s[5] = anchor; }
 static inline void set_top(Win *p, unsigned short top) { p->s[0] = top; }
 static inline void set_window_vertical(Win *p, unsigned short top, unsigned short anchor) { p->s[5] = anchor; p->s[0] = top; }
+/* FAKEMATCH: the #pragma rac2_sched1_order list below fixes the pre-reload order of the clip
+   block (after the w+0x34 test), which gives its registers the retail allocation */
+#pragma rac2_sched1_order 1250 1308 1270 1272 1253 1256 1333 1305 1313 1275 1319 1277 1310 1330 1336 1339
+/* FAKEMATCH: the #pragma rac2_sched2_order lists below fix the post-reload order of the clip
+   block (w+0x34 loaded before w+0x30, lui s0 after the lhu, sh 0x40 before the and) and of the
+   scroll DRAW (lw t1 before the add, addiu a3 before sh 0x4A) */
+#pragma rac2_sched2_order 1308 1305 1313 1333 1256 1310 1319
+#pragma rac2_sched2_order 1411 1394 1421 1391 1415 1396 1419 1399 1413 1417 1405 1402
 int func_US2_002CD670(unsigned char *w) {
     char buf[0x40];
     int id;
@@ -63,7 +69,7 @@ int func_US2_002CD670(unsigned char *w) {
     /* func_0027C878's TEX0 is 64 bits, and FontPrintWindow reads all of them: on the console the
        register keeps them whatever the C says, on a PC an int keeps only the low half. */
     long tex;
-    int clip, anchor, k;
+    int clip, anchor, k, sa, sb, ta, tb;
     int y, x; /* FAKEMATCH: y/x only serve the second scroll block below */
 
     font = 1;
@@ -255,12 +261,13 @@ int func_US2_002CD670(unsigned char *w) {
     set_anchor(&win, anchor);
     /* FAKEMATCH: dead shift/unshift on stand-in globals (RAC1 win_shift/win_unshift without the
        shadow DRAW), as in func_002CC6B0: combine cancels it and leaves USE insns at the block head. */
-    clip = D_001AB974; k = D_001AB9A8;
-    win.s[5] += clip; win.s[5] += k; win.s[5] -= clip;
+    sa = D_001AB974; sb = D_001AB9A8;
+    ta = sa; tb = sb;
+    win.s[5] += ta; win.s[5] += tb; win.s[5] -= ta;
     clip = *(int *)(w + 0x30);
     D_US2_001AB9D0 = *(int *)(w + 0x34);
     set_top(&win, win.s[0]);
-    win.s[5] -= k; /* FAKEMATCH: unshift after the s[0] copy */
+    win.s[5] -= tb; /* FAKEMATCH: unshift after the s[0] copy */
     k = 0x20000; /* FAKEMATCH: mask kept in the reused stand-in */
     clip &= k;
     if (clip) {

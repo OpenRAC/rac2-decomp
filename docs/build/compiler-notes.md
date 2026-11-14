@@ -400,6 +400,21 @@ callee save; left without a register, reload rematerialises the address at each 
 they match `func_PAL_L11_0045DCE0` (owner ruling, 14 November 2026). Controls:
 [test_l11_dce0_rules.py](../../tests/test_l11_dce0_rules.py).
 
+### The after-reload order hint and two rules of func_US2_002CD670 (opt-in)
+
+tools/compiler/transformers/sched2_order.py adds `-frac2-sched2-order`, the after-reload
+sibling of `-frac2-sched1-order`: the second scheduling pass issues the insns named by
+`#pragma rac2_sched2_order UID...` in list order, through the same hooks. It is an
+instruction-order hint, not a model of the retail compiler: a fakematch mechanism allowed only
+where AGENTS.md says. tools/compiler/transformers/cd670_rules.py adds, default off (forced-on
+corpus counts in brackets): `-frac2-sched-keep-live-length` (1315): the first scheduling pass
+may lengthen a register's recorded live length but never shortens it; and
+`-frac2-combine-keep-dead-sets` (1): combine marks a set left without uses REG_UNUSED instead of
+deleting it, for flow2 to remove. With dead user-variable copies and both order hints they match
+`func_US2_002CD670` (owner rulings, 14 November 2026). Controls:
+[test_sched2_order.py](../../tests/test_sched2_order.py),
+[test_cd670_rules.py](../../tests/test_cd670_rules.py).
+
 ### Four rules of func_002CC6B0 (opt-in)
 
 tools/compiler/transformers/cc6b0_rules.py adds, all default off (forced-on corpus counts in
@@ -2436,6 +2451,8 @@ oracle, and a same-size draft screen is not a match or current progress.
 | func_0034CEA0 rules (gcse, sched2, reload, alias, reorg, regmove) | [test_cea0_rules.py](../../tests/test_cea0_rules.py) |
 | PRE hash offsets fp-59 / parm-91 (PAL and USA v2.00 func_0034CEA0 copies) | [test_gcse_hash_fp_59.py](../../tests/test_gcse_hash_fp_59.py) |
 | PAL func_L11_004580E8 copy rules (sched1, global-alloc) | [test_l11_dce0_rules.py](../../tests/test_l11_dce0_rules.py) |
+| After-reload order hint (fakematch) | [test_sched2_order.py](../../tests/test_sched2_order.py) |
+| func_US2_002CD670 rules (sched1 live length, combine) | [test_cd670_rules.py](../../tests/test_cd670_rules.py) |
 | func_002CC6B0 rules (flow, local-alloc, sched1) | [test_cc6b0_rules.py](../../tests/test_cc6b0_rules.py) |
 | func_L04_00417308 rules (final, local-alloc, sched1, cse, loop, global-alloc) | [test_l04_17308_rules.py](../../tests/test_l04_17308_rules.py) |
 | func_L17_003E8A58 rules (stmt, combine, sched1, sched2) | [test_l17_rules.py](../../tests/test_l17_rules.py) |
