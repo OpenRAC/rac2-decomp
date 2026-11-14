@@ -1,23 +1,10 @@
-/* func_PAL_L11_0045DCE0 (2,500 bytes), NONMATCHING: the PAL copy of func_L11_004580E8
- * (src/levels/11_joba/L11_004580E8-fighter-g8.c). Build as its own unit with
- * -O2 -G8 -ffunction-sections -g -frac2-sched-call-addr-float -frac2-la-float-vars-last
- * -fno-rerun-loop-opt. 50 Hz changes: gravity 1/360 -> 0.004, particle life 120 -> 100, spark
- * frame count n -> (n * 5 + 2) / 6, case 5 rates and the spin clamp (0.004..0.12) rescaled.
- * 2500/2500 bytes, 0/1 places. A `Quad *c` for scratch.v.c makes gcse PRE number sp+0x40
- * before sp+0x30, so the preheader's integer order (i, sp+0x40, sp+0x30, 6) now matches.
- * Left: (1) FP constants in the preheader: retail 1.0, 0.3333, 45000; ours 0.3333, 45000, 1.0.
- * The three loads tie on every sched1 key (priority, weight, class, dependent count), so luid
- * decides: retail's order means 1.0 was hoisted by loop pass 1 (like 6) and 0.3333/45000 by the
- * -frerun-loop-opt pass. Plain constants with the rerun pass do that, but the rerun pass then
- * also hoists high(&D_L11_001A8F20) (cse2 stretches its life to 7) and leaves 45000 (life 1).
- * (2) Call setup: at sched1 cycle 56, high(&D_L11_001A8F20) (insn 320) and the split
- * lui $a3,0x8080 (1552) tie on priority/weight/class/deps; luid puts the high first, retail
- * issues lui $a3 first and the high just before its lo_sum; mov.s $f14 follows from that.
- * Swept singly: 57 sched/la/loop/ga switches and 55 cse/gcse/reload switches, plus
- * -mno-split-addresses and the rerun-loop switches: none improves.
- * The never-taken `skip` test keeps gcse PRE from hoisting &D_L11_001A8F20's %hi into $fp;
- * third as a user variable lets the first loop pass hoist 0.3333 so -fno-rerun-loop-opt keeps
- * the second pass from hoisting that %hi.
+/* func_PAL_L11_0045DCE0 (2,500 bytes): the PAL copy of func_L11_004580E8
+ * (src/levels/11_joba/L11_004580E8-fighter-g8.c). 50 Hz changes: gravity 1/360 -> 0.004, particle
+ * life 120 -> 100, spark frame count n -> (n * 5 + 2) / 6, case 5 rates and the spin clamp
+ * (0.004..0.12) rescaled. A `Quad *c` for scratch.v.c makes gcse PRE number sp+0x40 before sp+0x30.
+ * -frac2-sched-fp-const-temp-first orders the particle-loop preheader constants (1.0 first);
+ * -frac2-ga-addr-equiv-no-new-save keeps `axis` out of $fp so reload rematerialises it as `la`
+ * at the call, as in the v1.01 copy.
  */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
@@ -86,7 +73,7 @@ void func_PAL_L11_0045DCE0(char *p) {
   if(*(u8 *)(p+0x20)==3 && *(float *)(q+0xC8)<0) *(u8 *)(p+0x20)=2;
   func_00282978(q+0x16C);
   if(*(s16 *)(q+0x16C)) {
-   int skip=0; /* FAKEMATCH: never-taken test hides &D_L11_001A8F20 from gcse PRE */
+   Quad *axis=&D_L11_001A8F20;
    for(i=0;i<3;i++) {float third=0.3333f,scale=45000; /* FAKEMATCH: set-once copies so loop pass 1 hoists both */
     {Quad *c=(Quad *)scratch.v.c;*c=*(Quad *)(p+0x10);func_L00_0031D670(scratch.v.b,c,scratch.v.a,(float)i*third);}
     n=func_002A77E0(6);if(func_002A77E0(2))n=-n;
@@ -94,8 +81,7 @@ void func_PAL_L11_0045DCE0(char *p) {
     {
     float t=(float)*(s16 *)(q+0x16C)/f*scale+5000;
     Particle *particle;
-    if(skip)continue; /* FAKEMATCH: dead branch, see skip */
-    particle=func_002BDCE8(scratch.v.b,n,0.025f,1,1,&D_L11_001A8F20,0x80808080,0,t);
+    particle=func_002BDCE8(scratch.v.b,n,0.025f,1,1,axis,0x80808080,0,t);
     if(particle) {ParticleAttributes *attributes;particle->lifetime=100;attributes=&particle->attributes;attributes->mode=2;attributes->alpha=127;attributes->duration=(u8)particle->lifetime;}
     }
    }

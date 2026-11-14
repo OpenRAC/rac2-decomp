@@ -127,14 +127,15 @@ python3 $T/l04_17308_rules.py gcc
 python3 $T/l17_rules.py gcc
 python3 $T/l05_42b2c0_rules.py gcc
 python3 $T/gcse_hash_fp_59.py gcc
+python3 $T/l11_dce0_rules.py gcc
 sha256sum --check --quiet <<'SUMS'
 56ccede033f0d7041aeb573a89e79aeee2d635a18987403bee0a1e2d0370a44a  gcc/config/mips/mips.c
 e8b9e0234097ac5c9865812717b2b666c90f535cb114ceb5c579e911e78c972a  gcc/config/mips/mips.h
 790a54f4772853284ab43a7afc9f592913da8f012b46d43abf5f2a3660467eef  gcc/config/mips/mips.md
-f7f85a76e0b1598bc596bb91ea4a6d4b129a430f12a76cb01f078b5fa6765b2a  gcc/toplev.c
-a359fb4867609e631ca952101051c2d88fd26656ced2626ba050f5d9c9bea281  gcc/haifa-sched.c
+e67480d061a35bed2ab1f21b25c5f5c52ad2bbe9f9cf5a7ed5f3d0f4e82826c5  gcc/toplev.c
+93fc013939a54de9764d57c21c3e4565934d906cce4a26c43b6a04eb857c4e6d  gcc/haifa-sched.c
 85ce08b12f1222054a9e7e009314ed0aafe48f8612af7ba0c9d2f878087d8ee6  gcc/reorg.c
-a24b59d0d3a3077d85dada8d6327987762575ee0c7db02f85c54b936adecaedc  gcc/flags.h
+f2c893c27701fc503b8f098a69d86df9c0bb9a7a25344a99c5c029d173ca4d5c  gcc/flags.h
 d141934f9b0181c58b79b05eba17074d7e773b06749e541c35ce43dc759bc114  gcc/gcse.c
 ae0cc11c65f6ec520668b917bb5ef5052d52ee93964e8f06b5383be6b3e82a39  gcc/flow.c
 72941ee59459c038850f9c330c32c623d1290fad4a54444f9dfd3cb008dfdb0c  gcc/emit-rtl.c
@@ -145,7 +146,7 @@ fef520171c0efbdd9066fed9caf5485df7821796eb73fdb9783e6fdbecdd44ab  gcc/loop.c
 13587efab4dd4ff3a22bebb6ffa975a86fd1a46b9260e14786c93413cb0de1a6  gcc/cse.c
 734dc911b2b3764dc532eb95e3ddc886a94f6c9289a9686080db5e99d2221cd8  gcc/resource.c
 23fccc683e52141c78256e75795be2b6573cc2be5683247c86379d416f213729  gcc/expmed.c
-5af54a39f80de1661ed511d51abe5769158befe40d21d8ddf5cdc588c914c22d  gcc/global.c
+06f9cb7a772a5af1b5e7c883030505ff623ef499ac76fb4ab8c143b1558e8ea1  gcc/global.c
 c64b9016b3dd89b525f5fd0810acd3f7dcbde43b3d9d3fe4657ee486f36f0cbe  gcc/alias.c
 02e2157fd4ddbd3c0733e03faeceba4dbb5879ee50d0a53a81fb686fc561abf4  gcc/combine.c
 6164df9c2636274d06479453593f16aa01454ae99c3136179053d2adaa650bc6  gcc/local-alloc.c
@@ -245,6 +246,7 @@ RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l04_17308_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l17_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l05_42b2c0_rules.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_gcse_hash_fp_59.py"
+RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_l11_dce0_rules.py"
 python3 "$ROOT/tests/test_qcopy_rtl.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_dli_masks.py"
 RAC2_COMPILER_ROOT="$OUT" python3 "$ROOT/tests/test_hazard_labels.py"

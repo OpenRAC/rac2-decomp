@@ -387,6 +387,19 @@ menu object moves PRE's buckets (owner ruling, 14 November 2026). Forced on toge
 USA v1.01 C unit they change 117 functions. Controls:
 [test_gcse_hash_fp_59.py](../../tests/test_gcse_hash_fp_59.py).
 
+### Two rules of the PAL func_L11_004580E8 copy (opt-in)
+
+tools/compiler/transformers/l11_dce0_rules.py adds, default off (forced-on corpus counts in
+brackets): `-frac2-sched-fp-const-temp-first` (43): before reload, on a full tie between two
+floating-point constant loads into pseudos live beyond their block, the load into a compiler
+temporary goes before the load into a user variable (a sibling of
+`-frac2-sched-frame-temp-first`); `-frac2-ga-addr-equiv-no-new-save` (16): in global-alloc a
+call-crossing user variable set once to a constant address (REG_EQUIV of a SYMBOL_REF, LABEL_REF
+or CONST) does not take the only register left that nothing has used so far, one that would add a
+callee save; left without a register, reload rematerialises the address at each use. Together
+they match `func_PAL_L11_0045DCE0` (owner ruling, 14 November 2026). Controls:
+[test_l11_dce0_rules.py](../../tests/test_l11_dce0_rules.py).
+
 ### Four rules of func_002CC6B0 (opt-in)
 
 tools/compiler/transformers/cc6b0_rules.py adds, all default off (forced-on corpus counts in
@@ -2422,6 +2435,7 @@ oracle, and a same-size draft screen is not a match or current progress.
 | func_L04_0040AD28 rules (global-alloc, sched2) | [test_l04_ad28_rules.py](../../tests/test_l04_ad28_rules.py) |
 | func_0034CEA0 rules (gcse, sched2, reload, alias, reorg, regmove) | [test_cea0_rules.py](../../tests/test_cea0_rules.py) |
 | PRE hash offsets fp-59 / parm-91 (PAL and USA v2.00 func_0034CEA0 copies) | [test_gcse_hash_fp_59.py](../../tests/test_gcse_hash_fp_59.py) |
+| PAL func_L11_004580E8 copy rules (sched1, global-alloc) | [test_l11_dce0_rules.py](../../tests/test_l11_dce0_rules.py) |
 | func_002CC6B0 rules (flow, local-alloc, sched1) | [test_cc6b0_rules.py](../../tests/test_cc6b0_rules.py) |
 | func_L04_00417308 rules (final, local-alloc, sched1, cse, loop, global-alloc) | [test_l04_17308_rules.py](../../tests/test_l04_17308_rules.py) |
 | func_L17_003E8A58 rules (stmt, combine, sched1, sched2) | [test_l17_rules.py](../../tests/test_l17_rules.py) |

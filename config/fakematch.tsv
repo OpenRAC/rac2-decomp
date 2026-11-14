@@ -39,6 +39,7 @@ src/pal/game/0028DC40-g8.c	func_PAL_0028DC40	do { } while (0) group; its loop no
 src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	do { } while (0) adds loop notes, so flow counts the 0x70202080 register's refs at a deeper loop level; global then allocates it (s6) before `low`, as retail
 src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	volatile load, see above
 src/pal/game/0034F068-menu-g8.c	func_PAL_0034F068	volatile x store + volatile D_001B18D4 load below keep the x/y/color zero stores ahead of the slot-table load (retail +0x114..+0x124)
+src/pal/levels/11_joba/L11_0045DCE0-fighter-g8.c	func_PAL_L11_0045DCE0	set-once copies so loop pass 1 hoists both
 src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	`register` keeps t live to the end of its scope (-frac2-register-scope, retail's $f20); no-code copy chain of the 1.0 for state->f30 (tied in local-alloc, deleted by reload); its quantity holds $f2 over the init window like retail
 src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain copy
 src/pal/levels/17_smolg/L17_003ED568-fighter-g8.c	func_PAL_L17_003ED568	chain copy
