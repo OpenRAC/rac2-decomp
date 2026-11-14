@@ -19,7 +19,29 @@
  * loop around `a23 = w[0x20] / 2` does this); (2) clip block: retail `lui t0,2` before the subu,
  * ours `lui a1,2` after it (moving `k = 0x20000` earlier puts the lui before the sra instead);
  * (3) scroll block: retail builds &D_PAL_001F2840 first into t2 and issues sll before lhu s[7];
- * ours a3 and later (a set-once local for the address changes nothing, CSE folds it). */
+ * ours a3 and later (a set-once local for the address changes nothing, CSE folds it).
+ * 14 November 2026 (third pass, prototype -frac2-la-unweighted-refs plus -frac2-sched-const-first;
+ * C unchanged, 12 lines left: (2) and (3) above). Allocator evidence (tools/regalloc.py):
+ * - k (the mask) is a global allocno live only from its lui to the and; it conflicts with v0, v1, a0,
+ *   so it takes a1. In v1.01 and v2.00 CSE reuses k in the post-draw `& 0x20000` test, so k crosses
+ *   the draw and gets s0. Writing `& k` there here gives k s0 and moves the BF30 high part to s2:
+ *   s2, s3 and s4 are free across the clip block in retail too, so retail's k does not cross a call.
+ *   A set-once mask declared at the top is spilled and rematerialised (reload reg a1, lui before the
+ *   sra: 23 lines).
+ * - The scroll address (lo_sum of the spilled D_PAL_001F2840 high part, which crosses 8 calls and
+ *   is reloaded at each test) is block-local: local-alloc gives it a3. Retail's load comes before
+ *   the s[0]/s[5] stores, so its address has a known base: holding it in a multi-set user variable
+ *   (f0, a23, content...) makes it global (t0 with f0) but the load then waits for the stores
+ *   (2416 bytes). A set-once pointer assigned before the 0x400 test is global, takes a3, and its
+ *   high part lands in a1 as in retail (19 lines).
+ * - Moving the scroll stand-in loads into the previous block keeps them in code (2428 bytes; the
+ *   USE keeps them live through flow2), although k then takes t0 and m a2.
+ * - This compiler's reload (reload1.c, insn chains) picks reload regs round-robin (last_spill_reg)
+ *   over the whole function's spill set minus the regs occupied at the insn (finish_spills). Our
+ *   GPR spill set is v0..a2 (the struct copy takes v1, a0, a1, a2). If retail's t0/t2 are reload
+ *   regs, t0 and t2 must be in retail's spill set, which no visible retail insn explains.
+ * Next: find what puts a2..t1 out of reach at the scroll address (conflicts or regs_someone_prefers
+ * from a lower-priority allocno that does not cross a call) without code in the block. */
 #include "common.h"
 typedef struct { short s[12]; } Win;
 typedef struct { char pad[0x3C]; int so; } LabelSO;
